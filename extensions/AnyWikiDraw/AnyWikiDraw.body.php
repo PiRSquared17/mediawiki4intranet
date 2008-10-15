@@ -234,18 +234,18 @@ class AnyWikiDraw extends SpecialPage {
 		 * In some cases we may forbid overwriting of existing files.
 		 */
 		$overwrite = $this->checkOverwrite( $destName );
-		if( $overwrite !== true ) {
-			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
-					'[user '.$wgUser->getName().'] '.
-					$fname.' image may not be overwritten [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
-			header('HTTP/1.0 403 Forbidden');
-			exit("\n\n"+'<html><body>You are not allowed to overwrite this image.</body></html>');
-		}
+//		if( $overwrite !== true ) {
+//			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
+//					'[user '.$wgUser->getName().'] '.
+//					$fname.' image may not be overwritten [DrawingName='.$drawingName.']',
+//                true
+//            );
+//            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+//            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+//            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+//			header('HTTP/1.0 403 Forbidden');
+//			exit("\n\n"+'<html><body>You are not allowed to overwrite this image.</body></html>');
+//		}
 		
 		/* Don't allow users to override the blacklist (check file extension) */
 		global $wgStrictFileExtensions;

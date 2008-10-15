@@ -256,7 +256,7 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
             //       view URL as a query string. This way, we ensure,
             //       that the browser always displays the last edited version
             //       of the image
-			$output .= '<img '.
+			$imageblock = '<img '.
 				'src="'.$image->getViewUrl().
                     '?version='.$image->nextHistoryLine()->img_timestamp.'" '.
 				(($width != null) ? 'width="'.$width.'" ' : '').
@@ -265,6 +265,15 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 				'title="Image:'.$name.'" '.
 				(($isImageMap) ? 'usemap="#'.$mapId.'" ' : '').
 				'></img>';
+      if ($image->getMimeType()=="image/svg+xml"){  
+        $fullpath=$image->getURL();
+        $imageblock =<<<EOT
+<object type="image/svg+xml" width="{$width}" height="{$height}" data="$fullpath">        
+        {$imageblock }
+</object>      
+EOT;
+      }  
+ 			$output .= $imageblock;
 			if (! $isImageMap) {
 				$output .= '</a>';
 			}
