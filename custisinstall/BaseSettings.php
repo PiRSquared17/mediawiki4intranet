@@ -5,7 +5,7 @@ if( defined( 'MW_INSTALL_PATH' ) ) {
 	$IP = realpath(dirname( __FILE__ ) . "/..");
 }
 
-$path = array( $IP, "$IP/includes", "$IP/languages" );
+$path = array( $IP, "$IP/includes", "$IP/includes/specials","$IP/languages" );
 set_include_path( implode( PATH_SEPARATOR, $path ) . PATH_SEPARATOR . get_include_path() );
 
 require_once($IP . '/includes/DefaultSettings.php');
