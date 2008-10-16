@@ -124,7 +124,7 @@ lf=open("sphinxsearchd","w")
 lf.write(sphinxsearchd.replace("\r",""))
 lf.close()
 if os.name=="posix":
-  cmd="chmod a+x "+sphinxsearchd
+  cmd="chmod a+x sphinxsearchd"
   os.system(cmd)
 
 try:
