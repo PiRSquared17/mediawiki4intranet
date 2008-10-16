@@ -49,7 +49,8 @@ $wgImageMagickConvertCommand = "convert";
 # When you make changes to this configuration file, this will make
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
-
+$wgMainCacheType = CACHE_NONE;
+$wgMemCachedServers = array();
 
 $wgInterwikiMagic = false;
 
