@@ -132,8 +132,13 @@ try:
 except:
   pass
 
+try:
+  os.mkdir("cron.hourly")
+except:
+  pass
+
 for wiki in wikis:
-  ls="/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf inc_%(wikiname)s --rotate &> /dev/null" % wiki
+  ls="/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf main_%(wikiname)s --rotate &> /dev/null" % wiki
   ls="""#!/bin/sh
 
 %s
@@ -145,3 +150,16 @@ for wiki in wikis:
   if os.name=="posix":
     cmd="chmod a+x "+scriptname
     os.system(cmd)
+
+  ls="/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf inc_%(wikiname)s --rotate &> /dev/null" % wiki
+  ls="""#!/bin/sh
+
+%s
+""" % ls
+  scriptname="cron.hourly/reindex_%(wikiname)s" % wiki
+  lf=open(scriptname,"w")
+  lf.write(ls.replace("\r",""))
+  lf.close()
+  if os.name=="posix":
+    cmd="chmod a+x "+scriptname
+    os.system(cmd)    
