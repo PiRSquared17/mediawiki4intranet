@@ -169,4 +169,20 @@ for wiki in wikis:
   lf.close()
   if os.name=="posix":
     cmd="chmod a+x "+scriptname
-    os.system(cmd)    
+    os.system(cmd)
+    
+ls=""    
+for wiki in wikis:
+  ls+="\n/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf main_%(wikiname)s --all " % wiki
+ls="""#!/bin/sh
+
+%s
+""" % ls
+scriptname="reindex_all"
+lf=open(scriptname,"w")
+lf.write(ls.replace("\r",""))
+lf.close()
+if os.name=="posix":
+  cmd="chmod a+x "+scriptname
+  os.system(cmd)
+
