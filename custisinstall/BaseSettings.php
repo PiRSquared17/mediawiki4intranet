@@ -103,14 +103,13 @@ $wgUseImageMagick   = true;
 require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows()){
   $wgSVGConverterPath=realpath($IP."../../app/inkscape/");
-  //$wgImageMagickConvertCommand=realpath($IP."../../app/imagemagick/")."convert";
+  $wgImageMagickConvertCommand=realpath($IP."../../app/imagemagick/")."convert";
 }
-
 
 $wgLogo             = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
 $wgFavicon			    = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
 
 $wgDebugLogFile=false;
+$wgDefaultSkin = 'monobook';
 
-$wgDefaultSkin = 'custis';
 ?>
