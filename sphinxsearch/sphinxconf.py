@@ -78,13 +78,20 @@ searchd
   lf.write(ls)
   lf.close()
   
+wikis+=[{
+    "wikiname" : "wiki",
+    "sql_user" : "wiki",
+    "sql_pass" : "wiki",
+    "sql_db"	 : "wiki12",
+    "port"     : 3112,
+  }]
   
 
 wikis+=[{
     "wikiname" : "smwiki",
     "sql_user" : "smwiki",
     "sql_pass" : "smwiki",
-    "sql_db"	 : "smwiki13",
+    "sql_db"	 : "smwiki12",
     "port"     : 3113,
   }]
 
