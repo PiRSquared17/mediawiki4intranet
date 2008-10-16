@@ -105,7 +105,8 @@ if (wfIsWindows()){
   //$wgImageMagickConvertCommand=realpath($IP."../../app/imagemagick/")."convert";
 }
 
-
+$wgLogo             = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
+$wgFavicon			    = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
 
 $wgDefaultSkin = 'custis';
 ?>
