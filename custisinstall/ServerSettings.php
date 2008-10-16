@@ -14,5 +14,6 @@ $wgEnotifMinorEdits =true;
 $wgEmergencyContact = "stas@custis.ru";
 $wgPasswordSender = "stas@custis.ru";
 
+$wgAllowExternalImagesFrom = array( 'http://penguin.office.custis.ru/', 'http://svn.office.custis.ru/' );
 
 ?>
