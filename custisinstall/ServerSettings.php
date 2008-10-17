@@ -4,6 +4,8 @@ require_once($IP.'/custisinstall/BaseSettings.php');
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 $wgPageShowWatchingUsers = true;
 
+require_once($IP.'/extensions/Polls/poll.php');
+
 $wgEnableEmail      = true;
 $wgEnableUserEmail     = true;
 $wgEnotifUserTalk      = true; # UPO
