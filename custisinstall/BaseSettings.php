@@ -112,4 +112,6 @@ $wgFavicon			    = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
 $wgDebugLogFile=false;
 $wgDefaultSkin = 'monobook';
 
+$wgGroupPermissions['*']['edit'] = false;
+
 ?>
