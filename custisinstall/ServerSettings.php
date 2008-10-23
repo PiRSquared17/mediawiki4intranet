@@ -21,4 +21,10 @@ $wgAllowExternalImagesFrom = array( 'http://penguin.office.custis.ru/',
                                     'http://svn.office.custis.ru/',
                                     'http://plantime.office.custis.ru/');
 
+
+$wgSMTP = array("host" => 'localhost',
+           "IDHost" => 'custis.ru',
+           "port" => "25",
+           "auth" => false);
+
 ?>
