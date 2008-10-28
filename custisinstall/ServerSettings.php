@@ -16,6 +16,9 @@ $wgEnotifMinorEdits    = true;
 $wgEmergencyContact = "stas@custis.ru";
 $wgPasswordSender   = "stas@custis.ru";
 
+// Bug (Bug 43343), because detect VSD-files as application/msword
+$wgVerifyMimeType = false;
+
 $wgAllowExternalImages     = true;
 $wgAllowExternalImagesFrom = array( 'http://penguin.office.custis.ru/',
                                     'http://svn.office.custis.ru/',
