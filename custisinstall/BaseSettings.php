@@ -114,4 +114,9 @@ $wgDefaultSkin = 'monobook';
 
 $wgGroupPermissions['*']['edit'] = false;
 
+$wgSphinxTopSearchableCategory="Root";
+
+// Bug (Bug 43343), because detect VSD-files as application/msword, 
+// or incorrect define of .mm files 
+$wgVerifyMimeType = false;
 ?>
