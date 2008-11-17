@@ -1,6 +1,5 @@
 <?php
-
-require_once($IP.'/custisinstall/BaseSettings.php');
+require_once('BaseSettings.php');
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 $wgPageShowWatchingUsers = true;
 
