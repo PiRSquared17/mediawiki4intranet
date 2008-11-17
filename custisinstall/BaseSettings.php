@@ -77,6 +77,8 @@ $wgShowExceptionDetails = true;
 
 
 require_once($IP.'/extensions/ParserFunctions/ParserFunctions.php' );
+define( 'MW_PARSER_VERSION', '1.6.1' ); 
+require_once($IP.'/extensions/StringFunctions/StringFunctions.php' );
 require_once($IP.'/extensions/CharInsert/CharInsert.php' );
 require_once($IP.'/extensions/Cite/Cite.php');
 require_once($IP.'/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php');
@@ -95,6 +97,9 @@ require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
 require_once($IP.'/extensions/FreeMind/FreeMind.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
+
+require_once($IP. '/extensions/Calendar/Calendar.php');
+
 
 $wgSVGConverter="inkscape";
 
