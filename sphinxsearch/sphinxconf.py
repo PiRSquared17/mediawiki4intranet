@@ -82,7 +82,7 @@ wikis+=[{
     "wikiname" : "wiki",
     "sql_user" : "wiki",
     "sql_pass" : "wiki",
-    "sql_db"	 : "wiki12",
+    "sql_db"	 : "wiki13",
     "port"     : 3112,
   }]
   
@@ -91,7 +91,7 @@ wikis+=[{
     "wikiname" : "smwiki",
     "sql_user" : "smwiki",
     "sql_pass" : "smwiki",
-    "sql_db"	 : "smwiki12",
+    "sql_db"	 : "smwiki13",
     "port"     : 3113,
   }]
 
