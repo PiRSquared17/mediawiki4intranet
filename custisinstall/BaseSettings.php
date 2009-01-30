@@ -107,8 +107,9 @@ $wgUseImageMagick   = true;
 
 require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows()){
-  $wgSVGConverterPath=realpath($IP."../../app/inkscape/");
-  $wgImageMagickConvertCommand=realpath($IP."../../app/imagemagick/")."convert";
+  $wgSVGConverterPath=realpath($IP."/../../app/inkscape/");
+  $wgImageMagickConvertCommand=realpath($IP."/../../app/imagemagick")."/convert.exe";
+  $wgUseImageMagick=false;
 }
 
 $wgLogo             = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
