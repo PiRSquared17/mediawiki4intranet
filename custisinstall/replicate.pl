@@ -6,6 +6,7 @@ use strict;
 use Time::HiRes;
 use File::Temp qw(tempfile);
 use LWP::UserAgent;
+use HTTP::Date;
 use HTTP::Request::Common;
 use HTTP::Async::Polite;
 use HTML::Entities;
@@ -97,16 +98,36 @@ exit;
 sub enqueue
 {
     my ($url, $wikiurl, $towiki, $topath, $q) = @_;
-    print "ENQ $url\n";
     if ($url =~ s/^$wikiurl\/*//s)
     {
         my $fh;
-        print "GET $wikiurl/$url --> $topath/$url\n";
-        if (open $fh, ">$topath/$url")
+        my @mtime = ([stat "$topath/$url"]->[9]);
+        # Чтобы не перезасасывать неизменённые файлы
+        if ($mtime[0])
+        {
+            @mtime = (If_Modified_Since => time2str($mtime[0]));
+        }
+        else
+        {
+            @mtime = ();
+        }
+        if (open $fh, "+<", "$topath/$url")
         {
             binmode $fh;
             push @{$q->{fh}}, $fh;
-            $q->{async}->add_with_opts(GET("$wikiurl/$url"), { callback => sub { print $fh $_[0] } });
+            $q->{async}->add_with_opts(
+                GET("$wikiurl/$url", @mtime),
+                {
+                    callback => sub
+                    {
+                        if (length $_[0])
+                        {
+                            truncate $fh, 0 unless tell $fh;
+                            print $fh $_[0];
+                        }
+                    }
+                }
+            );
             return $towiki.'/'.$url;
         }
     }
