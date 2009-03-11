@@ -1,0 +1,47 @@
+Index: EditPage.php
+===================================================================
+--- EditPage.php	(revision 47934)
++++ EditPage.php	(working copy)
+@@ -1897,7 +1897,7 @@
+ 			array(
+ 				'image'  => $wgLang->getImageFile('button-sig'),
+ 				'id'     => 'mw-editbutton-signature',
+-				'open'   => '--~~~~',
++				'open'   => '~~~~',
+ 				'close'  => '',
+ 				'sample' => '',
+ 				'tip'    => wfMsg('sig_tip'),
+Index: specials/SpecialExport.php
+===================================================================
+--- specials/SpecialExport.php	(revision 47934)
++++ specials/SpecialExport.php	(working copy)
+@@ -212,12 +212,10 @@
+ 			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
+ 		}
+ 
+-		/*
+ 		// Enable this when we can do something useful exporting/importing image information. :)
+ 		if( $wgRequest->getCheck( 'images' ) ) {
+ 			$pageSet = wfExportGetImages( $inputPages, $pageSet );
+ 		}
+-		*/
+ 
+ 		$pages = array_keys( $pageSet );
+ 
+@@ -226,6 +224,7 @@
+ 		$db = wfGetDB( DB_SLAVE );
+ 		$exporter = new WikiExporter( $db, $history );
+ 		$exporter->list_authors = $list_authors ;
++		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
+ 		$exporter->openStream();
+ 
+ 		foreach( $pages as $page ) {
+@@ -275,7 +274,7 @@
+ 	}
+ 	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
+ 	// Enable this when we can do something useful exporting/importing image information. :)
+-	//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
++	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
+ 	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
+ 
+ 	$form .= Xml::submitButton( wfMsg( 'export-submit' ) );
