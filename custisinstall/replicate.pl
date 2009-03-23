@@ -17,6 +17,7 @@ use File::Path 2.07;
 use File::Temp;
 use Time::HiRes qw(CLOCK_REALTIME clock_gettime);
 use LWP::UserAgent;
+use Digest::SHA1;
 
 use MIME::Base64;
 use URI::Escape;
@@ -117,9 +118,13 @@ $img = array(
 EOF
     for (@{$q->{fnseq}})
     {
-        print PHP "'$_' => '".$q->{fhby}->{$_}->filename."',\n";
         $total += tell $q->{fhby}->{$_};
         close $q->{fhby}->{$_};
+        if (sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+        {
+            # Проверяем контрольные суммы
+            print PHP "'$_' => '".$q->{fhby}->{$_}->filename."',\n";
+        }
     }
     print PHP <<'EOF';
 );
@@ -205,6 +210,7 @@ sub enqueue
     # in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php on line 15
     return $towiki.'/'.$url if $fn =~ /!/;
     my @mtime = ([stat $fn]->[9]);
+    my $hash = $mtime[0] ? sha1_file($fn) : '';
     # Чтобы не перезасасывать неизменённые файлы
     if (!$force && $mtime[0])
     {
@@ -216,6 +222,7 @@ sub enqueue
     }
     push @mtime, Authorization => $auth if $auth;
     $fn =~ s/^.*\///so;
+    $q->{sha1}->{$fn} = $hash;
     $q->{async}->add_with_opts(
         GET("$wikiurl/$url", @mtime),
         {
@@ -282,6 +289,20 @@ sub read_config
     }
     return undef unless keys %$cfg;
     return $cfg;
+}
+
+sub sha1_file
+{
+    my ($fn) = @_;
+    my $hash = '';
+    if (open FH, "<$fn")
+    {
+        $hash = Digest::SHA1->new;
+        $hash->addfile(*FH);
+        $hash = $hash->hexdigest;
+        close FH;
+    }
+    return $hash;
 }
 
 package MYLWPUserAgent;
