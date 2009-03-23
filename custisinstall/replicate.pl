@@ -40,6 +40,7 @@ Config file fragment syntax (Replace __Test__ with desired [target] name):
 URL=<source wiki url>
 Category=<source category name>
 FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
+ForceImageDownload=<'yes' or 'no' (default), 'yes' means force image fetching>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 
@@ -94,7 +95,7 @@ sub replicate
         sub
         {
             # Меняем ссылки в тексте (тупо регэкспом) и параллельно (HTTP::Async) сливаем картинки
-            $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth).$3/egiso;
+            $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
             print $fh $_[0];
         }
     );
@@ -189,7 +190,7 @@ EOF
 
 sub enqueue
 {
-    my ($url, $wikiurl, $towiki, $topath, $q, $auth) = @_;
+    my ($url, $wikiurl, $towiki, $topath, $q, $auth, $force) = @_;
     $url =~ s/^$wikiurl//s;
     $url =~ s/^\/*//so;
     # Уже поставлено в очередь?
@@ -205,7 +206,7 @@ sub enqueue
     return $towiki.'/'.$url if $fn =~ /!/;
     my @mtime = ([stat $fn]->[9]);
     # Чтобы не перезасасывать неизменённые файлы
-    if ($mtime[0])
+    if (!$force && $mtime[0])
     {
         @mtime = (If_Modified_Since => time2str($mtime[0]));
     }
@@ -266,7 +267,7 @@ sub read_config
             {
                 $v =~ s!/+$!!so;
             }
-            elsif ($k eq 'fullhistory')
+            elsif ($k eq 'fullhistory' || $k eq 'forceimagedownload')
             {
                 $v = lc $v;
                 $v = $v eq 'yes' || $v eq 'true' || $v eq 'on' || $v eq '1' ? 1 : 0;
