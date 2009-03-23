@@ -120,7 +120,7 @@ EOF
     {
         $total += tell $q->{fhby}->{$_};
         close $q->{fhby}->{$_};
-        if (sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+        if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
         {
             # Проверяем контрольные суммы
             print PHP "'$_' => '".$q->{fhby}->{$_}->filename."',\n";
