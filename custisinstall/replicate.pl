@@ -111,10 +111,10 @@ sub replicate
     # Публикуем картинки, вызывая PHP код :-!
     print "[$targetname] Invoking PHP\n";
     open PHP, '| php';
-    print PHP <<'EOF';
+    print PHP <<EOF;
 <?php
-require_once "../maintenance/commandLine.inc";
-$img = array(
+require_once "$dest->{path}/maintenance/commandLine.inc";
+\$img = array(
 EOF
     for (@{$q->{fnseq}})
     {
