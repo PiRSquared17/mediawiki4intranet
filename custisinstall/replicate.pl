@@ -67,7 +67,7 @@ sub replicate
     my $ua = MYLWPUserAgent->new;
     $ua->cookie_jar(HTTP::Cookies->new);
     my $uri = URI->new($src->{url})->canonical;
-    $ua->credentials($uri->host.':'.$uri->port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
+    $ua->credentials($uri->host_port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
     # Читаем список страниц категории
     my $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
     die "[$targetname] Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
@@ -111,7 +111,7 @@ sub replicate
     print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", scalar(@{$q->{fh}}), $total, $ti-$tx);
     # Логинимся по назначению, если надо
     $uri = URI->new($dest->{url})->canonical;
-    $ua->credentials($uri->host.':'.$uri->port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
+    $ua->credentials($uri->host_port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
     if ($dest->{user} && $dest->{password})
     {
         $response = $ua->request(POST("$dest->{url}/index.php?title=Special:UserLogin&action=submitlogin&type=login",
@@ -247,7 +247,7 @@ use base 'LWP::UserAgent';
 sub get_basic_credentials
 {
     my ($self, $realm, $uri, $proxy) = @_;
-    return $self->credentials($uri->host_port, undef);
+    return @{ $self->{basic_authentication}->{$uri->host_port}->{""} || [] };
 }
 
 1;
