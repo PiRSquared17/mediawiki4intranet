@@ -14,10 +14,11 @@ BEGIN
 use lib qw(.);
 use URI;
 use File::Path 2.07;
-use File::Temp qw(tempfile);
+use File::Temp;
 use Time::HiRes qw(CLOCK_REALTIME clock_gettime);
 use LWP::UserAgent;
 
+use MIME::Base64;
 use URI::Escape;
 use HTTP::Cookies;
 use HTTP::Date;
@@ -78,7 +79,10 @@ sub replicate
     my $ts = clock_gettime(CLOCK_REALTIME);
     my $q = { async => HTTP::Async->new };
     # Читаем экспортную XML-ку
-    my ($fh, $fn) = tempfile();
+    my $fh = File::Temp->new;
+    my $fn = $fh->filename;
+    my $auth;
+    $auth = 'Basic '.encode_base64($src->{basiclogin}.':'.$src->{basicpassword}) if $src->{basiclogin};
     $response = $ua->request(
         POST("$src->{url}/index.php?title=Special:Export&action=submit", [
             templates  => 1,
@@ -90,7 +94,7 @@ sub replicate
         sub
         {
             # Меняем ссылки в тексте (тупо регэкспом) и параллельно (HTTP::Async) сливаем картинки
-            $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q).$3/egiso;
+            $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth).$3/egiso;
             print $fh $_[0];
         }
     );
@@ -102,13 +106,55 @@ sub replicate
     # Дожидаемся сливания картинок
     my $total = 0;
     1 while my $response = $q->{async}->wait_for_next_response;
-    for (@{$q->{fh}})
+    # Публикуем картинки, вызывая PHP код :-!
+    print "[$targetname] Invoking PHP\n";
+    open PHP, '| php';
+    print PHP <<'EOF';
+<?php
+require_once "../maintenance/commandLine.inc";
+$img = array(
+EOF
+    for (@{$q->{fnseq}})
     {
-        $total += tell $_;
-        close $_;
+        print PHP "'$_' => '".$q->{fhby}->{$_}->filename."',\n";
+        $total += tell $q->{fhby}->{$_};
+        close $q->{fhby}->{$_};
     }
+    print PHP <<'EOF';
+);
+foreach ($img as $base => $file)
+{
+    echo "Importing $file into Image:$base\n";
+    # Validate a title
+    $title = Title::makeTitleSafe(NS_IMAGE, $base);
+    if (!is_object($title))
+    {
+        echo "{$base} could not be imported; a valid title cannot be produced\n";
+        continue;
+    }
+    # Check existence
+    $image = wfLocalFile($title);
+    if ($image->exists())
+        echo "{$base} exists, overwriting...";
+    else
+        echo "Importing {$base}...";
+    # Import the file
+    $archive = $image->publish($file);
+    if (WikiError::isError($archive) || !$archive->isGood())
+    {
+        echo "failed.\n";
+        continue;
+    }
+    if ($image->recordUpload($archive->value, 'Imported image'))
+        echo "done.\n";
+    else
+        echo "failed.\n";
+}
+EOF
+    # выполняем, что понаписали
+    close PHP;
     my $ti = clock_gettime(CLOCK_REALTIME);
-    print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", scalar(@{$q->{fh}}), $total, $ti-$tx);
+    print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", scalar(keys %{$q->{fhby}}), $total, $ti-$tx);
     # Логинимся по назначению, если надо
     $uri = URI->new($dest->{url})->canonical;
     $ua->credentials($uri->host_port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
@@ -143,12 +189,20 @@ sub replicate
 
 sub enqueue
 {
-    my ($url, $wikiurl, $towiki, $topath, $q) = @_;
+    my ($url, $wikiurl, $towiki, $topath, $q, $auth) = @_;
     $url =~ s/^$wikiurl//s;
     $url =~ s/^\/*//so;
+    # Уже поставлено в очередь?
+    return $towiki.'/'.$url if $q->{alr}->{$url};
+    $q->{alr}->{$url} = 1;
     my $fh;
     my $fn = "$topath/$url";
     $fn = uri_unescape($fn);
+    # архивные картинки вызывают странные баги в MediaWiki, так что пропускаем их.
+    # - баги типа Fatal error: Cannot redeclare wfspecialupload() (previously
+    # declared in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php:12)
+    # in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php on line 15
+    return $towiki.'/'.$url if $fn =~ /!/;
     my @mtime = ([stat $fn]->[9]);
     # Чтобы не перезасасывать неизменённые файлы
     if ($mtime[0])
@@ -159,38 +213,27 @@ sub enqueue
     {
         @mtime = ();
     }
-    my $path = $fn;
-    $path =~ s!/*[^/]*$!!so;
-    mkpath($path) unless -d $path;
-    # Уже поставлено в очередь?
-    return $towiki.'/'.$url if $q->{alr}->{$url};
-    $q->{alr}->{$url} = 1;
-    my $e = -e $fn;
-    if ($e && open ($fh, "+<", $fn) ||
-        !$e && open ($fh, ">", $fn))
-    {
-        binmode $fh;
-        push @{$q->{fh}}, $fh;
-        $q->{async}->add_with_opts(
-            GET("$wikiurl/$url", @mtime),
+    push @mtime, Authorization => $auth if $auth;
+    $fn =~ s/^.*\///so;
+    $q->{async}->add_with_opts(
+        GET("$wikiurl/$url", @mtime),
+        {
+            callback => sub
             {
-                callback => sub
+                if (length $_[0])
                 {
-                    if (length $_[0])
+                    my $fh;
+                    unless ($fh = $q->{fhby}->{$fn})
                     {
-                        truncate $fh, 0 unless tell $fh;
-                        print $fh $_[0];
+                        $fh = $q->{fhby}->{$fn} = File::Temp->new();
+                        push @{$q->{fnseq}}, $fn;
                     }
+                    print $fh $_[0];
                 }
             }
-        );
-        return $towiki.'/'.$url;
-    }
-    else
-    {
-        warn "Could not write into $fn: $!";
-    }
-    return $url;
+        }
+    );
+    return $towiki.'/'.$url;
 }
 
 sub read_config
