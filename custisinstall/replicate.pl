@@ -3,8 +3,15 @@
 # Реплицирует как сами статьи, так и изображения, используемые в них
 
 use strict;
-use lib qw(.);
 
+BEGIN
+{
+    require File::Basename;
+    my ($a) = $0 =~ /^(.*)$/iso;
+    chdir(File::Basename::dirname($a));
+}
+
+use lib qw(.);
 use URI;
 use File::Path 2.07;
 use File::Temp qw(tempfile);
