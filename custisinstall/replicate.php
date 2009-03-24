@@ -29,6 +29,7 @@ BasicPassword=<HTTP basic auth password, if needed>
 [__Test__DestinationWiki]
 URL=<destination wiki url>
 Path=<destination wiki installation path>
+SwitchUser=<UNIX username to change to before copying files into Wiki directory>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 User=<name of a user having import rights in destination wiki>
@@ -126,6 +127,7 @@ function replicate($src, $dest, $targetname)
     array_push($temps, $listfile = tempnam('/tmp', 'list'));
     if (!($listfh = fopen($listfile, "wb")))
         return "Could not write into temporary file $listfile";
+    chmod($listfile, 0644);
     $publish = 0;
     foreach ($q[filenames] as $base => $file)
     {
@@ -142,7 +144,12 @@ function replicate($src, $dest, $targetname)
     }
     fclose($listfh);
     if ($publish > 0)
-        system("$dest[path]/custisinstall/loadimages.php < $listfile");
+    {
+        $cmd = "$dest[path]/custisinstall/loadimages.php < $listfile";
+        if ($dest[switchuser])
+            $cmd = "su $dest[switchuser] -s /bin/sh -c '$cmd'";
+        system($cmd);
+    }
     $ti = gettimeofday();
     $ti = $ti[sec] + $ti[usec]/1000000;
     print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", count($q[filenames]), $total, $ti-$tx);
@@ -212,7 +219,12 @@ function enqueue ($url, $wikiurl, $towiki, $topath, &$q, $auth, $force)
         return $towiki.'/'.$url;
     $curl = curl_init("$wikiurl/$url");
     array_push($temps, $tmpfn = tempnam('/tmp', 'img'));
-    $tmpfh = fopen($tmpfn, "wb");
+    if (!($tmpfh = fopen($tmpfn, "wb")))
+    {
+        echo "Can't write into $tmpfn\n";
+        return $towiki.'/'.$url;
+    }
+    chmod($tmpfn, 0644);
     curl_setopt_array($curl, array(
         CURLOPT_HEADER      => 0,
         CURLOPT_COOKIEFILE  => $cookiefile,
