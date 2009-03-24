@@ -40,8 +40,6 @@ EOF
 if (!function_exists('curl_init'))
     die("This script needs cURL extension to work - please enable it in your php.ini\n");
 
-require_once "../maintenance/commandLine.inc";
-
 $temps = array();
 $targets = array_map("strtolower", $argv);
 if (!count($targets))
@@ -125,6 +123,10 @@ function replicate($src, $dest, $targetname)
         curl_multi_exec($q[async], $still);
     # Публикуем картинки, вызывая код медиавики
     $total = 0;
+    array_push($temps, $listfile = tempnam('/tmp', 'list'));
+    if (!($listfh = fopen($listfile, "wb")))
+        return "Could not write into temporary file $listfile";
+    $publish = 0;
     foreach ($q[filenames] as $base => $file)
     {
         fseek($q[fhby][$base], 0, 2);
@@ -134,33 +136,13 @@ function replicate($src, $dest, $targetname)
         curl_close($q[curl][$base]);
         if ($tell && ($src[forceimagedownload] || sha1_file($file) != $q[sha1sum][$base]))
         {
-            echo "Importing $file into Image:$base...";
-            # Validate a title
-            $title = Title::makeTitleSafe(NS_IMAGE, $base);
-            if (is_object($title))
-            {
-                # Check existence
-                $image = wfLocalFile($title);
-                if ($image->exists())
-                    echo "overwriting...";
-                else
-                    echo "adding...";
-                # Import the file
-                $archive = $image->publish($file);
-                if (!WikiError::isError($archive) && $archive->isGood())
-                {
-                    if ($image->recordUpload($archive->value, 'Imported image'))
-                        echo "done.\n";
-                    else
-                        echo "failed: could not log upload.\n";
-                }
-                else
-                    echo "failed: could not publish.\n";
-            }
-            else
-                echo "failed: invalid title.\n";
+            $publish++;
+            fwrite($listfh, "$base\n$file\n");
         }
     }
+    fclose($listfh);
+    if ($publish > 0)
+        system("$dest[path]/custisinstall/loadimages.php < $listfile");
     $ti = gettimeofday();
     $ti = $ti[sec] + $ti[usec]/1000000;
     print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", count($q[filenames]), $total, $ti-$tx);
