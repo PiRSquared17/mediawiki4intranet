@@ -22,6 +22,7 @@ Config file fragment syntax (Replace __Test__ with desired [target] name):
 URL=<source wiki url>
 Category=<source category name>
 FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
+ForceImageDownload=<'yes' or 'no' (default), 'yes' means force image fetching>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 
