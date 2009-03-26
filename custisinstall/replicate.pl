@@ -48,6 +48,7 @@ BasicPassword=<HTTP basic auth password, if needed>
 [__Test__DestinationWiki]
 URL=<destination wiki url>
 Path=<destination wiki installation path>
+Remote=<username\@server for remote image publishing via SCP/SSH>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 User=<name of a user having import rights in destination wiki>
@@ -130,28 +131,54 @@ sub replicate
     # Дожидаемся сливания картинок
     my $total = 0;
     1 while my $response = $q->{async}->wait_for_next_response;
-    # Публикуем картинки, вызывая PHP код :-!
-    my $listfh = File::Temp->new;
-    my $listfn = $listfh->filename;
-    my $publish = 0;
-    for (@{$q->{fnseq}})
+    unless ($dest->{remote})
     {
-        $total += tell $q->{fhby}->{$_};
-        close $q->{fhby}->{$_};
-        # Проверяем контрольные суммы
-        if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+        # Публикуем картинки локально, вызывая PHP код
+        my $listfh = File::Temp->new;
+        my $listfn = $listfh->filename;
+        my $publish = 0;
+        for (@{$q->{fnseq}})
         {
-            print $listfh "$_\n".$q->{fhby}->{$_}->filename."\n";
-            $publish++;
+            $total += tell $q->{fhby}->{$_};
+            close $q->{fhby}->{$_};
+            # Проверяем контрольные суммы
+            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+            {
+                print $listfh "$_\n".$q->{fhby}->{$_}->filename."\n";
+                $publish++;
+            }
+        }
+        if ($publish > 0)
+        {
+            print "[$targetname] Invoking PHP\n";
+            my $cmd = "$dest->{path}/custisinstall/loadimages.php < $listfn";
+            $cmd = "su $dest->{switchuser} -s /bin/sh -c '$cmd'" if $dest->{switchuser};
+            system($cmd);
         }
     }
-    if ($publish > 0)
+    else
     {
-        print "[$targetname] Invoking PHP\n";
-        $cmd = "$dest->{path}/custisinstall/loadimages.php < $listfn";
-        if ($dest->{switchuser})
-            $cmd = "su $dest->{switchuser} -s /bin/sh -c '$cmd'";
-        system($cmd);
+        # Публикуем картинки удалённо, по SCP, на другом конце ожидается ./inimages.pl
+        my @publish = ();
+        for (@{$q->{fnseq}})
+        {
+            $total += tell $q->{fhby}->{$_};
+            close $q->{fhby}->{$_};
+            # Проверяем контрольные суммы
+            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+            {
+                push @publish, $q->{fhby}->{$_}->filename;
+            }
+        }
+        if (@publish)
+        {
+            print "[$targetname] Pausing $dest->{path} monitoring on $dest->{remote}";
+            system "ssh '$dest->{remote}' -o BatchMode=yes -c 'touch $dest->{path}/.pause'";
+            print "[$targetname] Uploading ".scalar(@publish)." objects to $dest->{remote}:$dest->{path}/";
+            system "scp -B ".join(" ", map { "'$_'" } @publish)." '$dest->{remote}:$dest->{path}/'";
+            print "[$targetname] Resuming $dest->{path} monitoring on $dest->{remote}";
+            system "ssh '$dest->{remote}' -o BatchMode=yes -c 'rm $dest->{path}/.pause'";
+        }
     }
     my $ti = clock_gettime(CLOCK_REALTIME);
     print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", scalar(keys %{$q->{fhby}}), $total, $ti-$tx);
@@ -227,7 +254,7 @@ sub enqueue
                     my $fh;
                     unless ($fh = $q->{fhby}->{$fn})
                     {
-                        $fh = $q->{fhby}->{$fn} = File::Temp->new();
+                        $fh = $q->{fhby}->{$fn} = File::Temp->new(SUFFIX => '-'.unpack('H*', $fn));
                         push @{$q->{fnseq}}, $fn;
                     }
                     print $fh $_[0];
