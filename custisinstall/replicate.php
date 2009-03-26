@@ -64,14 +64,30 @@ function xmlfh_repl_cb($m)
 
 function xmlfh_trans_write($curl, $content)
 {
-    global $xmlfh;
-    fwrite($xmlfh, preg_replace_callback('#(<src[^<>]*>)(.*?)(<\/src\s*>)#is', 'xmlfh_repl_cb', $content));
-    return strlen($content);
+    global $xmlfh, $in_censored;
+    $len = strlen($content);
+    $content = preg_replace_callback('#(<src[^<>]*>)(.*?)(<\/src\s*>)#is', 'xmlfh_repl_cb', $content);
+    $content = preg_split('#&lt;!--\s*begindsp\s*--&gt;#is', $content);
+    if (!$in_censored)
+        $text = $content[0];
+    else
+        $text = '';
+    for ($i = $in_censored ? 0 : 1; $i < count($content); $i++)
+    {
+        $in_censored = true;
+        if (preg_match('#&lt;!--\s*enddsp\s*--&gt;(.*)$#is', $content[$i], $m))
+        {
+            $text .= $m[1];
+            $in_censored = false;
+        }
+    }
+    fwrite($xmlfh, $text);
+    return $len;
 }
 
 function replicate($src, $dest, $targetname)
 {
-    global $temps, $xmlfh, $enqa, $cookiefile, $q;
+    global $temps, $xmlfh, $enqa, $cookiefile, $q, $in_censored;
     $curl = curl_init("$src[url]/index.php?title=Special:Export&action=submit");
     # Читаем список страниц категории
     curl_setopt_array($curl, array(
@@ -102,6 +118,7 @@ function replicate($src, $dest, $targetname)
     $curl = curl_init("$src[url]/index.php?title=Special:Export&action=submit");
     $xmlfh = $fh;
     $enqa = array($src[url], $dest[url], $dest[path], $src[basiclogin] ? $src[basiclogin].':'.$src[basicpassword] : '', $src[forceimagedownload]);
+    $in_censored = false;
     curl_setopt_array($curl, array(
         CURLOPT_POST          => 1,
         CURLOPT_HEADER        => 0,
