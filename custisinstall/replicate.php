@@ -67,7 +67,7 @@ function xmlfh_trans_write($curl, $content)
     global $xmlfh, $in_censored;
     $len = strlen($content);
     $content = preg_replace_callback('#(<src[^<>]*>)(.*?)(<\/src\s*>)#is', 'xmlfh_repl_cb', $content);
-    $content = preg_split('#&lt;!--\s*begindsp\s*--&gt;#is', $content);
+    $content = preg_split('#&lt;!--\s*begindsp@\s*--&gt;#is', $content);
     if (!$in_censored)
         $text = $content[0];
     else
@@ -75,7 +75,7 @@ function xmlfh_trans_write($curl, $content)
     for ($i = $in_censored ? 0 : 1; $i < count($content); $i++)
     {
         $in_censored = true;
-        if (preg_match('#&lt;!--\s*enddsp\s*--&gt;(.*)$#is', $content[$i], $m))
+        if (preg_match('#&lt;!--\s*enddsp@\s*--&gt;(.*)$#is', $content[$i], $m))
         {
             $text .= $m[1];
             $in_censored = false;
