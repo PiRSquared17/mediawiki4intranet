@@ -18,6 +18,7 @@ use File::Temp;
 use Time::HiRes qw(CLOCK_REALTIME clock_gettime);
 use LWP::UserAgent;
 use Digest::SHA1;
+use IPC::Run;
 
 use MIME::Base64;
 use URI::Escape;
@@ -49,6 +50,7 @@ BasicPassword=<HTTP basic auth password, if needed>
 URL=<destination wiki url>
 Path=<destination wiki installation path>
 Remote=<username\@server for remote image publishing via SCP/SSH>
+RemoteIncoming=<incoming image path on remote server>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 User=<name of a user having import rights in destination wiki>
@@ -103,8 +105,8 @@ sub replicate
             $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
             $text = $_[0];
             $_[0] = '';
-            while (!$in_censored && $text =~ /&lt;!--\s*begindsp\s*\@\s*--&gt;/iso ||
-                $in_censored && $text =~ /&lt;!--\s*enddsp\s*\@\s*--&gt;/iso)
+            while (!$in_censored && $text =~ /&lt;!--\s*begindsp\s*\@?\s*--&gt;/iso ||
+                    $in_censored && $text =~ /&lt;!--\s*enddsp\s*\@?\s*--&gt;/iso)
             {
                 if (!$in_censored)
                 {
@@ -114,12 +116,11 @@ sub replicate
                 }
                 else
                 {
-                    $_[0] .= $';
                     $text = $';
                     $in_censored = 0;
                 }
             }
-            $_[0] = $text if !$_[0] && !$in_censored && $text;
+            $_[0] .= $text if !$in_censored && $text;
             print $fh $_[0];
         }
     );
@@ -142,7 +143,7 @@ sub replicate
             $total += tell $q->{fhby}->{$_};
             close $q->{fhby}->{$_};
             # Проверяем контрольные суммы
-            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne sha1_file($q->{expath}->{$_}))
             {
                 print $listfh "$_\n".$q->{fhby}->{$_}->filename."\n";
                 $publish++;
@@ -160,24 +161,42 @@ sub replicate
     {
         # Публикуем картинки удалённо, по SCP, на другом конце ожидается ./inimages.pl
         my @publish = ();
+        my ($in, $out, $rd, $do, $sha1);
+        $rd = IPC::Run::start(['ssh', $dest->{remote}, '-o', 'BatchMode=yes'], \$in, \$out);
+        die "[$targetname] Failed to open SSH session to '$dest->{remote}'"
+            unless $rd;
         for (@{$q->{fnseq}})
         {
             $total += tell $q->{fhby}->{$_};
             close $q->{fhby}->{$_};
             # Проверяем контрольные суммы
-            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne $q->{sha1}->{$_})
+            $do = $src->{forceimagedownload};
+            if (!$do)
             {
-                push @publish, $q->{fhby}->{$_}->filename;
+                $| = 1;
+                $in .= "sha1sum '$q->{expath}->{$_}'\n";
+                IPC::Run::pump($rd) until $out =~ /\Q$q->{expath}->{$_}\E/s;
+                if ($out =~ /([a-f0-9]{40})\s*\Q$q->{expath}->{$_}\E/s)
+                {
+                    $sha1 = $1;
+                }
+                else
+                {
+                    $sha1 = '';
+                }
+                $do = 1 if sha1_file($q->{fhby}->{$_}->filename) ne $sha1;
             }
+            push @publish, $q->{fhby}->{$_}->filename if $do;
         }
+        IPC::Run::finish($rd);
         if (@publish)
         {
-            print "[$targetname] Pausing $dest->{path} monitoring on $dest->{remote}";
-            system "ssh '$dest->{remote}' -o BatchMode=yes -c 'touch $dest->{path}/.pause'";
-            print "[$targetname] Uploading ".scalar(@publish)." objects to $dest->{remote}:$dest->{path}/";
-            system "scp -B ".join(" ", map { "'$_'" } @publish)." '$dest->{remote}:$dest->{path}/'";
-            print "[$targetname] Resuming $dest->{path} monitoring on $dest->{remote}";
-            system "ssh '$dest->{remote}' -o BatchMode=yes -c 'rm $dest->{path}/.pause'";
+            print "[$targetname] Pausing $dest->{remoteincoming} monitoring on $dest->{remote}\n";
+            system "ssh '$dest->{remote}' -o BatchMode=yes 'touch $dest->{remoteincoming}/.pause'";
+            print "[$targetname] Uploading ".scalar(@publish)." objects to $dest->{remote}:$dest->{remoteincoming}/\n";
+            system "scp -B ".join(" ", map { "'$_'" } @publish)." '$dest->{remote}:$dest->{remoteincoming}/'";
+            print "[$targetname] Resuming $dest->{remoteincoming} monitoring on $dest->{remote}\n";
+            system "ssh '$dest->{remote}' -o BatchMode=yes 'rm $dest->{remoteincoming}/.pause'";
         }
     }
     my $ti = clock_gettime(CLOCK_REALTIME);
@@ -231,7 +250,7 @@ sub enqueue
     # in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php on line 15
     return $towiki.'/'.$url if $fn =~ /!/;
     my @mtime = ([stat $fn]->[9]);
-    my $hash = $mtime[0] ? sha1_file($fn) : '';
+    my $exfn = $fn;
     # Чтобы не перезасасывать неизменённые файлы
     if (!$force && $mtime[0])
     {
@@ -243,7 +262,7 @@ sub enqueue
     }
     push @mtime, Authorization => $auth if $auth;
     $fn =~ s/^.*\///so;
-    $q->{sha1}->{$fn} = $hash;
+    $q->{expath}->{$fn} = $exfn;
     $q->{async}->add_with_opts(
         GET("$wikiurl/$url", @mtime),
         {
@@ -254,7 +273,7 @@ sub enqueue
                     my $fh;
                     unless ($fh = $q->{fhby}->{$fn})
                     {
-                        $fh = $q->{fhby}->{$fn} = File::Temp->new(SUFFIX => "-$fn");
+                        $fh = $q->{fhby}->{$fn} = File::Temp->new(TEMPLATE => "/tmp/tempXXXX", SUFFIX => "^$fn");
                         push @{$q->{fnseq}}, $fn;
                     }
                     print $fh $_[0];
@@ -291,7 +310,7 @@ sub read_config
             $v = $2;
             $h = $cfg;
             $h = ($h->{$target}->{$key} ||= {}) if $target && $key;
-            if ($k eq 'url' || $k eq 'path')
+            if ($k eq 'url' || $k eq 'path' || $k eq 'remoteincoming')
             {
                 $v =~ s!/+$!!so;
             }
