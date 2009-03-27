@@ -137,6 +137,7 @@ sub replicate
         # Публикуем картинки локально, вызывая PHP код
         my $listfh = File::Temp->new;
         my $listfn = $listfh->filename;
+        chmod 0644, $listfn;
         my $publish = 0;
         for (@{$q->{fnseq}})
         {
@@ -161,8 +162,8 @@ sub replicate
     {
         # Публикуем картинки удалённо, по SCP, на другом конце ожидается ./inimages.pl
         my @publish = ();
-        my ($in, $out, $rd, $do, $sha1);
-        $rd = IPC::Run::start(['ssh', $dest->{remote}, '-o', 'BatchMode=yes'], \$in, \$out);
+        my ($in, $out, $err, $rd, $do, $sha1);
+        $rd = IPC::Run::start(['ssh', $dest->{remote}, '-o', 'BatchMode=yes'], \$in, \$out, \$err);
         die "[$targetname] Failed to open SSH session to '$dest->{remote}'"
             unless $rd;
         for (@{$q->{fnseq}})
@@ -175,7 +176,7 @@ sub replicate
             {
                 $| = 1;
                 $in .= "sha1sum '$q->{expath}->{$_}'\n";
-                IPC::Run::pump($rd) until $out =~ /\Q$q->{expath}->{$_}\E/s;
+                IPC::Run::pump($rd) until "$out\n$err" =~ /\Q$q->{expath}->{$_}\E/s;
                 if ($out =~ /([a-f0-9]{40})\s*\Q$q->{expath}->{$_}\E/s)
                 {
                     $sha1 = $1;
@@ -274,6 +275,7 @@ sub enqueue
                     unless ($fh = $q->{fhby}->{$fn})
                     {
                         $fh = $q->{fhby}->{$fn} = File::Temp->new(TEMPLATE => "/tmp/tempXXXX", SUFFIX => "^$fn");
+                        chmod 0644, $fh->filename;
                         push @{$q->{fnseq}}, $fn;
                     }
                     print $fh $_[0];
