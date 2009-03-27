@@ -115,7 +115,7 @@ sub replicate
                 else
                 {
                     $_[0] .= $';
-                    $text = $_[0];
+                    $text = $';
                     $in_censored = 0;
                 }
             }
@@ -254,7 +254,7 @@ sub enqueue
                     my $fh;
                     unless ($fh = $q->{fhby}->{$fn})
                     {
-                        $fh = $q->{fhby}->{$fn} = File::Temp->new(SUFFIX => '-'.unpack('H*', $fn));
+                        $fh = $q->{fhby}->{$fn} = File::Temp->new(SUFFIX => "-$fn");
                         push @{$q->{fnseq}}, $fn;
                     }
                     print $fh $_[0];
