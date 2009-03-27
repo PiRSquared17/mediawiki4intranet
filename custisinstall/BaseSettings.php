@@ -99,6 +99,7 @@ require_once($IP.'/extensions/FreeMind/FreeMind.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 
 require_once($IP. '/extensions/Calendar/Calendar.php');
+require_once($IP. '/extensions/SimpleTable/SimpleTable.php');
 
 
 $wgSVGConverter="inkscape";
