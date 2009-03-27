@@ -45,3 +45,23 @@ Index: specials/SpecialExport.php
  	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ) );
+Index: specials/SpecialUpload.php
+===================================================================
+--- specials/SpecialUpload.php  (revision 42138)
++++ specials/SpecialUpload.php  (working copy)
+@@ -4,6 +4,9 @@
+  * @ingroup SpecialPage
+  */
+
++# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
++if (!function_exists('wfSpecialUpload'))
++{
+
+ /**
+  * Entry point
+@@ -1753,3 +1756,5 @@
+                }
+        }
+ }
++
++}
