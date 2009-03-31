@@ -30,23 +30,39 @@ $wgExtensionFunctions[] = "wfShowHideExtension";
 
 function wfShowHideExtension()
 {
-    $GLOBALS[wgParser]->setHook("showhide","ShowHideExtension");
+    global $wgHooks;
+    $wgHooks[ParserAfterTidy][] = "ShowHideExtension";
 }
 
-function ShowHideExtension($in,$argv,&$parser)
+function ShowHideExtension(&$parser, &$out)
 {
-    global $wgOut;
-    static $numrun = 0;
-
-    $out = $parser->unstrip($parser->recursiveTagParse($in),$parser->mStripState);
+    static $run = 0;
     if ((($s = strpos($out,htmlentities("<show>"))) !== false &&
                strpos($out,htmlentities("</show>")) > $s) ||
         (($h = strpos($out,htmlentities("<hide>"))) !== false &&
                strpos($out,htmlentities("</hide>")) > $h))
     {
-        if (!$numrun)
+        $hideline = ' <script type="text/javascript">showSHToggle("' . addslashes( wfMsg('showtoc') ) . '","' . addslashes( wfMsg('hidetoc') ) . '",' . $run . ')</script> ';
+        if ($s !== false)
         {
-            $wgOut->addHTML(
+            $out = rtrim(substr($out,0,$s)) . $hideline . ltrim(substr($out,$s));
+            $act = 'show';
+        }
+        else
+        {
+            $out = rtrim(substr($out,0,$h)) . $hideline . ltrim(substr($out,$h));
+            $act = 'hide';
+        }
+
+        $out = str_replace(
+            array(htmlentities("<$act>"), htmlentities("</$act>"), htmlentities("<showhide>"), htmlentities("</showhide>")),
+            array("<span id=\"showhide$run\"><div id=\"shinside$run\">", "</div></span>", "", ""),
+            $out
+        );
+        if ($act == "hide")
+            $out .= "<script type=\"text/javascript\">toggleSH($run)</script>";
+        if (!$run++)
+            $out =
 "<script type=\"text/javascript\"><!--
 shWas=new Array();
 function showSHToggle(show,hide,num) {
@@ -75,28 +91,7 @@ function toggleSH(num) {
                 shmain.className = 'tochidden';
         }
 } // --></script>
-");
-        }
-        $numrun++;
-
-        if ($s !== false)
-            $act = "show";
-        else
-            $act = "hide";
-        $hideline = ' <script type="text/javascript">showSHToggle("' . addslashes( wfMsg('showtoc') ) . '","' . addslashes( wfMsg('hidetoc') ) . '",' . $numrun . ')</script>';
-
-        $out =
-            rtrim(substr($out,0,strpos($out,"&lt;$act&gt;")),"\n\r") .
-            $hideline .
-            substr($out,strpos($out,"&lt;$act&gt;"));
-        $out = str_replace(
-            array(htmlentities("<$act>"), htmlentities("</$act>")),
-            array("<div id=\"shinside$numrun\">","</div>"),
-            $out
-        );
-        $out = "<span id=\"showhide$numrun\">$out</span>";
-        if ($act == "hide")
-            $out .= "<script type=\"text/javascript\">toggleSH($numrun)</script>";
+" . $out;
     }
-    return $out;
+    return true;
 }
