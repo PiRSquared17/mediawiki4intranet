@@ -3,16 +3,18 @@ require_once('BaseSettings.php');
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 $wgPageShowWatchingUsers = true;
 
+require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 
-$wgEnableEmail      = true;
+$wgEnableEmail         = true;
 $wgEnableUserEmail     = true;
-$wgEnotifUserTalk      = true; # UPO
-$wgEnotifWatchlist     = true; # UPO
+$wgEnotifUserTalk      = true; // UPO
+$wgEnotifWatchlist     = true; // UPO
 $wgEmailAuthentication = true;
-$wgEnotifMinorEdits    = true; 
+$wgEnotifMinorEdits    = true;
+$wgCookieHttpOnly      = false;
 
 $wgEmergencyContact = "stas@custis.ru";
 $wgPasswordSender   = "stas@custis.ru";
