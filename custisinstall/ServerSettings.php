@@ -3,6 +3,7 @@ require_once('BaseSettings.php');
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 $wgPageShowWatchingUsers = true;
 
+require_once($IP.'/extensions/ShowHide/ShowHide.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
