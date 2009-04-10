@@ -88,7 +88,6 @@ sub replicate
     my $fh = File::Temp->new;
     my $fn = $fh->filename;
     my $auth;
-    my $in_censored;
     $auth = 'Basic '.encode_base64($src->{basiclogin}.':'.$src->{basicpassword}) if $src->{basiclogin};
     $response = $ua->request(
         POST("$src->{url}/index.php?title=Special:Export&action=submit", [
@@ -97,35 +96,15 @@ sub replicate
             wpDownload => 1,
             curonly    => !$src->{fullhistory} ? 1 : 0,
             pages      => $text,
-        ]),
-        sub
-        {
-            my $text;
-            # Меняем ссылки в тексте (тупо регэкспом) и параллельно (HTTP::Async) сливаем картинки
-            $_[0] =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
-            $text = $_[0];
-            $_[0] = '';
-            while (!$in_censored && $text =~ /&lt;!--\s*begindsp\s*\@?\s*--&gt;/iso ||
-                    $in_censored && $text =~ /&lt;!--\s*enddsp\s*\@?\s*--&gt;/iso)
-            {
-                if (!$in_censored)
-                {
-                    $_[0] .= $`;
-                    $text = $';
-                    $in_censored = 1;
-                }
-                else
-                {
-                    $text = $';
-                    $in_censored = 0;
-                }
-            }
-            $_[0] .= $text if !$in_censored && $text;
-            print $fh $_[0];
-        }
+        ])
     );
     die "[$targetname] Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
         unless $response->is_success;
+    my $text = $response->content;
+    $response->content('');
+    $text =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
+    $text =~ s/&lt;!--\s*begindsp\s*\@?\s*--&gt;.*?&lt;!--\s*enddsp\s*\@?\s*--&gt;//giso;
+    print $fh $text;
     my $tx = clock_gettime(CLOCK_REALTIME);
     print sprintf("[$targetname] Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
     close $fh;
