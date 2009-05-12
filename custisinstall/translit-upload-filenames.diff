@@ -1,0 +1,45 @@
+Index: filerepo/File.php
+===================================================================
+--- filerepo/File.php	(revision 47934)
++++ filerepo/File.php	(working copy)
+@@ -458,7 +458,7 @@
+ 		}
+ 		$extension = $this->getExtension();
+ 		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType() );
+-		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getName();
++		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getPhys();
+ 		if ( $thumbExt != $extension ) {
+ 			$thumbName .= ".$thumbExt";
+ 		}
+@@ -716,17 +716,29 @@
+ 	}
+ 
+ 	/**
++	 * Get the physical path of the file
++	 */
++	function getPhys() {
++		$name = $this->getName();
++		if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
++			$name = transliterate($m[1], transliterate_filters_get(), 'utf-8', 'utf-8').'.'.$m[2];
++		else
++			$name = transliterate($name, transliterate_filters_get(), 'utf-8', 'utf-8');
++		return $name;
++	}
++
++	/**
+ 	 * Get the path of the file relative to the public zone root
+ 	 */
+ 	function getRel() {
+-		return $this->getHashPath() . $this->getName();
++		return $this->getHashPath() . $this->getPhys();
+ 	}
+ 
+ 	/**
+ 	 * Get urlencoded relative path of the file
+ 	 */
+ 	function getUrlRel() {
+-		return $this->getHashPath() . rawurlencode( $this->getName() );
++		return $this->getHashPath() . rawurlencode( $this->getPhys() );
+ 	}
+ 
+ 	/** Get the relative path for an archive file */
