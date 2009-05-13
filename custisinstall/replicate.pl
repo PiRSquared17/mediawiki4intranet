@@ -96,7 +96,6 @@ sub replicate
         unless $response->is_success;
     my $text = $response->content;
     $response->content('');
-#    $text =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
     print $fh $text;
     my $tx = clock_gettime(CLOCK_REALTIME);
     print sprintf("[$targetname] Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
