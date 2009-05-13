@@ -25,7 +25,6 @@ use URI::Escape;
 use HTTP::Cookies;
 use HTTP::Date;
 use HTTP::Request::Common;
-use HTTP::Async;
 use HTML::Entities;
 
 my $config = read_config(shift @ARGV) || die <<EOF;
