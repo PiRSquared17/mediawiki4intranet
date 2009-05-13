@@ -1,0 +1,243 @@
+Index: includes/specials/SpecialImport.php
+===================================================================
+--- includes/specials/SpecialImport.php	(revision 47934)
++++ includes/specials/SpecialImport.php	(working copy)
+@@ -565,6 +565,28 @@
+ 		} while( $chunk !== false && !$this->mSource->atEnd() );
+ 		xml_parser_free( $parser );
+ 
++		/* TODO remove hardcode /tmp */
++		$temp = tempnam("/tmp", "ipart");
++		/* handle binary parts of multipart/related i.e upload images */
++		while ($part = $this->mSource->nextPart())
++		{
++			if (!$part[1])
++				continue;
++			file_put_contents($temp, $part[1]);
++			$title = Title::makeTitleSafe(NS_IMAGE, $part[0]);
++			if (is_object($title))
++			{
++				$image = wfLocalFile($title);
++				if (!$image->exists() || sha1_file($image->getPath()) != sha1_file($temp))
++				{
++					$archive = $image->publish($temp);
++					if (!WikiError::isError($archive) && $archive->isGood())
++						$image->recordUpload($archive->value, 'Imported an upload');
++				}
++			}
++		}
++		unlink($temp);
++
+ 		return true;
+ 	}
+ 
+@@ -1064,6 +1086,10 @@
+ 			return $this->mString;
+ 		}
+ 	}
++
++	function nextPart() {
++		return false;
++	}
+ }
+ 
+ /**
+@@ -1071,18 +1097,74 @@
+  * @ingroup SpecialPage
+  */
+ class ImportStreamSource {
++
++	var $buf;
++	var $eop;
++	var $boundary;
++
+ 	function __construct( $handle ) {
+ 		$this->mHandle = $handle;
++		$this->eop = false;
++		$this->buf = '';
++		$this->boundary = '';
++		$pos = ftell($this->mHandle);
++		$s = fgets($this->mHandle);
++		if (preg_match("/Content-Type:\s*multipart\/related; boundary=([^\r\n]+)\r*\n/s", $s, $m))
++		{
++			$this->boundary = $m[1];
++			/* skip headers */
++			while($s != "\n" && $s != "\r\n")
++				$s = fgets($this->mHandle);
++		}
++		else
++			fseek($this->mHandle, 0, $pos);
+ 	}
+ 
+ 	function atEnd() {
+-		return feof( $this->mHandle );
++		return $this->eop;
+ 	}
+ 
++	/* read next XML part chunk */
+ 	function readChunk() {
+-		return fread( $this->mHandle, 32768 );
++		if ($this->eop)
++			return false;
++		$this->buf = fread( $this->mHandle, 32768 );
++		if ($this->boundary && preg_match("/^(.*?)(\r?\n".preg_quote($this->boundary)."\r?\n.*)$/s", $this->buf, $m))
++		{
++			$this->buf = $m[2];
++			$this->eop = true;
++			return $m[1];
++		}
++		if (feof($this->mHandle))
++			$this->eop = true;
++		return $this->buf;
+ 	}
+ 
++	/* read next binary part of multipart/related */
++	function nextPart() {
++		if (!$this->eop || !$this->boundary)
++			return false;
++		$this->buf = preg_replace("/^\r?\n".preg_quote($this->boundary)."\r?\n/s", '', $this->buf);
++		$data = $this->buf;
++		while (!preg_match("/\r?\n\r?\n/is", $data) &&
++		    ($this->buf = fread($this->mHandle, 32768)))
++			$data .= $this->buf;
++		list($headers, $data) = preg_split("/\r?\n\r?\n/is", $data, 2);
++		if (preg_match("/Content-Length:\s*(\d+)/s", $headers, $m))
++		{
++			while (strlen($data) < $m[1] && ($this->buf = fread($this->mHandle, 32768)))
++				$data .= $this->buf;
++			if (strlen($data) > $m[1])
++			{
++				$this->buf = substr($data, $m[1]);
++				$data = substr($data, 0, $m[1]);
++			}
++			if (preg_match("/Content-ID:\s*([^\n\r]+)/s", $headers, $m))
++				return array($m[1], $data);
++		}
++		return false;
++	}
++
+ 	static function newFromFile( $filename ) {
+ 		$file = @fopen( $filename, 'rt' );
+ 		if( !$file ) {
+Index: includes/specials/SpecialExport.php
+===================================================================
+--- includes/specials/SpecialExport.php	(revision 47934)
++++ includes/specials/SpecialExport.php	(working copy)
+@@ -212,12 +212,10 @@
+ 			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
+ 		}
+ 
+-		/*
+ 		// Enable this when we can do something useful exporting/importing image information. :)
+ 		if( $wgRequest->getCheck( 'images' ) ) {
+ 			$pageSet = wfExportGetImages( $inputPages, $pageSet );
+ 		}
+-		*/
+ 
+ 		$pages = array_keys( $pageSet );
+ 
+@@ -226,6 +224,7 @@
+ 		$db = wfGetDB( DB_SLAVE );
+ 		$exporter = new WikiExporter( $db, $history );
+ 		$exporter->list_authors = $list_authors ;
++		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
+ 		$exporter->openStream();
+ 
+ 		foreach( $pages as $page ) {
+@@ -275,7 +274,7 @@
+ 	}
+ 	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
+ 	// Enable this when we can do something useful exporting/importing image information. :)
+-	//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
++	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
+ 	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
+ 
+ 	$form .= Xml::submitButton( wfMsg( 'export-submit' ) );
+Index: includes/Export.php
+===================================================================
+--- includes/Export.php	(revision 47934)
++++ includes/Export.php	(working copy)
+@@ -83,6 +83,9 @@
+ 	function closeStream() {
+ 		$output = $this->writer->closeStream();
+ 		$this->sink->writeCloseStream( $output );
++		/* Dump $this->writer->binaries into multipart/related */
++		while ($part = $this->writer->nextPart())
++			$this->sink->writePart($part);
+ 	}
+ 
+ 	/**
+@@ -299,6 +302,9 @@
+  */
+ class XmlDumpWriter {
+ 
++	var $boundary;
++	var $binaries;
++
+ 	/**
+ 	 * Returns the export schema version.
+ 	 * @return string
+@@ -320,7 +326,10 @@
+ 	function openStream() {
+ 		global $wgContLanguageCode;
+ 		$ver = $this->schemaVersion();
+-		return wfElement( 'mediawiki', array(
++		$this->boundary = '--'.time();
++		$this->binaries = array();
++		return "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n" .
++			wfElement( 'mediawiki', array(
+ 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
+ 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
+ 			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
+@@ -383,6 +392,20 @@
+ 		return "</mediawiki>\n";
+ 	}
+ 
++	function nextPart() {
++		if (count($this->binaries) > 0)
++		{
++			$bin = array_shift($this->binaries);
++			$data = @file_get_contents($bin[1]);
++			return $this->boundary.
++				"\nContent-Type: application/binary\n" .
++				"Content-Transfer-Encoding: Little-Endian\n" .
++				"Content-ID: $bin[0]\n" .
++				"Content-Length: ".strlen($data)."\n\n" .
++				$data;
++		}
++		return '';
++	}
+ 
+ 	/**
+ 	 * Opens a <page> section on the output stream, with data
+@@ -502,6 +525,7 @@
+ 	}
+ 
+ 	function writeUpload( $file ) {
++		$this->binaries[] = array($file->getName(), $file->getPath());
+ 		return "    <upload>\n" .
+ 			$this->writeTimestamp( $file->getTimestamp() ) .
+ 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
+@@ -540,6 +564,10 @@
+ 		$this->write( $string );
+ 	}
+ 
++	function writePart( $string ) {
++		$this->write( $string );
++	}
++
+ 	/**
+ 	 * Override to write to a different stream type.
+ 	 * @return bool
+Index: languages/messages/MessagesRu.php
+===================================================================
+--- languages/messages/MessagesRu.php	(revision 47934)
++++ languages/messages/MessagesRu.php	(working copy)
+@@ -2065,6 +2065,7 @@
+ 'export-submit'     => 'Экспортировать',
+ 'export-addcattext' => 'Добавить страницы из категории:',
+ 'export-addcat'     => 'Добавить',
++'export-images'     => 'Экспортировать изображения',
+ 'export-download'   => 'Предложить сохранить как файл',
+ 'export-templates'  => 'Включить шаблоны',
+ 

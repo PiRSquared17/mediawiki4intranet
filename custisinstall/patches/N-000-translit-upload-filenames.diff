@@ -1,7 +1,7 @@
-Index: filerepo/File.php
+Index: includes/filerepo/File.php
 ===================================================================
---- filerepo/File.php	(revision 47934)
-+++ filerepo/File.php	(working copy)
+--- includes/filerepo/File.php	(revision 47934)
++++ includes/filerepo/File.php	(working copy)
 @@ -458,7 +458,7 @@
  		}
  		$extension = $this->getExtension();
