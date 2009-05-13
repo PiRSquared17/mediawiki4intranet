@@ -1,7 +1,7 @@
-Index: AnyWikiDraw/AnyWikiDraw.php
+Index: extensions/AnyWikiDraw/AnyWikiDraw.php
 ===================================================================
---- AnyWikiDraw/AnyWikiDraw.php	(revision 76)
-+++ AnyWikiDraw/AnyWikiDraw.php	(working copy)
+--- extensions/AnyWikiDraw/AnyWikiDraw.php	(revision 76)
++++ extensions/AnyWikiDraw/AnyWikiDraw.php	(working copy)
 @@ -144,7 +144,7 @@
          $uploadURL = str_replace('$1', 'Special:AnyWikiDraw', $wgArticlePath);
  		$output .= 
