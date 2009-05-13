@@ -42,20 +42,15 @@ Config file fragment syntax (Replace __Test__ with desired [target] name):
 URL=<source wiki url>
 Category=<source category name>
 FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
-ForceImageDownload=<'yes' or 'no' (default), 'yes' means force image fetching>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 
 [__Test__DestinationWiki]
 URL=<destination wiki url>
-Path=<destination wiki installation path>
-Remote=<username\@server for remote image publishing via SCP/SSH>
-RemoteIncoming=<incoming image path on remote server>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
 User=<name of a user having import rights in destination wiki>
 Password=<his password>
-SwitchUser=<UNIX username to change to before copying files into Wiki directory>
 EOF
 
 my @targets = map { lc } @ARGV;
@@ -83,7 +78,6 @@ sub replicate
     die "[$targetname] No pages in category $src->{category}" unless $text;
     decode_entities($text);
     my $ts = clock_gettime(CLOCK_REALTIME);
-    my $q = { async => HTTP::Async->new };
     # Читаем экспортную XML-ку
     my $fh = File::Temp->new;
     my $fn = $fh->filename;
@@ -102,85 +96,11 @@ sub replicate
         unless $response->is_success;
     my $text = $response->content;
     $response->content('');
-    $text =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
-    $text =~ s/&lt;!--\s*begindsp\s*\@?\s*--&gt;.*?&lt;!--\s*enddsp\s*\@?\s*--&gt;//giso;
+#    $text =~ s/(<src[^<>]*>)(.*?)(<\/src\s*>)/$1.enqueue($2,$src->{url},$dest->{url},$dest->{path},$q,$auth,$src->{forceimagedownload}).$3/egiso;
     print $fh $text;
     my $tx = clock_gettime(CLOCK_REALTIME);
     print sprintf("[$targetname] Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
     close $fh;
-    # Дожидаемся сливания картинок
-    my $total = 0;
-    1 while my $response = $q->{async}->wait_for_next_response;
-    unless ($dest->{remote})
-    {
-        # Публикуем картинки локально, вызывая PHP код
-        my $listfh = File::Temp->new;
-        my $listfn = $listfh->filename;
-        chmod 0644, $listfn;
-        my $publish = 0;
-        for (@{$q->{fnseq}})
-        {
-            $total += tell $q->{fhby}->{$_};
-            close $q->{fhby}->{$_};
-            # Проверяем контрольные суммы
-            if ($src->{forceimagedownload} || sha1_file($q->{fhby}->{$_}->filename) ne sha1_file($q->{expath}->{$_}))
-            {
-                print $listfh "$_\n".$q->{fhby}->{$_}->filename."\n";
-                $publish++;
-            }
-        }
-        if ($publish > 0)
-        {
-            print "[$targetname] Invoking PHP\n";
-            my $cmd = "$dest->{path}/custisinstall/loadimages.php < $listfn";
-            $cmd = "su $dest->{switchuser} -s /bin/sh -c '$cmd'" if $dest->{switchuser};
-            system($cmd);
-        }
-    }
-    else
-    {
-        # Публикуем картинки удалённо, по SCP, на другом конце ожидается ./inimages.pl
-        my @publish = ();
-        my ($in, $out, $err, $rd, $do, $sha1);
-        $rd = IPC::Run::start(['ssh', $dest->{remote}, '-o', 'BatchMode=yes'], \$in, \$out, \$err);
-        die "[$targetname] Failed to open SSH session to '$dest->{remote}'"
-            unless $rd;
-        for (@{$q->{fnseq}})
-        {
-            $total += tell $q->{fhby}->{$_};
-            close $q->{fhby}->{$_};
-            # Проверяем контрольные суммы
-            $do = $src->{forceimagedownload};
-            if (!$do)
-            {
-                $| = 1;
-                $in .= "sha1sum '$q->{expath}->{$_}'\n";
-                IPC::Run::pump($rd) until "$out\n$err" =~ /\Q$q->{expath}->{$_}\E/s;
-                if ($out =~ /([a-f0-9]{40})\s*\Q$q->{expath}->{$_}\E/s)
-                {
-                    $sha1 = $1;
-                }
-                else
-                {
-                    $sha1 = '';
-                }
-                $do = 1 if sha1_file($q->{fhby}->{$_}->filename) ne $sha1;
-            }
-            push @publish, $q->{fhby}->{$_}->filename if $do;
-        }
-        IPC::Run::finish($rd);
-        if (@publish)
-        {
-            print "[$targetname] Pausing $dest->{remoteincoming} monitoring on $dest->{remote}\n";
-            system "ssh '$dest->{remote}' -o BatchMode=yes 'touch $dest->{remoteincoming}/.pause'";
-            print "[$targetname] Uploading ".scalar(@publish)." objects to $dest->{remote}:$dest->{remoteincoming}/\n";
-            system "scp -B ".join(" ", map { "'$_'" } @publish)." '$dest->{remote}:$dest->{remoteincoming}/'";
-            print "[$targetname] Resuming $dest->{remoteincoming} monitoring on $dest->{remote}\n";
-            system "ssh '$dest->{remote}' -o BatchMode=yes 'rm $dest->{remoteincoming}/.pause'";
-        }
-    }
-    my $ti = clock_gettime(CLOCK_REALTIME);
-    print sprintf("[$targetname] Retrieved %d objects (total %d bytes) in %.2f seconds\n", scalar(keys %{$q->{fhby}}), $total, $ti-$tx);
     # Логинимся по назначению, если надо
     $uri = URI->new($dest->{url})->canonical;
     $ua->credentials($uri->host_port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
@@ -208,61 +128,9 @@ sub replicate
         unless $response->is_success;
     die "[$targetname] Could not import XML data into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
     my $tp = clock_gettime(CLOCK_REALTIME);
-    print sprintf("[$targetname] Imported in %.2f seconds\n", $tp-$ti);
+    print sprintf("[$targetname] Imported in %.2f seconds\n", $tp-$tx);
     # Всё ОК
     1;
-}
-
-sub enqueue
-{
-    my ($url, $wikiurl, $towiki, $topath, $q, $auth, $force) = @_;
-    $url =~ s/^$wikiurl//s;
-    $url =~ s/^\/*//so;
-    # Уже поставлено в очередь?
-    return $towiki.'/'.$url if $q->{alr}->{$url};
-    $q->{alr}->{$url} = 1;
-    my $fh;
-    my $fn = "$topath/$url";
-    $fn = uri_unescape($fn);
-    # архивные картинки вызывают странные баги в MediaWiki, так что пропускаем их.
-    # - баги типа Fatal error: Cannot redeclare wfspecialupload() (previously
-    # declared in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php:12)
-    # in /home/www/localhost/WWW/wiki/includes/specials/SpecialUpload.php on line 15
-    return $towiki.'/'.$url if $fn =~ /!/;
-    my @mtime = ([stat $fn]->[9]);
-    my $exfn = $fn;
-    # Чтобы не перезасасывать неизменённые файлы
-    if (!$force && $mtime[0])
-    {
-        @mtime = (If_Modified_Since => time2str($mtime[0]));
-    }
-    else
-    {
-        @mtime = ();
-    }
-    push @mtime, Authorization => $auth if $auth;
-    $fn =~ s/^.*\///so;
-    $q->{expath}->{$fn} = $exfn;
-    $q->{async}->add_with_opts(
-        GET("$wikiurl/$url", @mtime),
-        {
-            callback => sub
-            {
-                if (length $_[0])
-                {
-                    my $fh;
-                    unless ($fh = $q->{fhby}->{$fn})
-                    {
-                        $fh = $q->{fhby}->{$fn} = File::Temp->new(TEMPLATE => "/tmp/tempXXXX", SUFFIX => "^$fn");
-                        chmod 0644, $fh->filename;
-                        push @{$q->{fnseq}}, $fn;
-                    }
-                    print $fh $_[0];
-                }
-            }
-        }
-    );
-    return $towiki.'/'.$url;
 }
 
 sub read_config
@@ -291,11 +159,11 @@ sub read_config
             $v = $2;
             $h = $cfg;
             $h = ($h->{$target}->{$key} ||= {}) if $target && $key;
-            if ($k eq 'url' || $k eq 'path' || $k eq 'remoteincoming')
+            if ($k eq 'url')
             {
                 $v =~ s!/+$!!so;
             }
-            elsif ($k eq 'fullhistory' || $k eq 'forceimagedownload')
+            elsif ($k eq 'fullhistory')
             {
                 $v = lc $v;
                 $v = $v eq 'yes' || $v eq 'true' || $v eq 'on' || $v eq '1' ? 1 : 0;
