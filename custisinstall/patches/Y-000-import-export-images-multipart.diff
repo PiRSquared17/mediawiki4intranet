@@ -210,7 +210,16 @@ Index: includes/Export.php
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -502,6 +525,7 @@
+@@ -450,6 +473,8 @@
+ 		} elseif( isset( $row->old_text ) ) {
+ 			// Raw text from the database may have invalid chars
+ 			$text = strval( Revision::getRevisionText( $row ) );
++			// Remove "export cuts"
++			$text = preg_replace( '/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->/is', '', $text );
+ 			$out .= "      " . wfElementClean( 'text',
+ 				array( 'xml:space' => 'preserve' ),
+ 				strval( $text ) ) . "\n";
+@@ -502,6 +527,7 @@
  	}
  
  	function writeUpload( $file ) {
@@ -218,7 +227,7 @@ Index: includes/Export.php
  		return "    <upload>\n" .
  			$this->writeTimestamp( $file->getTimestamp() ) .
  			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
-@@ -540,6 +564,10 @@
+@@ -540,6 +566,10 @@
  		$this->write( $string );
  	}
  
