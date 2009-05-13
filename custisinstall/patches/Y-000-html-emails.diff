@@ -1,7 +1,7 @@
-Index: UserMailer.php
+Index: includes/UserMailer.php
 ===================================================================
---- UserMailer.php	(revision 47934)
-+++ UserMailer.php	(working copy)
+--- includes/UserMailer.php	(revision 47934)
++++ includes/UserMailer.php	(working copy)
 @@ -101,8 +101,10 @@
  	 * @return mixed True on success, a WikiError object on failure.
  	 */
@@ -68,70 +68,3 @@ Index: UserMailer.php
  		return UserMailer::send($to, $this->from, $this->subject, $body, $this->replyto);
  	}
  
-Index: EditPage.php
-===================================================================
---- EditPage.php	(revision 47934)
-+++ EditPage.php	(working copy)
-@@ -1897,7 +1897,7 @@
- 			array(
- 				'image'  => $wgLang->getImageFile('button-sig'),
- 				'id'     => 'mw-editbutton-signature',
--				'open'   => '--~~~~',
-+				'open'   => '~~~~',
- 				'close'  => '',
- 				'sample' => '',
- 				'tip'    => wfMsg('sig_tip'),
-Index: specials/SpecialExport.php
-===================================================================
---- specials/SpecialExport.php	(revision 47934)
-+++ specials/SpecialExport.php	(working copy)
-@@ -212,12 +212,10 @@
- 			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
- 		}
- 
--		/*
- 		// Enable this when we can do something useful exporting/importing image information. :)
- 		if( $wgRequest->getCheck( 'images' ) ) {
- 			$pageSet = wfExportGetImages( $inputPages, $pageSet );
- 		}
--		*/
- 
- 		$pages = array_keys( $pageSet );
- 
-@@ -226,6 +224,7 @@
- 		$db = wfGetDB( DB_SLAVE );
- 		$exporter = new WikiExporter( $db, $history );
- 		$exporter->list_authors = $list_authors ;
-+		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
- 		$exporter->openStream();
- 
- 		foreach( $pages as $page ) {
-@@ -275,7 +274,7 @@
- 	}
- 	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
- 	// Enable this when we can do something useful exporting/importing image information. :)
--	//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
-+	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
- 	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
- 
- 	$form .= Xml::submitButton( wfMsg( 'export-submit' ) );
-Index: specials/SpecialUpload.php
-===================================================================
---- specials/SpecialUpload.php	(revision 47934)
-+++ specials/SpecialUpload.php	(working copy)
-@@ -4,6 +4,9 @@
-  * @ingroup SpecialPage
-  */
- 
-+# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
-+if (!function_exists('wfSpecialUpload'))
-+{
- 
- /**
-  * Entry point
-@@ -1753,3 +1756,5 @@
- 		}
- 	}
- }
-+
-+}
