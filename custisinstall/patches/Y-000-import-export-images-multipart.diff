@@ -42,7 +42,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,18 +1097,74 @@
+@@ -1071,18 +1097,76 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -103,13 +103,15 @@ Index: includes/specials/SpecialImport.php
 +		list($headers, $data) = preg_split("/\r?\n\r?\n/is", $data, 2);
 +		if (preg_match("/Content-Length:\s*(\d+)/s", $headers, $m))
 +		{
-+			while (strlen($data) < $m[1] && ($this->buf = fread($this->mHandle, 32768)))
++			while (strlen($data) < $m[1] && strlen($this->buf = fread($this->mHandle, 32768)) > 0)
 +				$data .= $this->buf;
 +			if (strlen($data) > $m[1])
 +			{
 +				$this->buf = substr($data, $m[1]);
 +				$data = substr($data, 0, $m[1]);
 +			}
++			else
++				$this->buf = '';
 +			if (preg_match("/Content-ID:\s*([^\n\r]+)/s", $headers, $m))
 +				return array($m[1], $data);
 +		}
