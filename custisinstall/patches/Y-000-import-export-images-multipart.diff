@@ -42,7 +42,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,18 +1097,76 @@
+@@ -1071,20 +1097,78 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -119,8 +119,11 @@ Index: includes/specials/SpecialImport.php
 +	}
 +
  	static function newFromFile( $filename ) {
- 		$file = @fopen( $filename, 'rt' );
+-		$file = @fopen( $filename, 'rt' );
++		$file = @fopen( $filename, 'rb' );
  		if( !$file ) {
+ 			return new WikiErrorMsg( "importcantopen" );
+ 		}
 Index: includes/specials/SpecialExport.php
 ===================================================================
 --- includes/specials/SpecialExport.php	(revision 47934)
