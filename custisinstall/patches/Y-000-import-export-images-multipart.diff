@@ -189,19 +189,21 @@ Index: includes/Export.php
  			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
  			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
  			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
-@@ -383,6 +392,20 @@
+@@ -383,6 +392,22 @@
  		return "</mediawiki>\n";
  	}
  
 +	function nextPart() {
 +		if (count($this->binaries) > 0)
 +		{
-+			$bin = array_shift($this->binaries);
-+			$data = @file_get_contents($bin[1]);
++			list($name) = array_keys($this->binaries);
++			$data = $this->binaries[$name];
++			unset($this->binaries[$name]);
++			$data = @file_get_contents($data);
 +			return $this->boundary.
 +				"\nContent-Type: application/binary\n" .
 +				"Content-Transfer-Encoding: Little-Endian\n" .
-+				"Content-ID: $bin[0]\n" .
++				"Content-ID: $name\n" .
 +				"Content-Length: ".strlen($data)."\n\n" .
 +				$data;
 +		}
@@ -210,7 +212,7 @@ Index: includes/Export.php
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -450,6 +473,8 @@
+@@ -450,6 +475,8 @@
  		} elseif( isset( $row->old_text ) ) {
  			// Raw text from the database may have invalid chars
  			$text = strval( Revision::getRevisionText( $row ) );
@@ -219,15 +221,15 @@ Index: includes/Export.php
  			$out .= "      " . wfElementClean( 'text',
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
-@@ -502,6 +527,7 @@
+@@ -502,6 +529,7 @@
  	}
  
  	function writeUpload( $file ) {
-+		$this->binaries[] = array($file->getName(), $file->getPath());
++		$this->binaries[$file->getName()] = $file->getPath();
  		return "    <upload>\n" .
  			$this->writeTimestamp( $file->getTimestamp() ) .
  			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
-@@ -540,6 +566,10 @@
+@@ -540,6 +568,10 @@
  		$this->write( $string );
  	}
  
