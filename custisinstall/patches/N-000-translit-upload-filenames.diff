@@ -30,7 +30,7 @@ Index: includes/filerepo/File.php
   * @ingroup FileRepo
   */
 +
-+function transliterate($s)
++function wfTransliterate($s)
 +{
 +    $s = strtr($s, array(
 +        'а' => 'a',
@@ -125,9 +125,9 @@ Index: includes/filerepo/File.php
 +	function getPhys() {
 +		$name = $this->getName();
 +		if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
-+			$name = transliterate($m[1]).'.'.$m[2];
++			$name = wfTransliterate($m[1]).'.'.$m[2];
 +		else
-+			$name = transliterate($name);
++			$name = wfTransliterate($name);
 +		return $name;
 +	}
 +
