@@ -18,7 +18,7 @@ Index: includes/specials/SpecialImport.php
 +			if (is_object($title))
 +			{
 +				$image = wfLocalFile($title);
-+				if (!$image->exists() || sha1_file($image->getPath()) != sha1_file($temp))
++				if (!$image->exists() || @sha1_file($image->getPath()) != sha1_file($temp))
 +				{
 +					$archive = $image->publish($temp);
 +					if (!WikiError::isError($archive) && $archive->isGood())
