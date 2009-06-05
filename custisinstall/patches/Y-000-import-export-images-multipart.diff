@@ -162,7 +162,15 @@ Index: includes/Export.php
 ===================================================================
 --- includes/Export.php	(revision 47934)
 +++ includes/Export.php	(working copy)
-@@ -83,6 +83,9 @@
+@@ -76,6 +76,7 @@
+ 	}
+ 
+ 	function openStream() {
++		$this->writer->multipart = $this->dumpUploads ? true : false;
+ 		$output = $this->writer->openStream();
+ 		$this->sink->writeOpenStream( $output );
+ 	}
+@@ -83,6 +84,9 @@
  	function closeStream() {
  		$output = $this->writer->closeStream();
  		$this->sink->writeCloseStream( $output );
@@ -172,34 +180,40 @@ Index: includes/Export.php
  	}
  
  	/**
-@@ -299,6 +302,9 @@
+@@ -299,6 +303,10 @@
   */
  class XmlDumpWriter {
  
 +	var $boundary;
 +	var $binaries;
++	var $multipart;
 +
  	/**
  	 * Returns the export schema version.
  	 * @return string
-@@ -320,7 +326,10 @@
+@@ -320,7 +328,15 @@
  	function openStream() {
  		global $wgContLanguageCode;
  		$ver = $this->schemaVersion();
 -		return wfElement( 'mediawiki', array(
-+		$this->boundary = '--'.time();
-+		$this->binaries = array();
-+		return "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n" .
++		$mp = '';
++		if ($this->multipart)
++		{
++			$this->boundary = '--'.time();
++			$this->binaries = array();
++			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
++		}
++		return $mp .
 +			wfElement( 'mediawiki', array(
  			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
  			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
  			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
-@@ -383,6 +392,22 @@
+@@ -383,6 +399,22 @@
  		return "</mediawiki>\n";
  	}
  
 +	function nextPart() {
-+		if (count($this->binaries) > 0)
++		if ($this->multipart && count($this->binaries) > 0)
 +		{
 +			list($name) = array_keys($this->binaries);
 +			$data = $this->binaries[$name];
@@ -217,7 +231,7 @@ Index: includes/Export.php
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -450,6 +475,8 @@
+@@ -450,6 +482,8 @@
  		} elseif( isset( $row->old_text ) ) {
  			// Raw text from the database may have invalid chars
  			$text = strval( Revision::getRevisionText( $row ) );
@@ -226,15 +240,16 @@ Index: includes/Export.php
  			$out .= "      " . wfElementClean( 'text',
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
-@@ -502,6 +529,7 @@
+@@ -502,6 +536,8 @@
  	}
  
  	function writeUpload( $file ) {
-+		$this->binaries[$file->getName()] = $file->getPath();
++		if ($this->multipart)
++			$this->binaries[$file->getName()] = $file->getPath();
  		return "    <upload>\n" .
  			$this->writeTimestamp( $file->getTimestamp() ) .
  			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
-@@ -540,6 +568,10 @@
+@@ -540,6 +576,10 @@
  		$this->write( $string );
  	}
  
