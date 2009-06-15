@@ -96,7 +96,7 @@ class DraftHooks {
 				// Save draft
 				$draft->save();
 				// Use the new draft id
-				$wgRequest->setVal( 'draft', $draft->getID() );
+				$wgRequest->data['draft'] = $draft->getID();
 			}
 		}
 		// Internationalization
