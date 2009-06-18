@@ -34,6 +34,8 @@ $wgAllowExternalImagesFrom = array(
     'http://plantime.office.custis.ru/'
 );
 
+$SVNIntegrationSettings['svnParams'] = array('config-dir' => '/var/www/.subversion');
+
 $wgSMTP = array(
     "host"   => 'localhost',
     "IDHost" => 'custis.ru',
