@@ -302,7 +302,7 @@ function SVNIntegrationPrintFile($text, $params, &$parser)
 	$args = array($text);
 	$svn->cat->passthru = false;
 	if ($SVNIntegrationSettings['useUtf8'])
-		$svn->cat->prepend_cmd = 'export LC_ALL=de_DE.UTF8 && ';
+		$svn->cat->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 
 	if ($output = $svn->cat->run($args, $SVNIntegrationSettings['svnParams']))
 	{
@@ -393,7 +393,7 @@ function SVNIntegrationFileInfo($text, $params, &$parser)
 	$svn->info->valid_switches[] = 'username';
 	$svn->info->valid_switches[] = 'password';
 	if ($SVNIntegrationSettings['useUtf8'])
-		$svn->info->prepend_cmd = 'export LC_ALL=de_DE.UTF8 && ';
+		$svn->info->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 	
 	if ($fileInfo = $svn->info->run($args, $SVNIntegrationSettings['svnParams']))
 	{
@@ -431,7 +431,7 @@ function SVNIntegrationFileInfo($text, $params, &$parser)
 		$logSvn = VersionControl_SVN::factory(array('log'), array('fetchmode' => VERSIONCONTROL_SVN_FETCHMODE_ASSOC, 'svn_path' => $SVNIntegrationSettings['svnPath']));
 		$logSvn->log->passthru = false;
 		if ($SVNIntegrationSettings['useUtf8'])
-			$logSvn->log->prepend_cmd = 'export LC_ALL=de_DE.UTF8 && ';
+			$logSvn->log->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 		$revNr = intval($info['revChanged']['value']);
 		$logOptions = array_merge(array('revision' => $revNr), $SVNIntegrationSettings['svnParams']);
 		$revisionInfo = $logSvn->log->run(array($text), $logOptions);
@@ -490,7 +490,7 @@ function SVNIntegrationFileHistory($text, $params, &$parser)
 	$args = array($text);
 	$svn->log->passthru = false;
 	if ($SVNIntegrationSettings['useUtf8'])
-		$svn->info->prepend_cmd = 'export LC_ALL=de_DE.UTF8 && ';
+		$svn->info->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 	
 	if ($history = $svn->log->run($args, $SVNIntegrationSettings['svnParams']))
 	{
@@ -548,7 +548,7 @@ function SVNIntegrationTodo($text, $params, &$parser)
 	$args = array($text);
 	$svn->cat->passthru = false;
 	if ($SVNIntegrationSettings['useUtf8'])
-		$svn->cat->prepend_cmd = 'export LC_ALL=de_DE.UTF8 && ';
+		$svn->cat->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 	
 	if ($output = $svn->cat->run($args, $SVNIntegrationSettings['svnParams']))
 	{
