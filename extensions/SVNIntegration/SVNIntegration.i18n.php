@@ -106,7 +106,7 @@ $messages['ru'] = array(
 	'svnintegration-historyrev'          => 'Ревизия $1, автор $2, от $3',
 	'svnintegration-todoheader'          => 'TODO-метки в ',
 	'svnintegration-todoline'            => 'на строке ',
-	'svnintegration-fromline'            => 'со строки ',
+	'svnintegration-fromline'            => 'строки с ',
 	'svnintegration-toline'              => 'по ',
 );
 
