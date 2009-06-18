@@ -12,6 +12,7 @@ require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/Drafts/Drafts.php');
+require_once($IP.'/extensions/SVNIntegration/SVNIntegration.setup.php');
 
 $egDraftsAutoSaveWait  = 60;   // 1 minute
 
