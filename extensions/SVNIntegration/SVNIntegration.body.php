@@ -325,6 +325,7 @@ function SVNIntegrationPrintFile($text, $params, &$parser)
 				$output .= $lines[$i] . "\n";
 			}
 		}
+		$output = htmlspecialchars($output);
 		
 		// try to find out file type for GeSHi and surround output with corresponding tags
 		if ($SVNIntegrationSettings['geshiExists'])
@@ -561,7 +562,7 @@ function SVNIntegrationTodo($text, $params, &$parser)
 		$lines = explode("\n", $output);
 		for ($i = 0; $i < count($lines); $i++)
 		{
-			$line = $lines[$i];
+			$line = htmlspecialchars($lines[$i]);
 			$todo = array();
 			if (preg_match('/[\s\*\/]*(TODO|FIXME|XXX):?\s*(.*)/i', $line, $todo))
 			{
@@ -570,8 +571,8 @@ function SVNIntegrationTodo($text, $params, &$parser)
 				if ($numberContextLines > 0)
 				{
 					$todoContext = '<pre class="SVNIntegrationTodoContext">';
-					for ($j = 1; $j <= $numberContextLines; $j++)
-						$todoContext .= ($i + $j + 1) . "\t" . $lines[$i + $j] . "\n";
+					for ($j = max(0,$i-intval(($numberContextLines-1)/2)); $j <= $i+($numberContextLines-1)/2; $j++)
+						$todoContext .= ($j + 1) . "\t" . htmlspecialchars($lines[$j]) . "\n";
 					$todoContext .= "</pre>\n";
 				}
 				
