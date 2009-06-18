@@ -34,7 +34,7 @@ $messages['en'] = array(
 	'svnintegration-invalidurl'          => 'Not a valid URL: ',
 	'svnintegration-printfileheader'     => 'File contents from SVN: ',
 	'svnintegration-filelinktext'        => 'Link to file in SVN: ',
-	'svnintegration-fileinfoheader'      => 'File informationen for ',
+	'svnintegration-fileinfoheader'      => 'File information for ',
 	'svnintegration-fileinfopath'        => 'Path',
 	'svnintegration-fileinfoname'        => 'Name',
 	'svnintegration-fileinfourl'         => 'Complete URL',
@@ -80,6 +80,34 @@ $messages['de'] = array(
 	'svnintegration-todoline'            => 'in Zeile ',
 	'svnintegration-fromline'            => 'von Zeile ',
 	'svnintegration-toline'              => 'bis Zeile ',
+);
+
+$messages['ru'] = array(
+	'svnintegration'                     => 'SVNIntegration',
+	'svnintegration-desc'                => 'Добавляет функции интеграции с Subversion в MediaWiki',
+	'svnintegration-short'               => 'SVNIntegration', # Do not translate or duplicate this message to other languages
+	'svnintegration-title'               => 'Добавляет функции интеграции с Subversion в MediaWiki',
+	'svnintegration-invalidurl'          => 'Некорректный URL: ',
+	'svnintegration-printfileheader'     => 'Содержимое файла из SVN: ',
+	'svnintegration-filelinktext'        => 'Ссылка на файл в SVN: ',
+	'svnintegration-fileinfoheader'      => 'Информация о файле ',
+	'svnintegration-fileinfopath'        => 'Путь',
+	'svnintegration-fileinfoname'        => 'Имя',
+	'svnintegration-fileinfourl'         => 'Полный URL',
+	'svnintegration-fileinfobase'        => 'Репозиторий',
+	'svnintegration-fileinfouuid'        => 'UUID',
+	'svnintegration-fileinforev'         => 'Текущая ревизия',
+	'svnintegration-fileinfonode'        => 'Тип записи',
+	'svnintegration-fileinfoauthor'      => 'Последний изменявший',
+	'svnintegration-fileinforevchanged'  => 'Последняя ревизия',
+	'svnintegration-fileinfodatechanged' => 'Дата последнего изменения',
+	'svnintegration-fileinfomessage'     => 'Комментарий к ревизии $1',
+	'svnintegration-historyheader'       => 'История ревизий файла ',
+	'svnintegration-historyrev'          => 'Ревизия $1, автор $2, от $3',
+	'svnintegration-todoheader'          => 'TODO-метки в ',
+	'svnintegration-todoline'            => 'на строке ',
+	'svnintegration-fromline'            => 'со строки ',
+	'svnintegration-toline'              => 'по ',
 );
 
 ?>
