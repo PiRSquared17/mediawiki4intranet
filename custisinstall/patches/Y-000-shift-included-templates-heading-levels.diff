@@ -83,7 +83,7 @@ Index: includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -898,6 +907,23 @@
+@@ -898,6 +907,29 @@
  			} elseif ( $contextNode instanceof DOMNode ) {
  				if ( $contextNode->nodeType == XML_TEXT_NODE ) {
  					$out .= $contextNode->nodeValue;
@@ -94,7 +94,13 @@ Index: includes/parser/Preprocessor_DOM.php
 +						if ($headshift > 0 && $headshift_enabled)
 +						{
 +							$mn->value = 0+$headshift+$mn->value;
-+							$contextNode->nodeValue = str_repeat('=', $headshift) . $contextNode->nodeValue . str_repeat('=', $headshift);
++							$headshiftlocal = $headshift;
++							if ($mn->value > 6)
++							{
++								$headshiftlocal = $headshift-$mn->value+6;
++								$mn->value = 6;
++							}
++							$contextNode->nodeValue = str_repeat('=', $headshiftlocal) . $contextNode->nodeValue . str_repeat('=', $headshiftlocal);
 +						}
 +						$headlevel = 0+$mn->value;
 +					}
@@ -107,7 +113,7 @@ Index: includes/parser/Preprocessor_DOM.php
  				} elseif ( $contextNode->nodeName == 'template' ) {
  					# Double-brace expansion
  					$xpath = new DOMXPath( $contextNode->ownerDocument );
-@@ -909,6 +935,7 @@
+@@ -909,6 +941,7 @@
  					} else {
  						$lineStart = $contextNode->getAttribute( 'lineStart' );
  						$params = array(
