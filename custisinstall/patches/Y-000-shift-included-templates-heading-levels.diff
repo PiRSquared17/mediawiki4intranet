@@ -83,11 +83,11 @@ Index: includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -898,6 +907,29 @@
+@@ -896,8 +905,30 @@
+ 			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
+ 				$newIterator = $contextNode;
  			} elseif ( $contextNode instanceof DOMNode ) {
- 				if ( $contextNode->nodeType == XML_TEXT_NODE ) {
- 					$out .= $contextNode->nodeValue;
-+				} elseif ( $contextNode->nodeName == 'h' ) {
++				if ( $contextNode->nodeName == 'h' ) {
 +					# Remember heading levels
 +					if ($mn = $contextNode->attributes->getNamedItem('level'))
 +					{
@@ -104,8 +104,9 @@ Index: includes/parser/Preprocessor_DOM.php
 +						}
 +						$headlevel = 0+$mn->value;
 +					}
-+					# Generic recursive expansion
-+					$newIterator = $contextNode->childNodes;
++				}
+ 				if ( $contextNode->nodeType == XML_TEXT_NODE ) {
+ 					$out .= $contextNode->nodeValue;
 +				} elseif ( $contextNode->nodeName == 'enableHeadShift' ) {
 +					$headshift_enabled = true;
 +					# Generic recursive expansion
@@ -113,7 +114,7 @@ Index: includes/parser/Preprocessor_DOM.php
  				} elseif ( $contextNode->nodeName == 'template' ) {
  					# Double-brace expansion
  					$xpath = new DOMXPath( $contextNode->ownerDocument );
-@@ -909,6 +941,7 @@
+@@ -909,6 +940,7 @@
  					} else {
  						$lineStart = $contextNode->getAttribute( 'lineStart' );
  						$params = array(
