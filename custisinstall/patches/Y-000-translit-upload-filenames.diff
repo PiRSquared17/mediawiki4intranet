@@ -116,18 +116,22 @@ Index: includes/filerepo/File.php
  		if ( $thumbExt != $extension ) {
  			$thumbName .= ".$thumbExt";
  		}
-@@ -716,17 +791,29 @@
+@@ -716,17 +791,33 @@
  	}
  
  	/**
 +	 * Get the physical path of the file
 +	 */
 +	function getPhys() {
++		global $wgTransliterateUploadFilenames;
 +		$name = $this->getName();
-+		if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
-+			$name = wfTransliterate($m[1]).'.'.$m[2];
-+		else
-+			$name = wfTransliterate($name);
++		if ($wgTransliterateUploadFilenames)
++		{
++			if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
++				$name = wfTransliterate($m[1]).'.'.$m[2];
++			else
++				$name = wfTransliterate($name);
++		}
 +		return $name;
 +	}
 +
