@@ -36,39 +36,33 @@ class BatchEditorPage extends SpecialPage
 {
     function BatchEditorPage()
     {
-        SpecialPage::SpecialPage( 'BatchEditor' );
+        SpecialPage::SpecialPage('BatchEditor', 'edit');
     }
 
     function execute($par = null)
     {
         global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
 
-        if (wfReadOnly())
-        {
-            $wgOut->readOnlyPage();
-            return;
-        }
-
         $wgOut->setPagetitle('BatchEditor');
 
-        extract( $wgRequest->getValues( 'a_titles' ) );
-        extract( $wgRequest->getValues( 'a_comment' ) );
-        extract( $wgRequest->getValues( 'a_find' ) );
-        extract( $wgRequest->getValues( 'a_replace' ) );
-        extract( $wgRequest->getValues( 'a_add' ) );
-        extract( $wgRequest->getValues( 'a_delete' ) );
-        extract( $wgRequest->getValues( 'a_action' ) );
+        extract($wgRequest->getValues('a_titles'));
+        extract($wgRequest->getValues('a_comment'));
+        extract($wgRequest->getValues('a_find'));
+        extract($wgRequest->getValues('a_replace'));
+        extract($wgRequest->getValues('a_add'));
+        extract($wgRequest->getValues('a_delete'));
+        extract($wgRequest->getValues('a_action'));
 
         $a_minor = $wgRequest->getCheck( 'a_minor' );
         $a_minor_checked = '';
         if ($a_minor)
-                $a_minor_checked = ' checked="checked" ';
+            $a_minor_checked = ' checked="checked" ';
 
         $parserOptions = ParserOptions::newFromUser( $wgUser );
         $numSessionID = preg_replace( "[\D]", "", session_id() );
         $action = $wgTitle->escapeLocalUrl("");
 
-        $interface_form=<<<EOT
+        $interface_form = <<<EOT
 This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Please, use this promptly!
 <html>
 <form action='$action' method='POST'>
