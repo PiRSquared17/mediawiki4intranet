@@ -15,9 +15,9 @@ if (!defined('MEDIAWIKI')) die();
 require_once('DifferenceEngine.php');
 require_once('LinksUpdate.php');
 
-$wgExtensionFunctions[] = "wfBatchEditor";
+$wgExtensionFunctions[] = "wfInitBatchEditor";
 
-function wfBatchEditor()
+function wfInitBatchEditor()
 {
     global $IP, $wgMessageCache;
     require_once("$IP/includes/SpecialPage.php");
@@ -39,7 +39,7 @@ class BatchEditorPage extends SpecialPage
         SpecialPage::SpecialPage('BatchEditor', 'edit');
     }
 
-    function execute($par = null)
+    function wfBatchEditor($par = null)
     {
         global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
 
