@@ -19,8 +19,7 @@ $wgWorkflowUpdateDelay = 1000; # Delay in milliseconds after clicking state befo
 $wgExtensionCredits['parserhook'][] = $wgExtensionCredits['specialpage'][] = array(
 	'name'        => "Workflow",
 	'author'      => "[http://www.organicdesign.co.nz/nad User:Nad]",
-	'description' => "Adds the ability for articles to be part of workflow sequences and easily moved
-dynamically between phases in the sequence using AJAX.",
+	'description' => "Adds the ability for articles to be part of workflow sequences and easily moved dynamically between phases in the sequence using AJAX.",
 	'url'         => "http://www.mediawiki.org/wiki/Extension:Workflow",
 	'version'     => WORKFLOW_VERSION
 );
@@ -183,7 +182,7 @@ class Workflow {
 			function getCategories() {
 				global $wgWorkflow;
 				if ($wgWorkflow->state) $wgWorkflow->updateCatLinks();
-				return $wgWorkflow->renderWorkflowInfo(parent::getCategories());
+				return "<div id=\'workflowlayer\'>" . $wgWorkflow->renderWorkflowInfo(parent::getCategories()) . "</div>";
 			}
 		}');
  
@@ -201,7 +200,7 @@ class Workflow {
 		if (isset($wgOut->mCategoryLinks['normal'])) $links = &$wgOut->mCategoryLinks['normal'];
 		else $links = &$wgOut->mCategoryLinks;
 		$data  = &$this->workflowData[$this->name];
-		$cats  = join('|', array_keys($data['states']));
+		$cats  = join('|', array_map('preg_quote', array_keys($data['states'])));
 		$tmp   = array();
 		foreach ($links as $i => $link) if (!preg_match("%>($cats)</a>%i", $link)) $tmp[] = $link;
 		$title = Title::newFromText($this->state, NS_CATEGORY);
@@ -246,18 +245,18 @@ class Workflow {
 			global $wgTitle;
 			$article = new Article($wgTitle);
 			$text = $article->getContent();
-			$cats = join('|', array_keys($data['states']));
+			$cats = join('|', array_map('preg_quote', array_keys($data['states'])));
  
 			# Template specified, extract state from template parameter
 			if ($data['template']) {
-				$tmpl = $data['template'];
-				$par  = $data['parameter'];
+				$tmpl = preg_quote($data['template']);
+				$par  = preg_quote($data['parameter']);
 				$state = "%\s*\{\{$tmpl.+?\|\s*$par\s*=\s*(\w+)%si";
 				if (preg_match("%\s*\{\{$tmpl.*?\|\s*$par\s*=\s*(\w+)%si", $text, $m)) $state = $m[1];
 			}
  
 			# No template specified, extract state from category links
-			elseif (preg_match("%\s*\[\[{$this->cat}:($cats)\]\]\s*%i", $text, $m)) $state = $m[1];
+			elseif (preg_match("%\s*\[\[".preg_quote($this->cat).":($cats)\]\]\s*%i", $text, $m)) $state = $m[1];
  
 			# Otherwise default to first defined state
 			else {
@@ -277,7 +276,7 @@ class Workflow {
 		$name  = $this->name;
 		$state = $this->state;
 		$data  = &$this->workflowData[$name];
-		$cats  = join('|', array_keys($data['states']));
+		$cats  = join('|', array_map('preg_quote', array_keys($data['states'])));
 		$tmpl  = $data['template'];
 		$par   = $data['parameter'];
 		$data['current'] = $state;
@@ -290,7 +289,7 @@ class Workflow {
 		# Update the state in the article text (as template parameter or direct cat links)
 		$text = $tmpl
 			? preg_replace("%(\s*\{\{$tmpl.*?\|\s*$par\s*=\s*)\w+%s", "$1$state", $text)
-			: preg_replace("%\s*\[\[{$cat}:($cats)\]\]\s*%i", "", $text) . "[[$cat:$state]]";
+			: preg_replace("%\s*\[\[".preg_quote($cat).":($cats)\]\]\s*%i", "", $text) . "[[$cat:$state]]";
  
 		# Update the article with the new text
 		$article->doEdit($text, wfMsg('workflowStateUpdated', $this->name, $this->state), EDIT_UPDATE);
@@ -309,6 +308,7 @@ class Workflow {
 		wfResetOutputBuffers();
 		header("Cache-Control: no-cache, must-revalidate");
 		header("Expires: Mon, 26 Jul 1997 05:00:00 GMT");
+		header("Content-Type: text/html; charset=utf-8");
 		print $catlinks;
 		return false;
 	}
@@ -326,7 +326,7 @@ class Workflow {
 				clearTimeout(workflowUpdate);
 				workflowLastState = workflowData[name][0];
 				var state = workflowData[name][workflowLastState];
-				sajax_do_call('workflow_ajax_callback',[wgPageName,name,state],document.getElementById('catlinks'));
+				sajax_do_call('workflow_ajax_callback',[wgPageName,name,state],document.getElementById('workflowlayer'));
 			}
 			function workflowSwitchState(name,dir) {
 				clearTimeout(workflowUpdate);
