@@ -42,6 +42,13 @@ class BatchEditorPage extends SpecialPage
     function execute($par = null)
     {
         global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
+
+        if (wfReadOnly())
+        {
+            $wgOut->readOnlyPage();
+            return;
+        }
+
         $wgOut->setPagetitle('BatchEditor');
 
         extract( $wgRequest->getValues( 'a_titles' ) );
