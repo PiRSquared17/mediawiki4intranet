@@ -32,37 +32,30 @@ function wfInitBatchEditor()
     SpecialPage::addPage(new BatchEditorPage);
 }
 
-class BatchEditorPage extends SpecialPage
+function wfSpecialBatchEditor($par = null)
 {
-    function BatchEditorPage()
-    {
-        SpecialPage::SpecialPage('BatchEditor', 'edit');
-    }
+    global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
 
-    function wfBatchEditor($par = null)
-    {
-        global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
+    $wgOut->setPagetitle('BatchEditor');
 
-        $wgOut->setPagetitle('BatchEditor');
+    extract($wgRequest->getValues('a_titles'));
+    extract($wgRequest->getValues('a_comment'));
+    extract($wgRequest->getValues('a_find'));
+    extract($wgRequest->getValues('a_replace'));
+    extract($wgRequest->getValues('a_add'));
+    extract($wgRequest->getValues('a_delete'));
+    extract($wgRequest->getValues('a_action'));
 
-        extract($wgRequest->getValues('a_titles'));
-        extract($wgRequest->getValues('a_comment'));
-        extract($wgRequest->getValues('a_find'));
-        extract($wgRequest->getValues('a_replace'));
-        extract($wgRequest->getValues('a_add'));
-        extract($wgRequest->getValues('a_delete'));
-        extract($wgRequest->getValues('a_action'));
+    $a_minor = $wgRequest->getCheck( 'a_minor' );
+    $a_minor_checked = '';
+    if ($a_minor)
+        $a_minor_checked = ' checked="checked" ';
 
-        $a_minor = $wgRequest->getCheck( 'a_minor' );
-        $a_minor_checked = '';
-        if ($a_minor)
-            $a_minor_checked = ' checked="checked" ';
+    $parserOptions = ParserOptions::newFromUser( $wgUser );
+    $numSessionID = preg_replace( "[\D]", "", session_id() );
+    $action = $wgTitle->escapeLocalUrl("");
 
-        $parserOptions = ParserOptions::newFromUser( $wgUser );
-        $numSessionID = preg_replace( "[\D]", "", session_id() );
-        $action = $wgTitle->escapeLocalUrl("");
-
-        $interface_form = <<<EOT
+    $interface_form = <<<EOT
 This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Please, use this promptly!
 <html>
 <form action='$action' method='POST'>
@@ -108,87 +101,94 @@ This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Plea
 </form>
 </html>
 EOT;
-        $wgOut->addWikiText($interface_form);
-        if (isset($a_titles))
+    $wgOut->addWikiText($interface_form);
+    if (isset($a_titles))
+    {
+        if (isset($a_action) && ($a_action=="Run"))
+            $wgOut->addWikiText("= Results =");
+        else
+            $wgOut->addWikiText("= Preview =");
+        $arr_titles = split("\n", $a_titles);
+        foreach($arr_titles as $s_title)
         {
-            if (isset($a_action) && ($a_action=="Run"))
-                $wgOut->addWikiText("= Results =");
-            else
-                $wgOut->addWikiText("= Preview =");
-            $arr_titles = split("\n", $a_titles);
-            foreach($arr_titles as $s_title)
+            $s_title = trim(str_replace("\r", "", $s_title));
+            if ($s_title)
             {
-                $s_title = trim(str_replace("\r", "", $s_title));
-                if ($s_title)
+                $wgOut->addWikiText("==[[$s_title]]==");
+                $title = Title::newFromURL( $s_title );
+                if ($title)
                 {
-                    $wgOut->addWikiText("==[[$s_title]]==");
-                    $title = Title::newFromURL( $s_title );
-                    if ($title)
+                    $article = new Article( $title  );
+                    if ($article->mTitle->getArticleID() == 0)
+                        $wgOut->addWikiText("Article [[$s_title]] not found!");
+                    else
                     {
-                        $article = new Article( $title  );
-                        if ($article->mTitle->getArticleID() == 0)
-                            $wgOut->addWikiText("Article [[$s_title]] not found!");
-                        else
+                        $article->loadContent(false);
+                        $oldtext = $article->mContent;
+                        $newtext = $oldtext;
+                        if (isset($a_find))
                         {
-                            $article->loadContent(false);
-                            $oldtext = $article->mContent;
-                            $newtext = $oldtext;
-                            if (isset($a_find))
+                            $a_find = trim($a_find);
+                            $a_find = str_replace("\r","",$a_find);
+                            $tmp = str_replace("\n","",$a_find);
+                            $tmp = str_replace("\r","",$tmp);
+                            $tmp = trim($tmp);
+                            if ($tmp)
+                                $newtext = str_replace($a_find,$a_replace,$newtext);
+                        }
+                        if (isset($a_delete))
+                        {
+                            $arr_delline = split("\n", $a_delete);
+                            foreach($arr_delline as $s_delline)
                             {
-                                $a_find = trim($a_find);
-                                $a_find = str_replace("\r","",$a_find);
-                                $tmp = str_replace("\n","",$a_find);
-                                $tmp = str_replace("\r","",$tmp);
-                                $tmp = trim($tmp);
-                                if ($tmp)
-                                    $newtext = str_replace($a_find,$a_replace,$newtext);
+                                $s_delline = str_replace("\r", "", $s_delline);
+                                if (trim(str_replace("\n","", $s_delline))!="")
+                                    $newtext = str_replace($s_delline,"",$newtext);
                             }
-                            if (isset($a_delete))
-                            {
-                                $arr_delline = split("\n", $a_delete);
-                                foreach($arr_delline as $s_delline)
-                                {
-                                    $s_delline = str_replace("\r", "", $s_delline);
-                                    if (trim(str_replace("\n","", $s_delline))!="")
-                                        $newtext = str_replace($s_delline,"",$newtext);
-                                }
-                            }
-                            if (isset($a_add) && trim($a_add)!="")
-                                $newtext.= "\n" . $a_add;
-                            //$ota = explode( "\n", $wgContLang->segmentForDiff( $oldtext ) );
-                            //$nta = explode( "\n", $wgContLang->segmentForDiff( $newtext ) );
-                            //$diffs = new Diff( $ota, $nta );
-                            //$formatter = new TableDiffFormatter();
-                            //$res = $formatter->format( $diffs );
+                        }
+                        if (isset($a_add) && trim($a_add)!="")
+                            $newtext.= "\n" . $a_add;
+                        //$ota = explode( "\n", $wgContLang->segmentForDiff( $oldtext ) );
+                        //$nta = explode( "\n", $wgContLang->segmentForDiff( $newtext ) );
+                        //$diffs = new Diff( $ota, $nta );
+                        //$formatter = new TableDiffFormatter();
+                        //$res = $formatter->format( $diffs );
 
-                            //$de=new DifferenceEngine($oldtext, $newtext);
-                            $de=new DifferenceEngine();
-                            $de->setText($oldtext, $newtext);
-                            //$de->showDiffStyle();
-                            $res = $de->getDiffBody();
-                            $res = "
-                                <table class='diff'>
-                                    <col class='diff-marker' />
-                                    <col class='diff-content' />
-                                    <col class='diff-marker' />
-                                    <col class='diff-content' />
-                                    <tr>
-                                        <td colspan='2' width='50%' align='center' class='diff-otitle'>Old text</td>
-                                        <td colspan='2' width='50%' align='center' class='diff-ntitle'>New text</td>
-                                    </tr>
-                            " . $res . "</table>";
-                            $wgOut->addStyle('common/diff.css');
-                            $wgOut->addHTML($res);
-                        }
-                        if ($a_action == "Run")
-                        {
-                            global $wgLinkCache, $wgParser, $wgLinkHolders, $wgInterwikiLinkHolders, $wgDeferredUpdateList;
-                            $article->updateArticle($newtext, $a_comment, $a_minor, $article->mTitle->userIsWatching(), true);
-                        }
+                        //$de=new DifferenceEngine($oldtext, $newtext);
+                        $de=new DifferenceEngine();
+                        $de->setText($oldtext, $newtext);
+                        //$de->showDiffStyle();
+                        $res = $de->getDiffBody();
+                        $res = "
+                            <table class='diff'>
+                                <col class='diff-marker' />
+                                <col class='diff-content' />
+                                <col class='diff-marker' />
+                                <col class='diff-content' />
+                                <tr>
+                                    <td colspan='2' width='50%' align='center' class='diff-otitle'>Old text</td>
+                                    <td colspan='2' width='50%' align='center' class='diff-ntitle'>New text</td>
+                                </tr>
+                        " . $res . "</table>";
+                        $wgOut->addStyle('common/diff.css');
+                        $wgOut->addHTML($res);
+                    }
+                    if ($a_action == "Run")
+                    {
+                        global $wgLinkCache, $wgParser, $wgLinkHolders, $wgInterwikiLinkHolders, $wgDeferredUpdateList;
+                        $article->updateArticle($newtext, $a_comment, $a_minor, $article->mTitle->userIsWatching(), true);
                     }
                 }
             }
         }
+    }
+}
+
+class BatchEditorPage extends SpecialPage
+{
+    function BatchEditorPage()
+    {
+        SpecialPage::SpecialPage('BatchEditor', 'edit');
     }
 }
 
