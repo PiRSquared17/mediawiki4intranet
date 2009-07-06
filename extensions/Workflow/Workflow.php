@@ -31,7 +31,7 @@ require_once "$IP/includes/SpecialPage.php";
 class SpecialWorkflow extends SpecialPage {
  
 	function SpecialWorkflow() {
-		SpecialPage::SpecialPage(wfMsg('workflow'), '', true, false, false, false);
+		#SpecialPage::SpecialPage(wfMsg('workflow'), '', true, false, false, false);
 	}
  
 	# Render list
