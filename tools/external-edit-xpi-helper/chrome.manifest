@@ -1,0 +1,4 @@
+content wikihelper                              jar:chrome/wikihelper.jar!/content/
+locale  wikihelper  en-US                       jar:chrome/wikihelper.jar!/locale/en-US/
+locale  wikihelper  ru-RU                       jar:chrome/wikihelper.jar!/locale/ru-RU/
+overlay chrome://browser/content/browser.xul    chrome://wikihelper/content/overlay.xul
