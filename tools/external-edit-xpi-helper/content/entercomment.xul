@@ -6,8 +6,10 @@
     chromehidden="menubar toolbar location directories status extrachrome"
     id="genericAbout"
     onload="window.focus()"
-    ondialogaccept="wgWikiHelper.save(document.getElementById('ecomment').value)"
+    ondialogaccept="alert('accept');"
     buttons="accept,cancel"
+    buttonlabelcancel="&wikihelper.cancel;"
+    buttonlabelaccept="&wikihelper.ok;"
     xmlns:em="http://www.mozilla.org/2004/em-rdf#"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
@@ -20,3 +22,4 @@
 </groupbox>
 
 </dialog>
+<!--wgWikiHelper.save(document.getElementById('ecomment').value)-->
