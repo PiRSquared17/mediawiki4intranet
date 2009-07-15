@@ -6,7 +6,7 @@
     chromehidden="menubar toolbar location directories status extrachrome"
     id="genericAbout"
     onload="window.focus()"
-    ondialogaccept="alert('accept');"
+    ondialogaccept="window.arguments[0].save(document.getElementById('ecomment').value)"
     buttons="accept,cancel"
     buttonlabelcancel="&wikihelper.cancel;"
     buttonlabelaccept="&wikihelper.ok;"
@@ -22,4 +22,3 @@
 </groupbox>
 
 </dialog>
-<!--wgWikiHelper.save(document.getElementById('ecomment').value)-->
