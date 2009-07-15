@@ -5,3 +5,5 @@
 <!ENTITY wikihelper.ecommenttitle  "Введите комментарий">
 <!ENTITY wikihelper.entercomment   "Введите комментарий к данному изменению:">
 <!ENTITY wikihelper.defaultcomment "Изменён файл">
+<!ENTITY wikihelper.ok             "Загрузить файл">
+<!ENTITY wikihelper.cancel         "Отмена">
