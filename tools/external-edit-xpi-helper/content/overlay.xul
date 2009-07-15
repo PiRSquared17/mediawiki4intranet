@@ -6,6 +6,7 @@
     <stringbundle id="bundle_wikihelper" src="chrome://wikihelper/locale/theplugin.properties" />
   </stringbundleset>
 -->
+  <script type="application/x-javascript" src="md5.js" />
   <script type="application/x-javascript" src="UrlDownloader.js" />
   <script type="application/x-javascript" src="WikiHelper.js" />
   <script type="application/x-javascript">
