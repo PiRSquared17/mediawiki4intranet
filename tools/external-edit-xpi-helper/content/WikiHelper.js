@@ -142,7 +142,7 @@ WikiContentHandler.prototype =
         if (aTopic != 'process-finished' && aTopic != 'process-finished-pre-3.5')
             return;
         // показываем окно для ввода описания изменений
-        openDialog('chrome://wikihelper/content/entercomment.xul', '', '');
+        openDialog('chrome://wikihelper/content/entercomment.xul', 'entercomment', 'chrome,centerscreen');
     },
     save: function(comment)
     {
