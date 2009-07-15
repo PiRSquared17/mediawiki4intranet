@@ -138,10 +138,16 @@ WikiContentHandler.prototype =
     },
     observe: function(aSubject, aTopic, aData)
     {
-        if (aTopic != 'process-finished')
+        if (aTopic != 'process-finished' &&
+            aTopic != 'process-not-finished-pre-3.5')
             return;
         // показываем окно для ввода описания изменений
-        var comment = prompt('Please enter a comment for this change', 'Uploaded file');
+        var comment = prompt(
+            aTopic == 'process-not-finished-pre-3.5'
+            ? 'Please enter a comment for this change AFTER editing file'
+            : 'Please enter a comment for this change',
+            'Changed a file'
+        );
         if (comment == null)
             return;
         // читаем файл
@@ -232,8 +238,13 @@ WikiContentHandler.prototype =
         var args = [outfiles[0].path];
         try
         {
-            alert(process.runAsync(args, args.length, this, false));
+            process.runAsync(args, args.length, this, false);
         }
-        catch (err) { alert(err); }
+        catch (err)
+        {
+            // runAsync, вероятно, недоступен (версия Firefox < 3.5)
+            process.run(false, args, args.length);
+            this.observe(process, 'process-not-finished-pre-3.5', null);
+        }
     },
 };
