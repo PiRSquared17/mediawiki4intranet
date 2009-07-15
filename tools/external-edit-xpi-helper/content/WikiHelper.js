@@ -142,56 +142,42 @@ WikiContentHandler.prototype =
         var type;
         for (var i in this.ud.types)
             type = this.ud.types[i];
-        var ed = '';
-        var mh = '';
-        var found = false;
+        var ed = null;
         try
         {
             var mime = mimeservice.getFromTypeAndExtension(type, '.'+this.ext);
-            var ed = mime.preferredApplicationHandler;
-            if (ed)
-            {
-                var all = mime.possibleLocalHandlers;
-                var hn;
-                for (var i = 0; i < all.length; i++)
-                {
-                    hn = all.queryElementAt(i, Components.interfaces.nsILocalHandlerApp);
-                    if (hn.name == ed.name)
-                    {
-                        ed = hn.executable.path;
-                        found = true;
-                        break;
-                    }
-                }
-            }
+            ed = mime.preferredApplicationHandler;
         }
-        catch(err) { alert(err); }
-        if (!found)
-            ed = '';
-        ed = prompt('Enter path to an editor', ed);
+        catch(err) { ed = null; }
         if (!ed)
-            return;
-        // запускаем редактор
-        var ef = Components
-            .classes["@mozilla.org/file/local;1"]
-            .createInstance(Components.interfaces.nsILocalFile);
-        ef.initWithPath(ed);
-        if (!ef.exists())
         {
-            alert("Editor '" + ef.path + "' not found!");
-            return;
+            ed = prompt('Enter path to an editor', ed);
+            if (!ed)
+                return;
+            // запускаем редактор
+            var ef = Components
+                .classes["@mozilla.org/file/local;1"]
+                .createInstance(Components.interfaces.nsILocalFile);
+            ef.initWithPath(ed);
+            if (!ef.exists())
+            {
+                alert("Editor '" + ef.path + "' not found!");
+                return;
+            }
+            if (!ef.isExecutable())
+            {
+                alert("File '" + ef.path + "' is not executable!");
+                return;
+            }
+            var process = Components
+                .classes["@mozilla.org/process/util;1"]
+                .createInstance(Components.interfaces.nsIProcess);
+            process.init(ef);
+            var args = [outfiles[0].path];
+            process.run(true, args, args.length);
         }
-        if (!ef.isExecutable())
-        {
-            alert("File '" + ef.path + "' is not executable!");
-            return;
-        }
-        var process = Components
-            .classes["@mozilla.org/process/util;1"]
-            .createInstance(Components.interfaces.nsIProcess);
-        process.init(ef);
-        var args = [outfiles[0].path];
-        process.run(true, args, args.length);
+        else
+            ed.launchWithFile(outfiles[0]);
         // читаем файл
         var is = Components
             .classes["@mozilla.org/network/file-input-stream;1"]
