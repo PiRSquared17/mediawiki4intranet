@@ -230,6 +230,10 @@ WikiContentHandler.prototype =
             .createInstance(Components.interfaces.nsIProcess);
         process.init(ef);
         var args = [outfiles[0].path];
-        process.runAsync(args, args.length, this, false);
+        try
+        {
+            alert(process.runAsync(args, args.length, this, false));
+        }
+        catch (err) { alert(err); }
     },
 };
