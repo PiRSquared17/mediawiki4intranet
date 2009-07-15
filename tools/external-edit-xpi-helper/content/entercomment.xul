@@ -6,15 +6,17 @@
     chromehidden="menubar toolbar location directories status extrachrome"
     id="genericAbout"
     onload="window.focus()"
-    onaccept="wgWikiHelper.save(document.getElementById('ecomment').value)"
+    ondialogaccept="wgWikiHelper.save(document.getElementById('ecomment').value)"
     buttons="accept,cancel"
     xmlns:em="http://www.mozilla.org/2004/em-rdf#"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
 
-<vbox>
+<groupbox>
+  <vbox>
     <text value="&wikihelper.entercomment;" style="font-weight: bold;" />
     <textbox id="ecomment" value="&wikihelper.defaultcomment;" style="width: 20em" />
     <separator class="thin" />
-</vbox>
+  </vbox>
+</groupbox>
 
 </dialog>
