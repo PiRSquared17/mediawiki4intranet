@@ -142,7 +142,7 @@ WikiContentHandler.prototype =
         var type;
         for (var i in this.ud.types)
             type = this.ud.types[i];
-        /*var ed = '';
+        var ed = '';
         try
         {
             var mime = mimeservice.getFromTypeAndExtension(type, '.'+this.ext);
@@ -174,10 +174,10 @@ WikiContentHandler.prototype =
             .createInstance(Components.interfaces.nsIProcess);
         process.init(ef);
         var args = [outfiles[0].path];
-        process.run(true, args, args.length);*/
-        mimeservice
+        process.run(true, args, args.length);
+        /*mimeservice
             .getFromTypeAndExtension(type, '.'+this.ext)
-            .launchWithFile(outfiles[0]);
+            .launchWithFile(outfiles[0]);*/
         // читаем файл
         var is = Components
             .classes["@mozilla.org/network/file-input-stream;1"]
