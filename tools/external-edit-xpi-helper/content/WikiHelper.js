@@ -165,7 +165,7 @@ WikiContentHandler.prototype =
                 }
             }
         }
-        catch(err) {}
+        catch(err) { alert(err); }
         if (!found)
             ed = '';
         ed = prompt('Enter path to an editor', ed);
