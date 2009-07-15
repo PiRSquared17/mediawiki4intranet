@@ -2,5 +2,6 @@
 <!ENTITY wikihelper.enterpath      "Введите путь к редактору:">
 <!ENTITY wikihelper.editornotfound "Редактор '%s' не найден!">
 <!ENTITY wikihelper.notexecutable  "Файл '%s' не исполняемый!">
+<!ENTITY wikihelper.ecommenttitle  "Введите комментарий">
 <!ENTITY wikihelper.entercomment   "Введите комментарий к данному изменению:">
 <!ENTITY wikihelper.defaultcomment "Изменён файл">
