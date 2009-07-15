@@ -59,6 +59,8 @@ WikiContentHandler.prototype =
     {
         if (!iid.equals(Components.interfaces.nsIStreamListener) &&
             !iid.equals(Components.interfaces.nsIRequestObserver) &&
+            !iid.equals(Components.interfaces.nsIObserver) &&
+            !iid.equals(Components.interfaces.nsIDOMEventListener) &&
             !iid.equals(Components.interfaces.nsISupports))
             return Components.results.NS_ERROR_NO_INTERFACE;
         return this;
@@ -134,6 +136,60 @@ WikiContentHandler.prototype =
 //            alert(this.post.responseText);
         }
     },
+    observe: function(aSubject, aTopic, aData)
+    {
+        if (aTopic != 'process-finished')
+            return;
+        // показываем окно для ввода описания изменений
+        var comment = prompt('Please enter a comment for this change', 'Uploaded file');
+        if (comment == null)
+            return;
+        // читаем файл
+        var is = Components
+            .classes["@mozilla.org/network/file-input-stream;1"]
+            .createInstance(Components.interfaces.nsIFileInputStream);
+        is.init(outfiles[0], 0x01, null, null);
+        var bis = Components
+            .classes["@mozilla.org/binaryinputstream;1"]
+            .createInstance(Components.interfaces.nsIBinaryInputStream);
+        bis.setInputStream(is);
+        var data;
+        var sz = is.available();
+        try
+        {
+            data = bis.readBytes(sz);
+        }
+        catch(err)
+        {
+            alert(err);
+        }
+        is.close();
+        // заливаем файл
+        var filename = /([^\/]*)$/i;
+        filename = this.url.match(filename);
+        filename = filename[1];
+        var post = Components
+            .classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+            .createInstance();
+        post.open('POST', this.script+'?title=Special:Upload&wpSourceType=file&wpIgnoreWarning=true&wpDestFile='+filename, true);
+        post.withCredentials = true;
+        post.setRequestHeader('Content-Type', 'multipart/form-data; boundary=--upload0962783');
+        post.onreadystatechange = this;
+        this.post = post;
+        data =
+            "----upload0962783\n"+
+            "Content-Disposition: form-data; name=\"wpUploadDescription\"\n\n"+
+            comment+"\n"+
+            "----upload0962783\n"+
+            "Content-Disposition: form-data; name=\"wpUpload\"\n\n"+
+            "Upload file\n"+
+            "----upload0962783\n"+
+            "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+outfiles[0].path+"\"\n"+
+            "Content-Length: "+sz+"\n\n"+
+            data+
+            "\n----upload0962783--\n";
+        post.sendAsBinary(data);
+    },
     finish: function(urls, outfiles)
     {
         var mimeservice = Components
@@ -174,58 +230,6 @@ WikiContentHandler.prototype =
             .createInstance(Components.interfaces.nsIProcess);
         process.init(ef);
         var args = [outfiles[0].path];
-        process.run(true, args, args.length);
-        /*mimeservice
-            .getFromTypeAndExtension(type, '.'+this.ext)
-            .launchWithFile(outfiles[0]);*/
-        // читаем файл
-        var is = Components
-            .classes["@mozilla.org/network/file-input-stream;1"]
-            .createInstance(Components.interfaces.nsIFileInputStream);
-        is.init(outfiles[0], 0x01, null, null);
-        var bis = Components
-            .classes["@mozilla.org/binaryinputstream;1"]
-            .createInstance(Components.interfaces.nsIBinaryInputStream);
-        bis.setInputStream(is);
-        var data;
-        var sz = is.available();
-        try
-        {
-            data = bis.readBytes(sz);
-        }
-        catch(err)
-        {
-            alert(err);
-        }
-        is.close();
-        // показываем окно для ввода описания изменений
-        var comment = prompt('Please enter a comment for this change', 'Uploaded file');
-        if (comment == null)
-            comment = '';
-        // заливаем файл
-        var filename = /([^\/]*)$/i;
-        filename = this.url.match(filename);
-        filename = filename[1];
-        var post = Components
-            .classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-            .createInstance();
-        post.open('POST', this.script+'?title=Special:Upload&wpSourceType=file&wpIgnoreWarning=true&wpDestFile='+filename, true);
-        post.withCredentials = true;
-        post.setRequestHeader('Content-Type', 'multipart/form-data; boundary=--upload0962783');
-        post.onreadystatechange = this;
-        this.post = post;
-        data =
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUploadDescription\"\n\n"+
-            comment+"\n"+
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUpload\"\n\n"+
-            "Upload file\n"+
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+outfiles[0].path+"\"\n"+
-            "Content-Length: "+sz+"\n\n"+
-            data+
-            "\n----upload0962783--\n";
-        post.sendAsBinary(data);
+        process.runAsync(args, args.length, this);
     },
 };
