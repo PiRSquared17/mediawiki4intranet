@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dialog SYSTEM "chrome://wikihelper/locale/wikihelper.dtd">
+
+<dialog
+    title="&wikihelper.ecommenttitle;"
+    chromehidden="menubar toolbar location directories status extrachrome"
+    id="genericAbout"
+    onload="window.focus()"
+    onaccept="wgWikiHelper.save(document.getElementById('ecomment').value)"
+    buttons="accept,cancel"
+    xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<vbox>
+    <text value="&wikihelper.entercomment;" style="font-weight: bold;" />
+    <textbox id="ecomment" value="&wikihelper.defaultcomment;" style="width: 20em" />
+    <separator class="thin" />
+</vbox>
+
+</dialog>
