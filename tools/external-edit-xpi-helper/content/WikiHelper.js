@@ -143,16 +143,31 @@ WikiContentHandler.prototype =
         for (var i in this.ud.types)
             type = this.ud.types[i];
         var ed = '';
+        var mh = '';
+        var found = false;
         try
         {
             var mime = mimeservice.getFromTypeAndExtension(type, '.'+this.ext);
-            var ed = mime.possibleLocalHandlers;
-            if (ed.length > 0)
-                ed = ed[0].executable.path;
-            else
-                ed = '';
+            var ed = mime.preferredApplicationHandler;
+            if (ed)
+            {
+                var all = mime.possibleLocalHandlers;
+                var hn;
+                for (var i = 0; i < all.length; i++)
+                {
+                    hn = all.queryElementAt(i, Components.interfaces.nsILocalHandlerApp);
+                    if (hn.name == ed.name)
+                    {
+                        ed = hn.executable.path;
+                        found = true;
+                        break;
+                    }
+                }
+            }
         }
-        catch(err) { ed = ''; }
+        catch(err) {}
+        if (!found)
+            ed = '';
         ed = prompt('Enter path to an editor', ed);
         if (!ed)
             return;
