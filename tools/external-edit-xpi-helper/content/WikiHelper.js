@@ -146,17 +146,11 @@ WikiContentHandler.prototype =
         try
         {
             var mime = mimeservice.getFromTypeAndExtension(type, '.'+this.ext);
-            var ed = mime.preferredApplicationHandler;
-            if (ed && 'executable' in ed)
-                ed = ed.executable.path;
+            var ed = mime.possibleLocalHandlers;
+            if (ed.length > 0)
+                ed = ed[0].executable.path;
             else
-            {
-                ed = mime.possibleApplicationHandlers;
-                if (ed.length > 0)
-                    ed = ed[0].executable.path;
-                else
-                    ed = '';
-            }
+                ed = '';
         }
         catch(err) { ed = ''; }
         ed = prompt('Enter path to an editor', ed);
