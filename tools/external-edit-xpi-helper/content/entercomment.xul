@@ -3,10 +3,9 @@
 
 <dialog
     title="&wikihelper.ecommenttitle;"
-    chromehidden="menubar toolbar location directories status extrachrome"
-    id="genericAbout"
+    id="wikiHelperEnterCommentDialog"
     onload="window.focus()"
-    ondialogaccept="window.arguments[0].save(document.getElementById('ecomment').value)"
+    ondialogaccept="alert(window.arguments[0]);window.arguments[0].save(document.getElementById('ecomment').value)"
     buttons="accept,cancel"
     buttonlabelcancel="&wikihelper.cancel;"
     buttonlabelaccept="&wikihelper.ok;"
