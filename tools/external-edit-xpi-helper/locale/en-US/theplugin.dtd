@@ -3,4 +3,4 @@
 <!ENTITY wikihelper.editornotfound "Editor '%s' not found!">
 <!ENTITY wikihelper.notexecutable  "File '%s' is not executable!">
 <!ENTITY wikihelper.entercomment   "Please enter a comment for this change">
-<!ENTITY wikihelper.defaultcomment "Uploaded file">
+<!ENTITY wikihelper.defaultcomment "Changed a file">

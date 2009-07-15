@@ -3,4 +3,4 @@
 <!ENTITY wikihelper.editornotfound "Редактор '%s' не найден!">
 <!ENTITY wikihelper.notexecutable  "Файл '%s' не исполняемый!">
 <!ENTITY wikihelper.entercomment   "Введите комментарий к данному изменению:">
-<!ENTITY wikihelper.defaultcomment "Загружен файл">
+<!ENTITY wikihelper.defaultcomment "Изменён файл">
