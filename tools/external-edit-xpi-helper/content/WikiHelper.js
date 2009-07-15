@@ -21,13 +21,13 @@ WikiHelper.prototype =
     hnd: null,
     canHandleContent: function(aContentType, aIsContentPreferred, aDesiredContentType)
     {
-        if (aContentType.substr(0,29) == 'application/x-external-editor')
+        if (!this.hnd.indialog && aContentType.substr(0,29) == 'application/x-external-editor')
             return true;
         return false;
     },
     isPreferred: function(aContentType, aDesiredContentType)
     {
-        if (aContentType.substr(0,29) == 'application/x-external-editor')
+        if (!this.hnd.indialog && aContentType.substr(0,29) == 'application/x-external-editor')
             return true;
         return false;
     },
@@ -37,7 +37,7 @@ WikiHelper.prototype =
     },
     doContent: function(aContentType, aIsContentPreferred, aRequest, aContentHandler)
     {
-        aContentHandler.value = this.hnd;
+        aContentHandler.value = this.hnd.indialog ? null : this.hnd;
         return false;
     },
 };
@@ -70,7 +70,9 @@ WikiContentHandler.prototype =
     url: '',
     ext: '',
     script: '',
+    outfile: null,
     post: null,
+    indialog: false,
     onStartRequest: function(aRequest, aContext)
     {
         this.data = '';
@@ -142,6 +144,7 @@ WikiContentHandler.prototype =
         if (aTopic != 'process-finished' && aTopic != 'process-finished-pre-3.5')
             return;
         // показываем окно для ввода описания изменений
+        this.indialog = true;
         openDialog('chrome://wikihelper/content/entercomment.xul', 'entercomment', 'chrome,centerscreen', this);
     },
     save: function(comment)
@@ -152,7 +155,7 @@ WikiContentHandler.prototype =
         var is = Components
             .classes["@mozilla.org/network/file-input-stream;1"]
             .createInstance(Components.interfaces.nsIFileInputStream);
-        is.init(outfiles[0], 0x01, null, null);
+        is.init(this.outfile, 0x01, null, null);
         var bis = Components
             .classes["@mozilla.org/binaryinputstream;1"]
             .createInstance(Components.interfaces.nsIBinaryInputStream);
@@ -188,7 +191,7 @@ WikiContentHandler.prototype =
             "Content-Disposition: form-data; name=\"wpUpload\"\n\n"+
             "Upload file\n"+
             "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+outfiles[0].path+"\"\n"+
+            "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+this.outfile.path+"\"\n"+
             "Content-Length: "+sz+"\n\n"+
             data+
             "\n----upload0962783--\n";
@@ -231,6 +234,7 @@ WikiContentHandler.prototype =
             //alert("File '" + ef.path + "' is not executable!");
             return;
         }
+        this.outfile = outfiles[0];
         var process = Components
             .classes["@mozilla.org/process/util;1"]
             .createInstance(Components.interfaces.nsIProcess);
