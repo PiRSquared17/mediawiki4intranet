@@ -250,6 +250,7 @@ WikiContentHandler.prototype =
         {
             var process2 = process.QueryInterface(Components.interfaces.nsIProcess2);
             process2.runAsync(args, args.length, this, false);
+            this.indialog = true;
         }
         catch (err)
         {
