@@ -248,7 +248,8 @@ WikiContentHandler.prototype =
         var args = [outfiles[0].path];
         try
         {
-            process.runAsync(args, args.length, this, false);
+            var process2 = process.QueryInterface(Components.interfaces.nsIProcess2);
+            process2.runAsync(args, args.length, this, false);
         }
         catch (err)
         {
