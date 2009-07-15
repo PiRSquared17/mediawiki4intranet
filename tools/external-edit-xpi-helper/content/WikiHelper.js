@@ -181,7 +181,11 @@ WikiContentHandler.prototype =
         post.open('POST', this.script+'?title=Special:Upload&wpSourceType=file&wpIgnoreWarning=true&wpDestFile='+filename, true);
         post.withCredentials = true;
         post.setRequestHeader('Content-Type', 'multipart/form-data; boundary=--upload0962783');
-        post.onreadystatechange = this;
+        try
+        {
+            post.onreadystatechange = this;
+        }
+        catch(err) { alert(err); }
         this.post = post;
         data =
             "----upload0962783\n"+
