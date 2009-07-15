@@ -110,7 +110,8 @@ WikiContentHandler.prototype =
         }
         if (this.url == '' || this.script == '')
         {
-            alert('Invalid helper file from MediaWiki: line URL=... or line Script=... not found');
+            alert(wgWikiHelperStrings['error']);
+            //alert('Invalid helper file from MediaWiki: line URL=... or line Script=... not found');
             return;
         }
         var f = Components
@@ -210,7 +211,7 @@ WikiContentHandler.prototype =
             ed = ed.executable.path;
         }
         catch(err) { ed = ''; }
-        ed = prompt('Enter path to an editor', ed);
+        ed = prompt(wgWikiHelperStrings['enterpath'], ed);
         if (!ed)
             return;
         // запускаем редактор
@@ -220,12 +221,14 @@ WikiContentHandler.prototype =
         ef.initWithPath(ed);
         if (!ef.exists())
         {
-            alert("Editor '" + ef.path + "' not found!");
+            alert(wgWikiHelperStrings['editornotfound'].replace('XXX', ef.path));
+            //alert("Editor '" + ef.path + "' not found!");
             return;
         }
         if (!ef.isExecutable())
         {
-            alert("File '" + ef.path + "' is not executable!");
+            alert(wgWikiHelperStrings['notexecutable'].replace('XXX', ef.path));
+            //alert("File '" + ef.path + "' is not executable!");
             return;
         }
         var process = Components
