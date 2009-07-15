@@ -5,3 +5,5 @@
 <!ENTITY wikihelper.ecommenttitle  "Enter revision comment">
 <!ENTITY wikihelper.entercomment   "Please enter a comment for this change:">
 <!ENTITY wikihelper.defaultcomment "Changed a file">
+<!ENTITY wikihelper.ok             "OK">
+<!ENTITY wikihelper.cancel         "Cancel">
