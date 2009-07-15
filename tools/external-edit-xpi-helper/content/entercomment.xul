@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
 <!DOCTYPE dialog SYSTEM "chrome://wikihelper/locale/wikihelper.dtd">
 
 <dialog
     title="&wikihelper.ecommenttitle;"
     id="wikiHelperEnterCommentDialog"
     onload="window.focus()"
-    ondialogaccept="alert(window.arguments[0]);window.arguments[0].save(document.getElementById('ecomment').value)"
+    ondialogaccept="window.arguments[0].save(document.getElementById('ecomment').value); return true"
     buttons="accept,cancel"
     buttonlabelcancel="&wikihelper.cancel;"
     buttonlabelaccept="&wikihelper.ok;"
