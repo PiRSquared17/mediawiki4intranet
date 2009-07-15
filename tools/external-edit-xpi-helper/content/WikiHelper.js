@@ -148,7 +148,7 @@ WikiContentHandler.prototype =
             var mime = mimeservice.getFromTypeAndExtension(type, '.'+this.ext);
             ed = mime.preferredApplicationHandler;
             ed = ed.QueryInterface(Components.interfaces.nsILocalHandlerApp);
-            ed = ed.application.path;
+            ed = ed.executable.path;
         }
         catch(err) { ed = ''; }
         ed = prompt('Enter path to an editor', ed);
