@@ -151,6 +151,12 @@ WikiContentHandler.prototype =
     {
         if (comment == null || comment == '')
             return;
+        // конвертируем комментарий в байты utf-8
+        var conv = Components
+            .classes["@mozilla.org/intl/scriptableunicodeconverter"]
+            .createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+        conv.charset = 'UTF-8';
+        comment = conv.ConvertFromUnicode(comment);
         // читаем файл
         var is = Components
             .classes["@mozilla.org/network/file-input-stream;1"]
