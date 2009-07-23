@@ -1,0 +1,14 @@
+Index: Wikilog.php
+===================================================================
+--- Wikilog.php (revision 428)
++++ Wikilog.php (working copy)
+@@ -268,7 +268,8 @@
+         */
+        static function getWikilogInfo( $title ) {
+                global $wgWikilogNamespaces;
+-
++               if (!$title)
++                       return NULL;
+                $ns = Namespace::getSubject( $title->getNamespace() );
+                if ( in_array( $ns, $wgWikilogNamespaces ) ) {
+                        return new WikilogInfo( $title );
