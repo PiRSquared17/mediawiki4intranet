@@ -1,7 +1,7 @@
-Index: Wikilog.php
+Index: extensions/Wikilog/Wikilog.php
 ===================================================================
---- Wikilog.php (revision 428)
-+++ Wikilog.php (working copy)
+--- extensions/Wikilog/Wikilog.php (revision 428)
++++ extensions/Wikilog/Wikilog.php (working copy)
 @@ -268,7 +268,8 @@
          */
         static function getWikilogInfo( $title ) {
