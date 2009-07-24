@@ -102,25 +102,23 @@ function Draft() {
 		);
 		// Ensure timer is cleared in case we saved manually before it expired
 		clearTimeout( timer );
+		timer = null;
 	}
 
 	/**
 	 * Updates the user interface to represent being out of sync with the server
+	 * Bug 50580. Изменено поведение - теперь черновик сохраняется раз в ... секунд,
+	 * а не только по истечении ... секунд с момента последнего действия пользователя
+	 * в поле редактирования.
 	 */
 	this.change = function() {
 		// Sets state to changed
-		self.setState( 'changed' );
+		self.setState('changed');
 		// Checks if timer is pending
-		if ( timer ) {
-			// Clears pending timer
-			clearTimeout( timer );
-		}
-		// Checks if auto-save wait time was set, and that it's greater than 0
-		if ( configuration.autoSaveWait && configuration.autoSaveWait > 0 ) {
+		if (!timer && configuration.autoSaveWait && configuration.autoSaveWait > 0)
+		{
 			// Sets timer to save automatically after a period of time
-			timer = setTimeout(
-				"wgDraft.save()", configuration.autoSaveWait * 1000
-			);
+			timer = setTimeout("wgDraft.save()", configuration.autoSaveWait * 1000);
 		}
 	}
 	
