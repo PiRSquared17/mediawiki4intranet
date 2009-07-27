@@ -14,6 +14,7 @@ require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/Drafts/Drafts.php');
 require_once($IP.'/extensions/SVNIntegration/SVNIntegration.setup.php');
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
+require_once($IP.'/extensions/LiquidThreads/LqtPages.php');
 Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 
 $egDraftsAutoSaveWait  = 60;   // 1 minute
@@ -25,6 +26,9 @@ $wgEnotifWatchlist     = true; // UPO
 $wgEmailAuthentication = true;
 $wgEnotifMinorEdits    = true;
 $wgCookieHttpOnly      = false;
+
+$wgEnableMWSuggest     = true;
+$wgOpenSearchTemplate  = true;
 
 $wgEmergencyContact    = "stas@custis.ru";
 $wgPasswordSender      = "stas@custis.ru";
