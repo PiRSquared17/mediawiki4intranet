@@ -6,8 +6,8 @@ Index: includes/specials/SpecialImport.php
  		} while( $chunk !== false && !$this->mSource->atEnd() );
  		xml_parser_free( $parser );
  
-+		/* TODO remove hardcode /tmp */
-+		$temp = tempnam("/tmp", "ipart");
++		global $wgTmpDirectory;
++		$temp = tempnam($wgTmpDirectory, "ipart");
 +		/* handle binary parts of multipart/related i.e upload images */
 +		while ($part = $this->mSource->nextPart())
 +		{
