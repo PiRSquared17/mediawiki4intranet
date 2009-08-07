@@ -49,4 +49,6 @@ $wgSMTP = array(
     "auth"   => false,
 );
 
+$wgGroupPermissions['*']['delete'] = true;
+
 ?>
