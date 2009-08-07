@@ -50,5 +50,6 @@ $wgSMTP = array(
 );
 
 $wgGroupPermissions['*']['delete'] = true;
+$wgGroupPermissions['*']['undelete'] = true;
 
 ?>
