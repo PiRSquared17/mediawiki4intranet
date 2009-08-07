@@ -105,7 +105,7 @@ if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
     $wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
-    $wgUseImageMagick = false;
+    $wgUseImageMagick = true;
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
 }
