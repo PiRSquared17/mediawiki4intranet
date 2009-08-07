@@ -1,0 +1,21 @@
+Index: skins/MonoBook.php
+===================================================================
+--- skins/MonoBook.php	(revision 47934)
++++ skins/MonoBook.php	(working copy)
+@@ -29,6 +29,16 @@
+ 		# tent CSS fix files.
+ 		$this->cssfiles = array( 'IE', 'IE50', 'IE55', 'IE60', 'IE70', 'rtl' );
+ 	}
++	/**
++	 * parameter level defines if we are on an indentation level
++	 */
++	function tocLine( $anchor, $tocline, $tocnumber, $level ) {
++		global $wgDotAfterTocnumber;
++		return "\n<li class=\"toclevel-$level\"><a href=\"#" .
++			$anchor . '"><span class="tocnumber">' .
++			$tocnumber . (!empty($wgDotAfterTocnumber) ? '.' : '') . '</span> <span class="toctext">' .
++			$tocline . '</span></a>';
++	}
+ }
+ 
+ /**
