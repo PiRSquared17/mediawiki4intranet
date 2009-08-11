@@ -64,7 +64,7 @@ UrlDownloader.prototype = {
         try
         {
             persist.progressListener = this;
-            persist.persistFlags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES | nsIWBP.PERSIST_FLAGS_FROM_CACHE;
+            persist.persistFlags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;// | nsIWBP.PERSIST_FLAGS_FROM_CACHE;
         }
         catch(err)
         {
