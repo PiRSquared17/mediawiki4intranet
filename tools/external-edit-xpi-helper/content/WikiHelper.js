@@ -113,7 +113,6 @@ WikiContentHandler.prototype =
         if (this.url == '' || this.script == '')
         {
             alert(wgWikiHelperStrings['error']);
-            //alert('Invalid helper file from MediaWiki: line URL=... or line Script=... not found');
             return;
         }
         var f = Components
@@ -131,12 +130,17 @@ WikiContentHandler.prototype =
             .get("UChrm",Components.interfaces.nsILocalFile)
             .path;
     },
+    i: 0,
     handleEvent: function(st)
     {
+        this.i = this.i+1;
         if (this.post.readyState == 4)
         {
             Application.activeWindow.activeTab.load(Application.activeWindow.activeTab.uri);
-//            alert(this.post.responseText);
+            this.postbodyfp.close();
+            this.postbodyfp = null;
+            this.postbodyfn.remove();
+            this.postbodyfn = null;
         }
     },
     observe: function(aSubject, aTopic, aData)
@@ -149,59 +153,93 @@ WikiContentHandler.prototype =
     },
     save: function(comment)
     {
-        if (comment == null || comment == '')
-            return;
-        // конвертируем комментарий в байты utf-8
-        var conv = Components
-            .classes["@mozilla.org/intl/scriptableunicodeconverter"]
-            .createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
-        conv.charset = 'UTF-8';
-        comment = conv.ConvertFromUnicode(comment);
-        // читаем файл
-        var is = Components
-            .classes["@mozilla.org/network/file-input-stream;1"]
-            .createInstance(Components.interfaces.nsIFileInputStream);
-        is.init(this.outfile, 0x01, null, null);
-        var bis = Components
-            .classes["@mozilla.org/binaryinputstream;1"]
-            .createInstance(Components.interfaces.nsIBinaryInputStream);
-        bis.setInputStream(is);
-        var data;
-        var sz = is.available();
         try
         {
-            data = bis.readBytes(sz);
+            if (comment == null || comment == '')
+                return;
+            // конвертируем комментарий в байты utf-8
+            var conv = Components
+                .classes["@mozilla.org/intl/scriptableunicodeconverter"]
+                .createInstance(Components.interfaces.nsIScriptableUnicodeConverter);
+            conv.charset = 'UTF-8';
+            comment = conv.ConvertFromUnicode(comment);
+            // заливаем файл
+            var filename = /([^\/]*)$/i;
+            filename = this.url.match(filename);
+            filename = filename[1];
+            var post = Components
+                .classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
+                .createInstance(Components.interfaces.nsIXMLHttpRequest);
+            this.post = post;
+            post.open('POST', this.script+'?title=Special:Upload&wpSourceType=file&wpIgnoreWarning=true&wpDestFile='+filename, true);
+            post.withCredentials = true;
+            post.onreadystatechange = this;
+            this.postbodyfn = Components
+                .classes["@mozilla.org/file/local;1"]
+                .createInstance(Components.interfaces.nsILocalFile);
+            this.postbodyfn.initWithPath(this.getTmpDir());
+            this.postbodyfn.appendRelativePath("wikihelper-POST-" + hex_md5(this.url) + ".multipart");
+            this.postbodyfp = Components
+                .classes["@mozilla.org/network/file-output-stream;1"]
+                .createInstance(Components.interfaces.nsIFileOutputStream);
+            this.postbodyfp.init(this.postbodyfn, -1, -1, null);
+            var is = Components
+                .classes["@mozilla.org/network/file-input-stream;1"]
+                .createInstance(Components.interfaces.nsIFileInputStream);
+            is.init(this.outfile, 0x01, null, null);
+            var bis = Components
+                .classes["@mozilla.org/binaryinputstream;1"]
+                .createInstance(Components.interfaces.nsIBinaryInputStream);
+            bis.setInputStream(is);
+            var sz = is.available();
+            var data =
+                "----upload0962783\n"+
+                "Content-Disposition: form-data; name=\"wpUploadDescription\"\n\n"+
+                comment+"\n"+
+                "----upload0962783\n"+
+                "Content-Disposition: form-data; name=\"wpUpload\"\n\n"+
+                "Upload file\n"+
+                "----upload0962783\n"+
+                "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+this.outfile.path+"\"\n"+
+                "Content-Length: "+sz+"\n\n";
+            this.postbodyfp.write(data, data.length);
+            var left;
+            while ((left = is.available()) > 0)
+            {
+                data = bis.readBytes(left > 65536 ? 65536 : left);
+                this.postbodyfp.write(data, data.length);
+            }
+            is.close();
+            data = "\n----upload0962783--\n";
+            this.postbodyfp.write(data, data.length);
+            this.postbodyfp.close();
+            this.postbodyfp = Components
+                .classes["@mozilla.org/network/file-input-stream;1"]
+                .createInstance(Components.interfaces.nsIFileInputStream);
+            this.postbodyfp.init(this.postbodyfn, 0x01, null, null);
+            post.setRequestHeader('Content-Type', 'multipart/form-data; boundary=--upload0962783');
+            post.send(this.postbodyfp);
+            this.delayed = true;
+            var timer = Components
+                .classes["@mozilla.org/timer;1"]
+                .createInstance(Components.interfaces.nsITimer);
+            timer.initWithCallback({
+                target: this,
+                notify: function (tim) { this.target.delayed = false; },
+            }, 1000, 0);
+            var thread = Components
+                .classes["@mozilla.org/thread-manager;1"]
+                .getService(Components.interfaces.nsIThreadManager)
+                .currentThread;
+            while (this.delayed)
+                thread.processNextEvent(true);
         }
         catch(err)
         {
-            alert(err);
+            alert("Exception in save(): "+err);
         }
-        is.close();
-        // заливаем файл
-        var filename = /([^\/]*)$/i;
-        filename = this.url.match(filename);
-        filename = filename[1];
-        var post = Components
-            .classes["@mozilla.org/xmlextras/xmlhttprequest;1"]
-            .createInstance();
-        this.post = post;
-        post.open('POST', this.script+'?title=Special:Upload&wpSourceType=file&wpIgnoreWarning=true&wpDestFile='+filename, true);
-        post.withCredentials = true;
-        post.setRequestHeader('Content-Type', 'multipart/form-data; boundary=--upload0962783');
-        post.onreadystatechange = this;
-        data =
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUploadDescription\"\n\n"+
-            comment+"\n"+
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUpload\"\n\n"+
-            "Upload file\n"+
-            "----upload0962783\n"+
-            "Content-Disposition: form-data; name=\"wpUploadFile\"; filename=\""+this.outfile.path+"\"\n"+
-            "Content-Length: "+sz+"\n\n"+
-            data+
-            "\n----upload0962783--\n";
-        post.sendAsBinary(data);
+        this.indialog = false;
+        return true;
     },
     finish: function(urls, outfiles)
     {
@@ -231,13 +269,11 @@ WikiContentHandler.prototype =
         if (!ef.exists())
         {
             alert(wgWikiHelperStrings['editornotfound'].replace('XXX', ef.path));
-            //alert("Editor '" + ef.path + "' not found!");
             return;
         }
         if (!ef.isExecutable())
         {
             alert(wgWikiHelperStrings['notexecutable'].replace('XXX', ef.path));
-            //alert("File '" + ef.path + "' is not executable!");
             return;
         }
         this.outfile = outfiles[0];
