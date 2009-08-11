@@ -1,21 +1,22 @@
-Index: skins/MonoBook.php
+Index: includes/parser/Parser.php
 ===================================================================
---- skins/MonoBook.php	(revision 47934)
-+++ skins/MonoBook.php	(working copy)
-@@ -29,6 +29,16 @@
- 		# tent CSS fix files.
- 		$this->cssfiles = array( 'IE', 'IE50', 'IE55', 'IE60', 'IE70', 'rtl' );
- 	}
-+	/**
-+	 * parameter level defines if we are on an indentation level
-+	 */
-+	function tocLine( $anchor, $tocline, $tocnumber, $level ) {
-+		global $wgDotAfterTocnumber;
-+		return "\n<li class=\"toclevel-$level\"><a href=\"#" .
-+			$anchor . '"><span class="tocnumber">' .
-+			$tocnumber . (!empty($wgDotAfterTocnumber) ? '.' : '') . '</span> <span class="toctext">' .
-+			$tocline . '</span></a>';
-+	}
- }
+--- includes/parser/Parser.php	(revision 53578)
++++ includes/parser/Parser.php	(working copy)
+@@ -3402,7 +3406,7 @@
+ 	 * @private
+ 	 */
+ 	function formatHeadings( $text, $isMain=true ) {
+-		global $wgMaxTocLevel, $wgContLang;
++		global $wgMaxTocLevel, $wgContLang, $wgDotAfterTocnumber;
  
- /**
+ 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
+ 		if( !$this->mTitle->quickUserCan( 'edit' ) ) {
+@@ -3544,6 +3548,8 @@
+ 						$dot = 1;
+ 					}
+ 				}
++				if ($wgDotAfterTocnumber)
++					$numbering .= '.';
+ 			}
+ 
+ 			# The safe header is a version of the header text safe to use for links
