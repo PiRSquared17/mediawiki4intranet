@@ -14,7 +14,7 @@
   <RDF:Description RDF:about="urn:mozilla:install-manifest"
                    em:id="{4399e992-706a-11de-bc00-001cc04c01bc}"
                    em:name="WikiHelper"
-                   em:version="1.0.218"
+                   em:version="1.0.241"
                    em:creator="Vitaliy Filippov vitalif@mail.ru"
                    em:description="Helper for MediaWiki External Edit"
                    em:homepageURL="http://lib.custis.ru/index.php/WikiHelper">
