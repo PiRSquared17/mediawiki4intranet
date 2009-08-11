@@ -7,7 +7,7 @@
     title="&wikihelper.ecommenttitle;"
     id="wikiHelperEnterCommentDialog"
     onload="window.focus()"
-    ondialogaccept="window.arguments[0].save(document.getElementById('ecomment').value); window.arguments[0].indialog = false; return true;"
+    ondialogaccept="return window.arguments[0].save(document.getElementById('ecomment').value);"
     ondialogcancel="window.arguments[0].indialog = false; return true;"
     buttons="accept,cancel"
     buttonlabelcancel="&wikihelper.cancel;"
