@@ -25,9 +25,9 @@ Index: extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php	(revision 426)
 +++ extensions/Wikilog/Wikilog.php	(working copy)
 @@ -269,7 +269,7 @@
- 	static function getWikilogInfo( $title ) {
  		global $wgWikilogNamespaces;
- 
+ 		if (!$title)
+ 			return NULL;
 -		$ns = Namespace::getSubject( $title->getNamespace() );
 +		$ns = MWNamespace::getSubject( $title->getNamespace() );
  		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
