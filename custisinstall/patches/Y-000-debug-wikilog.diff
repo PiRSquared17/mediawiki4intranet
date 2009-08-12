@@ -7,8 +7,8 @@ Index: extensions/Wikilog/Wikilog.php
  	static function getWikilogInfo( $title ) {
  		global $wgWikilogNamespaces;
 -
-+               if (!$title)
-+                       return NULL;
++		if (!$title)
++			return NULL;
  		$ns = Namespace::getSubject( $title->getNamespace() );
  		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
  			return new WikilogInfo( $title );
