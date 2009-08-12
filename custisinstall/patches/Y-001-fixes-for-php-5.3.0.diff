@@ -24,7 +24,7 @@ Index: extensions/Wikilog/Wikilog.php
 ===================================================================
 --- extensions/Wikilog/Wikilog.php	(revision 426)
 +++ extensions/Wikilog/Wikilog.php	(working copy)
-@@ -269,7 +269,7 @@
+@@ -270,7 +270,7 @@
  		global $wgWikilogNamespaces;
  		if (!$title)
  			return NULL;
@@ -33,7 +33,7 @@ Index: extensions/Wikilog/Wikilog.php
  		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
  			return new WikilogInfo( $title );
  		} else {
-@@ -298,7 +298,7 @@
+@@ -299,7 +299,7 @@
  	 * @param $title Title object.
  	 */
  	function __construct( $title ) {
