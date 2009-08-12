@@ -1,0 +1,35 @@
+Index: extensions/CategoryTree/CategoryTree.php
+===================================================================
+--- extensions/CategoryTree/CategoryTree.php	(revision 52733)
++++ extensions/CategoryTree/CategoryTree.php	(working copy)
+@@ -351,7 +351,7 @@
+ * Hook callback that injects messages and things into the <head> tag
+ * Does nothing if $parserOutput->mCategoryTreeTag is not set
+ */
+-function efCategoryTreeParserOutput( &$outputPage, &$parserOutput )  {
++function efCategoryTreeParserOutput( $outputPage, $parserOutput )  {
+ 	if ( !empty( $parserOutput->mCategoryTreeTag ) ) {
+ 		CategoryTree::setHeaders( $outputPage );
+ 	}
+@@ -361,7 +361,7 @@
+ /**
+  * ArticleFromTitle hook, override category page handling
+  */
+-function efCategoryTreeArticleFromTitle( &$title, &$article ) {
++function efCategoryTreeArticleFromTitle( $title, $article ) {
+ 	if ( $title->getNamespace() == NS_CATEGORY ) {
+ 		$article = new CategoryTreeCategoryPage( $title );
+ 	}
+Index: languages/Language.php
+===================================================================
+--- languages/Language.php	(revision 47934)
++++ languages/Language.php	(working copy)
+@@ -1672,7 +1672,7 @@
+ 	}
+ 
+ 	# Fill a MagicWord object with data from here
+-	function getMagic( &$mw ) {
++	function getMagic( $mw ) {
+ 		if ( !$this->mMagicHookDone ) {
+ 			$this->mMagicHookDone = true;
+ 			wfRunHooks( 'LanguageGetMagic', array( &$this->mMagicExtensions, $this->getCode() ) );
