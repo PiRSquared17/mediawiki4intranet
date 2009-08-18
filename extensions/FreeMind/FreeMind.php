@@ -23,12 +23,12 @@ function renderMindmap($input)
     $mm_type = "flash";
     $mm_target = "embedded";
 
-    if (preg_match('/^\s*\[{2}\s*:\s*(\w.*)\]{2}\s*$/', $input, $matches))
+    if (preg_match('/^\s*\[{2}\s*:\s*(\S.*)\]{2}\s*$/', $input, $matches))
     {
         $mm_target = "link";
         $input = $matches[1];
     }
-    elseif (preg_match('/^\s*\[{2}\s*(\w.*)\]{2}\s*$/', $input, $matches))
+    elseif (preg_match('/^\s*\[{2}\s*(\S.*)\]{2}\s*$/', $input, $matches))
     {
         $mm_target = "embedded";
         $input = $matches[1];
@@ -46,15 +46,15 @@ function renderMindmap($input)
         $param = trim($paramVector[$i]);
         if (preg_match('/^\s*[0-9]+p[xt]$/', $param))
             $mm_height = $param;
-        elseif (preg_match('/^(\w+)\s+(.*)$/', $param, $pair))
+        elseif (preg_match('/^(\S+)\s+(.*)$/', $param, $pair))
         {
             if ("title" === $pair[1])
                 $mm_title = $pair[2];
             elseif ("parameters" === $pair[1])
             {
-                preg_match_all('/(\\w+?)\\s*=\\s*"(.+?)"/', $pair[2], $match, PREG_SET_ORDER);
+                preg_match_all('/(\\S+?)\\s*=\\s*"(.+?)"/', $pair[2], $match, PREG_SET_ORDER);
                 foreach ($match as $i) $params[$i[1]] = $i[2];
-                preg_match_all('/(\\w+?)\s*=\s*([^"\s]+?)/', $pair[2], $match, PREG_SET_ORDER);
+                preg_match_all('/(\\S+?)\s*=\s*([^"\s]+?)/', $pair[2], $match, PREG_SET_ORDER);
                 foreach ($match as $i) $params[$i[1]] = $i[2];
             }
             else
