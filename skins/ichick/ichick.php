@@ -17,7 +17,7 @@ require_once( dirname(__FILE__) . '/MonoBook.php' );
  * @todo document
  * @ingroup Skins
  */
-class SkinChick extends SkinTemplate {
+class SkinIchick extends SkinTemplate {
 	function initPage( &$out ) {
 		SkinTemplate::initPage( $out );
 		$this->skinname  = 'ichick';
