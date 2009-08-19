@@ -360,7 +360,7 @@ table.rimage {
 }
 
 a.external { color: #3366bb; }
-div#footer { text-align: center; }
+div#footer { display: none; }
 ul#f-list li { list-style: none;  text-align: center; }
 div.portlet { margin: 0.5em 0; }
 
@@ -432,5 +432,9 @@ div#mw-recreate-deleted-warn ul li {
 }
 
 #column-one {
+    display: none;
+}
+
+#siteSub {
     display: none;
 }
