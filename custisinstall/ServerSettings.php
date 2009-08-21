@@ -14,6 +14,7 @@ require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/Drafts/Drafts.php');
 require_once($IP.'/extensions/SVNIntegration/SVNIntegration.setup.php');
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
+require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
 #require_once($IP.'/extensions/LiquidThreads/LqtPages.php');
 Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 
