@@ -127,6 +127,22 @@ wikis+=[{
     "port"     : 3117,
   }]
 
+wikis+=[{
+    "wikiname" : "hrwiki",
+    "sql_user" : "hrwiki",
+    "sql_pass" : "hrwiki",
+    "sql_db"	 : "hrwiki13",
+    "port"     : 3118,
+  }]
+
+wikis+=[{
+    "wikiname" : "cbwiki",
+    "sql_user" : "cbwiki",
+    "sql_pass" : "cbwiki",
+    "sql_db"	 : "cbwiki13",
+    "port"     : 3119,
+  }]
+
 
 for wiki in wikis:
   print_wiki_conf(wiki)
