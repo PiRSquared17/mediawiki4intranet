@@ -25,7 +25,7 @@ $egDraftsAutoSaveWait  = 60;   // 1 minute
 $wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 $wgFLVConverters = array(
-    'ffmpeg' => '$path/ffmpeg -i $input -ss 0 -vframes 1 -s $widthx$height -f image2 $output'
+    'ffmpeg' => '$path/ffmpeg -i $input -ss 0 -vframes 1 -f image2 $output.png && convert $output.png -resize $widthx$height $output && rm $output.png'
 );
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
@@ -61,5 +61,6 @@ $wgSMTP = array(
 
 $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
+$wgGroupPermissions['sysop']['deletebatch'] = true;
 
 ?>
