@@ -21,8 +21,12 @@ Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 
 $egDraftsAutoSaveWait  = 60;   // 1 minute
 
-$wgFlashPlayer = $wgScriptPath . '/extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
+# Extension:FlvHandler
+$wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
+$wgFLVConverters = array(
+    'ffmpeg' => '$path/ffmpeg -i $input -ss 0 -vframes 1 -s $widthx$height -f image2 $output'
+);
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 $wgEnableEmail         = true;
