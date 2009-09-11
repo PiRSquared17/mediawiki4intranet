@@ -24,7 +24,6 @@ $egDraftsAutoSaveWait  = 60;   // 1 minute
 # Extension:FlvHandler
 $wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
-$wgFLVConverter = 'ffmpeg4i';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 $wgEnableEmail         = true;
