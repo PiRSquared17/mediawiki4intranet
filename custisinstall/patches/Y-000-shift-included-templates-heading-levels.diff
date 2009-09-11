@@ -83,7 +83,7 @@ Index: includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -896,8 +905,30 @@
+@@ -896,8 +905,36 @@
  			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
  				$newIterator = $contextNode;
  			} elseif ( $contextNode instanceof DOMNode ) {
