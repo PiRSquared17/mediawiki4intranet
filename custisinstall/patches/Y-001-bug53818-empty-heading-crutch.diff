@@ -1,0 +1,18 @@
+Index: includes/parser/Preprocessor_DOM.php
+===================================================================
+--- includes/parser/Preprocessor_DOM.php	(revision 54846)
++++ includes/parser/Preprocessor_DOM.php	(working copy)
+@@ -398,10 +405,12 @@
+ 					} else {
+ 						$count = min( $equalsLength, $count );
+ 					}
+-					if ( $count > 0 ) {
++					if ( $count > 0 && !preg_match('/^=+$/', $accum) ) {
+ 						// Normal match, output <h>
+ 						$element = "<h level=\"$count\" i=\"$headingIndex\">$accum</h>";
+ 						$headingIndex++;
++					} elseif ( $count > 0 ) {
++						$element = '<ignore>' . htmlspecialchars( $accum ) . '</ignore>';
+ 					} else {
+ 						// Single equals sign on its own line, count=0
+ 						$element = $accum;
