@@ -100,7 +100,13 @@ Index: includes/parser/Preprocessor_DOM.php
 +								$headshiftlocal = $headshift-$mn->value+6;
 +								$mn->value = 6;
 +							}
-+							$contextNode->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->nodeValue) . str_repeat('=', $headshiftlocal);
++							if ($contextNode->childNodes->length <= 1)
++								$contextNode->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->nodeValue) . str_repeat('=', $headshiftlocal);
++							else
++							{
++								$contextNode->childNodes->item(0)->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->childNodes->item(0)->nodeValue);
++								$contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue = trim($contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue) . str_repeat('=', $headshiftlocal);
++							}
 +						}
 +						$headlevel = 0+$mn->value;
 +					}
