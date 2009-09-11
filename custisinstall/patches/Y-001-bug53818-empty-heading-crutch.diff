@@ -2,14 +2,6 @@ Index: includes/parser/Preprocessor_DOM.php
 ===================================================================
 --- includes/parser/Preprocessor_DOM.php	(revision 54846)
 +++ includes/parser/Preprocessor_DOM.php	(working copy)
-@@ -909,6 +940,7 @@
- 					} else {
- 						$lineStart = $contextNode->getAttribute( 'lineStart' );
- 						$params = array(
-+							'headLevel' => $headlevel,
- 							'title' => new PPNode_DOM( $title ),
- 							'parts' => new PPNode_DOM( $parts ),
- 							'lineStart' => $lineStart );
 @@ -986,20 +1018,23 @@
  
                      # Insert a heading marker only for <h> children of <root>
