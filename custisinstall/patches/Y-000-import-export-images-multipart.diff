@@ -272,3 +272,15 @@ Index: languages/messages/MessagesRu.php
  'export-download'   => 'Предложить сохранить как файл',
  'export-templates'  => 'Включить шаблоны',
  
+Index: languages/messages/MessagesEn.php
+===================================================================
+--- languages/messages/MessagesEn.php	2009-03-02 18:52:00.158742452 +0300
++++ languages/messages/MessagesEn.php	2009-09-21 23:25:41.440979724 +0400
+@@ -2514,6 +2514,7 @@ In the latter case you can also use a li
+ 'export-submit'     => 'Export',
+ 'export-addcattext' => 'Add pages from category:',
+ 'export-addcat'     => 'Add',
++'export-images'     => 'Export images',
+ 'export-download'   => 'Save as file',
+ 'export-templates'  => 'Include templates',
+ 

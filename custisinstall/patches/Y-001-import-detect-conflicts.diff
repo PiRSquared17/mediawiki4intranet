@@ -1,0 +1,254 @@
+Index: includes/specials/SpecialImport.php
+===================================================================
+--- includes/specials/SpecialImport.php	2009-09-21 23:21:18.284973476 +0400
++++ includes/specials/SpecialImport.php	2009-09-21 23:20:31.000000000 +0400
+@@ -186,7 +186,9 @@ class ImportReporter {
+ 		$wgOut->addHtml( "<ul>\n" );
+ 	}
+ 
+-	function reportPage( $title, $origTitle, $revisionCount, $successCount ) {
++	function reportPage( $title, $origTitle, $revisionCount, $successCount,
++		$lastExistingRevision, $lastLocalRevision, $lastRevision )
++	{
+ 		global $wgOut, $wgUser, $wgLang, $wgContLang;
+ 
+ 		$skin = $wgUser->getSkin();
+@@ -196,12 +198,56 @@ class ImportReporter {
+ 		$localCount = $wgLang->formatNum( $successCount );
+ 		$contentCount = $wgContLang->formatNum( $successCount );
+ 
+-		if( $successCount > 0 ) {
+-			$wgOut->addHtml( "<li>" . $skin->makeKnownLinkObj( $title ) . " " .
+-				wfMsgExt( 'import-revision-count', array( 'parsemag', 'escape' ), $localCount ) .
+-				"</li>\n"
+-			);
++		/* No revisions in import */
++		if (!$lastExistingRevision && $successCount == 0)
++			$msg = wfMsgHtml('import-norevisions');
++
++		/* New page imported */
++		else if (!$lastLocalRevision && $successCount > 0)
++			$msg = wfMsgExt('import-revision-count-newpage', array('parsemag', 'escape'), $localCount);
+ 
++		else if ($lastExistingRevision)
++		{
++			$newer = $lastLocalRevision->getTimestamp() > $lastExistingRevision->getTimestamp();
++			if ($successCount > 0)
++			{
++				/* Conflict */
++				if ($newer)
++				{
++					$linktext = wfMsgExt( 'import-conflict-difflink',
++						array( 'parsemag', 'escape' ),
++						$lastRevision->getId(),
++						$lastLocalRevision->getId() );
++					$link = $skin->makeKnownLinkObj(
++						$title, $linktext,
++						'diff=' . $lastRevision->getId() .
++						"&oldid=" . $lastLocalRevision->getId() );
++					$msg = wfMsgExt( 'import-conflict',
++						array( 'parsemag' ),
++						$localCount,
++						$link );
++				}
++				/* Page history continued with new revisions */
++				else
++					$msg = wfMsgExt('import-revision-count', array('parsemag', 'escape'), $localCount);
++			}
++			else
++			{
++				/* Local revision is newer */
++				if ($newer)
++					$msg = wfMsgHtml('import-nonewrevisions-localnewer');
++				/* No changes nowhere */
++				else
++					$msg = wfMsgHtml('import-nonewrevisions');
++			}
++		}
++
++		if ($lastRevision || $lastLocalRevision)
++			$msg = $skin->makeKnownLinkObj( $title ) . ': ' . $msg;
++
++		$wgOut->addHtml( "<li>$msg</li>" );
++
++		if( $successCount > 0 ) {
+ 			$log = new LogPage( 'import' );
+ 			if( $this->mIsUpload ) {
+ 				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
+@@ -223,8 +269,6 @@ class ImportReporter {
+ 			# Update page record
+ 			$article->updateRevisionOn( $dbw, $nullRevision );
+ 			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, false) );
+-		} else {
+-			$wgOut->addHtml( '<li>' . wfMsgHtml( 'import-nonewrevisions' ) . '</li>' );
+ 		}
+ 	}
+ 
+@@ -377,7 +422,7 @@ class WikiRevision {
+ 				wfDebug( __METHOD__ . ": skipping existing revision for [[" .
+ 					$this->title->getPrefixedText() . "]], timestamp " .
+ 					$this->timestamp . "\n" );
+-				return false;
++				return $prior;
+ 			}
+ 		}
+ 
+@@ -421,7 +466,9 @@ class WikiRevision {
+ 				$revId );
+ 		}
+ 
+-		return true;
++		# A hack. TOdo it better?
++		$revision->_imported = true;
++		return $revision;
+ 	}
+ 
+ 	function importUpload() {
+@@ -531,6 +578,7 @@ class WikiImporter {
+ 	function __construct( $source ) {
+ 		$this->setRevisionCallback( array( $this, "importRevision" ) );
+ 		$this->setUploadCallback( array( $this, "importUpload" ) );
++		$this->setPageCallback( array( $this, "beginPage" ) );
+ 		$this->mSource = $source;
+ 	}
+ 
+@@ -730,12 +778,14 @@ class WikiImporter {
+ 	 * @param $origTitle Title
+ 	 * @param $revisionCount int
+ 	 * @param $successCount Int: number of revisions for which callback returned true
++	 * @param $lastExistingRevision Revision
++	 * @param $lastLocalRevision Revision
++	 * @param $lastRevision Revision
+ 	 * @private
+ 	 */
+-	function pageOutCallback( $title, $origTitle, $revisionCount, $successCount ) {
++	function pageOutCallback() {
+ 		if( is_callable( $this->mPageOutCallback ) ) {
+-			call_user_func( $this->mPageOutCallback, $title, $origTitle,
+-				$revisionCount, $successCount );
++			call_user_func_array( $this->mPageOutCallback, func_get_args() );
+ 		}
+ 	}
+ 
+@@ -763,6 +813,8 @@ class WikiImporter {
+ 			$this->workSuccessCount = 0;
+ 			$this->uploadCount = 0;
+ 			$this->uploadSuccessCount = 0;
++			$this->lastRevision = NULL;
++			$this->lastExistingRevision = NULL;
+ 			xml_set_element_handler( $parser, "in_page", "out_page" );
+ 		} else {
+ 			return $this->throwXMLerror( "Expected <page>, got <$name>" );
+@@ -799,6 +851,28 @@ class WikiImporter {
+ 		}
+ 	}
+ 
++	function beginPage( $title )
++	{
++		$fields = Revision::selectFields();
++		$fields[] = 'page_namespace';
++		$fields[] = 'page_title';
++		$fields[] = 'page_latest';
++		$dbr = wfGetDB( DB_MASTER );
++		$res = $dbr->select(
++			array( 'page', 'revision' ),
++			$fields,
++			array( 'page_id=rev_page',
++			       'page_namespace' => $this->pageTitle->getNamespace(),
++			       'page_title'     => $this->pageTitle->getDBkey(),
++			       'rev_len IS NOT NULL' ),
++			'Revision::fetchRow',
++			array( 'LIMIT' => 1,
++			       'ORDER BY' => 'rev_timestamp DESC' ) );
++		$row = $res->fetchObject();
++		$res->free();
++		if ($row)
++			$this->lastLocalRevision = new Revision( $row );
++	}
+ 
+ 	function in_page( $parser, $name, $attribs ) {
+ 		$this->debug( "in_page $name" );
+@@ -849,7 +923,9 @@ class WikiImporter {
+ 		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
+ 
+ 		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
+-			$this->workRevisionCount, $this->workSuccessCount );
++			$this->workRevisionCount, $this->workSuccessCount,
++			$this->lastExistingRevision, $this->lastLocalRevision,
++			$this->lastRevision );
+ 
+ 		$this->workTitle = null;
+ 		$this->workRevision = null;
+@@ -975,9 +1051,12 @@ class WikiImporter {
+ 		if( $this->workRevision ) {
+ 			$ok = call_user_func_array( $this->mRevisionCallback,
+ 				array( $this->workRevision, $this ) );
+-			if( $ok ) {
++			if( is_object($ok) && $ok->_imported ) {
++				$this->lastRevision = $ok;
+ 				$this->workSuccessCount++;
+-			}
++			} else if ( is_object($ok) && ( !$this->lastExistingRevision ||
++				$ok->getTimestamp() > $this->lastExistingRevision->getTimestamp() ) )
++				$this->lastExistingRevision = $ok;
+ 		}
+ 	}
+ 
+Index: languages/messages/MessagesRu.php
+===================================================================
+--- languages/messages/MessagesRu.php	2009-09-21 23:23:26.369479764 +0400
++++ languages/messages/MessagesRu.php	2009-09-21 23:22:58.345476900 +0400
+@@ -2100,7 +2100,6 @@ Все операции межвики �
+ 'import-interwiki-namespace' => 'Помещать страницы в пространство имён:',
+ 'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
+ 'importstart'                => 'Импортирование страниц…',
+-'import-revision-count'      => '$1 {{PLURAL:$1|версия|версии|версий}}',
+ 'importnopages'              => 'Нет страниц для импортирования.',
+ 'importfailed'               => 'Не удалось импортировать: $1',
+ 'importunknownsource'        => 'Неизвестный тип импортируемой страницы',
+@@ -2116,9 +2115,15 @@ Все операции межвики �
+ 'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
+ 'import-parse-failure'       => 'Ошибка разбора XML при импорте',
+ 'import-noarticle'           => 'Нет страницы для импортирования!',
+-'import-nonewrevisions'      => 'Все редакции были ранее импортированы.',
+ 'xml-error-string'           => '$1 в строке $2, позиции $3 (байт $4): $5',
+ 'import-upload'              => 'Загрузить XML-данные',
++'import-norevisions'         => 'Нет редакций для импортирования.',
++'import-nonewrevisions-localnewer' => 'Все редакции были ранее импортированы. Страница изменена локально.',
++'import-nonewrevisions'      => 'Все редакции были ранее импортированы. Локальных изменений нет.',
++'import-revision-count'      => '$1 {{PLURAL:$1|версия|версии|версий}}',
++'import-revision-count-newpage' => '$1 {{PLURAL:$1|версия|версии|версий}} (новая страница)',
++'import-conflict'            => '$1 {{PLURAL:$1|версия|версии|версий}} (конфликт: $2)',
++'import-conflict-difflink'   => '$1 (импорт) и $2 (локальная)',
+ 
+ # Import log
+ 'importlogpage'                    => 'Журнал импорта',
+Index: languages/messages/MessagesEn.php
+===================================================================
+--- languages/messages/MessagesEn.php	2009-09-21 23:26:08.984981489 +0400
++++ languages/messages/MessagesEn.php	2009-09-21 23:28:57.108979818 +0400
+@@ -2550,7 +2550,6 @@ All transwiki import actions are logged 
+ 'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
+ Save it to your computer and upload it here.',
+ 'importstart'                => 'Importing pages...',
+-'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
+ 'importnopages'              => 'No pages to import.',
+ 'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
+ 'importunknownsource'        => 'Unknown import source type',
+@@ -2569,9 +2568,15 @@ The file was only partially uploaded.',
+ A temporary folder is missing.',
+ 'import-parse-failure'       => 'XML import parse failure',
+ 'import-noarticle'           => 'No page to import!',
+-'import-nonewrevisions'      => 'All revisions were previously imported.',
+ 'xml-error-string'           => '$1 at line $2, col $3 (byte $4): $5',
+ 'import-upload'              => 'Upload XML data',
++'import-norevisions'         => 'No revisions to import.',
++'import-nonewrevisions-localnewer' => 'All revisions were previously imported. Page changed locally.',
++'import-nonewrevisions'      => 'All revisions were previously imported. No local changes.',
++'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
++'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
++'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
++'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
+ 
+ # Import log
+ 'importlogpage'                    => 'Import log',
