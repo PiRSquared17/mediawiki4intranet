@@ -84,11 +84,12 @@ sub replicate
     $auth = 'Basic '.encode_base64($src->{basiclogin}.':'.$src->{basicpassword}) if $src->{basiclogin};
     $response = $ua->request(
         POST("$src->{url}/index.php?title=Special:Export&action=submit", [
-            templates  => 1,
-            images     => 1,
-            wpDownload => 1,
-            curonly    => !$src->{fullhistory} ? 1 : 0,
-            pages      => $text,
+            templates     => 1,
+            images        => 1,
+            selfcontained => 1,
+            wpDownload    => 1,
+            curonly       => !$src->{fullhistory} ? 1 : 0,
+            pages         => $text,
         ])
     );
     die "[$targetname] Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
