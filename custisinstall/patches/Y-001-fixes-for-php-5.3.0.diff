@@ -1,3 +1,16 @@
+Index: includes/FileDeleteForm.php
+===================================================================
+--- includes/FileDeleteForm.php	(revision 54846)
++++ includes/FileDeleteForm.php	(working copy)
+@@ -107,7 +107,7 @@
+ 			if( $status->ok ) {
+ 				// Need to delete the associated article
+ 				$article = new Article( $title );
+-				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, &$reason)) ) {
++				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, $reason, $article->getId())) ) {
+ 					if( $article->doDeleteArticle( $reason, $suppress ) )
+ 						wfRunHooks('ArticleDeleteComplete', array(&$article, &$wgUser, $reason));
+ 				}
 Index: extensions/CategoryTree/CategoryTree.php
 ===================================================================
 --- extensions/CategoryTree/CategoryTree.php	(revision 52733)
@@ -42,6 +55,23 @@ Index: extensions/Wikilog/Wikilog.php
  		if ( strpos( $title->getText(), '/' ) !== false ) {
  			list( $this->mWikilogName, $this->mItemName ) =
  				explode( '/', $title->getText(), 2 );
+Index: extensions/Wikilog/WikilogHooks.php
+===================================================================
+--- extensions/Wikilog/WikilogHooks.php	(revision 428)
++++ extensions/Wikilog/WikilogHooks.php	(working copy)
+@@ -134,9 +134,11 @@
+ 	 * Purges wikilog metadata when an article is deleted.
+ 	 * @note This function REQUIRES MediaWiki 1.13 or higher ($id parameter).
+ 	 */
+-	static function ArticleDeleteComplete( &$article, &$user, $reason, $id ) {
++	static function ArticleDeleteComplete( &$article, &$user, $reason, $id = NULL ) {
+ 		# Retrieve wikilog information.
+ 		$wi = Wikilog::getWikilogInfo( $article->getTitle() );
++		if ( is_null($id) && $article )
++			$id = $article->getId();
+ 
+ 		# Take special procedures if it is a wikilog page.
+ 		if ( $wi ) {
 Index: languages/Language.php
 ===================================================================
 --- languages/Language.php	(revision 47934)
