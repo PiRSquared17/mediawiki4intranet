@@ -26,6 +26,8 @@ $wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
+$wgAllowCategorizedRecentChanges = true;
+
 $wgEnableEmail         = true;
 $wgEnableUserEmail     = true;
 $wgEnotifUserTalk      = true; // UPO
