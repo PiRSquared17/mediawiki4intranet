@@ -15,6 +15,8 @@ class OldImageRenamer
 			$this->quiet = true;
 		if ($args['delunexisting'])
 			$this->remove_unexisting = true;
+		if ($args['bak'])
+			$this->bak = true;
 	}
 	
 	function out($s)
@@ -56,8 +58,19 @@ class OldImageRenamer
 					}
 					if (file_exists($path . $nfn))
 					{
-						print "Error moving $path$fn to $path$nfn: $path$nfn already exists\n";
-						break;
+						if ($this->bak)
+						{
+							$i = 0;
+							while (file_exists($path.$nfn.'.'.$i))
+								$i++;
+							rename($path.$nfn, $path.$nfn.'.'.$i);
+							print "WARNING: moved $path$nfn into $path$nfn.$i\n";
+						}
+						else
+						{
+							print "Error moving $path$fn to $path$nfn: $path$nfn already exists\n";
+							break;
+						}
 					}
 					if (rename($path . $fn, $path . $nfn))
 					{
