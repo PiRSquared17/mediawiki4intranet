@@ -1,15 +1,17 @@
 Index: includes/filerepo/LocalFile.php
 ===================================================================
---- includes/filerepo/LocalFile.php	2009-09-22 22:24:48.805473447 +0400
-+++ includes/filerepo/LocalFile.php	2009-09-22 22:24:40.433536507 +0400
-@@ -763,6 +763,63 @@ class LocalFile extends File
- 
+--- includes/filerepo/LocalFile.php	(revision 54846)
++++ includes/filerepo/LocalFile.php	(working copy)
+@@ -764,6 +764,66 @@ class LocalFile extends File
  	}
  
-+	/* Upload a file directly into archive. Generally for Special:Import */
-+	function uploadIntoArchive( $srcPath, $dstName, $comment, $pageText, $flags = 0, $props = false, $timestamp = false )
+ 	/**
++	 * Upload a file directly into archive. Generally for Special:Import
++	 */
++	function uploadIntoArchive( $srcPath, $comment, $pageText, $flags = 0, $props = false, $timestamp = false )
 +	{
 +		$this->lock();
++		$dstName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $timestamp ) ) . '!' . $this->getPhys();
 +		$status = $this->publish( $srcPath, $flags, $dstName );
 +		if ( $status->ok ) {
 +			if ( !$this->recordOldUpload( $dstName, $comment, $pageText, $props, $timestamp ) ) {
@@ -21,7 +23,7 @@ Index: includes/filerepo/LocalFile.php
 +	}
 +
 +	/**
-+	 * Record a file upload in the old upload log and the image table
++	 * Record a file upload in the upload log and the oldimage table
 +	 */
 +	function recordOldUpload( $dstName, $comment, $pageText, $props = false, $timestamp = false )
 +	{
@@ -63,10 +65,11 @@ Index: includes/filerepo/LocalFile.php
 +		return true;
 +	}
 +
- 	/**
++	/**
  	 * Record a file upload in the upload log and the image table
  	 */
-@@ -929,14 +986,18 @@ class LocalFile extends File
+ 	function recordUpload2( $oldver, $comment, $pageText, $props = false, $timestamp = false )
+@@ -929,15 +989,21 @@ class LocalFile extends File
  	 *
  	 * @param string $sourcePath Local filesystem path to the source image
  	 * @param integer $flags A bitwise combination of:
@@ -83,11 +86,15 @@ Index: includes/filerepo/LocalFile.php
  		$this->lock();
 +		if (!$dstName)
  		$dstRel = $this->getRel();
+-		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
 +		else
 +			$dstRel = 'archive/' . $this->getHashPath() . $dstName;
- 		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
++		# Изначальное gmdate( 'YmdHis' ) - это НИФИГА не правильно!
++		# Получается, что в имени файла один timestamp, а в базе другой...
++		$archiveName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $this->getTimestamp() ) ) . '!'. $this->getPhys();
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
+ 		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 Index: includes/specials/SpecialExport.php
 ===================================================================
 --- includes/specials/SpecialExport.php	(revision 54846)
@@ -285,7 +292,7 @@ Index: includes/specials/SpecialImport.php
  		# Insert the row
  		$revision = new Revision( array(
  			'page'       => $pageId,
-@@ -421,65 +475,85 @@
+@@ -421,65 +475,81 @@
  				$revId );
  		}
  
@@ -371,12 +378,8 @@ Index: includes/specials/SpecialImport.php
 +		if ($file->exists() && $file->getTimestamp() > $this->getTimestamp())
 +		{
 +			/* Upload an *archive* version */
-+			$arch = $this->getArchiveName();
 +			wfDebug( "Importing an archive $arch version of file (".$this->getTimestamp().")\n" );
-+			if (!$arch)
-+				$arch = gmdate( 'YmdHis' ) . '!'. $file->getPhys();
 +			$status = $file->uploadIntoArchive( $source,
-+				$arch,
 +				$this->getComment(),
 +				$this->getComment(), // Initial page, if none present...
 +				File::DELETE_SOURCE,
@@ -409,7 +412,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	function downloadSource() {
-@@ -488,6 +562,12 @@
+@@ -488,6 +558,12 @@
  			return false;
  		}
  
@@ -422,7 +425,7 @@ Index: includes/specials/SpecialImport.php
  		$tempo = tempnam( wfTempDir(), 'download' );
  		$f = fopen( $tempo, 'wb' );
  		if( !$f ) {
-@@ -496,7 +576,6 @@
+@@ -496,7 +572,6 @@
  		}
  
  		// @fixme!
@@ -430,7 +433,7 @@ Index: includes/specials/SpecialImport.php
  		$data = Http::get( $src );
  		if( !$data ) {
  			wfDebug( "IMPORT: couldn't fetch source $src\n" );
-@@ -531,6 +610,7 @@
+@@ -531,6 +606,7 @@
  	function __construct( $source ) {
  		$this->setRevisionCallback( array( $this, "importRevision" ) );
  		$this->setUploadCallback( array( $this, "importUpload" ) );
@@ -438,7 +441,7 @@ Index: includes/specials/SpecialImport.php
  		$this->mSource = $source;
  	}
  
-@@ -665,12 +745,13 @@
+@@ -665,12 +741,13 @@
  	}
  
  	/**
@@ -456,7 +459,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	/**
-@@ -708,12 +789,14 @@
+@@ -708,12 +785,14 @@
  	 * @param $origTitle Title
  	 * @param $revisionCount int
  	 * @param $successCount Int: number of revisions for which callback returned true
@@ -474,7 +477,7 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -741,6 +824,8 @@
+@@ -741,6 +820,8 @@
  			$this->workSuccessCount = 0;
  			$this->uploadCount = 0;
  			$this->uploadSuccessCount = 0;
@@ -483,7 +486,7 @@ Index: includes/specials/SpecialImport.php
  			xml_set_element_handler( $parser, "in_page", "out_page" );
  		} else {
  			return $this->throwXMLerror( "Expected <page>, got <$name>" );
-@@ -777,6 +862,28 @@
+@@ -777,6 +858,28 @@
  		}
  	}
  
@@ -512,7 +515,7 @@ Index: includes/specials/SpecialImport.php
  
  	function in_page( $parser, $name, $attribs ) {
  		$this->debug( "in_page $name" );
-@@ -827,7 +934,9 @@
+@@ -827,7 +930,9 @@
  		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  
  		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
@@ -523,14 +526,8 @@ Index: includes/specials/SpecialImport.php
  
  		$this->workTitle = null;
  		$this->workRevision = null;
-@@ -902,9 +1011,24 @@
- 			if( $this->workRevision )
- 				$this->workRevision->setFilename( $this->appenddata );
+@@ -904,7 +1009,18 @@
  			break;
-+		case "sha1":
-+			if( $this->workRevision )
-+				$this->workRevision->setSha1( $this->appenddata );
-+			break;
  		case "src":
  			if( $this->workRevision )
 -				$this->workRevision->setSrc( $this->appenddata );
@@ -549,7 +546,7 @@ Index: includes/specials/SpecialImport.php
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -953,9 +1077,12 @@
+@@ -953,9 +1069,12 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -564,15 +561,16 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -968,6 +1095,7 @@
+@@ -967,6 +1086,8 @@
+ 		case "text":
  		case "filename":
  		case "src":
++			if ($this->workRevision && $attribs['sha1'])
++				$this->workRevision->setSha1( $attribs['sha1'] );
  		case "size":
-+		case "sha1":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
- 			xml_set_character_data_handler( $parser, "char_append" );
-@@ -982,7 +1110,7 @@
+@@ -982,7 +1103,7 @@
  	}
  
  	function out_upload( $parser, $name ) {
@@ -581,7 +579,7 @@ Index: includes/specials/SpecialImport.php
  		$this->pop();
  		if( $name != "upload" ) {
  			return $this->throwXMLerror( "Expected </upload>, got </$name>" );
-@@ -1064,6 +1192,10 @@
+@@ -1064,6 +1185,10 @@
  			return $this->mString;
  		}
  	}
@@ -592,7 +590,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,20 +1203,131 @@
+@@ -1071,20 +1196,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -854,7 +852,7 @@ Index: includes/Export.php
  					$out .= $this->writeUpload( $ver );
  				}
  				$out .= $this->writeUpload( $img );
-@@ -502,13 +539,19 @@
+@@ -502,12 +539,19 @@
  	}
  
  	function writeUpload( $file ) {
@@ -869,13 +867,13 @@ Index: includes/Export.php
  			"      " . wfElementClean( 'comment', null, $file->getDescription() ) . "\n" .
  			"      " . wfElement( 'filename', null, $file->getName() ) . "\n" .
 -			"      " . wfElement( 'src', null, $file->getFullUrl() ) . "\n" .
-+			"      " . wfElement( 'src', null, $partname ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
++			"      " . wfElement( 'src',
++			                      array('sha1' => $file->getSha1()),
++			                      $partname ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
  			"      " . wfElement( 'size', null, $file->getSize() ) . "\n" .
-+			"      " . wfElement( 'sha1', null, $file->getSha1() ) . "\n" .
  			"    </upload>\n";
  	}
- 
-@@ -540,6 +583,10 @@
+@@ -540,6 +584,10 @@
  		$this->write( $string );
  	}
  
