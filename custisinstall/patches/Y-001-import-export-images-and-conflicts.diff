@@ -243,14 +243,10 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -301,6 +346,14 @@
+@@ -301,6 +346,10 @@
  		$this->filename = $filename;
  	}
  
-+	function setArchiveName( $archname ) {
-+		$this->archivename = $archname;
-+	}
-+
 +	function setSha1( $sha1 ) {
 +		$this->sha1 = trim( $sha1 );
 +	}
@@ -258,14 +254,10 @@ Index: includes/specials/SpecialImport.php
  	function setSize( $size ) {
  		$this->size = intval( $size );
  	}
-@@ -341,6 +394,14 @@
+@@ -341,6 +390,10 @@
  		return $this->filename;
  	}
  
-+	function getArchiveName() {
-+		return $this->archivename;
-+	}
-+
 +	function getSha1() {
 +		return $this->sha1;
 +	}
@@ -273,7 +265,7 @@ Index: includes/specials/SpecialImport.php
  	function getSize() {
  		return $this->size;
  	}
-@@ -377,17 +438,10 @@
+@@ -377,17 +430,10 @@
  				wfDebug( __METHOD__ . ": skipping existing revision for [[" .
  					$this->title->getPrefixedText() . "]], timestamp " .
  					$this->timestamp . "\n" );
@@ -292,7 +284,7 @@ Index: includes/specials/SpecialImport.php
  		# Insert the row
  		$revision = new Revision( array(
  			'page'       => $pageId,
-@@ -421,65 +475,81 @@
+@@ -421,65 +467,81 @@
  				$revId );
  		}
  
@@ -412,7 +404,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	function downloadSource() {
-@@ -488,6 +558,12 @@
+@@ -488,6 +550,12 @@
  			return false;
  		}
  
@@ -425,7 +417,7 @@ Index: includes/specials/SpecialImport.php
  		$tempo = tempnam( wfTempDir(), 'download' );
  		$f = fopen( $tempo, 'wb' );
  		if( !$f ) {
-@@ -496,7 +572,6 @@
+@@ -496,7 +564,6 @@
  		}
  
  		// @fixme!
@@ -433,7 +425,7 @@ Index: includes/specials/SpecialImport.php
  		$data = Http::get( $src );
  		if( !$data ) {
  			wfDebug( "IMPORT: couldn't fetch source $src\n" );
-@@ -531,6 +606,7 @@
+@@ -531,6 +598,7 @@
  	function __construct( $source ) {
  		$this->setRevisionCallback( array( $this, "importRevision" ) );
  		$this->setUploadCallback( array( $this, "importUpload" ) );
@@ -441,7 +433,7 @@ Index: includes/specials/SpecialImport.php
  		$this->mSource = $source;
  	}
  
-@@ -665,12 +741,13 @@
+@@ -665,12 +733,13 @@
  	}
  
  	/**
@@ -459,7 +451,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	/**
-@@ -708,12 +785,14 @@
+@@ -708,12 +777,14 @@
  	 * @param $origTitle Title
  	 * @param $revisionCount int
  	 * @param $successCount Int: number of revisions for which callback returned true
@@ -477,7 +469,7 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -741,6 +820,8 @@
+@@ -741,6 +812,8 @@
  			$this->workSuccessCount = 0;
  			$this->uploadCount = 0;
  			$this->uploadSuccessCount = 0;
@@ -486,7 +478,7 @@ Index: includes/specials/SpecialImport.php
  			xml_set_element_handler( $parser, "in_page", "out_page" );
  		} else {
  			return $this->throwXMLerror( "Expected <page>, got <$name>" );
-@@ -777,6 +858,28 @@
+@@ -777,6 +850,28 @@
  		}
  	}
  
@@ -515,7 +507,7 @@ Index: includes/specials/SpecialImport.php
  
  	function in_page( $parser, $name, $attribs ) {
  		$this->debug( "in_page $name" );
-@@ -827,7 +930,9 @@
+@@ -827,7 +922,9 @@
  		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  
  		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
@@ -526,15 +518,12 @@ Index: includes/specials/SpecialImport.php
  
  		$this->workTitle = null;
  		$this->workRevision = null;
-@@ -904,7 +1009,18 @@
+@@ -904,7 +1001,15 @@
  			break;
  		case "src":
  			if( $this->workRevision )
 -				$this->workRevision->setSrc( $this->appenddata );
 +			{
-+				/* Сохраняем архивное имя файла */
-+				if (preg_match('#^.*/([^/]*![^/]*)$#', $this->appenddata, $m))
-+					$this->workRevision->setArchiveName($m[1]);
 +				/* Передаём путь к файлу, если он уже загружен */
 +				if (substr($this->appenddata, 0, 12) == 'multipart://' &&
 +				    ($p = $this->mSource->parts[substr($this->appenddata, 12)]))
@@ -546,7 +535,7 @@ Index: includes/specials/SpecialImport.php
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -953,9 +1069,12 @@
+@@ -953,9 +1058,12 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -561,7 +550,7 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -967,6 +1086,8 @@
+@@ -967,6 +1075,8 @@
  		case "text":
  		case "filename":
  		case "src":
@@ -570,7 +559,7 @@ Index: includes/specials/SpecialImport.php
  		case "size":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
-@@ -982,7 +1103,7 @@
+@@ -982,7 +1092,7 @@
  	}
  
  	function out_upload( $parser, $name ) {
@@ -579,7 +568,7 @@ Index: includes/specials/SpecialImport.php
  		$this->pop();
  		if( $name != "upload" ) {
  			return $this->throwXMLerror( "Expected </upload>, got </$name>" );
-@@ -1064,6 +1185,10 @@
+@@ -1064,6 +1174,10 @@
  			return $this->mString;
  		}
  	}
@@ -590,7 +579,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,20 +1196,131 @@
+@@ -1071,20 +1185,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
