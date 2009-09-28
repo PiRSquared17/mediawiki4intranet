@@ -28,7 +28,7 @@ $wgDBpassword       = "wiki";
 
 $wgDBprefix         = "";
 
-$wgDBTableOptions   = "TYPE=MyISAM";
+$wgDBTableOptions   = "ENGINE=InnoDB, DEFAULT CHARSET=utf8";
 $wgDBmysql5         = true;
 
 $wgEnableUploads    = true;
