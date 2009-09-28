@@ -144,9 +144,9 @@ wikis+=[{
   }]
 
 wikis+=[{
-    "wikiname" : "gzstable",
-    "sql_user" : "gzstable",
-    "sql_pass" : "gzstable",
+    "wikiname" : "gzstable13",
+    "sql_user" : "gzstable13",
+    "sql_pass" : "gzstable13",
     "sql_db"	 : "gzstable13",
     "port"     : 3120,
   }]
