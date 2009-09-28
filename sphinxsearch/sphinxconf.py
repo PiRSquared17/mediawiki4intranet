@@ -143,6 +143,14 @@ wikis+=[{
     "port"     : 3119,
   }]
 
+wikis+=[{
+    "wikiname" : "gzstable",
+    "sql_user" : "gzstable",
+    "sql_pass" : "gzstable",
+    "sql_db"	 : "gzstable13",
+    "port"     : 3120,
+  }]
+
 
 for wiki in wikis:
   print_wiki_conf(wiki)
