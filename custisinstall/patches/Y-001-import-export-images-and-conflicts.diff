@@ -459,7 +459,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	/**
-@@ -708,12 +777,14 @@
+@@ -708,12 +777,15 @@
  	 * @param $origTitle Title
  	 * @param $revisionCount int
  	 * @param $successCount Int: number of revisions for which callback returned true
@@ -473,11 +473,12 @@ Index: includes/specials/SpecialImport.php
  		if( is_callable( $this->mPageOutCallback ) ) {
 -			call_user_func( $this->mPageOutCallback, $title, $origTitle,
 -				$revisionCount, $successCount );
-+			call_user_func_array( $this->mPageOutCallback, func_get_args() );
++			$args = func_get_args();
++			call_user_func_array( $this->mPageOutCallback, $args );
  		}
  	}
  
-@@ -741,6 +812,8 @@
+@@ -741,6 +813,8 @@
  			$this->workSuccessCount = 0;
  			$this->uploadCount = 0;
  			$this->uploadSuccessCount = 0;
@@ -486,7 +487,7 @@ Index: includes/specials/SpecialImport.php
  			xml_set_element_handler( $parser, "in_page", "out_page" );
  		} else {
  			return $this->throwXMLerror( "Expected <page>, got <$name>" );
-@@ -777,6 +850,28 @@
+@@ -777,6 +851,28 @@
  		}
  	}
  
@@ -515,7 +516,7 @@ Index: includes/specials/SpecialImport.php
  
  	function in_page( $parser, $name, $attribs ) {
  		$this->debug( "in_page $name" );
-@@ -827,7 +922,9 @@
+@@ -827,7 +923,9 @@
  		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  
  		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
@@ -526,7 +527,7 @@ Index: includes/specials/SpecialImport.php
  
  		$this->workTitle = null;
  		$this->workRevision = null;
-@@ -904,7 +1001,15 @@
+@@ -904,7 +1002,15 @@
  			break;
  		case "src":
  			if( $this->workRevision )
@@ -543,7 +544,7 @@ Index: includes/specials/SpecialImport.php
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -953,9 +1058,12 @@
+@@ -953,9 +1059,12 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -558,7 +559,7 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -967,6 +1075,8 @@
+@@ -967,6 +1076,8 @@
  		case "text":
  		case "filename":
  		case "src":
@@ -567,7 +568,7 @@ Index: includes/specials/SpecialImport.php
  		case "size":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
-@@ -982,7 +1092,7 @@
+@@ -982,7 +1093,7 @@
  	}
  
  	function out_upload( $parser, $name ) {
@@ -576,7 +577,7 @@ Index: includes/specials/SpecialImport.php
  		$this->pop();
  		if( $name != "upload" ) {
  			return $this->throwXMLerror( "Expected </upload>, got </$name>" );
-@@ -1064,6 +1174,10 @@
+@@ -1064,6 +1175,10 @@
  			return $this->mString;
  		}
  	}
@@ -587,7 +588,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,20 +1185,131 @@
+@@ -1071,20 +1186,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
