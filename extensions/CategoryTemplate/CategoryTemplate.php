@@ -51,16 +51,21 @@ function _cattemplateaddcategory(&$text)
 function _cattemplatecategorychange($catpage)
 {
     global $wgOut, $wgScript, $CategoryTemplateMessages;
-    $boxtext = addcslashes(wfMsg("addcategorytemplate-create-article"));
-    $btext = addcslashes(wfMsg("addcategorytemplate-submit"));
-    $confirmtext = addcslashes(wfMsg("addcategorytemplate-confirm"));
+    $boxtext = addslashes(wfMsg("addcategorytemplate-create-article"));
+    $btext = addslashes(wfMsg("addcategorytemplate-submit"));
+    $confirmtext = addslashes(wfMsg("addcategorytemplate-confirm"));
     $Action = htmlspecialchars($wgScript);
     $temp2 = <<<ENDFORM
 <!-- Add Article Extension Start -->
 <script type="text/javascript">
 function clearText(thefield) { if (thefield.defaultValue==thefield.value) thefield.value="" }
 function addText(thefield) { if (thefield.value=="") thefield.value=thefield.defaultValue }
-function checkname() { return document.createbox.createboxInput.value!=document.createbox.createboxInput.defaultValue || confirm("$confirmtext".replace("%s", document.createbox.createboxInput.value)); }
+function checkname()
+{
+    var inp = document.getElementById('createboxInput');
+    //if (inp.value
+    return inp.value!=inp.defaultValue || confirm("$confirmtext".replace("%s", document.createbox.createboxInput.value));
+}
 </script>
 <table border="0" align="right" width="423" cellspacing="0" cellpadding="0">
 <tr><td width="100%" align="right" bgcolor="">
@@ -68,7 +73,7 @@ function checkname() { return document.createbox.createboxInput.value!=document.
     <input type="hidden" name="action" value="edit">
     <input type="hidden" name="_new" value="1">
     <input type="hidden" name="_category" value="{$catpage->mTitle->getText()}">
-    <input class="createboxInput" name="title" type="text" value="{$boxtext}" size="30" style="color:#666;" onfocus="clearText(this);" onblur="addText(this);" />
+    <input id="createboxInput" class="createboxInput" name="title" type="text" value="{$boxtext}" size="30" style="color:#666;" onfocus="clearText(this);" onblur="addText(this);" />
     <input type="submit" name="create" class="createboxButton" value="{$btext}" />
 </form>
 </td></tr>
