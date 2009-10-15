@@ -51,9 +51,9 @@ function _cattemplateaddcategory(&$text)
 function _cattemplatecategorychange($catpage)
 {
     global $wgOut, $wgScript, $CategoryTemplateMessages;
-    $boxtext = wfMsg("addcategorytemplate-create-article");
-    $btext = wfMsg("addcategorytemplate-submit");
-    $confirmtext = wfMsg("addcategorytemplate-confirm");
+    $boxtext = addcslashes(wfMsg("addcategorytemplate-create-article"));
+    $btext = addcslashes(wfMsg("addcategorytemplate-submit"));
+    $confirmtext = addcslashes(wfMsg("addcategorytemplate-confirm"));
     $Action = htmlspecialchars($wgScript);
     $temp2 = <<<ENDFORM
 <!-- Add Article Extension Start -->
