@@ -53,16 +53,18 @@ function _cattemplatecategorychange($catpage)
     global $wgOut, $wgScript, $CategoryTemplateMessages;
     $boxtext = wfMsg("addcategorytemplate-create-article");
     $btext = wfMsg("addcategorytemplate-submit");
+    $confirmtext = wfMsg("addcategorytemplate-confirm");
     $Action = htmlspecialchars($wgScript);
     $temp2 = <<<ENDFORM
 <!-- Add Article Extension Start -->
 <script type="text/javascript">
-function clearText(thefield) { if (thefield.defaultValue==thefield.value) thefield.value = "" }
-function addText(thefield) { if (thefield.value=="") thefield.value = thefield.defaultValue }
+function clearText(thefield) { if (thefield.defaultValue==thefield.value) thefield.value="" }
+function addText(thefield) { if (thefield.value=="") thefield.value=thefield.defaultValue }
+function checkname() { return document.createbox.createboxInput.value!=document.createbox.createboxInput.defaultValue || confirm("$confirmtext".replace("%s", document.createbox.createboxInput.value)); }
 </script>
 <table border="0" align="right" width="423" cellspacing="0" cellpadding="0">
 <tr><td width="100%" align="right" bgcolor="">
-<form name="createbox" action="{$Action}" method="get" class="createbox">
+<form name="createbox" action="{$Action}" method="get" class="createbox" onsubmit="return checkname()">
     <input type="hidden" name="action" value="edit">
     <input type="hidden" name="_new" value="1">
     <input type="hidden" name="_category" value="{$catpage->mTitle->getText()}">
