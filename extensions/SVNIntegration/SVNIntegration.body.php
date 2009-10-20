@@ -218,7 +218,7 @@ function SVNIntegrationGetError($errMsg)
  */
 function SVNIntegrationHandleParams($params)
 {
-	global $SVNIntegrationSettings;
+	global $SVNIntegrationDefaultSettings, $SVNIntegrationSettings;
 	
 	if (!is_array($params))
 		return;
@@ -237,7 +237,7 @@ function SVNIntegrationHandleParams($params)
 		unset($SVNIntegrationSettings['password']);
 	
 	// use all given parameters
-	$SVNIntegrationSettings['svnParams'] = array_merge($SVNIntegrationSettings['svnParams'], $params);
+	$SVNIntegrationSettings['svnParams'] = array_merge($SVNIntegrationDefaultSettings['svnParams'], $params);
 }
 
 /**
@@ -434,7 +434,7 @@ function SVNIntegrationFileInfo($text, $params, &$parser)
 		if ($SVNIntegrationSettings['useUtf8'])
 			$logSvn->log->prepend_cmd = 'export LC_ALL=en_US.UTF8 && ';
 		$revNr = intval($info['revChanged']['value']);
-		$logOptions = array_merge(array('revision' => $revNr), $SVNIntegrationSettings['svnParams']);
+		$logOptions = array_merge($SVNIntegrationSettings['svnParams'], array('revision' => $revNr));
 		$revisionInfo = $logSvn->log->run(array($text), $logOptions);
 		$info['message']['text'] = wfMsg('svnintegration-fileinfomessage', array($revNr));
 		$info['message']['value'] = $parser->recursiveTagParse("\n" . trim($revisionInfo[0]['MSG']));
