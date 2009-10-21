@@ -1,0 +1,13 @@
+Index: WikilogMainPage.php
+===================================================================
+--- WikilogMainPage.php	(revision 428)
++++ WikilogMainPage.php	(working copy)
+@@ -245,7 +245,7 @@
+ 		$fields[] = Xml::hidden( 'title', $this->mTitle->getPrefixedText() );
+ 		$fields[] = Xml::hidden( 'action', 'wikilog' );
+ 		$fields[] = Xml::inputLabel( wfMsg( 'wikilog-item-name' ),
+-			'wlItemName', 'wl-item-name', 25 );
++			'wlItemName', 'wl-item-name', 25, date('Y-m-d/') );
+ 		$fields[] = Xml::submitButton( wfMsg( 'wikilog-new-item-go' ),
+ 			array( 'name' => 'wlActionNewItem' ) );
+ 
