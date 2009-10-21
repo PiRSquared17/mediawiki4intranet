@@ -33,6 +33,19 @@ Index: extensions/CategoryTree/CategoryTree.php
  	if ( $title->getNamespace() == NS_CATEGORY ) {
  		$article = new CategoryTreeCategoryPage( $title );
  	}
+Index: extensions/DocExport/DocExport.php
+===================================================================
+--- extensions/DocExport/DocExport.php	(revision 327)
++++ extensions/DocExport/DocExport.php	(working copy)
+@@ -162,7 +162,7 @@
+         echo $html;
+     }
+ 
+-    public function onUnknownAction($action, &$article)
++    public function onUnknownAction($action, $article)
+     {
+         // Here comes all the stuff to show the form and parse it...
+         global $wgTitle, $wgOut, $wgUser;
 Index: extensions/Wikilog/Wikilog.php
 ===================================================================
 --- extensions/Wikilog/Wikilog.php	(revision 426)
@@ -72,6 +85,15 @@ Index: extensions/Wikilog/WikilogHooks.php
  
  		# Take special procedures if it is a wikilog page.
  		if ( $wi ) {
+@@ -253,7 +255,7 @@
+ 	 * UnknownAction hook handler function.
+ 	 * Handles action=wikilog requests.
+ 	 */
+-	static function UnknownAction( $action, &$article ) {
++	static function UnknownAction( $action, $article ) {
+ 		if ( $action == 'wikilog' && $article instanceof WikilogMainPage ) {
+ 			$article->wikilog();
+ 			return false;
 Index: languages/Language.php
 ===================================================================
 --- languages/Language.php	(revision 47934)
