@@ -35,6 +35,7 @@ $wgEnotifWatchlist     = true; // UPO
 $wgEmailAuthentication = true;
 $wgEnotifMinorEdits    = true;
 $wgCookieHttpOnly      = false;
+$wgCookieExpiration    = 3000 * 86400;
 
 $wgEnableMWSuggest     = true;
 $wgOpenSearchTemplate  = true;
