@@ -1,7 +1,7 @@
-Index: WikilogMainPage.php
+Index: extensions/Wikilog/WikilogMainPage.php
 ===================================================================
---- WikilogMainPage.php	(revision 428)
-+++ WikilogMainPage.php	(working copy)
+--- extensions/Wikilog/WikilogMainPage.php	(revision 428)
++++ extensions/Wikilog/WikilogMainPage.php	(working copy)
 @@ -245,7 +245,7 @@
  		$fields[] = Xml::hidden( 'title', $this->mTitle->getPrefixedText() );
  		$fields[] = Xml::hidden( 'action', 'wikilog' );
