@@ -28,6 +28,8 @@ require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 $wgAllowCategorizedRecentChanges = true;
 
+$egMarkupBabelMaxImageInch = 6.3;
+
 $wgEnableEmail         = true;
 $wgEnableUserEmail     = true;
 $wgEnotifUserTalk      = true; // UPO
