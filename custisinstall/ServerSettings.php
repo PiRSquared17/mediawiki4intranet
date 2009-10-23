@@ -52,6 +52,8 @@ $wgAllowExternalImagesFrom = array(
     'http://plantime.office.custis.ru/'
 );
 
+$wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
+
 $SVNIntegrationDefaultSettings['svnParams'] = array('config-dir' => '/var/www/.subversion');
 
 $wgSMTP = array(
