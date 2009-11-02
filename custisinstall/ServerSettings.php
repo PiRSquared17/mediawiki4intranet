@@ -26,6 +26,8 @@ $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
+require_once($IP.'/extensions/MMHandler/MMHandler.php');
+
 $wgAllowCategorizedRecentChanges = true;
 
 $egMarkupBabelMaxImageInch = 6.3;
