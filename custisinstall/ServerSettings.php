@@ -22,7 +22,7 @@ Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 $egDraftsAutoSaveWait  = 60;   // 1 minute
 
 # Extension:FlvHandler
-$wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
+$wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
