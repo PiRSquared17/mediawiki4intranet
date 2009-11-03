@@ -12,3 +12,16 @@ Index: extensions/Wikilog/Wikilog.php
  		$ns = Namespace::getSubject( $title->getNamespace() );
  		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
  			return new WikilogInfo( $title );
+Index: extensions/Wikilog/WikilogUtils.php
+===================================================================
+--- extensions/Wikilog/WikilogUtils.php    (revision 428)
++++ extensions/Wikilog/WikilogUtils.php    (working copy)
+@@ -131,7 +131,7 @@
+                                return self::authorSig( $list[0] );
+                        }
+                        else {
+-                               $first = implode( ', ', array_map( array( 'Wikilog', 'authorSig' ),
++                               $first = implode( ', ', array_map( array( 'WikilogUtils', 'authorSig' ),
+                                        array_slice( $list, 0, $count - 1 ) ) );
+                                $last = self::authorSig( $list[$count-1] );
+                                $and = wfMsgForContent( 'and' );
