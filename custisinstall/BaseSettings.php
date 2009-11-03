@@ -13,7 +13,7 @@ $wgSitename         = "CustisWiki";
 
 ## The URL base path to the directory containing the wiki;
 ## defaults for all runtime URL paths are based off of this.
-$wgScriptPath       = "/wiki12";
+$wgScriptPath       = "/wiki";
 $wgScriptExtension  = ".php";
 
 $wgEnableEmail      = false;
@@ -22,7 +22,7 @@ $wgEnableUserEmail  = false;
 $wgDBtype           = "mysql";
 $wgDBserver         = "localhost";
 
-$wgDBname           = "wiki12";
+$wgDBname           = "wiki";
 $wgDBuser           = "wiki";
 $wgDBpassword       = "wiki";
 

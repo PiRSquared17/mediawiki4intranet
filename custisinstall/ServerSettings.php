@@ -22,15 +22,13 @@ Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 $egDraftsAutoSaveWait  = 60;   // 1 minute
 
 # Extension:FlvHandler
-$wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
+$wgFlashPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 require_once($IP.'/extensions/MMHandler/MMHandler.php');
 
 $wgAllowCategorizedRecentChanges = true;
-
-$egMarkupBabelMaxImageInch = 6.3;
 
 $wgEnableEmail         = true;
 $wgEnableUserEmail     = true;
@@ -39,7 +37,6 @@ $wgEnotifWatchlist     = true; // UPO
 $wgEmailAuthentication = true;
 $wgEnotifMinorEdits    = true;
 $wgCookieHttpOnly      = false;
-$wgCookieExpiration    = 3000 * 86400;
 
 $wgEnableMWSuggest     = true;
 $wgOpenSearchTemplate  = true;
@@ -54,9 +51,7 @@ $wgAllowExternalImagesFrom = array(
     'http://plantime.office.custis.ru/'
 );
 
-$wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
-
-$SVNIntegrationDefaultSettings['svnParams'] = array('config-dir' => '/var/www/.subversion');
+$SVNIntegrationSettings['svnParams'] = array('config-dir' => '/var/www/.subversion');
 
 $wgSMTP = array(
     "host"   => 'localhost',
