@@ -151,6 +151,14 @@ wikis+=[{
     "port"     : 3120,
   }]
 
+wikis+=[{
+    "wikiname" : "orwiki",
+    "sql_user" : "orwiki13",
+    "sql_pass" : "orwiki13",
+    "sql_db"	 : "orwiki13",
+    "port"     : 3121,
+  }]
+
 
 for wiki in wikis:
   print_wiki_conf(wiki)
