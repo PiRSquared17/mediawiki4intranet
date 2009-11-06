@@ -101,15 +101,13 @@ class SpecialForm extends SpecialPage {
 
 			$wgOut->addHTML( Xml::openElement( 'div', array( 'class' => 'instructions' ) ) .
 							$wgOut->parse( $form->instructions ) .
-							Xml::closeElement( 'div' ) .
-							Xml::element( 'br' ) );
+							Xml::closeElement( 'div' ));
 		}
 
 		if( !is_null( $errmsg ) ) {
 			$wgOut->addHTML( Xml::openElement( 'div', array( 'class' => 'error' ) ) .
 							$wgOut->parse( $errmsg ) .
-							Xml::closeElement( 'div' ) .
-							Xml::element( 'br' ) );
+							Xml::closeElement( 'div' ));
 		}
 
 		$wgOut->addHTML(
@@ -121,7 +119,10 @@ class SpecialForm extends SpecialPage {
 		);
 
 		foreach( $form->fields as $field ) {
-			$wgOut->addHTML( $field->render( $wgRequest->getText( $field->name ) ) . Xml::element( 'br' ) . "\n" );
+			if (!is_object($field))
+				$wgOut->addHTML( $wgOut->parse( $field ) );
+			else
+				$wgOut->addHTML( $field->render( $wgRequest->getText( $field->name ) ) . Xml::element( 'br' ) . "\n" );
 		}
 
 		# Anonymous user, use recaptcha
@@ -314,9 +315,11 @@ class Form {
 	var $instructions;
 	var $fields;
 	var $namePattern;
+	var $nText;
 
 	function Form( $name, $text ) {
 		$this->name = $name;
+		$this->nText = 0;
 		$this->title = wfMsgForContent( 'formtitlepattern', $name );
 		$this->template = array();
 		$this->template[0] = wfMsgForContent( 'formtemplatepattern', $name );
@@ -368,7 +371,8 @@ class Form {
 				}
 				$this->fields[$field->name] = $field;
 			} else {
-				wfDebug( __METHOD__ . ": unrecognized form line: '$line'; skipping.\n" );
+				wfDebug( __METHOD__ . ": unrecognized form line: '$line'; adding into output text.\n" );
+				$this->fields['-text-'.($this->nText++)] = $line;
 			}
 		}
 	}
@@ -467,8 +471,7 @@ class FormField {
 				if( $def == 'checked' ) {
 					$attrs['checked'] = 'checked';
 				}
-				return Xml::element( 'label', array( 'for' => $this->name ), $this->label ) . wfMsg( 'colon-separator' ) .
-					Xml::element( 'input', $attrs );
+				return Xml::element( 'input', $attrs ) . Xml::element( 'label', array( 'for' => $this->name ), $this->label );
 			break;
 			case 'radio':
 				$items = array();
