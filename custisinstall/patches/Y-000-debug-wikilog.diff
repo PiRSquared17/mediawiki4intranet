@@ -25,3 +25,21 @@ Index: extensions/Wikilog/WikilogUtils.php
                                         array_slice( $list, 0, $count - 1 ) ) );
                                 $last = self::authorSig( $list[$count-1] );
                                 $and = wfMsgForContent( 'and' );
+@@ -172,16 +172,7 @@
+ 			$blocks = preg_split( '/< (h[1-6]) .*? > .*? <\\/\\1>/ix', $content );
+ 
+ 			if ( count( $blocks ) > 1 ) {
+-				# Long article, get only the first paragraph.
+-				$pextr = '/<(p)
+-					( \\s+ (?: [^\'"\\/>] | \'[^\']*\' | "[^"]*" )* )?
+-					(?: > .*? <\\/\\1\\s*> | \\/> )/isx';
+-
+-				if ( preg_match_all( $pextr, $blocks[0], $m ) ) {
+-					$summary = implode( "\n", $m[0] );
+-				} else {
+-					$summary = NULL;
+-				}
++				$summary = $blocks[0];
+ 			} else {
+ 				# Short article, no summary.
+ 				$summary = NULL;
