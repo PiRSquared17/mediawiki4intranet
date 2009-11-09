@@ -248,7 +248,7 @@ class SubpageList
             $options['ORDER BY'] = '`page_counter` ' . $order;
         else // if ($this->ordermethod == 'lastedit')
             $options['ORDER BY'] = '`page_touched` ' . $order;
-        if ($this->parent || !is_null($this->parent) && $this->category)
+        if ($this->parent || !is_null($this->parent) && ($this->category || $deepness))
             $parent = $this->parent;
         else
             $parent = $this->title->getDBkey() . '/';
@@ -258,7 +258,7 @@ class SubpageList
 
         $tables = array('page');
         $conditions['page_is_redirect'] = 0;
-        if ($parent)
+        if ($parent || $deepness)
             $conditions[] = '`page_title` REGEXP ' . $dbr->addQuotes('^' . preg_quote($parent) . $deepness);
 
         if ($this->category)
