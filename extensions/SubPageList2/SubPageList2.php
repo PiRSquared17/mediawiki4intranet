@@ -239,7 +239,7 @@ class SubpageList
         if ($this->offset)
             $options['OFFSET'] = $this->offset;
         if ($this->deepmax || $this->deepmin)
-            $deepness = '(/?[^/]+){' . $this->deepmin . ',' . $this->deepmax . '}$';
+            $deepness = '/?([^/]+(/|$)){' . $this->deepmin . ',' . $this->deepmax . '}$';
         if (!is_null($this->namespace))
             $conditions['page_namespace'] = $this->namespace;
         if ($this->ordermethod == 'title')
@@ -293,12 +293,12 @@ class SubpageList
      */
     function makeList($pages)
     {
-        $xml = '<root>';
+        $text = '';
         foreach ($pages as $i => $article)
         {
             $args = array();
             $t = $article->getTitle()->getText();
-            $c = $this->preprocess($article);
+            $c = $article->getContent();
             $args['index']         = $i;
             $args['number']        = $i+1;
             $args['odd']           = $i&1 ? 0 : 1;
@@ -308,25 +308,24 @@ class SubpageList
             $args['title_rel']     = substr($t, strlen($this->parent));
             $args['title_last']    = strrpos($t, '/') !== false ? substr($t, strrpos($t, '/')+1) : $t;
             $args['title_last']    = preg_replace('#\.jpg#is', '', $args['title_last']);
-            $args['content']       = $c;
-            $args['first_section'] = $this->parser->getSection($c, 0);
+            $args['first_section'] = $this->preprocess($article, $this->parser->getSection($c, 0));
             $args['has_more']      = $this->parser->getSection($c, 1) ? 1 : 0;
+            $xml = '<root>';
             $xml .= '<template><title>'.$this->template.'</title>';
             foreach ($args as $k => $v)
                 $xml .= '<part><name>'.htmlspecialchars($k).'</name>=<value>'.htmlspecialchars($v).'</value></part>';
             $xml .= '</template>';
+            $xml .= '</root>';
+            $dom = new DOMDocument;
+            $result = $dom->loadXML($xml);
+            if (!$result)
+            {
+                $this->error('Cannot build templatized list.');
+                return '';
+            }
+            $text .= $this->preprocess($article, $dom);
         }
-        $xml .= '</root>';
-        $dom = new DOMDocument;
-        $result = $dom->loadXML($xml);
-        if (!$result)
-        {
-            $this->error('Cannot build templatized list.');
-            return '';
-        }
-        $this->parser->setOutputType(OT_HTML);
-        $d = $this->parser->getPreprocessor()->newFrame()->expand($dom);
-        return $d;
+        return $text;
     }
 
     /**
@@ -349,7 +348,7 @@ class SubpageList
      * @param string $article the article
      * @return string preprocessed article text
      */
-    function preprocess($article)
+    function preprocess($article, $dom = NULL)
     {
         wfProfileIn(__METHOD__);
         $this->parser->clearState();
@@ -357,11 +356,15 @@ class SubpageList
         $this->parser->setTitle($article->getTitle());
         $this->parser->mRevisionId = $article->getRevIdFetched();
         $this->parser->mRevisionTimestamp = $article->getTimestamp();
-        $text = $article->getContent();
-        wfRunHooks('ParserBeforeStrip', array(&$this->parser, &$text, &$this->parser->mStripState));
-        wfRunHooks('ParserAfterStrip', array(&$this->parser, &$text, &$this->parser->mStripState));
+        if (!$dom)
+            $dom = $article->getContent();
+        if (!is_object($dom))
+        {
+            wfRunHooks('ParserBeforeStrip', array(&$this->parser, &$dom, &$this->parser->mStripState));
+            wfRunHooks('ParserAfterStrip', array(&$this->parser, &$dom, &$this->parser->mStripState));
+            $dom = $this->parser->preprocessToDom($dom, Parser::PTD_FOR_INCLUSION);
+        }
         $frame = $this->parser->getPreprocessor()->newFrame();
-        $dom = $this->parser->preprocessToDom($text, Parser::PTD_FOR_INCLUSION);
         $text = $frame->expand($dom);
         $text = $this->parser->mStripState->unstripBoth($text);
         wfProfileOut(__METHOD__);
