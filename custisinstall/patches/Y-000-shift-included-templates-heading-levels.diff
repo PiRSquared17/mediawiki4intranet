@@ -65,16 +65,16 @@ Index: includes/parser/Preprocessor_DOM.php
  				// Determine element name
  				if ( !preg_match( $elementsRegex, $text, $matches, 0, $i + 1 ) ) {
  					// Element name missing or not listed
-@@ -825,7 +832,7 @@
+@@ -826,7 +833,7 @@
  		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title );
  	}
  
 -	function expand( $root, $flags = 0 ) {
 +	function expand( $root, $flags = 0, $headshift = 0 ) {
- 		static $depth = 0;
+ 		static $expansionDepth = 0;
  		if ( is_string( $root ) ) {
  			return $root;
-@@ -851,6 +858,8 @@
+@@ -853,6 +860,8 @@
  		$outStack = array( '', '' );
  		$iteratorStack = array( false, $root );
  		$indexStack = array( 0, 0 );
@@ -83,7 +83,7 @@ Index: includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -896,8 +905,36 @@
+@@ -898,8 +907,36 @@
  			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
  				$newIterator = $contextNode;
  			} elseif ( $contextNode instanceof DOMNode ) {
@@ -120,7 +120,7 @@ Index: includes/parser/Preprocessor_DOM.php
  				} elseif ( $contextNode->nodeName == 'template' ) {
  					# Double-brace expansion
  					$xpath = new DOMXPath( $contextNode->ownerDocument );
-@@ -909,6 +940,7 @@
+@@ -911,6 +948,7 @@
  					} else {
  						$lineStart = $contextNode->getAttribute( 'lineStart' );
  						$params = array(
