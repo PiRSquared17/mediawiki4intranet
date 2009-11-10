@@ -11,10 +11,10 @@ Index: includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-@@ -1706,7 +1706,8 @@
+@@ -1729,7 +1795,8 @@
  		$this->target = $target;
  		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );
- 		$this->newHash = $this->file->repo->getHashPath( $this->target->getDbKey() );
+ 		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
 -		$this->oldName = $this->file->getName();
 +		$this->oldName = $this->file->getPhys();
 +		/* FIXME getPhysFromTitle is needed */

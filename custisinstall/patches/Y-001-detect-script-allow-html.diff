@@ -11,7 +11,7 @@ Index: includes/specials/SpecialUpload.php
  
  		#ugly hack: for text files, always look at the entire file.
  		#For binarie field, just check the first K.
-@@ -1461,7 +1464,9 @@
+@@ -1478,7 +1481,9 @@
  		* when served with a generic content-type.
  		*/
  
@@ -19,6 +19,6 @@ Index: includes/specials/SpecialUpload.php
 +		$tags = $wgForbiddenTagsInUploads;
 +		if (!$tags)
 +			$tags = array(
+ 			'<a href',
  			'<body',
  			'<head',
- 			'<html',   #also in safari

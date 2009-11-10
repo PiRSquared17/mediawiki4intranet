@@ -97,7 +97,7 @@ Index: includes/filerepo/LocalFile.php
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 Index: includes/specials/SpecialExport.php
 ===================================================================
---- includes/specials/SpecialExport.php	(revision 54846)
+--- includes/specials/SpecialExport.php	(revision 58851)
 +++ includes/specials/SpecialExport.php	(working copy)
 @@ -105,13 +105,6 @@
  }
@@ -137,23 +137,23 @@ Index: includes/specials/SpecialExport.php
  
  		$pages = array_keys( $pageSet );
  
-@@ -226,6 +220,8 @@
- 		$db = wfGetDB( DB_SLAVE );
- 		$exporter = new WikiExporter( $db, $history );
+@@ -241,6 +235,8 @@
+ 
+ 		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors ;
 +		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
 +		$exporter->selfContained = $wgRequest->getCheck('selfcontained') ? true : false;
  		$exporter->openStream();
  
  		foreach( $pages as $page ) {
-@@ -269,13 +265,14 @@
+@@ -287,13 +283,14 @@
  	$form .= '<br />';
  
  	if( $wgExportAllowHistory ) {
 -		$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', true ) . '<br />';
 +		$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', $wgRequest->getCheck('curonly') ? true : false ) . '<br />';
  	} else {
- 		$wgOut->addHtml( wfMsgExt( 'exportnohistory', 'parse' ) );
+ 		$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
  	}
 -	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
 +	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', $wgRequest->getCheck('templates') ? true : false ) . '<br />';
@@ -163,13 +163,13 @@ Index: includes/specials/SpecialExport.php
 +	$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
  	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
  
- 	$form .= Xml::submitButton( wfMsg( 'export-submit' ) );
+ 	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 Index: includes/specials/SpecialImport.php
 ===================================================================
---- includes/specials/SpecialImport.php	(revision 54846)
+--- includes/specials/SpecialImport.php	(revision 58851)
 +++ includes/specials/SpecialImport.php	(working copy)
-@@ -186,7 +186,9 @@
- 		$wgOut->addHtml( "<ul>\n" );
+@@ -264,7 +264,9 @@
+ 		$wgOut->addHTML( "<ul>\n" );
  	}
  
 -	function reportPage( $title, $origTitle, $revisionCount, $successCount ) {
@@ -179,7 +179,7 @@ Index: includes/specials/SpecialImport.php
  		global $wgOut, $wgUser, $wgLang, $wgContLang;
  
  		$skin = $wgUser->getSkin();
-@@ -196,12 +198,57 @@
+@@ -274,12 +276,57 @@
  		$localCount = $wgLang->formatNum( $successCount );
  		$contentCount = $wgContLang->formatNum( $successCount );
  
@@ -234,7 +234,7 @@ Index: includes/specials/SpecialImport.php
 +		$wgOut->addHtml( "<li>$msg</li>" );
 +
  		if( $successCount > 0 ) {
--			$wgOut->addHtml( "<li>" . $skin->makeKnownLinkObj( $title ) . " " .
+-			$wgOut->addHTML( "<li>" . $skin->makeKnownLinkObj( $title ) . " " .
 -				wfMsgExt( 'import-revision-count', array( 'parsemag', 'escape' ), $localCount ) .
 -				"</li>\n"
 -			);
@@ -242,16 +242,185 @@ Index: includes/specials/SpecialImport.php
  			$log = new LogPage( 'import' );
  			if( $this->mIsUpload ) {
  				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
-@@ -223,8 +270,6 @@
+@@ -308,8 +355,6 @@
  			# Update page record
  			$article->updateRevisionOn( $dbw, $nullRevision );
- 			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, false) );
+ 			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
 -		} else {
--			$wgOut->addHtml( '<li>' . wfMsgHtml( 'import-nonewrevisions' ) . '</li>' );
+-			$wgOut->addHTML( '<li>' . wfMsgHtml( 'import-nonewrevisions' ) . '</li>' );
  		}
  	}
  
-@@ -301,6 +346,10 @@
+Index: includes/Export.php
+===================================================================
+--- includes/Export.php	(revision 58851)
++++ includes/Export.php	(working copy)
+@@ -28,7 +28,8 @@
+ 	var $list_authors = false ; # Return distinct author list (when not returning full history)
+ 	var $author_list = "" ;
+ 
+-	var $dumpUploads = false;
++	var $dumpUploads = false;   # Dump uploaded files into the export file
++	var $selfContained = false; # Make export file self-contained (multipart/related)
+ 
+ 	const FULL = 0;
+ 	const CURRENT = 1;
+@@ -77,6 +78,7 @@
+ 	}
+ 
+ 	public function openStream() {
++		$this->writer->multipart = $this->dumpUploads && $this->selfContained;
+ 		$output = $this->writer->openStream();
+ 		$this->sink->writeOpenStream( $output );
+ 	}
+@@ -84,6 +86,9 @@
+ 	public function closeStream() {
+ 		$output = $this->writer->closeStream();
+ 		$this->sink->writeCloseStream( $output );
++		/* Dump $this->writer->binaries into multipart/related */
++		while ($part = $this->writer->nextPart())
++			$this->sink->writePart($part);
+ 	}
+ 
+ 	/**
+@@ -293,7 +298,8 @@
+ 				if( isset( $last ) ) {
+ 					$output = '';
+ 					if( $this->dumpUploads ) {
+-						$output .= $this->writer->writeUploads( $last );
++						$output .= $this->writer->writeUploads( $last,
++							$this->history == WikiExporter::CURRENT ? 1 : null );
+ 					}
+ 					$output .= $this->writer->closePage();
+ 					$this->sink->writeClosePage( $output );
+@@ -308,7 +314,8 @@
+ 		if( isset( $last ) ) {
+ 			$output = '';
+ 			if( $this->dumpUploads ) {
+-				$output .= $this->writer->writeUploads( $last );
++				$output .= $this->writer->writeUploads( $last,
++					$this->history == WikiExporter::CURRENT ? 1 : null );
+ 			}
+ 			$output .= $this->author_list;
+ 			$output .= $this->writer->closePage();
+@@ -331,6 +338,10 @@
+  */
+ class XmlDumpWriter {
+ 
++	var $boundary;
++	var $binaries;
++	var $multipart;
++
+ 	/**
+ 	 * Returns the export schema version.
+ 	 * @return string
+@@ -352,7 +363,15 @@
+ 	function openStream() {
+ 		global $wgContLanguageCode;
+ 		$ver = $this->schemaVersion();
+-		return Xml::element( 'mediawiki', array(
++		$mp = '';
++		if ($this->multipart)
++		{
++			$this->boundary = '--'.time();
++			$this->binaries = array();
++			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
++		}
++		return $mp .
++			Xml::element( 'mediawiki', array(
+ 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
+ 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
+ 			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
+@@ -415,6 +434,22 @@
+ 		return "</mediawiki>\n";
+ 	}
+ 
++	function nextPart() {
++		if ($this->multipart && count($this->binaries) > 0)
++		{
++			list($name) = array_keys($this->binaries);
++			$data = $this->binaries[$name];
++			unset($this->binaries[$name]);
++			$data = @file_get_contents($data);
++			return $this->boundary.
++				"\nContent-Type: application/binary\n" .
++				"Content-Transfer-Encoding: Little-Endian\n" .
++				"Content-ID: $name\n" .
++				"Content-Length: ".strlen($data)."\n\n" .
++				$data;
++		}
++		return '';
++	}
+ 
+ 	/**
+ 	 * Opens a <page> section on the output stream, with data
+@@ -482,7 +517,9 @@
+ 		} elseif( isset( $row->old_text ) ) {
+ 			// Raw text from the database may have invalid chars
+ 			$text = strval( Revision::getRevisionText( $row ) );
+-			$out .= "      " . Xml::elementClean( 'text',
++			// Remove "export cuts"
++			$text = preg_replace( '/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->/is', '', $text );
++			$out .= "      " . Xml::ElementClean( 'text',
+ 				array( 'xml:space' => 'preserve' ),
+ 				strval( $text ) ) . "\n";
+ 		} else {
+@@ -566,12 +603,12 @@
+ 	/**
+ 	 * Warning! This data is potentially inconsistent. :(
+ 	 */
+-	function writeUploads( $row ) {
++	function writeUploads( $row, $limit = null ) {
+ 		if( $row->page_namespace == NS_IMAGE ) {
+ 			$img = wfFindFile( $row->page_title );
+ 			if( $img ) {
+ 				$out = '';
+-				foreach( array_reverse( $img->getHistory() ) as $ver ) {
++				foreach( $img->getHistory($limit) as $ver ) {
+ 					$out .= $this->writeUpload( $ver );
+ 				}
+ 				$out .= $this->writeUpload( $img );
+@@ -582,13 +619,20 @@
+ 	}
+ 
+ 	function writeUpload( $file ) {
++		if ($this->multipart)
++		{
++			$partname = $file->isOld() ? $file->getArchiveName() : $file->getName();
++			$this->binaries[$partname] = $file->getPath();
++		}
+ 		return "    <upload>\n" .
+ 			$this->writeTimestamp( $file->getTimestamp() ) .
+ 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
+-			"      " . Xml::elementClean( 'comment', null, $file->getDescription() ) . "\n" .
+-			"      " . Xml::element( 'filename', null, $file->getName() ) . "\n" .
+-			"      " . Xml::element( 'src', null, $file->getFullUrl() ) . "\n" .
+-			"      " . Xml::element( 'size', null, $file->getSize() ) . "\n" .
++			"      " . Xml::ElementClean( 'comment', null, $file->getDescription() ) . "\n" .
++			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
++			"      " . Xml::Element( 'src',
++			                      array('sha1' => $file->getSha1()),
++			                      $partname ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
++			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
+ 			"    </upload>\n";
+ 	}
+ 
+@@ -624,6 +668,10 @@
+ 		$this->write( $string );
+ 	}
+ 
++	function writePart( $string ) {
++		$this->write( $string );
++	}
++
+ 	/**
+ 	 * Override to write to a different stream type.
+ 	 * @return bool
+Index: includes/Import.php
+===================================================================
+--- includes/Import.php	(revision 58851)
++++ includes/Import.php	(working copy)
+@@ -87,6 +87,10 @@
  		$this->filename = $filename;
  	}
  
@@ -262,7 +431,7 @@ Index: includes/specials/SpecialImport.php
  	function setSize( $size ) {
  		$this->size = intval( $size );
  	}
-@@ -341,6 +390,10 @@
+@@ -139,6 +143,10 @@
  		return $this->filename;
  	}
  
@@ -273,38 +442,35 @@ Index: includes/specials/SpecialImport.php
  	function getSize() {
  		return $this->size;
  	}
-@@ -377,17 +430,10 @@
+@@ -192,7 +200,7 @@
+ 				// FIXME: this could fail slightly for multiple matches :P
  				wfDebug( __METHOD__ . ": skipping existing revision for [[" .
- 					$this->title->getPrefixedText() . "]], timestamp " .
- 					$this->timestamp . "\n" );
+ 					$this->title->getPrefixedText() . "]], timestamp " . $this->timestamp . "\n" );
 -				return false;
 +				return $prior;
  			}
  		}
  
--		# FIXME: Use original rev_id optionally
--		# FIXME: blah blah blah
--
--		#if( $numrows > 0 ) {
--		#	return wfMsg( "importhistoryconflict" );
--		#}
--
- 		# Insert the row
- 		$revision = new Revision( array(
- 			'page'       => $pageId,
-@@ -421,65 +467,81 @@
- 				$revId );
+@@ -235,7 +243,9 @@
  		}
+ 		$GLOBALS['wgTitle'] = $tempTitle;
  
 -		return true;
 +		# A hack. TOdo it better?
 +		$revision->_imported = true;
 +		return $revision;
  	}
+ 	
+ 	function importLogItem() {
+@@ -281,60 +291,71 @@
+ 		$dbw->insert( 'logging', $data, __METHOD__ );
+ 	}
  
 -	function importUpload() {
--		wfDebug( __METHOD__ . ": STUB\n" );
--
++	function importUpload()
++	{
+ 		wfDebug( __METHOD__ . ": STUB\n" );
+ 
 -		/**
 -			// from file revert...
 -			$source = $this->file->getArchiveVirtualUrl( $this->oldimage );
@@ -329,15 +495,11 @@ Index: includes/specials/SpecialImport.php
 -		// it may also create a page without our desire, also wrong potentially.
 -		// and, it will record a *current* upload, but we might want an archive version here
 -
-+	function importUpload()
-+	{
- 		$file = wfLocalFile( $this->getTitle() );
- 		if( !$file ) {
+-		$file = wfLocalFile( $this->getTitle() );
+-		if( !$file ) {
 -			var_dump( $file );
- 			wfDebug( "IMPORT: Bad file. :(\n" );
- 			return false;
- 		}
- 
+-			wfDebug( "IMPORT: Bad file. :(\n" );
+-			return false;
 +		/* First check if file already exists */
 +		if ($file->exists())
 +		{
@@ -357,8 +519,8 @@ Index: includes/specials/SpecialImport.php
 +					return false;
 +				}
 +			}
-+		}
-+
+ 		}
+ 
 +		/* Get file source into a temporary file */
  		$source = $this->downloadSource();
  		if( !$source ) {
@@ -408,11 +570,9 @@ Index: includes/specials/SpecialImport.php
 -		wfDebug( "IMPORT: is bad? " . $status->getXml() . "\n" );
 +		wfDebug( "IMPORT: file import FAILED: " . $status->getXml() . "\n" );
  		return false;
--
- 	}
  
- 	function downloadSource() {
-@@ -488,6 +550,12 @@
+ 	}
+@@ -345,6 +366,12 @@
  			return false;
  		}
  
@@ -425,7 +585,7 @@ Index: includes/specials/SpecialImport.php
  		$tempo = tempnam( wfTempDir(), 'download' );
  		$f = fopen( $tempo, 'wb' );
  		if( !$f ) {
-@@ -496,7 +564,6 @@
+@@ -353,7 +380,6 @@
  		}
  
  		// @fixme!
@@ -433,15 +593,30 @@ Index: includes/specials/SpecialImport.php
  		$data = Http::get( $src );
  		if( !$data ) {
  			wfDebug( "IMPORT: couldn't fetch source $src\n" );
-@@ -531,6 +598,7 @@
+@@ -390,6 +416,7 @@
  	function __construct( $source ) {
  		$this->setRevisionCallback( array( $this, "importRevision" ) );
  		$this->setUploadCallback( array( $this, "importUpload" ) );
 +		$this->setPageCallback( array( $this, "beginPage" ) );
+ 		$this->setLogItemCallback( array( $this, "importLogItem" ) );
  		$this->mSource = $source;
  	}
+@@ -408,11 +435,11 @@
  
-@@ -665,12 +733,13 @@
+ 	function stripXmlNamespace($name) {
+ 		if( $this->mXmlNamespace ) {
+-	               return(preg_replace($this->mXmlNamespace,'',$name,1));
++			return(preg_replace($this->mXmlNamespace,'',$name,1));
+ 		}
+ 		else {
+-		       return($name);
+-                }
++			return($name);
++		}
+ 	}
+    
+ 	# --------------
+@@ -563,12 +590,13 @@
  	}
  
  	/**
@@ -459,7 +634,7 @@ Index: includes/specials/SpecialImport.php
  	}
  
  	/**
-@@ -708,12 +777,15 @@
+@@ -606,12 +634,15 @@
  	 * @param $origTitle Title
  	 * @param $revisionCount int
  	 * @param $successCount Int: number of revisions for which callback returned true
@@ -478,16 +653,59 @@ Index: includes/specials/SpecialImport.php
  		}
  	}
  
-@@ -741,6 +813,8 @@
+@@ -621,7 +652,7 @@
+ 	}
+ 
+ 	function in_start( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_start $name" );
+ 		if( $name != "mediawiki" ) {
+ 			return $this->throwXMLerror( "Expected <mediawiki>, got <$name>" );
+@@ -630,7 +661,7 @@
+ 	}
+ 
+ 	function in_mediawiki( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_mediawiki $name" );
+ 		if( $name == 'siteinfo' ) {
+ 			xml_set_element_handler( $parser, "in_siteinfo", "out_siteinfo" );
+@@ -640,6 +671,8 @@
  			$this->workSuccessCount = 0;
  			$this->uploadCount = 0;
  			$this->uploadSuccessCount = 0;
 +			$this->lastRevision = NULL;
 +			$this->lastExistingRevision = NULL;
  			xml_set_element_handler( $parser, "in_page", "out_page" );
- 		} else {
- 			return $this->throwXMLerror( "Expected <page>, got <$name>" );
-@@ -777,6 +851,28 @@
+ 		} elseif( $name == 'logitem' ) {
+ 			$this->push( $name );
+@@ -650,7 +683,7 @@
+ 		}
+ 	}
+ 	function out_mediawiki( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_mediawiki $name" );
+ 		if( $name != "mediawiki" ) {
+ 			return $this->throwXMLerror( "Expected </mediawiki>, got </$name>" );
+@@ -661,7 +694,7 @@
+ 
+ 	function in_siteinfo( $parser, $name, $attribs ) {
+ 		// no-ops for now
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_siteinfo $name" );
+ 		switch( $name ) {
+ 		case "sitename":
+@@ -677,15 +710,37 @@
+ 	}
+ 
+ 	function out_siteinfo( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		if( $name == "siteinfo" ) {
+ 			xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  		}
  	}
  
@@ -515,8 +733,21 @@ Index: includes/specials/SpecialImport.php
 +	}
  
  	function in_page( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
  		$this->debug( "in_page $name" );
-@@ -827,7 +923,9 @@
+ 		switch( $name ) {
+ 		case "id":
+@@ -726,7 +781,7 @@
+ 	}
+ 
+ 	function out_page( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_page $name" );
+ 		$this->pop();
+ 		if( $name != "page" ) {
+@@ -735,7 +790,9 @@
  		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  
  		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
@@ -527,11 +758,28 @@ Index: includes/specials/SpecialImport.php
  
  		$this->workTitle = null;
  		$this->workRevision = null;
-@@ -904,7 +1002,15 @@
+@@ -746,7 +803,7 @@
+ 	}
+ 
+ 	function in_nothing( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_nothing $name" );
+ 		return $this->throwXMLerror( "No child elements allowed here; got <$name>" );
+ 	}
+@@ -757,7 +814,7 @@
+ 	}
+ 
+ 	function out_append( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_append $name" );
+ 		if( $name != $this->appendfield ) {
+ 			return $this->throwXMLerror( "Expected </{$this->appendfield}>, got </$name>" );
+@@ -835,7 +892,15 @@
  			break;
  		case "src":
  			if( $this->workRevision )
--				$this->workRevision->setSrc( $this->appenddata );
 +			{
 +				/* Передаём путь к файлу, если он уже загружен */
 +				if (substr($this->appenddata, 0, 12) == 'multipart://' &&
@@ -539,12 +787,30 @@ Index: includes/specials/SpecialImport.php
 +					$this->workRevision->setSrc($p['tempfile']);
 +				/* Иначе передаём URL */
 +				else
-+					$this->workRevision->setSrc( $this->appenddata );
+ 				$this->workRevision->setSrc( $this->appenddata );
 +			}
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -953,9 +1059,12 @@
+@@ -853,7 +918,7 @@
+ 	}
+ 
+ 	function in_revision( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_revision $name" );
+ 		switch( $name ) {
+ 		case "id":
+@@ -875,7 +940,7 @@
+ 	}
+ 
+ 	function out_revision( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_revision $name" );
+ 		$this->pop();
+ 		if( $name != "revision" ) {
+@@ -886,14 +951,17 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -558,8 +824,32 @@ Index: includes/specials/SpecialImport.php
 +				$this->lastExistingRevision = $ok;
  		}
  	}
+ 	
+ 	function in_logitem( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_logitem $name" );
+ 		switch( $name ) {
+ 		case "id":
+@@ -917,7 +985,7 @@
+ 	}
  
-@@ -967,6 +1076,8 @@
+ 	function out_logitem( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_logitem $name" );
+ 		$this->pop();
+ 		if( $name != "logitem" ) {
+@@ -935,7 +1003,7 @@
+ 	}
+ 
+ 	function in_upload( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_upload $name" );
+ 		switch( $name ) {
+ 		case "timestamp":
+@@ -943,6 +1011,8 @@
  		case "text":
  		case "filename":
  		case "src":
@@ -568,16 +858,34 @@ Index: includes/specials/SpecialImport.php
  		case "size":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
-@@ -982,7 +1093,7 @@
+@@ -958,7 +1028,7 @@
  	}
  
  	function out_upload( $parser, $name ) {
--		$this->debug( "out_revision $name" );
-+		$this->debug( "out_upload $name" );
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_revision $name" );
  		$this->pop();
  		if( $name != "upload" ) {
- 			return $this->throwXMLerror( "Expected </upload>, got </$name>" );
-@@ -1064,6 +1175,10 @@
+@@ -976,7 +1046,7 @@
+ 	}
+ 
+ 	function in_contributor( $parser, $name, $attribs ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "in_contributor $name" );
+ 		switch( $name ) {
+ 		case "username":
+@@ -992,7 +1062,7 @@
+ 	}
+ 
+ 	function out_contributor( $parser, $name ) {
+-	        $name = $this->stripXmlNamespace($name);
++		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_contributor $name" );
+ 		$this->pop();
+ 		if( $name != "contributor" ) {
+@@ -1043,6 +1113,10 @@
  			return $this->mString;
  		}
  	}
@@ -588,7 +896,7 @@ Index: includes/specials/SpecialImport.php
  }
  
  /**
-@@ -1071,20 +1186,131 @@
+@@ -1050,20 +1124,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -723,170 +1031,11 @@ Index: includes/specials/SpecialImport.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-Index: includes/Export.php
-===================================================================
---- includes/Export.php	(revision 54846)
-+++ includes/Export.php	(working copy)
-@@ -28,7 +28,8 @@
- 	var $list_authors = false ; # Return distinct author list (when not returning full history)
- 	var $author_list = "" ;
- 
--	var $dumpUploads = false;
-+	var $dumpUploads = false;   # Dump uploaded files into the export file
-+	var $selfContained = false; # Make export file self-contained (multipart/related)
- 
- 	const FULL = 0;
- 	const CURRENT = 1;
-@@ -76,6 +77,7 @@
- 	}
- 
- 	function openStream() {
-+		$this->writer->multipart = $this->dumpUploads && $this->selfContained;
- 		$output = $this->writer->openStream();
- 		$this->sink->writeOpenStream( $output );
- 	}
-@@ -83,6 +85,9 @@
- 	function closeStream() {
- 		$output = $this->writer->closeStream();
- 		$this->sink->writeCloseStream( $output );
-+		/* Dump $this->writer->binaries into multipart/related */
-+		while ($part = $this->writer->nextPart())
-+			$this->sink->writePart($part);
- 	}
- 
- 	/**
-@@ -269,7 +274,8 @@
- 				if( isset( $last ) ) {
- 					$output = '';
- 					if( $this->dumpUploads ) {
--						$output .= $this->writer->writeUploads( $last );
-+						$output .= $this->writer->writeUploads( $last,
-+							$this->history == WikiExporter::CURRENT ? 1 : null );
- 					}
- 					$output .= $this->writer->closePage();
- 					$this->sink->writeClosePage( $output );
-@@ -284,7 +290,8 @@
- 		if( isset( $last ) ) {
- 			$output = '';
- 			if( $this->dumpUploads ) {
--				$output .= $this->writer->writeUploads( $last );
-+				$output .= $this->writer->writeUploads( $last,
-+					$this->history == WikiExporter::CURRENT ? 1 : null );
- 			}
- 			$output .= $this->author_list;
- 			$output .= $this->writer->closePage();
-@@ -299,6 +306,10 @@
-  */
- class XmlDumpWriter {
- 
-+	var $boundary;
-+	var $binaries;
-+	var $multipart;
-+
- 	/**
- 	 * Returns the export schema version.
- 	 * @return string
-@@ -320,7 +331,15 @@
- 	function openStream() {
- 		global $wgContLanguageCode;
- 		$ver = $this->schemaVersion();
--		return wfElement( 'mediawiki', array(
-+		$mp = '';
-+		if ($this->multipart)
-+		{
-+			$this->boundary = '--'.time();
-+			$this->binaries = array();
-+			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
-+		}
-+		return $mp .
-+			wfElement( 'mediawiki', array(
- 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
- 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
- 			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
-@@ -383,6 +402,22 @@
- 		return "</mediawiki>\n";
- 	}
- 
-+	function nextPart() {
-+		if ($this->multipart && count($this->binaries) > 0)
-+		{
-+			list($name) = array_keys($this->binaries);
-+			$data = $this->binaries[$name];
-+			unset($this->binaries[$name]);
-+			$data = @file_get_contents($data);
-+			return $this->boundary.
-+				"\nContent-Type: application/binary\n" .
-+				"Content-Transfer-Encoding: Little-Endian\n" .
-+				"Content-ID: $name\n" .
-+				"Content-Length: ".strlen($data)."\n\n" .
-+				$data;
-+		}
-+		return '';
-+	}
- 
- 	/**
- 	 * Opens a <page> section on the output stream, with data
-@@ -450,6 +485,8 @@
- 		} elseif( isset( $row->old_text ) ) {
- 			// Raw text from the database may have invalid chars
- 			$text = strval( Revision::getRevisionText( $row ) );
-+			// Remove "export cuts"
-+			$text = preg_replace( '/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->/is', '', $text );
- 			$out .= "      " . wfElementClean( 'text',
- 				array( 'xml:space' => 'preserve' ),
- 				strval( $text ) ) . "\n";
-@@ -486,12 +523,12 @@
- 	/**
- 	 * Warning! This data is potentially inconsistent. :(
- 	 */
--	function writeUploads( $row ) {
-+	function writeUploads( $row, $limit = null ) {
- 		if( $row->page_namespace == NS_IMAGE ) {
- 			$img = wfFindFile( $row->page_title );
- 			if( $img ) {
- 				$out = '';
--				foreach( array_reverse( $img->getHistory() ) as $ver ) {
-+				foreach( $img->getHistory($limit) as $ver ) {
- 					$out .= $this->writeUpload( $ver );
- 				}
- 				$out .= $this->writeUpload( $img );
-@@ -502,12 +539,19 @@
- 	}
- 
- 	function writeUpload( $file ) {
-+		if ($this->multipart)
-+		{
-+			$partname = $file->isOld() ? $file->getArchiveName() : $file->getName();
-+			$this->binaries[$partname] = $file->getPath();
-+		}
- 		return "    <upload>\n" .
- 			$this->writeTimestamp( $file->getTimestamp() ) .
- 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
- 			"      " . wfElementClean( 'comment', null, $file->getDescription() ) . "\n" .
- 			"      " . wfElement( 'filename', null, $file->getName() ) . "\n" .
--			"      " . wfElement( 'src', null, $file->getFullUrl() ) . "\n" .
-+			"      " . wfElement( 'src',
-+			                      array('sha1' => $file->getSha1()),
-+			                      $partname ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
- 			"      " . wfElement( 'size', null, $file->getSize() ) . "\n" .
- 			"    </upload>\n";
- 	}
-@@ -540,6 +584,10 @@
- 		$this->write( $string );
- 	}
- 
-+	function writePart( $string ) {
-+		$this->write( $string );
-+	}
-+
- 	/**
- 	 * Override to write to a different stream type.
- 	 * @return bool
 Index: languages/messages/MessagesRu.php
 ===================================================================
 --- languages/messages/MessagesRu.php	(revision 47934)
 +++ languages/messages/MessagesRu.php	(working copy)
-@@ -2065,6 +2065,8 @@
+@@ -2088,6 +2088,8 @@
  'export-submit'     => 'Экспортировать',
  'export-addcattext' => 'Добавить страницы из категории:',
  'export-addcat'     => 'Добавить',
@@ -895,15 +1044,15 @@ Index: languages/messages/MessagesRu.php
  'export-download'   => 'Предложить сохранить как файл',
  'export-templates'  => 'Включить шаблоны',
  
-@@ -2099,7 +2101,6 @@
- 'import-interwiki-namespace' => 'Помещать страницы в пространство имён:',
+@@ -2122,7 +2124,6 @@
+ 'import-interwiki-namespace' => 'Целевое пространство имён:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
 -'import-revision-count'      => '$1 {{PLURAL:$1|версия|версии|версий}}',
  'importnopages'              => 'Нет страниц для импортирования.',
  'importfailed'               => 'Не удалось импортировать: $1',
  'importunknownsource'        => 'Неизвестный тип импортируемой страницы',
-@@ -2115,9 +2116,15 @@
+@@ -2138,9 +2139,15 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -917,14 +1066,14 @@ Index: languages/messages/MessagesRu.php
 +'import-revision-count-newpage' => '$1 {{PLURAL:$1|версия|версии|версий}} (новая страница).',
 +'import-conflict'            => '$1 {{PLURAL:$1|версия|версии|версий}} (конфликт: $2).',
 +'import-conflict-difflink'   => '$1 (импорт) и $2 (локальная)',
+ 'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
+ 'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
- # Import log
- 'importlogpage'                    => 'Журнал импорта',
 Index: languages/messages/MessagesEn.php
 ===================================================================
 --- languages/messages/MessagesEn.php	(revision 47934)
 +++ languages/messages/MessagesEn.php	(working copy)
-@@ -2514,6 +2514,8 @@
+@@ -2529,6 +2529,8 @@
  'export-submit'     => 'Export',
  'export-addcattext' => 'Add pages from category:',
  'export-addcat'     => 'Add',
@@ -933,7 +1082,7 @@ Index: languages/messages/MessagesEn.php
  'export-download'   => 'Save as file',
  'export-templates'  => 'Include templates',
  
-@@ -2549,7 +2551,6 @@
+@@ -2564,7 +2566,6 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -941,7 +1090,7 @@ Index: languages/messages/MessagesEn.php
  'importnopages'              => 'No pages to import.',
  'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
  'importunknownsource'        => 'Unknown import source type',
-@@ -2568,9 +2569,15 @@
+@@ -2583,9 +2584,15 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',
@@ -955,6 +1104,6 @@ Index: languages/messages/MessagesEn.php
 +'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
 +'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
 +'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
+ 'import-token-mismatch'      => 'Loss of session data. Please try again.',
+ 'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
- # Import log
- 'importlogpage'                    => 'Import log',
