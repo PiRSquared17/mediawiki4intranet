@@ -12,7 +12,6 @@
 
 if (!defined('MEDIAWIKI')) die();
 
-require_once('DifferenceEngine.php');
 require_once('LinksUpdate.php');
 
 $wgExtensionFunctions[] = "wfInitBatchEditor";
