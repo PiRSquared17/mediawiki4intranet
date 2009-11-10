@@ -462,7 +462,7 @@ Index: includes/Import.php
  	}
  	
  	function importLogItem() {
-@@ -281,60 +291,71 @@
+@@ -281,29 +291,10 @@
  		$dbw->insert( 'logging', $data, __METHOD__ );
  	}
  
@@ -491,15 +491,13 @@ Index: includes/Import.php
 -				$resultDetails = array( 'internal' => $status->getWikiText() );
 -		*/
 -
--		// @fixme upload() uses $wgUser, which is wrong here
--		// it may also create a page without our desire, also wrong potentially.
--		// and, it will record a *current* upload, but we might want an archive version here
--
--		$file = wfLocalFile( $this->getTitle() );
--		if( !$file ) {
--			var_dump( $file );
--			wfDebug( "IMPORT: Bad file. :(\n" );
--			return false;
+ 		// @fixme upload() uses $wgUser, which is wrong here
+ 		// it may also create a page without our desire, also wrong potentially.
+ 		// and, it will record a *current* upload, but we might want an archive version here
+@@ -315,26 +306,67 @@
+ 			return false;
+ 		}
+ 
 +		/* First check if file already exists */
 +		if ($file->exists())
 +		{
@@ -519,8 +517,8 @@ Index: includes/Import.php
 +					return false;
 +				}
 +			}
- 		}
- 
++		}
++
 +		/* Get file source into a temporary file */
  		$source = $this->downloadSource();
  		if( !$source ) {
