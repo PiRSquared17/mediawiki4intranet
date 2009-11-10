@@ -2,16 +2,16 @@ Index: includes/parser/Parser.php
 ===================================================================
 --- includes/parser/Parser.php	(revision 53578)
 +++ includes/parser/Parser.php	(working copy)
-@@ -3402,7 +3406,7 @@
+@@ -3448,7 +3454,7 @@
  	 * @private
  	 */
  	function formatHeadings( $text, $isMain=true ) {
--		global $wgMaxTocLevel, $wgContLang;
-+		global $wgMaxTocLevel, $wgContLang, $wgDotAfterTocnumber;
+-		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
++		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
  
  		$doNumberHeadings = $this->mOptions->getNumberHeadings();
- 		if( !$this->mTitle->quickUserCan( 'edit' ) ) {
-@@ -3544,6 +3548,8 @@
+ 		$showEditLink = $this->mOptions->getEditSection();
+@@ -3591,6 +3597,8 @@
  						$dot = 1;
  					}
  				}

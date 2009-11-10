@@ -2,50 +2,15 @@ Index: includes/FileDeleteForm.php
 ===================================================================
 --- includes/FileDeleteForm.php	(revision 54846)
 +++ includes/FileDeleteForm.php	(working copy)
-@@ -107,7 +107,7 @@
- 			if( $status->ok ) {
+@@ -108,7 +108,7 @@
+ 				$id = $title->getArticleID( GAID_FOR_UPDATE );
  				// Need to delete the associated article
  				$article = new Article( $title );
 -				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, &$reason)) ) {
 +				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, $reason, $article->getId())) ) {
- 					if( $article->doDeleteArticle( $reason, $suppress ) )
- 						wfRunHooks('ArticleDeleteComplete', array(&$article, &$wgUser, $reason));
- 				}
-Index: extensions/CategoryTree/CategoryTree.php
-===================================================================
---- extensions/CategoryTree/CategoryTree.php	(revision 52733)
-+++ extensions/CategoryTree/CategoryTree.php	(working copy)
-@@ -351,7 +351,7 @@
- * Hook callback that injects messages and things into the <head> tag
- * Does nothing if $parserOutput->mCategoryTreeTag is not set
- */
--function efCategoryTreeParserOutput( &$outputPage, &$parserOutput )  {
-+function efCategoryTreeParserOutput( $outputPage, $parserOutput )  {
- 	if ( !empty( $parserOutput->mCategoryTreeTag ) ) {
- 		CategoryTree::setHeaders( $outputPage );
- 	}
-@@ -361,7 +361,7 @@
- /**
-  * ArticleFromTitle hook, override category page handling
-  */
--function efCategoryTreeArticleFromTitle( &$title, &$article ) {
-+function efCategoryTreeArticleFromTitle( $title, $article ) {
- 	if ( $title->getNamespace() == NS_CATEGORY ) {
- 		$article = new CategoryTreeCategoryPage( $title );
- 	}
-Index: extensions/DocExport/DocExport.php
-===================================================================
---- extensions/DocExport/DocExport.php	(revision 327)
-+++ extensions/DocExport/DocExport.php	(working copy)
-@@ -162,7 +162,7 @@
-         echo $html;
-     }
- 
--    public function onUnknownAction($action, &$article)
-+    public function onUnknownAction($action, $article)
-     {
-         // Here comes all the stuff to show the form and parse it...
-         global $wgTitle, $wgOut, $wgUser;
+ 					if( $article->doDeleteArticle( $reason, $suppress, $id ) ) {
+ 						global $wgRequest;
+ 						if( $wgRequest->getCheck( 'wpWatch' ) ) {
 Index: extensions/Wikilog/Wikilog.php
 ===================================================================
 --- extensions/Wikilog/Wikilog.php	(revision 426)
