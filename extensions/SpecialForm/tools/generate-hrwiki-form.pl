@@ -30,7 +30,7 @@ for (my $i = 0; $i < @$options; $i+=2)
         $f = $f->[1];
     }
     $formname ||= $f;
-    print STDERR "$formname:\n";
+    print STDERR "'''$formname:'''\n";
     print "== $f ==\n\n";
     foreach (@$o)
     {
@@ -48,9 +48,9 @@ for (my $i = 0; $i < @$options; $i+=2)
             $itemtext =~ s/_/ /giso;
         }
         $formid = lc($t . '_' . $formid);
-        print STDERR "$formid|$itemtext|checkbox|\n";
+        print STDERR "$formid|$itemtext|checkbox\n";
         print "{{#if:{{{$formid|}}}|* {{$t|$categoryid}}}}\n";
     }
-    print STDERR lc($t)."_other|Другое|text|\n";
+    print STDERR lc($t)."_other|Другое|text\n";
     print "{{#if:{{{".lc($t)."_other|}}}|* Другое: {{{".lc($t)."_other}}}}}\n\n";
 }
