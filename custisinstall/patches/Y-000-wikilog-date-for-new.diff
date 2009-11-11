@@ -7,7 +7,7 @@ Index: extensions/Wikilog/WikilogMainPage.php
  		$fields[] = Xml::hidden( 'action', 'wikilog' );
  		$fields[] = Xml::inputLabel( wfMsg( 'wikilog-item-name' ),
 -			'wlItemName', 'wl-item-name', 25 );
-+			'wlItemName', 'wl-item-name', 25, date('Y-m-d/') );
++			'wlItemName', 'wl-item-name', 25, date('Y-m-d ') );
  		$fields[] = Xml::submitButton( wfMsg( 'wikilog-new-item-go' ),
  			array( 'name' => 'wlActionNewItem' ) );
  
