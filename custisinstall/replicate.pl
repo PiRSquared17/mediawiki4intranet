@@ -115,11 +115,19 @@ sub replicate
         die "[$targetname] Could not login into destination wiki under user '$dest->{user}': ".$response->status_line
             unless $response->code == 302;
     }
+    # Вытаскиваем editToken, мля. Какой от него толк - хрен знает.
+    $response = $ua->request(GET "$dest->{url}/index.php?title=Special:Import");
+    die "[$targetname] Could not retrieve Special:Import page from '$dest->{url}/index.php?title=Special:Import: ".$response->status_line
+        unless $response->is_success;
+    $text = $response->content;
+    my $token = $text =~ /<input([^<>]*name="editToken"[^<>]*)>/iso &&
+        $1 =~ /value=\"([^\"]*)\"/iso && $1 || undef;
     # Запускаем импорт исправленной XML-ки
     $response = $ua->request(POST("$dest->{url}/index.php?title=Special:Import&action=submit",
         Content_Type => 'form-data',
         Content      => [
             source    => 'upload',
+            editToken => $token,
             xmlimport => [ $fn ],
         ],
     ));
@@ -128,6 +136,20 @@ sub replicate
     die "[$targetname] Could not import XML data into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
     my $tp = clock_gettime(CLOCK_REALTIME);
     print sprintf("[$targetname] Imported in %.2f seconds\n", $tp-$tx);
+    $text = $response->content;
+    # Извлекаем отчёт
+    ($text) = $text =~ /<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/iso;
+    for ($text)
+    {
+        s/&nbsp;/ /giso;
+        s/\s+/ /giso;
+        s/<li[^<>]*>/\n/giso;
+        s/<\/?[a-z0-9_:\-]+(\/?\s+[^<>]*)?>//giso;
+        decode_entities($_);
+        s/^\s+//so;
+        s/\s+$//so;
+    }
+    print "[$targetname] Report:\n$text\n";
     # Всё ОК
     1;
 }
