@@ -52,6 +52,8 @@ User=<name of a user having import rights in destination wiki>
 Password=<his password>
 EOF
 
+$| = 1;
+
 my @targets = map { lc } @ARGV;
 @targets = keys %$config unless @targets;
 for (@targets)
