@@ -166,7 +166,7 @@ Index: includes/specials/SpecialExport.php
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 Index: includes/specials/SpecialImport.php
 ===================================================================
---- includes/specials/SpecialImport.php	(revision 58851)
+--- includes/specials/SpecialImport.php	(revision 58865)
 +++ includes/specials/SpecialImport.php	(working copy)
 @@ -264,7 +264,9 @@
  		$wgOut->addHTML( "<ul>\n" );
@@ -179,7 +179,7 @@ Index: includes/specials/SpecialImport.php
  		global $wgOut, $wgUser, $wgLang, $wgContLang;
  
  		$skin = $wgUser->getSkin();
-@@ -274,12 +276,57 @@
+@@ -274,12 +276,56 @@
  		$localCount = $wgLang->formatNum( $successCount );
  		$contentCount = $wgContLang->formatNum( $successCount );
  
@@ -228,8 +228,7 @@ Index: includes/specials/SpecialImport.php
 +			}
 +		}
 +
-+		if ($lastRevision || $lastLocalRevision)
-+			$msg = $skin->makeKnownLinkObj( $title ) . ': ' . $msg;
++		$msg = $skin->makeKnownLinkObj( $title ) . ': ' . $msg;
 +
 +		$wgOut->addHtml( "<li>$msg</li>" );
 +
@@ -242,7 +241,7 @@ Index: includes/specials/SpecialImport.php
  			$log = new LogPage( 'import' );
  			if( $this->mIsUpload ) {
  				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
-@@ -308,8 +355,6 @@
+@@ -308,8 +354,6 @@
  			# Update page record
  			$article->updateRevisionOn( $dbw, $nullRevision );
  			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
