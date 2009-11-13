@@ -3,6 +3,7 @@
 # При этом всё время проверяет ошибки PHP.
 # Если что - дохнет и пишет на STDERR ошибку.
 
+use strict;
 use POSIX qw(strftime);
 use HTTP::Cookies;
 use HTTP::Request::Common;
@@ -60,12 +61,11 @@ sub test_save
     # создаём юзерагента
     my $ua = MYLWPUserAgent->new;
     $ua->cookie_jar(HTTP::Cookies->new);
-    my $uri = URI->new($url)->canonical;
-    $ua->credentials($uri->host_port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
 
     # логинимся по назначению, если надо
-    $uri = URI->new($url)->canonical;
-    $ua->credentials($uri->host_port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
+    my $uri = URI->new($url)->canonical;
+    $ua->credentials($uri->host_port, undef, $basiclogin || undef, $basicpassword);
+    my $response;
     if ($user && $password)
     {
         $response = $ua->request(POST("$url/index.php?title=Special:UserLogin&action=submitlogin&type=login",
@@ -75,7 +75,7 @@ sub test_save
                 wpLoginAttempt => 1,
             ],
         ));
-        die logp()." Could not login into wiki under user '$dest->{user}': ".$response->status_line
+        die logp()." Could not login into wiki '$url' under user '$user': ".$response->status_line
             unless $response->code == 302;
     }
 
