@@ -218,7 +218,7 @@ for wiki in wikis:
 
 ls = ""
 for wiki in wikis:
-  ls += "\n/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf main_%(wikiname)s --all " % wiki
+  ls += "\n/usr/local/bin/indexer --config /etc/sphinxsearch/%(wikiname)s.conf main_%(wikiname)s --all --rotate" % wiki
 ls = """#!/bin/sh
 
 %s
