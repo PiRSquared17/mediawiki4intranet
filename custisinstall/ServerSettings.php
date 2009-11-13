@@ -65,5 +65,7 @@ $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 $wgSphinxSearch_weights = array('page_title' => 10, 'old_text' => 1);
+$wgSphinxSearch_matches = 20;
+$wgSphinxMatchAll = 1;
 
 ?>
