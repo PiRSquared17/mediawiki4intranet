@@ -11,3 +11,16 @@ Index: includes/Linker.php
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
  		return $ret;
+Index: includes/SkinTemplate.php
+===================================================================
+--- includes/SkinTemplate.php	(revision 58867)
++++ includes/SkinTemplate.php	(working copy)
+@@ -597,6 +597,8 @@
+ 		if( $checkEdit && !$title->isKnown() ) {
+ 			$classes[] = 'new';
+ 			$query = 'action=edit&redlink=1';
++			if ($title->isTalkPage())
++				$query .= '&section=new';
+ 		}
+ 
+ 		$text = wfMsg( $message );
