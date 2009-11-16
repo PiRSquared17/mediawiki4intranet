@@ -144,7 +144,7 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
         $uploadURL = str_replace('$1', 'Special:AnyWikiDraw', $wgArticlePath);
 		$output .= 
 				'<a name="anywikidraw" id="anywikidraw">'.
-				'<applet codebase="/" archive="'.$wgScriptPath.'/extensions/AnyWikiDraw/AnyWikiDrawForMediaWiki.jar"'. 
+				'<applet archive="'.$wgScriptPath.'/extensions/AnyWikiDraw/AnyWikiDrawForMediaWiki.jar"'. 
 				' code="org.anywikidraw.mediawiki.MediaWikiDrawingApplet.class"'.
 				' width="'.htmlspecialchars(min(max($width+4, 600), 800)).'" '.
                 ' height="'.htmlspecialchars(min(max($height+140, 480), 600)).'">'.
