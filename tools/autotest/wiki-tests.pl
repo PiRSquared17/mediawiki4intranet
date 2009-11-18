@@ -177,13 +177,18 @@ sub test_random_search
     my $su = $params->{searchurl} || '/Special:SphinxSearch?fulltext=Search&match_all=1&ns0=1&ns1=1&ns2=1&ns3=1&ns4=1&ns5=1&ns6=1&ns7=1&ns8=1&ns9=1&ns10=1&ns11=1&ns12=1&ns13=1&ns14=1&ns15=1&ns100=1&ns101=1&search={TITLE}&page={PAGE}';
 
     # получаем редирект на случайную страницу
-    my $response = $ua->request(GET "$url/index.php/Special:Random");
-    die logp()." Could not retrieve random page redirect from '$url/index.php/Special:Random': ".$response->status_line
-        unless $response->code == 200;
-    my $text = $response->content;
-    check_php_warnings($text);
-    my ($title) = $text =~ /^\s*var\s*wgTitle\s*=\s*\"([^\"]*)\";\s*$/imo;
-    $title = decode 'unicode-escape', $title;
+    my ($title, $i, $response, $text) = ('', 0);
+    while (length($title) < 2 && $i < 10)
+    {
+        $response = $ua->request(GET "$url/index.php/Special:Random");
+        die logp()." Could not retrieve random page redirect from '$url/index.php/Special:Random': ".$response->status_line
+            unless $response->code == 200;
+        $text = $response->content;
+        check_php_warnings($text);
+        ($title) = $text =~ /^\s*var\s*wgTitle\s*=\s*\"([^\"]*)\";\s*$/imo;
+        $title = decode 'unicode-escape', $title;
+    }
+    return if length $title < 2;
 
     # ищем эту страницу поиском
     my $page = 1;
