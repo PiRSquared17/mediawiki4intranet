@@ -56,7 +56,7 @@ function _enotifdiff_compose_common_mailtext(&$mailer, &$keys)
     global $wgOut;
     $oldWgOut = $wgOut;
     $wgOut = new OutputPage;
-    $de = new DifferenceEngine($mailer->getTitle(), $mailer->oldid, 'next');
+    $de = new DifferenceEngine(Title::newFromText($keys['$PAGETITLE']), $keys['$OLDID'], 'next');
     $de->showDiffPage(true);
     $keys['$DIFF'] = $wgOut->getHTML();
     $keys['$DIFF'] = preg_replace('#^(.*?)<tr[^<>]*>.*?</tr\s*>#is', '\1', $keys['$DIFF'], 1);
