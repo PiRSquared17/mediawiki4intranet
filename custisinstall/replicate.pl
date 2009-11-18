@@ -19,7 +19,6 @@ use File::Temp;
 use Time::HiRes qw(CLOCK_REALTIME clock_gettime);
 use LWP::UserAgent;
 use Digest::SHA1;
-use IPC::Run;
 
 use MIME::Base64;
 use URI::Escape;
@@ -55,17 +54,19 @@ EOF
 
 $| = 1;
 
-my $datetime = strftime("%Y-%m-%d %H:%M:%S", localtime);
+my $replicating;
+sub logp { strftime("[%Y-%m-%d %H:%M:%S] [$replicating]", localtime) }
+
 my $log;
 my @targets = map { lc } @ARGV;
 @targets = keys %$config unless @targets;
 for (@targets)
 {
     # replicate targets
-    $log = "[$datetime] [$_]";
-    print "$log Begin replication\n";
+    $replicating = $_;
+    print logp()." Begin replication\n";
     eval { replicate($config->{$_}->{src}, $config->{$_}->{dest}) };
-    print STDERR "$log Could not replicate:\n$@" if $@;
+    print STDERR logp()." Could not replicate:\n$@" if $@;
 }
 
 sub replicate
@@ -77,10 +78,10 @@ sub replicate
     $ua->credentials($uri->host_port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
     # Читаем список страниц категории
     my $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
-    die "$log Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
+    die logp()." Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
     my $text = $response->content;
     ($text) = $text =~ m!<textarea[^<>]*>(.*?)</textarea>!iso;
-    die "$log No pages in category $src->{category}" unless $text;
+    die logp()." No pages in category $src->{category}" unless $text;
     decode_entities($text);
     my $ts = clock_gettime(CLOCK_REALTIME);
     # Читаем экспортную XML-ку
@@ -98,13 +99,13 @@ sub replicate
             pages         => $text,
         ])
     );
-    die "$log Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
+    die logp()." Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
         unless $response->is_success;
     my $text = $response->content;
     $response->content('');
     print $fh $text;
     my $tx = clock_gettime(CLOCK_REALTIME);
-    print sprintf("$log Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
+    print sprintf(logp()." Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
     close $fh;
     # Логинимся по назначению, если надо
     $uri = URI->new($dest->{url})->canonical;
@@ -118,12 +119,12 @@ sub replicate
                 wpLoginAttempt => 1,
             ],
         ));
-        die "$log Could not login into destination wiki under user '$dest->{user}': ".$response->status_line
+        die logp()." Could not login into destination wiki under user '$dest->{user}': ".$response->status_line
             unless $response->code == 302;
     }
     # Вытаскиваем editToken, мля. Какой от него толк - хрен знает.
     $response = $ua->request(GET "$dest->{url}/index.php?title=Special:Import");
-    die "$log Could not retrieve Special:Import page from '$dest->{url}/index.php?title=Special:Import: ".$response->status_line
+    die logp()." Could not retrieve Special:Import page from '$dest->{url}/index.php?title=Special:Import: ".$response->status_line
         unless $response->is_success;
     $text = $response->content;
     my $token = $text =~ /<input([^<>]*name="editToken"[^<>]*)>/iso &&
@@ -137,11 +138,11 @@ sub replicate
             xmlimport => [ $fn ],
         ],
     ));
-    die "$log Could not import XML data into '$dest->{url}/index.php?title=Special:Import&action=submit': ".$response->status_line
+    die logp()." Could not import XML data into '$dest->{url}/index.php?title=Special:Import&action=submit': ".$response->status_line
         unless $response->is_success;
-    die "$log Could not import XML data into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
+    die logp()." Could not import XML data into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
     my $tp = clock_gettime(CLOCK_REALTIME);
-    print sprintf("$log Imported in %.2f seconds\n", $tp-$tx);
+    print sprintf(logp()." Imported in %.2f seconds\n", $tp-$tx);
     $text = $response->content;
     # Извлекаем отчёт
     ($text) = $text =~ /<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/iso;
@@ -155,7 +156,7 @@ sub replicate
         s/^\s+//so;
         s/\s+$//so;
     }
-    print "$log Report:\n$text\n";
+    print logp()." Report:\n$text\n";
     # Всё ОК
     1;
 }
