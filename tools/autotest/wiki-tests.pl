@@ -182,7 +182,7 @@ sub test_random_search
         unless $response->code == 200;
     my $text = $response->content;
     check_php_warnings($text);
-    my ($title) = $text =~ /var\s*wgTitle\s*=\s*\"([^\"]*)\"/iso;
+    my ($title) = $text =~ /^\s*var\s*wgTitle\s*=\s*\"([^\"]*)\";\s*$/imo;
     $title = decode 'unicode-escape', $title;
 
     # ищем эту страницу поиском
