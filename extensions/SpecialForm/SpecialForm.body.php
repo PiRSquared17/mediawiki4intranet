@@ -459,7 +459,7 @@ class FormField {
 							'type' => 'text',
 							'name' => $this->name,
 							'id' => $this->name,
-							'value' => ( ( is_null( $def ) ) ? '' : $def ),
+							'value' => ( ( is_null( $def ) ) ? $this->getOption( 'default', '' ) : $def ),
 							'size' => $this->getOption( 'size', 30 )
 						)
 					);
