@@ -5,167 +5,86 @@
  */
 
 $aliases = array();
-
-$aliases['en'] = array(
-	'Form' => array( 'Form' ),
-);
-
-/** Arabic (العربية)
- * @author Meno25
- */
-$aliases['ar'] = array(
-	'Form' => array( 'استمارة' ),
-);
-
-/** Egyptian Spoken Arabic (مصرى)
- * @author Meno25
- */
-$aliases['arz'] = array(
-	'Form' => array( 'استمارة' ),
-);
-
-/** German (Deutsch) */
-$aliases['de'] = array(
-	'Form' => array( 'Eingabefeld' ),
-);
-
-/** Lower Sorbian (Dolnoserbski) */
-$aliases['dsb'] = array(
-	'Form' => array( 'Formular' ),
-);
-
-/** Persian (فارسی) */
-$aliases['fa'] = array(
-	'Form' => array( 'فرم' ),
-);
-
-/** Franco-Provençal (Arpetan) */
-$aliases['frp'] = array(
-	'Form' => array( 'Formulèro' ),
-);
-
-/** Galician (Galego) */
-$aliases['gl'] = array(
-	'Form' => array( 'Formulario' ),
-);
-
-/** Swiss German (Alemannisch) */
-$aliases['gsw'] = array(
-	'Form' => array( 'Form' ),
-);
-
-/** Hebrew (עברית) */
-$aliases['he'] = array(
-	'Form' => array( 'טופס' ),
-);
-
-/** Upper Sorbian (Hornjoserbsce) */
-$aliases['hsb'] = array(
-	'Form' => array( 'Formular' ),
-);
-
-/** Hungarian (Magyar) */
-$aliases['hu'] = array(
-	'Form' => array( 'Űrlap' ),
-);
-
-/** Interlingua (Interlingua) */
-$aliases['ia'] = array(
-	'Form' => array( 'Formulario' ),
-);
-
-/** Indonesian (Bahasa Indonesia) */
-$aliases['id'] = array(
-	'Form' => array( 'Formulir' ),
-);
-
-/** Italian (Italiano) */
-$aliases['it'] = array(
-	'Form' => array( 'Modulo' ),
-);
-
-/** Japanese (日本語) */
-$aliases['ja'] = array(
-	'Form' => array( 'フォーム' ),
-);
-
-/** Khmer (ភាសាខ្មែរ) */
-$aliases['km'] = array(
-	'Form' => array( 'បែបបទ' ),
-);
-
-/** Ripoarisch (Ripoarisch) */
-$aliases['ksh'] = array(
-	'Form' => array( 'Fommulaa', 'Formular' ),
-);
-
-/** Luxembourgish (Lëtzebuergesch) */
-$aliases['lb'] = array(
-	'Form' => array( 'Formulaire' ),
-);
-
-/** Macedonian (Македонски) */
-$aliases['mk'] = array(
-	'Form' => array( 'Формулар', 'Форма' ),
-);
-
-/** Marathi (मराठी) */
-$aliases['mr'] = array(
-	'Form' => array( 'छापीलनमूना' ),
-);
-
-/** Maltese (Malti) */
-$aliases['mt'] = array(
-	'Form' => array( 'Formola' ),
-);
-
-/** Nedersaksisch (Nedersaksisch) */
-$aliases['nds-nl'] = array(
-	'Form' => array( 'Formelier' ),
-);
-
-/** Dutch (Nederlands) */
-$aliases['nl'] = array(
-	'Form' => array( 'Formulier' ),
-);
-
-/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬) */
-$aliases['no'] = array(
-	'Form' => array( 'Skjema' ),
-);
-
-/** Occitan (Occitan) */
-$aliases['oc'] = array(
-	'Form' => array( 'Formulari' ),
-);
-
-/** Slovak (Slovenčina) */
-$aliases['sk'] = array(
-	'Form' => array( 'Formulár' ),
-);
-
-/** Albanian (Shqip) */
-$aliases['sq'] = array(
-	'Form' => array( 'Formë' ),
-);
-
-/** Swedish (Svenska) */
-$aliases['sv'] = array(
-	'Form' => array( 'Formulär' ),
-);
-
-/** Swahili (Kiswahili) */
-$aliases['sw'] = array(
-	'Form' => array( 'Fomu' ),
-);
-
-/** Thai (ไทย) */
-$aliases['th'] = array(
-	'Form' => array( 'ฟอร์ม' ),
-);
-
-/** Tagalog (Tagalog) */
-$aliases['tl'] = array(
-	'Form' => array( 'Pormularyo' ),
-);
-
+$aliases['en'] = array('Form' => 'Form');
+$aliases['qqq'] = array('Form' => '');
+$aliases['af'] = array('Form' => '');
+$aliases['an'] = array('Form' => '');
+$aliases['ar'] = array('Form' => 'استمارة');
+$aliases['arz'] = array('Form' => 'استمارة');
+$aliases['bcl'] = array('Form' => '');
+$aliases['be-tarask'] = array('Form' => 'Форма');
+$aliases['bg'] = array('Form' => 'Формуляр');
+$aliases['bn'] = array('Form' => 'ফরম');
+$aliases['br'] = array('Form' => 'Furmskrid');
+$aliases['bs'] = array('Form' => 'Obrazac');
+$aliases['ca'] = array('Form' => 'Formulari');
+$aliases['cs'] = array('Form' => 'Formulář');
+$aliases['de'] = array('Form' => 'Formular');
+$aliases['de-formal'] = array('Form' => '');
+$aliases['dsb'] = array('Form' => 'Formular');
+$aliases['el'] = array('Form' => 'Φόρμα');
+$aliases['eo'] = array('Form' => 'Formulario');
+$aliases['es'] = array('Form' => 'Formulario');
+$aliases['eu'] = array('Form' => 'Formularioa');
+$aliases['fi'] = array('Form' => 'Lomake');
+$aliases['fr'] = array('Form' => 'Formulaire');
+$aliases['frp'] = array('Form' => '');
+$aliases['fy'] = array('Form' => '');
+$aliases['gl'] = array('Form' => 'Formulario');
+$aliases['grc'] = array('Form' => '');
+$aliases['gsw'] = array('Form' => 'Formular');
+$aliases['he'] = array('Form' => 'טופס');
+$aliases['hr'] = array('Form' => '');
+$aliases['hsb'] = array('Form' => 'Formular');
+$aliases['hu'] = array('Form' => 'Űrlap');
+$aliases['ia'] = array('Form' => 'Formulario');
+$aliases['id'] = array('Form' => 'Formulir');
+$aliases['io'] = array('Form' => '');
+$aliases['is'] = array('Form' => '');
+$aliases['it'] = array('Form' => 'Modulo');
+$aliases['ja'] = array('Form' => 'フォーム');
+$aliases['jv'] = array('Form' => 'Formulir');
+$aliases['km'] = array('Form' => 'សំណុំបែបបទ');
+$aliases['ksh'] = array('Form' => 'Fommulaa');
+$aliases['la'] = array('Form' => '');
+$aliases['lb'] = array('Form' => 'Formulaire');
+$aliases['mhr'] = array('Form' => '');
+$aliases['mk'] = array('Form' => '');
+$aliases['ml'] = array('Form' => 'ഫോം');
+$aliases['mr'] = array('Form' => 'अर्ज');
+$aliases['ms'] = array('Form' => 'Borang');
+$aliases['myv'] = array('Form' => '');
+$aliases['nah'] = array('Form' => '');
+$aliases['nds'] = array('Form' => 'Formular');
+$aliases['nl'] = array('Form' => 'Formulier');
+$aliases['nn'] = array('Form' => 'Skjema');
+$aliases['no'] = array('Form' => 'Skjema');
+$aliases['oc'] = array('Form' => 'Formulari');
+$aliases['os'] = array('Form' => '');
+$aliases['pl'] = array('Form' => 'Formularz');
+$aliases['pms'] = array('Form' => 'Domanda');
+$aliases['pt'] = array('Form' => 'Formulário');
+$aliases['pt-br'] = array('Form' => 'Formulário');
+$aliases['ro'] = array('Form' => '');
+$aliases['roa-tara'] = array('Form' => '');
+$aliases['ru'] = array('Form' => 'Форма');
+$aliases['sk'] = array('Form' => 'Formulár');
+$aliases['so'] = array('Form' => '');
+$aliases['sr-ec'] = array('Form' => '');
+$aliases['sr-el'] = array('Form' => '');
+$aliases['stq'] = array('Form' => 'Formular');
+$aliases['su'] = array('Form' => 'Formulir');
+$aliases['sv'] = array('Form' => 'Formulär');
+$aliases['sw'] = array('Form' => '');
+$aliases['te'] = array('Form' => 'ఫారం');
+$aliases['tg-cyrl'] = array('Form' => '');
+$aliases['th'] = array('Form' => '');
+$aliases['tl'] = array('Form' => 'Pormularyo');
+$aliases['tr'] = array('Form' => '');
+$aliases['uk'] = array('Form' => '');
+$aliases['vep'] = array('Form' => 'Form');
+$aliases['vi'] = array('Form' => 'Biểu mẫu');
+$aliases['vo'] = array('Form' => 'Fomet');
+$aliases['yi'] = array('Form' => '');
+$aliases['zh-hans'] = array('Form' => '表单');
+$aliases['zh-hant'] = array('Form' => '表格');
