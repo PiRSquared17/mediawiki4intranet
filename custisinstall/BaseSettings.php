@@ -103,8 +103,9 @@ require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
-    $wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
-    $wgUseImageMagick = true;
+    //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
+    $wgUseImageMagick = false;
+    $wgGDAlwaysResample = true;
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
 }
