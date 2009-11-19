@@ -459,8 +459,8 @@ class FormField {
 							'type' => 'text',
 							'name' => $this->name,
 							'id' => $this->name,
-							'value' => ( ( is_null( $def ) ) ? $this->getOption( 'default', '' ) : $def ),
-							'size' => $this->getOption( 'size', 30 )
+							'value' => strlen($def) ? $def : $this->getOption('default', ''),
+							'size' => $this->getOption('size', 30)
 						)
 					);
 			break;
