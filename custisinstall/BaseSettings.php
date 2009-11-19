@@ -104,6 +104,7 @@ if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
+    # TODO move it into global settings (force UNIX installations use GD also)
     $wgUseImageMagick = false;
     $wgGDAlwaysResample = true;
     # Bug 48216
