@@ -91,7 +91,6 @@ require_once($IP.'/extensions/DocExport/DocExport.php');
 require_once($IP.'/extensions/CustisScripts/CustisScripts.php');
 require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
-require_once($IP.'/extensions/FreeMind/FreeMind.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 
 require_once($IP.'/extensions/Calendar/Calendar.php');
