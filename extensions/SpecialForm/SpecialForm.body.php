@@ -162,6 +162,8 @@ class SpecialForm extends SpecialPage {
 		$missedFields = array();
 
 		foreach( $form->fields as $name => $field ) {
+			if (!is_object($field))
+				continue;
 			$value = $wgRequest->getText( $name );
 			if( $field->isOptionTrue( 'required' ) && ( is_null( $value ) || strlen( $value ) == 0 ) ) {
 				$missedFields[] = $field->label;
