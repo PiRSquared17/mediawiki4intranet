@@ -1,0 +1,21 @@
+Index: includes/media/Bitmap.php
+===================================================================
+--- includes/media/Bitmap.php	(revision 58865)
++++ includes/media/Bitmap.php	(working copy)
+@@ -168,6 +168,7 @@
+ 			#
+ 			# First find out what kind of file this is, and select the correct
+ 			# input routine for this.
++			global $wgGDAlwaysResample;
+ 
+ 			$typemap = array(
+ 				'image/gif'          => array( 'imagecreatefromgif',  'palette',   'imagegif'  ),
+@@ -198,7 +199,7 @@
+ 			imagecolortransparent( $dst_image, $background );
+ 			imagealphablending( $dst_image, false );
+ 
+-			if( $colorStyle == 'palette' ) {
++			if( $colorStyle == 'palette' && !$wgGDAlwaysResample ) {
+ 				// Don't resample for paletted GIF images.
+ 				// It may just uglify them, and completely breaks transparency.
+ 				imagecopyresized( $dst_image, $src_image,
