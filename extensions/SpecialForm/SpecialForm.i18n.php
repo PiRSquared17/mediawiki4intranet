@@ -92,7 +92,7 @@ $messages['ar'] = array(
 	'formbadnametext' => 'لا توجد استمارة بهذا الاسم.',
 	'formpattern' => '$1-استمارة',
 	'formtitlepattern' => 'أضف $1 جديدا',
-	'formsave' => 'حفظ',
+	'formsave' => 'احفظ',
 	'formindexmismatch-title' => 'نمط الاسم والقالب لا يتطابقان',
 	'formindexmismatch' => 'هذه الاستمارة بها أنماط أسماء وقوالب غير متطابقة بدءا عند الفهرس $1.',
 	'formarticleexists' => 'الصفحة موجودة',
@@ -196,17 +196,23 @@ $messages['bg'] = array(
  * @author Bellayet
  */
 $messages['bn'] = array(
+	'form-desc' => 'নতুন পাতা শুরু করতে [[Special:Form|ফরম ইন্টারফেস]]',
 	'form' => 'ফরম',
 	'formnoname' => 'কোনো ফরম নাম নাই',
 	'formbadname' => 'মন্দ ফরম নাম',
+	'formbadnametext' => 'এই নামে কোনো ফরম নাই।',
 	'formpattern' => '$1-ফরম',
 	'formtitlepattern' => 'নতুন $1 যোগ',
 	'formsave' => 'সংরক্ষণ',
+	'formarticleexists' => 'পাতা রয়েছে',
+	'formbadpagename' => 'পাতার মন্দ নাম',
+	'formsaveerror' => 'ফরম সংরক্ষণে ত্রুটি',
 );
 
 /** Breton (Brezhoneg)
  * @author Fohanno
  * @author Fulup
+ * @author Y-M D
  */
 $messages['br'] = array(
 	'form' => 'Furmskrid',
@@ -216,6 +222,7 @@ $messages['br'] = array(
 	'formsave' => 'Enrollañ',
 	'formarticleexists' => 'Ar bajenn zo anezhi dija',
 	'formarticleexiststext' => 'Ar bajenn [[$1]] zo anezhi dija.',
+	'formbadpagename' => 'Anv fall evit ar bajenn',
 	'formsaveerror' => 'Fazi en ur enrollañ ar furmskrid',
 );
 
@@ -373,6 +380,7 @@ $messages['el'] = array(
 
 /** Esperanto (Esperanto)
  * @author Melancholie
+ * @author Michawiki
  * @author Yekrats
  */
 $messages['eo'] = array(
@@ -388,8 +396,8 @@ $messages['eo'] = array(
 	'formarticleexiststext' => 'La paĝo [[$1]] jam ekzistas.',
 	'formbadpagename' => 'Fuŝa paĝnomo',
 	'formbadrecaptcha' => 'Malkorektaj valoroj por reCaptcha. Reprovu.',
-	'formrequiredfielderror' => 'La kampo $1 estas deviga por ĉi tiu kamparo.
-Bonvolu plenumi ĝin.',
+	'formrequiredfielderror' => 'La {{PLURAL:$2|kampo $1 estas deviga|kampoj $1 estas devigaj}} por ĉi tiu formulario.
+Bonvolu plenigi {{PLURAL:$2|ĝin|ilin}}.',
 	'formsaveerror' => 'Eraro konservante formularon',
 	'formsaveerrortext' => "Estis nekonata eraro konservante paĝon '$1'.",
 );
@@ -677,7 +685,7 @@ $messages['ia'] = array(
 	'formarticleexists' => 'Pagina existe',
 	'formarticleexiststext' => 'Le pagina [[$1]] existe ja.',
 	'formbadpagename' => 'Nomine de pagina invalide',
-	'formbadrecaptcha' => 'Valores incorrecte pro reCaptcha. Reprova.',
+	'formbadrecaptcha' => 'Valores incorrecte pro reCaptcha. Reproba.',
 	'formbadpagenametext' => 'Le datos de formulario que tu entrava resulta in un nomine de pagina invalide, "$1".',
 	'formrequiredfielderror' => 'Le {{PLURAL:$2|campo|campos}} $1 es requirite pro iste formulario.
 Per favor completa {{PLURAL:$2|lo|los}}.',
@@ -712,6 +720,13 @@ Silakan masukkan {{PLURAL:$2|isian|isian}} itu.',
 	'formsavesummary' => 'Halaman baru menggunakan [[Special:Form/$1|formulir $1]]',
 	'formsaveerror' => 'Kesalahan penyimpanan formulir',
 	'formsaveerrortext' => "Terjadi kesalahan yang tak dikenal sewaktu menyimpan halaman '$1'.",
+);
+
+/** Ido (Ido)
+ * @author Malafaya
+ */
+$messages['io'] = array(
+	'formsave' => 'Registragar',
 );
 
 /** Icelandic (Íslenska)
@@ -873,6 +888,7 @@ $messages['lb'] = array(
 	'formtitlepattern' => 'Nei $1 derbäisetzen',
 	'formsave' => 'Späicheren',
 	'formindexmismatch-title' => 'Duercherneen tëschent dem Numm an der Schabloun',
+	'formindexmismatch' => "Dëse Formulaire ass net richteg configuréiert wat d'Schablounen an d'Modeller vun den Donnéeën. De Feeler fänkt beim Index $1 un.",
 	'formarticleexists' => "D'Säit gëtt et schonn.",
 	'formarticleexiststext' => "D'Säit [[$1]] gëtt et schonn.",
 	'formbadpagename' => 'Falsche Säitennumm',
@@ -890,6 +906,13 @@ Fëllt {{PLURAL:$2|et|se}} w.e.g. aus.",
  */
 $messages['mhr'] = array(
 	'formsave' => 'Аралаш',
+);
+
+/** Macedonian (Македонски)
+ * @author Bjankuloski06
+ */
+$messages['mk'] = array(
+	'formbadpagenametext' => 'Внесените податоци за формата образуваат погрешен назив на страницата, „$1“.',
 );
 
 /** Malayalam (മലയാളം)
