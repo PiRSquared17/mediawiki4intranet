@@ -12,7 +12,11 @@ use strict;
 use POSIX qw(strftime);
 use HTTP::Cookies;
 use HTTP::Request::Common;
+use HTML::Entities;
+
 use Encode::Escape;
+BEGIN { $\ = '' };
+
 use URI::Escape;
 
 our $logp = '';
@@ -33,6 +37,11 @@ my $tests = {
     random_search => {
         ''           => 'Search random page using Sphinx',
         searchurl    => 'URL for search, {PAGE} is page placeholder, {TITLE} is title placeholder (default не скажу)',
+    },
+    search => {
+        ''           => 'Search for specific page using Sphinx',
+        searchurl    => 'URL for search, {PAGE} is page placeholder, {TITLE} is title placeholder (default не скажу)',
+        searchtitle  => 'Search title',
     },
 };
 my @order = qw(login save random_search);
@@ -89,10 +98,10 @@ OPTIONS:
 -T test             run test 'test'
 TESTS:
 EOF
-    foreach (@order)
+    foreach (keys %$tests)
     {
         my $t = $tests->{$_};
-        print '-T '.$_.(' ' x (17-length $_)).$t->{''}."\n";
+        print "-T $_".(' ' x (17-length $_)).$t->{''}."\n";
         for (keys %$t)
         {
             print "--$_".(' ' x (20-length $_)).$t->{$_}."\n" if $_;
@@ -174,7 +183,6 @@ sub test_save
 sub test_random_search
 {
     my ($url, $params, $ua) = @_;
-    my $su = $params->{searchurl} || '/Special:SphinxSearch?fulltext=Search&match_all=1&ns0=1&ns1=1&ns2=1&ns3=1&ns4=1&ns5=1&ns6=1&ns7=1&ns8=1&ns9=1&ns10=1&ns11=1&ns12=1&ns13=1&ns14=1&ns15=1&ns100=1&ns101=1&search={TITLE}&page={PAGE}';
 
     # получаем редирект на случайную страницу
     my ($title, $i, $response, $text) = ('', 0);
@@ -191,8 +199,18 @@ sub test_random_search
     return if length $title < 2;
 
     # ищем эту страницу поиском
+    $params->{searchtitle} = $title;
+    test_search($url, $params, $ua);
+}
+
+sub test_search
+{
+    my ($url, $params, $ua) = @_;
+    my $su = $params->{searchurl} || '/Special:SphinxSearch?fulltext=Search&match_all=1&ns0=1&ns1=1&ns2=1&ns3=1&ns4=1&ns5=1&ns6=1&ns7=1&ns8=1&ns9=1&ns10=1&ns11=1&ns12=1&ns13=1&ns14=1&ns15=1&ns100=1&ns101=1&search={TITLE}&page={PAGE}';
+    my $title = $params->{searchtitle} || return;
     my $page = 1;
     my @found;
+    my $text;
     my $u;
     my $u1 = $su;
     $u = $title;
@@ -204,12 +222,13 @@ sub test_random_search
         $u = $u1;
         $u =~ s/\{PAGE\}/uri_escape($page)/gsoe;
         $u = "$url/index.php$u";
-        $response = $ua->request(GET $u);
+        my $response = $ua->request(GET $u);
         die logp()." Could not GET search page '$u': ".$response->status_line
             unless $response->code == 200;
         $text = $response->content;
         check_php_warnings($text);
         @found = $text =~ /<li>(.*?)<\/li>/giso;
+        decode_entities($_) for @found;
         return if grep { /\Q$title\E/is } @found;
         $page++;
     } while ($text =~ />\s*$page\s*</is);
