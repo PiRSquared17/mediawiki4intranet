@@ -95,6 +95,7 @@ require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 
 require_once($IP.'/extensions/Calendar/Calendar.php');
 require_once($IP.'/extensions/SimpleTable/SimpleTable.php');
+require_once($IP.'/extensions/MagicNumberedHeadings/MagicNumberedHeadings.php');
 
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = true;
