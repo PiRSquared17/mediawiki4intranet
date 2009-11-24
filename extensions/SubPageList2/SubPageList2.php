@@ -73,6 +73,7 @@ class SubpageList
 {
     /* MediaWiki objects */
     var $parser;
+    var $oldParser;
     var $title;
     var $language;
 
@@ -108,6 +109,7 @@ class SubpageList
     {
         global $wgContLang;
         $parser->disableCache();
+        $this->oldParser = $parser;
         $this->parser = clone $parser;
         $this->title = $parser->mTitle;
         $this->language = $wgContLang;
@@ -336,7 +338,7 @@ class SubpageList
     function parse($text)
     {
         wfProfileIn(__METHOD__);
-        $options = $this->parser->mOptions;
+        $options = $this->oldParser->mOptions;
         $output = $this->parser->parse($text, $this->title, $options, true, false);
         wfProfileOut(__METHOD__);
         return $output->getText();
