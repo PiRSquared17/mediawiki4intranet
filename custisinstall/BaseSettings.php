@@ -92,6 +92,7 @@ require_once($IP.'/extensions/CustisScripts/CustisScripts.php');
 require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
+require_once($IP.'/extensions/PdfHandler/PdfHandler.php');
 
 require_once($IP.'/extensions/Calendar/Calendar.php');
 require_once($IP.'/extensions/SimpleTable/SimpleTable.php');
@@ -126,5 +127,16 @@ $wgSphinxTopSearchableCategory = "Root";
 // Bug (Bug 43343), because detect VSD-files as application/msword, 
 // or incorrect define of .mm files
 $wgVerifyMimeType = false;
+
+// Bug 57350 - PDF and Djvu
+$wgDjvuDump = "djvudump";
+$wgDjvuRenderer = "ddjvu";
+$wgDjvuTxt = "djvutxt";
+$wgDjvuPostProcessor = "ppmtojpeg";
+$wgDjvuOutputExtension = 'jpg';
+
+$wgPdfProcessor = 'gs';
+$wgPdfPostProcessor = $wgImageMagickConvertCommand;
+$wgPdfInfo = 'pdfinfo';
 
 ?>
