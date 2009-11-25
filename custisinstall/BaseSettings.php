@@ -62,7 +62,7 @@ $wgNamespacesWithSubpages[NS_USER_TALK] = true;
 $wgUseAjax = true;
 
 $wgLogo                 = "$wgScriptPath/skins/custis/cis-logo.png";
-$wgFileExtensions       = array( 'mm', 'png', 'gif', 'jpg', 'jpeg', 'doc', 'xpi', 'zip', 'rar', 'ppt', 'pps', 'xls','vsd', 'djvu', 'svg');
+$wgFileExtensions       = array( 'mm', 'png', 'gif', 'jpg', 'jpeg', 'doc', 'xpi', 'zip', 'rar', 'ppt', 'pps', 'xls','vsd', 'djvu', 'svg', 'pdf' );
 $wgAllowCopyUploads     = true;
 $wgStrictFileExtensions = false;
 
