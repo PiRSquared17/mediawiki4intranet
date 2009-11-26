@@ -27,19 +27,17 @@ $wgExtensionCredits['other'][] = array(
 );
 
 $wgHooks['LinkBegin'][] = 'efAllowGetParamsInWikiLinks';
-function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$query, &$options, &$ret) {
-
-    for ($i=0;$i<count($options) && ($options[$i]!='broken');$i++);
-
-
-    if ($i>=count($options)) {
+function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$query, &$options, &$ret)
+{
+    if (!in_array('broken', $options))
+    {
         /** known link */
         return true;
     }
-    $brokenPos = $i;
     $direccion = parse_url($target->getText());
 
-    if (!array_key_exists('query',$direccion)) {
+    if (!array_key_exists('query', $direccion))
+    {
         /** it is not written in the form target?query */
         return true;
     }
@@ -47,7 +45,8 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     if (isset($direccion['user']) ||
         isset($direccion['pass']) ||
         isset($direccion['host']) ||
-        isset($direccion['scheme'])) {
+        isset($direccion['scheme']))
+    {
         /** complex urls are not the target of this extension */
         return true;
     }
@@ -55,22 +54,22 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     /** patch for solving problems with Special pages */
     $pos = strpos($target->getPrefixedText(), "?");
     $direccion['path'] = substr($target->getPrefixedText(), 0, $pos);
-
     $tituloArticulo = Title::newFromText($direccion['path']);
-    if (!$tituloArticulo->isKnown()) {
+    if (!$tituloArticulo->isKnown())
         return true;
-    }
+
     $nuevosArgumentos = array();
-    foreach (explode('&',$direccion['query']) as $argumento) {
+    foreach (explode('&', $direccion['query']) as $argumento)
+    {
         $valores = split('=',$argumento,2);
         $nuevosArgumentos[$valores[0]] = $valores[1];
     }
-    $query = array_merge($query,$nuevosArgumentos);
+    $query = array_merge($query, $nuevosArgumentos);
 
     /** customAttribs probably is not preloaded, but we use it in case it is */
     $myattribs = $customAttribs;
     $myattribs['href'] = $tituloArticulo->getLinkUrl();
-    $myattribs['href'] = wfAppendQuery( $myattribs['href'], wfArrayToCgi( $query ) );
+    $myattribs['href'] = wfAppendQuery($myattribs['href'], wfArrayToCgi($query));
 
     /** Preparing the link text and the title */
     if (is_null($text))
@@ -79,6 +78,6 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     $myattribs['title'] = $tituloArticulo->getPrefixedText();
 
     /** Create the link */
-    $ret = Xml::openElement( 'a', $myattribs ) . $text . Xml::closeElement( 'a' );
+    $ret = Xml::openElement('a', $myattribs) . $text . Xml::closeElement('a');
     return false;
 }
