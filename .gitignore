@@ -39,6 +39,7 @@ extensions/geshi
 extensions/recaptcha
 extensions/MediaFunctions
 extensions/SpecialForm
+extensions/PdfHandler
 extensions/FlvHandler/.svn
 extensions/FlvHandler/ImagePage.php.diff
 extensions/FlvHandler/t
