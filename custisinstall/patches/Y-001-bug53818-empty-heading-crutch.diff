@@ -1,3 +1,4 @@
+Depends on: Y-000-shift-included-templates-heading-levels.diff
 Index: includes/parser/Preprocessor_DOM.php
 ===================================================================
 --- includes/parser/Preprocessor_DOM.php	(revision 54846)
