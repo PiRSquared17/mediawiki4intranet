@@ -1,3 +1,4 @@
+Depends on: Y-000-debug-wikilog.diff
 Index: includes/FileDeleteForm.php
 ===================================================================
 --- includes/FileDeleteForm.php	(revision 54846)
