@@ -43,8 +43,16 @@ my $tests = {
         searchurl    => 'URL for search, {PAGE} is page placeholder, {TITLE} is title placeholder (default не скажу)',
         searchtitle  => 'Search title',
     },
+    checkurl => {
+        ''           => 'Simply check URL for PHP errors',
+        checkurl     => 'URL for checking',
+    },
+    categorizedrc => {
+        ''           => 'Check categorized Special:RecentChanges for PHP errors',
+        checkcat     => 'Test',
+    },
 };
-my @order = qw(login save random_search);
+my @order = qw(login save random_search categorizedrc);
 
 # параметры
 my $params = {};
@@ -233,6 +241,23 @@ sub test_search
         $page++;
     } while ($text =~ />\s*$page\s*</is);
     die logp()." Not found: $title";
+}
+
+sub test_checkurl
+{
+    my ($url, $params, $ua) = @_;
+    my $response = $ua->request(GET $url.$params->{checkurl});
+    die logp()." Could not check URL '$url$params->{checkurl}': ".$response->status_line
+        unless $response->code == 200;
+    my $text = $response->content;
+    check_php_warnings($text);
+    return $text;
+}
+
+sub test_categorizedrc
+{
+    my ($url, $params, $ua) = @_;
+    test_checkurl($url, { checkurl => '/index.php/Special:RecentChanges?categories='.($params->{checkcat} || 'Test') }, $ua);
 }
 
 sub check_php_warnings
