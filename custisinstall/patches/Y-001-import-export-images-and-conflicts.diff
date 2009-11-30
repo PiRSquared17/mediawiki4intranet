@@ -1,3 +1,4 @@
+Depends on: Y-000-translit-upload-filenames.diff
 Index: includes/filerepo/LocalFile.php
 ===================================================================
 --- includes/filerepo/LocalFile.php	(revision 54846)
