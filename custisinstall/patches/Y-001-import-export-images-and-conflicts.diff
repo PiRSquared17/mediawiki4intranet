@@ -908,7 +908,7 @@ index d8debb5..27aeca2 100644
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 diff --git includes/specials/SpecialExport.php includes/specials/SpecialExport.php
-index 898b5a7..d537875 100644
+index 898b5a7..8c05e51 100644
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,29 +21,33 @@
@@ -1010,10 +1010,10 @@ index 898b5a7..d537875 100644
 +			$page .= "\n" . implode("\n", $catpages);
 +		if (!$catname && strlen($catname = $wgRequest->getText('catname')))
 +			$errors[] = array('export-invalid-catname', $catname);
-+		if (!$modifydate && ($modifydate = $wgRequest->getText('modifydate')))
-+			$errors[] = array('export-invalid-modifydate', $modifydate);
-+		else
++		if ($modifydate)
 +			$modifydate = wfTimestamp(TS_DB, $modifydate);
++		else if ($modifydate = $wgRequest->getText('modifydate'))
++			$errors[] = array('export-invalid-modifydate', $modifydate);
 +		if (!$namespace && strlen($namespace = $wgRequest->getText('namespace')))
 +			$errors[] = array('export-invalid-namespace', $namespace);
  	}
