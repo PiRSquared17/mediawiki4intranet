@@ -1,5 +1,6 @@
 From: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 Subject: [PATCH] t/001-import-export-images-and-conflicts
+Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
 advanced export page list building options and support for exporting file data
