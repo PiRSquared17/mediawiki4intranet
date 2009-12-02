@@ -10,11 +10,8 @@ require_once($IP.'/extensions/EnotifDiff/EnotifDiff.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
-require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/Drafts/Drafts.php');
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
-require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
-require_once($IP.'/extensions/FullLocalImage.php');
 #require_once($IP.'/extensions/LiquidThreads/LqtPages.php');
 Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 
@@ -24,10 +21,6 @@ $egDraftsAutoSaveWait  = 60;   // 1 minute
 $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
-
-require_once($IP.'/extensions/MMHandler/MMHandler.php');
-
-$wgAllowCategorizedRecentChanges = true;
 
 $wgEnableEmail         = true;
 $wgEnableUserEmail     = true;
@@ -67,6 +60,17 @@ $wgSphinxSearch_weights = array('page_title' => 2, 'old_text' => 1);
 $wgSphinxSearch_matches = 20;
 $wgSphinxMatchAll = 1;
 
-$wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
+// Bug 57350 - PDF and Djvu (UNIX only)
+require_once($IP.'/extensions/PdfHandler/PdfHandler.php');
+
+$wgDjvuDump = "djvudump";
+$wgDjvuRenderer = "ddjvu";
+$wgDjvuTxt = "djvutxt";
+$wgDjvuPostProcessor = "ppmtojpeg";
+$wgDjvuOutputExtension = 'jpg';
+
+$wgPdfProcessor = 'gs';
+$wgPdfPostProcessor = $wgImageMagickConvertCommand;
+$wgPdfInfo = 'pdfinfo';
 
 ?>
