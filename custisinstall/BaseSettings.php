@@ -80,7 +80,6 @@ require_once($IP.'/extensions/Cite/Cite.php');
 require_once($IP.'/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php');
 require_once($IP.'/extensions/CategoryTree/CategoryTree.php');
 
-
 $wgGroupPermissions['*']['interwiki'] = false;
 $wgGroupPermissions['sysop']['interwiki'] = true;
 
@@ -92,13 +91,22 @@ require_once($IP.'/extensions/CustisScripts/CustisScripts.php');
 require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
-require_once($IP.'/extensions/PdfHandler/PdfHandler.php');
+require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
+require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
+require_once($IP.'/extensions/FullLocalImage.php');
+
+require_once($IP.'/extensions/MMHandler/MMHandler.php');
+/* for mindmap uploads */
+$wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
+
+$wgAllowCategorizedRecentChanges = true;
 
 require_once($IP.'/extensions/Calendar/Calendar.php');
 require_once($IP.'/extensions/SimpleTable/SimpleTable.php');
 require_once($IP.'/extensions/MagicNumberedHeadings/MagicNumberedHeadings.php');
 require_once($IP.'/extensions/MediaFunctions/MediaFunctions.php');
 require_once($IP.'/extensions/AllowGetParamsInWikilinks/AllowGetParamsInWikilinks.php');
+require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = true;
@@ -130,16 +138,5 @@ $wgSphinxTopSearchableCategory = "Root";
 // Bug (Bug 43343), because detect VSD-files as application/msword, 
 // or incorrect define of .mm files
 $wgVerifyMimeType = false;
-
-// Bug 57350 - PDF and Djvu
-$wgDjvuDump = "djvudump";
-$wgDjvuRenderer = "ddjvu";
-$wgDjvuTxt = "djvutxt";
-$wgDjvuPostProcessor = "ppmtojpeg";
-$wgDjvuOutputExtension = 'jpg';
-
-$wgPdfProcessor = 'gs';
-$wgPdfPostProcessor = $wgImageMagickConvertCommand;
-$wgPdfInfo = 'pdfinfo';
 
 ?>
