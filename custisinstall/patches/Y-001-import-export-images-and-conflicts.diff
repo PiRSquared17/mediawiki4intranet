@@ -12,11 +12,11 @@ Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
  includes/Export.php                 |   70 ++++++--
  includes/Import.php                 |  330 ++++++++++++++++++++++++++++-------
  includes/filerepo/LocalFile.php     |   74 ++++++++-
- includes/specials/SpecialExport.php |  115 +++++++------
+ includes/specials/SpecialExport.php |  117 +++++++------
  includes/specials/SpecialImport.php |   60 ++++++-
  languages/messages/MessagesEn.php   |   19 ++-
  languages/messages/MessagesRu.php   |   19 ++-
- 7 files changed, 540 insertions(+), 147 deletions(-)
+ 7 files changed, 543 insertions(+), 146 deletions(-)
 
 diff --git includes/Export.php includes/Export.php
 index 5f040b1..f5d5e27 100644
@@ -908,10 +908,10 @@ index d8debb5..27aeca2 100644
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 diff --git includes/specials/SpecialExport.php includes/specials/SpecialExport.php
-index 898b5a7..8c05e51 100644
+index 898b5a7..1b68ec9 100644
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
-@@ -21,29 +21,33 @@
+@@ -21,28 +21,36 @@
   * @ingroup SpecialPage
   */
  
@@ -954,15 +954,17 @@ index 898b5a7..8c05e51 100644
 +		$where['page_namespace'] = $namespace = $namespace->getNamespace();
  
 -		$pages[] = $n;
--	}
 +	$pages = array();
 +	$res = $dbr->select($from, array('page_namespace', 'page_title'), $where, __METHOD__);
 +	while ($row = $dbr->fetchRow($res))
-+		$pages[] = Title::makeTitleSafe($row['page_namespace'], $row['page_title'])->getPrefixedText();
++	{
++		$row = Title::makeTitleSafe($row['page_namespace'], $row['page_title']);
++		if ($row)
++			$pages[] = $row->getPrefixedText();
+ 	}
  	$dbr->freeResult($res);
  
- 	return $pages;
-@@ -105,13 +109,6 @@ function wfExportGetLinks( $inputPages, $pageSet, $table, $fields, $join ) {
+@@ -105,13 +113,6 @@ function wfExportGetLinks( $inputPages, $pageSet, $table, $fields, $join ) {
  }
  
  /**
@@ -976,7 +978,7 @@ index 898b5a7..8c05e51 100644
   *
   */
  function wfSpecialExport( $page = '' ) {
-@@ -120,23 +117,25 @@ function wfSpecialExport( $page = '' ) {
+@@ -120,23 +121,25 @@ function wfSpecialExport( $page = '' ) {
  
  	$curonly = true;
  	$doexport = false;
@@ -1019,7 +1021,7 @@ index 898b5a7..8c05e51 100644
  	}
  	else if( $wgRequest->wasPosted() && $page == '' ) {
  		$page = $wgRequest->getText( 'pages' );
-@@ -205,19 +204,20 @@ function wfSpecialExport( $page = '' ) {
+@@ -205,19 +208,20 @@ function wfSpecialExport( $page = '' ) {
  		}
  
  		/* Split up the input and look up linked pages */
@@ -1043,7 +1045,7 @@ index 898b5a7..8c05e51 100644
  
  		$pages = array_keys( $pageSet );
  
-@@ -241,6 +241,8 @@ function wfSpecialExport( $page = '' ) {
+@@ -241,6 +245,8 @@ function wfSpecialExport( $page = '' ) {
  
  		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors ;
@@ -1052,7 +1054,7 @@ index 898b5a7..8c05e51 100644
  		$exporter->openStream();
  
  		foreach( $pages as $page ) {
-@@ -278,22 +280,31 @@ function wfSpecialExport( $page = '' ) {
+@@ -278,22 +284,31 @@ function wfSpecialExport( $page = '' ) {
  	$form = Xml::openElement( 'form', array( 'method' => 'post',
  		'action' => $self->getLocalUrl( 'action=submit' ) ) );
  
