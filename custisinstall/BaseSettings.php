@@ -107,6 +107,7 @@ require_once($IP.'/extensions/MagicNumberedHeadings/MagicNumberedHeadings.php');
 require_once($IP.'/extensions/MediaFunctions/MediaFunctions.php');
 require_once($IP.'/extensions/AllowGetParamsInWikilinks/AllowGetParamsInWikilinks.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
+require_once($IP.'/extensions/WikiBookmarks/WikiBookmarks.php');
 
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = true;
