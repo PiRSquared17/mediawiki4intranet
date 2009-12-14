@@ -1,4 +1,17 @@
+From: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+Subject: [PATCH] t/001-bug53818-empty-heading-crutch
 Depends on: Y-000-shift-included-templates-heading-levels.diff
+
+A logical patch which removes empty headings from parser output
+instead of taking '==' as their text and all the remaining ='s
+as heading marker.
+
+Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+
+---
+ includes/parser/Preprocessor_DOM.php |   27 +++++++++++++++------------
+ 1 files changed, 15 insertions(+), 12 deletions(-)
+
 Index: includes/parser/Preprocessor_DOM.php
 ===================================================================
 --- includes/parser/Preprocessor_DOM.php	(revision 54846)
