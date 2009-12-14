@@ -39,7 +39,7 @@ if ( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
 $wgExtensionCredits['parserhook'][] = array(
 	'name' => 'CharInsert',
 	'author' => 'Brion Vibber',
-	'svn-date' => '$LastChangedDate: 2008-06-17 00:54:29 +0400 (÷ÔÒ, 17 éÀÎ 2008) $',
+	'svn-date' => '$LastChangedDate: 2008-06-17 00:54:29 +0400 (Ð’Ñ‚Ñ€, 17 Ð˜ÑŽÐ½ 2008) $',
 	'svn-revision' => '$LastChangedRevision: 36357 $',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:CharInsert',
 	'description' => 'Allows creation of JavaScript box for inserting non-standard characters',

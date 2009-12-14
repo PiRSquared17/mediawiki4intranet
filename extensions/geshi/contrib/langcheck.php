@@ -6,7 +6,7 @@
  * and the language files in subdirectory "../geshi/")
  *
  * @author  Nigel McNie
- * @version $Id: langcheck.php 1971 2008-12-25 15:14:14Z benbe $
+ * @version $Id: langcheck.php 2111 2009-06-14 13:08:07Z benbe $
  */
 header('Content-Type: text/html; charset=utf-8');
 
@@ -57,6 +57,10 @@ function report_error($type, $message) {
     if(TYPE_ERROR == $type) {
         $error_abort = true;
     }
+}
+
+function dupfind_strtolower(&$value){
+    $value = strtolower($value);
 }
 
 ?>
@@ -463,6 +467,9 @@ if(!$error_abort) {
                     } else if (preg_match('/^([\(\)\{\}\[\]\^=.,:;\-+\*\/%\$\"\'\?]|&[\w#]\w*;)+$/i', $kw)) {
                         report_error(TYPE_NOTICE, "Language file contains an keyword ('$kw') at \$language_data['KEYWORDS'][$key][$id] which seems to be better suited for the symbols section!");
                     }
+                }
+                if(isset($language_data['CASE_SENSITIVE'][$key]) && !$language_data['CASE_SENSITIVE'][$key]) {
+                    array_walk($keywords, 'dupfind_strtolower');
                 }
                 if(count($keywords) != count(array_unique($keywords))) {
                     $kw_diffs = array_count_values($keywords);

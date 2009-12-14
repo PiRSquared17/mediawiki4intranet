@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions
+END
+Expr.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/Expr.php
+END
+ParserFunctions.i18n.magic.php
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/ParserFunctions.i18n.magic.php
+END
+ParserFunctions.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/ParserFunctions.i18n.php
+END
+ParserFunctions.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/ParserFunctions.php
+END
+funcsParserTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/funcsParserTests.txt
+END
+SprintfDateCompat.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/ParserFunctions/SprintfDateCompat.php
+END

@@ -15,7 +15,7 @@ if (!defined('MEDIAWIKI')) die();
 
 $wgExtensionCredits['specialpage'][] = array(
 	'name' => 'Cite',
-	'svn-date' => '$LastChangedDate: 2008-10-30 19:12:17 +0300 (þÔ×, 30 ïËÔ 2008) $',
+	'svn-date' => '$LastChangedDate: 2008-10-30 19:12:17 +0300 (Ð§Ñ‚Ð², 30 ÐžÐºÑ‚ 2008) $',
 	'svn-revision' => '$LastChangedRevision: 42818 $',
 	'author' => 'Ã†var ArnfjÃ¶rÃ° Bjarmason',
 	'description' => 'adds a [[Special:Cite|citation]] special page & toolbox link', // kept for b/c
