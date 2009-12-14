@@ -1,0 +1,31 @@
+# HG changeset patch
+# User vitali@st-filippov.office.custis.ru
+# Date 1260819048 -10800
+Bug 56653
+Debug wfMsgExt to remove UNIQ____QINU
+
+diff -r 6be66a71a5f8 -r 33208161f262 includes/OutputPage.php
+--- includes/OutputPage.php
++++ includes/OutputPage.php
+@@ -637,7 +637,7 @@
+ 		$popts = $this->parserOptions();
+ 		if ( $interface) { $popts->setInterfaceMessage(true); }
+ 		$parserOutput = $wgParser->parse( $text, $wgTitle, $popts,
+-			$linestart, true, $this->mRevisionId );
++			$linestart, false, $this->mRevisionId );
+ 		if ( $interface) { $popts->setInterfaceMessage(false); }
+ 		return $parserOutput->getText();
+ 	}
+diff -r 6be66a71a5f8 -r 33208161f262 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -308,7 +308,7 @@
+ 		wfProfileIn( __METHOD__ );
+ 		wfProfileIn( $fname );
+ 
+-		if ( $clearState ) {
++		if ( $clearState || !$this->mStripState ) {
+ 			$this->clearState();
+ 		}
+ 
+
