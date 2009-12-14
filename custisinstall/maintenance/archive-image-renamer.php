@@ -4,8 +4,8 @@
  * @ingroup Maintenance
  */
 
-require_once 'commandLine.inc';
-require_once 'counter.php';
+require_once '../../maintenance/commandLine.inc';
+require_once '../../maintenance/counter.php';
 
 class OldImageRenamer
 {
@@ -102,7 +102,7 @@ revision in file names. This script renames them to contain **their** timestamp
 in file names.
 
 Usage:
-php oldimageRenamer.php
+php archive-image-renamer.php
 
 END;
 	}
