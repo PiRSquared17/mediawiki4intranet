@@ -1,7 +1,14 @@
-Index: extensions/Wikilog/Wikilog.php
-===================================================================
---- extensions/Wikilog/Wikilog.php	(revision 428)
-+++ extensions/Wikilog/Wikilog.php	(working copy)
+# HG changeset patch
+# User vitali@st-filippov.office.custis.ru
+# Date 1260891031 -10800
+Wikilog extension debug:
+Bug 56420 - fix php warning
+Bug 36400 - don't strip lists
+Bug 58154 - fix caching error
+
+diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/Wikilog.php
+--- extensions/Wikilog/Wikilog.php
++++ extensions/Wikilog/Wikilog.php
 @@ -361,7 +361,8 @@
  	 */
  	static function getWikilogInfo( $title ) {
@@ -12,10 +19,97 @@ Index: extensions/Wikilog/Wikilog.php
  		$ns = MWNamespace::getSubject( $title->getNamespace() );
  		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
  			return new WikilogInfo( $title );
-Index: extensions/Wikilog/WikilogUtils.php
-===================================================================
---- extensions/Wikilog/WikilogUtils.php    (revision 428)
-+++ extensions/Wikilog/WikilogUtils.php    (working copy)
+diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogFeed.php
+--- extensions/Wikilog/WikilogFeed.php
++++ extensions/Wikilog/WikilogFeed.php
+@@ -133,15 +133,24 @@
+ 		FeedUtils::checkPurge( $timekey, $feedkey );
+ 
+ 		if ( $feed->isCacheable() ) {
++
++			# IMPORTANT
++			# When you output cached feed, you MUST NOT output the
++			# Last-Modified header value of which is greater than cache time!
++			# It is set by OutputPage::checkLastModified(), so we need to pass
++			# the "effective" timestamp instead of real feed update timestamp.
++			# See error case in getEffectiveCacheTimestamp() description.
++			$tsEffective = $this->getEffectiveCacheTimestamp($feed->getUpdated(), $timekey);
++
+ 			# Check if client cache is ok.
+-			if ( $wgOut->checkLastModified( $feed->getUpdated() ) ) {
++			if ( $wgOut->checkLastModified( $tsEffective ) ) {
+ 				# Client cache is fresh. OutputPage takes care of sending
+ 				# the appropriate headers, nothing else to do.
+ 				return;
+ 			}
+ 
+ 			# Try to load the feed from our cache.
+-			$cached = $this->loadFromCache( $feed->getUpdated(), $timekey, $feedkey );
++			$cached = $this->loadFromCache( $tsEffective, $timekey, $feedkey );
+ 
+ 			if( is_string( $cached ) ) {
+ 				wfDebug( "Wikilog: Outputting cached feed\n" );
+@@ -424,6 +433,34 @@
+ 	}
+ 
+ 	/**
++	 * Returns effective timestamp for cached OR uncached data.
++	 * This is needed due to $wgFeedCacheTimeout.
++	 * Suppose the following situation:
++	 * 1. Wiki caches OLD version of feed with OLD timestamp
++	 * 2. So client caches OLD version of feed with OLD timestamp
++	 * 3. User updates the wikilog - now it has NEW update timestamp
++	 * 4. It happens that client updates feed BEFORE $wgFeedCacheTimeout seconds passed after the first update
++	 * 5. So Wiki outputs OLD version of feed with NEW (!!!) timestamp (see execute())
++	 * 6. Client caches OLD version of feed with NEW (!!!) timestamp
++	 * 7. In the future, client sends requests with If-Modified-Since = NEW timestamp
++	 * 8. So Wiki outputs 304 Not Modified
++	 * 9. So client does not get the new data
++	 */
++	public function getEffectiveCacheTimestamp($tsData, $timekey)
++	{
++		global $messageMemc, $wgFeedCacheTimeout;
++		if (($wgFeedCacheTimeout > 0) &&
++		    ($tsCache = $messageMemc->get($timekey)) &&
++		    ($age = time() - wfTimestamp(TS_UNIX, $tsCache)) < $wgFeedCacheTimeout)
++		{
++			wfDebug("Wikilog: too little time passed after last feed cache time, ".
++				"using old version -- age ($age) < timeout ($wgFeedCacheTimeout)\n");
++			return $tsCache;
++		}
++		return $tsData;
++	}
++
++	/**
+ 	 * Load feed output from cache.
+ 	 *
+ 	 * @param $tsData Timestamp of the last change of the local data.
+@@ -436,20 +473,13 @@
+ 		$tsCache = $messageMemc->get( $timekey );
+ 
+ 		if ( ( $wgFeedCacheTimeout > 0 ) && $tsCache ) {
+-			$age = time() - wfTimestamp( TS_UNIX, $tsCache );
+-
+-			if ( $age < $wgFeedCacheTimeout ) {
+-				wfDebug( "Wikilog: loading feed from cache -- ".
+-					"too young: age ($age) < timeout ($wgFeedCacheTimeout) ".
+-					"($feedkey; $tsCache; $tsData)\n" );
+-				return $messageMemc->get( $feedkey );
+-			} else if ( $tsCache >= $tsData ) {
++			if ( $tsCache >= $tsData ) {
+ 				wfDebug( "Wikilog: loading feed from cache -- ".
+ 					"not modified: cache ($tsCache) >= data ($tsData)".
+ 					"($feedkey)\n" );
+ 				return $messageMemc->get( $feedkey );
+ 			} else {
+-				wfDebug( "Wikilog: cached feed timestamp check failed -- ".
++				wfDebug( "Wikilog: cache must be invalidated -- ".
+ 					"cache ($tsCache) < data ($tsData)\n" );
+ 			}
+ 		}
+diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogUtils.php
+--- extensions/Wikilog/WikilogUtils.php
++++ extensions/Wikilog/WikilogUtils.php
 @@ -212,16 +212,9 @@
  			$blocks = preg_split( '/< (h[1-6]) .*? > .*? <\\/\\1>/ix', $content );
  
@@ -36,3 +130,4 @@ Index: extensions/Wikilog/WikilogUtils.php
  			} else {
  				# Short article, no summary.
  				$summary = NULL;
+
