@@ -26,6 +26,7 @@ $dir = dirname(__FILE__) . '/';
 $wgAutoloadClasses['SpecialSWFUpload'] = $dir . 'SWFUpload.body.php';
 $wgExtensionMessagesFiles['SWFUpload'] = $dir . 'SWFUpload.i18n.php';
 $wgSpecialPages['SWFUpload'] = 'SpecialSWFUpload';
+SpecialPage::setGroup('SWFUpload', 'media');
 
 // Extension credits that will show up on Special:Version
 $wgExtensionCredits['specialpage'][] = array(
