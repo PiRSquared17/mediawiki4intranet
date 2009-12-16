@@ -56,6 +56,7 @@ $messages['en'] = array(
     'swfupload-filename-prefix'           => "Filename prefix:&nbsp;",
     'swfupload-title'                     => "Upload multiple files",
     'swfupload'                           => "Upload files using Flash applet",
+    'swfupload-cancelbtn'                 => "Cancel",
     'swfupload-page-text'                 =>
 "You can upload multiple files using this page and simple Flash applet.
 
@@ -98,6 +99,7 @@ $messages['ru'] = array(
     'swfupload-filename-prefix'           => "Префикс имени файла:&nbsp;",
     'swfupload-title'                     => "Загрузка множества файлов",
     'swfupload'                           => "Загрузить файлы через Flash-апплет",
+    'swfupload-cancelbtn'                 => "Отменить",
     'swfupload-page-text'                 =>
 "На данной странице Вы можете загрузить несколько файлов сразу.
 
