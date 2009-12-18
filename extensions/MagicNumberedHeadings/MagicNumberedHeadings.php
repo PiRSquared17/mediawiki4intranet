@@ -54,12 +54,14 @@ $wgHooks['ParserBeforeInternalParse'][] = 'MagicNumberedHeadingsParserBeforeInte
 function MagicNumberedHeadingsMagicWordMagicWords(&$magicWords)
 {
     $magicWords[] = 'MAG_NUMBEREDHEADINGS';
+    $magicWords[] = 'MAG_NONUMBEREDHEADINGS';
     return true;
 }
 
 function MagicNumberedHeadingsMagicWordwgVariableIDs(&$wgVariableIDs)
 {
     $wgVariableIDs[] = MAG_NUMBEREDHEADINGS;
+    $wgVariableIDs[] = MAG_NONUMBEREDHEADINGS;
     return true;
 }
 
@@ -75,6 +77,7 @@ function MagicNumberedHeadingsLanguageGetMagic(&$magicWords, $langCode)
             break;
         default:
             $magicWords[MAG_NUMBEREDHEADINGS] = array(0, '__NUMBEREDHEADINGS__');
+            $magicWords[MAG_NONUMBEREDHEADINGS] = array(0, '__NONUMBEREDHEADINGS__');
     }
     return true;
 }
@@ -83,6 +86,8 @@ function MagicNumberedHeadingsParserBeforeInternalParse($parser, $text, $stripSt
 {
     if (MagicWord::get(MAG_NUMBEREDHEADINGS)->matchAndRemove($text))
         $parser->mOptions->mNumberHeadings = TRUE;
+    if (MagicWord::get(MAG_NONUMBEREDHEADINGS)->matchAndRemove($text))
+        $parser->mOptions->mNumberHeadings = FALSE;
     return true;
 }
 ?>
