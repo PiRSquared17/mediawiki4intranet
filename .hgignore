@@ -1,0 +1,4 @@
+images
+/\.svn
+^LocalSettings\.php$
+^\.htaccess$
