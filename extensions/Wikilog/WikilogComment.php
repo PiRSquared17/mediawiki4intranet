@@ -28,13 +28,11 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Wikilog article comment database entry.
  */
 class WikilogComment
 {
-
 	/**
 	 * Comment statuses.
 	 */
@@ -258,7 +256,7 @@ class WikilogComment
 	public function getAutoSummary() {
 		global $wgContLang;
 		$user = $this->mUserID ? $this->mUserText : $this->mAnonName;
-		$summ = $wgContLang->truncate( str_replace("\n", ' ', $this->mText),
+		$summ = $wgContLang->truncate( str_replace( "\n", ' ', $this->mText ),
 			max( 0, 200 - strlen( wfMsgForContent( 'wikilog-comment-autosumm' ) ) ),
 			'...' );
 		return wfMsgForContent( 'wikilog-comment-autosumm', $user, $summ );
@@ -483,7 +481,7 @@ class WikilogComment
 		extract( $dbr->tableNames( 'wikilog_comments', 'page' ) );
 		return array(
 			'tables' =>
-				"{$wikilog_comments} ".
+				"{$wikilog_comments} " .
 				"LEFT JOIN {$page} ON (page_id = wlc_comment_page)",
 			'fields' => array(
 				'wlc_id',
@@ -503,5 +501,4 @@ class WikilogComment
 			)
 		);
 	}
-
 }
