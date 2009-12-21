@@ -1,0 +1,21 @@
+# HG changeset patch
+# User vitali@st-filippov.office.custis.ru
+# Date 1261398770 -10800
+Make file extensions lower-case in upload form autofill JS
+
+diff -r 6be66a71a5f8 -r e0899fc289d8 skins/common/upload.js
+--- skins/common/upload.js
++++ skins/common/upload.js
+@@ -131,6 +131,11 @@
+ 		fname = path.substring(backslash+1, 10000);
+ 	}
+ 
++	// Find and make extension lower-case
++	var dot = fname.lastIndexOf('.');
++	if (dot >= 0)
++		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
++
+ 	// Capitalise first letter and replace spaces by underscores
+ 	fname = fname.charAt(0).toUpperCase().concat(fname.substring(1,10000)).replace(/ /g, '_');
+ 
+

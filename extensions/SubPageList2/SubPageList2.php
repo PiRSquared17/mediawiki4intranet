@@ -28,6 +28,7 @@ if (file_exists('extensions/SubPageList.php'))
 }
 
 $wgExtensionFunctions[] = 'efSubpageList';
+$wgHooks['LanguageGetMagic'][] = 'efSubpageListLanguageGetMagic';
 $wgExtensionCredits['parserhook'][] = array(
     'name'   => 'Subpage List 3',
     'author' => 'Vitaliy Filippov, Martin Schallnahs, Rob Church'
@@ -40,6 +41,28 @@ function efSubpageList()
 {
     global $wgParser;
     $wgParser->setHook('subpages', 'efRenderSubpageList');
+    $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
+}
+
+function efSubpageListLanguageGetMagic(&$magicWords, $langCode = "en")
+{
+    $magicWords['getsection'] = array(0, 'getsection');
+    return true;
+}
+
+/**
+ * Parser function returning numbered section of article text
+ */
+function efFunctionHookGetSection($parser, $num)
+{
+    $args = func_get_args();
+    array_shift($args);
+    array_shift($args);
+    $args = implode('|', $args);
+    $st = $parser->mStripState;
+    $text = $parser->getSection($args, $num);
+    $parser->mStripState = $st;
+    return $text;
 }
 
 /**
@@ -251,7 +274,7 @@ class SubpageList
         else // if ($this->ordermethod == 'lastedit')
             $options['ORDER BY'] = '`page_touched` ' . $order;
         if ($this->parent || !is_null($this->parent) && ($this->category || $deepness))
-            $parent = $this->parent;
+            $parent = str_replace(' ', '_', $this->parent);
         else
             $parent = $this->title->getDBkey() . '/';
         if ($this->ignore)
@@ -299,19 +322,16 @@ class SubpageList
         foreach ($pages as $i => $article)
         {
             $args = array();
-            $t = $article->getTitle()->getText();
-            $c = $article->getContent();
+            $t = $article->getTitle()->getPrefixedText();
             $args['index']         = $i;
             $args['number']        = $i+1;
             $args['odd']           = $i&1 ? 0 : 1;
             $args['title_full']    = $article->getTitle()->getPrefixedText();
             $args['ns_'.$article->getTitle()->getNamespace()] = 1;
             $args['title']         = $t;
-            $args['title_rel']     = substr($t, strlen($this->parent));
-            $args['title_last']    = strrpos($t, '/') !== false ? substr($t, strrpos($t, '/')+1) : $t;
+            $args['title_rel']     = mb_substr($t, mb_strlen($this->parent));
+            $args['title_last']    = mb_strrpos($t, '/') !== false ? mb_substr($t, mb_strrpos($t, '/')+1) : $t;
             $args['title_last']    = preg_replace('#\.jpg#is', '', $args['title_last']);
-            $args['first_section'] = $this->preprocess($article, $this->parser->getSection($c, 0));
-            $args['has_more']      = $this->parser->getSection($c, 1) ? 1 : 0;
             $xml = '<root>';
             $xml .= '<template><title>'.$this->template.'</title>';
             foreach ($args as $k => $v)
