@@ -28,7 +28,6 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Special:Wikilog special page.
  * The primary function of this special page is to list all wikilog articles
@@ -40,7 +39,6 @@ if ( !defined( 'MEDIAWIKI' ) )
 class SpecialWikilog
 	extends IncludableSpecialPage
 {
-
 	/** Alternate views. */
 	protected static $views = array( 'summary', 'archives' );
 
@@ -52,7 +50,25 @@ class SpecialWikilog
 	 */
 	function __construct( ) {
 		parent::__construct( 'Wikilog' );
-		wfLoadExtensionMessages('Wikilog');
+		wfLoadExtensionMessages( 'Wikilog' );
+	}
+
+	/**
+	 * Execute the special page.
+	 * Called from MediaWiki.
+	 */
+	public function execute( $parameters ) {
+		global $wgRequest;
+
+		$feedFormat = $wgRequest->getVal( 'feed' );
+
+		if ( $feedFormat ) {
+			$opts = $this->feedSetup();
+			return $this->feedOutput( $feedFormat, $opts );
+		} else {
+			$opts = $this->webSetup( $parameters );
+			return $this->webOutput( $opts );
+		}
 	}
 
 	/**
@@ -105,24 +121,6 @@ class SpecialWikilog
 		$opts->fetchValuesFromRequest( $wgRequest, array( 'show', 'limit' ) );
 		$opts->validateIntBounds( 'limit', 0, min( $wgFeedLimit, $wgWikilogSummaryLimit ) );
 		return $opts;
-	}
-
-	/**
-	 * Execute the special page.
-	 * Called from MediaWiki.
-	 */
-	public function execute( $parameters ) {
-		global $wgRequest;
-
-		$feedFormat = $wgRequest->getVal( 'feed' );
-
-		if ( $feedFormat ) {
-			$opts = $this->feedSetup();
-			return $this->feedOutput( $feedFormat, $opts );
-		} else {
-			$opts = $this->webSetup( $parameters );
-			return $this->webOutput( $opts );
-		}
 	}
 
 	/**
@@ -230,6 +228,14 @@ class SpecialWikilog
 	}
 
 	/**
+	 * Returns the name used as page title in the special page itself,
+	 * and also the name that will be listed in Special:Specialpages.
+	 */
+	public function getDescription() {
+		return wfMsg( 'wikilog-specialwikilog-title' );
+	}
+
+	/**
 	 * Parse inline parameters passed after the special page name.
 	 * Example: Special:Wikilog/Category:catname/tag=tagname/5
 	 * @param $parameters Inline parameters after the special page name.
@@ -311,7 +317,7 @@ class SpecialWikilog
 
 		$align = $wgContLang->isRtl() ? 'left' : 'right';
 		$fields = self::getQueryFormFields( $opts );
-		$columns = array_chunk( $fields, (count( $fields ) + 1) / 2, true );
+		$columns = array_chunk( $fields, ( count( $fields ) + 1 ) / 2, true );
 
 		$out = Xml::openElement( 'table', array( 'width' => '100%' ) ) .
 				Xml::openElement( 'tr' );
@@ -434,5 +440,4 @@ class SpecialWikilog
 			return false;
 		}
 	}
-
 }
