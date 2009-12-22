@@ -1,1 +1,2 @@
-Create branch for patch 000-debug-wikilog
+Wikilog extension debug:
+Bug 58154 - fix caching error
