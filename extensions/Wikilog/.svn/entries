@@ -1,15 +1,15 @@
 10
 
 dir
-60281
+60293
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-12-20T19:42:16.985651Z
-60246
-raymond
+2009-12-21T23:28:08.928762Z
+60286
+siebrand
 has-props
 
 
@@ -789,11 +789,11 @@ file
 
 
 
-2009-12-21T22:45:44.384772Z
-5700980abe42ed2e45db34901c13cb0b
-2009-12-20T19:42:16.985651Z
-60246
-raymond
+2009-12-22T14:45:45.083901Z
+b4bfcb09c88e19ff22429669cb50315b
+2009-12-21T23:28:08.928762Z
+60286
+siebrand
 has-props
 
 
@@ -815,7 +815,7 @@ has-props
 
 
 
-216177
+216175
 
 documentation
 dir

@@ -264,14 +264,14 @@ has-props
 
 285067
 
-MessagesLfn.php
+MessagesPnb.php
 file
 
 
 
 
 2009-11-10T13:27:52.000000Z
-e9a4232e3c96300c5b5e3f2fe8f869a7
+1b44ab2087d724e9d1b50461ec27e057
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -296,7 +296,7 @@ has-props
 
 
 
-44810
+76872
 
 MessagesAls.php
 file
@@ -332,14 +332,14 @@ has-props
 
 129
 
-MessagesPnb.php
+MessagesLfn.php
 file
 
 
 
 
 2009-11-10T13:27:52.000000Z
-1b44ab2087d724e9d1b50461ec27e057
+e9a4232e3c96300c5b5e3f2fe8f869a7
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -364,7 +364,7 @@ has-props
 
 
 
-76872
+44810
 
 MessagesPfl.php
 file
@@ -434,40 +434,6 @@ has-props
 
 33890
 
-MessagesShi.php
-file
-
-
-
-
-2009-11-10T13:27:52.000000Z
-8a1cc91244d33002d506b97c71fe94fd
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-7749
-
 MessagesIlo.php
 file
 
@@ -501,6 +467,40 @@ has-props
 
 
 109595
+
+MessagesShi.php
+file
+
+
+
+
+2009-11-10T13:27:52.000000Z
+8a1cc91244d33002d506b97c71fe94fd
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7749
 
 MessagesEnRTL.php
 file
@@ -1284,40 +1284,6 @@ has-props
 
 57316
 
-MessagesCo.php
-file
-
-
-
-
-2009-11-10T13:27:52.000000Z
-c3d1d016309120195c50486ed7efbda1
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-18346
-
 MessagesZh_cn.php
 file
 
@@ -1351,6 +1317,40 @@ has-props
 
 
 492
+
+MessagesCo.php
+file
+
+
+
+
+2009-11-10T13:27:52.000000Z
+c3d1d016309120195c50486ed7efbda1
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18346
 
 MessagesQqq.php
 file
@@ -1386,14 +1386,14 @@ has-props
 
 243450
 
-MessagesSr_el.php
+MessagesGn.php
 file
 
 
 
 
 2009-11-10T13:27:52.000000Z
-fa1ba91ae63b2350d66c022e7bcdeb95
+68b89bcbed4ae1ddaf271c839ca5cde0
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -1418,7 +1418,7 @@ has-props
 
 
 
-114049
+22516
 
 MessagesKu_arab.php
 file
@@ -1454,14 +1454,14 @@ has-props
 
 70250
 
-MessagesGn.php
+MessagesSr_el.php
 file
 
 
 
 
 2009-11-10T13:27:52.000000Z
-68b89bcbed4ae1ddaf271c839ca5cde0
+fa1ba91ae63b2350d66c022e7bcdeb95
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -1486,41 +1486,7 @@ has-props
 
 
 
-22516
-
-MessagesSc.php
-file
-
-
-
-
-2009-11-10T13:27:52.000000Z
-75fc02941e118a5a2aacea8026663734
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-68918
+114049
 
 MessagesCs.php
 file
@@ -1555,6 +1521,40 @@ has-props
 
 
 206153
+
+MessagesSc.php
+file
+
+
+
+
+2009-11-10T13:27:52.000000Z
+75fc02941e118a5a2aacea8026663734
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+68918
 
 MessagesPdc.php
 file
@@ -1794,40 +1794,6 @@ has-props
 
 104
 
-MessagesSo.php
-file
-
-
-
-
-2009-11-10T13:27:52.000000Z
-c3e6d1848384f682ad6a349d4a64987c
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-32077
-
 MessagesAvk.php
 file
 
@@ -1861,6 +1827,40 @@ has-props
 
 
 132275
+
+MessagesSo.php
+file
+
+
+
+
+2009-11-10T13:27:52.000000Z
+c3e6d1848384f682ad6a349d4a64987c
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+32077
 
 MessagesKy.php
 file
@@ -1896,40 +1896,6 @@ has-props
 
 12885
 
-MessagesSs.php
-file
-
-
-
-
-2009-11-10T13:27:52.000000Z
-a79f8fe04e56475ee76e002241d8b9f6
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4324
-
 MessagesKri.php
 file
 
@@ -1964,14 +1930,14 @@ has-props
 
 16883
 
-MessagesSw.php
+MessagesSs.php
 file
 
 
 
 
 2009-11-10T13:27:52.000000Z
-ce89f23f1a79f2e424714be7cd7d09e3
+a79f8fe04e56475ee76e002241d8b9f6
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -1996,7 +1962,7 @@ has-props
 
 
 
-59708
+4324
 
 MessagesSimple.php
 file
@@ -2031,6 +1997,40 @@ has-props
 
 
 167
+
+MessagesSw.php
+file
+
+
+
+
+2009-11-10T13:27:52.000000Z
+ce89f23f1a79f2e424714be7cd7d09e3
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+59708
 
 MessagesBpy.php
 file
@@ -3976,7 +3976,7 @@ file
 
 
 
-2009-11-30T13:22:39.818916Z
+2009-12-22T14:49:42.724401Z
 8f2db5506b3b6d20d1117cf4f68ceda2
 2009-05-16T13:54:45.254820Z
 50660
@@ -4310,14 +4310,14 @@ has-props
 
 33194
 
-MessagesMyv.php
+MessagesOm.php
 file
 
 
 
 
 2009-11-10T13:27:54.000000Z
-8a4b0756220996214cd53e70886fd1a4
+9d39e802bab13f273ae8a6e7d08e9b38
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -4342,7 +4342,7 @@ has-props
 
 
 
-136666
+1260
 
 MessagesLld.php
 file
@@ -4378,14 +4378,14 @@ has-props
 
 83
 
-MessagesOm.php
+MessagesMyv.php
 file
 
 
 
 
 2009-11-10T13:27:54.000000Z
-9d39e802bab13f273ae8a6e7d08e9b38
+8a4b0756220996214cd53e70886fd1a4
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -4410,7 +4410,7 @@ has-props
 
 
 
-1260
+136666
 
 MessagesSl.php
 file
@@ -4582,14 +4582,14 @@ has-props
 
 124771
 
-MessagesKrj.php
+MessagesIke_latn.php
 file
 
 
 
 
 2009-11-10T13:27:54.000000Z
-1592f39ee983f82fb8536e4ba3683acb
+323ade590254533c57d1542583617ba4
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -4614,7 +4614,7 @@ has-props
 
 
 
-12461
+13793
 
 MessagesSt.php
 file
@@ -4650,14 +4650,14 @@ has-props
 
 4816
 
-MessagesIke_latn.php
+MessagesKrj.php
 file
 
 
 
 
 2009-11-10T13:27:54.000000Z
-323ade590254533c57d1542583617ba4
+1592f39ee983f82fb8536e4ba3683acb
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -4682,41 +4682,7 @@ has-props
 
 
 
-13793
-
-MessagesTlh.php
-file
-
-
-
-
-2009-11-10T13:27:54.000000Z
-aacbc94a2dd7d7bc91e7990fcc76eb3a
-2008-12-01T17:14:30.460111Z
-44121
-vyznev
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-763
+12461
 
 MessagesPdt.php
 file
@@ -4751,6 +4717,40 @@ has-props
 
 
 27718
+
+MessagesTlh.php
+file
+
+
+
+
+2009-11-10T13:27:54.000000Z
+aacbc94a2dd7d7bc91e7990fcc76eb3a
+2008-12-01T17:14:30.460111Z
+44121
+vyznev
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+763
 
 MessagesLa.php
 file
@@ -4956,40 +4956,6 @@ has-props
 
 186729
 
-MessagesKk_kz.php
-file
-
-
-
-
-2009-03-02T15:51:58.000000Z
-2d2e34cc18b16d30632817ea68e29990
-2008-08-06T22:00:53.456740Z
-38745
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-167
-
 MessagesHr.php
 file
 
@@ -5024,16 +4990,16 @@ has-props
 
 196423
 
-MessagesEn_gb.php
+MessagesKk_kz.php
 file
 
 
 
 
-2009-11-10T13:27:54.000000Z
-447702d3c5c6e7e964fe2a0b9532447e
-2009-05-16T13:54:45.254820Z
-50660
+2009-03-02T15:51:58.000000Z
+2d2e34cc18b16d30632817ea68e29990
+2008-08-06T22:00:53.456740Z
+38745
 siebrand
 has-props
 
@@ -5056,7 +5022,7 @@ has-props
 
 
 
-2772
+167
 
 MessagesTg.php
 file
@@ -5092,14 +5058,14 @@ has-props
 
 138
 
-MessagesPl.php
+MessagesEn_gb.php
 file
 
 
 
 
 2009-11-10T13:27:54.000000Z
-607634d2acdc47eb9a292598eb3a324b
+447702d3c5c6e7e964fe2a0b9532447e
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -5124,7 +5090,7 @@ has-props
 
 
 
-204086
+2772
 
 MessagesBqi.php
 file
@@ -5159,6 +5125,40 @@ has-props
 
 
 55146
+
+MessagesPl.php
+file
+
+
+
+
+2009-11-10T13:27:54.000000Z
+607634d2acdc47eb9a292598eb3a324b
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+204086
 
 MessagesNds_nl.php
 file
@@ -5398,40 +5398,6 @@ has-props
 
 17007
 
-MessagesLmo.php
-file
-
-
-
-
-2009-11-10T13:27:55.000000Z
-a85a563dd81fd6ea9ced8977a80b8091
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-29677
-
 MessagesAst.php
 file
 
@@ -5465,6 +5431,40 @@ has-props
 
 
 185423
+
+MessagesLmo.php
+file
+
+
+
+
+2009-11-10T13:27:55.000000Z
+a85a563dd81fd6ea9ced8977a80b8091
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+29677
 
 MessagesRoa_tara.php
 file
@@ -5500,40 +5500,6 @@ has-props
 
 156611
 
-MessagesGot.php
-file
-
-
-
-
-2009-11-10T13:27:55.000000Z
-37ea3cd7a93413f4f29a52d9d73e74e6
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-17818
-
 MessagesIa.php
 file
 
@@ -5567,6 +5533,40 @@ has-props
 
 
 194285
+
+MessagesGot.php
+file
+
+
+
+
+2009-11-10T13:27:55.000000Z
+37ea3cd7a93413f4f29a52d9d73e74e6
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17818
 
 MessagesKk_arab.php
 file
@@ -5602,14 +5602,14 @@ has-props
 
 246584
 
-MessagesAk.php
+MessagesNiu.php
 file
 
 
 
 
 2009-11-10T13:27:55.000000Z
-4d3b26eed93559208ea8ce9bb6b1bb3b
+79d961b88a0735cc1f655b765d177cbc
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -5634,7 +5634,7 @@ has-props
 
 
 
-1277
+7104
 
 MessagesZh_hant.php
 file
@@ -5670,14 +5670,14 @@ has-props
 
 165978
 
-MessagesNiu.php
+MessagesAk.php
 file
 
 
 
 
 2009-11-10T13:27:55.000000Z
-79d961b88a0735cc1f655b765d177cbc
+4d3b26eed93559208ea8ce9bb6b1bb3b
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -5702,7 +5702,7 @@ has-props
 
 
 
-7104
+1277
 
 MessagesFur.php
 file
@@ -5840,74 +5840,6 @@ has-props
 
 92
 
-MessagesLbe.php
-file
-
-
-
-
-2009-11-10T13:27:55.000000Z
-c36dbd39418f60bf1c62d1750e85ddc1
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2939
-
-MessagesEn.php
-file
-
-
-
-
-2009-11-30T13:22:40.006917Z
-12d2005c24c7bc572bf03d1eb7c2f6cf
-2009-05-16T13:58:19.680781Z
-50661
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-229965
-
 MessagesJut.php
 file
 
@@ -5941,6 +5873,74 @@ has-props
 
 
 45772
+
+MessagesEn.php
+file
+
+
+
+
+2009-12-22T14:49:42.732402Z
+12d2005c24c7bc572bf03d1eb7c2f6cf
+2009-05-16T13:58:19.680781Z
+50661
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+229965
+
+MessagesLbe.php
+file
+
+
+
+
+2009-11-10T13:27:55.000000Z
+c36dbd39418f60bf1c62d1750e85ddc1
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2939
 
 MessagesAs.php
 file
@@ -6248,40 +6248,6 @@ has-props
 
 4081
 
-MessagesFa.php
-file
-
-
-
-
-2009-11-10T13:27:57.000000Z
-a26e2afb2906188fe67ff27964a21b5b
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-267773
-
 MessagesUr.php
 file
 
@@ -6315,6 +6281,40 @@ has-props
 
 
 62868
+
+MessagesFa.php
+file
+
+
+
+
+2009-11-10T13:27:57.000000Z
+a26e2afb2906188fe67ff27964a21b5b
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+267773
 
 MessagesBcc.php
 file
@@ -6384,40 +6384,6 @@ has-props
 
 101354
 
-MessagesFi.php
-file
-
-
-
-
-2009-11-10T13:27:58.000000Z
-84150c285e58ee3c967ad848873fbfe1
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-185608
-
 MessagesUz.php
 file
 
@@ -6451,6 +6417,40 @@ has-props
 
 
 32921
+
+MessagesFi.php
+file
+
+
+
+
+2009-11-10T13:27:58.000000Z
+84150c285e58ee3c967ad848873fbfe1
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+185608
 
 MessagesBn.php
 file
@@ -6724,40 +6724,6 @@ has-props
 
 248614
 
-MessagesNo.php
-file
-
-
-
-
-2009-11-10T13:28:01.000000Z
-d253a90b0ed54bd82a0ecd702f577fc8
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-182426
-
 MessagesHsb.php
 file
 
@@ -6792,14 +6758,14 @@ has-props
 
 196015
 
-MessagesFy.php
+MessagesNo.php
 file
 
 
 
 
-2009-11-10T13:28:02.000000Z
-5107e85da5b8c2abd2259915d2ad96bc
+2009-11-10T13:28:01.000000Z
+d253a90b0ed54bd82a0ecd702f577fc8
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -6824,7 +6790,7 @@ has-props
 
 
 
-147851
+182426
 
 MessagesVi.php
 file
@@ -6860,14 +6826,14 @@ has-props
 
 214923
 
-MessagesSma.php
+MessagesFy.php
 file
 
 
 
 
-2009-11-10T13:28:03.000000Z
-9d6ed8adadd5157d9f75ddc1268a19b0
+2009-11-10T13:28:02.000000Z
+5107e85da5b8c2abd2259915d2ad96bc
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -6892,7 +6858,7 @@ has-props
 
 
 
-40754
+147851
 
 MessagesTt_cyrl.php
 file
@@ -6927,6 +6893,40 @@ has-props
 
 
 69386
+
+MessagesSma.php
+file
+
+
+
+
+2009-11-10T13:28:03.000000Z
+9d6ed8adadd5157d9f75ddc1268a19b0
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+40754
 
 MessagesZh.php
 file
@@ -7166,40 +7166,6 @@ has-props
 
 4609
 
-MessagesNov.php
-file
-
-
-
-
-2009-11-10T13:28:07.000000Z
-8b3632181e43345f6bc5db642a42a991
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-17174
-
 MessagesGl.php
 file
 
@@ -7233,6 +7199,40 @@ has-props
 
 
 195750
+
+MessagesNov.php
+file
+
+
+
+
+2009-11-10T13:28:07.000000Z
+8b3632181e43345f6bc5db642a42a991
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17174
 
 MessagesSa.php
 file
@@ -7268,14 +7268,14 @@ has-props
 
 13620
 
-MessagesKk.php
+MessagesTt_latn.php
 file
 
 
 
 
 2009-11-10T13:28:08.000000Z
-ac48b465ec68e973f6e46d2721c7b3a2
+4b77d7deab45262697163ed7c0c6073b
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -7300,7 +7300,7 @@ has-props
 
 
 
-759
+30178
 
 MessagesAng.php
 file
@@ -7336,14 +7336,14 @@ has-props
 
 29566
 
-MessagesTt_latn.php
+MessagesKk.php
 file
 
 
 
 
 2009-11-10T13:28:08.000000Z
-4b77d7deab45262697163ed7c0c6073b
+ac48b465ec68e973f6e46d2721c7b3a2
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -7368,41 +7368,7 @@ has-props
 
 
 
-30178
-
-MessagesSe.php
-file
-
-
-
-
-2009-11-10T13:28:09.000000Z
-9d766bbcb38d3907974d4c0ad494be9f
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-69123
+759
 
 MessagesCu.php
 file
@@ -7438,6 +7404,40 @@ has-props
 
 26908
 
+MessagesSe.php
+file
+
+
+
+
+2009-11-10T13:28:09.000000Z
+9d766bbcb38d3907974d4c0ad494be9f
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+69123
+
 MessagesKo.php
 file
 
@@ -7472,40 +7472,6 @@ has-props
 
 200671
 
-MessagesSi.php
-file
-
-
-
-
-2009-11-10T13:28:10.000000Z
-bf3fce8e35b295ad689bf4a78a5ef3b4
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-351812
-
 MessagesCy.php
 file
 
@@ -7539,6 +7505,40 @@ has-props
 
 
 189978
+
+MessagesSi.php
+file
+
+
+
+
+2009-11-10T13:28:10.000000Z
+bf3fce8e35b295ad689bf4a78a5ef3b4
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+351812
 
 MessagesKs.php
 file
@@ -7608,14 +7608,14 @@ has-props
 
 6566
 
-MessagesOr.php
+MessagesWuu.php
 file
 
 
 
 
-2009-11-10T13:28:12.000000Z
-7d17a8edb364ae7b6e9d187f96d35218
+2009-11-10T13:28:11.000000Z
+5774a3b9e8dd8ae728f9a7c9fe0612b7
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -7640,7 +7640,7 @@ has-props
 
 
 
-2703
+37539
 
 MessagesArn.php
 file
@@ -7676,14 +7676,14 @@ has-props
 
 17676
 
-MessagesWuu.php
+MessagesOr.php
 file
 
 
 
 
-2009-11-10T13:28:11.000000Z
-5774a3b9e8dd8ae728f9a7c9fe0612b7
+2009-11-10T13:28:12.000000Z
+7d17a8edb364ae7b6e9d187f96d35218
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -7708,7 +7708,7 @@ has-props
 
 
 
-37539
+2703
 
 MessagesKw.php
 file
@@ -8016,40 +8016,6 @@ has-props
 
 128
 
-MessagesMzn.php
-file
-
-
-
-
-2009-11-10T13:28:15.000000Z
-bbf79c4b375d5797caa9df7a5eb56960
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5879
-
 MessagesBar.php
 file
 
@@ -8083,6 +8049,40 @@ has-props
 
 
 40239
+
+MessagesMzn.php
+file
+
+
+
+
+2009-11-10T13:28:15.000000Z
+bbf79c4b375d5797caa9df7a5eb56960
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5879
 
 MessagesNah.php
 file
@@ -8254,14 +8254,14 @@ has-props
 
 296223
 
-MessagesPam.php
+MessagesVec.php
 file
 
 
 
 
-2009-11-10T13:28:19.000000Z
-39c356ba384cc93a54aaa77256cb712c
+2009-11-10T13:28:17.000000Z
+9b0dcf89f062a03f24baa9a4957d099f
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -8286,7 +8286,7 @@ has-props
 
 
 
-162556
+196582
 
 MessagesDiq.php
 file
@@ -8322,14 +8322,14 @@ has-props
 
 43906
 
-MessagesVec.php
+MessagesPam.php
 file
 
 
 
 
-2009-11-10T13:28:17.000000Z
-9b0dcf89f062a03f24baa9a4957d099f
+2009-11-10T13:28:19.000000Z
+39c356ba384cc93a54aaa77256cb712c
 2009-05-16T13:54:45.254820Z
 50660
 siebrand
@@ -8354,7 +8354,7 @@ has-props
 
 
 
-196582
+162556
 
 MessagesNap.php
 file
@@ -8390,40 +8390,6 @@ has-props
 
 20218
 
-MessagesTl.php
-file
-
-
-
-
-2009-11-10T13:28:19.000000Z
-6373ae3becdfa40dac1035134c6d4df2
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-208301
-
 MessagesZea.php
 file
 
@@ -8457,6 +8423,40 @@ has-props
 
 
 69833
+
+MessagesTl.php
+file
+
+
+
+
+2009-11-10T13:28:19.000000Z
+6373ae3becdfa40dac1035134c6d4df2
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+208301
 
 MessagesLv.php
 file
@@ -8492,40 +8492,6 @@ has-props
 
 118365
 
-MessagesScn.php
-file
-
-
-
-
-2009-11-10T13:28:20.000000Z
-f80072e702a5dcaabfb06d4635d701e0
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-199585
-
 MessagesTp.php
 file
 
@@ -8559,6 +8525,40 @@ has-props
 
 
 205
+
+MessagesScn.php
+file
+
+
+
+
+2009-11-10T13:28:20.000000Z
+f80072e702a5dcaabfb06d4635d701e0
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+199585
 
 MessagesTt.php
 file
@@ -8628,40 +8628,6 @@ has-props
 
 32890
 
-MessagesXmf.php
-file
-
-
-
-
-2009-11-10T13:28:21.000000Z
-d50a04d5b01ebcadc7564b941c579cbb
-2009-05-16T13:54:45.254820Z
-50660
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-46003
-
 MessagesLez.php
 file
 
@@ -8695,6 +8661,40 @@ has-props
 
 
 6686
+
+MessagesXmf.php
+file
+
+
+
+
+2009-11-10T13:28:21.000000Z
+d50a04d5b01ebcadc7564b941c579cbb
+2009-05-16T13:54:45.254820Z
+50660
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+46003
 
 MessagesZh_tw.php
 file

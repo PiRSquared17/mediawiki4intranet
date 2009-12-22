@@ -1,7 +1,7 @@
 10
 
 dir
-58865
+60293
 http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/includes/zhtable
 http://svn.wikimedia.org/svnroot/mediawiki
 
@@ -60,16 +60,16 @@ has-props
 
 5094
 
-simp2trad.manual
+trad2simp.manual
 file
 
 
 
 
 2009-11-10T13:27:40.000000Z
-5da98539b307c3cd57b76a43eda9deb4
-2008-07-31T01:37:53.269155Z
-38270
+efa2eb28e950a3a3f6118cc83d73dc79
+2008-08-14T02:50:16.436348Z
+39326
 shinjiman
 has-props
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-7145
+620
 
 toHK.manual
 file
@@ -128,16 +128,16 @@ has-props
 
 3302
 
-trad2simp.manual
+simp2trad.manual
 file
 
 
 
 
 2009-11-10T13:27:40.000000Z
-efa2eb28e950a3a3f6118cc83d73dc79
-2008-08-14T02:50:16.436348Z
-39326
+5da98539b307c3cd57b76a43eda9deb4
+2008-07-31T01:37:53.269155Z
+38270
 shinjiman
 has-props
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-620
+7145
 
 simpphrases_exclude.manual
 file
@@ -366,40 +366,6 @@ has-props
 
 1221
 
-trad2simp_supp_set.manual
-file
-
-
-
-
-2009-03-02T15:51:26.000000Z
-c43bfe02c8c5d0628b00719091c878b8
-2008-08-08T04:46:59.386296Z
-38843
-shinjiman
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8
-
 simp2trad_supp_set.manual
 file
 
@@ -433,6 +399,40 @@ has-props
 
 
 16
+
+trad2simp_supp_set.manual
+file
+
+
+
+
+2009-03-02T15:51:26.000000Z
+c43bfe02c8c5d0628b00719091c878b8
+2008-08-08T04:46:59.386296Z
+38843
+shinjiman
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8
 
 tradphrases_exclude.manual
 file

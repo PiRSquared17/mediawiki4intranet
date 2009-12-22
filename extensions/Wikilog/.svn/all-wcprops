@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 58
-/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/Wikilog
+/svnroot/mediawiki/!svn/ver/60286/trunk/extensions/Wikilog
 END
 WikilogFeed.php
 K 25
@@ -127,7 +127,7 @@ Wikilog.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/Wikilog/Wikilog.i18n.php
+/svnroot/mediawiki/!svn/ver/60286/trunk/extensions/Wikilog/Wikilog.i18n.php
 END
 WikilogItem.php
 K 25
