@@ -3340,6 +3340,8 @@ class Parser
 				$output = "<$name$attrText/>";
 			} else {
 				$close = is_null( $params['close'] ) ? '' : $frame->expand( $params['close'] );
+				if ($this->needPreSave[$name])
+					return "<$name$attrText>".$this->replaceVariables($content).$close;
 				$output = "<$name$attrText>$content$close";
 			}
 		}
