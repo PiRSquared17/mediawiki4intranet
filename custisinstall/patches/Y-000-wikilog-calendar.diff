@@ -1,0 +1,204 @@
+# HG changeset patch
+# User root@yourcmc.ru
+# Date 1261435649 -10800
+Calendar support for Wikilog and MediaWiki Sidebar
+
+diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.i18n.php
+--- extensions/Wikilog/Wikilog.i18n.php
++++ extensions/Wikilog/Wikilog.i18n.php
+@@ -18,6 +18,10 @@
+ 	'right-wl-postcomment' => 'Post comments to wikilog articles',
+ 	'right-wl-moderation' => 'Moderation of wikilog article comments',
+ 
++	# Calendar
++	'wikilogcalendar' => 'Wikilog calendar',
++	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
++
+ 	# Special:Wikilog
+ 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
+ 	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
+@@ -3413,6 +3417,8 @@
+ 	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
+ 	'wikilog-auto' => 'Викилог Авто',
+ 	'wikilog-help' => '{{ns:Help}}:Викилог',
++	'wikilogcalendar' => 'Календарь блога',
++	'wikilog-calendar-archive-link-title' => 'Записи $1 за $2',
+ 	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
+ 	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
+ 	'wikilog-specialwikilog-title' => 'Викилоги',
+diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
+--- extensions/Wikilog/Wikilog.php
++++ extensions/Wikilog/Wikilog.php
+@@ -110,6 +110,9 @@
+ $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
+ $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
+ 
++$wgEnableSidebarCache = false;
++$wgHooks['SkinBuildSidebar'][] = 'Wikilog::SkinBuildSidebar';
++
+ // General Wikilog hooks
+ $wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
+ $wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
+@@ -355,6 +358,134 @@
+ 		return true;
+ 	}
+ 
++	static function Weekday($ts)
++	{
++		global $wgWikilogWeekStart;
++		if (!$wgWikilogWeekStart)
++			$wgWikilogWeekStart = 0;
++		return (date('N', $ts) + 6 - $wgWikilogWeekStart) % 7;
++	}
++
++	/**
++	 * SkinBuildSidebar hook handler function.
++	 * Adds support for "* WIKILOGCALENDAR" on MediaWiki:Sidebar
++	 */
++	static function SkinBuildSidebar($skin, &$bar)
++	{
++		global $wgTitle, $wgRequest;
++		if (array_key_exists('WIKILOGCALENDAR', $bar))
++		{
++			$wi = self::getWikilogInfo($wgTitle);
++			if ($wi)
++				$wi = $wi->mWikilogTitle;
++			else if ($wgTitle->getNamespace() == NS_SPECIAL && $wgTitle->getBaseText() == 'Wikilog')
++			{
++				if ($wgRequest->getVal('wikilog'))
++					$wi = Title::makeTitleSafe(NS_MAIN, $wgRequest->getVal('wikilog'));
++				if (!$wi)
++					$wi = $wgTitle;
++			}
++			else
++			{
++				unset($bar['WIKILOGCALENDAR']);
++				return true;
++			}
++			$dbr = wfGetDB(DB_SLAVE);
++			$where = array('wlp_publish' => 1);
++			if ($wi->getNamespace() != NS_SPECIAL)
++				$where['wlp_parent'] = $wi->getArticleId();
++			$start = $dbr->selectField(
++				'wikilog_posts',
++				'MAX(wlp_pubdate)',
++				array_merge($where, array()),
++				__METHOD__
++			);
++			/* first day of last month with posts */
++			$month = substr($start, 0, 6);
++			$start = wfTimestamp(TS_UNIX, substr($start, 0, 6) . '01000000');
++			/* skip to beginning of the week */
++			$start = wfTimestamp(TS_MW, $start - 86400 * self::Weekday($start));
++			$where[] = "wlp_pubdate>=$start";
++			/* select dates and post counts */
++			$res = $dbr->select(
++				'wikilog_posts',
++				'wlp_page, wlp_pubdate, COUNT(1) numposts',
++				$where,
++				__METHOD__,
++				array('GROUP BY' => 'SUBSTR(wlp_pubdate,1,8)')
++			);
++			$dates = array();
++			while ($row = $dbr->fetchRow($res))
++			{
++				$date = substr($row['wlp_pubdate'], 0, 8);
++				if ($row['numposts'] == 1)
++				{
++					/* link to the post if it's the only one for that date */
++					$title = Title::newFromId($row['wlp_page']);
++					$dates[$date] = array(
++						$title->getLocalUrl(),
++						$title->getPrefixedText(),
++					);
++				}
++				else
++				{
++					/* link to archive page if there's more than one post for that date */
++					$dates[$date] = array(
++						$wi->getLocalUrl(array(
++							view  => 'archives',
++							year  => substr($date, 0, 4),
++							month => substr($date, 4, 2),
++							day   => substr($date, 6, 2),
++						)),
++						wfMsgExt('wikilog-calendar-archive-link-title', 'parseinline',
++							$wi->getPrefixedText(),
++							date('Y-m-d', wfTimestamp(TS_UNIX, $row['wlp_pubdate']))
++						),
++					);
++				}
++			}
++			$dbr->freeResult($res);
++			/* build HTML code */
++			$html = '<table class="wl-calendar"><tr>';
++			$ts = wfTimestamp(TS_UNIX, $start);
++			$i = 0;
++			while (date('Ym', $ts) <= $month || ($i % 7))
++			{
++				if ($i && !($i % 7))
++					$html .= '</tr><tr>';
++				$date = $dates[date('Ymd', $ts)];
++				$html .= '<td class="';
++				if (date('Ym', $ts) != $month)
++					$html .= 'wl-calendar-other ';
++				$html .= 'wl-calendar-day';
++				if (!$date)
++					$html .= '-empty">';
++				else
++					$html .= '"><a href="'.htmlspecialchars($date[0]).'" title="'.htmlspecialchars($date[1]).'">';
++				$html .= date('j', $ts);
++				if ($date)
++					$html .= '</a>';
++				$html .= '</td>';
++				/* + 1 day */
++				$ts += 86400;
++				$i++;
++			}
++			$html .= '</tr></table>';
++			$newbar = array();
++			foreach ($bar as $k => $v)
++			{
++				if ($k == 'WIKILOGCALENDAR')
++				{
++					$k = 'wikilogcalendar';
++					$v = $html;
++				}
++				$newbar[$k] = $v;
++			}
++			$bar = $newbar;
++		}
++		return true;
++	}
++
+ 	# ##
+ 	# #  Other global wikilog functions.
+ 	#
+diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/style/wikilog.css
+--- extensions/Wikilog/style/wikilog.css
++++ extensions/Wikilog/style/wikilog.css
+@@ -137,4 +137,23 @@
+ 	text-align: center;
+ }
+ 
++table.wl-calendar {
++	margin-right: auto;
++	margin-left: auto;
++}
++
++.wl-calendar td {
++	text-align: right;
++	padding: 2px 3px 0 3px;
++}
++
++.wl-calendar td.wl-calendar-day {
++	font-weight: bold;
++	background-color: #e0e0e0;
++}
++
++.wl-calendar td.wl-calendar-other {
++	color: gray;
++}
++
+ /* kate: indent-mode normal; space-indent off; tab-width 4; */
+
