@@ -1,4 +1,4 @@
 ^images
-/\.svn
+^(custisinstall|extensions/(AllowGetParamsInWikilinks|Calendar|DocExport|FlvHandler|ListFeed|mediawikiquizzer|PreferencesExtension|SimpleTable|SphinxSearch|SWFUploadAnyWikiDraw|CategoryTemplate|Drafts|FreeMind|MagicNumberedHeadings|MMHandler|recaptcha|SiteExport|SubPageList2|WikiBookmarksBatchEditor|CustisScripts|EnotifDiff|MarkupBabel|Polls|ShowHide|SpecialForm|SVNIntegration|Workflow)|skins/(custis|dumphtml|ichick)|sphinxsearch|tools).*/\.svn
 ^LocalSettings\.php$
 ^\.htaccess$
