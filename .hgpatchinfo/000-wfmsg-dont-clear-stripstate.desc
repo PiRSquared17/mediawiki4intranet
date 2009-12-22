@@ -1,1 +1,2 @@
-Create branch for patch 000-wfmsg-dont-clear-stripstate
+Bug 56653
+Debug wfMsgExt to remove UNIQ____QINU
