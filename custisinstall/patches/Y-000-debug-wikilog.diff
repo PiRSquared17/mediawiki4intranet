@@ -1,28 +1,33 @@
 # HG changeset patch
-# User vitali@st-filippov.office.custis.ru
-# Date 1260891031 -10800
+# User root@yourcmc.ru
+# Date 1261435647 -10800
 Wikilog extension debug:
-Bug 56420 - fix php warning
-Bug 36400 - don't strip lists
 Bug 58154 - fix caching error
 
-diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/Wikilog.php
---- extensions/Wikilog/Wikilog.php
-+++ extensions/Wikilog/Wikilog.php
-@@ -361,7 +361,8 @@
- 	 */
- 	static function getWikilogInfo( $title ) {
- 		global $wgWikilogNamespaces;
--
-+		if (!$title)
-+			return NULL;
- 		$ns = MWNamespace::getSubject( $title->getNamespace() );
- 		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
- 			return new WikilogInfo( $title );
-diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogFeed.php
+diff -r c21799a3fd44 -r ef6e32e48b06 extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
-@@ -133,15 +133,24 @@
+@@ -28,15 +28,17 @@
+ if ( !defined( 'MEDIAWIKI' ) )
+ 	die();
+ 
++
+ /**
+  * Syndication feed driver. Creates feeds from a list of wikilog articles,
+  * given a format and a query object.
+  */
+ class WikilogFeed
+ {
++
+ 	/**
+-	 * Feed title (i.e., not Wikilog title). For Special:Wikilog,
+-	 * 'wikilog-specialwikilog-title' system message should be used.
++	 * Feed title (i.e., not Wikilog title). For Special:Wikilog, 'wikilog'
++	 * system message should be used.
+ 	 */
+ 	protected $mTitle;
+ 
+@@ -131,17 +133,26 @@
  		FeedUtils::checkPurge( $timekey, $feedkey );
  
  		if ( $feed->isCacheable() ) {
@@ -47,9 +52,30 @@ diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogFeed.php
 -			$cached = $this->loadFromCache( $feed->getUpdated(), $timekey, $feedkey );
 +			$cached = $this->loadFromCache( $tsEffective, $timekey, $feedkey );
  
- 			if( is_string( $cached ) ) {
+-			if ( is_string( $cached ) ) {
++			if( is_string( $cached ) ) {
  				wfDebug( "Wikilog: Outputting cached feed\n" );
-@@ -424,6 +433,34 @@
+ 				$feed->httpHeaders();
+ 				echo $cached;
+@@ -315,7 +326,7 @@
+ 	 */
+ 	public function getSiteFeedObject() {
+ 		global $wgContLanguageCode, $wgWikilogFeedClasses, $wgFavicon, $wgLogo;
+-		$title = wfMsgForContent( 'wikilog-specialwikilog-title' );
++		$title = wfMsgForContent( 'wikilog' );
+ 		$subtitle = wfMsgExt( 'wikilog-feed-description', array( 'parse', 'content' ) );
+ 
+ 		$updated = $this->mDb->selectField( 'wikilog_wikilogs',
+@@ -392,7 +403,7 @@
+ 				}
+ 				if ( $row->wlw_authors ) {
+ 					$authors = unserialize( $row->wlw_authors );
+-					foreach ( $authors as $user => $userid ) {
++					foreach( $authors as $user => $userid ) {
+ 						$usertitle = Title::makeTitle( NS_USER, $user );
+ 						$feed->addAuthor( $user, $usertitle->getFullUrl() );
+ 					}
+@@ -422,6 +433,34 @@
  	}
  
  	/**
@@ -84,50 +110,56 @@ diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogFeed.php
  	 * Load feed output from cache.
  	 *
  	 * @param $tsData Timestamp of the last change of the local data.
-@@ -436,20 +473,13 @@
+@@ -434,26 +473,13 @@
  		$tsCache = $messageMemc->get( $timekey );
  
  		if ( ( $wgFeedCacheTimeout > 0 ) && $tsCache ) {
 -			$age = time() - wfTimestamp( TS_UNIX, $tsCache );
 -
--			if ( $age < $wgFeedCacheTimeout ) {
--				wfDebug( "Wikilog: loading feed from cache -- ".
--					"too young: age ($age) < timeout ($wgFeedCacheTimeout) ".
+-			# XXX: Minimum feed cache age check disabled. This code is
+-			# shadowed from ChangesFeed::loadFromCache(), but Vitaliy Filippov
+-			# noticed that this causes the old cached feed to output with the
+-			# updated last-modified timestamp, breaking cache behavior.
+-			# For now, it is disabled, since this is just a performance
+-			# optimization.
+-			/* if ( $age < $wgFeedCacheTimeout ) {
+-				wfDebug( "Wikilog: loading feed from cache -- " .
+-					"too young: age ($age) < timeout ($wgFeedCacheTimeout) " .
 -					"($feedkey; $tsCache; $tsData)\n" );
 -				return $messageMemc->get( $feedkey );
--			} else if ( $tsCache >= $tsData ) {
+-			} else */ if ( $tsCache >= $tsData ) {
+-				wfDebug( "Wikilog: loading feed from cache -- " .
+-					"not modified: cache ($tsCache) >= data ($tsData)" .
 +			if ( $tsCache >= $tsData ) {
- 				wfDebug( "Wikilog: loading feed from cache -- ".
- 					"not modified: cache ($tsCache) >= data ($tsData)".
++				wfDebug( "Wikilog: loading feed from cache -- ".
++					"not modified: cache ($tsCache) >= data ($tsData)".
  					"($feedkey)\n" );
  				return $messageMemc->get( $feedkey );
  			} else {
--				wfDebug( "Wikilog: cached feed timestamp check failed -- ".
+-				wfDebug( "Wikilog: cached feed timestamp check failed -- " .
 +				wfDebug( "Wikilog: cache must be invalidated -- ".
  					"cache ($tsCache) < data ($tsData)\n" );
  			}
  		}
-diff -r 6be66a71a5f8 -r a1240f3d14d1 extensions/Wikilog/WikilogUtils.php
---- extensions/Wikilog/WikilogUtils.php
-+++ extensions/Wikilog/WikilogUtils.php
-@@ -212,16 +212,9 @@
- 			$blocks = preg_split( '/< (h[1-6]) .*? > .*? <\\/\\1>/ix', $content );
- 
- 			if ( count( $blocks ) > 1 ) {
--				# Long article, get only the first paragraph.
--				$pextr = '/<(p)
--					( \\s+ (?: [^\'"\\/>] | \'[^\']*\' | "[^"]*" )* )?
--					(?: > .*? <\\/\\1\\s*> | \\/> )/isx';
--
--				if ( preg_match_all( $pextr, $blocks[0], $m ) ) {
--					$summary = implode( "\n", $m[0] );
--				} else {
--					$summary = NULL;
--				}
-+				$summary = $blocks[0];
-+				while (preg_match('#^(.*)<(/?)[a-z0-9\-_:]+[^<>]*>#is', $summary, $m) && !$m[2])
-+					$summary = $m[1];
- 			} else {
- 				# Short article, no summary.
- 				$summary = NULL;
+@@ -480,12 +506,12 @@
+ 	 * $wgFeedClasses.
+ 	 */
+ 	public function checkFeedOutput() {
+-		global $wgOut, $wgFeed, $wgWikilogFeedClasses;
++		global $wgFeed, $wgWikilogFeedClasses;
+ 		if ( !$wgFeed ) {
+ 			$wgOut->addWikiMsg( 'feed-unavailable' );
+ 			return false;
+ 		}
+-		if ( !isset( $wgWikilogFeedClasses[$this->mFormat] ) ) {
++		if( !isset( $wgWikilogFeedClasses[$this->mFormat] ) ) {
+ 			wfHttpError( 500, "Internal Server Error", "Unsupported feed type." );
+ 			return false;
+ 		}
+@@ -539,4 +565,5 @@
+ 			return $title->getFullUrl();
+ 		}
+ 	}
++
+ }
 
