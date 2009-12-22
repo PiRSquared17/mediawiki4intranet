@@ -28,12 +28,10 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 class WikilogMainPage
 	extends Article
 	implements WikilogCustomAction
 {
-
 	/**
 	 * Alternate views.
 	 */
@@ -137,23 +135,25 @@ class WikilogMainPage
 	public function wikilog() {
 		global $wgUser, $wgOut, $wgRequest;
 
-		if ( !$this->mTitle->exists() ) {
-			$wgOut->showErrorPage( 'nopagetitle', 'nopagetext' );
-			return;
-		}
-
-		if ( $wgRequest->getBool( 'wlActionNewItem' ) )
+		if ( $this->mTitle->exists() && $wgRequest->getBool( 'wlActionNewItem' ) )
 			return $this->actionNewItem();
 
-		$skin = $wgUser->getSkin();
 		$wgOut->setPageTitle( wfMsg( 'wikilog-tab-title' ) );
 		$wgOut->setRobotpolicy( 'noindex,nofollow' );
 
-		$wgOut->addHTML( $this->formatWikilogDescription( $skin ) );
-		$wgOut->addHTML( $this->formatWikilogInformation( $skin ) );
-
-		if ( $this->mTitle->quickUserCan( 'edit' ) ) {
-			$wgOut->addHTML( $this->formNewItem() );
+		if ( $this->mTitle->exists() ) {
+			$skin = $wgUser->getSkin();
+			$wgOut->addHTML( $this->formatWikilogDescription( $skin ) );
+			$wgOut->addHTML( $this->formatWikilogInformation( $skin ) );
+			if ( $this->mTitle->quickUserCan( 'edit' ) ) {
+				$wgOut->addHTML( $this->formNewItem() );
+			}
+		} else if ( $this->mTitle->userCan( 'create' ) ) {
+			$text = wfMsgExt( 'wikilog-missing-wikilog', 'parse' );
+			$text = WikilogUtils::wrapDiv( 'noarticletext', $text );
+			$wgOut->addHTML( $text );
+		} else {
+			$this->showMissingArticle();
 		}
 	}
 
@@ -220,8 +220,15 @@ class WikilogMainPage
 	 */
 	private function formatPostCount( $skin, $elem, $type, $num ) {
 		global $wgWikilogFeedClasses;
-		$s = $skin->makeKnownLinkObj( $this->mTitle,
-			wfMsgExt( "wikilog-post-count-{$type}", array( 'parsemag' ), $num ),
+
+		// Uses messages 'wikilog-post-count-published', 'wikilog-post-count-drafts', 'wikilog-post-count-all'
+		$s = $skin->makeKnownLinkObj(
+			$this->mTitle,
+			wfMsgExt(
+				"wikilog-post-count-{$type}",
+				array( 'parsemag' ),
+				$num
+			),
 			"view=archives&show={$type}"
 		);
 		if ( !empty( $wgWikilogFeedClasses ) ) {
@@ -337,6 +344,4 @@ class WikilogMainPage
 	public static function getWikilogDataFromId( $dbr, $id ) {
 		return self::getWikilogData( $dbr, array( 'wlw_page' => $id ) );
 	}
-
 }
-

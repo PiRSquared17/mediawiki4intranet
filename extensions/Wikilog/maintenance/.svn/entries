@@ -1,19 +1,15 @@
 10
 
 dir
-473
-http://svn.juliano.info/svn/mediawiki/extensions/Wikilog/trunk/maintenance
-http://svn.juliano.info/svn/mediawiki
+60281
+http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog/maintenance
+http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-09-12T21:58:51.603118Z
-468
-Juliano F. Ravasi
-
-
-
-
+2009-11-02T04:08:47.044394Z
+58418
+juliano
 
 
 
@@ -24,7 +20,11 @@ Juliano F. Ravasi
 
 
 
-363dca7b-97fb-0310-8b71-a8c95a34027a
+
+
+
+
+dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 wikilogImportDocumentation.php
 file
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-13T12:33:48.000000Z
-64c67bf408552c7a55f42de2561ec16d
-2009-09-12T21:58:51.603118Z
-468
-Juliano F. Ravasi
+2009-12-21T22:45:44.012777Z
+e05636ca8bbc57688c6bba22dc40dbdf
+2009-11-02T04:08:47.044394Z
+58418
+juliano
 has-props
 
 
@@ -58,8 +58,42 @@ has-props
 
 
 
-5852
+6249
 
 unsupported
 dir
+
+wikilogImportDocumentation-pre1.16.php
+file
+
+
+
+
+2009-12-21T22:45:44.012777Z
+909670b5d208ddd6d4c1ab2dec04be9a
+2009-11-02T04:08:47.044394Z
+58418
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5604
 
