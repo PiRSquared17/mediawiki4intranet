@@ -34,7 +34,6 @@ if ( !defined( 'MEDIAWIKI' ) )
  */
 class WikilogUtils
 {
-
 	/**
 	 * Retrieves an article parsed output either from parser cache or by
 	 * parsing it again. If parsing again, stores it back into parser cache.
@@ -130,20 +129,20 @@ class WikilogUtils
 		$fh_diff = array_diff_key( $wgParser->mFunctionHooks, $newparser->mFunctionHooks );
 
 		if ( !empty( $th_diff ) || !empty( $tt_diff ) || !empty( $fh_diff ) ) {
-			wfDebug("*** Wikilog WARNING: Detected broken extensions installed. "
+			wfDebug( "*** Wikilog WARNING: Detected broken extensions installed. "
 				  . "A second instance of the parser is not properly initialized. "
-				  . "The following hooks are missing:\n");
+				  . "The following hooks are missing:\n" );
 			if ( !empty( $th_diff ) ) {
 				$hooks = implode( ', ', array_keys( $th_diff ) );
-				wfDebug("***    Tag hooks: $hooks.\n");
+				wfDebug( "***    Tag hooks: $hooks.\n" );
 			}
 			if ( !empty( $tt_diff ) ) {
 				$hooks = implode( ', ', array_keys( $tt_diff ) );
-				wfDebug("***    Transparent tag hooks: $hooks.\n");
+				wfDebug( "***    Transparent tag hooks: $hooks.\n" );
 			}
 			if ( !empty( $fh_diff ) ) {
 				$hooks = implode( ', ', array_keys( $fh_diff ) );
-				wfDebug("***    Function hooks: $hooks.\n");
+				wfDebug( "***    Function hooks: $hooks.\n" );
 			}
 			return false;
 		} else {
@@ -199,24 +198,78 @@ class WikilogUtils
 	}
 
 	/**
-	 * Split summary of a wikilog post from the contents.
-	 * If summary was provided in <summary>...</summary> tags, use it,
-	 * otherwise, use some heuristics to find it in the content.
+	 * Formats a list of categories.
+	 * Given a list of categories, this function formats it in wiki syntax,
+	 * with links to either their page or to Special:Wikilog.
+	 *
+	 * @param $list Array of categories.
+	 * @return Wikitext-formatted textual list of categories.
+	 */
+	public static function categoryList( $list ) {
+		global $wgContLang;
+		$special = $wgContLang->specialPage( 'Wikilog' );
+		$categories = array();
+		foreach ( $list as $cat ) {
+			$title = Title::makeTitle( NS_CATEGORY, $cat );
+			$categoryUrl = $title->getPrefixedText();
+			$categoryTxt = $title->getText();
+			$categories[] = "[[{$special}/{$categoryUrl}|{$categoryTxt}]]";
+		}
+		return $wgContLang->listToText( $categories );
+	}
+
+	/**
+	 * Formats a list of tags.
+	 * Given a list of tags, this function formats it in wiki syntax,
+	 * with links to Special:Wikilog.
+	 *
+	 * @param $list Array of tags.
+	 * @return Wikitext-formatted textual list of tags.
+	 */
+	public static function tagList( $list ) {
+		global $wgContLang;
+		$special = $wgContLang->specialPage( 'Wikilog' );
+		$tags = array();
+		foreach ( $list as $tag ) {
+			$tags[] = "[[{$special}/t={$tag}|{$tag}]]";
+		}
+		return $wgContLang->listToText( $tags );
+	}
+
+	/**
+	 * Split summary of a wikilog article from the contents.
+	 * If summary is part of the parser output, use it; otherwise, try to
+	 * extract it from the content text (section zero, before the first
+	 * heading).
+	 *
+	 * @param $parserOutput ParserOutput object.
+	 * @return Two-element array with summary and content. Summary may be
+	 *   NULL if nonexistent.
 	 */
 	public static function splitSummaryContent( $parserOutput ) {
+		global $wgUseTidy;
+
 		$content = Sanitizer::removeHTMLcomments( $parserOutput->getText() );
 
 		if ( isset( $parserOutput->mExtWikilog ) && $parserOutput->mExtWikilog->mSummary ) {
+			# Parser output contains wikilog output and summary, use it.
 			$summary = Sanitizer::removeHTMLcomments( $parserOutput->mExtWikilog->mSummary );
 		} else {
-			$blocks = preg_split( '/< (h[1-6]) .*? > .*? <\\/\\1>/ix', $content );
-
+			# Try to extract summary from the content text.
+			$blocks = preg_split( '/<(h[1-6]).*?>.*?<\\/\\1>/i', $content, 2 );
 			if ( count( $blocks ) > 1 ) {
+				# Long article with multiple sections, use only the first one.
 				$summary = $blocks[0];
-				while (preg_match('#^(.*)<(/?)[a-z0-9\-_:]+[^<>]*>#is', $summary, $m) && !$m[2])
-					$summary = $m[1];
+				# It is possible for the regex to split on a heading that is
+				# not a child of the root element (e.g. <div><h2>...</h2>
+				# </div> leaving an open <div> tag). In order to handle such
+				# cases, we pass the summary through tidy if it is available.
+				if ( $wgUseTidy ) {
+					$summary = MWTidy::tidy( $summary );
+				}
 			} else {
-				# Short article, no summary.
+				# Short article with a single section, use no summary and
+				# leave to the caller to decide what to do.
 				$summary = NULL;
 			}
 		}
@@ -275,7 +328,7 @@ class WikilogUtils
 		$rows = array();
 		foreach ( $fields as $field ) {
 			if ( is_array( $field ) ) {
-				$row = Xml::tags( 'td', array( 'class' => 'mw-label' ), $field[0] ).
+				$row = Xml::tags( 'td', array( 'class' => 'mw-label' ), $field[0] ) .
 					Xml::tags( 'td', array( 'class' => 'mw-input' ), $field[1] );
 			} else {
 				$row = Xml::tags( 'td', array( 'class' => 'mw-input',
@@ -288,4 +341,36 @@ class WikilogUtils
 		return $form;
 	}
 
+	/**
+	 * Wraps a div, with a class, around some HTML fragment.
+	 * Similar to Xml::wrapClass(..., 'div') or Xml::tags('div',...).
+	 * This is something that should be in includes/Xml.php, doing it here
+	 * to avoid Mw version dependency.
+	 */
+	public static function wrapDiv( $class, $text ) {
+		return Xml::tags( 'div', array( 'class' => $class ), $text );
+	}
+
+	/**
+	 * Returns the date and user parameters suitable for substitution in
+	 * {{wl-publish:...}} parser function.
+	 */
+	public static function getPublishParameters() {
+		global $wgUser, $wgLocaltimezone;
+
+		$user = $wgUser->getName();
+		$popt = ParserOptions::newFromUser( $wgUser );
+
+		$unixts = wfTimestamp( TS_UNIX, $popt->getTimestamp() );
+		if ( isset( $wgLocaltimezone ) ) {
+			$oldtz = getenv( 'TZ' );
+			putenv( "TZ={$wgLocaltimezone}" );
+			$date = date( 'Y-m-d H:i:s O', $unixts );
+			putenv( "TZ={$oldtz}" );
+		} else {
+			$date = date( 'Y-m-d H:i:s O', $unixts );
+		}
+
+		return array( 'date' => $date, 'user' => $user );
+	}
 }

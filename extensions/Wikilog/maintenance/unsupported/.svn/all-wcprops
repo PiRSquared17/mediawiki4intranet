@@ -1,11 +1,11 @@
 K 25
 svn:wc:ra_dav:version-url
-V 76
-/svn/mediawiki/!svn/ver/468/extensions/Wikilog/trunk/maintenance/unsupported
+V 82
+/svnroot/mediawiki/!svn/ver/58299/trunk/extensions/Wikilog/maintenance/unsupported
 END
 wikilogImportComments.php
 K 25
 svn:wc:ra_dav:version-url
-V 102
-/svn/mediawiki/!svn/ver/468/extensions/Wikilog/trunk/maintenance/unsupported/wikilogImportComments.php
+V 108
+/svnroot/mediawiki/!svn/ver/58299/trunk/extensions/Wikilog/maintenance/unsupported/wikilogImportComments.php
 END

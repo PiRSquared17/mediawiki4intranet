@@ -37,8 +37,8 @@ class WikilogFeed
 {
 
 	/**
-	 * Feed title (i.e., not Wikilog title). For Special:Wikilog, 'wikilog'
-	 * system message should be used.
+	 * Feed title (i.e., not Wikilog title). For Special:Wikilog,
+	 * 'wikilog-specialwikilog-title' system message should be used.
 	 */
 	protected $mTitle;
 
@@ -506,7 +506,7 @@ class WikilogFeed
 	 * $wgFeedClasses.
 	 */
 	public function checkFeedOutput() {
-		global $wgFeed, $wgWikilogFeedClasses;
+		global $wgOut, $wgFeed, $wgWikilogFeedClasses;
 		if ( !$wgFeed ) {
 			$wgOut->addWikiMsg( 'feed-unavailable' );
 			return false;

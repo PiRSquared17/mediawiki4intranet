@@ -28,13 +28,11 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * General wikilog hooks.
  */
 class WikilogHooks
 {
-
 	/**
 	 * ArticleEditUpdates hook handler function.
 	 * Performs post-edit updates if article is a wikilog article.
@@ -183,6 +181,24 @@ class WikilogHooks
 	}
 
 	/**
+	 * ArticleSave hook handler function.
+	 * Add article signature if user selected "sign and publish" option in
+	 * EditPage.
+	 */
+	static function ArticleSave( &$article, &$user, &$text, &$summary,
+			$minor, $watch, $sectionanchor, &$flags )
+	{
+		# $article->mExtWikilog piggybacked from WikilogHooks::EditPageAttemptSave().
+		if ( isset( $article->mExtWikilog ) && $article->mExtWikilog['signpub'] ) {
+			$t = WikilogUtils::getPublishParameters();
+			$txtDate = $t['date'];
+			$txtUser = $t['user'];
+			$text = rtrim( $text ) . "\n{{wl-publish: {$txtDate} | {$txtUser} }}\n";
+		}
+		return true;
+	}
+
+	/**
 	 * TitleMoveComplete hook handler function.
 	 * Handles moving articles to and from wikilog namespaces.
 	 */
@@ -196,7 +212,7 @@ class WikilogHooks
 		if ( $oldwl && $newwl ) {
 			# Moving title between wikilog namespaces.
 			# Update wikilog data.
-			wfDebug( __METHOD__ . ": Moving title between wikilog namespaces ".
+			wfDebug( __METHOD__ . ": Moving title between wikilog namespaces " .
 				"($oldns, $newns). Updating wikilog data.\n" );
 
 			$wi = Wikilog::getWikilogInfo( $newtitle );
@@ -212,14 +228,14 @@ class WikilogHooks
 		} else if ( $newwl ) {
 			# Moving from normal namespace to wikilog namespace.
 			# Create wikilog data.
-			wfDebug( __METHOD__ . ": Moving from another namespace to wikilog ".
+			wfDebug( __METHOD__ . ": Moving from another namespace to wikilog " .
 				"namespace ($oldns, $newns). Creating wikilog data.\n" );
 			# FIXME: This needs a reparse of the wiki text in order to
 			# populate wikilog metadata. Or forbid this action.
 		} else if ( $oldwl ) {
 			# Moving from wikilog namespace to normal namespace.
 			# Purge wikilog data.
-			wfDebug( __METHOD__ . ": Moving from wikilog namespace to another ".
+			wfDebug( __METHOD__ . ": Moving from wikilog namespace to another " .
 				"namespace ($oldns, $newns). Purging wikilog data.\n" );
 			$dbw = wfGetDB( DB_MASTER );
 			$dbw->delete( 'wikilog_wikilogs', array( 'wlw_page'   => $pageid ) );
@@ -236,6 +252,8 @@ class WikilogHooks
 	/**
 	 * LanguageGetSpecialPageAliases hook handler function.
 	 * Adds language aliases for special pages.
+	 * @note Deprecated in MediaWiki 1.16.
+	 * @todo Remove this in Wikilog 1.1.0, along with support for Mw < 1.16.
 	 */
 	static function LanguageGetSpecialPageAliases( &$specialPageAliases, $lang ) {
 		wfLoadExtensionMessages( 'Wikilog' );
@@ -247,14 +265,92 @@ class WikilogHooks
 	/**
 	 * LanguageGetMagic hook handler function.
 	 * Adds language aliases for magic words.
+	 * @note Deprecated in MediaWiki 1.16.
+	 * @todo Remove this in Wikilog 1.1.0, along with support for Mw < 1.16.
 	 */
-	static function LanguageGetMagic( &$magicWords, $lang ) {
+	static function LanguageGetMagic( &$words, $lang ) {
 		require( 'Wikilog.i18n.magic.php' );
-		if ( $lang == 'en' || !isset( $words[$lang] ) ) {
-			$magicWords += $words['en'];
+		if ( $lang == 'en' || !isset( $magicWords[$lang] ) ) {
+			$words += $magicWords['en'];
 		} else {
-			$magicWords += array_merge( $words['en'], $words[$lang] );
+			$words += array_merge( $magicWords['en'], $magicWords[$lang] );
 		}
+		return true;
+	}
+
+	/**
+	 * EditPage::showEditForm:fields hook handler function.
+	 * Adds wikilog article options to edit pages.
+	 */
+	static function EditPageEditFormFields( &$editpage, &$output ) {
+		$wi = Wikilog::getWikilogInfo( $editpage->mTitle );
+		if ( $wi && $wi->isItem() && !$wi->isTalk() ) {
+			global $wgUser, $wgWikilogSignAndPublishDefault;
+			$fields = array();
+			$item = WikilogItem::newFromInfo( $wi );
+
+			# [x] Sign and publish this wikilog article.
+			if ( !$item || !$item->getIsPublished() ) {
+				if ( isset( $editpage->wlSignpub ) ) {
+					$checked = $editpage->wlSignpub;
+				} else {
+					$checked = !$item && $wgWikilogSignAndPublishDefault;
+				}
+				$label = wfMsgExt( 'wikilog-edit-signpub', array( 'parseinline' ) );
+				$tooltip = wfMsgExt( 'wikilog-edit-signpub-tooltip', array( 'parseinline' ) );
+				$fields['wlSignpub'] =
+					Xml::check( 'wlSignpub', $checked, array(
+						'id' => 'wl-signpub',
+						'tabindex' => 1, // after text, before summary
+					) ) . '&nbsp;' .
+					Xml::element( 'label', array(
+						'for' => 'wl-signpub',
+						'title' => $tooltip,
+					), $label );
+			}
+
+			$fields = implode( $fields, "\n" );
+			$html = Xml::fieldset(
+				wfMsgExt( 'wikilog-edit-fieldset-legend', array( 'parseinline' ) ),
+				$fields
+			);
+			$editpage->editFormTextAfterWarn .= $html;
+		}
+		return true;
+	}
+
+	/**
+	 * EditPage::importFormData hook handler function.
+	 * Import wikilog article options form data in edit pages.
+	 * @note Requires MediaWiki 1.16+.
+	 */
+	static function EditPageImportFormData( $editpage, $request ) {
+		if ( $request->wasPosted() ) {
+			$editpage->wlSignpub = $request->getCheck( 'wlSignpub' );
+		}
+		return true;
+	}
+
+	/**
+	 * EditPage::attemptSave hook handler function.
+	 * Check edit page options.
+	 * @todo Remove $editpage->wlSignpub hack in Wikilog 1.1.0, along with
+	 *   support for Mw < 1.16.
+	 */
+	static function EditPageAttemptSave( $editpage ) {
+		# HACK: For Mw < 1.16, due to the lack of 'EditPage::importFormData' hook.
+		if ( !isset( $editpage->wlSignpub ) ) {
+			global $wgRequest;
+			$editpage->wlSignpub = $wgRequest->getCheck( 'wlSignpub' );
+		}
+
+		$options = array(
+			'signpub' => $editpage->wlSignpub
+		);
+
+		# Piggyback options into article object. Will be retrieved later
+		# in 'ArticleEditUpdates' hook.
+		$editpage->mArticle->mExtWikilog = $options;
 		return true;
 	}
 
@@ -267,19 +363,14 @@ class WikilogHooks
 	static function ExtensionSchemaUpdates() {
 		global $wgDBtype, $wgExtNewFields, $wgExtPGNewFields, $wgExtNewIndexes, $wgExtNewTables;
 
-		$dir = dirname(__FILE__) . '/';
+		$dir = dirname( __FILE__ ) . '/';
 
-		if( $wgDBtype == 'mysql' ) {
-			foreach ( array( 'wikilogs', 'posts', 'authors', 'tags', 'comments' ) as $t )
-				$wgExtNewTables[] = array( "wikilog_{$t}", "{$dir}wikilog-tables.sql" );
-			$wgExtNewFields[] = array( 'wikilog_posts', 'wlp_parent', $dir . 'archives/patch-post-titles.sql' );
-			$wgExtNewFields[] = array( 'wikilog_posts', 'wlp_title',  $dir . 'archives/patch-post-titles.sql' );
-			$wgExtNewFields[] = array( 'wikilog_wikilogs', 'wlw_authors', $dir . 'archives/patch-wikilog-authors.sql' );
-			$wgExtNewFields[] = array( 'wikilog_posts', 'wlp_num_comments', $dir . 'archives/patch-comment-count.sql' );
+		if ( $wgDBtype == 'mysql' ) {
+			$wgExtNewTables[] = array( "wikilog_wikilogs", "{$dir}wikilog-tables.sql" );
 		} else {
-			/// TODO: PostgreSQL, SQLite, etc...
-			print "\n".
-				"Warning: There are no table structures for the Wikilog\n".
+			// TODO: PostgreSQL, SQLite, etc...
+			print "\n" .
+				"Warning: There are no table structures for the Wikilog\n" .
 				"extension other than for MySQL at this moment.\n\n";
 		}
 		return true;
@@ -296,5 +387,4 @@ class WikilogHooks
 		}
 		return true;
 	}
-
 }
