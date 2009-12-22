@@ -1,20 +1,16 @@
 10
 
 dir
-473
-http://svn.juliano.info/svn/mediawiki/extensions/Wikilog/trunk
-http://svn.juliano.info/svn/mediawiki
+60281
+http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog
+http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-09-15T20:48:32.797607Z
-473
-Juliano F. Ravasi
-
-
-
-
-
+2009-12-20T19:42:16.985651Z
+60246
+raymond
+has-props
 
 
 
@@ -24,7 +20,11 @@ Juliano F. Ravasi
 
 
 
-363dca7b-97fb-0310-8b71-a8c95a34027a
+
+
+
+
+dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 WikilogFeed.php
 file
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-13T12:44:30.000000Z
-82023e7de61cae9a0a6d8008eff15cf2
-2009-09-12T21:54:25.840056Z
-467
-Juliano F. Ravasi
+2009-12-21T22:45:44.368772Z
+66cd56befa6a6c11a4c2e4c4f511453e
+2009-12-17T23:32:33.240308Z
+60190
+juliano
 has-props
 
 
@@ -58,180 +58,10 @@ has-props
 
 
 
-15787
-
-WikilogDefaultSettings.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-096e0696d444acc9d2821b96401729e9
-2009-09-09T05:28:57.609780Z
-458
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4646
-
-WikilogQuery.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-6b5366040218605299ef878b33f8c68e
-2009-09-12T21:54:25.840056Z
-467
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-10739
+16194
 
 maintenance
 dir
-
-Wikilog.i18n.magic.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-46dc571555422403b9f68551422c43e2
-2009-09-05T23:52:18.897952Z
-445
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1997
-
-WlFeed.body.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-b2fb80c95ecacbf3fd7eeb2a6b9c7928
-2009-09-10T00:45:38.768118Z
-461
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-31544
-
-Wikilog.php
-file
-
-
-
-
-2009-11-30T13:21:16.078916Z
-4280cbfa621d04971098081f1544c592
-2009-09-15T20:48:32.797607Z
-473
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-13940
 
 SpecialWikilog.php
 file
@@ -239,11 +69,11 @@ file
 
 
 
-2009-11-13T12:33:50.000000Z
-1e58a7e37da5ea22a9273436d1786fdc
-2009-09-15T20:43:12.612937Z
-471
-Juliano F. Ravasi
+2009-12-21T22:45:44.372772Z
+fd8c8b4c1676192ebdc32d20da812115
+2009-12-06T00:08:47.914030Z
+59763
+juliano
 has-props
 
 
@@ -265,75 +95,7 @@ has-props
 
 
 
-13532
-
-WlFeed.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-db7d0e801608a0baec816eb2efff6acf
-2009-09-15T20:48:32.797607Z
-473
-Juliano F. Ravasi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3113
-
-WikilogMainPage.php
-file
-
-
-
-
-2009-11-30T13:21:16.082916Z
-efa136351be1e322e4a0562739382582
-2009-09-07T22:16:30.520125Z
-451
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-9885
+13768
 
 WlCaptchaAdapter.php
 file
@@ -341,11 +103,11 @@ file
 
 
 
-2009-11-13T12:33:50.000000Z
-8ed6bcd0f6158c2018802a3f3308dec3
-2009-09-03T05:03:41.717046Z
-438
-Juliano F. Ravasi
+2009-12-21T22:45:44.372772Z
+3483bea25e1253b2847f50954bbac2b1
+2009-10-29T13:14:45.309463Z
+58311
+siebrand
 has-props
 
 
@@ -367,7 +129,486 @@ has-props
 
 
 
-6705
+6716
+
+WikilogMainPage.php
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+f6173b020beb5ee80a906fde3538d5d8
+2009-12-06T00:08:47.914030Z
+59763
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10211
+
+CREDITS
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+6f2993b4f03770dcd9e6069ca1c16136
+2009-12-17T23:32:33.240308Z
+60190
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+306
+
+Wikilog.i18n.alias.php
+file
+
+
+
+
+2009-12-21T22:45:44.376772Z
+50b4870662004ab600d8e2d588b6efbe
+2009-11-26T19:22:36.298558Z
+59466
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+401
+
+images
+dir
+
+WikilogItemPage.php
+file
+
+
+
+
+2009-12-21T22:45:44.376772Z
+7bd08862e606220459e1c62ecf63ddc6
+2009-11-28T03:47:16.795926Z
+59505
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4754
+
+COPYING
+file
+
+
+
+
+2009-12-21T22:45:44.380772Z
+4e068d050b28e4405b691fdc9d54afdd
+2009-10-29T03:21:46.815395Z
+58299
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17997
+
+WlFeed.i18n.php
+file
+
+
+
+
+2009-12-21T22:45:44.384772Z
+39622b4659b65083c708a1c9e67f68fb
+2009-12-20T19:42:16.985651Z
+60246
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4416
+
+WikilogPager.php
+file
+
+
+
+
+2009-12-21T22:45:44.384772Z
+3b892a1e29b5a4799b84cd8c76672f12
+2009-11-28T03:47:16.795926Z
+59505
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+18209
+
+WikilogQuery.php
+file
+
+
+
+
+2009-12-21T22:45:44.368772Z
+fc82c28a266561a9d2d247d7af01c8c8
+2009-10-29T22:28:40.627655Z
+58345
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10755
+
+WikilogDefaultSettings.php
+file
+
+
+
+
+2009-12-21T22:45:44.368772Z
+49c126002013572ebdc30a768a0740f6
+2009-11-28T03:47:16.795926Z
+59505
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5875
+
+WlFeed.body.php
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+c8492d5f8ab6f6d2d7586c54761cd725
+2009-10-29T22:28:40.627655Z
+58345
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+31519
+
+Wikilog.i18n.magic.php
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+79be0c8eebdb4c66c9482f08ad85af37
+2009-12-19T21:36:15.242594Z
+60233
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1922
+
+Wikilog.php
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+836992f3243a8a7dd4e34280bd43ad44
+2009-12-19T21:36:15.242594Z
+60233
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+14619
+
+WlFeed.php
+file
+
+
+
+
+2009-12-21T22:45:44.372772Z
+e21cfd049b48153f360145edafccfc72
+2009-11-28T12:50:15.091721Z
+59514
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3171
+
+README
+file
+
+
+
+
+2009-12-21T22:45:44.376772Z
+1d36eb5b8de871858ea53bfd75fb89a5
+2009-10-29T03:21:46.815395Z
+58299
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2816
 
 WikilogCommentsPage.php
 file
@@ -375,11 +616,11 @@ file
 
 
 
-2009-11-13T12:33:50.000000Z
-4cba3d6733f6df73a9377e6c13712225
-2009-09-09T05:28:03.177942Z
-457
-Juliano F. Ravasi
+2009-12-21T22:45:44.376772Z
+f834ae3a50703d611afcb47a51793cb2
+2009-11-27T03:55:07.180469Z
+59480
+juliano
 has-props
 
 
@@ -401,7 +642,7 @@ has-props
 
 
 
-22426
+22860
 
 WikilogHooks.php
 file
@@ -409,11 +650,187 @@ file
 
 
 
-2009-11-30T13:21:16.082916Z
-0d7a8d1c86b0085a887669691980155a
-2009-09-04T00:27:17.441491Z
-441
-Juliano F. Ravasi
+2009-12-21T22:45:44.376772Z
+371ffdbff4bf8712ea26ba46b32f5a11
+2009-11-26T20:13:36.506561Z
+59467
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12976
+
+WikilogLinksUpdate.php
+file
+
+
+
+
+2009-12-21T22:45:44.376772Z
+cba8048f71d60f759ea6738ec73e2ce0
+2009-10-29T13:14:45.309463Z
+58311
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4705
+
+style
+dir
+
+RELEASE-NOTES
+file
+
+
+
+
+2009-12-21T22:45:44.376772Z
+485781a1b4385169942e264630f56a79
+2009-12-19T21:36:15.242594Z
+60233
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3221
+
+WikilogParser.php
+file
+
+
+
+
+2009-12-21T22:45:44.380772Z
+5c77787e89f1de6d5214ad86d0245329
+2009-12-19T21:36:15.242594Z
+60233
+juliano
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+19796
+
+Wikilog.i18n.php
+file
+
+
+
+
+2009-12-21T22:45:44.384772Z
+5700980abe42ed2e45db34901c13cb0b
+2009-12-20T19:42:16.985651Z
+60246
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+216177
+
+documentation
+dir
+
+WikilogItem.php
+file
+
+
+
+
+2009-12-21T22:45:44.384772Z
+ee889fcdca0a0842c0482a1829d65541
+2009-11-28T03:47:16.795926Z
+59505
+juliano
 has-props
 
 
@@ -437,336 +854,18 @@ has-props
 
 10293
 
-WikilogLinksUpdate.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-18a9e314bca8d7f2c1fb4bc38828fef1
-2009-09-03T05:03:41.717046Z
-438
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4703
-
-style
-dir
-
-archives
-dir
-
-images
-dir
-
-RELEASE-NOTES
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-ad8c7bcbea84a863ee4011d5ecc3ff74
-2009-09-12T22:12:07.109843Z
-469
-Juliano F. Ravasi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-391
-
-WikilogItemPage.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-3d043e1d014681eaa58b74d985a21650
-2009-09-09T05:28:03.177942Z
-457
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5598
-
-WikilogParser.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-e4d84c934929aeb730fcb02db5b177d7
-2009-09-07T03:03:31.715852Z
-447
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-17277
-
-COPYING
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-4e068d050b28e4405b691fdc9d54afdd
-2008-11-11T17:11:16.500835Z
-362
-Juliano F. Ravasi
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-17997
-
-Wikilog.i18n.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-05f9df13cc23f085bbc41a22918f848a
-2009-09-12T21:58:51.603118Z
-468
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-23505
-
-documentation
-dir
-
-WikilogPager.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-7150c1d376e4d13440685e99236f514b
-2009-09-15T20:43:12.612937Z
-471
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-17506
-
-WlFeed.i18n.php
-file
-
-
-
-
-2009-07-03T15:50:12.000000Z
-2428e9c5522563ed39a9a6d1fbd1c383
-2008-09-13T17:27:36.700755Z
-274
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-448
-
-WikilogItem.php
-file
-
-
-
-
-2009-11-13T12:33:50.000000Z
-698e237fe52d95fa337ee022df854b8c
-2009-09-04T00:27:17.441491Z
-441
-Juliano F. Ravasi
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8521
-
 wikilog-tables.sql
 file
 
 
 
 
-2009-11-13T12:33:50.000000Z
+2009-12-21T22:45:44.384772Z
 934a19a5052ef5899051c2bcc5594826
-2009-05-03T18:58:38.151905Z
-410
-Juliano F. Ravasi
-
+2009-10-29T03:21:46.815395Z
+58299
+juliano
+has-props
 
 
 
@@ -795,11 +894,11 @@ file
 
 
 
-2009-11-30T13:21:16.286923Z
-d9113fc079ac59967250c438ba8a666f
-2009-09-05T23:50:44.550029Z
-444
-Juliano F. Ravasi
+2009-12-21T22:45:44.384772Z
+904e7a08e149c961cafeb2493efc4a35
+2009-12-19T21:36:15.242594Z
+60233
+juliano
 has-props
 
 
@@ -821,7 +920,7 @@ has-props
 
 
 
-9165
+11880
 
 WikilogComment.php
 file
@@ -829,11 +928,11 @@ file
 
 
 
-2009-11-13T12:33:50.000000Z
-080325352f4188bed0af4c15e3396916
-2009-09-10T00:40:56.104416Z
-459
-Juliano F. Ravasi
+2009-12-21T22:45:44.384772Z
+d88a1107b0460fd02e2c3ad3a9be13c7
+2009-10-29T22:28:40.627655Z
+58345
+siebrand
 has-props
 
 
