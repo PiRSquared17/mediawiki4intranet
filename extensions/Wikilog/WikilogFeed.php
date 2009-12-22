@@ -133,15 +133,24 @@ class WikilogFeed
 		FeedUtils::checkPurge( $timekey, $feedkey );
 
 		if ( $feed->isCacheable() ) {
+
+			# IMPORTANT
+			# When you output cached feed, you MUST NOT output the
+			# Last-Modified header value of which is greater than cache time!
+			# It is set by OutputPage::checkLastModified(), so we need to pass
+			# the "effective" timestamp instead of real feed update timestamp.
+			# See error case in getEffectiveCacheTimestamp() description.
+			$tsEffective = $this->getEffectiveCacheTimestamp($feed->getUpdated(), $timekey);
+
 			# Check if client cache is ok.
-			if ( $wgOut->checkLastModified( $feed->getUpdated() ) ) {
+			if ( $wgOut->checkLastModified( $tsEffective ) ) {
 				# Client cache is fresh. OutputPage takes care of sending
 				# the appropriate headers, nothing else to do.
 				return;
 			}
 
 			# Try to load the feed from our cache.
-			$cached = $this->loadFromCache( $feed->getUpdated(), $timekey, $feedkey );
+			$cached = $this->loadFromCache( $tsEffective, $timekey, $feedkey );
 
 			if( is_string( $cached ) ) {
 				wfDebug( "Wikilog: Outputting cached feed\n" );
@@ -424,6 +433,34 @@ class WikilogFeed
 	}
 
 	/**
+	 * Returns effective timestamp for cached OR uncached data.
+	 * This is needed due to $wgFeedCacheTimeout.
+	 * Suppose the following situation:
+	 * 1. Wiki caches OLD version of feed with OLD timestamp
+	 * 2. So client caches OLD version of feed with OLD timestamp
+	 * 3. User updates the wikilog - now it has NEW update timestamp
+	 * 4. It happens that client updates feed BEFORE $wgFeedCacheTimeout seconds passed after the first update
+	 * 5. So Wiki outputs OLD version of feed with NEW (!!!) timestamp (see execute())
+	 * 6. Client caches OLD version of feed with NEW (!!!) timestamp
+	 * 7. In the future, client sends requests with If-Modified-Since = NEW timestamp
+	 * 8. So Wiki outputs 304 Not Modified
+	 * 9. So client does not get the new data
+	 */
+	public function getEffectiveCacheTimestamp($tsData, $timekey)
+	{
+		global $messageMemc, $wgFeedCacheTimeout;
+		if (($wgFeedCacheTimeout > 0) &&
+		    ($tsCache = $messageMemc->get($timekey)) &&
+		    ($age = time() - wfTimestamp(TS_UNIX, $tsCache)) < $wgFeedCacheTimeout)
+		{
+			wfDebug("Wikilog: too little time passed after last feed cache time, ".
+				"using old version -- age ($age) < timeout ($wgFeedCacheTimeout)\n");
+			return $tsCache;
+		}
+		return $tsData;
+	}
+
+	/**
 	 * Load feed output from cache.
 	 *
 	 * @param $tsData Timestamp of the last change of the local data.
@@ -436,20 +473,13 @@ class WikilogFeed
 		$tsCache = $messageMemc->get( $timekey );
 
 		if ( ( $wgFeedCacheTimeout > 0 ) && $tsCache ) {
-			$age = time() - wfTimestamp( TS_UNIX, $tsCache );
-
-			if ( $age < $wgFeedCacheTimeout ) {
-				wfDebug( "Wikilog: loading feed from cache -- ".
-					"too young: age ($age) < timeout ($wgFeedCacheTimeout) ".
-					"($feedkey; $tsCache; $tsData)\n" );
-				return $messageMemc->get( $feedkey );
-			} else if ( $tsCache >= $tsData ) {
+			if ( $tsCache >= $tsData ) {
 				wfDebug( "Wikilog: loading feed from cache -- ".
 					"not modified: cache ($tsCache) >= data ($tsData)".
 					"($feedkey)\n" );
 				return $messageMemc->get( $feedkey );
 			} else {
-				wfDebug( "Wikilog: cached feed timestamp check failed -- ".
+				wfDebug( "Wikilog: cache must be invalidated -- ".
 					"cache ($tsCache) < data ($tsData)\n" );
 			}
 		}

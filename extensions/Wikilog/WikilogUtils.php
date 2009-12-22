@@ -212,16 +212,9 @@ class WikilogUtils
 			$blocks = preg_split( '/< (h[1-6]) .*? > .*? <\\/\\1>/ix', $content );
 
 			if ( count( $blocks ) > 1 ) {
-				# Long article, get only the first paragraph.
-				$pextr = '/<(p)
-					( \\s+ (?: [^\'"\\/>] | \'[^\']*\' | "[^"]*" )* )?
-					(?: > .*? <\\/\\1\\s*> | \\/> )/isx';
-
-				if ( preg_match_all( $pextr, $blocks[0], $m ) ) {
-					$summary = implode( "\n", $m[0] );
-				} else {
-					$summary = NULL;
-				}
+				$summary = $blocks[0];
+				while (preg_match('#^(.*)<(/?)[a-z0-9\-_:]+[^<>]*>#is', $summary, $m) && !$m[2])
+					$summary = $m[1];
 			} else {
 				# Short article, no summary.
 				$summary = NULL;
