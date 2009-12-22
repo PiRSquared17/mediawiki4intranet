@@ -5,7 +5,7 @@ class OpenIDHooks {
 		global $wgOpenIDOnly, $wgOpenIDClientOnly;
 
 		if ( $wgOpenIDOnly ) {
-			$list['Userlogin'] = array( 'SpecialRedirectToSpecial', 'Userlogin', 'OpenIDLogin' );
+			$list['Userlogin'] = array( 'SpecialRedirectToSpecial', 'Userlogin', 'OpenIDLogin', false, array( 'returnto', 'returntoquery' ) );
 			# Used in 1.12.x and above
 			$list['CreateAccount'] = array( 'SpecialRedirectToSpecial', 'CreateAccount', 'OpenIDLogin' );
 		}
@@ -56,6 +56,7 @@ class OpenIDHooks {
 											"<a href='$url'>$disp</a>" .
 											"</span>" );
 					}
+				} else {
 					# Add OpenID data if its allowed
 					if ( !$wgOpenIDClientOnly ) {
 						$st = SpecialPage::getTitleFor( 'OpenIDServer' );
@@ -173,17 +174,36 @@ class OpenIDHooks {
 		return true;
 	}
 	public static function onLoadExtensionSchemaUpdates() {
-		global $wgDBtype, $wgExtNewTables;
+		global $wgDBtype, $wgUpdates, $wgExtNewTables;
 
 		$base = dirname( __FILE__ );
 
 		if ( $wgDBtype == 'mysql' ) {
 			$wgExtNewTables[] = array( 'user_openid', "$base/openid_table.sql" );
+			$wgUpdates['mysql'][] = array( array( __CLASS__, 'makeUoiUserNotUnique' ) );
 		} else if ( $wgDBtype == 'postgres' ) {
 			$wgExtNewTables[] = array( 'user_openid', "$base/openid_table.pg.sql" );
+			# This doesn't work since MediaWiki doesn't use $wgUpdates when
+			# updating a PostgreSQL database
+			#$wgUpdates['postgres'][] = array( array( __CLASS__, 'makeUoiUserNotUnique' ) );
 		}
 
 		return true;
+	}
+
+	public static function makeUoiUserNotUnique() {
+		$db = wfGetDB( DB_MASTER );
+		if ( !$db->tableExists( 'user_openid' ) )
+			return;
+
+		$info = $db->fieldInfo( 'user_openid', 'uoi_user' );
+		if ( !$info->isMultipleKey() ) {
+			wfOut( "Making uoi_user filed not unique..." );
+			$db->sourceFile( dirname( __FILE__ ) . '/patch-uoi_user-not-unique.sql' );
+			wfOut( " done.\n" );
+		} else {
+			wfOut( "...uoi_user field is already not unique.\n" );
+		}
 	}
 
 	private static function loginStyle() {

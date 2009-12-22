@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 61
-/svnroot/mediawiki/!svn/ver/58495/trunk/extensions/PdfHandler
+/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/PdfHandler
 END
 PdfHandler_body.php
 K 25
@@ -13,7 +13,7 @@ PdfHandler.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/58495/trunk/extensions/PdfHandler/PdfHandler.i18n.php
+/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/PdfHandler/PdfHandler.i18n.php
 END
 PdfHandler.php
 K 25
