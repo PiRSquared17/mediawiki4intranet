@@ -28,13 +28,11 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Wikilog article database entry.
  */
 class WikilogItem
 {
-
 	/**
 	 * General data about the article.
 	 */
@@ -161,6 +159,66 @@ class WikilogItem
 	}
 
 	/**
+	 * Returns an array with common header and footer system message
+	 * parameters.
+	 */
+	public function getMsgParams( $extended = false, $pout = null ) {
+		global $wgContLang, $wgWikilogEnableTags;
+
+		$authors = array_keys( $this->mAuthors );
+		$authorsFmt = WikilogUtils::authorList( $authors );
+		$commentsFmt = WikilogUtils::getCommentsWikiText( $this );
+
+		$categories = array();
+		$categoriesFmt = '';
+		$tags = array();
+		$tagsFmt = '';
+
+		if ( $extended ) {
+			if ( $pout !== null ) {
+				$categories = $pout->getCategoryLinks();
+				if ( count( $categories ) > 0 ) {
+					$categoriesFmt = wfMsgExt( 'wikilog-summary-categories',
+						array( 'content', 'parsemag' ),
+						count( $categories ),
+						WikilogUtils::categoryList( $categories )
+					);
+				} else {
+					$categoriesFmt = wfMsgExt( 'wikilog-summary-uncategorized',
+						array( 'content', 'parsemag' )
+					);
+				}
+			}
+			if ( $wgWikilogEnableTags ) {
+				$tags = array_keys( $this->mTags );
+				$tagsFmt = WikilogUtils::tagList( $tags );
+			}
+		}
+
+		/*
+		 * This is probably the largest amount of parameters to a
+		 * system message in MediaWiki. This is the price of allowing
+		 * the user to customize the presentation of wikilog articles.
+		 */
+		return array(
+			/* $1  */ $this->mParentTitle->getPrefixedURL(),
+			/* $2  */ $this->mParentName,
+			/* $3  */ $this->mTitle->getPrefixedURL(),
+			/* $4  */ $this->mName,
+			/* $5  */ count( $authors ),
+			/* $6  */ ( count( $authors ) > 0 ? $authors[0] : '' ),
+			/* $7  */ $authorsFmt,
+			/* $8  */ $wgContLang->date( $this->mPubDate ),
+			/* $9  */ $wgContLang->time( $this->mPubDate ),
+			/* $10 */ $commentsFmt,
+			/* $11 */ count( $categories ),
+			/* $12 */ $categoriesFmt,
+			/* $13 */ count( $tags ),
+			/* $14 */ $tagsFmt
+		);
+	}
+
+	/**
 	 * Returns an array with all published comments.
 	 */
 	public function getComments( $thread = NULL ) {
@@ -173,7 +231,7 @@ class WikilogItem
 		}
 
 		$comments = array();
-		foreach( $result as $row ) {
+		foreach ( $result as $row ) {
 			$comment = WikilogComment::newFromRow( $this, $row );
 			if ( $row->page_latest ) {
 				$rev = Revision::newFromId( $row->page_latest );
@@ -278,8 +336,8 @@ class WikilogItem
 		extract( $dbr->tableNames( 'wikilog_posts', 'page' ) );
 		return array(
 			'tables' =>
-				"{$wikilog_posts} ".
-				"LEFT JOIN {$page} AS w ON (w.page_id = wlp_parent) ".
+				"{$wikilog_posts} " .
+				"LEFT JOIN {$page} AS w ON (w.page_id = wlp_parent) " .
 				"LEFT JOIN {$page} AS p ON (p.page_id = wlp_page) ",
 			'fields' => array(
 				'wlp_page',
@@ -298,5 +356,4 @@ class WikilogItem
 			)
 		);
 	}
-
 }

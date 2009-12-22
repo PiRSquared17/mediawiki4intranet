@@ -28,7 +28,6 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Common wikilog pager interface.
  */
@@ -37,7 +36,6 @@ interface WikilogPager
 	function including( $x = NULL );
 	function getNavigationBar( $class = 'wl-navbar-any' );
 }
-
 
 /**
  * Summary pager.
@@ -55,7 +53,6 @@ class WikilogSummaryPager
 	extends ReverseChronologicalPager
 	implements WikilogPager
 {
-
 	# Override default limits.
 	public $mLimitsShown = array( 5, 10, 20, 50 );
 
@@ -126,7 +123,7 @@ class WikilogSummaryPager
 	}
 
 	function getEmptyBody() {
-		return wfMsgExt( 'wikilog-pager-empty', array( 'parsemag' ) );
+		return '<div class="wl-empty">' . wfMsgExt( 'wikilog-pager-empty', array( 'parsemag' ) ) . "</div>";
 	}
 
 	function getNavigationBar( $class = 'wl-navbar-any' ) {
@@ -160,77 +157,66 @@ class WikilogSummaryPager
 	}
 
 	function formatRow( $row ) {
-		global $wgUser, $wgContLang;
-
+		global $wgWikilogExtSummaries;
 		$skin = $this->getSkin();
+		$header = $footer = '';
 
 		# Retrieve article parser output and other data.
 		$item = WikilogItem::newFromRow( $row );
 		list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $item->mTitle );
 		list( $summary, $content ) = WikilogUtils::splitSummaryContent( $parserOutput );
 
-		# Some general data.
-		$authors = WikilogUtils::authorList( array_keys( $item->mAuthors ) );
-		$pubdate = $wgContLang->timeanddate( $item->getPublishDate(), true );
-		$comments = WikilogUtils::getCommentsWikiText( $item );
+		# Retrieve the common header and footer parameters.
+		$params = $item->getMsgParams( $wgWikilogExtSummaries, $parserOutput );
 
-		# Entry div class.
-		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
-		$result = "<div class=\"{$divclass} visualClear\">";
-
-		# Edit section link.
-		if ( $item->mTitle->userCanEdit() ) {
-			$result .= $this->editLink( $item->mTitle );
-		}
-
-		# Title heading, with link.
-		$heading = $skin->makeKnownLinkObj( $item->mTitle, $item->mName .
-			( $item->getIsPublished() ? '' : ' '. wfMsgForContent( 'wikilog-draft-title-mark' ) ) );
-		$result .= "<h2>{$heading}</h2>\n";
-
-		# Item header.
-		$msg = wfMsgForContentNoTrans( 'wikilog-item-brief-header',
-			/* $1 */ $item->mParentTitle->getPrefixedURL(),
-			/* $2 */ $item->mParentName,
-			/* $3 */ $item->mTitle->getPrefixedURL(),
-			/* $4 */ $item->mName,
-			/* $5 */ $authors,
-			/* $6 */ $pubdate,
-			/* $7 */ $comments
+		# Article title heading, with direct link article page and optional
+		# edit link (if user can edit the article).
+		$titleText = $item->mName;
+		if ( !$item->getIsPublished() )
+			$titleText .= wfMsgForContent( 'wikilog-draft-title-mark' );
+		$heading = $skin->link( $item->mTitle, $titleText, array(), array(),
+			array( 'known', 'noclasses' )
 		);
-		if ( !empty( $msg ) ) {
-			$result .= $this->parse( $msg . "\n" );
+		$heading = Xml::tags( 'h2', null, $heading );
+		if ( $item->mTitle->quickUserCan( 'edit' ) ) {
+			$heading = $this->editLink( $item->mTitle ) . $heading;
 		}
 
-		# Item text.
+		# Sumary entry header.
+		$key = $this->mQuery->isSingleWikilog()
+			? 'wikilog-summary-header-single'
+			: 'wikilog-summary-header';
+		$msg = wfMsgExt( $key, array( 'content', 'parsemag' ), $params );
+		if ( !empty( $msg ) ) {
+			$header = WikilogUtils::wrapDiv( 'wl-summary-header', $this->parse( $msg ) );
+		}
+
+		# Summary entry text.
 		if ( $summary ) {
-			$more = $this->parse( wfMsgForContentNoTrans( 'wikilog-item-more',
-				/* $1 */ $item->mParentTitle->getPrefixedURL(),
-				/* $2 */ $item->mParentName,
-				/* $3 */ $item->mTitle->getPrefixedURL(),
-				/* $4 */ $item->mName
-			) );
-			$result .= "<div class=\"wl-summary\">{$summary}\n{$more}\n</div>\n";
+			$more = $this->parse( wfMsgForContentNoTrans( 'wikilog-summary-more', $params ) );
+			$summary = WikilogUtils::wrapDiv( 'wl-summary', $summary . $more );
 		} else {
-			$result .= "<div class=\"wl-summary\">{$content}</div>\n";
+			$summary = WikilogUtils::wrapDiv( 'wl-summary', $content );
 		}
 
-		# Item footer.
-		$msg = wfMsgForContentNoTrans( 'wikilog-item-brief-footer',
-			/* $1 */ $item->mParentTitle->getPrefixedURL(),
-			/* $2 */ $item->mParentName,
-			/* $3 */ $item->mTitle->getPrefixedURL(),
-			/* $4 */ $item->mName,
-			/* $5 */ $authors,
-			/* $6 */ $pubdate,
-			/* $7 */ $comments
-		);
+		# Summary entry footer.
+		$key = $this->mQuery->isSingleWikilog()
+			? 'wikilog-summary-footer-single'
+			: 'wikilog-summary-footer';
+		$msg = wfMsgExt( $key, array( 'content', 'parsemag' ), $params );
 		if ( !empty( $msg ) ) {
-			$result .= $this->parse( $msg . "\n" );
+			$footer = WikilogUtils::wrapDiv( 'wl-summary-footer', $this->parse( $msg ) );
 		}
 
-		$result .= "</div>\n\n";
-		return $result;
+		# Assembly the entry div.
+		$divclass = array( 'wl-entry', 'visualClear' );
+		if ( !$item->getIsPublished() )
+			$divclass[] = 'wl-draft';
+		$entry = WikilogUtils::wrapDiv(
+			implode( ' ', $divclass ),
+			$heading . $header . $summary . $footer
+		);
+		return $entry;
 	}
 
 	/**
@@ -261,13 +247,11 @@ class WikilogSummaryPager
 	 */
 	private function editLink( $title ) {
 		$skin = $this->getSkin();
-		$url = $skin->makeKnownLinkObj( $title, wfMsg('wikilog-edit-lc'), 'action=edit' );
+		$url = $skin->makeKnownLinkObj( $title, wfMsg( 'wikilog-edit-lc' ), 'action=edit' );
 		$result = wfMsg( 'editsection-brackets', $url );
 		return "<span class=\"editsection\">$result</span>";
 	}
-
 }
-
 
 /**
  * Template pager.
@@ -292,7 +276,6 @@ class WikilogSummaryPager
 class WikilogTemplatePager
 	extends WikilogSummaryPager
 {
-
 	protected $mTemplate, $mTemplateTitle;
 
 	/**
@@ -325,6 +308,10 @@ class WikilogTemplatePager
 		return "</div>\n";
 	}
 
+	/**
+	 * @todo (On or after Wl 1.2.0) Remove {{{pubdate}}} and {{{updated}}}.
+	 * @todo (Req >= Mw 1.16) Remove bug 20431 workaround.
+	 */
 	function formatRow( $row ) {
 		global $wgParser, $wgContLang;
 
@@ -332,15 +319,28 @@ class WikilogTemplatePager
 		$item = WikilogItem::newFromRow( $row );
 		list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $item->mTitle );
 		list( $summary, $content ) = WikilogUtils::splitSummaryContent( $parserOutput );
-		if ( !$summary ) $summary = $content;
+		if ( empty( $summary ) ) {
+			$summary = $content;
+			$hasMore = false;
+		} else {
+			$hasMore = true;
+		}
 
 		# Some general data.
 		$authors = WikilogUtils::authorList( array_keys( $item->mAuthors ) );
 		$tags = implode( wfMsgForContent( 'comma-separator' ), array_keys( $item->mTags ) );
-		$pubdate = $wgContLang->timeanddate( $item->getPublishDate(), true );
-		$updated = $wgContLang->timeanddate( $item->getUpdatedDate(), true );
 		$comments = WikilogUtils::getCommentsWikiText( $item );
 		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
+
+		$itemPubdate = $item->getPublishDate();
+		$pubdate = $wgContLang->timeanddate( $itemPubdate, true );
+		$publishedDate = $wgContLang->date( $itemPubdate );
+		$publishedTime = $wgContLang->time( $itemPubdate );
+
+		$itemUpdated = $item->getUpdatedDate();
+		$updated = $wgContLang->timeanddate( $itemUpdated, true );
+		$updatedDate = $wgContLang->date( $itemUpdated );
+		$updatedTime = $wgContLang->time( $itemUpdated );
 
 		# Template parameters.
 		$vars = array(
@@ -352,9 +352,14 @@ class WikilogTemplatePager
 			'authors'       => $authors,
 			'tags'          => $tags,
 			'published'     => $item->getIsPublished() ? '*' : '',
-			'pubdate'       => $pubdate,
-			'updated'       => $updated,
+			'pubdate'       => $pubdate, # Deprecated, to be removed on Wl 1.2.0.
+			'date'          => $publishedDate,
+			'time'          => $publishedTime,
+			'updated'       => $updated, # Deprecated, to be removed on Wl 1.2.0.
+			'updatedDate'   => $updatedDate,
+			'updatedTime'   => $updatedTime,
 			'summary'       => $wgParser->insertStripItem( $summary ),
+			'hasMore'       => $hasMore ? '*' : '',
 			'comments'      => $comments
 		);
 
@@ -369,9 +374,7 @@ class WikilogTemplatePager
 
 		return $this->parse( $text );
 	}
-
 }
-
 
 /**
  * Archives pager.
@@ -384,7 +387,6 @@ class WikilogArchivesPager
 	extends TablePager
 	implements WikilogPager
 {
-
 	# Local variables.
 	protected $mQuery = NULL;			///< Wikilog item query data
 	protected $mIncluding = false;		///< If pager is being included
@@ -518,7 +520,7 @@ class WikilogArchivesPager
 				return $this->getSkin()->makeKnownLinkObj( $page, $text );
 
 			case '_wl_actions':
-				if ( $this->mCurrentItem->mTitle->userCanEdit() ) {
+				if ( $this->mCurrentItem->mTitle->quickUserCan( 'edit' ) ) {
 					return $this->editLink( $this->mCurrentItem->mTitle );
 				} else {
 					return '';
@@ -539,7 +541,7 @@ class WikilogArchivesPager
 		$fields = array();
 
 		$fields['wlp_pubdate']			= wfMsgHtml( 'wikilog-published' );
-// 		$fields['wlp_updated']			= wfMsgHtml( 'wikilog-updated' );
+ 		// $fields['wlp_updated']			= wfMsgHtml( 'wikilog-updated' );
 		$fields['wlp_authors']			= wfMsgHtml( 'wikilog-authors' );
 
 		if ( !$this->mQuery->isSingleWikilog() )
@@ -590,9 +592,7 @@ class WikilogArchivesPager
 	 */
 	private function editLink( $title ) {
 		$skin = $this->getSkin();
-		$url = $skin->makeKnownLinkObj( $title, wfMsg('wikilog-edit-lc'), 'action=edit' );
+		$url = $skin->makeKnownLinkObj( $title, wfMsg( 'wikilog-edit-lc' ), 'action=edit' );
 		return wfMsg( 'wikilog-brackets', $url );
 	}
-
 }
-
