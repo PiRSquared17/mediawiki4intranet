@@ -30,16 +30,25 @@
 $WIKILOGDIR = dirname( dirname( __FILE__ ) );
 $MEDIAWIKIDIR = dirname( dirname( $WIKILOGDIR ) );
 
-$optionsWithArgs = array();
-require_once( "$MEDIAWIKIDIR/maintenance/commandLine.inc" );
-require_once( "$MEDIAWIKIDIR/maintenance/rebuildrecentchanges.inc" );
+# Wikilog documentation source file.
+$wgWikilogDocumentationXML = "$WIKILOGDIR/documentation/documentation.xml";
+
+# Compatibility with MediaWiki < 1.16.
+if ( !file_exists( "$MEDIAWIKIDIR/maintenance/Maintenance.php" ) ) {
+	require( 'wikilogImportDocumentation-pre1.16.php' );
+	exit( 0 );
+}
+
+# Maintenance scripts base class.
+require_once( "$MEDIAWIKIDIR/maintenance/Maintenance.php" );
 
 
 /**
  * Wikilog documentation importer. Imports the Wikilog extension documentation
  * pages and images into the wiki.
  */
-class WikilogDocImport
+class WikilogImportDocumentation
+	extends Maintenance
 {
 
 	protected $mFilename;			///< Import filename.
@@ -51,15 +60,58 @@ class WikilogDocImport
 	protected $mComment;			///< Comment ("Imported Wikilog doc...").
 	protected $mTimestamp;			///< Timestamp.
 
-	protected $mOverwriteFiles = false;	///< Whether files should be overwritten.
-
 	protected $mStatPages, $mStatFiles;	///< Statistics.
 
+	public function __construct() {
+		parent::__construct();
+		$this->mDescription = "Imports the documentation for the Wikilog extension";
+		$this->addOption( 'overwrite', "Overwrite existing files" );
+	}
+
+	public function execute() {
+		global $wgTitle, $wgWikilogDocumentationXML;
+		$wgTitle = Title::newFromText( "Wikilog documentation import script" );
+
+		# Check dependencies.
+		$this->checkDependencies();
+
+		# If the wiki is in read-only state, die.
+		if ( wfReadOnly() ) {
+			$this->error( "Wiki is in read-only mode; you'll need to disable it for import to work.\n", true );
+		}
+
+		# Perform import.
+		$this->doImport( $wgWikilogDocumentationXML );
+
+		# Update recent changes table.
+		$this->updateRecentChanges();
+	}
+
 	/**
-	 * Constructor.
+	 * Check if all dependencies for documentation are met.
+	 */
+	protected function checkDependencies() {
+		$errors = 0;
+
+		# ParserFunctions extension.
+		if ( !class_exists( 'ExtParserFunctions' ) ) {
+			$this->error( "Error: Wikilog documentation requires the ParserFunctions extension." );
+			$this->error( "  * http://www.mediawiki.org/wiki/Extension:ParserFunctions" );
+			$errors++;
+		}
+
+		if ( $errors ) {
+			$this->error( "Some requirements were not met. Exiting.", true );
+		}
+	}
+
+	/**
+	 * Perform the documentation import.
 	 * @param $filename Import filename.
 	 */
-	public function __construct( $filename ) {
+	protected function doImport( $filename ) {
+		global $wgUser;
+
 		$this->mFilename = $filename;
 		$this->mFileHandle = fopen( $this->mFilename, 'rb' );
 		if ( !$this->mFileHandle ) {
@@ -71,55 +123,35 @@ class WikilogDocImport
 		$this->mImporter = new WikiImporter( $this->mSource );
 
 		$this->mUser = User::newFromName( wfMsgForContent( 'wikilog-auto' ), false );
+		$wgUser = $this->mUser;
+
 		$this->mComment = wfMsgForContent( 'wikilog-doc-import-comment' );
 		$this->mTimestamp = wfTimestampNow();
 
 		$this->mImporter->setRevisionCallback( array( &$this, 'handleRevision' ) );
-	}
-
-	/**
-	 * Destructor.
-	 */
-	public function __destruct() {
-		fclose( $this->mFileHandle );
-	}
-
-	/**
-	 * Acessor for the mOverwriteFiles property.
-	 */
-	public function OverwriteFiles( $x = NULL ) {
-		wfSetVar( $this->mOverwriteFiles, $x );
-	}
-
-	/**
-	 * Perform the documentation import.
-	 */
-	public function doImport() {
-		global $wgUser;
-
-		$wgUser = $this->mUser;
 
 		$basefn = wfBasename( $this->mFilename );
-		echo "+ Importing {$basefn}...\n";
+		$this->output( "+ Importing {$basefn}...\n" );
 
 		$this->mStatPages = 0;
 		$this->mStatFiles = 0;
 		$this->mImporter->doImport();
 
-		echo "  + Done. {$this->mStatPages} page(s) and {$this->mStatFiles} file(s) imported.\n";
+		$this->output( "  + Done. {$this->mStatPages} page(s) and {$this->mStatFiles} file(s) imported.\n" );
+		fclose( $this->mFileHandle );
 	}
 
 	/**
 	 * Perform recent changes update.
 	 */
-	public function updateRecentChanges() {
-		echo "+ Rebuilding recent changes...\n";
-		rebuildRecentChangesTable();
-		echo "  + Done.\n";
+	protected function updateRecentChanges() {
+		$this->output("+ Rebuilding recent changes...\n");
+		$this->runChild( 'RebuildRecentchanges', 'rebuildrecentchanges.php' );
+		$this->output("  + Done.\n");
 	}
 
 	/**
-	 * Importer revision callback.
+	 * Importer revision callback.  Called from WikiImporter.
 	 */
 	public function handleRevision( $revision ) {
 		$title = $revision->getTitle();
@@ -127,29 +159,29 @@ class WikilogDocImport
 
 		if ( $title->getNamespace() == NS_FILE ) {
 			$base = $title->getDBkey();
-			echo "  + File: '{$base}'...";
+			$this->output( "  + File: '{$base}'..." );
 			$image = wfLocalFile( $title );
-			if ( !$image->exists() || $this->mOverwriteFiles ) {
-				echo " uploading...";
+			if ( !$image->exists() || $this->getOption( 'overwrite' ) ) {
+				$this->output( " uploading..." );
 				$filepath = dirname( $this->mFilename ) . '/' . $base;
 				$archive = $image->upload( $filepath, $this->mComment,
 					$revision->getText(), 0, false, $this->mTimeStamp,
 					$this->mUser);
 
 				if ( WikiError::isError( $archive ) || !$archive->isGood() ) {
-					echo " failed.\n";
+					$this->output( " failed.\n" );
 					return false;
 				} else {
-					echo " success.\n";
+					$this->output( " success.\n" );
 					$this->mStatFiles++;
 					return true;
 				}
 			} else {
-				echo " file exists, skipping.\n";
+				$this->output( " file exists, skipping.\n" );
 				return false;
 			}
 		} else {
-			echo "  + Page: '{$title_text}'...\n";
+			$this->output( "  + Page: '{$title_text}'...\n" );
 			$revision->setUsername( $this->mUser->getName() );
 			$revision->setComment( $this->mComment );
 			$revision->setTimestamp( $this->mTimestamp );
@@ -162,50 +194,5 @@ class WikilogDocImport
 
 }
 
-
-/**
- * Display a help message for the script.
- */
-function showHelp() {
-	echo <<<EOF
-Usage: php wikilogImportDocumentation.php [OPTIONS]
-Imports the documentation for the Wikilog extension.
-
-Options:
-  --overwrite       Overwrite existing files.
-  --help            Displays this message and exit.
-
-EOF;
-}
-
-
-# Generic title.
-$wgTitle = Title::newFromText( "Wikilog documentation import script" );
-$wgDBuser = $wgDBadminuser;
-$wgDBpassword = $wgDBadminpassword;
-
-# --help option: displays help message and exit.
-if ( $options['help'] ) {
-	showHelp();
-	exit();
-}
-
-# If the wiki is in read-only state, die.
-if( wfReadOnly() ) {
-	wfDie( "Wiki is in read-only mode; you'll need to disable it for import to work.\n" );
-}
-
-# Load extension messages.
-wfLoadExtensionMessages( 'Wikilog' );
-
-# Perform import.
-$i = new WikilogDocImport( "$WIKILOGDIR/documentation/documentation.xml" );
-
-if ( isset( $option['overwrite'] ) ) {
-	$i->OverwriteFiles( true );
-}
-
-$i->doImport();
-$i->updateRecentChanges();
-
-exit();
+$maintClass = "WikilogImportDocumentation";
+require_once( DO_MAINTENANCE );
