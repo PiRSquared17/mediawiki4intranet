@@ -4,8 +4,9 @@
  * @ingroup Maintenance
  */
 
-require_once '../../maintenance/commandLine.inc';
-require_once '../../maintenance/counter.php';
+$dir = dirname($_SERVER['PHP_SELF']);
+require_once "$dir/../../maintenance/commandLine.inc";
+require_once "$dir/../../maintenance/counter.php";
 
 class OldImageRenamer
 {
