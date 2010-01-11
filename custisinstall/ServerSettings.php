@@ -52,6 +52,9 @@ $wgSMTP = array(
     "auth"   => false,
 );
 
+// Don't purge recent changes... (keep them for 50 years)
+$wgRCMaxAge = 50 * 365 * 86400;
+
 $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
