@@ -48,6 +48,7 @@ index main_%(wikiname)s
     min_infix_len = 1
     enable_star   = 1
     charset_type  = utf-8
+    charset_table = 0..9, A..Z->a..z, _, -, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F
 }
 
 index inc_%(wikiname)s : main_%(wikiname)s
