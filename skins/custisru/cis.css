@@ -31,6 +31,7 @@ td.vb { vertical-align: bottom; }
 .bottom { background-image: url(bottom.gif); font-size: 12px; color: black; background-repeat: repeat-x; height: 20px; vertical-align: bottom; text-align: left; }
 .navigation { font-size: 80%; color: black; padding: 10px 0 10px 0; }
 #bodyContent { margin: 20px; }
+#bodyContent table { border-collapse: separate; }
 #firstHeading { border-width: 0; }
 #prefooter1 { background-image: url(separator_right.gif); background-repeat: no-repeat; background-position: top right; background-color: #96A4C4; width: 100%; text-align: right; font-size: 1px; height: 6px; }
 #prefooter1 img { top: 0; }
