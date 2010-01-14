@@ -3,6 +3,7 @@ img { border: 0; padding: 0; margin: 0; }
 table { border-collapse: collapse; padding: 0; border-width: 0; margin: 0; }
 td { vertical-align: top; text-align: left; padding: 0; }
 form { margin: 0; }
+blockquote { border: 1px dashed #ffc000; padding: 2px; }
 table.cen { width: 100%; }
 a:normal { color: #000066; }
 a:active { color: #CC0000; }
