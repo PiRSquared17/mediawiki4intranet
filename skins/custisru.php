@@ -42,7 +42,7 @@ class SkinCustisRu extends SkinTemplate {
 		$out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
 		$out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
 
-		$out->addStyle( 'custisru/IEFixes.css', 'screen', 'lt IE 8' );
+		$out->addStyle( 'custisru/IEFixes.css', 'screen', 'IE' );
 
 		$out->addStyle( 'custisru/common.css', 'screen' );
 		$out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
@@ -321,6 +321,7 @@ class CustisRuTemplate extends QuickTemplate {
     /*************************************************************************************************/
     function toolbox()
     {
+        global $wgScriptPath;
         $bar = 'toolbox';
         $cont = array();
         if($this->data['notspecialpage'])
@@ -342,12 +343,12 @@ class CustisRuTemplate extends QuickTemplate {
                 text => $this->translator->translate('trackbacklink'),
             );
         if($this->data['feeds'])
+        {
+            $a = '<img alt="" src="'.$wgScriptPath.'/skins/custisru/feed.png" width="16" height="16" />';
             foreach($this->data['feeds'] as $key => $feed)
-                $cont[] = array(
-                    href => $feed['href'],
-                    id   => "feed-$key",
-                    text => $feed['text'],
-                );
+                $a .= '<a class="m_uplink m_feedlink" href="'.htmlspecialchars($feed['href']).'" '.$this->skin->tooltipAndAccesskey("feed-$key").'>'.$feed['text'].'</a>';
+            $cont[] = array(html => $a);
+        }
 
         foreach(array('contributions', 'log', 'blockip', 'emailuser', 'upload', 'specialpages') as $special)
             if($this->data['nav_urls'][$special])
@@ -414,7 +415,7 @@ class CustisRuTemplate extends QuickTemplate {
     <tr>
      <td width="20" class="menu_partition_sep"><img alt="" height="1" width="5" src="<?=$sp?>/skins/custisru/spacer.gif"></td>
      <td width="100%" class="menu_normal_text">
-      <a class="m_uplink" <?= $val['href'] ? 'href="'.htmlspecialchars($val['href']).'"' : '' ?> <?= $val['id'] ? $this->skin->tooltipAndAccesskey($val['id']) : '' ?>><?= htmlspecialchars($val['text']) ?></a>
+      <a class="m_uplink" <?= $val['href'] ? 'href="'.htmlspecialchars($val['href']).'"' : '' ?> <?= $val['id'] ? $this->skin->tooltipAndAccesskey($val['id']) : '' ?>><?= $val['html'] ? $val['html'] : htmlspecialchars($val['text']) ?></a>
      </td>
     </tr>
     <tr>
