@@ -308,7 +308,7 @@ class Parser
 		wfProfileIn( __METHOD__ );
 		wfProfileIn( $fname );
 
-		if ( $clearState ) {
+		if ( $clearState || !$this->mStripState ) {
 			$this->clearState();
 		}
 
