@@ -315,7 +315,7 @@ class CustisRuTemplate extends QuickTemplate {
 <?php
         $cont = ob_get_contents();
         ob_end_clean();
-    $this->customBox('search', $cont);
+        $this->customBox('search', $cont);
     }
 
     /*************************************************************************************************/
@@ -425,6 +425,10 @@ class CustisRuTemplate extends QuickTemplate {
     <tr>
      <td class="menu_partition_sep"></td>
      <td><?=$cont?></td>
+    </tr>
+    <tr>
+     <td class="menu_left_background"></td>
+     <td class="menu_separator"></td>
     </tr>
 <?php   }
     }
