@@ -42,7 +42,7 @@ class SkinCustisRu extends SkinTemplate {
 		$out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
 		$out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
 
-		$out->addStyle( 'custisru/IEFixes.css', 'screen', 'IE' );
+		$out->addStyle( 'custisru/IEFixes.css', 'screen', 'lt IE 8' );
 
 		$out->addStyle( 'custisru/common.css', 'screen' );
 		$out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
