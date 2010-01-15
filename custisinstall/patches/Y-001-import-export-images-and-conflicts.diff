@@ -13,8 +13,8 @@ installation.
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
 diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/Export.php
---- a/includes/Export.php
-+++ b/includes/Export.php
+--- includes/Export.php
++++ includes/Export.php
 @@ -28,7 +28,8 @@ class WikiExporter {
  	var $list_authors = false ; # Return distinct author list (when not returning full history)
  	var $author_list = "" ;
@@ -175,8 +175,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/Export.php
  	 * Override to write to a different stream type.
  	 * @return bool
 diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/Import.php
---- a/includes/Import.php
-+++ b/includes/Import.php
+--- includes/Import.php
++++ includes/Import.php
 @@ -87,6 +87,10 @@ class WikiRevision {
  		$this->filename = $filename;
  	}
@@ -801,8 +801,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/Import.php
  			return new WikiErrorMsg( "importcantopen" );
  		}
 diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/filerepo/LocalFile.php
---- a/includes/filerepo/LocalFile.php
-+++ b/includes/filerepo/LocalFile.php
+--- includes/filerepo/LocalFile.php
++++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@ class LocalFile extends File
  	}
  
@@ -897,8 +897,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/filerepo/LocalFile.php
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/specials/SpecialExport.php
---- a/includes/specials/SpecialExport.php
-+++ b/includes/specials/SpecialExport.php
+--- includes/specials/SpecialExport.php
++++ includes/specials/SpecialExport.php
 @@ -21,28 +21,36 @@
   * @ingroup SpecialPage
   */
@@ -1082,8 +1082,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/specials/SpecialImport.php
---- a/includes/specials/SpecialImport.php
-+++ b/includes/specials/SpecialImport.php
+--- includes/specials/SpecialImport.php
++++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@ class ImportReporter {
  		$wgOut->addHTML( "<ul>\n" );
  	}
@@ -1167,8 +1167,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa includes/specials/SpecialImport.php
  	}
  
 diff -r f8f47f972f2f -r cc5c0d5bf0aa languages/messages/MessagesEn.php
---- a/languages/messages/MessagesEn.php
-+++ b/languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
 @@ -2763,8 +2763,16 @@ In the latter case you can also use a li
  'exportnohistory'   => "----
  '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
@@ -1213,8 +1213,8 @@ diff -r f8f47f972f2f -r cc5c0d5bf0aa languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
 diff -r f8f47f972f2f -r cc5c0d5bf0aa languages/messages/MessagesRu.php
---- a/languages/messages/MessagesRu.php
-+++ b/languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
 @@ -2321,8 +2321,16 @@ PICT # различные
  'exportnohistory'   => "----
  '''Замечание:''' экспорт полной истории изменений страниц отключен из-за проблем с производительностью.",
