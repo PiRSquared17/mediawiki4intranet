@@ -40,6 +40,7 @@ Config file fragment syntax (Replace __Test__ with desired [target] name):
 [__Test__SourceWiki]
 URL=<source wiki url>
 Category=<source category name>
+RemoveConfidential=<'yes' or 'no' (default)>
 FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
 BasicLogin=<HTTP basic auth username, if needed>
 BasicPassword=<HTTP basic auth password, if needed>
@@ -104,15 +105,18 @@ sub replicate
     my $text = $response->content;
     $response->content('');
     my $text2 = '';
-    if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n/so)
-    {
-        # из файлов и т.п. вырезать ничего не нужно!
-        $text2 = index($text, $1, length $1);
-        $text2 = substr($text, $s, length($text)-$s, '');
-    }
     # Нужно вырезать "конфиденциальные данные"
-    $text =~ s/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->//giso;
-    $text =~ s/\{\{CONFIDENTIAL-BEGIN.*?\{\{CONFIDENTIAL-END.*?\}\}//giso;
+    if ($src->{removeconfidential})
+    {
+        if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n/so)
+        {
+            # из файлов и т.п. вырезать ничего не нужно!
+            $text2 = index($text, $1, length $1);
+            $text2 = substr($text, $s, length($text)-$s, '');
+        }
+        $text =~ s/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->//giso;
+        $text =~ s/\{\{CONFIDENTIAL-BEGIN.*?\{\{CONFIDENTIAL-END.*?\}\}//giso;
+    }
     print $fh $text;
     print $fh $text2;
     my $tx = clock_gettime(CLOCK_REALTIME);
