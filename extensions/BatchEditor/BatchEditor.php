@@ -155,7 +155,8 @@ This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Plea
         $arr_titles = split("\n", $a_titles);
         foreach($arr_titles as $s_title)
         {
-            $title = Title::newFromURL(trim($s_title));
+            $s_title = trim($s_title);
+            $title = Title::newFromURL($s_title);
             if (!$title)
                 continue;
             $article = new Article($title);
