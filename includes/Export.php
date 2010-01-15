@@ -517,8 +517,6 @@ class XmlDumpWriter {
 		} elseif( isset( $row->old_text ) ) {
 			// Raw text from the database may have invalid chars
 			$text = strval( Revision::getRevisionText( $row ) );
-			// Remove "export cuts"
-			$text = preg_replace( '/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->/is', '', $text );
 			$out .= "      " . Xml::ElementClean( 'text',
 				array( 'xml:space' => 'preserve' ),
 				strval( $text ) ) . "\n";
