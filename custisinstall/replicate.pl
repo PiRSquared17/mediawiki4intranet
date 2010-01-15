@@ -206,7 +206,7 @@ sub read_config
             {
                 $v =~ s!/+$!!so;
             }
-            elsif ($k eq 'fullhistory')
+            elsif ($k eq 'fullhistory' || $k eq 'removeconfidential')
             {
                 $v = lc $v;
                 $v = $v eq 'yes' || $v eq 'true' || $v eq 'on' || $v eq '1' ? 1 : 0;
