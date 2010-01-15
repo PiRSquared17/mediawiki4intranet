@@ -194,7 +194,8 @@ class Parser
 		$this->mLastSection = '';
 		$this->mDTopen = false;
 		$this->mIncludeCount = array();
-		$this->mStripState = new StripState;
+		if ( !$this->mStripState )
+			$this->mStripState = new StripState;
 		$this->mArgStack = false;
 		$this->mInPre = false;
 		$this->mLinkHolders = new LinkHolderArray( $this );
@@ -308,7 +309,7 @@ class Parser
 		wfProfileIn( __METHOD__ );
 		wfProfileIn( $fname );
 
-		if ( $clearState || !$this->mStripState ) {
+		if ( $clearState ) {
 			$this->clearState();
 		}
 

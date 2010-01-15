@@ -637,7 +637,7 @@ class OutputPage {
 		$popts = $this->parserOptions();
 		if ( $interface) { $popts->setInterfaceMessage(true); }
 		$parserOutput = $wgParser->parse( $text, $wgTitle, $popts,
-			$linestart, false, $this->mRevisionId );
+			$linestart, true, $this->mRevisionId );
 		if ( $interface) { $popts->setInterfaceMessage(false); }
 		return $parserOutput->getText();
 	}
