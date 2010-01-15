@@ -103,7 +103,18 @@ sub replicate
         unless $response->is_success;
     my $text = $response->content;
     $response->content('');
+    my $text2 = '';
+    if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n/so)
+    {
+        # из файлов и т.п. вырезать ничего не нужно!
+        $text2 = index($text, $1, length $1);
+        $text2 = substr($text, $s, length($text)-$s, '');
+    }
+    # Нужно вырезать "конфиденциальные данные"
+    $text =~ s/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->//giso;
+    $text =~ s/\{\{CONFIDENTIAL-BEGIN.*?\{\{CONFIDENTIAL-END.*?\}\}//giso;
     print $fh $text;
+    print $fh $text2;
     my $tx = clock_gettime(CLOCK_REALTIME);
     print sprintf(logp()." Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
     close $fh;
