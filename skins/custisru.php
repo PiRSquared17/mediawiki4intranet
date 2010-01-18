@@ -187,7 +187,7 @@ class CustisRuTemplate extends QuickTemplate {
 <table>
  <tr>
   <td width="18%">
-   <table>
+   <table class="cen">
     <tr>
      <td><img class="iefix1px" alt="" height="56" width="5" src="<?=$sp?>/skins/custisru/menu_top_left.gif"></td>
      <td class="menu_top ar" width="100%"><img class="iefix1px" alt="" height="56" width="10" src="<?=$sp?>/skins/custisru/menu_top_right.gif"></td>
