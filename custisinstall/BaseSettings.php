@@ -125,7 +125,7 @@ if (wfIsWindows())
     $wgTransliterateUploadFilenames = true;
 }
 
-$wgCookieExpiration = 30 * 86400;
+$wgCookieExpiration = 3650 * 86400;
 
 $wgLogo    = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
 $wgFavicon = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
