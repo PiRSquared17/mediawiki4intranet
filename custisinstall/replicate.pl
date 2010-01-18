@@ -108,11 +108,11 @@ sub replicate
     # Нужно вырезать "конфиденциальные данные"
     if ($src->{removeconfidential})
     {
-        if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n/so)
+        if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\1\n/so)
         {
             # из файлов и т.п. вырезать ничего не нужно!
-            $text2 = index($text, $1, length $1);
-            $text2 = substr($text, $s, length($text)-$s, '');
+            $text2 = index($text, $&, length $&);
+            $text2 = substr($text, $text2, length($text)-$text2, '');
         }
         $text =~ s/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->//giso;
         $text =~ s/\{\{CONFIDENTIAL-BEGIN.*?\{\{CONFIDENTIAL-END.*?\}\}//giso;
