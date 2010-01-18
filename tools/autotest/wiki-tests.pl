@@ -222,8 +222,6 @@ sub test_search
     my $u;
     my $u1 = $su;
     $u = $title;
-    # sphinx воспринимает - как исключение и в итоге ничего не находит
-    $u =~ s/\s-/ /gso;
     $u =~ tr/\\/ /;
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
