@@ -7,7 +7,7 @@ blockquote { border: 1px dashed #ffc000; padding: 2px; }
 table.cen { width: 100%; }
 a:normal { color: #000066; }
 a:active { color: #CC0000; }
-a:visited { color: #330033; }
+a:visited { color: #660066; }
 .pad4 { padding: 4px; }
 td.ar { text-align: right; }
 td.vb { vertical-align: bottom; }
