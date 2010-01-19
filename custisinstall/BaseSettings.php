@@ -141,4 +141,12 @@ $wgSphinxTopSearchableCategory = "Root";
 // or incorrect define of .mm files
 $wgVerifyMimeType = false;
 
+$wgNamespacesToBeSearchedDefault = array(
+    NS_MAIN => 1,
+    NS_USER => 1,
+    NS_FILE => 1,
+    NS_HELP => 1,
+    NS_CATEGORY => 1,
+);
+
 ?>

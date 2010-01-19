@@ -11,11 +11,14 @@ require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/Drafts/Drafts.php');
-require_once($IP.'/extensions/Wikilog/Wikilog.php');
-#require_once($IP.'/extensions/LiquidThreads/LqtPages.php');
-Wikilog::setupNamespace(100, 'Блог', 'Обсуждение_блога');
 
-$egDraftsAutoSaveWait  = 60;   // 1 minute
+# Wikilog
+require_once($IP.'/extensions/Wikilog/Wikilog.php');
+define('NS_BLOG', 100);
+Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
+$wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
+
+$egDraftsAutoSaveWait = 60;   // 1 minute
 
 # Extension:FlvHandler
 $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
