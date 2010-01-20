@@ -2775,6 +2775,7 @@ In the latter case you can also use a link, for example [[{{#Special:Export}}/{{
 'export-selfcontained' => 'Include image contents into the export file',
 'export-download'   => 'Save as file',
 'export-templates'  => 'Include templates',
+'export-closure'    => 'Include subcategories',
 
 # Namespace 8 related
 'allmessages'               => 'System messages',
