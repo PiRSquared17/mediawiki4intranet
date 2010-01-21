@@ -222,7 +222,7 @@ sub test_search
     my $u;
     my $u1 = $su;
     $u = $title;
-    $u =~ s/\s-(?=\s)//gso;
+    $u =~ s/(?<=\W)-/ /gso;
     $u =~ tr/\\/ /;
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
