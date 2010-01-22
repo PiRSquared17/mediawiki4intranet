@@ -222,8 +222,10 @@ sub test_search
     my $u;
     my $u1 = $su;
     $u = $title;
-    $u =~ s/(?<=\W)-/ /gso;
+    Encode::_utf8_on($u);
+    $u =~ s/(?<!\w)-([^\d])/ $1/gso;
     $u =~ tr/\\/ /;
+    Encode::_utf8_off($u);
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
     {
