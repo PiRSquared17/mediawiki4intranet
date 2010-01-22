@@ -1,23 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1264189723 -10800
+# Date 1264190276 -10800
 RSS/Atom comments feed support for wikilogs
 
-diff -r ecc1d86fc6cf -r 0e70ea6b0662 extensions/Wikilog/Wikilog.i18n.php
+diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
-@@ -18,6 +18,10 @@
- 	'right-wl-postcomment' => 'Post comments to wikilog articles',
- 	'right-wl-moderation' => 'Moderation of wikilog article comments',
- 
-+	# Calendar
-+	'wikilogcalendar' => 'Wikilog calendar',
-+	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
-+
- 	# Special:Wikilog
- 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
- 	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
-@@ -113,8 +117,10 @@
+@@ -113,8 +113,10 @@
  	'wikilog-newtalk-summary' => 'created automatically by Wikilog',
  
  	# Atom and RSS feeds
@@ -29,16 +18,7 @@ diff -r ecc1d86fc6cf -r 0e70ea6b0662 extensions/Wikilog/Wikilog.i18n.php
  
  	# Item and comments page titles
  	'wikilog-title-item-full' => '$1 - $2', # $1 = article title, $2 wikilog title
-@@ -3411,6 +3417,8 @@
- 	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
- 	'wikilog-auto' => 'Викилог Авто',
- 	'wikilog-help' => '{{ns:Help}}:Викилог',
-+	'wikilogcalendar' => 'Календарь блога',
-+	'wikilog-calendar-archive-link-title' => 'Записи $1 за $2',
- 	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
- 	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
- 	'wikilog-specialwikilog-title' => 'Викилоги',
-@@ -3534,6 +3542,8 @@
+@@ -3534,6 +3536,8 @@
  	'wikilog-page-lc' => 'страница',
  	'wikilog-history-lc' => 'история',
  	'wikilog-doc-import-comment' => 'Импортированная документация Викилога',
@@ -47,7 +27,7 @@ diff -r ecc1d86fc6cf -r 0e70ea6b0662 extensions/Wikilog/Wikilog.i18n.php
  );
  
  /** Sinhala (සිංහල)
-diff -r ecc1d86fc6cf -r 0e70ea6b0662 extensions/Wikilog/WikilogCommentsPage.php
+diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/WikilogCommentsPage.php
 --- extensions/Wikilog/WikilogCommentsPage.php
 +++ extensions/Wikilog/WikilogCommentsPage.php
 @@ -58,6 +58,7 @@
