@@ -44,6 +44,8 @@ $messages['en'] = array(
     'batcheditor-preview-page'  => '= Preview =',
     'batcheditor-results-page'  => "= '''Results''' =",
     'batcheditor-not-found'     => 'Article [[$1]] not found!',
+    'batcheditor-edit-error'    => 'Editing failed',
+    'batcheditor-edit-denied'   => 'You cannot edit this article.',
 );
 $specialPageAliases['en'] = array(
     'BatchEditor' => array('BatchEditor'),
@@ -68,6 +70,8 @@ $messages['ru'] = array(
     'batcheditor-preview-page'  => '= Предварительный просмотр =',
     'batcheditor-results-page'  => "= '''Результаты''' =",
     'batcheditor-not-found'     => 'Article [[$1]] not found!',
+    'batcheditor-edit-error'    => 'Ошибка редактирования',
+    'batcheditor-edit-denied'   => 'Вам запрещено редактировать эту статью.'
 );
 $specialPageAliases['ru'] = array(
     'BatchEditor' => array('BatchEditor', 'МассоваяПравка'),
