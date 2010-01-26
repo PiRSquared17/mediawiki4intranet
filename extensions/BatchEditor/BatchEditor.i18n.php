@@ -69,7 +69,7 @@ $messages['ru'] = array(
     'batcheditor-run'           => 'Выполнить',
     'batcheditor-preview-page'  => '= Предварительный просмотр =',
     'batcheditor-results-page'  => "= '''Результаты''' =",
-    'batcheditor-not-found'     => 'Article [[$1]] not found!',
+    'batcheditor-not-found'     => 'Статья [[$1]] не существует!',
     'batcheditor-edit-error'    => 'Ошибка редактирования',
     'batcheditor-edit-denied'   => 'Вам запрещено редактировать эту статью.'
 );
