@@ -136,7 +136,7 @@ function wfSpecialBatchEditor($par = null)
         if ($f)
         {
             if ($a_regexp)
-                $f = '#'.preg_replace('/([#\\])/', '\\\1', $f).'#';
+                $f = '#'.preg_replace('/([#\\\\])/', '\\\\\1', $f).'#';
             $a_find[] = array($f, trim($ar[$a]));
         }
     }
@@ -148,7 +148,7 @@ function wfSpecialBatchEditor($par = null)
         $f = trim($f);
         if ($f)
         {
-            $f = '#^[ \t\r]*'.str_replace('#', '\\#', preg_quote($f)).'[ \t\r]*$#m';
+            $f = '#^[ \t\r]*'.preg_replace('/([#\\\\])/', '\\\\\1', preg_quote($f)).'[ \t\r]*$#m';
             $a_delete[] = $f;
         }
     }
