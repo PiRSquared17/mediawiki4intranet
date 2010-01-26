@@ -202,7 +202,12 @@ function wfSpecialBatchEditor($par = null)
                     $wgOut->addWikiText("== [[$s_title]] ==");
                     $wgOut->addHTML($res);
                     if ($a_run)
-                        $article->updateArticle($newtext, $a_comment, $a_minor, $article->mTitle->userIsWatching(), true);
+                    {
+                        $flags = EDIT_UPDATE | EDIT_DEFER_UPDATES | EDIT_AUTOSUMMARY;
+                        if ($a_minor)
+                            $flags |= EDIT_MINOR;
+                        $article->doEdit($newtext, $a_comment, $flags);
+                    }
                 }
             }
         }
