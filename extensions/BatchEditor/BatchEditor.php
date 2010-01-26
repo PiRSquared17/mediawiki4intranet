@@ -15,27 +15,20 @@ if (!defined('MEDIAWIKI')) die();
 require_once('LinksUpdate.php');
 
 $wgExtensionFunctions[] = "wfInitBatchEditor";
+$wgExtensionMessagesFiles['BatchEditor'] = dirname(__FILE__) . '/BatchEditor.i18n.php';
 
 function wfInitBatchEditor()
 {
-    global $IP, $wgMessageCache;
+    global $IP;
     require_once("$IP/includes/SpecialPage.php");
-
-    $wgMessageCache->addMessages(
-        array(
-            'specialpagename' => 'BatchEditor',
-            'batcheditor' => 'Batch Editor',
-        )
-    );
-
     SpecialPage::addPage(new BatchEditorPage);
 }
 
 function wfSpecialBatchEditor($par = null)
 {
-    global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgContLang;
+    global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgLang, $IP, $wgScriptPath;
 
-    $wgOut->setPagetitle('BatchEditor');
+    $wgOut->setPageTitle(wfMsg('batcheditor-title'));
 
     extract($wgRequest->getValues('a_titles'));
     extract($wgRequest->getValues('a_comment'));
@@ -44,10 +37,24 @@ function wfSpecialBatchEditor($par = null)
     extract($wgRequest->getValues('a_add'));
     extract($wgRequest->getValues('a_delete'));
     extract($wgRequest->getValues('a_run'));
+    extract($wgRequest->getValues('a_preview'));
 
     $a_minor  = $wgRequest->getCheck('a_minor') ? ' checked="checked" ' : false;
     $a_regexp = $wgRequest->getCheck('a_regexp') ? ' checked="checked" ' : false;
     $a_one    = $wgRequest->getCheck('a_one') ? ' checked="checked" ' : false;
+
+    /* If CustIS-modified Import/Export engine is available */
+    require_once("$IP/includes/specials/SpecialExport.php");
+    if (function_exists('wfExportAddPagesExec'))
+    {
+        $state = $_POST;
+        $state['pages'] = $a_titles;
+        if ($wgRequest->getCheck('addcat'))
+        {
+            wfExportAddPagesExec($state);
+            $a_titles = $state['pages'];
+        }
+    }
 
     $parserOptions = ParserOptions::newFromUser( $wgUser );
     $numSessionID = preg_replace( "[\D]", "", session_id() );
@@ -55,26 +62,25 @@ function wfSpecialBatchEditor($par = null)
 
     ob_start();
 ?>
-This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Please, use this promptly!
-<html>
-<form action=<?="'$action'"?> method='POST'>
+<form action='<?=$action?>' method='POST'>
 <table>
 <tr valign="top">
-    <td style="vertical-align: top; padding-right: 20px"><b>Articles:</b><br><small>Article titles,<br/> one per line</small></td>
+    <td style="vertical-align: top; padding-right: 20px"><?=wfMsgExt('batcheditor-list-title', array('parseinline'))?></td>
     <td><textarea name="a_titles" rows="8" cols="60"><?=htmlspecialchars($a_titles)?></textarea></td>
+    <td style="padding-left: 16px"><?= function_exists('wfExportAddPagesExec') ? wfExportAddPagesForm($state) : '' ?></td>
 </tr>
 <tr valign="top">
-    <td>Comment:</td>
+    <td><?=wfMsgExt('batcheditor-comment-title', array('parseinline'))?></td>
     <td>
         <input name="a_comment" size="80" value="<?=htmlspecialchars($a_comment)?>" />
-        <input type="checkbox" name="a_minor" <?=$a_minor?> value="1"/><label for='a_minor'>Minor&nbsp;Edit</label>
+        <input type="checkbox" name="a_minor" <?=$a_minor?> value="1"/><label for='a_minor'><?=wfMsg('minoredit')?></label>
     </td>
 </tr>
 </table>
 <table cellspacing="8">
 <tr>
-    <th>Find</th>
-    <th>Replace</th>
+    <th><?=wfMsgExt('batcheditor-find', array('parseinline'))?></th>
+    <th><?=wfMsgExt('batcheditor-replace', array('parseinline'))?></th>
 </tr>
 <tr>
     <td><textarea name="a_find"    rows="5" cols="45"><?=htmlspecialchars($a_find)?></textarea></td>
@@ -82,30 +88,30 @@ This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Plea
 </tr>
 <tr>
     <td colspan="2" align="right">
-        <input type="checkbox" name="a_regexp" <?=$a_regexp?> value="1" />&nbsp;<label for='a_regexp'>Use <a href="http://en.wikipedia.org/wiki/PCRE">Perl-compatible regular expressions for replacement</a></label>
+        <input type="checkbox" name="a_regexp" <?=$a_regexp?> value="1" />&nbsp;<label for='a_regexp'><?=wfMsgExt('batcheditor-pcre', array('parseinline'))?></label>
         &nbsp; &nbsp;
-        <input type="checkbox" name="a_one" <?=$a_one?> value="1" />&nbsp;<label for='a_one'>Treat this as <b>one</b> multi-line replacement</label>
+        <input type="checkbox" name="a_one" <?=$a_one?> value="1" />&nbsp;<label for='a_one'><?=wfMsgExt('batcheditor-oneline', array('parseinline'))?></label>
     </td>
 </tr>
 <tr>
-    <th>Add lines</th>
-    <th>Delete lines</th>
+    <th><?=wfMsgExt('batcheditor-addlines', array('parseinline'))?></th>
+    <th><?=wfMsgExt('batcheditor-deletelines', array('parseinline'))?></th>
 </tr>
 <tr>
     <td><textarea name="a_add"    rows="5" cols="45"><?=htmlspecialchars($a_add)?></textarea></td>
     <td><textarea name="a_delete" rows="5" cols="45"><?=htmlspecialchars($a_delete)?></textarea></td>
 </tr>
 <tr><td align="center" colspan="2">
-    <input value='Preview' type='submit' /> &nbsp; &nbsp;
-    <input name='a_run' value='Run' type='submit' /> &nbsp; &nbsp;
+    <input name='a_preview' value='<?=wfMsgExt('batcheditor-preview', array('parseinline'))?>' type='submit' /> &nbsp; &nbsp;
+    <input name='a_run' value='<?=wfMsgExt('batcheditor-run', array('parseinline'))?>' type='submit' /> &nbsp; &nbsp;
 </td></tr>
 </table>
 </form>
-</html>
 <?
     $interface_form = ob_get_contents();
     ob_end_clean();
-    $wgOut->addWikiText($interface_form);
+    $wgOut->addExtensionStyle($wgScriptPath . '/extensions/BatchEditor/BatchEditor.css');
+    $wgOut->addHTML($interface_form);
     # Remove CRLF
     $a_find    = str_replace("\r", "", $a_find);
     $a_replace = str_replace("\r", "", $a_replace);
@@ -146,22 +152,19 @@ This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Plea
             $a_delete[] = $f;
         }
     }
-    if (isset($a_titles))
+    if (trim($a_titles) != '' && ($a_run || $a_preview))
     {
-        if ($a_run)
-            $wgOut->addWikiText("= Results =");
-        else
-            $wgOut->addWikiText("= Preview =");
+        $wgOut->addWikiText(wfMsg('batcheditor-'.($a_run?'results':'preview').'-page'));
         $arr_titles = split("\n", $a_titles);
         foreach($arr_titles as $s_title)
         {
             $s_title = trim($s_title);
-            $title = Title::newFromURL($s_title);
+            $title = Title::newFromText($s_title);
             if (!$title)
                 continue;
             $article = new Article($title);
             if ($article->mTitle->getArticleID() == 0)
-                $wgOut->addWikiText("== [[$s_title]] ==\nArticle [[$s_title]] not found!");
+                $wgOut->addWikiText("== [[$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
             else
             {
                 $article->loadContent(false);
@@ -191,8 +194,8 @@ This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Plea
     <col class='diff-marker' />
     <col class='diff-content' />
     <tr>
-        <td colspan='2' width='50%' align='center' class='diff-otitle'>Old text</td>
-        <td colspan='2' width='50%' align='center' class='diff-ntitle'>New text</td>
+        <td colspan='2' width='50%' align='center' class='diff-otitle'>".wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true))."</td>
+        <td colspan='2' width='50%' align='center' class='diff-ntitle'>".wfMsg('yourtext')."</td>
     </tr>
 " . $res . "</table>";
                     $wgOut->addStyle('common/diff.css');
@@ -211,6 +214,7 @@ class BatchEditorPage extends SpecialPage
     function BatchEditorPage()
     {
         SpecialPage::SpecialPage('BatchEditor', 'edit');
+        wfLoadExtensionMessages('BatchEditor');
     }
 }
 
