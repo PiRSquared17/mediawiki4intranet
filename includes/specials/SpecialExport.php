@@ -130,6 +130,38 @@ function wfExportGetLinks( $inputPages, $pageSet, $table, $fields, $join ) {
 	return $pageSet;
 }
 
+function wfExportAddPagesExec(&$state)
+{
+	$catname = $state['catname'];
+	$modifydate = $state['modifydate'];
+	$namespace = $state['namespace'];
+	$closure = $state['closure'];
+	$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
+	if ($catpages)
+		$state['pages'] .= "\n" . implode("\n", $catpages);
+	if (!$catname && strlen($state['catname']))
+		$state['errors'][] = array('export-invalid-catname', $state['catname']);
+	if ($modifydate)
+		$state['modifydate'] = wfTimestamp(TS_DB, $modifydate);
+	else if ($state['modifydate'])
+		$state['errors'][] = array('export-invalid-modifydate', $state['modifydate']);
+	if (!$namespace && strlen($state['namespace']))
+		$state['errors'][] = array('export-invalid-namespace', $state['namespace']);
+}
+
+function wfExportAddPagesForm($state)
+{
+	$form .= '<div class="addpages">';
+	$form .= wfMsgExt('export-addpages', 'parse');// style="display: inline-block; text-align: right; vertical-align: top">
+	$form .= '<div class="ap_catname">' . Xml::inputLabel(wfMsg('export-catname'), 'catname', 'catname', 40, $state['catname']) .
+	         '<br />' . Xml::checkLabel(wfMsg('export-closure'), 'closure', 'wpExportClosure', $state['closure'] ? true : false) . '</div>';
+	$form .= '<div class="ap_namespace">' . Xml::inputLabel(wfMsg('export-namespace'), 'namespace', 'namespace', 20, $state['namespace']) . '</div>';
+	$form .= '<div class="ap_modifydate">' . Xml::inputLabel(wfMsg('export-modifydate'), 'modifydate', 'modifydate', 20, $state['modifydate']) . '</div>';
+	$form .= '<div class="ap_submit">' . Xml::submitButton(wfMsg('export-addcat'), array('name' => 'addcat')) . '</div>';
+	$form .= '</div>';
+	return $form;
+}
+
 /**
  *
  */
@@ -141,24 +173,13 @@ function wfSpecialExport( $page = '' ) {
 	$doexport = false;
 	$errors = array();
 
-	if ($wgRequest->getCheck('addcat'))
+	# FIXME OO approach (as in trunk) would probably be better here,
+	#       but I'm too lazy to backport it into 1.14.
+	$state = $_REQUEST;
+	if ($state['addcat'])
 	{
-		$page = $wgRequest->getText('pages');
-		$catname = $wgRequest->getText('catname');
-		$modifydate = $wgRequest->getText('modifydate');
-		$namespace = $wgRequest->getText('namespace');
-		$closure = $wgRequest->getCheck('closure');
-		$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
-		if ($catpages)
-			$page .= "\n" . implode("\n", $catpages);
-		if (!$catname && strlen($catname = $wgRequest->getText('catname')))
-			$errors[] = array('export-invalid-catname', $catname);
-		if ($modifydate)
-			$modifydate = wfTimestamp(TS_DB, $modifydate);
-		else if ($modifydate = $wgRequest->getText('modifydate'))
-			$errors[] = array('export-invalid-modifydate', $modifydate);
-		if (!$namespace && strlen($namespace = $wgRequest->getText('namespace')))
-			$errors[] = array('export-invalid-namespace', $namespace);
+		wfExportAddPagesExec($state);
+		$page = $state['pages'];
 	}
 	else if( $wgRequest->wasPosted() && $page == '' ) {
 		$page = $wgRequest->getText( 'pages' );
@@ -306,15 +327,7 @@ function wfSpecialExport( $page = '' ) {
 	foreach ($errors as $e)
 		$form .= wfMsgExt($e[0], array('parse'), $e[1]);
 
-	$form .= wfMsgExt( 'export-addpages', 'parse' );
-	$form .= '<p>';
-	$form .= '<div style="display: inline-block; text-align: right; vertical-align: top">';
-	$form .= Xml::inputLabel( wfMsg( 'export-catname' ), 'catname', 'catname', 40, $catname );
-	$form .= '<br />' . Xml::checkLabel( wfMsg( 'export-closure' ), 'closure', 'wpExportClosure', $wgRequest->getCheck('closure') ? true : false ) . '</div>&nbsp; ';
-	$form .= Xml::inputLabel( wfMsg( 'export-namespace' ), 'namespace', 'namespace', 20, $namespace ) . '&nbsp; ';
-	$form .= Xml::inputLabel( wfMsg( 'export-modifydate' ), 'modifydate', 'modifydate', 20, $modifydate ) . '&nbsp; ';
-	$form .= Xml::submitButton( wfMsg( 'export-addcat' ), array( 'name' => 'addcat' ) );
-	$form .= '</p>';
+	$form .= wfExportAddPagesForm($state);
 
 	$form .= Xml::openElement( 'textarea', array( 'name' => 'pages', 'cols' => 40, 'rows' => 10 ) );
 	$form .= htmlspecialchars( $page );
