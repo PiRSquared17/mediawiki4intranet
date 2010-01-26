@@ -184,29 +184,47 @@ function wfSpecialBatchEditor($par = null)
                 # Preview or run only if new text differs
                 if ($newtext != $oldtext)
                 {
-                    $de = new DifferenceEngine();
-                    $de->setText($oldtext, $newtext);
-                    $res = $de->getDiffBody();
-                    $res = "
+                    $oldrev = wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true));
+                    $newrev = wfMsg('yourtext');
+                    $wgOut->addStyle('common/diff.css');
+                    $wgOut->addWikiText("== [[$s_title]] ==");
+                    if (!($canedit = $article->getTitle()->userCan('edit')))
+                        $wgOut->addWikiText('<div style="color:red">\'\'\''.wfMsg('batcheditor-edit-denied').'\'\'\'</div>');
+                    else if ($a_run)
+                    {
+                        $flags = EDIT_UPDATE | EDIT_DEFER_UPDATES | EDIT_AUTOSUMMARY;
+                        if ($a_minor)
+                            $flags |= EDIT_MINOR;
+                        $st = false;
+                        if (($st = $article->doEdit($newtext, $a_comment, $flags)) && $st->isGood())
+                            $newrev = wfMsgHTML('currentrev-asof', $wgLang->timeanddate($article->getTimestamp(), true));
+                        else
+                        {
+                            $msg = wfMsg('batcheditor-edit-error');
+                            if ($st)
+                                $msg .= ': ' . $st->getWikiText();
+                            else
+                                $msg .= '.';
+                            $wgOut->addWikiText('<div style="color:red">\'\'\'' . $msg . '\'\'\'</div>');
+                        }
+                    }
+                    if (!$a_run || $canedit)
+                    {
+                        $de = new DifferenceEngine();
+                        $de->setText($oldtext, $newtext);
+                        $res = $de->getDiffBody();
+                        $res = "
 <table class='diff'>
     <col class='diff-marker' />
     <col class='diff-content' />
     <col class='diff-marker' />
     <col class='diff-content' />
     <tr>
-        <td colspan='2' width='50%' align='center' class='diff-otitle'>".wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true))."</td>
-        <td colspan='2' width='50%' align='center' class='diff-ntitle'>".wfMsg('yourtext')."</td>
+        <td colspan='2' width='50%' align='center' class='diff-otitle'>$oldrev</td>
+        <td colspan='2' width='50%' align='center' class='diff-ntitle'>$newrev</td>
     </tr>
 " . $res . "</table>";
-                    $wgOut->addStyle('common/diff.css');
-                    $wgOut->addWikiText("== [[$s_title]] ==");
-                    $wgOut->addHTML($res);
-                    if ($a_run)
-                    {
-                        $flags = EDIT_UPDATE | EDIT_DEFER_UPDATES | EDIT_AUTOSUMMARY;
-                        if ($a_minor)
-                            $flags |= EDIT_MINOR;
-                        $article->doEdit($newtext, $a_comment, $flags);
+                        $wgOut->addHTML($res);
                     }
                 }
             }
