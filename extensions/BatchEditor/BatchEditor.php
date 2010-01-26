@@ -136,7 +136,7 @@ function wfSpecialBatchEditor($par = null)
         if ($f)
         {
             if ($a_regexp)
-                $f = '#'.str_replace('#', '\\#', $f).'#';
+                $f = '#'.preg_replace('/([#\\])/', '\\\1', $f).'#';
             $a_find[] = array($f, trim($ar[$a]));
         }
     }
