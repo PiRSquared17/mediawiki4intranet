@@ -42,7 +42,7 @@ $messages['en'] = array(
     'batcheditor-preview'       => 'Preview',
     'batcheditor-run'           => 'Run',
     'batcheditor-preview-page'  => '= Preview =',
-    'batcheditor-results-page'  => '= Results =',
+    'batcheditor-results-page'  => "= '''Results''' =",
     'batcheditor-not-found'     => 'Article [[$1]] not found!',
 );
 $specialPageAliases['en'] = array(
@@ -65,6 +65,9 @@ $messages['ru'] = array(
     'batcheditor-deletelines'   => 'Удалить строки',
     'batcheditor-preview'       => 'Просмотреть',
     'batcheditor-run'           => 'Выполнить',
+    'batcheditor-preview-page'  => '= Предварительный просмотр =',
+    'batcheditor-results-page'  => "= '''Результаты''' =",
+    'batcheditor-not-found'     => 'Article [[$1]] not found!',
 );
 $specialPageAliases['ru'] = array(
     'BatchEditor' => array('BatchEditor', 'МассоваяПравка'),
