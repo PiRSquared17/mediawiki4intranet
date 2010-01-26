@@ -197,7 +197,7 @@ function wfSpecialBatchEditor($par = null)
                             $flags |= EDIT_MINOR;
                         $st = false;
                         if (($st = $article->doEdit($newtext, $a_comment, $flags)) && $st->isGood())
-                            $newrev = wfMsgHTML('currentrev-asof', $wgLang->timeanddate($article->getTimestamp(), true));
+                            $newrev = wfMsgHTML('currentrev-asof', $wgLang->timeanddate($st->value['revision']->getTimestamp(), true));
                         else
                         {
                             $msg = wfMsg('batcheditor-edit-error');
