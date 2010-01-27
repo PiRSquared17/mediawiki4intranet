@@ -29,6 +29,7 @@ $specialPageAliases = array();
  * @author Vitaliy Filippov <vitalif@mail.ru>
  */
 $messages['en'] = array(
+    'batcheditor'               => 'Batch editing of pages',
     'batcheditor-title'         => 'Batch Editor',
     'batcheditor-warning'       => 'This page is intended to batch (mass) editing of [[{{SITENAME}}]] articles. Please, use this promptly!',
     'batcheditor-list-title'    => '<b>Articles:</b><br /><small>Article titles,<br />one per line</small>',
@@ -55,6 +56,7 @@ $specialPageAliases['en'] = array(
  * @author Vitaliy Filippov <vitalif@mail.ru>
  */
 $messages['ru'] = array(
+    'batcheditor'               => 'Массовая правка страниц',
     'batcheditor-title'         => 'Массовый редактор',
     'batcheditor-warning'       => 'Данная страница служит для массового редактирования статей [[{{SITENAME}}]]. Пожалуйста, используйте её с осторожностью!',
     'batcheditor-list-title'    => 'Статьи:<br /><small>Названия статей,<br />одно на строку</small>',
