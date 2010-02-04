@@ -368,7 +368,7 @@ class Wikilog
 
 	/**
 	 * SkinBuildSidebar hook handler function.
-	 * Adds support for "* WIKILOGCALENDAR" on MediaWiki:Sidebar
+	 * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
 	 */
 	static function SkinBuildSidebar($skin, &$bar)
 	{
