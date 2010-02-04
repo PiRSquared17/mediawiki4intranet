@@ -1,11 +1,11 @@
 # HG changeset patch
-# User root@yourcmc.ru
-# Date 1261435649 -10800
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1265297315 -10800
 Calendar support for Wikilog and MediaWiki Sidebar
 
-diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.i18n.php
---- extensions/Wikilog/Wikilog.i18n.php
-+++ extensions/Wikilog/Wikilog.i18n.php
+diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.i18n.php
+--- a/extensions/Wikilog/Wikilog.i18n.php
++++ b/extensions/Wikilog/Wikilog.i18n.php
 @@ -18,6 +18,10 @@
  	'right-wl-postcomment' => 'Post comments to wikilog articles',
  	'right-wl-moderation' => 'Moderation of wikilog article comments',
@@ -17,7 +17,7 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.i18n.php
  	# Special:Wikilog
  	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
  	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
-@@ -3413,6 +3417,8 @@
+@@ -3411,6 +3415,8 @@
  	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
  	'wikilog-auto' => 'Викилог Авто',
  	'wikilog-help' => '{{ns:Help}}:Викилог',
@@ -26,9 +26,9 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.i18n.php
  	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
  	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
  	'wikilog-specialwikilog-title' => 'Викилоги',
-diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
---- extensions/Wikilog/Wikilog.php
-+++ extensions/Wikilog/Wikilog.php
+diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.php
+--- a/extensions/Wikilog/Wikilog.php
++++ b/extensions/Wikilog/Wikilog.php
 @@ -110,6 +110,9 @@
  $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
  $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
@@ -39,7 +39,7 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
  // General Wikilog hooks
  $wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
  $wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
-@@ -355,6 +358,134 @@
+@@ -355,6 +358,124 @@
  		return true;
  	}
  
@@ -53,12 +53,12 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
 +
 +	/**
 +	 * SkinBuildSidebar hook handler function.
-+	 * Adds support for "* WIKILOGCALENDAR" on MediaWiki:Sidebar
++	 * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
 +	 */
 +	static function SkinBuildSidebar($skin, &$bar)
 +	{
 +		global $wgTitle, $wgRequest;
-+		if (array_key_exists('WIKILOGCALENDAR', $bar))
++		if (array_key_exists('wikilogcalendar', $bar))
 +		{
 +			$wi = self::getWikilogInfo($wgTitle);
 +			if ($wi)
@@ -72,7 +72,7 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
 +			}
 +			else
 +			{
-+				unset($bar['WIKILOGCALENDAR']);
++				unset($bar['wikilogcalendar']);
 +				return true;
 +			}
 +			$dbr = wfGetDB(DB_SLAVE);
@@ -156,17 +156,7 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
 +				$i++;
 +			}
 +			$html .= '</tr></table>';
-+			$newbar = array();
-+			foreach ($bar as $k => $v)
-+			{
-+				if ($k == 'WIKILOGCALENDAR')
-+				{
-+					$k = 'wikilogcalendar';
-+					$v = $html;
-+				}
-+				$newbar[$k] = $v;
-+			}
-+			$bar = $newbar;
++			$bar['wikilogcalendar'] = $html;
 +		}
 +		return true;
 +	}
@@ -174,9 +164,9 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/Wikilog.php
  	# ##
  	# #  Other global wikilog functions.
  	#
-diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/style/wikilog.css
---- extensions/Wikilog/style/wikilog.css
-+++ extensions/Wikilog/style/wikilog.css
+diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/style/wikilog.css
+--- a/extensions/Wikilog/style/wikilog.css
++++ b/extensions/Wikilog/style/wikilog.css
 @@ -137,4 +137,23 @@
  	text-align: center;
  }
@@ -201,4 +191,3 @@ diff -r c21799a3fd44 -r 42d70b31a13d extensions/Wikilog/style/wikilog.css
 +}
 +
  /* kate: indent-mode normal; space-indent off; tab-width 4; */
-
