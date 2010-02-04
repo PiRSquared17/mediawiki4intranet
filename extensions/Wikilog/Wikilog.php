@@ -373,7 +373,7 @@ class Wikilog
 	static function SkinBuildSidebar($skin, &$bar)
 	{
 		global $wgTitle, $wgRequest;
-		if (array_key_exists('WIKILOGCALENDAR', $bar))
+		if (array_key_exists('wikilogcalendar', $bar))
 		{
 			$wi = self::getWikilogInfo($wgTitle);
 			if ($wi)
@@ -387,7 +387,7 @@ class Wikilog
 			}
 			else
 			{
-				unset($bar['WIKILOGCALENDAR']);
+				unset($bar['wikilogcalendar']);
 				return true;
 			}
 			$dbr = wfGetDB(DB_SLAVE);
@@ -471,17 +471,7 @@ class Wikilog
 				$i++;
 			}
 			$html .= '</tr></table>';
-			$newbar = array();
-			foreach ($bar as $k => $v)
-			{
-				if ($k == 'WIKILOGCALENDAR')
-				{
-					$k = 'wikilogcalendar';
-					$v = $html;
-				}
-				$newbar[$k] = $v;
-			}
-			$bar = $newbar;
+			$bar['wikilogcalendar'] = $html;
 		}
 		return true;
 	}
