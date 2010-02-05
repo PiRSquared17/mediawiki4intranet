@@ -1,25 +1,45 @@
-Index: includes/Linker.php
-===================================================================
---- includes/Linker.php	(revision 54846)
-+++ includes/Linker.php	(working copy)
-@@ -244,6 +244,8 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1265372780 -10800
+Add new section by default when editing a discussion page.
+
+diff -r ecc1d86fc6cf -r cf0f457f45ed extensions/Wikilog/WikilogCommentsPage.php
+--- extensions/Wikilog/WikilogCommentsPage.php
++++ extensions/Wikilog/WikilogCommentsPage.php
+@@ -434,7 +434,7 @@
+ 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
+ 					wfMsg( 'wikilog-edit-lc' ),
+ 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
+-					array( 'action' => 'edit' ), 'known' );
++					array( 'action' => 'edit', 'section' => false ), 'known' );
+ 			}
+ 			if ( $comment->mCommentTitle->quickUserCan( 'delete' ) ) {
+ 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
+diff -r ecc1d86fc6cf -r cf0f457f45ed includes/Linker.php
+--- includes/Linker.php
++++ includes/Linker.php
+@@ -244,6 +244,13 @@
  			$query['action'] = 'edit';
  			$query['redlink'] = '1';
  		}
-+		if ($target->isTalkPage())
-+			$query['section'] = 'new';
++		if ( $target->isTalkPage() )
++		{
++			if ( !array_key_exists( 'section', $query ) )
++				$query['section'] = 'new';
++			else if ( !$query['section'] )
++				unset( $query['section'] );
++		}
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
  		return $ret;
-Index: includes/SkinTemplate.php
-===================================================================
---- includes/SkinTemplate.php	(revision 58867)
-+++ includes/SkinTemplate.php	(working copy)
+diff -r ecc1d86fc6cf -r cf0f457f45ed includes/SkinTemplate.php
+--- includes/SkinTemplate.php
++++ includes/SkinTemplate.php
 @@ -597,6 +597,8 @@
  		if( $checkEdit && !$title->isKnown() ) {
  			$classes[] = 'new';
  			$query = 'action=edit&redlink=1';
-+			if ($title->isTalkPage())
++			if ( $title->isTalkPage() )
 +				$query .= '&section=new';
  		}
  
