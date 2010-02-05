@@ -37,3 +37,5 @@ td.vb { vertical-align: bottom; }
 #prefooter1 { background-image: url(separator_right.gif); background-repeat: no-repeat; background-position: top right; background-color: #96A4C4; width: 100%; text-align: right; font-size: 1px; height: 6px; }
 #prefooter1 img { top: 0; }
 .m_feedlink { margin-left: 10px; }
+.custom_box { font-size: 80%; padding: 0 .5em; }
+table.wl-calendar { font-size: 125%; }
