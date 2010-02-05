@@ -4,8 +4,8 @@
 Calendar support for Wikilog and MediaWiki Sidebar
 
 diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.i18n.php
---- a/extensions/Wikilog/Wikilog.i18n.php
-+++ b/extensions/Wikilog/Wikilog.i18n.php
+--- extensions/Wikilog/Wikilog.i18n.php
++++ extensions/Wikilog/Wikilog.i18n.php
 @@ -18,6 +18,10 @@
  	'right-wl-postcomment' => 'Post comments to wikilog articles',
  	'right-wl-moderation' => 'Moderation of wikilog article comments',
@@ -27,8 +27,8 @@ diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.i18n.php
  	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
  	'wikilog-specialwikilog-title' => 'Викилоги',
 diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.php
---- a/extensions/Wikilog/Wikilog.php
-+++ b/extensions/Wikilog/Wikilog.php
+--- extensions/Wikilog/Wikilog.php
++++ extensions/Wikilog/Wikilog.php
 @@ -110,6 +110,9 @@
  $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
  $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
@@ -165,8 +165,8 @@ diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/Wikilog.php
  	# #  Other global wikilog functions.
  	#
 diff -r ecc1d86fc6cf -r 13e996097297 extensions/Wikilog/style/wikilog.css
---- a/extensions/Wikilog/style/wikilog.css
-+++ b/extensions/Wikilog/style/wikilog.css
+--- extensions/Wikilog/style/wikilog.css
++++ extensions/Wikilog/style/wikilog.css
 @@ -137,4 +137,23 @@
  	text-align: center;
  }
