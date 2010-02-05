@@ -425,7 +425,7 @@ class CustisRuTemplate extends QuickTemplate {
 <?php       } } else { # allow raw HTML block to be defined by extensions ?>
     <tr>
      <td class="menu_partition_sep"></td>
-     <td><?=$cont?></td>
+     <td class="custom_box"><?=$cont?></td>
     </tr>
     <tr>
      <td class="menu_left_background"></td>
