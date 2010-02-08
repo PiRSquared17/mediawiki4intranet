@@ -67,7 +67,7 @@ function wfSpecialBatchEditor($par = null)
 <tr valign="top">
     <td style="vertical-align: top; padding-right: 20px"><?=wfMsgExt('batcheditor-list-title', array('parseinline'))?></td>
     <td><textarea name="a_titles" rows="8" cols="60"><?=htmlspecialchars($a_titles)?></textarea></td>
-    <td style="padding-left: 16px"><?= function_exists('wfExportAddPagesExec') ? wfExportAddPagesForm($state) : '' ?></td>
+    <td rowspan="2" style="padding-left: 16px"><?= function_exists('wfExportAddPagesExec') ? wfExportAddPagesForm($state) : '' ?></td>
 </tr>
 <tr valign="top">
     <td><?=wfMsgExt('batcheditor-comment-title', array('parseinline'))?></td>
