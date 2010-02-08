@@ -35,7 +35,7 @@ function wfExportGetPagesFromCategory(&$catname, &$modifydate, &$namespace, $clo
 		$namespace = $namespace->getNamespace();
 	$pages = array();
 	wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, $pages);
-	return array_keys($pages);
+	return array_values($pages);
 }
 
 function wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, &$pages)
@@ -63,9 +63,9 @@ function wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closu
 	while ($row = $dbr->fetchRow($res))
 	{
 		$row = Title::makeTitleSafe($row['page_namespace'], $row['page_title']);
-		if ($row && !$pages[$row->getPrefixedText()])
+		if ($row && !$pages[$row->getArticleId()])
 		{
-			$pages[$row->getPrefixedText()] = 1;
+			$pages[$row->getArticleId()] = $row;
 			if ($closure && $row->getNamespace() == NS_CATEGORY)
 				wfExportGetPagesFromCategoryR($row->getDbKey(), $modifydate, $namespace, $closure, $pages);
 		}
@@ -138,7 +138,8 @@ function wfExportAddPagesExec(&$state)
 	$closure = $state['closure'];
 	$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
 	if ($catpages)
-		$state['pages'] .= "\n" . implode("\n", $catpages);
+		foreach ($catpages as $title)
+			$state['pages'] .= "\n" . $title->getPrefixedText();
 	if (!$catname && strlen($state['catname']))
 		$state['errors'][] = array('export-invalid-catname', $state['catname']);
 	if ($modifydate)
@@ -151,14 +152,14 @@ function wfExportAddPagesExec(&$state)
 
 function wfExportAddPagesForm($state)
 {
-	$form .= '<div class="addpages">';
-	$form .= wfMsgExt('export-addpages', 'parse');// style="display: inline-block; text-align: right; vertical-align: top">
+	$form .= '<fieldset class="addpages">';
+	$form .= '<legend>' . wfMsgExt('export-addpages', 'parse') . '</legend>';// style="display: inline-block; text-align: right; vertical-align: top">
 	$form .= '<div class="ap_catname">' . Xml::inputLabel(wfMsg('export-catname'), 'catname', 'catname', 40, $state['catname']) .
 	         '<br />' . Xml::checkLabel(wfMsg('export-closure'), 'closure', 'wpExportClosure', $state['closure'] ? true : false) . '</div>';
 	$form .= '<div class="ap_namespace">' . Xml::inputLabel(wfMsg('export-namespace'), 'namespace', 'namespace', 20, $state['namespace']) . '</div>';
 	$form .= '<div class="ap_modifydate">' . Xml::inputLabel(wfMsg('export-modifydate'), 'modifydate', 'modifydate', 20, $state['modifydate']) . '</div>';
 	$form .= '<div class="ap_submit">' . Xml::submitButton(wfMsg('export-addcat'), array('name' => 'addcat')) . '</div>';
-	$form .= '</div>';
+	$form .= '</fieldset>';
 	return $form;
 }
 
