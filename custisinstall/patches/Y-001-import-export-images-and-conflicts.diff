@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1264520520 -10800
+# Date 1265643918 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -12,7 +12,7 @@ installation.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r f8f47f972f2f -r 488eda664e3d includes/Export.php
+diff -r f8f47f972f2f -r e89588a9c96b includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -174,7 +174,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r f8f47f972f2f -r 488eda664e3d includes/Import.php
+diff -r f8f47f972f2f -r e89588a9c96b includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -87,6 +87,10 @@
@@ -800,7 +800,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r f8f47f972f2f -r 488eda664e3d includes/filerepo/LocalFile.php
+diff -r f8f47f972f2f -r e89588a9c96b includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@
@@ -896,7 +896,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
+diff -r f8f47f972f2f -r e89588a9c96b includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,28 +21,54 @@
@@ -918,7 +918,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
 +		$namespace = $namespace->getNamespace();
 +	$pages = array();
 +	wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, $pages);
-+	return array_keys($pages);
++	return array_values($pages);
 +}
 +
 +function wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, &$pages)
@@ -959,9 +959,9 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
 +	while ($row = $dbr->fetchRow($res))
 +	{
 +		$row = Title::makeTitleSafe($row['page_namespace'], $row['page_title']);
-+		if ($row && !$pages[$row->getPrefixedText()])
++		if ($row && !$pages[$row->getArticleId()])
 +		{
-+			$pages[$row->getPrefixedText()] = 1;
++			$pages[$row->getArticleId()] = $row;
 +			if ($closure && $row->getNamespace() == NS_CATEGORY)
 +				wfExportGetPagesFromCategoryR($row->getDbKey(), $modifydate, $namespace, $closure, $pages);
  		}
@@ -970,7 +970,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
  	}
  	$dbr->freeResult($res);
  
-@@ -104,11 +130,36 @@
+@@ -104,11 +130,37 @@
  	return $pageSet;
  }
  
@@ -987,7 +987,8 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
 +	$closure = $state['closure'];
 +	$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
 +	if ($catpages)
-+		$state['pages'] .= "\n" . implode("\n", $catpages);
++		foreach ($catpages as $title)
++			$state['pages'] .= "\n" . $title->getPrefixedText();
 +	if (!$catname && strlen($state['catname']))
 +		$state['errors'][] = array('export-invalid-catname', $state['catname']);
 +	if ($modifydate)
@@ -1000,19 +1001,19 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
 +
 +function wfExportAddPagesForm($state)
 +{
-+	$form .= '<div class="addpages">';
-+	$form .= wfMsgExt('export-addpages', 'parse');// style="display: inline-block; text-align: right; vertical-align: top">
++	$form .= '<fieldset class="addpages">';
++	$form .= '<legend>' . wfMsgExt('export-addpages', 'parse') . '</legend>';// style="display: inline-block; text-align: right; vertical-align: top">
 +	$form .= '<div class="ap_catname">' . Xml::inputLabel(wfMsg('export-catname'), 'catname', 'catname', 40, $state['catname']) .
 +	         '<br />' . Xml::checkLabel(wfMsg('export-closure'), 'closure', 'wpExportClosure', $state['closure'] ? true : false) . '</div>';
 +	$form .= '<div class="ap_namespace">' . Xml::inputLabel(wfMsg('export-namespace'), 'namespace', 'namespace', 20, $state['namespace']) . '</div>';
 +	$form .= '<div class="ap_modifydate">' . Xml::inputLabel(wfMsg('export-modifydate'), 'modifydate', 'modifydate', 20, $state['modifydate']) . '</div>';
 +	$form .= '<div class="ap_submit">' . Xml::submitButton(wfMsg('export-addcat'), array('name' => 'addcat')) . '</div>';
-+	$form .= '</div>';
++	$form .= '</fieldset>';
 +	return $form;
  }
  
  /**
-@@ -120,23 +171,15 @@
+@@ -120,23 +172,15 @@
  
  	$curonly = true;
  	$doexport = false;
@@ -1044,7 +1045,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
  	}
  	else if( $wgRequest->wasPosted() && $page == '' ) {
  		$page = $wgRequest->getText( 'pages' );
-@@ -205,19 +248,20 @@
+@@ -205,19 +249,20 @@
  		}
  
  		/* Split up the input and look up linked pages */
@@ -1068,7 +1069,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
  
  		$pages = array_keys( $pageSet );
  
-@@ -241,6 +285,8 @@
+@@ -241,6 +286,8 @@
  
  		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors ;
@@ -1077,7 +1078,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
  		$exporter->openStream();
  
  		foreach( $pages as $page ) {
-@@ -278,23 +324,26 @@
+@@ -278,23 +325,26 @@
  	$form = Xml::openElement( 'form', array( 'method' => 'post',
  		'action' => $self->getLocalUrl( 'action=submit' ) ) );
  
@@ -1112,7 +1113,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialImport.php
+diff -r f8f47f972f2f -r e89588a9c96b includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@
@@ -1197,7 +1198,7 @@ diff -r f8f47f972f2f -r 488eda664e3d includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r f8f47f972f2f -r 488eda664e3d languages/messages/MessagesEn.php
+diff -r f8f47f972f2f -r e89588a9c96b languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2763,10 +2763,19 @@
@@ -1246,7 +1247,7 @@ diff -r f8f47f972f2f -r 488eda664e3d languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r f8f47f972f2f -r 488eda664e3d languages/messages/MessagesRu.php
+diff -r f8f47f972f2f -r e89588a9c96b languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2321,10 +2321,19 @@
@@ -1295,7 +1296,7 @@ diff -r f8f47f972f2f -r 488eda664e3d languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r f8f47f972f2f -r 488eda664e3d skins/common/shared.css
+diff -r f8f47f972f2f -r e89588a9c96b skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -311,3 +311,5 @@
