@@ -118,18 +118,20 @@ class PositivePageRate
     static function SkinBuildSidebar($skin, &$bar)
     {
         global $wgTitle, $wgUser, $wgRequest, $egPositivePageRateAllowRecall, $egPositivePageRateAllowNegative;
-        if ($wgUser && $wgUser->mPassword && ($page_id = $wgTitle->getArticleID()) &&
-            array_key_exists('pprate', $bar))
+        if (($page_id = $wgTitle->getArticleID()) && array_key_exists('pprate', $bar))
         {
             wfLoadExtensionMessages('PositivePageRate');
-            $user_id = $wgUser->getId();
             /* Read total unique views and rating */
             $dbr = wfGetDB(DB_SLAVE);
-            $me = $dbr->selectField('ppr_page_stats', '1', array('ps_page' => $page_id, 'ps_user' => $user_id, 'ps_rate!=0'), __METHOD__);
             $users = $dbr->selectField('ppr_page_stats', 'COUNT(DISTINCT ps_user)', '1', __METHOD__);
             $result = $dbr->select('ppr_page_aggr', '*', array('pa_page' => $page_id), __METHOD__);
             $row = $dbr->fetchRow($result);
             $dbr->freeResult($result);
+            if ($wgUser && $wgUser->mPassword)
+            {
+                $user_id = $wgUser->getId();
+                $me = $dbr->selectField('ppr_page_stats', '1', array('ps_page' => $page_id, 'ps_user' => $user_id, 'ps_rate!=0'), __METHOD__);
+            }
             if ($row)
             {
                 extract($row);
@@ -140,7 +142,7 @@ class PositivePageRate
                     $log_url = Title::newFromText('Special:PositivePageRate')->getLocalUrl(array('page' => $wgTitle->getPrefixedText()));
                 $html = '<div style="margin: 3pt 0">';
                 if ($log_url)
-                    $html .= '<a href="' . $log_url . '">';
+                    $html .= '<a rel="nofollow" href="' . $log_url . '">';
                 $html .= wfMsgExt('pprate-statistics', 'parseinline', $pa_total, $pa_plus+$pa_minus, $pa_plus, $pa_minus, $pa_total-$pa_plus-$pa_minus);
                 if ($log_url)
                     $html .= '</a>';
@@ -148,24 +150,24 @@ class PositivePageRate
                 {
                     $html .= '<div style="margin-top: 3pt">';
                     if ($log_url)
-                        $html .= '<a href="' . $log_url . '">';
+                        $html .= '<a rel="nofollow" href="' . $log_url . '">';
                     $html .= self::bar((100*log($pa_total)/log($users)).'%', $pa_total, $pa_plus, $pa_minus);
                     if ($log_url)
                         $html .= '</a>';
                     $html .= '</div>';
                 }
                 if ($me && $egPositivePageRateAllowRecall)
-                    $html .= '<div><a href="' . $wgTitle->getLocalUrl('action=ppunrate') . '">' . wfMsgExt('pprate-unrate', 'parseinline') . '</a></div>';
+                    $html .= '<div><a rel="nofollow" href="' . $wgTitle->getLocalUrl('action=ppunrate') . '">' . wfMsgExt('pprate-unrate', 'parseinline') . '</a></div>';
             }
             else
                 $html .= '<div style="margin: 3pt 0">' . wfMsg('pprate-no-stats') . '</div>';
-            if (!$me)
+            if (!$me && $user_id)
             {
-                $html .= '<div><a href="' . $wgTitle->getLocalUrl('action=pprate&plus=1') . '">';
+                $html .= '<div><a rel="nofollow" href="' . $wgTitle->getLocalUrl('action=pprate&plus=1') . '">';
                 $html .= wfMsg('pprate-plus').'</a>';
                 if ($egPositivePageRateAllowNegative)
                 {
-                    $html .= ' | <a href="' . $wgTitle->getLocalUrl('action=pprate&minus=1') . '">';
+                    $html .= ' | <a rel="nofollow" href="' . $wgTitle->getLocalUrl('action=pprate&minus=1') . '">';
                     $html .= wfMsg('pprate-minus').'</a></div>';
                 }
             }
