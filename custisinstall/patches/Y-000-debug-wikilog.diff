@@ -1,13 +1,40 @@
 # HG changeset patch
-# User root@yourcmc.ru
-# Date 1261435647 -10800
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1265995622 -10800
 Wikilog extension debug:
 Bug 58154 - fix caching error
+Bug 56056 - do not handle post subarticles as posts themselves
 
-diff -r c21799a3fd44 -r ef6e32e48b06 extensions/Wikilog/WikilogFeed.php
+diff -r ecc1d86fc6cf -r cedcc2795031 extensions/Wikilog/Wikilog.php
+--- extensions/Wikilog/Wikilog.php
++++ extensions/Wikilog/Wikilog.php
+@@ -409,16 +409,12 @@
+ 		$ns = MWNamespace::getSubject( $origns );
+ 		$tns = MWNamespace::getTalk( $origns );
+ 
+-		if ( strpos( $title->getText(), '/' ) !== false ) {
+-			# If title contains a '/', treat as a wikilog article title.
+-			list( $this->mWikilogName, $this->mItemName ) =
+-				explode( '/', $title->getText(), 2 );
+-
+-			if ( strpos( $this->mItemName, '/' ) !== false ) {
+-				list( $this->mItemName, $this->mTrailing ) =
+-					explode( '/', $this->mItemName, 2 );
+-			}
+-
++		# If title contains a '/', treat as a wikilog article title.
++		if ( strpos( $title->getText(), '/' ) !== false &&
++			( list( $this->mWikilogName, $this->mItemName ) =
++				explode( '/', $title->getText(), 2 ) ) &&
++			( strpos( $this->mItemName, '/' ) === false ) )
++		{
+ 			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
+ 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
+ 			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
+diff -r ecc1d86fc6cf -r cedcc2795031 extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
-@@ -28,15 +28,17 @@
+@@ -28,12 +28,14 @@
  if ( !defined( 'MEDIAWIKI' ) )
  	die();
  
@@ -20,13 +47,8 @@ diff -r c21799a3fd44 -r ef6e32e48b06 extensions/Wikilog/WikilogFeed.php
  {
 +
  	/**
--	 * Feed title (i.e., not Wikilog title). For Special:Wikilog,
--	 * 'wikilog-specialwikilog-title' system message should be used.
-+	 * Feed title (i.e., not Wikilog title). For Special:Wikilog, 'wikilog'
-+	 * system message should be used.
- 	 */
- 	protected $mTitle;
- 
+ 	 * Feed title (i.e., not Wikilog title). For Special:Wikilog,
+ 	 * 'wikilog-specialwikilog-title' system message should be used.
 @@ -131,17 +133,26 @@
  		FeedUtils::checkPurge( $timekey, $feedkey );
  
@@ -141,13 +163,7 @@ diff -r c21799a3fd44 -r ef6e32e48b06 extensions/Wikilog/WikilogFeed.php
  					"cache ($tsCache) < data ($tsData)\n" );
  			}
  		}
-@@ -480,12 +506,12 @@
- 	 * $wgFeedClasses.
- 	 */
- 	public function checkFeedOutput() {
--		global $wgOut, $wgFeed, $wgWikilogFeedClasses;
-+		global $wgFeed, $wgWikilogFeedClasses;
- 		if ( !$wgFeed ) {
+@@ -485,7 +511,7 @@
  			$wgOut->addWikiMsg( 'feed-unavailable' );
  			return false;
  		}
@@ -162,4 +178,3 @@ diff -r c21799a3fd44 -r ef6e32e48b06 extensions/Wikilog/WikilogFeed.php
  	}
 +
  }
-
