@@ -409,16 +409,12 @@ class WikilogInfo
 		$ns = MWNamespace::getSubject( $origns );
 		$tns = MWNamespace::getTalk( $origns );
 
-		if ( strpos( $title->getText(), '/' ) !== false ) {
-			# If title contains a '/', treat as a wikilog article title.
-			list( $this->mWikilogName, $this->mItemName ) =
-				explode( '/', $title->getText(), 2 );
-
-			if ( strpos( $this->mItemName, '/' ) !== false ) {
-				list( $this->mItemName, $this->mTrailing ) =
-					explode( '/', $this->mItemName, 2 );
-			}
-
+		# If title contains a '/', treat as a wikilog article title.
+		if ( strpos( $title->getText(), '/' ) !== false &&
+			( list( $this->mWikilogName, $this->mItemName ) =
+				explode( '/', $title->getText(), 2 ) ) &&
+			( strpos( $this->mItemName, '/' ) === false ) )
+		{
 			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
 			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
