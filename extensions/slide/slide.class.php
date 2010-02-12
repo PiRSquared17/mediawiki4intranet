@@ -191,6 +191,7 @@ class S5SlideShow
 
         # output content
         $wgOut->disable();
+        header("Content-Type: text/html; charset=utf-8");
         echo $fileContent;
     }
 
