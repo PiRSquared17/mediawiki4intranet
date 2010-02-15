@@ -174,6 +174,7 @@ class S5SlideShow
                 }
                 if ($sc > 1)
                     $title .= " (".($i+1)."/$sc)";
+                $title = $fileParser->parse($title, $this->sTitle, $options, false, false);
                 $fc .= "<div class=\"slide\"><h1>$title</h1><div class=\"slidecontent\">$slideContent</div></div>\n";
             }
         }
