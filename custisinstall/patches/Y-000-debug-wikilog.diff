@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1265995622 -10800
+# Date 1266240011 -10800
 Wikilog extension debug:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
 
-diff -r ecc1d86fc6cf -r cedcc2795031 extensions/Wikilog/Wikilog.php
+diff -r ecc1d86fc6cf -r 99d8124c86d9 extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -409,16 +409,12 @@
@@ -23,15 +23,15 @@ diff -r ecc1d86fc6cf -r cedcc2795031 extensions/Wikilog/Wikilog.php
 -			}
 -
 +		# If title contains a '/', treat as a wikilog article title.
-+		if ( strpos( $title->getText(), '/' ) !== false &&
-+			( list( $this->mWikilogName, $this->mItemName ) =
-+				explode( '/', $title->getText(), 2 ) ) &&
-+			( strpos( $this->mItemName, '/' ) === false ) )
++		$parts = explode('/', $title->getText());
++		if (count($parts) > 1 && ($this->mIsTalk || count($parts) == 2))
 +		{
++			$this->mWikilogName = $parts[0];
++			$this->mItemName = $parts[1];
  			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
  			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
  			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
-diff -r ecc1d86fc6cf -r cedcc2795031 extensions/Wikilog/WikilogFeed.php
+diff -r ecc1d86fc6cf -r 99d8124c86d9 extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
 @@ -28,12 +28,14 @@
