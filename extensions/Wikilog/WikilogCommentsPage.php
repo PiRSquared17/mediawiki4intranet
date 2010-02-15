@@ -825,7 +825,8 @@ class WikilogCommentsFeed
 			$parserCache = ParserCache::singleton();
 		while ($row = $dbr->fetchRow($res))
 		{
-			$article = Article::newFromID($row['wlc_comment_page']);
+			if (!($article = Article::newFromID($row['wlc_comment_page'])))
+				continue;
 			if ($parserCache)
 				$out = $parserCache->get($article, $wgUser);
 			if (!$out)
