@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1264190276 -10800
-RSS/Atom comments feed support for wikilogs
+# Date 1266249171 -10800
+RSS/Atom comments feed support for wikilog
 
-diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/Wikilog.i18n.php
+diff -r ecc1d86fc6cf -r cfac4df10b5c extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -113,8 +113,10 @@
@@ -27,7 +27,7 @@ diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/Wikilog.i18n.php
  );
  
  /** Sinhala (සිංහල)
-diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/WikilogCommentsPage.php
+diff -r ecc1d86fc6cf -r cfac4df10b5c extensions/Wikilog/WikilogCommentsPage.php
 --- extensions/Wikilog/WikilogCommentsPage.php
 +++ extensions/Wikilog/WikilogCommentsPage.php
 @@ -58,6 +58,7 @@
@@ -83,7 +83,7 @@ diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/WikilogCommentsPage.php
  			);
  			$fullPageTitle = wfMsg( 'wikilog-title-comments', $fullPageTitle );
  			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem->mName ) );
-@@ -712,3 +728,125 @@
+@@ -712,3 +728,126 @@
  		return false;
  	}
  }
@@ -184,7 +184,8 @@ diff -r ecc1d86fc6cf -r 3ddffd3f1d8c extensions/Wikilog/WikilogCommentsPage.php
 +			$parserCache = ParserCache::singleton();
 +		while ($row = $dbr->fetchRow($res))
 +		{
-+			$article = Article::newFromID($row['wlc_comment_page']);
++			if (!($article = Article::newFromID($row['wlc_comment_page'])))
++				continue;
 +			if ($parserCache)
 +				$out = $parserCache->get($article, $wgUser);
 +			if (!$out)
