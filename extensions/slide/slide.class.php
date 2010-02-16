@@ -179,15 +179,20 @@ class S5SlideShow
             }
         }
 
-        # parse strings
-        $p = array();
+        # build replacement array
+        $replace = array();
         foreach(split(' ', 'title subtitle author footer subfooter') as $v)
-            $p[$v] = $fileParser->parse($this->$v, $this->sTitle, $options, false)->getText();
+            $replace["[$v]"] = $fileParser->parse($this->$v, $this->sTitle, $options, false)->getText();
+        $replace['[style]'] = $this->style;
+        $replace['[content]'] = $fc;
+        $replace['[pageid]'] = $this->sArticle->getID();
 
         # substitute values
-        $search = array('[style]', '[content]', '[title]', '[subtitle]', '[author]', '[footer]', '[subfooter]');
-        $replace = array($this->style, $fc, $p['title'], $p['subtitle'], $p['author'], $p['footer'], $p['subfooter'], $p['style']);
-        $fileContent = str_replace($search, $replace, $ce_slide_tpl);
+        $fileContent = str_replace(
+            array_keys($replace),
+            array_values($replace),
+            $ce_slide_tpl
+        );
         $fileContent = $wgContLang->Convert($fileContent);
 
         # output content

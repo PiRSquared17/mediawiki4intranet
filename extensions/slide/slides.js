@@ -177,6 +177,7 @@ function go(step) {
 		ne.style.visibility = 'visible';
 	} // /hallvord
 	jl.selectedIndex = snum;
+	setS5Cookie(snum);
 	currentSlide();
 	loadNote();
 	permaLink();
@@ -358,6 +359,8 @@ function slideJump() {
 	} else {
 		dest = findSlide(window.location.hash.slice(1));
 	}
+	if (dest == null)
+		dest = getS5Cookie();
 	if (dest != null)
 		go(dest - snum);
 }
@@ -738,6 +741,70 @@ function readTime(val) {
 
 function windowChange() {
 	fontScale();
+}
+
+function getCookie(name)
+{
+	var cookie = " " + document.cookie;
+	var search = " " + name + "=";
+	var setStr = null;
+	var offset = 0;
+	var end = 0;
+	if (cookie.length > 0) {
+		offset = cookie.indexOf(search);
+		if (offset != -1) {
+			offset += search.length;
+			end = cookie.indexOf(";", offset)
+			if (end == -1) {
+				end = cookie.length;
+			}
+			setStr = unescape(cookie.substring(offset, end));
+		}
+	}
+	return setStr;
+}
+
+function setS5Cookie(snum)
+{
+	var a = [], c = getCookie('s5slide');
+	if (c)
+		a = c.split(',');
+	var i;
+	var sid = slideshowId;
+	if (!sid)
+		sid = 0;
+	sid = ''+sid;
+	for (i = 0; i < a.length; i++)
+	{
+		c = a[i].split(':');
+		if (c.length < 2)
+			a[i] = '';
+		else if (c[0] == sid)
+			a[i] = sid+':'+snum;
+	}
+	if (i < a.length || !a.length)
+		a.push(sid+':'+snum);
+	document.cookie='s5slide='+escape(a.join(','))+'; path=/';
+}
+
+function getS5Cookie()
+{
+	var a, c;
+	var sid = slideshowId;
+	if (!sid)
+		sid = 0;
+	sid = ''+sid;
+	if (c = getCookie('s5slide'))
+	{
+		var a = c.split(',');
+		for (var i = 0; i < a.length; i++)
+		{
+			c = a[i].split(':');
+			if (c[0] == sid)
+				return parseInt(c[1]);
+		}
+	}
+	return null;
 }
 
 function startup() {
