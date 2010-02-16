@@ -8,7 +8,7 @@
  */
 
 if( !defined( 'MEDIAWIKI' ) )
-	die( -1 );
+    die( -1 );
 
 require_once( dirname( dirname( __FILE__ ) ) . '/includes/SkinTemplate.php');
 
@@ -18,35 +18,35 @@ require_once( dirname( dirname( __FILE__ ) ) . '/includes/SkinTemplate.php');
  * @ingroup Skins
  */
 class SkinCustisRu extends SkinTemplate {
-	function initPage( OutputPage $out ) {
-		parent::initPage( $out );
-		$this->skinname  = 'custisru';
-		$this->stylename = 'custisru';
-		$this->template  = 'CustisRuTemplate';
-	}
+    function initPage( OutputPage $out ) {
+        parent::initPage( $out );
+        $this->skinname  = 'custisru';
+        $this->stylename = 'custisru';
+        $this->template  = 'CustisRuTemplate';
+    }
 
-	function setupSkinUserCss( OutputPage $out ) {
-		global $wgHandheldStyle;
+    function setupSkinUserCss( OutputPage $out ) {
+        global $wgHandheldStyle;
 
-		parent::setupSkinUserCss( $out );
+        parent::setupSkinUserCss( $out );
 
-		// Append to the default screen common & print styles...
-		$out->addStyle( 'custisru/cis.css', 'screen' );
-		if( $wgHandheldStyle ) {
-			// Currently in testing... try 'chick/main.css'
-			$out->addStyle( $wgHandheldStyle, 'handheld' );
-		}
+        // Append to the default screen common & print styles...
+        $out->addStyle( 'custisru/cis.css', 'screen' );
+        if( $wgHandheldStyle ) {
+            // Currently in testing... try 'chick/main.css'
+            $out->addStyle( $wgHandheldStyle, 'handheld' );
+        }
 
-		$out->addStyle( 'monobook/IE50Fixes.css', 'screen', 'lt IE 5.5000' );
-		$out->addStyle( 'monobook/IE55Fixes.css', 'screen', 'IE 5.5000' );
-		$out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
-		$out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
+        $out->addStyle( 'monobook/IE50Fixes.css', 'screen', 'lt IE 5.5000' );
+        $out->addStyle( 'monobook/IE55Fixes.css', 'screen', 'IE 5.5000' );
+        $out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
+        $out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
 
-		$out->addStyle( 'custisru/IEFixes.css', 'screen', 'IE' );
+        $out->addStyle( 'custisru/IEFixes.css', 'screen', 'IE' );
 
-		$out->addStyle( 'custisru/common.css', 'screen' );
-		$out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
-	}
+        $out->addStyle( 'custisru/common.css', 'screen' );
+        $out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
+    }
 }
 
 /**
@@ -54,61 +54,62 @@ class SkinCustisRu extends SkinTemplate {
  * @ingroup Skins
  */
 class CustisRuTemplate extends QuickTemplate {
-	var $skin;
-	/**
-	 * Template filter callback.
-	 * Takes an associative array of data set from a SkinTemplate-based
-	 * class, and a wrapper for MediaWiki's localization database, and
-	 * outputs a formatted page.
-	 *
-	 * @access private
-	 */
-	function execute() {
-		global $wgRequest;
-		$this->skin = $skin = $this->data['skin'];
-		$action = $wgRequest->getText( 'action' );
-		global $wgScriptPath;
-		$sp = $wgScriptPath;
+    var $skin;
+    /**
+     * Template filter callback.
+     * Takes an associative array of data set from a SkinTemplate-based
+     * class, and a wrapper for MediaWiki's localization database, and
+     * outputs a formatted page.
+     *
+     * @access private
+     */
+    function execute() {
+        global $wgRequest;
+        $this->skin = $skin = $this->data['skin'];
+        $action = $wgRequest->getText( 'action' );
+        global $wgScriptPath;
+        $sp = $wgScriptPath;
 
-		// Suppress warnings to prevent notices about missing indexes in $this->data
-		wfSuppressWarnings();
+        // Suppress warnings to prevent notices about missing indexes in $this->data
+        wfSuppressWarnings();
 
 ?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="<?php $this->text('xhtmldefaultnamespace') ?>" <?php
-	foreach($this->data['xhtmlnamespaces'] as $tag => $ns) {
-		?>xmlns:<?php echo "{$tag}=\"{$ns}\" ";
-	} ?>xml:lang="<?php $this->text('lang') ?>" lang="<?php $this->text('lang') ?>" dir="<?php $this->text('dir') ?>">
-	<head>
-		<meta http-equiv="Content-Type" content="<?php $this->text('mimetype') ?>; charset=<?php $this->text('charset') ?>" />
-		<?php $this->html('headlinks') ?>
-		<title><?php $this->text('pagetitle') ?></title>
-		<?php $this->html('csslinks') ?>
+    foreach($this->data['xhtmlnamespaces'] as $tag => $ns) {
+        ?>xmlns:<?php echo "{$tag}=\"{$ns}\" ";
+    } ?>xml:lang="<?php $this->text('lang') ?>" lang="<?php $this->text('lang') ?>" dir="<?php $this->text('dir') ?>">
+    <head>
+        <meta http-equiv="Content-Type" content="<?php $this->text('mimetype') ?>; charset=<?php $this->text('charset') ?>" />
+        <meta name="google-site-verification" content="anyU3u45qDhtfNNBz4KB8XvxmIlUSVknkU0Nf92117M" />
+        <?php $this->html('headlinks') ?>
+        <title><?php $this->text('pagetitle') ?></title>
+        <?php $this->html('csslinks') ?>
 
-		<!--[if lt IE 7]><script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath') ?>/common/IEFixes.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"></script>
-		<meta http-equiv="imagetoolbar" content="no" /><![endif]-->
+        <!--[if lt IE 7]><script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath') ?>/common/IEFixes.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"></script>
+        <meta http-equiv="imagetoolbar" content="no" /><![endif]-->
 
-		<?php print Skin::makeGlobalVariablesScript( $this->data ); ?>
+        <?php print Skin::makeGlobalVariablesScript( $this->data ); ?>
 
-		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath' ) ?>/common/wikibits.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"><!-- wikibits js --></script>
-		<!-- Head Scripts -->
+        <script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('stylepath' ) ?>/common/wikibits.js?<?php echo $GLOBALS['wgStyleVersion'] ?>"><!-- wikibits js --></script>
+        <!-- Head Scripts -->
 <?php $this->html('headscripts') ?>
-<?php	if($this->data['jsvarurl']) { ?>
-		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('jsvarurl') ?>"><!-- site js --></script>
-<?php	} ?>
-<?php	if($this->data['pagecss']) { ?>
-		<style type="text/css"><?php $this->html('pagecss') ?></style>
-<?php	}
-		if($this->data['usercss']) { ?>
-		<style type="text/css"><?php $this->html('usercss') ?></style>
-<?php	}
-		if($this->data['userjs']) { ?>
-		<script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('userjs' ) ?>"></script>
-<?php	}
-		if($this->data['userjsprev']) { ?>
-		<script type="<?php $this->text('jsmimetype') ?>"><?php $this->html('userjsprev') ?></script>
-<?php	}
-		if($this->data['trackbackhtml']) print $this->data['trackbackhtml']; ?>
-	</head>
+<?php   if($this->data['jsvarurl']) { ?>
+        <script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('jsvarurl') ?>"><!-- site js --></script>
+<?php   } ?>
+<?php   if($this->data['pagecss']) { ?>
+        <style type="text/css"><?php $this->html('pagecss') ?></style>
+<?php   }
+        if($this->data['usercss']) { ?>
+        <style type="text/css"><?php $this->html('usercss') ?></style>
+<?php   }
+        if($this->data['userjs']) { ?>
+        <script type="<?php $this->text('jsmimetype') ?>" src="<?php $this->text('userjs' ) ?>"></script>
+<?php   }
+        if($this->data['userjsprev']) { ?>
+        <script type="<?php $this->text('jsmimetype') ?>"><?php $this->html('userjsprev') ?></script>
+<?php   }
+        if($this->data['trackbackhtml']) print $this->data['trackbackhtml']; ?>
+    </head>
 <body<?php if($this->data['body_ondblclick']) { ?> ondblclick="<?php $this->text('body_ondblclick') ?>"<?php } ?>
 <?php if($this->data['body_onload']) { ?> onload="<?php $this->text('body_onload') ?>"<?php } ?>
  class="mediawiki <?php $this->text('dir') ?> <?php $this->text('pageclass') ?> <?php $this->text('skinnameclass') ?>">
@@ -125,19 +126,19 @@ class CustisRuTemplate extends QuickTemplate {
  </td>
  <td class="header_right" width="82%">
   <div class="portlet" id="p-personal">
-  	<h5><?php $this->msg('personaltools') ?></h5>
-  	<div class="pBody">
-  		<ul>
-  <?php		foreach($this->data['personal_urls'] as $key => $item) { ?>
-  			<li id="<?php echo Sanitizer::escapeId( "pt-$key" ) ?>"<?php
-  				if ($item['active']) { ?> class="active"<?php } ?>><a href="<?php
-  			echo htmlspecialchars($item['href']) ?>"<?php echo $skin->tooltipAndAccesskey('pt-'.$key) ?><?php
-  			if(!empty($item['class'])) { ?> class="<?php
-  			echo htmlspecialchars($item['class']) ?>"<?php } ?>><?php
-  			echo htmlspecialchars($item['text']) ?></a></li>
-  <?php		} ?>
-  		</ul>
-  	</div>
+    <h5><?php $this->msg('personaltools') ?></h5>
+    <div class="pBody">
+        <ul>
+  <?php     foreach($this->data['personal_urls'] as $key => $item) { ?>
+            <li id="<?php echo Sanitizer::escapeId( "pt-$key" ) ?>"<?php
+                if ($item['active']) { ?> class="active"<?php } ?>><a href="<?php
+            echo htmlspecialchars($item['href']) ?>"<?php echo $skin->tooltipAndAccesskey('pt-'.$key) ?><?php
+            if(!empty($item['class'])) { ?> class="<?php
+            echo htmlspecialchars($item['class']) ?>"<?php } ?>><?php
+            echo htmlspecialchars($item['text']) ?></a></li>
+  <?php     } ?>
+        </ul>
+    </div>
   </div>
  </td>
  <td class="ar" rowspan="2"><img alt="" height="77" width="17" src="<?=$sp?>/skins/custisru/header_shadow_right.gif" /></td>
@@ -149,32 +150,32 @@ class CustisRuTemplate extends QuickTemplate {
     <td class="shadow_text"></td>
     <td class="vb">
      <div id="p-cactions" class="portlet">
-     	<h5><?php $this->msg('views') ?></h5>
-     	<div class="pBody">
-     		<ul>
-     <?php		foreach($this->data['content_actions'] as $key => $tab) {
-     				echo '
-     			 <li id="' . Sanitizer::escapeId( "ca-$key" ) . '"';
-     				if( $tab['class'] ) {
-     					echo ' class="'.htmlspecialchars($tab['class']).'"';
-     				}
-     				echo'><a href="'.htmlspecialchars($tab['href']).'"';
-     				# We don't want to give the watch tab an accesskey if the
-     				# page is being edited, because that conflicts with the
-     				# accesskey on the watch checkbox.  We also don't want to
-     				# give the edit tab an accesskey, because that's fairly su-
-     				# perfluous and conflicts with an accesskey (Ctrl-E) often
-     				# used for editing in Safari.
-     			 	if( in_array( $action, array( 'edit', 'submit' ) )
-     			 	&& in_array( $key, array( 'edit', 'watch', 'unwatch' ))) {
-     			 		echo $skin->tooltip( "ca-$key" );
-     			 	} else {
-     			 		echo $skin->tooltipAndAccesskey( "ca-$key" );
-     			 	}
-     			 	echo '>'.htmlspecialchars($tab['text']).'</a></li>';
-     			} ?>
-     		</ul>
-     	</div>
+        <h5><?php $this->msg('views') ?></h5>
+        <div class="pBody">
+            <ul>
+     <?php      foreach($this->data['content_actions'] as $key => $tab) {
+                    echo '
+                 <li id="' . Sanitizer::escapeId( "ca-$key" ) . '"';
+                    if( $tab['class'] ) {
+                        echo ' class="'.htmlspecialchars($tab['class']).'"';
+                    }
+                    echo'><a href="'.htmlspecialchars($tab['href']).'"';
+                    # We don't want to give the watch tab an accesskey if the
+                    # page is being edited, because that conflicts with the
+                    # accesskey on the watch checkbox.  We also don't want to
+                    # give the edit tab an accesskey, because that's fairly su-
+                    # perfluous and conflicts with an accesskey (Ctrl-E) often
+                    # used for editing in Safari.
+                    if( in_array( $action, array( 'edit', 'submit' ) )
+                    && in_array( $key, array( 'edit', 'watch', 'unwatch' ))) {
+                        echo $skin->tooltip( "ca-$key" );
+                    } else {
+                        echo $skin->tooltipAndAccesskey( "ca-$key" );
+                    }
+                    echo '>'.htmlspecialchars($tab['text']).'</a></li>';
+                } ?>
+            </ul>
+        </div>
      </div>
      <script type="<?php $this->text('jsmimetype') ?>"> if (window.isMSIE55) fixalpha(); </script>
     </td>
@@ -253,35 +254,35 @@ class CustisRuTemplate extends QuickTemplate {
 
 <div id="footer">
 <?php
-		if($this->data['poweredbyico']) { ?>
-				<div id="f-poweredbyico"><?php $this->html('poweredbyico') ?></div>
-<?php 	}
-		if($this->data['copyrightico']) { ?>
-				<div id="f-copyrightico"><?php $this->html('copyrightico') ?></div>
-<?php	}
+        if($this->data['poweredbyico']) { ?>
+                <div id="f-poweredbyico"><?php $this->html('poweredbyico') ?></div>
+<?php   }
+        if($this->data['copyrightico']) { ?>
+                <div id="f-copyrightico"><?php $this->html('copyrightico') ?></div>
+<?php   }
 
-		// Generate additional footer links
-		$footerlinks = array(
-			'lastmod', 'viewcount', 'numberofwatchingusers', 'credits', 'copyright',
-			'privacy', 'about', 'disclaimer', 'tagline',
-		);
-		$validFooterLinks = array();
-		foreach( $footerlinks as $aLink ) {
-			if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
-				$validFooterLinks[] = $aLink;
-			}
-		}
-		if ( count( $validFooterLinks ) > 0 ) {
-?>			<ul id="f-list">
+        // Generate additional footer links
+        $footerlinks = array(
+            'lastmod', 'viewcount', 'numberofwatchingusers', 'credits', 'copyright',
+            'privacy', 'about', 'disclaimer', 'tagline',
+        );
+        $validFooterLinks = array();
+        foreach( $footerlinks as $aLink ) {
+            if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
+                $validFooterLinks[] = $aLink;
+            }
+        }
+        if ( count( $validFooterLinks ) > 0 ) {
+?>          <ul id="f-list">
 <?php
-			foreach( $validFooterLinks as $aLink ) {
-				if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
-?>					<li id="<?php echo$aLink?>"><?php $this->html($aLink) ?></li>
-<?php 			}
-			}
+            foreach( $validFooterLinks as $aLink ) {
+                if( isset( $this->data[$aLink] ) && $this->data[$aLink] ) {
+?>                  <li id="<?php echo$aLink?>"><?php $this->html($aLink) ?></li>
+<?php           }
+            }
 ?>
-			</ul>
-<?php	}
+            </ul>
+<?php   }
 ?>
 </div>
 
@@ -296,8 +297,8 @@ class CustisRuTemplate extends QuickTemplate {
 <?php endif; ?>
 </body></html>
 <?php
-	wfRestoreWarnings();
-	} // end of execute() method
+    wfRestoreWarnings();
+    } // end of execute() method
 
     /*************************************************************************************************/
     function searchBox()
@@ -305,12 +306,12 @@ class CustisRuTemplate extends QuickTemplate {
         ob_start();
 ?>
 <div id="searchBody" class="pBody">
-	<form action="<?php $this->text('searchaction') ?>" id="searchform"><div>
-		<input id="searchInput" name="search" type="text"<?php echo $this->skin->tooltipAndAccesskey('search');
-			if( isset( $this->data['search'] ) ) {
-				?> value="<?php $this->text('search') ?>"<?php } ?> />
-		<input type='submit' name="go" class="searchButton" id="searchGoButton"	value="<?php $this->msg('searcharticle') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-go' ); ?> />&nbsp;<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="<?php $this->msg('searchbutton') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-fulltext' ); ?> />
-	</div></form>
+    <form action="<?php $this->text('searchaction') ?>" id="searchform"><div>
+        <input id="searchInput" name="search" type="text"<?php echo $this->skin->tooltipAndAccesskey('search');
+            if( isset( $this->data['search'] ) ) {
+                ?> value="<?php $this->text('search') ?>"<?php } ?> />
+        <input type='submit' name="go" class="searchButton" id="searchGoButton" value="<?php $this->msg('searcharticle') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-go' ); ?> />&nbsp;<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton" value="<?php $this->msg('searchbutton') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-fulltext' ); ?> />
+    </div></form>
 </div>
 <?php
         $cont = ob_get_contents();
