@@ -113,12 +113,12 @@ class S5SlideShow
     /* Split $content to slides and save them into $this->mSlides */
     function loadContent($content)
     {
-        $secs = preg_split('/(^==[^=].*?==)(?!\S)/mi', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
+        $secs = preg_split('/(^=+[^=].*?=+)(?!\S)/mi', $content, -1, PREG_SPLIT_DELIM_CAPTURE);
         $secCount = count($secs);
         $this->mSlides = array();
         for ($i = 1; $i < $secCount; $i += 2)
         {
-            $title = preg_replace('/^==\s*(.*?)\s*==$/is', '\1', $secs[$i]);
+            $title = preg_replace('/^=+\s*(.*?)\s*=+$/is', '\1', $secs[$i]);
             /* check for heading mark */
             if ($this->headingmark && !self::strCheck($title, $this->headingmark))
                 continue;
