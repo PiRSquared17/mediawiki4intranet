@@ -110,6 +110,9 @@ $wgHooks['LinkBegin'][] = 'Wikilog::LinkBegin';
 $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
 $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
 
+$wgEnableSidebarCache = false;
+$wgHooks['SkinBuildSidebar'][] = 'Wikilog::SkinBuildSidebar';
+
 // General Wikilog hooks
 $wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
 $wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
@@ -351,6 +354,124 @@ class Wikilog
 					unset( $contentActions['addsection'] );
 				}
 			}
+		}
+		return true;
+	}
+
+	static function Weekday($ts)
+	{
+		global $wgWikilogWeekStart;
+		if (!$wgWikilogWeekStart)
+			$wgWikilogWeekStart = 0;
+		return (date('N', $ts) + 6 - $wgWikilogWeekStart) % 7;
+	}
+
+	/**
+	 * SkinBuildSidebar hook handler function.
+	 * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
+	 */
+	static function SkinBuildSidebar($skin, &$bar)
+	{
+		global $wgTitle, $wgRequest;
+		if (array_key_exists('wikilogcalendar', $bar))
+		{
+			$wi = self::getWikilogInfo($wgTitle);
+			if ($wi)
+				$wi = $wi->mWikilogTitle;
+			else if ($wgTitle->getNamespace() == NS_SPECIAL && $wgTitle->getBaseText() == 'Wikilog')
+			{
+				if ($wgRequest->getVal('wikilog'))
+					$wi = Title::makeTitleSafe(NS_MAIN, $wgRequest->getVal('wikilog'));
+				if (!$wi)
+					$wi = $wgTitle;
+			}
+			else
+			{
+				unset($bar['wikilogcalendar']);
+				return true;
+			}
+			$dbr = wfGetDB(DB_SLAVE);
+			$where = array('wlp_publish' => 1);
+			if ($wi->getNamespace() != NS_SPECIAL)
+				$where['wlp_parent'] = $wi->getArticleId();
+			$start = $dbr->selectField(
+				'wikilog_posts',
+				'MAX(wlp_pubdate)',
+				array_merge($where, array()),
+				__METHOD__
+			);
+			/* first day of last month with posts */
+			$month = substr($start, 0, 6);
+			$start = wfTimestamp(TS_UNIX, substr($start, 0, 6) . '01000000');
+			/* skip to beginning of the week */
+			$start = wfTimestamp(TS_MW, $start - 86400 * self::Weekday($start));
+			$where[] = "wlp_pubdate>=$start";
+			/* select dates and post counts */
+			$res = $dbr->select(
+				'wikilog_posts',
+				'wlp_page, wlp_pubdate, COUNT(1) numposts',
+				$where,
+				__METHOD__,
+				array('GROUP BY' => 'SUBSTR(wlp_pubdate,1,8)')
+			);
+			$dates = array();
+			while ($row = $dbr->fetchRow($res))
+			{
+				$date = substr($row['wlp_pubdate'], 0, 8);
+				if ($row['numposts'] == 1)
+				{
+					/* link to the post if it's the only one for that date */
+					$title = Title::newFromId($row['wlp_page']);
+					$dates[$date] = array(
+						$title->getLocalUrl(),
+						$title->getPrefixedText(),
+					);
+				}
+				else
+				{
+					/* link to archive page if there's more than one post for that date */
+					$dates[$date] = array(
+						$wi->getLocalUrl(array(
+							view  => 'archives',
+							year  => substr($date, 0, 4),
+							month => substr($date, 4, 2),
+							day   => substr($date, 6, 2),
+						)),
+						wfMsgExt('wikilog-calendar-archive-link-title', 'parseinline',
+							$wi->getPrefixedText(),
+							date('Y-m-d', wfTimestamp(TS_UNIX, $row['wlp_pubdate']))
+						),
+					);
+				}
+			}
+			$dbr->freeResult($res);
+			/* build HTML code */
+			$html = '<table class="wl-calendar"><tr>';
+			$ts = wfTimestamp(TS_UNIX, $start);
+			$i = 0;
+			while (date('Ym', $ts) <= $month || ($i % 7))
+			{
+				if ($i && !($i % 7))
+					$html .= '</tr><tr>';
+				$date = $dates[date('Ymd', $ts)];
+				$html .= '<td class="';
+				if (date('Ym', $ts) != $month)
+					$html .= 'wl-calendar-other ';
+				$html .= 'wl-calendar-day';
+				if (!$date)
+					$html .= '-empty">';
+				else
+					$html .= '"><a href="'.htmlspecialchars($date[0]).'" title="'.htmlspecialchars($date[1]).'">';
+				$html .= date('j', $ts);
+				if ($date)
+					$html .= '</a>';
+				$html .= '</td>';
+				/* + 1 day */
+				$ts += 86400;
+				$i++;
+			}
+			$html .= '</tr></table>';
+			$bar['wikilogcalendar'] = $html;
 		}
 		return true;
 	}
