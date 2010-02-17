@@ -28,7 +28,6 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Wikilog comments namespace handler class.
  *
@@ -59,6 +58,7 @@ class WikilogCommentsPage
 	public    $mItem;				///< Wikilog item the page is associated with.
 	public    $mTalkTitle;			///< Main talk page title.
 	public    $mSingleComment;		///< Used when viewing a single comment.
+	public    $mWikilogInfo;		///< Wikilog info, used in feeds for simplicity.
 
 	/**
 	 * Constructor.
@@ -79,7 +79,8 @@ class WikilogCommentsPage
 		$this->mItem = WikilogItem::newFromInfo( $wi );
 
 		# Check if user can post.
-		$this->mUserCanPost = $wgUser->isAllowed( 'wl-postcomment' );
+		$this->mUserCanPost = $wgUser->isAllowed( 'wl-postcomment' ) ||
+			( $wgUser->isAllowed( 'edit' ) && $wgUser->isAllowed( 'createtalk' ) );
 		$this->mUserCanModerate = $wgUser->isAllowed( 'wl-moderation' );
 
 		# Form options.
@@ -92,6 +93,7 @@ class WikilogCommentsPage
 		# This flags if we are viewing a single comment (subpage).
 		$this->mTrailing = $wi->getTrailing();
 		$this->mTalkTitle = $wi->getItemTalkTitle();
+		$this->mWikilogInfo = $wi;
 		if ( $this->mItem && $this->mTrailing ) {
 			$this->mSingleComment =
 				WikilogComment::newFromPageID( $this->mItem, $this->getID() );
@@ -102,11 +104,18 @@ class WikilogCommentsPage
 	 * Handler for action=view requests.
 	 */
 	public function view() {
-		global $wgRequest;
+		global $wgRequest, $wgOut;
 
 		# If diffing, don't show comments.
 		if ( $wgRequest->getVal( 'diff' ) )
 			return parent::view();
+
+		# RSS or Atom feed requested. Ignore all other options.
+		if ( ( $feedFormat = $wgRequest->getVal( 'feed' ) ) ) {
+			global $wgWikilogFeedCommentCount;
+			$feed = new WikilogCommentsFeed($feedFormat, $this->mWikilogInfo, $wgRequest->getInt('limit', $wgWikilogFeedCommentCount));
+			return $feed->execute();
+		}
 
 		# Normal page view, show talk page contents followed by comments.
 		if ( $this->mItem ) {
@@ -119,6 +128,26 @@ class WikilogCommentsPage
 		# Retrieve comments from database and display them.
 		if ( $this->mItem ) {
 			$this->viewComments();
+		}
+
+		# Add feed links.
+		$wgOut->setSyndicated();
+		if ( isset( $qarr['show'] ) ) {
+			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogFeed::$paramWhitelist ) );
+			$wgOut->setFeedAppendQuery( $altquery );
+		}
+
+		# Set a more human-friendly title to the comments page.
+		# NOTE (MW1.16+): Must come after parent::view().
+		if ( !$this->mSingleComment ) {
+			# Note: Sorry for the three-level cascade of wfMsg()'s...
+			$fullPageTitle = wfMsg( 'wikilog-title-item-full',
+				$this->mItem->mName,
+				$this->mItem->mParentTitle->getPrefixedText()
+			);
+			$fullPageTitle = wfMsg( 'wikilog-title-comments', $fullPageTitle );
+			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem->mName ) );
+			$wgOut->setHTMLTitle( wfMsg( 'pagetitle', $fullPageTitle ) );
 		}
 	}
 
@@ -134,16 +163,6 @@ class WikilogCommentsPage
 			$wgOut->addHtml( Xml::tags(
 				'div', array( 'class' => 'wl-comment-meta' ), $meta
 			) );
-		} else {
-			# Set a more human-friendly title to the comments page.
-			# Note: Sorry for the three-level cascade of wfMsg()'s...
-			$fullPageTitle = wfMsg( 'wikilog-title-item-full',
-					$this->mItem->mName,
-					$this->mItem->mParentTitle->getPrefixedText()
-			);
-			$fullPageTitle = wfMsg( 'wikilog-title-comments', $fullPageTitle );
-			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem->mName ) );
-			$wgOut->setHTMLTitle( wfMsg( 'pagetitle', $fullPageTitle ) );
 		}
 
 		# Add a backlink to the original article. Specially important in
@@ -220,7 +239,7 @@ class WikilogCommentsPage
 		}
 
 		# Initialize a session, when an anonymous post a comment...
-		if( session_id() == '' ) {
+		if ( session_id() == '' ) {
 			wfSetupSession();
 		}
 
@@ -288,12 +307,12 @@ class WikilogCommentsPage
 		$html = Xml::openElement( 'div', array( 'class' => 'wl-threads' ) );
 
 		foreach ( $comments as $comment ) {
-			while ( $top > 0 && $comment->mParent != $stack[$top-1] ) {
+			while ( $top > 0 && $comment->mParent != $stack[$top - 1] ) {
 				$html .= Xml::closeElement( 'div' );
 				array_pop( $stack ); $top--;
 			}
 
-			$html .= Xml::openElement( 'div', array( 'class' => 'wl-thread' ) ).
+			$html .= Xml::openElement( 'div', array( 'class' => 'wl-thread' ) ) .
 				$this->formatComment( $comment );
 
 			if ( $comment->mID == $replyTo && $this->mUserCanPost ) {
@@ -347,7 +366,7 @@ class WikilogCommentsPage
 			$meta = $this->formatCommentMetadata( $comment );
 			$text = $wgOut->parse( $comment->getText() );  // TODO: Optimize this.
 			$html =
-				Xml::tags( 'div', array( 'class' => 'wl-comment-meta' ), $meta ).
+				Xml::tags( 'div', array( 'class' => 'wl-comment-meta' ), $meta ) .
 				Xml::tags( 'div', array( 'class' => 'wl-comment-text' ), $text );
 		}
 
@@ -364,13 +383,14 @@ class WikilogCommentsPage
 		if ( $comment->mUserID ) {
 			$by = wfMsgExt( 'wikilog-comment-by-user',
 				array( 'parseinline', 'replaceafter' ),
-				$this->mSkin->userLink( $comment->mUserID, $comment->mUserText ),
-				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText )
+				'<span class="wl-comment-author">' . $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ) . '</span>',
+				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
+				$comment->mUserText
 			);
 		} else {
 			$by = wfMsgExt( 'wikilog-comment-by-anon',
 				array( 'parseinline', 'replaceafter' ),
-				$this->mSkin->userLink( $comment->mUserID, $comment->mUserText ),
+				'<span class="wl-comment-author">' . $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ) . '</span>',
 				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
 				htmlspecialchars( $comment->mAnonName )
 			);
@@ -387,9 +407,13 @@ class WikilogCommentsPage
 			$meta .= "<div class=\"wl-comment-status\">{$status}</div>";
 		}
 		if ( $comment->mUpdated != $comment->mTimestamp ) {
-			$updated = wfMsg( 'wikilog-comment-edited',
+			$updated = wfMsg(
+				'wikilog-comment-edited',
 				$wgLang->timeanddate( $comment->mUpdated, true ),
-				$this->getCommentHistoryLink( $comment ) );
+				$this->getCommentHistoryLink( $comment ),
+				$wgLang->date( $comment->mUpdated, true ),
+				$wgLang->time( $comment->mUpdated, true )
+			);
 			$meta .= "<div class=\"wl-comment-edited\">{$updated}</div>";
 		}
 
@@ -426,7 +450,7 @@ class WikilogCommentsPage
 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ), 'known' );
+					array( 'action' => 'edit', 'section' => false ), 'known' );
 			}
 			if ( $comment->mCommentTitle->quickUserCan( 'delete' ) ) {
 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
@@ -496,7 +520,7 @@ class WikilogCommentsPage
 		$opts = $this->mFormOptions;
 
 		$preview = '';
-		if ( $comment && $comment->mParent == $parent) {
+		if ( $comment && $comment->mParent == $parent ) {
 			$check = $this->validateComment( $comment );
 			if ( $check ) {
 				$preview = Xml::wrapClass( wfMsg( $check ), 'mw-warning', 'div' );
@@ -508,9 +532,9 @@ class WikilogCommentsPage
 		}
 
 		$form =
-			Xml::hidden( 'title', $this->getTitle()->getPrefixedText() ).
-			Xml::hidden( 'action', 'wikilog' ).
-			Xml::hidden( 'wpEditToken', $wgUser->editToken() ).
+			Xml::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
+			Xml::hidden( 'action', 'wikilog' ) .
+			Xml::hidden( 'wpEditToken', $wgUser->editToken() ) .
 			( $parent ? Xml::hidden( 'wlParent', $parent ) : '' );
 
 		$fields = array();
@@ -528,7 +552,7 @@ class WikilogCommentsPage
 			$fields[] = array(
 				Xml::label( wfMsg( 'wikilog-form-name' ), 'wl-name' ),
 				Xml::input( 'wlAnonName', 25, $opts->consumeValue( 'wlAnonName' ),
-					array( 'id' => 'wl-name', 'maxlength' => 255 ) ).
+					array( 'id' => 'wl-name', 'maxlength' => 255 ) ) .
 					"<p>{$message}</p>"
 			);
 		}
@@ -548,7 +572,7 @@ class WikilogCommentsPage
 		}
 
 		$fields[] = array( '',
-			Xml::submitbutton( wfMsg( 'wikilog-submit' ), array( 'name' => 'wlActionCommentSubmit' ) ) .'&nbsp;'.
+			Xml::submitbutton( wfMsg( 'wikilog-submit' ), array( 'name' => 'wlActionCommentSubmit' ) ) . '&nbsp;' .
 			Xml::submitbutton( wfMsg( 'wikilog-preview' ), array( 'name' => 'wlActionCommentPreview' ) )
 		);
 
@@ -586,7 +610,10 @@ class WikilogCommentsPage
 			$log->addEntry( 'c-approv', $title, '' );
 			$wgOut->redirect( $this->mTalkTitle->getFullUrl() );
 		} else if ( $approval == 'reject' ) {
-			$reason = wfMsgForContent( 'wikilog-log-cmt-rejdel', $comment->mUserText );
+			$reason = wfMsgExt( 'wikilog-log-cmt-rejdel',
+				array( 'content', 'parsemag' ),
+				$comment->mUserText
+			);
 			$id = $title->getArticleID( GAID_FOR_UPDATE );
 			if ( $this->doDeleteArticle( $reason, false, $id ) ) {
 				$comment->deleteComment();
@@ -700,5 +727,127 @@ class WikilogCommentsPage
 
 		return false;
 	}
+}
 
+class WikilogCommentsFeed
+{
+	public $wikilog;
+	public $limit;
+
+	public function __construct($format, $wikilog, $limit)
+	{
+		if (!$limit || $limit <= 0)
+			$limit = 100;
+		$this->wikilog = $wikilog;
+		$this->limit = $limit;
+		$this->format = $format;
+	}
+
+	public function execute()
+	{
+		global $wgFeedClasses;
+
+		$forall = $this->wikilog->mWikilogTitle ? false : true;
+		$title = $forall ? Title::newFromText(wfMsg('wikilog-specialwikilog'), NS_SPECIAL) : $this->wikilog->mWikilogTitle;
+		$feed = new $wgFeedClasses[$this->format](
+			wfMsgExt('wikilog-comments-feed-title', array('parseinline'), $title->getPrefixedText()),
+			wfMsgExt('wikilog-comments-feed-desc', array('parseinline'), $title->getPrefixedText()),
+			$title->getFullUrl());
+		$dbr = wfGetDB(DB_SLAVE);
+		$where = array('wlc_post=wlp_page');
+		if (!$forall)
+			$where['wlp_parent'] = $title->getArticleID();
+		$lastmod = $dbr->selectField(array('wikilog_comments', 'wikilog_posts'), 'MAX(wlc_timestamp)', $where, __METHOD__);
+		$timekey = wfMemcKey($forall ? 'all' : $title->getArticleID(), $this->format, $this->limit, 'timestamp');
+		$key = wfMemcKey($forall ? 'all' : $title->getArticleID(), $this->format, $this->limit, 'feed');
+
+		FeedUtils::checkPurge($timekey, $key);
+
+		$cachedFeed = $this->loadFromCache($lastmod, $timekey, $key);
+		if (is_string($cachedFeed))
+		{
+			wfDebug("Wikilog comments: Outputting cached feed\n");
+			$feed->httpHeaders();
+			echo $cachedFeed;
+		}
+		else
+		{
+			wfDebug("Wikilog comments: rendering new feed and caching it\n");
+			ob_start();
+			self::generateFeed($feed, $where);
+			$cachedFeed = ob_get_contents();
+			ob_end_flush();
+			$this->saveToCache($cachedFeed, $timekey, $key);
+		}
+		return true;
+	}
+
+	public function saveToCache($feed, $timekey, $key)
+	{
+		global $messageMemc;
+		$expire = 3600 * 24; # One day
+		$messageMemc->set($key, $feed);
+		$messageMemc->set($timekey, wfTimestamp(TS_MW), $expire);
+	}
+
+	public function loadFromCache($lastmod, $timekey, $key)
+	{
+		global $wgFeedCacheTimeout, $messageMemc;
+		$feedLastmod = $messageMemc->get($timekey);
+
+		if($wgFeedCacheTimeout > 0 && $feedLastmod)
+		{
+			$feedAge = time() - wfTimestamp(TS_UNIX, $feedLastmod);
+			$feedLastmodUnix = wfTimestamp(TS_UNIX, $feedLastmod);
+			$lastmodUnix = wfTimestamp(TS_UNIX, $lastmod);
+			if ($feedAge < $wgFeedCacheTimeout || $feedLastmodUnix > $lastmodUnix)
+			{
+				wfDebug("Wikilog comments: loading feed from cache ($key; $feedLastmod; $lastmod)...\n");
+				return $messageMemc->get($key);
+			}
+			else
+				wfDebug("Wikilog comments: cached feed timestamp check failed ($feedLastmod; $lastmod)\n");
+		}
+		return false;
+	}
+
+	public function generateFeed($feed, $where)
+	{
+		global $wgParser, $wgOut, $wgEnableParserCache, $wgUser;
+		wfProfileIn(__METHOD__);
+		$feed->outHeader();
+		$dbr = wfGetDB(DB_SLAVE);
+		$res = $dbr->select(array('wikilog_comments', 'wikilog_posts'), '*', $where, __METHOD__,
+			array('ORDER BY' => 'wlc_timestamp DESC', 'LIMIT' => $this->limit)
+		);
+		$popt = $wgOut->parserOptions();
+		if ($wgEnableParserCache)
+			$parserCache = ParserCache::singleton();
+		while ($row = $dbr->fetchRow($res))
+		{
+			if (!($article = Article::newFromID($row['wlc_comment_page'])))
+				continue;
+			if ($parserCache)
+				$out = $parserCache->get($article, $wgUser);
+			if (!$out)
+			{
+				$out = $wgParser->parse($article->getContent(), $article->getTitle(), $popt, false, true, $article->getLatest());
+				if ($parserCache && $out->getCacheTime() != -1)
+					$parserCache->save($out, $article, $wgUser);
+			}
+			$title = Title::newFromID($row['wlc_post'])->getTalkPage();
+			$title->mFragment = 'c' . $row['wlc_id'];
+			$item = new FeedItem(
+				$title->getPrefixedText(),
+				$out->getText(),
+				$title->getFullUrl(),
+				$row['wlc_timestamp'],
+				$row['wlc_user_text']
+			);
+			$feed->outItem($item);
+		}
+		$dbr->freeResult($res);
+		$feed->outFooter();
+		wfProfileOut(__METHOD__);
+	}
 }

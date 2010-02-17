@@ -6,6 +6,26 @@
  * Lincensed under the GNU General Public License version 2.
  */
 
+div.wl-summary-header {
+	font-size: 90%;
+	font-style: italic;
+}
+
+div.wl-summary-footer {
+	font-size: 90%;
+	font-style: italic;
+	padding: 0 3em;
+}
+
+div.wl-entry-header {
+	font-style: italic;
+}
+
+div.wl-entry-footer {
+	font-style: italic;
+	padding: 3pt 3em;
+}
+
 div.wl-description {
 	border: 1px solid #CCCCCC;
 	background-color: #EEEEEE;
@@ -115,6 +135,25 @@ div.wl-comment-error-box {
 
 .TablePager_col_wlp_num_comments {
 	text-align: center;
+}
+
+table.wl-calendar {
+	margin-right: auto;
+	margin-left: auto;
+}
+
+.wl-calendar td {
+	text-align: right;
+	padding: 2px 3px 0 3px;
+}
+
+.wl-calendar td.wl-calendar-day {
+	font-weight: bold;
+	background-color: #e0e0e0;
+}
+
+.wl-calendar td.wl-calendar-other {
+	color: gray;
 }
 
 /* kate: indent-mode normal; space-indent off; tab-width 4; */

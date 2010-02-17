@@ -28,17 +28,15 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /**
  * Syndication feed driver. Creates feeds from a list of wikilog articles,
  * given a format and a query object.
  */
 class WikilogFeed
 {
-
 	/**
-	 * Feed title (i.e., not Wikilog title). For Special:Wikilog, 'wikilog'
-	 * system message should be used.
+	 * Feed title (i.e., not Wikilog title). For Special:Wikilog,
+	 * 'wikilog-specialwikilog-title' system message should be used.
 	 */
 	protected $mTitle;
 
@@ -143,7 +141,7 @@ class WikilogFeed
 			# Try to load the feed from our cache.
 			$cached = $this->loadFromCache( $feed->getUpdated(), $timekey, $feedkey );
 
-			if( is_string( $cached ) ) {
+			if ( is_string( $cached ) ) {
 				wfDebug( "Wikilog: Outputting cached feed\n" );
 				$feed->httpHeaders();
 				echo $cached;
@@ -317,7 +315,7 @@ class WikilogFeed
 	 */
 	public function getSiteFeedObject() {
 		global $wgContLanguageCode, $wgWikilogFeedClasses, $wgFavicon, $wgLogo;
-		$title = wfMsgForContent( 'wikilog' );
+		$title = wfMsgForContent( 'wikilog-specialwikilog-title' );
 		$subtitle = wfMsgExt( 'wikilog-feed-description', array( 'parse', 'content' ) );
 
 		$updated = $this->mDb->selectField( 'wikilog_wikilogs',
@@ -394,7 +392,7 @@ class WikilogFeed
 				}
 				if ( $row->wlw_authors ) {
 					$authors = unserialize( $row->wlw_authors );
-					foreach( $authors as $user => $userid ) {
+					foreach ( $authors as $user => $userid ) {
 						$usertitle = Title::makeTitle( NS_USER, $user );
 						$feed->addAuthor( $user, $usertitle->getFullUrl() );
 					}
@@ -438,18 +436,24 @@ class WikilogFeed
 		if ( ( $wgFeedCacheTimeout > 0 ) && $tsCache ) {
 			$age = time() - wfTimestamp( TS_UNIX, $tsCache );
 
-			if ( $age < $wgFeedCacheTimeout ) {
-				wfDebug( "Wikilog: loading feed from cache -- ".
-					"too young: age ($age) < timeout ($wgFeedCacheTimeout) ".
+			# XXX: Minimum feed cache age check disabled. This code is
+			# shadowed from ChangesFeed::loadFromCache(), but Vitaliy Filippov
+			# noticed that this causes the old cached feed to output with the
+			# updated last-modified timestamp, breaking cache behavior.
+			# For now, it is disabled, since this is just a performance
+			# optimization.
+			/* if ( $age < $wgFeedCacheTimeout ) {
+				wfDebug( "Wikilog: loading feed from cache -- " .
+					"too young: age ($age) < timeout ($wgFeedCacheTimeout) " .
 					"($feedkey; $tsCache; $tsData)\n" );
 				return $messageMemc->get( $feedkey );
-			} else if ( $tsCache >= $tsData ) {
-				wfDebug( "Wikilog: loading feed from cache -- ".
-					"not modified: cache ($tsCache) >= data ($tsData)".
+			} else */ if ( $tsCache >= $tsData ) {
+				wfDebug( "Wikilog: loading feed from cache -- " .
+					"not modified: cache ($tsCache) >= data ($tsData)" .
 					"($feedkey)\n" );
 				return $messageMemc->get( $feedkey );
 			} else {
-				wfDebug( "Wikilog: cached feed timestamp check failed -- ".
+				wfDebug( "Wikilog: cached feed timestamp check failed -- " .
 					"cache ($tsCache) < data ($tsData)\n" );
 			}
 		}
@@ -476,12 +480,12 @@ class WikilogFeed
 	 * $wgFeedClasses.
 	 */
 	public function checkFeedOutput() {
-		global $wgFeed, $wgWikilogFeedClasses;
+		global $wgOut, $wgFeed, $wgWikilogFeedClasses;
 		if ( !$wgFeed ) {
 			$wgOut->addWikiMsg( 'feed-unavailable' );
 			return false;
 		}
-		if( !isset( $wgWikilogFeedClasses[$this->mFormat] ) ) {
+		if ( !isset( $wgWikilogFeedClasses[$this->mFormat] ) ) {
 			wfHttpError( 500, "Internal Server Error", "Unsupported feed type." );
 			return false;
 		}
@@ -535,5 +539,4 @@ class WikilogFeed
 			return $title->getFullUrl();
 		}
 	}
-
 }

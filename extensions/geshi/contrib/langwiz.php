@@ -8,7 +8,7 @@
  *This script
  *
  * @author  Nigel McNie
- * @version $Id: langwiz.php 2098 2009-05-30 13:22:34Z benbe $
+ * @version $Id: langwiz.php 2218 2009-12-06 12:02:49Z segaja $
  */
 header('Content-Type: text/html; charset=utf-8');
 
@@ -564,11 +564,29 @@ echo "</pre>";
                 </table>
             </fieldset>
         </fieldset>
-
     </fieldset>
-
+ 
     <fieldset>
         <legend>Keywords</legend>
+
+        <fieldset>
+            <legend>Case of Keywords</legend>
+
+            <table width="100%">
+                <tr>
+                    <td>
+                        <label for="ld[kw_case]">Handling of keywords case:</label>
+                    </td>
+                    <td>
+                        <select name=ld[kw_case]" id="ld[kw_case]">
+                            <option value="GESHI_CAPS_NO_CHANGE">Don’t change the case of any keyword</option>
+                            <option value="GESHI_CAPS_UPPER">Convert the case of all keywords to upper case</option>
+                            <option value="GESHI_CAPS_LOWER">Convert the case of all keywords to lower case</option>
+                        </select>
+                    </td>
+                </tr>
+            </table>
+        </fieldset>
 
         <fieldset>
             <legend>Quotemark Group 1</legend>
@@ -697,6 +715,13 @@ function validate_lang(){
                         'style' => 'test'
                         )
                     ),
+                'ml' => array(
+                    1 => array(
+                        'start' => '/*',
+                        'end' => '*/',
+                        'style' => 'font-style: italic; color: #666666;'
+                        )
+                    ),
                 'rxc' => array(
                     1 => array(
                         'rx' => '/Hello/',
@@ -704,7 +729,17 @@ function validate_lang(){
                         )
                     )
                 ),
-            );
+            'str' => array(
+                'qm' => array(),
+                'ec' => array(
+                    'char' => ''  
+                    ),
+                'erx' => array()
+                ),
+            'kw' => array(),
+            'kw_case' => 'GESHI_CAPS_NO_CHANGE',
+            'sy' => array()
+        );
     }
 
     return array('ai' => $ai, 'li' => $li, 'ld' => $ld);
@@ -781,12 +816,18 @@ GESHI_LANGFILE_HEAD;
     }
     $src .= $i[2] . "),\n";
     $src .= $i[1] . "'COMMENT_MULTI' => array(\n";
+    foreach($lang['ld']['cmt']['ml'] as $tmp_cmt_ml) {
+        $src .= $i[2] . str_to_phpstring($tmp_cmt_ml['start']). " => ". str_to_phpstring($tmp_cmt_ml['end']) . ",\n";
+    }
     $src .= $i[2] . "),\n";
     $src .= $i[1] . "'COMMENT_REGEXP' => array(\n";
     foreach($lang['ld']['cmt']['rxc'] as $idx_cmt_rxc => $tmp_cmt_rxc) {
         $src .= $i[2] . ((int)$idx_cmt_rxc). " => ". str_to_phpstring($tmp_cmt_rxc['rx']) . ",\n";
     }
     $src .= $i[2] . "),\n";
+
+    //Case Keywords
+    $src .= $i[1] . "'CASE_KEYWORDS' => " . $lang['ld']['kw_case'] . ",\n";
 
     //Quotes \ Strings
     $src .= $i[1] . "'QUOTEMARKS' => array(\n";
@@ -893,7 +934,7 @@ GESHI_LANGFILE_HEAD;
     foreach($lang['ld']['cmt']['rxc'] as $idx_cmt_rxc => $tmp_cmt_rxc) {
         $src .= $i[3] . ((int)$idx_cmt_rxc) . " => " . str_to_phpstring($tmp_cmt_rxc['style']) . ",\n";
     }
-    //    'MULTI' => 'color: #666666; font-style: italic;'
+    $src .= $i[3] . "'MULTI' => " . str_to_phpstring($lang['ld']['cmt']['ml'][1]['style']) . "\n";
     $src .= $i[3] . "),\n";
     $src .= $i[2] . "'ESCAPE_CHAR' => array(\n";
     foreach($lang['ld']['str']['erx'] as $idx_str_erx => $tmp_str_erx) {

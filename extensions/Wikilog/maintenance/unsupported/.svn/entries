@@ -1,19 +1,15 @@
 10
 
 dir
-473
-http://svn.juliano.info/svn/mediawiki/extensions/Wikilog/trunk/maintenance/unsupported
-http://svn.juliano.info/svn/mediawiki
+60293
+http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog/maintenance/unsupported
+http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-09-12T21:58:51.603118Z
-468
-Juliano F. Ravasi
-
-
-
-
+2009-10-29T03:21:46.815395Z
+58299
+juliano
 
 
 
@@ -24,7 +20,11 @@ Juliano F. Ravasi
 
 
 
-363dca7b-97fb-0310-8b71-a8c95a34027a
+
+
+
+
+dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 wikilogImportComments.php
 file
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-13T12:33:48.000000Z
+2009-12-21T22:45:43.992777Z
 38fdd4e2c3eb872603eba25953beeff4
-2009-09-12T21:58:51.603118Z
-468
-Juliano F. Ravasi
+2009-10-29T03:21:46.815395Z
+58299
+juliano
 has-props
 
 

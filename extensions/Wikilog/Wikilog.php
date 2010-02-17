@@ -28,31 +28,31 @@
 if ( !defined( 'MEDIAWIKI' ) )
 	die();
 
-
 /*
  * General extension information.
  */
 $wgExtensionCredits['specialpage'][] = array(
-	'name'				=> 'Wikilog',
-	'version'			=> '0.8.1.1svn',
-	'author'			=> 'Juliano F. Ravasi',
-	'description'		=> 'Adds blogging features, creating a wiki-blog hybrid.',
-	'descriptionmsg'	=> 'wikilog-desc',
-	'url'				=> 'http://www.mediawiki.org/wiki/Extension:Wikilog',
+	'path'           => __FILE__,
+	'name'           => 'Wikilog',
+	'version'        => '1.0.99.1dev',
+	'author'         => 'Juliano F. Ravasi',
+	'description'    => 'Adds blogging features, creating a wiki-blog hybrid.',
+	'descriptionmsg' => 'wikilog-desc',
+	'url'            => 'http://www.mediawiki.org/wiki/Extension:Wikilog',
 );
-
 
 /*
  * Dependencies.
  */
-require_once( dirname(__FILE__) . '/WlFeed.php' );
-
+require_once( dirname( __FILE__ ) . '/WlFeed.php' );
 
 /*
  * Messages.
  */
-$dir = dirname(__FILE__) . '/';
+$dir = dirname( __FILE__ ) . '/';
 $wgExtensionMessagesFiles['Wikilog'] = $dir . 'Wikilog.i18n.php';
+$wgExtensionMessagesFiles['WikilogMagic'] = $dir . 'Wikilog.i18n.magic.php';
+$wgExtensionMessagesFiles['WikilogAlias'] = $dir . 'Wikilog.i18n.alias.php';
 
 /*
  * Autoloaded classes.
@@ -103,33 +103,44 @@ $wgSpecialPageGroups['Wikilog'] = 'changes';
 $wgExtensionFunctions[] = array( 'Wikilog', 'ExtensionInit' );
 
 // Main Wikilog hooks
-$wgHooks['ArticleFromTitle'][]			= 'Wikilog::ArticleFromTitle';
-$wgHooks['ArticleViewHeader'][]			= 'Wikilog::ArticleViewHeader';
-$wgHooks['BeforePageDisplay'][]			= 'Wikilog::BeforePageDisplay';
-$wgHooks['LinkBegin'][]					= 'Wikilog::LinkBegin';
-$wgHooks['SkinTemplateTabAction'][]		= 'Wikilog::SkinTemplateTabAction';
-$wgHooks['SkinTemplateTabs'][]			= 'Wikilog::SkinTemplateTabs';
+$wgHooks['ArticleFromTitle'][] = 'Wikilog::ArticleFromTitle';
+$wgHooks['ArticleViewHeader'][] = 'Wikilog::ArticleViewHeader';
+$wgHooks['BeforePageDisplay'][] = 'Wikilog::BeforePageDisplay';
+$wgHooks['LinkBegin'][] = 'Wikilog::LinkBegin';
+$wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
+$wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
+
+$wgEnableSidebarCache = false;
+$wgHooks['SkinBuildSidebar'][] = 'Wikilog::SkinBuildSidebar';
 
 // General Wikilog hooks
-$wgHooks['ArticleEditUpdates'][]		= 'WikilogHooks::ArticleEditUpdates';
-$wgHooks['ArticleDeleteComplete'][]		= 'WikilogHooks::ArticleDeleteComplete';
-$wgHooks['TitleMoveComplete'][]			= 'WikilogHooks::TitleMoveComplete';
-$wgHooks['LanguageGetSpecialPageAliases'][]
-										= 'WikilogHooks::LanguageGetSpecialPageAliases';
-$wgHooks['LanguageGetMagic'][]			= 'WikilogHooks::LanguageGetMagic';
-$wgHooks['LoadExtensionSchemaUpdates'][]= 'WikilogHooks::ExtensionSchemaUpdates';
-$wgHooks['UnknownAction'][]				= 'WikilogHooks::UnknownAction';
+$wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
+$wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
+$wgHooks['ArticleSave'][] = 'WikilogHooks::ArticleSave';
+$wgHooks['TitleMoveComplete'][] = 'WikilogHooks::TitleMoveComplete';
+$wgHooks['EditPage::attemptSave'][] = 'WikilogHooks::EditPageAttemptSave';
+$wgHooks['EditPage::showEditForm:fields'][] = 'WikilogHooks::EditPageEditFormFields';
+$wgHooks['EditPage::importFormData'][] = 'WikilogHooks::EditPageImportFormData';
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'WikilogHooks::ExtensionSchemaUpdates';
+$wgHooks['UnknownAction'][] = 'WikilogHooks::UnknownAction';
 
 // WikilogLinksUpdate hooks
-$wgHooks['LinksUpdate'][]				= 'WikilogLinksUpdate::LinksUpdate';
+$wgHooks['LinksUpdate'][] = 'WikilogLinksUpdate::LinksUpdate';
 
 // WikilogParser hooks
-$wgHooks['ParserFirstCallInit'][]		= 'WikilogParser::FirstCallInit';
-$wgHooks['ParserClearState'][]			= 'WikilogParser::ClearState';
-$wgHooks['ParserBeforeInternalParse'][]	= 'WikilogParser::BeforeInternalParse';
-$wgHooks['ParserAfterTidy'][]			= 'WikilogParser::AfterTidy';
-$wgHooks['GetLocalURL'][]				= 'WikilogParser::GetLocalURL';
-$wgHooks['GetFullURL'][]				= 'WikilogParser::GetFullURL';
+$wgHooks['ParserFirstCallInit'][] = 'WikilogParser::FirstCallInit';
+$wgHooks['ParserClearState'][] = 'WikilogParser::ClearState';
+$wgHooks['ParserBeforeStrip'][] = 'WikilogParser::BeforeStrip';
+$wgHooks['ParserAfterTidy'][] = 'WikilogParser::AfterTidy';
+$wgHooks['InternalParseBeforeLinks'][] = 'WikilogParser::InternalParseBeforeLinks';
+$wgHooks['GetLocalURL'][] = 'WikilogParser::GetLocalURL';
+$wgHooks['GetFullURL'][] = 'WikilogParser::GetFullURL';
+
+if ( !defined( 'MW_SUPPORTS_LOCALISATIONCACHE' ) ) {
+	/* pre Mw1.16 compatibility */
+	$wgHooks['LanguageGetMagic'][] = 'WikilogHooks::LanguageGetMagic';
+	$wgHooks['LanguageGetSpecialPageAliases'][] = 'WikilogHooks::LanguageGetSpecialPageAliases';
+}
 
 /*
  * Added rights.
@@ -156,7 +167,7 @@ $wgLogActions['wikilog/c-reject'] = 'wikilog-log-cmt-reject';
 /*
  * Default settings.
  */
-require_once( dirname(__FILE__) . '/WikilogDefaultSettings.php' );
+require_once( dirname( __FILE__ ) . '/WikilogDefaultSettings.php' );
 
 
 /**
@@ -165,8 +176,8 @@ require_once( dirname(__FILE__) . '/WikilogDefaultSettings.php' );
  */
 class Wikilog
 {
-	###
-	##  Setup functions.
+	# ##
+	# #  Setup functions.
 	#
 
 	/**
@@ -180,12 +191,12 @@ class Wikilog
 		global $wgExtraNamespaces, $wgWikilogNamespaces;
 
 		if ( $ns < 100 ) {
-			echo "Wikilog setup: custom namespaces should start ".
+			echo "Wikilog setup: custom namespaces should start " .
 				 "at 100 to avoid conflict with standard namespaces.\n";
 			die( 1 );
 		}
-		if ( ($ns % 2) != 0 ) {
-			echo "Wikilog setup: given namespace ($ns) is not a ".
+		if ( ( $ns % 2 ) != 0 ) {
+			echo "Wikilog setup: given namespace ($ns) is not a " .
 				 "subject namespace (even number).\n";
 			die( 1 );
 		}
@@ -197,12 +208,12 @@ class Wikilog
 		}
 
 		$wgExtraNamespaces[$ns  ] = $name;
-		$wgExtraNamespaces[$ns^1] = $talk;
+		$wgExtraNamespaces[$ns ^ 1] = $talk;
 		$wgWikilogNamespaces[] = $ns;
 	}
 
-	###
-	##  MediaWiki hooks.
+	# ##
+	# #  MediaWiki hooks.
 	#
 
 	/**
@@ -220,7 +231,7 @@ class Wikilog
 		# Find assigned namespaces and make sure they have subpages
 		foreach ( $wgWikilogNamespaces as $ns ) {
 			$wgNamespacesWithSubpages[$ns  ] = true;
-			$wgNamespacesWithSubpages[$ns^1] = true;
+			$wgNamespacesWithSubpages[$ns ^ 1] = true;
 		}
 
 		# Work around bug in MediaWiki 1.13 when '?action=render'.
@@ -292,7 +303,7 @@ class Wikilog
 		if ( $target->isTalkPage() && !in_array( 'known', $options ) ) {
 			$wi = self::getWikilogInfo( $target );
 			if ( $wi && $wi->isItem() && !$wi->getTrailing() && $wi->getItemTitle()->exists() ) {
-				if ( ($i = array_search( 'broken', $options )) !== false ) {
+				if ( ( $i = array_search( 'broken', $options ) ) !== false ) {
 					array_splice( $options, $i, 1 );
 				}
 				$options[] = 'known';
@@ -312,7 +323,7 @@ class Wikilog
 			$wi = self::getWikilogInfo( $title );
 			if ( $wi && $wi->isItem() && $wi->getItemTitle()->exists() ) {
 				$query = '';
-				if ( ($i = array_search( 'new', $classes )) !== false ) {
+				if ( ( $i = array_search( 'new', $classes ) ) !== false ) {
 					array_splice( $classes, $i, 1 );
 				}
 			}
@@ -325,7 +336,7 @@ class Wikilog
 	 * Adds a wikilog tab to articles in Wikilog namespaces.
 	 * Suppresses the "add section" tab in comments pages.
 	 */
-	static function SkinTemplateTabs( &$skin, &$contentActions ) {
+	static function SkinTemplateTabs( $skin, &$contentActions ) {
 		global $wgRequest, $wgWikilogEnableComments;
 
 		$wi = self::getWikilogInfo( $skin->mTitle );
@@ -333,8 +344,8 @@ class Wikilog
 			$action = $wgRequest->getText( 'action' );
 			if ( $wi->isMain() && $skin->mTitle->quickUserCan( 'edit' ) ) {
 				$contentActions['wikilog'] = array(
-					'class' => ($action == 'wikilog') ? 'selected' : false,
-					'text' => wfMsg('wikilog-tab'),
+					'class' => ( $action == 'wikilog' ) ? 'selected' : false,
+					'text' => wfMsg( 'wikilog-tab' ),
 					'href' => $skin->mTitle->getLocalUrl( 'action=wikilog' )
 				);
 			}
@@ -347,8 +358,126 @@ class Wikilog
 		return true;
 	}
 
-	###
-	##  Other global wikilog functions.
+	static function Weekday($ts)
+	{
+		global $wgWikilogWeekStart;
+		if (!$wgWikilogWeekStart)
+			$wgWikilogWeekStart = 0;
+		return (date('N', $ts) + 6 - $wgWikilogWeekStart) % 7;
+	}
+
+	/**
+	 * SkinBuildSidebar hook handler function.
+	 * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
+	 */
+	static function SkinBuildSidebar($skin, &$bar)
+	{
+		global $wgTitle, $wgRequest;
+		if (array_key_exists('wikilogcalendar', $bar))
+		{
+			$wi = self::getWikilogInfo($wgTitle);
+			if ($wi)
+				$wi = $wi->mWikilogTitle;
+			else if ($wgTitle->getNamespace() == NS_SPECIAL && $wgTitle->getBaseText() == 'Wikilog')
+			{
+				if ($wgRequest->getVal('wikilog'))
+					$wi = Title::makeTitleSafe(NS_MAIN, $wgRequest->getVal('wikilog'));
+				if (!$wi)
+					$wi = $wgTitle;
+			}
+			else
+			{
+				unset($bar['wikilogcalendar']);
+				return true;
+			}
+			$dbr = wfGetDB(DB_SLAVE);
+			$where = array('wlp_publish' => 1);
+			if ($wi->getNamespace() != NS_SPECIAL)
+				$where['wlp_parent'] = $wi->getArticleId();
+			$start = $dbr->selectField(
+				'wikilog_posts',
+				'MAX(wlp_pubdate)',
+				array_merge($where, array()),
+				__METHOD__
+			);
+			/* first day of last month with posts */
+			$month = substr($start, 0, 6);
+			$start = wfTimestamp(TS_UNIX, substr($start, 0, 6) . '01000000');
+			/* skip to beginning of the week */
+			$start = wfTimestamp(TS_MW, $start - 86400 * self::Weekday($start));
+			$where[] = "wlp_pubdate>=$start";
+			/* select dates and post counts */
+			$res = $dbr->select(
+				'wikilog_posts',
+				'wlp_page, wlp_pubdate, COUNT(1) numposts',
+				$where,
+				__METHOD__,
+				array('GROUP BY' => 'SUBSTR(wlp_pubdate,1,8)')
+			);
+			$dates = array();
+			while ($row = $dbr->fetchRow($res))
+			{
+				$date = substr($row['wlp_pubdate'], 0, 8);
+				if ($row['numposts'] == 1)
+				{
+					/* link to the post if it's the only one for that date */
+					$title = Title::newFromId($row['wlp_page']);
+					$dates[$date] = array(
+						$title->getLocalUrl(),
+						$title->getPrefixedText(),
+					);
+				}
+				else
+				{
+					/* link to archive page if there's more than one post for that date */
+					$dates[$date] = array(
+						$wi->getLocalUrl(array(
+							view  => 'archives',
+							year  => substr($date, 0, 4),
+							month => substr($date, 4, 2),
+							day   => substr($date, 6, 2),
+						)),
+						wfMsgExt('wikilog-calendar-archive-link-title', 'parseinline',
+							$wi->getPrefixedText(),
+							date('Y-m-d', wfTimestamp(TS_UNIX, $row['wlp_pubdate']))
+						),
+					);
+				}
+			}
+			$dbr->freeResult($res);
+			/* build HTML code */
+			$html = '<table class="wl-calendar"><tr>';
+			$ts = wfTimestamp(TS_UNIX, $start);
+			$i = 0;
+			while (date('Ym', $ts) <= $month || ($i % 7))
+			{
+				if ($i && !($i % 7))
+					$html .= '</tr><tr>';
+				$date = $dates[date('Ymd', $ts)];
+				$html .= '<td class="';
+				if (date('Ym', $ts) != $month)
+					$html .= 'wl-calendar-other ';
+				$html .= 'wl-calendar-day';
+				if (!$date)
+					$html .= '-empty">';
+				else
+					$html .= '"><a href="'.htmlspecialchars($date[0]).'" title="'.htmlspecialchars($date[1]).'">';
+				$html .= date('j', $ts);
+				if ($date)
+					$html .= '</a>';
+				$html .= '</td>';
+				/* + 1 day */
+				$ts += 86400;
+				$i++;
+			}
+			$html .= '</tr></table>';
+			$bar['wikilogcalendar'] = $html;
+		}
+		return true;
+	}
+
+	# ##
+	# #  Other global wikilog functions.
 	#
 
 	/**
@@ -362,6 +491,9 @@ class Wikilog
 	static function getWikilogInfo( $title ) {
 		global $wgWikilogNamespaces;
 
+		if ( !$title )
+			return NULL;
+
 		$ns = MWNamespace::getSubject( $title->getNamespace() );
 		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
 			return new WikilogInfo( $title );
@@ -369,9 +501,7 @@ class Wikilog
 			return NULL;
 		}
 	}
-
 }
-
 
 /**
  * Wikilog information class.
@@ -400,16 +530,12 @@ class WikilogInfo
 		$ns = MWNamespace::getSubject( $origns );
 		$tns = MWNamespace::getTalk( $origns );
 
-		if ( strpos( $title->getText(), '/' ) !== false ) {
-			# If title contains a '/', treat as a wikilog article title.
-			list( $this->mWikilogName, $this->mItemName ) =
-				explode( '/', $title->getText(), 2 );
-
-			if ( strpos( $this->mItemName, '/' ) !== false ) {
-				list( $this->mItemName, $this->mTrailing ) =
-					explode( '/', $this->mItemName, 2 );
-			}
-
+		# If title contains a '/', treat as a wikilog article title.
+		$parts = explode('/', $title->getText());
+		if (count($parts) > 1 && ($this->mIsTalk || count($parts) == 2))
+		{
+			$this->mWikilogName = $parts[0];
+			$this->mItemName = $parts[1];
 			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
 			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
@@ -436,9 +562,7 @@ class WikilogInfo
 	function getItemTalkTitle() { return $this->mItemTitle->getTalkPage(); }
 
 	function getTrailing() { return $this->mTrailing; }
-
 }
-
 
 /**
  * Interface used by article derived classes that implement the "wikilog"
@@ -448,4 +572,3 @@ interface WikilogCustomAction
 {
 	public function wikilog();
 }
-

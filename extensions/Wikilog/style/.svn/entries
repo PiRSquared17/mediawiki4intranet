@@ -1,19 +1,15 @@
 10
 
 dir
-473
-http://svn.juliano.info/svn/mediawiki/extensions/Wikilog/trunk/style
-http://svn.juliano.info/svn/mediawiki
+60293
+http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog/style
+http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-09-09T05:28:57.609780Z
-458
-Juliano F. Ravasi
-
-
-
-
+2009-11-28T03:47:16.795926Z
+59505
+juliano
 
 
 
@@ -24,7 +20,11 @@ Juliano F. Ravasi
 
 
 
-363dca7b-97fb-0310-8b71-a8c95a34027a
+
+
+
+
+dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 wikilog.css
 file
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-13T12:33:49.000000Z
-232b27284faacdbf4bca1fa77c1caf6c
-2009-09-09T05:28:57.609780Z
-458
-Juliano F. Ravasi
+2009-12-21T22:45:44.124777Z
+21602319ad81c50cb30f3613ae801461
+2009-11-28T03:47:16.795926Z
+59505
+juliano
 has-props
 
 
@@ -58,5 +58,5 @@ has-props
 
 
 
-2078
+2336
 

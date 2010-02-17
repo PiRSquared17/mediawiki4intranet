@@ -4,7 +4,7 @@
  * ----------
  * Author: Alan Juden (alan@judenware.org)
  * Copyright: (c) 2004 Alan Juden, Nigel McNie (http://qbnz.com/highlighter/)
- * Release Version: 1.0.8.4
+ * Release Version: 1.0.8.5
  * Date Started: 2004/06/04
  *
  * C# language file for GeSHi.
@@ -64,7 +64,7 @@ $language_data = array (
             'override', 'params', 'partial', 'private', 'protected', 'public',
             'readonly', 'ref', 'return', 'sealed', 'stackalloc', 'static',
             'switch', 'this', 'throw', 'true', 'try', 'unsafe', 'using',
-            'virtual', 'while'
+            'virtual', 'while', 'yield'
             ),
         2 => array(
             '#elif', '#endif', '#endregion', '#else', '#error', '#define', '#if',

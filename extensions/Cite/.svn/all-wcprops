@@ -9,6 +9,12 @@ svn:wc:ra_dav:version-url
 V 91
 /svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Cite/SpecialCite.i18n.alias.php
 END
+citeParserTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Cite/citeParserTests.txt
+END
 Cite_body.php
 K 25
 svn:wc:ra_dav:version-url
@@ -38,12 +44,6 @@ K 25
 svn:wc:ra_dav:version-url
 V 85
 /svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Cite/SpecialCite.i18n.php
-END
-citeParserTests.txt
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Cite/citeParserTests.txt
 END
 Cite.php
 K 25
