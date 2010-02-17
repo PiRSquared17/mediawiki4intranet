@@ -4,6 +4,9 @@
  * @ingroup SpecialPage
  */
 
+# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
+if (!function_exists('wfSpecialUpload'))
+{
 
 /**
  * Entry point
@@ -1430,7 +1433,7 @@ wgUploadAutoFill = {$autofill};
 	 * @return bool true if the file contains something looking like embedded scripts
 	 */
 	function detectScript($file, $mime, $extension) {
-		global $wgAllowTitlesInSVG;
+		global $wgAllowTitlesInSVG, $wgForbiddenTagsInUploads;
 
 		#ugly hack: for text files, always look at the entire file.
 		#For binarie field, just check the first K.
@@ -1478,7 +1481,9 @@ wgUploadAutoFill = {$autofill};
 		* when served with a generic content-type.
 		*/
 
-		$tags = array(
+		$tags = $wgForbiddenTagsInUploads;
+		if (!$tags)
+			$tags = array(
 			'<a href',
 			'<body',
 			'<head',
@@ -1808,4 +1813,6 @@ wgUploadAutoFill = {$autofill};
 			$out->addHTML( '</div>' );
 		}
 	}
+}
+
 }
