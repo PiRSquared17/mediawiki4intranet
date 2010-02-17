@@ -392,7 +392,7 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$defaults = $opts->getAllValues();
 		$nondefaults = $opts->getChangedValues();
-		$opts->consumeValues( array( 'namespace', 'invert' ) );
+		$opts->consumeValues( array( 'namespace', 'invert', 'categories', 'categories_any' ) );
 
 		$panel = array();
 		$panel[] = $this->optionsPanel( $defaults, $nondefaults );
@@ -529,6 +529,7 @@ class SpecialRecentChanges extends SpecialPage {
 		# Filter articles
 		$articles = array();
 		$a2r = array();
+		$newrows = array();
 		foreach( $rows AS $k => $r ) {
 			$nt = Title::makeTitle( $r->rc_namespace, $r->rc_title );
 			$id = $nt->getArticleID();
@@ -539,8 +540,10 @@ class SpecialRecentChanges extends SpecialPage {
 			if( !isset($a2r[$id]) ) {
 				$a2r[$id] = array();
 			}
+			$newrows[$k] = $r;
 			$a2r[$id][] = $k;
 		}
+		$rows = $newrows;
 
 		# Shortcut?
 		if( !count($articles) || !count($cats) )
