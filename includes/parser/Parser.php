@@ -153,7 +153,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
@@ -194,7 +194,8 @@ class Parser
 		$this->mLastSection = '';
 		$this->mDTopen = false;
 		$this->mIncludeCount = array();
-		$this->mStripState = new StripState;
+		if ( !$this->mStripState )
+			$this->mStripState = new StripState;
 		$this->mArgStack = false;
 		$this->mInPre = false;
 		$this->mLinkHolders = new LinkHolderArray( $this );
@@ -3452,7 +3453,7 @@ class Parser
 	 * @private
 	 */
 	function formatHeadings( $text, $isMain=true ) {
-		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
+		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
 
 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
 		$showEditLink = $this->mOptions->getEditSection();
@@ -3595,6 +3596,8 @@ class Parser
 						$dot = 1;
 					}
 				}
+				if ($wgDotAfterTocnumber)
+					$numbering .= '.';
 			}
 
 			# The safe header is a version of the header text safe to use for links
