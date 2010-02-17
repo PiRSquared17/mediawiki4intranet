@@ -450,7 +450,7 @@ class WikilogCommentsPage
 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ), 'known' );
+					array( 'action' => 'edit', 'section' => false ), 'known' );
 			}
 			if ( $comment->mCommentTitle->quickUserCan( 'delete' ) ) {
 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
