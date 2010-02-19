@@ -81,6 +81,7 @@ class CustisRuTemplate extends QuickTemplate {
     <head>
         <meta http-equiv="Content-Type" content="<?php $this->text('mimetype') ?>; charset=<?php $this->text('charset') ?>" />
         <meta name="google-site-verification" content="anyU3u45qDhtfNNBz4KB8XvxmIlUSVknkU0Nf92117M" />
+        <meta name='yandex-verification' content='61f5d9b5d45859e0' />
         <?php $this->html('headlinks') ?>
         <title><?php $this->text('pagetitle') ?></title>
         <?php $this->html('csslinks') ?>
