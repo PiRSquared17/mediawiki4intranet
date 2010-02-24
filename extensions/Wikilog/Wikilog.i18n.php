@@ -18,6 +18,10 @@ $messages['en'] = array(
 	'right-wl-postcomment' => 'Post comments to wikilog articles',
 	'right-wl-moderation' => 'Moderation of wikilog article comments',
 
+	# Calendar
+	'wikilogcalendar' => 'Wikilog calendar',
+	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
+
 	# Special:Wikilog
 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
 	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
@@ -116,7 +120,7 @@ Uncheck this box to keep the article as a draft.',
 	'wikilog-newtalk-summary' => 'created automatically by Wikilog',
 
 	# Atom and RSS feeds
-	'wikilog-feed-title' => '{{SITENAME}} - $1 [$2]', # $1 = title, $2 = content language
+	'wikilog-feed-title' => '{{SITENAME}} — $1 [$2]', # $1 = title, $2 = content language
 	'wikilog-feed-description' => 'Read the most recent posts in this feed.',
 	'wikilog-comment-feed-title1' => 'Comment by $2 (#$1)',
 	'wikilog-comment-feed-title2' => 'Comment by $2 to $3 (#$1)',
@@ -4862,6 +4866,8 @@ $messages['ru'] = array(
 	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
 	'wikilog-auto' => 'Викилог Авто',
 	'wikilog-help' => '{{ns:Help}}:Викилог',
+	'wikilogcalendar' => 'Календарь блога',
+	'wikilog-calendar-archive-link-title' => 'Записи $1 за $2',
 	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
 	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
 	'wikilog-specialwikilog-title' => 'Викилоги',
@@ -4988,6 +4994,8 @@ $messages['ru'] = array(
 	'wikilog-page-lc' => 'страница',
 	'wikilog-history-lc' => 'история',
 	'wikilog-doc-import-comment' => 'Импортированная документация Викилога',
+	'wikilog-comments-feed-title' => '{{SITENAME}} — $1 — Обсуждение',
+	'wikilog-comments-feed-desc' => 'Лента новых комментариев к постам в Викилоге $1 в {{SITENAME}}.',
 );
 
 /** Sinhala (සිංහල)
