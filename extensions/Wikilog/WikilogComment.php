@@ -740,7 +740,7 @@ class WikilogCommentFormatter
 			}
 		}
 		if ( $extra ) {
-			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
+			$extra = implode( ' | ', $extra );
 		} else {
 			$extra = "";
 		}
