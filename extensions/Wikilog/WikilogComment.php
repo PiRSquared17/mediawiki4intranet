@@ -897,7 +897,7 @@ class WikilogCommentFormatter
 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-page-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array(),
+					array( 'section' => false ),
 					'known'
 				);
 			}
