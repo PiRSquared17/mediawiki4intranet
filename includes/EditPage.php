@@ -2005,7 +2005,7 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-sig'),
 				'id'     => 'mw-editbutton-signature',
-				'open'   => '--~~~~',
+				'open'   => '~~~~',
 				'close'  => '',
 				'sample' => '',
 				'tip'    => wfMsg('sig_tip'),
