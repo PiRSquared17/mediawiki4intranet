@@ -1,17 +1,17 @@
 K 25
 svn:wc:ra_dav:version-url
 V 70
-/svnroot/mediawiki/!svn/ver/58418/trunk/extensions/Wikilog/maintenance
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/maintenance
 END
 wikilogImportDocumentation.php
 K 25
 svn:wc:ra_dav:version-url
 V 101
-/svnroot/mediawiki/!svn/ver/58418/trunk/extensions/Wikilog/maintenance/wikilogImportDocumentation.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/maintenance/wikilogImportDocumentation.php
 END
 wikilogImportDocumentation-pre1.16.php
 K 25
 svn:wc:ra_dav:version-url
 V 109
-/svnroot/mediawiki/!svn/ver/58418/trunk/extensions/Wikilog/maintenance/wikilogImportDocumentation-pre1.16.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/maintenance/wikilogImportDocumentation-pre1.16.php
 END
