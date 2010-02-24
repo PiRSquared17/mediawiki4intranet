@@ -29,6 +29,20 @@ $messages['af'] = array(
 	'wlfeed-desc' => 'Klasse vir die skep van verbeterde voere (feeds)',
 );
 
+/** Arabic (العربية)
+ * @author Meno25
+ */
+$messages['ar'] = array(
+	'wlfeed-desc' => 'رتب توليد تلقيم ممددة',
+);
+
+/** Egyptian Spoken Arabic (مصرى)
+ * @author Meno25
+ */
+$messages['arz'] = array(
+	'wlfeed-desc' => 'رتب توليد تلقيم ممددة',
+);
+
 /** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
  * @author EugeneZelenko
  */
@@ -50,11 +64,25 @@ $messages['bs'] = array(
 	'wlfeed-desc' => 'Napredno generisanje klasa fida',
 );
 
+/** Czech (Česky)
+ * @author Matěj Grabovský
+ */
+$messages['cs'] = array(
+	'wlfeed-desc' => 'Vylepšené třídy pro vytváření kanálů',
+);
+
 /** Lower Sorbian (Dolnoserbski)
  * @author Michawiki
  */
 $messages['dsb'] = array(
 	'wlfeed-desc' => 'Pólěpšone klase kanaloweje generacije',
+);
+
+/** Spanish (Español)
+ * @author Translationista
+ */
+$messages['es'] = array(
+	'wlfeed-desc' => 'Clases de generación de canales mejoradas',
 );
 
 /** Finnish (Suomi)
@@ -148,11 +176,25 @@ $messages['nl'] = array(
 	'wlfeed-desc' => 'Klassen voor het aanmaken van verbeterde feeds',
 );
 
+/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
+ * @author Nghtwlkr
+ */
+$messages['no'] = array(
+	'wlfeed-desc' => 'Avanserte genereringsklasser for mating',
+);
+
 /** Occitan (Occitan)
  * @author Cedric31
  */
 $messages['oc'] = array(
-	'wlfeed-desc' => 'Classas de generacion de fluses melhorats',
+	'wlfeed-desc' => 'Classas de generacion de fluxes melhorats',
+);
+
+/** Polish (Polski)
+ * @author Sp5uhe
+ */
+$messages['pl'] = array(
+	'wlfeed-desc' => 'Rozszerzone klasy generowania kanałów',
 );
 
 /** Piedmontese (Piemontèis)
@@ -168,6 +210,13 @@ $messages['pms'] = array(
  */
 $messages['pt'] = array(
 	'wlfeed-desc' => "Classes melhoradas de geração de ''feeds''",
+);
+
+/** Brazilian Portuguese (Português do Brasil)
+ * @author Daemorris
+ */
+$messages['pt-br'] = array(
+	'wlfeed-desc' => 'Classes melhoradas de geração de alimentadores',
 );
 
 /** Tarandíne (Tarandíne)
@@ -189,6 +238,20 @@ $messages['ru'] = array(
  */
 $messages['si'] = array(
 	'wlfeed-desc' => 'වර්ධිත සංග්‍රහ ප්‍රවේණි පංති',
+);
+
+/** Swedish (Svenska)
+ * @author Boivie
+ */
+$messages['sv'] = array(
+	'wlfeed-desc' => 'Utökade feed-skapningsklasser',
+);
+
+/** Turkish (Türkçe)
+ * @author Vito Genovese
+ */
+$messages['tr'] = array(
+	'wlfeed-desc' => 'Gelişmiş besleme oluşturma sınıfları',
 );
 
 /** Ukrainian (Українська)

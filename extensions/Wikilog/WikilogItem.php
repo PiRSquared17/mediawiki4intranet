@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,18 +36,18 @@ class WikilogItem
 	/**
 	 * General data about the article.
 	 */
-	public    $mID          = NULL;		///< Article ID.
-	public    $mName        = NULL;		///< Article title text (as in DB).
-	public    $mTitle       = NULL;		///< Article Title object.
-	public    $mParent      = NULL;		///< Parent wikilog article ID.
-	public    $mParentName  = NULL;		///< Parent wikilog title text.
-	public    $mParentTitle = NULL;		///< Parent wikilog Title object.
-	public    $mPublish     = NULL;		///< Article is published.
-	public    $mPubDate     = NULL;		///< Date the article was published.
-	public    $mUpdated     = NULL;		///< Date the article was last updated.
+	public    $mID          = null;		///< Article ID.
+	public    $mName        = null;		///< Article title text (as in DB).
+	public    $mTitle       = null;		///< Article Title object.
+	public    $mParent      = null;		///< Parent wikilog article ID.
+	public    $mParentName  = null;		///< Parent wikilog title text.
+	public    $mParentTitle = null;		///< Parent wikilog Title object.
+	public    $mPublish     = null;		///< Article is published.
+	public    $mPubDate     = null;		///< Date the article was published.
+	public    $mUpdated     = null;		///< Date the article was last updated.
 	public    $mAuthors     = array();	///< Array of authors.
 	public    $mTags        = array();	///< Array of tags.
-	public    $mNumComments = NULL;		///< Cached number of comments.
+	public    $mNumComments = null;		///< Cached number of comments.
 
 	/**
 	 * Constructor.
@@ -220,8 +220,10 @@ class WikilogItem
 
 	/**
 	 * Returns an array with all published comments.
+	 * @deprecated Doesn't scale well, use query and pager objects instead.
 	 */
-	public function getComments( $thread = NULL ) {
+	public function getComments( $thread = null ) {
+		wfDeprecated( __METHOD__ );
 		$dbr = wfGetDB( DB_SLAVE );
 
 		if ( $thread ) {
@@ -233,8 +235,8 @@ class WikilogItem
 		$comments = array();
 		foreach ( $result as $row ) {
 			$comment = WikilogComment::newFromRow( $this, $row );
-			if ( $row->page_latest ) {
-				$rev = Revision::newFromId( $row->page_latest );
+			if ( $comment->mCommentRev ) {
+				$rev = Revision::newFromId( $row->mCommentRev );
 				$comment->setText( $rev->getText() );
 			}
 			$comments[] = $comment;
@@ -257,8 +259,8 @@ class WikilogItem
 		$item->mParentName  = str_replace( '_', ' ', $row->wlw_title );
 		$item->mParentTitle = Title::makeTitle( $row->wlw_namespace, $row->wlw_title );
 		$item->mPublish     = intval( $row->wlp_publish );
-		$item->mPubDate     = $row->wlp_pubdate ? wfTimestamp( TS_MW, $row->wlp_pubdate ) : NULL;
-		$item->mUpdated     = $row->wlp_updated ? wfTimestamp( TS_MW, $row->wlp_updated ) : NULL;
+		$item->mPubDate     = $row->wlp_pubdate ? wfTimestamp( TS_MW, $row->wlp_pubdate ) : null;
+		$item->mUpdated     = $row->wlp_updated ? wfTimestamp( TS_MW, $row->wlp_updated ) : null;
 		$item->mNumComments = $row->wlp_num_comments;
 		$item->mAuthors     = unserialize( $row->wlp_authors );
 		$item->mTags        = unserialize( $row->wlp_tags );
@@ -283,7 +285,7 @@ class WikilogItem
 		if ( $row ) {
 			return self::newFromRow( $row );
 		}
-		return NULL;
+		return null;
 	}
 
 	/**
@@ -297,7 +299,7 @@ class WikilogItem
 		if ( $itemTitle ) {
 			return self::newFromID( $itemTitle->getArticleID() );
 		} else {
-			return NULL;
+			return null;
 		}
 	}
 
@@ -309,8 +311,16 @@ class WikilogItem
 	 * @return Database row, or false.
 	 */
 	private static function loadFromConds( $dbr, $conds ) {
-		extract( self::selectInfo( $dbr ) );	// $tables, $fields
-		$row = $dbr->selectRow( $tables, $fields, $conds, __METHOD__, array( ) );
+		$tables = self::selectTables( $dbr );
+		$fields = self::selectFields();
+		$row = $dbr->selectRow(
+			$tables['tables'],
+			$fields,
+			$conds,
+			__METHOD__,
+			array(),
+			$tables['join_conds']
+		);
 		return $row;
 	}
 
@@ -326,34 +336,44 @@ class WikilogItem
 	}
 
 	/**
-	 * Returns the tables and fields used for database queries for wikilog
-	 * article objects.
-	 * @param $dbr Database connection object.
-	 * @return Array(2) with the description of the tables and fields to be
-	 *   used in database queries.
+	 * Return the list of database tables required to create a new instance
+	 * of WikilogItem.
 	 */
-	private static function selectInfo( $dbr ) {
-		extract( $dbr->tableNames( 'wikilog_posts', 'page' ) );
+	public static function selectTables( $dbr = null ) {
+		if ( !$dbr ) $dbr = wfGetDB( DB_SLAVE );
+		$page = $dbr->tableName( 'page' );
 		return array(
-			'tables' =>
-				"{$wikilog_posts} " .
-				"LEFT JOIN {$page} AS w ON (w.page_id = wlp_parent) " .
-				"LEFT JOIN {$page} AS p ON (p.page_id = wlp_page) ",
-			'fields' => array(
-				'wlp_page',
-				'wlp_parent',
-				'w.page_namespace AS wlw_namespace',
-				'w.page_title AS wlw_title',
-				'p.page_namespace AS page_namespace',
-				'p.page_title AS page_title',
-				'wlp_title',
-				'wlp_publish',
-				'wlp_pubdate',
-				'wlp_updated',
-				'wlp_authors',
-				'wlp_tags',
-				'wlp_num_comments'
+			'tables' => array(
+				'wikilog_posts',
+				"{$page} AS w",
+				"{$page} AS p"
+			),
+			'join_conds' => array(
+				"{$page} AS w" => array( 'LEFT JOIN', 'w.page_id = wlp_parent' ),
+				"{$page} AS p" => array( 'LEFT JOIN', 'p.page_id = wlp_page' )
 			)
+		);
+	}
+
+	/**
+	 * Return the list of post fields required to create a new instance of
+	 * WikilogItem.
+	 */
+	public static function selectFields() {
+		return array(
+			'wlp_page',
+			'wlp_parent',
+			'w.page_namespace AS wlw_namespace',
+			'w.page_title AS wlw_title',
+			'p.page_namespace AS page_namespace',
+			'p.page_title AS page_title',
+			'wlp_title',
+			'wlp_publish',
+			'wlp_pubdate',
+			'wlp_updated',
+			'wlp_authors',
+			'wlp_tags',
+			'wlp_num_comments'
 		);
 	}
 }
