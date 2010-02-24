@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -96,7 +96,7 @@ class SpecialWikilog
 	 * Prepare special page parameters for a web request.
 	 */
 	public function webSetup( $parameters ) {
-		global $wgRequest, $wgWikilogSummaryLimit;
+		global $wgRequest, $wgWikilogExpensiveLimit;
 
 		$opts = $this->getDefaultOptions();
 		$opts->fetchValuesFromRequest( $wgRequest );
@@ -104,7 +104,7 @@ class SpecialWikilog
 		# Collect inline parameters, they have precedence over query params.
 		$this->parseInlineParams( $parameters, $opts );
 
-		$opts->validateIntBounds( 'limit', 0, $wgWikilogSummaryLimit );
+		$opts->validateIntBounds( 'limit', 0, $wgWikilogExpensiveLimit );
 		return $opts;
 	}
 
@@ -115,11 +115,11 @@ class SpecialWikilog
 	 * are recognized. Other parameters are ignored.
 	 */
 	public function feedSetup() {
-		global $wgRequest, $wgFeedLimit, $wgWikilogSummaryLimit;
+		global $wgRequest, $wgFeedLimit;
 
 		$opts = $this->getDefaultOptions();
 		$opts->fetchValuesFromRequest( $wgRequest, array( 'show', 'limit' ) );
-		$opts->validateIntBounds( 'limit', 0, min( $wgFeedLimit, $wgWikilogSummaryLimit ) );
+		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
 
@@ -129,7 +129,6 @@ class SpecialWikilog
 	 */
 	public function webOutput( FormOptions $opts ) {
 		global $wgRequest, $wgOut, $wgMimeType, $wgTitle, $wgParser;
-		global $wgWikilogNavTop, $wgWikilogNavBottom;
 
 		# Set page title, html title, nofollow, noindex, etc...
 		$this->setHeaders();
@@ -179,10 +178,7 @@ class SpecialWikilog
 			$body .= $pager->getBody();
 
 			# Add navigation bars.
-			if ( $wgWikilogNavTop )
-				$body = $pager->getNavigationBar( 'wl-navbar-top' ) . $body;
-			if ( $wgWikilogNavBottom )
-				$body = $body . $pager->getNavigationBar( 'wl-navbar-bottom' );
+			$body .= $pager->getNavigationBar();
 		}
 
 		# Output.
@@ -195,7 +191,7 @@ class SpecialWikilog
 		# Add feed links.
 		$wgOut->setSyndicated();
 		if ( isset( $qarr['show'] ) ) {
-			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogFeed::$paramWhitelist ) );
+			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogItemFeed::$paramWhitelist ) );
 			$wgOut->setFeedAppendQuery( $altquery );
 		}
 
@@ -222,7 +218,7 @@ class SpecialWikilog
 	public function feedOutput( $format, FormOptions $opts ) {
 		global $wgTitle;
 
-		$feed = new WikilogFeed( $wgTitle, $format, self::getQuery( $opts ),
+		$feed = new WikilogItemFeed( $wgTitle, $format, self::getQuery( $opts ),
 			$opts['limit'] );
 		return $feed->execute();
 	}
@@ -267,7 +263,7 @@ class SpecialWikilog
 					list( $opts['year'], $opts['month'], $opts['day'] ) = $date;
 				}
 			} else {
-				if ( ( $t = Title::newFromText( $par ) ) !== NULL ) {
+				if ( ( $t = Title::newFromText( $par ) ) !== null ) {
 					$ns = $t->getNamespace();
 					if ( in_array( $ns, $wgWikilogNamespaces ) ) {
 						$opts['wikilog'] = $t->getPrefixedDBkey();
@@ -330,7 +326,7 @@ class SpecialWikilog
 				$out .= Xml::openElement( 'tr' );
 				if ( is_array( $row ) ) {
 					$out .= Xml::tags( 'td', array( 'align' => $align ), $row[0] );
-					$out .= Xml::tags( 'td', NULL, $row[1] );
+					$out .= Xml::tags( 'td', null, $row[1] );
 				} else {
 					$out .= Xml::tags( 'td', array( 'colspan' => 2 ), $row );
 				}
@@ -433,8 +429,8 @@ class SpecialWikilog
 		if ( preg_match( '|^(\d+)(?:[/-](\d+)(?:[/-](\d+))?)?$|', $date, $m ) ) {
 			return array(
 				intval( $m[1] ),
-				( isset( $m[2] ) ? intval( $m[2] ) : NULL ),
-				( isset( $m[3] ) ? intval( $m[3] ) : NULL )
+				( isset( $m[2] ) ? intval( $m[2] ) : null ),
+				( isset( $m[3] ) ? intval( $m[3] ) : null )
 			);
 		} else {
 			return false;
