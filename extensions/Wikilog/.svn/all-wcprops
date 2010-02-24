@@ -1,115 +1,133 @@
 K 25
 svn:wc:ra_dav:version-url
 V 58
-/svnroot/mediawiki/!svn/ver/60286/trunk/extensions/Wikilog
+/svnroot/mediawiki/!svn/ver/62888/trunk/extensions/Wikilog
 END
 WikilogFeed.php
 K 25
 svn:wc:ra_dav:version-url
 V 74
-/svnroot/mediawiki/!svn/ver/60190/trunk/extensions/Wikilog/WikilogFeed.php
+/svnroot/mediawiki/!svn/ver/62626/trunk/extensions/Wikilog/WikilogFeed.php
 END
 WikilogDefaultSettings.php
 K 25
 svn:wc:ra_dav:version-url
 V 85
-/svnroot/mediawiki/!svn/ver/59505/trunk/extensions/Wikilog/WikilogDefaultSettings.php
+/svnroot/mediawiki/!svn/ver/62576/trunk/extensions/Wikilog/WikilogDefaultSettings.php
 END
 WikilogQuery.php
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/58345/trunk/extensions/Wikilog/WikilogQuery.php
-END
-Wikilog.i18n.magic.php
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/60233/trunk/extensions/Wikilog/Wikilog.i18n.magic.php
+/svnroot/mediawiki/!svn/ver/62572/trunk/extensions/Wikilog/WikilogQuery.php
 END
 WlFeed.body.php
 K 25
 svn:wc:ra_dav:version-url
 V 74
-/svnroot/mediawiki/!svn/ver/58345/trunk/extensions/Wikilog/WlFeed.body.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WlFeed.body.php
+END
+Wikilog.i18n.magic.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/62623/trunk/extensions/Wikilog/Wikilog.i18n.magic.php
+END
+WikilogItemPager.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/62575/trunk/extensions/Wikilog/WikilogItemPager.php
 END
 Wikilog.php
 K 25
 svn:wc:ra_dav:version-url
 V 70
-/svnroot/mediawiki/!svn/ver/60233/trunk/extensions/Wikilog/Wikilog.php
+/svnroot/mediawiki/!svn/ver/62858/trunk/extensions/Wikilog/Wikilog.php
 END
 SpecialWikilog.php
 K 25
 svn:wc:ra_dav:version-url
 V 77
-/svnroot/mediawiki/!svn/ver/59763/trunk/extensions/Wikilog/SpecialWikilog.php
+/svnroot/mediawiki/!svn/ver/62574/trunk/extensions/Wikilog/SpecialWikilog.php
 END
 WlFeed.php
 K 25
 svn:wc:ra_dav:version-url
 V 69
-/svnroot/mediawiki/!svn/ver/59514/trunk/extensions/Wikilog/WlFeed.php
+/svnroot/mediawiki/!svn/ver/62858/trunk/extensions/Wikilog/WlFeed.php
 END
-README
+WikilogCommentPager.php
 K 25
 svn:wc:ra_dav:version-url
-V 65
-/svnroot/mediawiki/!svn/ver/58299/trunk/extensions/Wikilog/README
+V 82
+/svnroot/mediawiki/!svn/ver/62576/trunk/extensions/Wikilog/WikilogCommentPager.php
 END
 CREDITS
 K 25
 svn:wc:ra_dav:version-url
 V 66
-/svnroot/mediawiki/!svn/ver/60190/trunk/extensions/Wikilog/CREDITS
+/svnroot/mediawiki/!svn/ver/62633/trunk/extensions/Wikilog/CREDITS
 END
 WikilogMainPage.php
 K 25
 svn:wc:ra_dav:version-url
 V 78
-/svnroot/mediawiki/!svn/ver/59763/trunk/extensions/Wikilog/WikilogMainPage.php
+/svnroot/mediawiki/!svn/ver/62574/trunk/extensions/Wikilog/WikilogMainPage.php
 END
 WlCaptchaAdapter.php
 K 25
 svn:wc:ra_dav:version-url
 V 79
-/svnroot/mediawiki/!svn/ver/58311/trunk/extensions/Wikilog/WlCaptchaAdapter.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WlCaptchaAdapter.php
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/README
 END
 WikilogCommentsPage.php
 K 25
 svn:wc:ra_dav:version-url
 V 82
-/svnroot/mediawiki/!svn/ver/59480/trunk/extensions/Wikilog/WikilogCommentsPage.php
+/svnroot/mediawiki/!svn/ver/62626/trunk/extensions/Wikilog/WikilogCommentsPage.php
 END
 WikilogHooks.php
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/59467/trunk/extensions/Wikilog/WikilogHooks.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WikilogHooks.php
 END
 WikilogLinksUpdate.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/58311/trunk/extensions/Wikilog/WikilogLinksUpdate.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WikilogLinksUpdate.php
 END
 Wikilog.i18n.alias.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/59466/trunk/extensions/Wikilog/Wikilog.i18n.alias.php
+/svnroot/mediawiki/!svn/ver/60408/trunk/extensions/Wikilog/Wikilog.i18n.alias.php
+END
+TODO
+K 25
+svn:wc:ra_dav:version-url
+V 63
+/svnroot/mediawiki/!svn/ver/62836/trunk/extensions/Wikilog/TODO
 END
 RELEASE-NOTES
 K 25
 svn:wc:ra_dav:version-url
 V 72
-/svnroot/mediawiki/!svn/ver/60233/trunk/extensions/Wikilog/RELEASE-NOTES
+/svnroot/mediawiki/!svn/ver/62633/trunk/extensions/Wikilog/RELEASE-NOTES
 END
 WikilogItemPage.php
 K 25
 svn:wc:ra_dav:version-url
 V 78
-/svnroot/mediawiki/!svn/ver/59505/trunk/extensions/Wikilog/WikilogItemPage.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WikilogItemPage.php
 END
 COPYING
 K 25
@@ -121,47 +139,41 @@ WikilogParser.php
 K 25
 svn:wc:ra_dav:version-url
 V 76
-/svnroot/mediawiki/!svn/ver/60233/trunk/extensions/Wikilog/WikilogParser.php
+/svnroot/mediawiki/!svn/ver/62454/trunk/extensions/Wikilog/WikilogParser.php
 END
 Wikilog.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/60286/trunk/extensions/Wikilog/Wikilog.i18n.php
-END
-WikilogItem.php
-K 25
-svn:wc:ra_dav:version-url
-V 74
-/svnroot/mediawiki/!svn/ver/59505/trunk/extensions/Wikilog/WikilogItem.php
-END
-WikilogPager.php
-K 25
-svn:wc:ra_dav:version-url
-V 75
-/svnroot/mediawiki/!svn/ver/59505/trunk/extensions/Wikilog/WikilogPager.php
+/svnroot/mediawiki/!svn/ver/62888/trunk/extensions/Wikilog/Wikilog.i18n.php
 END
 WlFeed.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 74
-/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/Wikilog/WlFeed.i18n.php
+/svnroot/mediawiki/!svn/ver/61946/trunk/extensions/Wikilog/WlFeed.i18n.php
+END
+WikilogItem.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/mediawiki/!svn/ver/62633/trunk/extensions/Wikilog/WikilogItem.php
 END
 wikilog-tables.sql
 K 25
 svn:wc:ra_dav:version-url
 V 77
-/svnroot/mediawiki/!svn/ver/58299/trunk/extensions/Wikilog/wikilog-tables.sql
+/svnroot/mediawiki/!svn/ver/61893/trunk/extensions/Wikilog/wikilog-tables.sql
 END
 WikilogUtils.php
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/60233/trunk/extensions/Wikilog/WikilogUtils.php
+/svnroot/mediawiki/!svn/ver/62666/trunk/extensions/Wikilog/WikilogUtils.php
 END
 WikilogComment.php
 K 25
 svn:wc:ra_dav:version-url
 V 77
-/svnroot/mediawiki/!svn/ver/58345/trunk/extensions/Wikilog/WikilogComment.php
+/svnroot/mediawiki/!svn/ver/62667/trunk/extensions/Wikilog/WikilogComment.php
 END
