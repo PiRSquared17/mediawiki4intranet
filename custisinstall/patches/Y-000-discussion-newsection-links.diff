@@ -1,21 +1,30 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1265372780 -10800
+# Date 1267036280 -10800
 Add new section by default when editing a discussion page.
 
-diff -r ecc1d86fc6cf -r cf0f457f45ed extensions/Wikilog/WikilogCommentsPage.php
---- extensions/Wikilog/WikilogCommentsPage.php
-+++ extensions/Wikilog/WikilogCommentsPage.php
-@@ -434,7 +434,7 @@
- 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
+diff -r 2f012c39365a -r dae2066690fc extensions/Wikilog/WikilogComment.php
+--- extensions/Wikilog/WikilogComment.php
++++ extensions/Wikilog/WikilogComment.php
+@@ -897,7 +897,7 @@
+ 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
+ 					wfMsg( 'wikilog-page-lc' ),
+ 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
+-					array(),
++					array( 'section' => false ),
+ 					'known'
+ 				);
+ 			}
+@@ -905,7 +905,7 @@
+ 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
  					wfMsg( 'wikilog-edit-lc' ),
  					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
--					array( 'action' => 'edit' ), 'known' );
-+					array( 'action' => 'edit', 'section' => false ), 'known' );
+-					array( 'action' => 'edit' ),
++					array( 'action' => 'edit', 'section' => false ),
+ 					'known'
+ 				);
  			}
- 			if ( $comment->mCommentTitle->quickUserCan( 'delete' ) ) {
- 				$tools[] = $this->mSkin->link( $comment->mCommentTitle,
-diff -r ecc1d86fc6cf -r cf0f457f45ed includes/Linker.php
+diff -r 2f012c39365a -r dae2066690fc includes/Linker.php
 --- includes/Linker.php
 +++ includes/Linker.php
 @@ -244,6 +244,13 @@
@@ -32,7 +41,7 @@ diff -r ecc1d86fc6cf -r cf0f457f45ed includes/Linker.php
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
  		return $ret;
-diff -r ecc1d86fc6cf -r cf0f457f45ed includes/SkinTemplate.php
+diff -r 2f012c39365a -r dae2066690fc includes/SkinTemplate.php
 --- includes/SkinTemplate.php
 +++ includes/SkinTemplate.php
 @@ -597,6 +597,8 @@
