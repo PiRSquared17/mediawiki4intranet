@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -53,24 +53,24 @@ class WikilogComment
 	/**
 	 * Wikilog article item this comment is associated to.
 	 */
-	public  $mItem			= NULL;
+	public  $mItem			= null;
 
 	/**
 	 * General data about the comment.
 	 */
-	public  $mID			= NULL;		///< Comment ID.
-	public  $mParent		= NULL;		///< Parent comment ID.
-	public  $mThread		= NULL;		///< Comment thread.
-	public  $mUserID		= NULL;		///< Comment author user id.
-	public  $mUserText		= NULL;		///< Comment author user name.
-	public  $mAnonName		= NULL;		///< Comment anonymous author name.
-	public  $mStatus		= NULL;		///< Comment status.
-	public  $mTimestamp		= NULL;		///< Date the comment was published.
-	public  $mUpdated		= NULL;		///< Date the comment was last updated.
-	public  $mCommentPage	= NULL;		///< Comment page id.
-	public  $mCommentTitle  = NULL;		///< Comment page title.
-	public  $mCommentRev	= NULL;		///< Comment revision id.
-	public  $mText			= NULL;		///< Comment text.
+	public  $mID			= null;		///< Comment ID.
+	public  $mParent		= null;		///< Parent comment ID.
+	public  $mThread		= null;		///< Comment thread.
+	public  $mUserID		= null;		///< Comment author user id.
+	public  $mUserText		= null;		///< Comment author user name.
+	public  $mAnonName		= null;		///< Comment anonymous author name.
+	public  $mStatus		= null;		///< Comment status.
+	public  $mTimestamp		= null;		///< Date the comment was published.
+	public  $mUpdated		= null;		///< Date the comment was last updated.
+	public  $mCommentPage	= null;		///< Comment page id.
+	public  $mCommentTitle  = null;		///< Comment page title.
+	public  $mCommentRev	= null;		///< Comment revision id.
+	public  $mText			= null;		///< Comment text.
 
 	/**
 	 * Whether the text was changed, and thus a database update is required.
@@ -101,7 +101,7 @@ class WikilogComment
 	public function setUser( $user ) {
 		$this->mUserID = $user->getId();
 		$this->mUserText = $user->getName();
-		$this->mAnonName = NULL;
+		$this->mAnonName = null;
 	}
 
 	/**
@@ -146,8 +146,10 @@ class WikilogComment
 	public function loadText() {
 		$dbr = wfGetDB( DB_SLAVE );
 		$rev = Revision::loadFromId( $dbr, $this->mCommentRev );
-		$this->mText = $rev->getText();
-		$this->mTextChanged = false;
+		if ( $rev ) {
+			$this->mText = $rev->getText();
+			$this->mTextChanged = false;
+		}
 	}
 
 	/**
@@ -230,7 +232,7 @@ class WikilogComment
 		$this->mItem->mTitle->invalidateCache();
 		$this->mItem->mTitle->getTalkPage()->invalidateCache();
 		$this->mItem->mParentTitle->invalidateCache();
-		$this->mID = NULL;
+		$this->mID = null;
 	}
 
 	/**
@@ -321,9 +323,9 @@ class WikilogComment
 		$comment->mCommentPage  = $row->wlc_comment_page;
 
 		# This information may not be available for deleted comments.
-		if ( $row->page_title && $row->page_latest ) {
-			$comment->mCommentTitle = Title::makeTitle( $row->page_namespace, $row->page_title );
-			$comment->mCommentRev = $row->page_latest;
+		if ( $row->wlc_page_title && $row->wlc_page_latest ) {
+			$comment->mCommentTitle = Title::makeTitle( $row->wlc_page_namespace, $row->wlc_page_title );
+			$comment->mCommentRev = $row->wlc_page_latest;
 		}
 		return $comment;
 	}
@@ -336,7 +338,7 @@ class WikilogComment
 	 * @param $parent Parent comment id.
 	 * @return New WikilogComment object.
 	 */
-	public static function newFromText( &$item, $text, $parent = NULL ) {
+	public static function newFromText( &$item, $text, $parent = null ) {
 		$ts = wfTimestamp( TS_MW );
 		$comment = new WikilogComment( $item );
 		$comment->mParent    = $parent;
@@ -360,7 +362,7 @@ class WikilogComment
 		if ( $row ) {
 			return self::newFromRow( $item, $row );
 		}
-		return NULL;
+		return null;
 	}
 
 	/**
@@ -376,7 +378,7 @@ class WikilogComment
 		if ( $row && $row->wlc_post == $item->getID() ) {
 			return self::newFromRow( $item, $row );
 		}
-		return NULL;
+		return null;
 	}
 
 	/**
@@ -387,13 +389,15 @@ class WikilogComment
 	 * @return Database row, or false.
 	 */
 	private static function loadFromConds( $dbr, $conds ) {
-		extract( self::selectInfo( $dbr ) );	// $tables, $fields
+		$tables = self::selectTables( $dbr );
+		$fields = self::selectFields();
 		$row = $dbr->selectRow(
-			$tables,
+			$tables['tables'],
 			$fields,
 			$conds,
 			__METHOD__,
-			array( )
+			array(),
+			$tables['join_conds']
 		);
 		return $row;
 	}
@@ -428,13 +432,15 @@ class WikilogComment
 	 * @return Database query result object.
 	 */
 	private static function fetchFromConds( $dbr, $conds, $options = array() ) {
-		extract( self::selectInfo( $dbr ) );	// $tables, $fields
+		$tables = self::selectTables( $dbr );
+		$fields = self::selectFields();
 		$result = $dbr->select(
-			$tables,
+			$tables['tables'],
 			$fields,
 			$conds,
 			__METHOD__,
-			$options
+			$options,
+			$tables['join_conds']
 		);
 		return $result;
 	}
@@ -471,34 +477,456 @@ class WikilogComment
 	}
 
 	/**
-	 * Returns the tables and fields used for database queries for comment
-	 * objects.
-	 * @param $dbr Database connection object.
-	 * @return Array(2) with the description of the tables and fields to be
-	 *   used in database queries.
+	 * Return the list of database tables required to create a new instance
+	 * of WikilogComment.
 	 */
-	private static function selectInfo( $dbr ) {
-		extract( $dbr->tableNames( 'wikilog_comments', 'page' ) );
+	public static function selectTables( $dbr = null ) {
+		if ( !$dbr ) $dbr = wfGetDB( DB_SLAVE );
+		$page = $dbr->tableName( 'page' );
 		return array(
-			'tables' =>
-				"{$wikilog_comments} " .
-				"LEFT JOIN {$page} ON (page_id = wlc_comment_page)",
-			'fields' => array(
-				'wlc_id',
-				'wlc_parent',
-				'wlc_thread',
-				'wlc_post',
-				'wlc_user',
-				'wlc_user_text',
-				'wlc_anon_name',
-				'wlc_status',
-				'wlc_timestamp',
-				'wlc_updated',
-				'wlc_comment_page',
-				'page_namespace',
-				'page_title',
-				'page_latest'
+			'tables' => array(
+				'wikilog_comments',
+				"{$page} AS c"
+			),
+			'join_conds' => array(
+				"{$page} AS c" => array( 'LEFT JOIN', 'c.page_id = wlc_comment_page' )
 			)
 		);
+	}
+
+	/**
+	 * Return the list of post fields required to create a new instance of
+	 * WikilogComment.
+	 */
+	public static function selectFields() {
+		return array(
+			'wlc_id',
+			'wlc_parent',
+			'wlc_thread',
+			'wlc_post',
+			'wlc_user',
+			'wlc_user_text',
+			'wlc_anon_name',
+			'wlc_status',
+			'wlc_timestamp',
+			'wlc_updated',
+			'wlc_comment_page',
+			'c.page_namespace AS wlc_page_namespace',
+			'c.page_title AS wlc_page_title',
+			'c.page_latest AS wlc_page_latest'
+		);
+	}
+}
+
+/**
+ * Comment formatter.
+ * @since Wikilog v1.1.0.
+ */
+class WikilogCommentFormatter
+{
+	protected $mSkin;               ///< Skin used when rendering comments.
+	protected $mAllowReplies;       ///< Whether to show reply links.
+	protected $mAllowModeration;    ///< User is allowed to moderate.
+	protected $mPermalinkTitle;     ///< Optional title used for permalinks.
+
+	/// Whether to show the item title.
+	protected $mShowItem = false;
+
+	/// Comment stack for thread formatting.
+	protected $mThreadStack = array();
+	protected $mThreadRoot = array();
+
+	/**
+	 * Constructor.
+	 *
+	 * @param $title Title of the page.
+	 * @param $wi WikilogInfo object with information about the wikilog and
+	 *   the item.
+	 */
+	public function __construct( $skin = false, $allowReplies = false ) {
+		global $wgUser;
+		$this->mSkin = $skin ? $skin : $wgUser->getSkin();
+		$this->mAllowReplies = $allowReplies;
+		$this->mAllowModeration = $wgUser->isAllowed( 'wl-moderation' );
+	}
+
+	/**
+	 * Set page title used for permanent links. If not set, permalinks point
+	 * to their own comment page.
+	 *
+	 * @param $title Title object to use for permalinks.
+	 */
+	public function setPermalinkTitle( $title = null ) {
+		return wfSetVar( $this->mPermalinkTitle, $title );
+	}
+
+	/**
+	 * Set whether the item the comment is about is to be printed.
+	 */
+	public function setShowItem( $value = true ) {
+		return wfSetVar( $this->mShowItem, $value );
+	}
+
+	/**
+	 * Format a single comment in HTML.
+	 *
+	 * @param $comment Comment to be formatted.
+	 * @param $highlight Whether the comment should be highlighted.
+	 * @return Generated HTML.
+	 */
+	public function formatComment( $comment, $highlight = false ) {
+		global $wgUser, $wgOut;
+
+		$hidden = WikilogComment::$statusMap[ $comment->mStatus ];
+
+		# div class.
+		$divclass = array( 'wl-comment' );
+		if ( !$comment->isVisible() ) {
+			$divclass[] = "wl-comment-{$hidden}";
+		}
+		if ( $comment->mUserID ) {
+			$divclass[] = 'wl-comment-by-user';
+			if ( isset( $comment->mItem->mAuthors[$comment->mUserText] ) ) {
+				$divclass[] = 'wl-comment-by-author';
+			}
+		} else {
+			$divclass[] = 'wl-comment-by-anon';
+		}
+
+		# If user is has moderator privileges and the comment is pending
+		# approval, highlight it.
+		if ( $this->mAllowModeration && $comment->mStatus == WikilogComment::S_PENDING ) {
+			$highlight = true;
+		}
+
+		if ( !$comment->isVisible() && !$this->mAllowModeration ) {
+			# Placeholder.
+			$status = wfMsg( "wikilog-comment-{$hidden}" );
+			$html = WikilogUtils::wrapDiv( 'wl-comment-placeholder', $status );
+		} else {
+			# The comment.
+			$params = $this->getCommentMsgParams( $comment );
+			$html = $this->formatCommentHeader( $comment, $params );
+
+			if ( $comment->mID && $comment->mCommentRev ) {
+				list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $comment->mCommentTitle );
+				$text = $parserOutput->getText();
+			} else {
+				$text = $comment->getText();
+			}
+
+			if ( $text ) {
+				$html .= WikilogUtils::wrapDiv( 'wl-comment-text', $text );
+			}
+
+			$html .= $this->formatCommentFooter( $comment, $params );
+			$html .= $this->getCommentToolLinks( $comment );
+		}
+
+		# Enclose everything in a div.
+		if ( $highlight ) {
+			$divclass[] = 'wl-comment-highlight';
+		}
+		return Xml::tags( 'div', array(
+			'class' => implode( ' ', $divclass ),
+			'id' => ( $comment->mID ? "c{$comment->mID}" : 'cpreview' )
+		), $html );
+	}
+
+	/**
+	 * Format and return the header of a comment. This processes the
+	 * 'wikilog-comment-header' system message with the given parameters,
+	 * possibly adds some status messages (for pending or deleted posts),
+	 * and returns the result.
+	 *
+	 * @param $comment Comment.
+	 * @param $params Message parameters, from getCommentMsgParams().
+	 * @return HTML-formatted comment header.
+	 */
+	public function formatCommentHeader( $comment, $params ) {
+		$status = "";
+		if ( !$comment->isVisible() ) {
+			# If comment is not visible to non-moderators, make note of it.
+			$hidden = WikilogComment::$statusMap[ $comment->mStatus ];
+			$status = WikilogUtils::wrapDiv( 'wl-comment-status', wfMsg( "wikilog-comment-{$hidden}" ) );
+		}
+
+		$header = wfMsgExt( 'wikilog-comment-header', array( 'content', 'parsemag', 'replaceafter' ), $params );
+		if ( $header ) {
+			$header = WikilogUtils::wrapDiv( 'wl-comment-header', $header );
+		}
+
+		return $status . $header;
+	}
+
+	/**
+	 * Format and return the footer of a comment. This processes the
+	 * 'wikilog-comment-footer' system message with the given parameters
+	 * and returns the result.
+	 *
+	 * @param $comment Comment.
+	 * @param $params Message parameters, from getCommentMsgParams().
+	 * @return HTML-formatted comment footer.
+	 */
+	public function formatCommentFooter( $comment, $params ) {
+		$footer = wfMsgExt( 'wikilog-comment-footer', array( 'content', 'parsemag', 'replaceafter' ), $params );
+		if ( $footer ) {
+			return WikilogUtils::wrapDiv( 'wl-comment-footer', $footer );
+		} else {
+			return "";
+		}
+	}
+
+	/**
+	 * Returns an array with common header and footer system message
+	 * parameters that are used in 'wikilog-comment-header' and
+	 * 'wikilog-comment-footer'.
+	 *
+	 * Note: *Content* language should be used for everything but final
+	 * strings (like tooltips). These messages are intended to be customized
+	 * by the wiki admin, and we don't want to require changing it for the
+	 * 300+ languages suported by MediaWiki.
+	 *
+	 * Parameters should be HTML-formated. They are substituded using
+	 * 'replaceafter' parameter to wfMsgExt().
+	 *
+	 * @param $comment Comment.
+	 * @return Array with message parameters.
+	 */
+	public function getCommentMsgParams( $comment ) {
+		global $wgContLang;
+
+		if ( $comment->mUserID ) {
+			$authorPlain = htmlspecialchars( $comment->mUserText );
+			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
+				array( 'content', 'parseinline', 'replaceafter' ),
+				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
+				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
+				$comment->mUserText
+			);
+		} else {
+			$authorPlain = htmlspecialchars( $comment->mAnonName );
+			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
+				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
+				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
+				htmlspecialchars( $comment->mAnonName )
+			);
+		}
+
+		$date = $wgContLang->date( $comment->mTimestamp );
+		$time = $wgContLang->time( $comment->mTimestamp );
+		$permalink = $this->getCommentPermalink( $comment, $date, $time );
+
+		$extra = array();
+		if ( $this->mShowItem && $comment->mItem ) {
+			# Display item title.
+			$extra[] = wfMsgForContent( 'wikilog-comment-note-item',
+				$this->mSkin->link( $comment->mItem->mTitle, $comment->mItem->mName )
+			);
+		}
+		if ( $comment->mID && $comment->mCommentTitle &&
+				$comment->mCommentTitle->exists() )
+		{
+			if ( $comment->mUpdated != $comment->mTimestamp ) {
+				# Comment was edited.
+				$extra[] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsgForContent( 'wikilog-comment-note-edited',
+						$wgContLang->date( $comment->mUpdated, true ),
+						$wgContLang->time( $comment->mUpdated, true )
+					),
+					array( 'title' => wfMsg( 'wikilog-comment-history' ) ),
+					array( 'action' => 'history' ), 'known'
+				);
+			}
+		}
+		if ( $extra ) {
+			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
+		} else {
+			$extra = "";
+		}
+
+		return array(
+			/* $1  */ $authorPlain,
+			/* $2  */ $authorFmt,
+			/* $3  */ $date,
+			/* $4  */ $time,
+			/* $5  */ $permalink,
+			/* $6  */ $extra
+		);
+	}
+
+	/**
+	 * Define the root thread used to align replies formatted with
+	 * startCommentThread() and closeCommentThreads(). This prevents
+	 * omitted comment placeholders to be displayed when listing replies
+	 * of another comment.
+	 *
+	 * When in this state, all calls to startCommentThread() MUST be
+	 * to comments below the root thread. The thread stack stays in this
+	 * state until closeCommentThreads() is called.
+	 *
+	 * @param $thread Root comment thread that will affect future calls
+	 *   to startCommentThread().
+	 */
+	public function setupRootThread( $thread ) {
+		$this->mThreadStack = $this->mThreadRoot = $thread;
+	}
+
+	/**
+	 * Start a new comment thread. Should be called before formatComment()
+	 * when formatting comments in threads. Comments must be displayed in
+	 * correct thread sequence when using this function, which means that
+	 * the 'wlc_thread' column should be used to sort the query results from
+	 * the 'wikilog_comments' table. After the last comment,
+	 * closeCommentThreads() must be called.
+	 *
+	 * @param $comment Comment to be formatted.
+	 * @return Generated HTML.
+	 */
+	public function startCommentThread( $comment ) {
+		$top = count( $this->mThreadStack );
+		$thread = count( $comment->mThread );
+
+		# Find common ancestors.
+		$common = min( $top, $thread );
+		for ( $i = 0; $i < $common; $i++ ) {
+			if ( $this->mThreadStack[$i] != $comment->mThread[$i] )
+				break;
+		}
+
+		# Close previous threads.
+		$html = str_repeat( "</div>", $top - $i );
+		array_splice( $this->mThreadStack, $i );
+
+		# Create omitted comment thread(s).
+		for ( ; $i < $thread-1; $i++ ) {
+			$msg = wfMsgExt( 'wikilog-comment-omitted-x', array( 'parseinline' ), $comment->mThread[$i] );
+			$msg = WikilogUtils::wrapDiv( 'wl-comment-placeholder', $msg );
+			$msg = WikilogUtils::wrapDiv( 'wl-comment wl-comment-omitted', $msg );
+			$html .= '<div class="wl-thread">' . $msg;
+			array_push( $this->mThreadStack, $comment->mThread[$i] );
+		}
+
+		# Open the new comment thread.
+		$html .= '<div class="wl-thread">';
+		array_push( $this->mThreadStack, $comment->mThread[$i] );
+		return $html;
+	}
+
+	/**
+	 * Close all open comment threads.
+	 * @return Generated HTML.
+	 */
+	public function closeCommentThreads() {
+		$open = count( $this->mThreadStack ) - count( $this->mThreadRoot );
+		$this->mThreadStack = $this->mThreadRoot = array();
+		return str_repeat( "</div>", $open );
+	}
+
+	/**
+	 * Return a permanent link to the comment.
+	 *
+	 * @param $comment Comment.
+	 * @param $date Comment date.
+	 * @param $time Comment time.
+	 * @return HTML fragment.
+	 */
+	protected function getCommentPermalink( $comment, $date, $time ) {
+		if ( $comment->mID ) {
+			if ( $this->mPermalinkTitle ) {
+				$title = $this->mPermalinkTitle;
+				$title->setFragment( "#c{$comment->mID}" );
+			} else {
+				$title = $comment->mCommentTitle;
+			}
+			return $this->mSkin->link( $title,
+				wfMsg( 'wikilog-comment-permalink', $date, $time ),
+				array( 'title' => wfMsg( 'permalink' ) )
+			);
+		} else {
+			return wfMsg( 'wikilog-comment-permalink', $date, $time );
+		}
+	}
+
+	/**
+	 * Return an HTML fragment with various links (tools) that act upon
+	 * the comment, like reply, accept, reject, edit, etc.
+	 *
+	 * @param $comment Comment.
+	 * @return HTML fragment containing the links.
+	 */
+	protected function getCommentToolLinks( $comment ) {
+		global $wgUser, $wgRequest;
+		$tools = array();
+
+		if ( $comment->mID && $comment->mCommentTitle &&
+				$comment->mCommentTitle->exists() ) {
+			if ( $this->mAllowReplies && $comment->isVisible() ) {
+				$tools['reply'] = Xml::tags( 'a',
+					array(
+						'title' => wfMsg( 'wikilog-reply-to-comment' ),
+						'href' => $wgRequest->appendQueryValue( 'wlParent', $comment->mID )
+					),
+					wfMsg( 'wikilog-reply-lc' )
+				);
+			}
+			if ( $this->mAllowModeration && $comment->mStatus == WikilogComment::S_PENDING ) {
+				$token = $wgUser->editToken();
+				$tools['approve'] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsg( 'wikilog-approve-lc' ),
+					array( 'title' => wfMsg( 'wikilog-comment-approve' ) ),
+					array(
+						'action' => 'wikilog',
+						'wlActionCommentApprove' => 'approve',
+						'wpEditToken' => $token
+					),
+					'known'
+				);
+				$tools['reject'] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsg( 'wikilog-reject-lc' ),
+					array( 'title' => wfMsg( 'wikilog-comment-reject' ) ),
+					array(
+						'action' => 'wikilog',
+						'wlActionCommentApprove' => 'reject',
+						'wpEditToken' => $token
+					),
+					'known'
+				);
+			}
+			if ( $this->mAllowModeration ) {
+				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsg( 'wikilog-page-lc' ),
+					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
+					array(),
+					'known'
+				);
+			}
+			if ( $comment->mCommentTitle->quickUserCan( 'edit' ) ) {
+				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsg( 'wikilog-edit-lc' ),
+					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
+					array( 'action' => 'edit' ),
+					'known'
+				);
+			}
+			if ( $comment->mCommentTitle->quickUserCan( 'delete' ) ) {
+				$tools['delete'] = $this->mSkin->link( $comment->mCommentTitle,
+					wfMsg( 'wikilog-delete-lc' ),
+					array( 'title' => wfMsg( 'wikilog-comment-delete' ) ),
+					array( 'action' => 'delete' ),
+					'known'
+				);
+			}
+		}
+
+		if ( $tools ) {
+			$html = '';
+			foreach ( $tools as $cls => $tool ) {
+				$html .= Xml::tags( 'li', array( 'class' => "wl-comment-action-{$cls}" ), $tool );
+			}
+			return Xml::tags( 'ul', array( 'class' => 'wl-comment-tools' ), $html );
+		} else {
+			return '';
+		}
 	}
 }
