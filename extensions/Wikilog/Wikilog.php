@@ -267,7 +267,7 @@ class Wikilog
 
 		if ( ( $wi = self::getWikilogInfo( $title ) ) ) {
 			if ( $title->isTalkPage() ) {
-				if ( $wgWikilogEnableComments && $wi->isItem() ) {
+				if ( $wgWikilogEnableComments ) {
 					$article = new WikilogCommentsPage( $title, $wi );
 				} else {
 					return true;
@@ -544,16 +544,13 @@ class WikilogInfo
 		$ns = MWNamespace::getSubject( $origns );
 		$tns = MWNamespace::getTalk( $origns );
 
-		if ( strpos( $title->getText(), '/' ) !== false ) {
-			# If title contains a '/', treat as a wikilog article title.
-			list( $this->mWikilogName, $this->mItemName ) =
-				explode( '/', $title->getText(), 2 );
-
-			if ( strpos( $this->mItemName, '/' ) !== false ) {
-				list( $this->mItemName, $this->mTrailing ) =
-					explode( '/', $this->mItemName, 2 );
-			}
-
+		# If title contains a '/', treat as a wikilog article title.
+		$parts = explode('/', $title->getText());
+		if (count($parts) > 1 && ($this->mIsTalk || count($parts) == 2))
+		{
+			$this->mWikilogName = array_shift($parts);
+			$this->mItemName = array_shift($parts);
+			$this->mTrailing = implode('/', $parts);
 			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
 			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
@@ -577,7 +574,7 @@ class WikilogInfo
 	function getTitle() { return $this->mWikilogTitle; }
 	function getItemName() { return $this->mItemName; }
 	function getItemTitle() { return $this->mItemTitle; }
-	function getItemTalkTitle() { return $this->mItemTitle->getTalkPage(); }
+	function getTalkTitle() { return $this->mItemTitle ? $this->mItemTitle->getTalkPage() : $this->mWikilogTitle->getTalkPage(); }
 
 	function getTrailing() { return $this->mTrailing; }
 }
