@@ -89,7 +89,7 @@ class WikilogUtils
 				: ParserCache::singleton();
 
 			# Look for the parsed article output in the parser cache.
-			$parserOutput = $parserCache->get( $article, $parserOpt );
+			$parserOutput = $parserCache->get( $article, $wgUser );
 
 			# On success, return the object retrieved from the cache.
 			if ( $parserOutput ) {
@@ -123,7 +123,7 @@ class WikilogUtils
 
 		# Save in parser cache.
 		if ( $useParserCache && $parserOutput->getCacheTime() != -1 ) {
-			$parserCache->save( $parserOutput, $article, $parserOpt );
+			$parserCache->save( $parserOutput, $article, $wgUser );
 		}
 
 		# Restore default behavior.
