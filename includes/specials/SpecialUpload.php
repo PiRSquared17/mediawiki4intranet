@@ -4,6 +4,9 @@
  * @ingroup SpecialPage
  */
 
+# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
+if (!function_exists('wfSpecialUpload'))
+{
 
 /**
  * Entry point
@@ -1810,4 +1813,6 @@ wgUploadAutoFill = {$autofill};
 			$out->addHTML( '</div>' );
 		}
 	}
+}
+
 }
