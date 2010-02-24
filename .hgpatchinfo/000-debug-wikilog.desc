@@ -1,0 +1,3 @@
+Wikilog extension debug:
+Bug 58154 - fix caching error
+Bug 56056 - do not handle post subarticles as posts themselves
