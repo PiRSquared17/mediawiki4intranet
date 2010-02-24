@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -55,20 +55,40 @@ $wgWikilogStylePath = false;
  * Wikilog style version, incremented when $wgWikilogStylePath/wikilog.css
  * is changed.
  */
-$wgWikilogStyleVersion = 3;
+$wgWikilogStyleVersion = 6;
 
 /* *** Presentation options *** */
 
 /**
- * Maximum number of items in wikilog front page.
+ * Maximum number of articles to display in wikilog front pages, or comments
+ * in article discussion pages.
+ *
+ * Each article and comment is stored as a wiki page and, in order to
+ * display them, they may need to be parsed (if they are not cached) which
+ * is a little expensive. So, the number of articles or comments to show
+ * per page is limited by this variable, which has the same purpose of
+ * $wgFeedLimit and thus inherits its value by default.
+ *
+ * A good value is 50. More than this not only impacts performance, it
+ * allows long pages of articles or comments that has little value over
+ * smaller pages.
+ *
+ * @note This variable replaced the older $wgWikilogSummaryLimit.
+ * @since Wikilog v1.1.0.
  */
-$wgWikilogSummaryLimit = $wgFeedLimit;
+$wgWikilogExpensiveLimit = $wgFeedLimit;
 
 /**
  * Default number of articles to list in the wikilog front page and in
  * Special:Wikilog.
  */
 $wgWikilogNumArticles = 20;
+
+/**
+ * Default number of comments to list in wikilog comment pages.
+ * @since Wikilog v1.1.0.
+ */
+$wgWikilogNumComments = 50;
 
 /**
  * Allow listing of categories and tags for each article in the wikilog
@@ -83,12 +103,6 @@ $wgWikilogNumArticles = 20;
  * @since Wikilog v1.1.0.
  */
 $wgWikilogExtSummaries = false;
-
-/**
- * Navigation bars to show in listing pages.
- */
-$wgWikilogNavTop = false;
-$wgWikilogNavBottom = true;
 
 /* *** Editing *** */
 
