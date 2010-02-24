@@ -58,7 +58,6 @@ class WikilogCommentsPage
 	public    $mItem;				///< Wikilog item the page is associated with.
 	public    $mTalkTitle;			///< Main talk page title.
 	public    $mSingleComment;		///< Used when viewing a single comment.
-	public    $mWikilogInfo;		///< Wikilog info, used in feeds for simplicity.
 
 	/**
 	 * Constructor.
@@ -93,7 +92,6 @@ class WikilogCommentsPage
 		# This flags if we are viewing a single comment (subpage).
 		$this->mTrailing = $wi->getTrailing();
 		$this->mTalkTitle = $wi->getItemTalkTitle();
-		$this->mWikilogInfo = $wi;
 		if ( $this->mItem && $this->mTrailing ) {
 			$this->mSingleComment =
 				WikilogComment::newFromPageID( $this->mItem, $this->getID() );
@@ -110,13 +108,6 @@ class WikilogCommentsPage
 		if ( $wgRequest->getVal( 'diff' ) )
 			return parent::view();
 
-		# RSS or Atom feed requested. Ignore all other options.
-		if ( ( $feedFormat = $wgRequest->getVal( 'feed' ) ) ) {
-			global $wgWikilogFeedCommentCount;
-			$feed = new WikilogCommentsFeed($feedFormat, $this->mWikilogInfo, $wgRequest->getInt('limit', $wgWikilogFeedCommentCount));
-			return $feed->execute();
-		}
-
 		# Normal page view, show talk page contents followed by comments.
 		if ( $this->mItem ) {
 			$this->viewHeader();
@@ -130,20 +121,13 @@ class WikilogCommentsPage
 			$this->viewComments();
 		}
 
-		# Add feed links.
-		$wgOut->setSyndicated();
-		if ( isset( $qarr['show'] ) ) {
-			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogFeed::$paramWhitelist ) );
-			$wgOut->setFeedAppendQuery( $altquery );
-		}
-
 		# Set a more human-friendly title to the comments page.
 		# NOTE (MW1.16+): Must come after parent::view().
 		if ( !$this->mSingleComment ) {
 			# Note: Sorry for the three-level cascade of wfMsg()'s...
 			$fullPageTitle = wfMsg( 'wikilog-title-item-full',
-				$this->mItem->mName,
-				$this->mItem->mParentTitle->getPrefixedText()
+					$this->mItem->mName,
+					$this->mItem->mParentTitle->getPrefixedText()
 			);
 			$fullPageTitle = wfMsg( 'wikilog-title-comments', $fullPageTitle );
 			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem->mName ) );
@@ -726,128 +710,5 @@ class WikilogCommentsPage
 		}
 
 		return false;
-	}
-}
-
-class WikilogCommentsFeed
-{
-	public $wikilog;
-	public $limit;
-
-	public function __construct($format, $wikilog, $limit)
-	{
-		if (!$limit || $limit <= 0)
-			$limit = 100;
-		$this->wikilog = $wikilog;
-		$this->limit = $limit;
-		$this->format = $format;
-	}
-
-	public function execute()
-	{
-		global $wgFeedClasses;
-
-		$forall = $this->wikilog->mWikilogTitle ? false : true;
-		$title = $forall ? Title::newFromText(wfMsg('wikilog-specialwikilog'), NS_SPECIAL) : $this->wikilog->mWikilogTitle;
-		$feed = new $wgFeedClasses[$this->format](
-			wfMsgExt('wikilog-comments-feed-title', array('parseinline'), $title->getPrefixedText()),
-			wfMsgExt('wikilog-comments-feed-desc', array('parseinline'), $title->getPrefixedText()),
-			$title->getFullUrl());
-		$dbr = wfGetDB(DB_SLAVE);
-		$where = array('wlc_post=wlp_page');
-		if (!$forall)
-			$where['wlp_parent'] = $title->getArticleID();
-		$lastmod = $dbr->selectField(array('wikilog_comments', 'wikilog_posts'), 'MAX(wlc_timestamp)', $where, __METHOD__);
-		$timekey = wfMemcKey($forall ? 'all' : $title->getArticleID(), $this->format, $this->limit, 'timestamp');
-		$key = wfMemcKey($forall ? 'all' : $title->getArticleID(), $this->format, $this->limit, 'feed');
-
-		FeedUtils::checkPurge($timekey, $key);
-
-		$cachedFeed = $this->loadFromCache($lastmod, $timekey, $key);
-		if (is_string($cachedFeed))
-		{
-			wfDebug("Wikilog comments: Outputting cached feed\n");
-			$feed->httpHeaders();
-			echo $cachedFeed;
-		}
-		else
-		{
-			wfDebug("Wikilog comments: rendering new feed and caching it\n");
-			ob_start();
-			self::generateFeed($feed, $where);
-			$cachedFeed = ob_get_contents();
-			ob_end_flush();
-			$this->saveToCache($cachedFeed, $timekey, $key);
-		}
-		return true;
-	}
-
-	public function saveToCache($feed, $timekey, $key)
-	{
-		global $messageMemc;
-		$expire = 3600 * 24; # One day
-		$messageMemc->set($key, $feed);
-		$messageMemc->set($timekey, wfTimestamp(TS_MW), $expire);
-	}
-
-	public function loadFromCache($lastmod, $timekey, $key)
-	{
-		global $wgFeedCacheTimeout, $messageMemc;
-		$feedLastmod = $messageMemc->get($timekey);
-
-		if($wgFeedCacheTimeout > 0 && $feedLastmod)
-		{
-			$feedAge = time() - wfTimestamp(TS_UNIX, $feedLastmod);
-			$feedLastmodUnix = wfTimestamp(TS_UNIX, $feedLastmod);
-			$lastmodUnix = wfTimestamp(TS_UNIX, $lastmod);
-			if ($feedAge < $wgFeedCacheTimeout || $feedLastmodUnix > $lastmodUnix)
-			{
-				wfDebug("Wikilog comments: loading feed from cache ($key; $feedLastmod; $lastmod)...\n");
-				return $messageMemc->get($key);
-			}
-			else
-				wfDebug("Wikilog comments: cached feed timestamp check failed ($feedLastmod; $lastmod)\n");
-		}
-		return false;
-	}
-
-	public function generateFeed($feed, $where)
-	{
-		global $wgParser, $wgOut, $wgEnableParserCache, $wgUser;
-		wfProfileIn(__METHOD__);
-		$feed->outHeader();
-		$dbr = wfGetDB(DB_SLAVE);
-		$res = $dbr->select(array('wikilog_comments', 'wikilog_posts'), '*', $where, __METHOD__,
-			array('ORDER BY' => 'wlc_timestamp DESC', 'LIMIT' => $this->limit)
-		);
-		$popt = $wgOut->parserOptions();
-		if ($wgEnableParserCache)
-			$parserCache = ParserCache::singleton();
-		while ($row = $dbr->fetchRow($res))
-		{
-			if (!($article = Article::newFromID($row['wlc_comment_page'])))
-				continue;
-			if ($parserCache)
-				$out = $parserCache->get($article, $wgUser);
-			if (!$out)
-			{
-				$out = $wgParser->parse($article->getContent(), $article->getTitle(), $popt, false, true, $article->getLatest());
-				if ($parserCache && $out->getCacheTime() != -1)
-					$parserCache->save($out, $article, $wgUser);
-			}
-			$title = Title::newFromID($row['wlc_post'])->getTalkPage();
-			$title->mFragment = 'c' . $row['wlc_id'];
-			$item = new FeedItem(
-				$title->getPrefixedText(),
-				$out->getText(),
-				$title->getFullUrl(),
-				$row['wlc_timestamp'],
-				$row['wlc_user_text']
-			);
-			$feed->outItem($item);
-		}
-		$dbr->freeResult($res);
-		$feed->outFooter();
-		wfProfileOut(__METHOD__);
 	}
 }

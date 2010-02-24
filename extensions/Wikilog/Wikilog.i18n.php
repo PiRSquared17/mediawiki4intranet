@@ -113,10 +113,8 @@ Uncheck this box to keep the article as a draft.',
 	'wikilog-newtalk-summary' => 'created automatically by Wikilog',
 
 	# Atom and RSS feeds
-	'wikilog-feed-title' => '{{SITENAME}} — $1 [$2]', # $1 = title, $2 = content language
+	'wikilog-feed-title' => '{{SITENAME}} - $1 [$2]', # $1 = title, $2 = content language
 	'wikilog-feed-description' => 'Read the most recent posts in this feed.',
-	'wikilog-comments-feed-title' => '{{SITENAME}} — $1 — Discussion',
-	'wikilog-comments-feed-desc' => 'Feed containing recent comments to posts in Wikilog $1 in {{SITENAME}}.',
 
 	# Item and comments page titles
 	'wikilog-title-item-full' => '$1 - $2', # $1 = article title, $2 wikilog title
@@ -3536,8 +3534,6 @@ $messages['ru'] = array(
 	'wikilog-page-lc' => 'страница',
 	'wikilog-history-lc' => 'история',
 	'wikilog-doc-import-comment' => 'Импортированная документация Викилога',
-	'wikilog-comments-feed-title' => '{{SITENAME}} — $1 — Обсуждение',
-	'wikilog-comments-feed-desc' => 'Лента новых комментариев к постам в Викилоге $1 в {{SITENAME}}.',
 );
 
 /** Sinhala (සිංහල)
