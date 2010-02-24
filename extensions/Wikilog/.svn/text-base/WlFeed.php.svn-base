@@ -1,7 +1,7 @@
 <?php
 /**
  * Enhanced feed generation classes.
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,6 @@ $wgExtensionCredits['other'][] = array(
 	'name'           => 'WlFeed',
 	'version'        => '1.0.99.1dev',
 	'author'         => 'Juliano F. Ravasi',
-	'description'    => 'Enhanced feed generation classes.',
 	'descriptionmsg' => 'wlfeed-desc',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:Wikilog',
 );

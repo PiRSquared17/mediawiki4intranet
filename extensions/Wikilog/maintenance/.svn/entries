@@ -1,14 +1,14 @@
 10
 
 dir
-60293
+62916
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/Wikilog/maintenance
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-11-02T04:08:47.044394Z
-58418
+2010-02-14T04:14:46.827417Z
+62454
 juliano
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2009-12-21T22:45:44.012777Z
-e05636ca8bbc57688c6bba22dc40dbdf
-2009-11-02T04:08:47.044394Z
-58418
+2010-02-24T14:15:26.692112Z
+dcbe469d5814ce41fc583ca8a8f4b05d
+2010-02-14T04:14:46.827417Z
+62454
 juliano
 has-props
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-6249
+6248
 
 unsupported
 dir
@@ -69,10 +69,10 @@ file
 
 
 
-2009-12-21T22:45:44.012777Z
-909670b5d208ddd6d4c1ab2dec04be9a
-2009-11-02T04:08:47.044394Z
-58418
+2010-02-24T14:15:26.692112Z
+bf59ea2f4675dd5376d99d09783cd675
+2010-02-14T04:14:46.827417Z
+62454
 juliano
 has-props
 
@@ -95,5 +95,5 @@ has-props
 
 
 
-5604
+5603
 

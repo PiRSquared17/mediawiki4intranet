@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -60,7 +60,6 @@ class WikilogMainPage
 	 */
 	public function view() {
 		global $wgRequest, $wgOut, $wgMimeType;
-		global $wgWikilogNavTop, $wgWikilogNavBottom;
 
 		$query = new WikilogItemQuery( $this->mTitle );
 		$query->setPubStatus( $wgRequest->getVal( 'show' ) );
@@ -68,7 +67,7 @@ class WikilogMainPage
 		# RSS or Atom feed requested. Ignore all other options.
 		if ( ( $feedFormat = $wgRequest->getVal( 'feed' ) ) ) {
 			global $wgWikilogNumArticles;
-			$feed = new WikilogFeed( $this->mTitle, $feedFormat, $query,
+			$feed = new WikilogItemFeed( $this->mTitle, $feedFormat, $query,
 				$wgRequest->getInt( 'limit', $wgWikilogNumArticles ) );
 			return $feed->execute();
 		}
@@ -98,8 +97,7 @@ class WikilogMainPage
 
 		# Display list of wikilog posts.
 		$body = $pager->getBody();
-		if ( $wgWikilogNavTop ) $body = $pager->getNavigationBar( 'wl-navbar-top' ) . $body;
-		if ( $wgWikilogNavBottom ) $body = $body . $pager->getNavigationBar( 'wl-navbar-bottom' );
+		$body .= $pager->getNavigationBar();
 		$wgOut->addHTML( Xml::openElement( 'div', array( 'class' => 'wl-wrapper' ) ) );
 		$wgOut->addHTML( $body );
 		$wgOut->addHTML( Xml::closeElement( 'div' ) );
@@ -110,7 +108,7 @@ class WikilogMainPage
 		# Add feed links.
 		$wgOut->setSyndicated();
 		if ( isset( $qarr['show'] ) ) {
-			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogFeed::$paramWhitelist ) );
+			$altquery = wfArrayToCGI( array_intersect_key( $qarr, WikilogItemFeed::$paramWhitelist ) );
 			$wgOut->setFeedAppendQuery( $altquery );
 		}
 
@@ -243,7 +241,7 @@ class WikilogMainPage
 			}
 			$s .= ' (' . implode( ', ', $f ) . ')';
 		}
-		return Xml::tags( $elem, NULL, $s );
+		return Xml::tags( $elem, null, $s );
 	}
 
 	/**

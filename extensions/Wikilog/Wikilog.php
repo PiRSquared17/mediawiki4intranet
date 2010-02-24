@@ -1,7 +1,7 @@
 <?php
 /**
  * MediaWiki Wikilog extension
- * Copyright © 2008, 2009 Juliano F. Ravasi
+ * Copyright © 2008-2010 Juliano F. Ravasi
  * http://www.mediawiki.org/wiki/Extension:Wikilog
  *
  * This program is free software; you can redistribute it and/or modify
@@ -36,7 +36,6 @@ $wgExtensionCredits['specialpage'][] = array(
 	'name'           => 'Wikilog',
 	'version'        => '1.0.99.1dev',
 	'author'         => 'Juliano F. Ravasi',
-	'description'    => 'Adds blogging features, creating a wiki-blog hybrid.',
 	'descriptionmsg' => 'wikilog-desc',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:Wikilog',
 );
@@ -59,36 +58,51 @@ $wgExtensionMessagesFiles['WikilogAlias'] = $dir . 'Wikilog.i18n.alias.php';
  */
 $wgAutoloadClasses += array(
 	// General
-	'WikilogFeed'			=> $dir . 'WikilogFeed.php',
-	'WikilogHooks'			=> $dir . 'WikilogHooks.php',
-	'WikilogItemQuery'		=> $dir . 'WikilogQuery.php',
-	'WikilogLinksUpdate'	=> $dir . 'WikilogLinksUpdate.php',
-	'WikilogUtils'			=> $dir . 'WikilogUtils.php',
-	'SpecialWikilog'		=> $dir . 'SpecialWikilog.php',
+	'WikilogHooks'              => $dir . 'WikilogHooks.php',
+	'WikilogLinksUpdate'        => $dir . 'WikilogLinksUpdate.php',
+	'WikilogUtils'              => $dir . 'WikilogUtils.php',
+	'WikilogNavbar'             => $dir . 'WikilogUtils.php',
+	'SpecialWikilog'            => $dir . 'SpecialWikilog.php',
 
 	// Objects
-	'WikilogItem'			=> $dir . 'WikilogItem.php',
-	'WikilogComment'		=> $dir . 'WikilogComment.php',
+	'WikilogItem'               => $dir . 'WikilogItem.php',
+	'WikilogComment'            => $dir . 'WikilogComment.php',
+	'WikilogCommentFormatter'   => $dir . 'WikilogComment.php',
 
 	// WikilogParser.php
-	'WikilogParser'			=> $dir . 'WikilogParser.php',
-	'WikilogParserOutput'	=> $dir . 'WikilogParser.php',
-	'WikilogParserCache'	=> $dir . 'WikilogParser.php',
+	'WikilogParser'             => $dir . 'WikilogParser.php',
+	'WikilogParserOutput'       => $dir . 'WikilogParser.php',
+	'WikilogParserCache'        => $dir . 'WikilogParser.php',
 
-	// WikilogPager.php
-	'WikilogPager'			=> $dir . 'WikilogPager.php',
-	'WikilogSummaryPager'	=> $dir . 'WikilogPager.php',
-	'WikilogTemplatePager'	=> $dir . 'WikilogPager.php',
-	'WikilogArchivesPager'	=> $dir . 'WikilogPager.php',
+	// WikilogItemPager.php
+	'WikilogItemPager'          => $dir . 'WikilogItemPager.php',
+	'WikilogSummaryPager'       => $dir . 'WikilogItemPager.php',
+	'WikilogTemplatePager'      => $dir . 'WikilogItemPager.php',
+	'WikilogArchivesPager'      => $dir . 'WikilogItemPager.php',
+
+	// WikilogCommentPager.php
+	'WikilogCommentPager'       => $dir . 'WikilogCommentPager.php',
+	'WikilogCommentListPager'   => $dir . 'WikilogCommentPager.php',
+	'WikilogCommentThreadPager' => $dir . 'WikilogCommentPager.php',
+
+	// WikilogFeed.php
+	'WikilogFeed'               => $dir . 'WikilogFeed.php',
+	'WikilogItemFeed'           => $dir . 'WikilogFeed.php',
+	'WikilogCommentFeed'        => $dir . 'WikilogFeed.php',
+
+	// WikilogQuery.php
+	'WikilogQuery'              => $dir . 'WikilogQuery.php',
+	'WikilogItemQuery'          => $dir . 'WikilogQuery.php',
+	'WikilogCommentQuery'       => $dir . 'WikilogQuery.php',
 
 	// Namespace pages
-	'WikilogMainPage'		=> $dir . 'WikilogMainPage.php',
-	'WikilogItemPage'		=> $dir . 'WikilogItemPage.php',
-	'WikilogCommentsPage'	=> $dir . 'WikilogCommentsPage.php',
+	'WikilogMainPage'           => $dir . 'WikilogMainPage.php',
+	'WikilogItemPage'           => $dir . 'WikilogItemPage.php',
+	'WikilogCommentsPage'       => $dir . 'WikilogCommentsPage.php',
 
 	// Captcha adapter
-	'WlCaptcha'				=> $dir . 'WlCaptchaAdapter.php',
-	'WlCaptchaAdapter'		=> $dir . 'WlCaptchaAdapter.php',
+	'WlCaptcha'                 => $dir . 'WlCaptchaAdapter.php',
+	'WlCaptchaAdapter'          => $dir . 'WlCaptchaAdapter.php',
 );
 
 /*
@@ -492,13 +506,13 @@ class Wikilog
 		global $wgWikilogNamespaces;
 
 		if ( !$title )
-			return NULL;
+			return null;
 
 		$ns = MWNamespace::getSubject( $title->getNamespace() );
 		if ( in_array( $ns, $wgWikilogNamespaces ) ) {
 			return new WikilogInfo( $title );
 		} else {
-			return NULL;
+			return null;
 		}
 	}
 }
@@ -518,7 +532,7 @@ class WikilogInfo
 	public $mItemTalkTitle;		///< Wikilog post talk title object.
 
 	public $mIsTalk;			///< Constructed using a talk page title.
-	public $mTrailing = NULL;	///< Trailing subpage title.
+	public $mTrailing = null;	///< Trailing subpage title.
 
 	/**
 	 * Constructor.
@@ -544,16 +558,16 @@ class WikilogInfo
 			# Title doesn't contain a '/', treat as a wikilog name.
 			$this->mWikilogName = $title->getText();
 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
-			$this->mItemName = NULL;
-			$this->mItemTitle = NULL;
-			$this->mItemTalkTitle = NULL;
+			$this->mItemName = null;
+			$this->mItemTitle = null;
+			$this->mItemTalkTitle = null;
 		}
 	}
 
-	function isMain() { return $this->mItemTitle === NULL; }
-	function isItem() { return $this->mItemTitle !== NULL; }
+	function isMain() { return $this->mItemTitle === null; }
+	function isItem() { return $this->mItemTitle !== null; }
 	function isTalk() { return $this->mIsTalk; }
-	function isSubpage() { return $this->mTrailing !== NULL; }
+	function isSubpage() { return $this->mTrailing !== null; }
 
 	function getName() { return $this->mWikilogName; }
 	function getTitle() { return $this->mWikilogTitle; }
