@@ -1,0 +1,174 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1267099635 -10800
+Bug 60624 - Support for exclusion of category items
+
+diff -r 2f012c39365a -r 20165416543f extensions/Wikilog/SpecialWikilog.php
+--- extensions/Wikilog/SpecialWikilog.php
++++ extensions/Wikilog/SpecialWikilog.php
+@@ -76,12 +76,14 @@
+ 	 */
+ 	public function getDefaultOptions() {
+ 		global $wgWikilogNumArticles;
++		global $wgWikilogDefaultNotCategory;
+ 
+ 		$opts = new FormOptions();
+ 		$opts->add( 'view',     'summary' );
+ 		$opts->add( 'show',     'published' );
+ 		$opts->add( 'wikilog',  '' );
+ 		$opts->add( 'category', '' );
++		$opts->add( 'notcategory', '' );
+ 		$opts->add( 'author',   '' );
+ 		$opts->add( 'tag',      '' );
+ 		$opts->add( 'year',     '', FormOptions::INTNULL );
+@@ -97,9 +99,12 @@
+ 	 */
+ 	public function webSetup( $parameters ) {
+ 		global $wgRequest, $wgWikilogExpensiveLimit;
++		global $wgWikilogDefaultNotCategory;
+ 
+ 		$opts = $this->getDefaultOptions();
+ 		$opts->fetchValuesFromRequest( $wgRequest );
++		if ( is_null( $wgRequest->getVal('notcategory') ) )
++			$opts['notcategory'] = $wgWikilogDefaultNotCategory;
+ 
+ 		# Collect inline parameters, they have precedence over query params.
+ 		$this->parseInlineParams( $parameters, $opts );
+@@ -116,9 +121,12 @@
+ 	 */
+ 	public function feedSetup() {
+ 		global $wgRequest, $wgFeedLimit;
++		global $wgWikilogDefaultNotCategory;
+ 
+ 		$opts = $this->getDefaultOptions();
+ 		$opts->fetchValuesFromRequest( $wgRequest, array( 'show', 'limit' ) );
++		if ( is_null( $wgRequest->getVal('notcategory') ) )
++			$opts['notcategory'] = $wgWikilogDefaultNotCategory;
+ 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
+ 		return $opts;
+ 	}
+@@ -348,6 +356,7 @@
+ 	 */
+ 	protected static function getQueryFormFields( FormOptions $opts ) {
+ 		global $wgWikilogEnableTags;
++		global $wgWikilogDefaultNotCategory;
+ 
+ 		$fields = array();
+ 
+@@ -361,6 +370,11 @@
+ 			str_replace( '_', ' ', $opts->consumeValue( 'category' ) )
+ 		);
+ 
++		$fields['notcategory'] = Xml::inputLabelSep(
++			wfMsg( 'wikilog-form-notcategory' ), 'notcategory', 'wl-notcategory', 40,
++			str_replace( '_', ' ', $opts->consumeValue( 'notcategory' ) )
++		);
++
+ 		$fields['author'] = Xml::inputLabelSep(
+ 			wfMsg( 'wikilog-form-author' ), 'author', 'wl-author', 40,
+ 			str_replace( '_', ' ', $opts->consumeValue( 'author' ) )
+@@ -407,6 +421,9 @@
+ 		if ( ( $t = $opts['category'] ) ) {
+ 			$query->setCategory( $t );
+ 		}
++		if ( ( $t = $opts['notcategory'] ) ) {
++			$query->setNotCategory( $t );
++		}
+ 		if ( ( $t = $opts['author'] ) ) {
+ 			$query->setAuthor( $t );
+ 		}
+diff -r 2f012c39365a -r 20165416543f extensions/Wikilog/Wikilog.i18n.php
+--- extensions/Wikilog/Wikilog.i18n.php
++++ extensions/Wikilog/Wikilog.i18n.php
+@@ -158,7 +158,8 @@
+ 	'wikilog-post-reply' => 'Post a new reply',
+ 	'wikilog-form-legend' => 'Search for wikilog posts',
+ 	'wikilog-form-wikilog' => 'Wikilog:',
+-	'wikilog-form-category' => 'Category:',
++	'wikilog-form-category' => 'In category:',
++	'wikilog-form-notcategory' => 'Not in category:',
+ 	'wikilog-form-name' => 'Name:',
+ 	'wikilog-form-author' => 'Author:',
+ 	'wikilog-form-tag' => 'Tag:',
+@@ -4967,7 +4968,8 @@
+ 	'wikilog-post-reply' => 'Написать новый ответ',
+ 	'wikilog-form-legend' => 'Поиск по заметкам викилога',
+ 	'wikilog-form-wikilog' => 'Викилог:',
+-	'wikilog-form-category' => 'Категория:',
++	'wikilog-form-category' => 'В категории:',
++	'wikilog-form-notcategory' => 'Не в категории:',
+ 	'wikilog-form-name' => 'Имя:',
+ 	'wikilog-form-author' => 'Автор:',
+ 	'wikilog-form-tag' => 'Метка:',
+diff -r 2f012c39365a -r 20165416543f extensions/Wikilog/WikilogQuery.php
+--- extensions/Wikilog/WikilogQuery.php
++++ extensions/Wikilog/WikilogQuery.php
+@@ -159,6 +159,7 @@
+ 	private $mWikilogTitle = null;			///< Filter by wikilog.
+ 	private $mPubStatus = self::PS_ALL;		///< Filter by published status.
+ 	private $mCategory = false;				///< Filter by category.
++	private $mNotCategory = false;			///< Exclude items belonging to this category.
+ 	private $mAuthor = false;				///< Filter by author.
+ 	private $mTag = false;					///< Filter by tag.
+ 	private $mDate = false;					///< Filter by date.
+@@ -222,6 +223,21 @@
+ 	}
+ 
+ 	/**
++	 * Sets the category not to query for.
++	 * @param $category Category title object or text.
++	 */
++	public function setNotCategory( $category ) {
++		if ( is_object( $category ) ) {
++			$this->mNotCategory = $category;
++		} elseif ( is_string( $category ) ) {
++			$t = Title::makeTitleSafe( NS_CATEGORY, $category );
++			if ( $t !== null ) {
++				$this->mNotCategory = $t;
++			}
++		}
++	}
++
++	/**
+ 	 * Sets the author to query for.
+ 	 * @param $author User page title object or text.
+ 	 */
+@@ -275,6 +291,7 @@
+ 	public function getWikilogTitle()	{ return $this->mWikilogTitle; }
+ 	public function getPubStatus()		{ return $this->mPubStatus; }
+ 	public function getCategory()		{ return $this->mCategory; }
++	public function getNotCategory()	{ return $this->mNotCategory; }
+ 	public function getAuthor()		{ return $this->mAuthor; }
+ 	public function getTag()			{ return $this->mTag; }
+ 	public function getDate()			{ return $this->mDate; }
+@@ -315,9 +332,16 @@
+ 
+ 		# Filter by category.
+ 		if ( $this->mCategory ) {
+-			$q_tables[] = 'categorylinks';
+-			$q_joins['categorylinks'] = array( 'JOIN', 'wlp_page = cl_from' );
+-			$q_conds['cl_to'] = $this->mCategory->getDBkey();
++			$q_tables[] = '`categorylinks` clyes';
++			$q_joins['`categorylinks` clyes'] = array( 'JOIN', 'wlp_page = clyes.cl_from' );
++			$q_conds['clyes.cl_to'] = $this->mCategory->getDBkey();
++		}
++
++		# Exclude items belonging to category.
++		if ( $this->mNotCategory ) {
++			$q_tables[] = '`categorylinks` clno';
++			$q_joins['`categorylinks` clno'] = array( 'LEFT JOIN', array( 'wlp_page = clno.cl_from', 'clno.cl_to' => $this->mNotCategory->getDBkey() ) );
++			$q_conds[] = 'clno.cl_to IS NULL';
+ 		}
+ 
+ 		# Filter by author.
+@@ -379,6 +403,10 @@
+ 			$query['category'] = $this->mCategory->getDBKey();
+ 		}
+ 
++		if ( $this->mNotCategory ) {
++			$query['notcategory'] = $this->mNotCategory->getDBKey();
++		}
++
+ 		if ( $this->mAuthor ) {
+ 			$query['author'] = $this->mAuthor->getDBKey();
+ 		}
