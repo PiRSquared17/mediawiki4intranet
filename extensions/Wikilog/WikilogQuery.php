@@ -337,11 +337,16 @@ class WikilogItemQuery
 			$q_conds['clyes.cl_to'] = $this->mCategory->getDBkey();
 		}
 
-		# Exclude items belonging to category.
+		# Exclude items and blogs belonging to category.
 		if ( $this->mNotCategory ) {
+			# Items
 			$q_tables[] = '`categorylinks` clno';
 			$q_joins['`categorylinks` clno'] = array( 'LEFT JOIN', array( 'wlp_page = clno.cl_from', 'clno.cl_to' => $this->mNotCategory->getDBkey() ) );
 			$q_conds[] = 'clno.cl_to IS NULL';
+			# Blogs
+			$q_tables[] = '`categorylinks` clnob';
+			$q_joins['`categorylinks` clnob'] = array( 'LEFT JOIN', array( 'wlp_parent = clnob.cl_from', 'clnob.cl_to' => $this->mNotCategory->getDBkey() ) );
+			$q_conds[] = 'clnob.cl_to IS NULL';
 		}
 
 		# Filter by author.
