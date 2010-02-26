@@ -251,8 +251,8 @@ function wfSpecialExport( $page = '' ) {
 		/* Split up the input and look up linked pages */
 		$inputPages = array();
 		foreach (explode("\n", $page) as $p)
-			if ($p !== '' && $p !== null)
-				$inputPages[] = Title::newFromText($p)->getPrefixedText();
+			if ($p !== '' && $p !== null && ($p = Title::newFromText($p)))
+				$inputPages[] = $p->getPrefixedText();
 		$pageSet = array_flip( $inputPages );
 
 		if( $wgRequest->getCheck( 'templates' ) ) {
