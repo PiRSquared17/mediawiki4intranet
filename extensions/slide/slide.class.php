@@ -33,11 +33,11 @@ if (!defined('MEDIAWIKI'))
 class S5SlideShow
 {
     var $sTitle, $sArticle;
-    var $mSlides;
+    var $mPageContent, $mSlides;
     var $style, $title, $subtitle, $author, $footer, $subfooter, $headingmark, $incmark, $pagebreak;
 
     /* Constructor. If $attr is not an array(), attributes will be taken from article content. */
-    function __construct($sTitle, $attr = NULL)
+    function __construct($sTitle, $sContent = NULL, $attr = NULL)
     {
         if (!is_object($sTitle))
         {
@@ -46,17 +46,20 @@ class S5SlideShow
         }
         $this->sArticle = new Article($sTitle);
         $this->sTitle = $sTitle;
+        if ($sContent)
+            $this->mPageContent = $sContent;
+        else
+            $this->mPageContent = $this->sArticle->getContent();
         if (!is_array($attr))
         {
             /* get attributes from article content using a hook */
             global $wgUser;
             $parser = new Parser;
             $parser->setHook('slide', array($this, 'slide_for_args'));
-            $parser->parse($this->sArticle->getContent(), $this->sTitle, ParserOptions::newFromUser($wgUser));
+            $parser->parse($this->mPageContent, $this->sTitle, ParserOptions::newFromUser($wgUser));
         }
         else
             $this->setAttributes($attr);
-        $this->loadContent($this->sArticle->getContent());
     }
 
     /* Parse attribute hash and save them into $this */
@@ -139,8 +142,8 @@ class S5SlideShow
         global $egS5SlideTemplateFile;
         global $wgUser, $wgContLang, $wgOut, $wgParser;
 
-        if (empty($this->mSlides))
-            return false;
+        if (!$this->mSlides)
+            $this->loadContent($this->mPageContent);
 
         # get template
         $ce_slide_tpl = @file_get_contents($egS5SlideTemplateFile);
@@ -220,7 +223,7 @@ class S5SlideShow
         }
         /* Create slide show object */
         $attr['content'] = $content;
-        $slideShow = new S5SlideShow($title, $attr);
+        $slideShow = new S5SlideShow($title, NULL, $attr);
         $url = $title->escapeLocalURL("action=slide");
         return "<div class=\"floatright\"><span>
 <a href=\"$url\" class=\"image\" title=\"Slide Show\" target=\"_blank\">
