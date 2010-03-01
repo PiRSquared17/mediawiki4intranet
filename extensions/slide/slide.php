@@ -68,7 +68,7 @@ function S5SlideShow_UnknownAction($action, $article)
     if ($action == 'slide')
     {
         global $wgRequest;
-        $slideShow = new S5SlideShow($article->getTitle());
+        $slideShow = new S5SlideShow($article->getTitle(), $wgRequest->getVal('wpTextbox1'));
         if ($style = trim($wgRequest->getText('s5style')))
             $slideShow->style = $style;
         $slideShow->genSlideFile();
