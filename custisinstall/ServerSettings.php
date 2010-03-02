@@ -18,7 +18,7 @@ define('NS_BLOG', 100);
 Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
 $wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
 $wgWikilogMaxCommentSize = 0x7FFFFFFF;
-$wgWikilogDefaultNotCategory = 'Внутренние';
+$wgWikilogDefaultNotCategory = 'Скрытые';
 
 $egDraftsAutoSaveWait = 60;   // 1 minute
 
