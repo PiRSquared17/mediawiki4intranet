@@ -333,7 +333,7 @@ class WikilogItemQuery
 		# Filter by category.
 		if ( $this->mCategory ) {
 			$q_tables[] = '`categorylinks` clyes';
-			$q_joins['`categorylinks` clyes'] = array( 'JOIN', 'wlp_page = clyes.cl_from' );
+			$q_joins['`categorylinks` clyes'] = array( 'JOIN', '(wlp_page = clyes.cl_from OR wlp_parent = clyes.cl_from)' );
 			$q_conds['clyes.cl_to'] = $this->mCategory->getDBkey();
 		}
 
