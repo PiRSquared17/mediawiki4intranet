@@ -740,7 +740,7 @@ class WikilogCommentFormatter
 			}
 		}
 		if ( $extra ) {
-			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
+			$extra = implode( ' | ', $extra );
 		} else {
 			$extra = "";
 		}
@@ -897,7 +897,7 @@ class WikilogCommentFormatter
 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-page-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array(),
+					array( 'section' => false ),
 					'known'
 				);
 			}
@@ -905,7 +905,7 @@ class WikilogCommentFormatter
 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ),
+					array( 'action' => 'edit', 'section' => false ),
 					'known'
 				);
 			}
