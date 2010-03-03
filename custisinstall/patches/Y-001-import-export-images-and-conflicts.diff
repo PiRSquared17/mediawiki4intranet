@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1267207477 -10800
+# Date 1267628193 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -12,7 +12,7 @@ installation.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 6c1f5422a04e -r f356979f2790 includes/Export.php
+diff -r 6c1f5422a04e -r bb272e4819a3 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -174,7 +174,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 6c1f5422a04e -r f356979f2790 includes/Import.php
+diff -r 6c1f5422a04e -r bb272e4819a3 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -87,6 +87,10 @@
@@ -800,7 +800,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 6c1f5422a04e -r f356979f2790 includes/filerepo/LocalFile.php
+diff -r 6c1f5422a04e -r bb272e4819a3 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@
@@ -896,7 +896,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
+diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,28 +21,54 @@
@@ -970,7 +970,27 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  	}
  	$dbr->freeResult($res);
  
-@@ -104,11 +130,37 @@
+@@ -63,6 +89,19 @@
+ }
+ 
+ /**
++ * Expand a list of pages to include linked pages.
++ * @param $inputPages array, list of titles to look up
++ * @param $pageSet array, associative array indexed by titles for output
++ * @return array associative array index by titles
++ */
++function wfExportGetPagelinks( $inputPages, $pageSet ) {
++	return wfExportGetLinks( $inputPages, $pageSet,
++		'pagelinks',
++		array( 'pl_namespace AS namespace', 'pl_title AS title' ),
++		array( 'page_id=pl_from' ) );
++}
++
++/**
+  * Expand a list of pages to include images used in those pages.
+  * @param $inputPages array, list of titles to look up
+  * @param $pageSet array, associative array indexed by titles for output
+@@ -104,11 +143,37 @@
  	return $pageSet;
  }
  
@@ -1013,7 +1033,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  }
  
  /**
-@@ -120,23 +172,15 @@
+@@ -120,23 +185,15 @@
  
  	$curonly = true;
  	$doexport = false;
@@ -1045,7 +1065,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  	}
  	else if( $wgRequest->wasPosted() && $page == '' ) {
  		$page = $wgRequest->getText( 'pages' );
-@@ -205,19 +249,20 @@
+@@ -205,19 +262,23 @@
  		}
  
  		/* Split up the input and look up linked pages */
@@ -1061,7 +1081,11 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  		}
  
 -		/*
- 		// Enable this when we can do something useful exporting/importing image information. :)
+-		// Enable this when we can do something useful exporting/importing image information. :)
++		if( $wgRequest->getCheck( 'pagelinks' ) ) {
++			$pageSet = wfExportGetPagelinks( $inputPages, $pageSet );
++		}
++
  		if( $wgRequest->getCheck( 'images' ) ) {
  			$pageSet = wfExportGetImages( $inputPages, $pageSet );
  		}
@@ -1069,7 +1093,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  
  		$pages = array_keys( $pageSet );
  
-@@ -241,6 +286,8 @@
+@@ -241,6 +302,8 @@
  
  		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors ;
@@ -1078,7 +1102,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  		$exporter->openStream();
  
  		foreach( $pages as $page ) {
-@@ -278,23 +325,26 @@
+@@ -278,23 +341,27 @@
  	$form = Xml::openElement( 'form', array( 'method' => 'post',
  		'action' => $self->getLocalUrl( 'action=submit' ) ) );
  
@@ -1105,6 +1129,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
 -	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
 +
 +	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', $wgRequest->getCheck('templates') ? true : false ) . '<br />';
++	$form .= Xml::checkLabel( wfMsg( 'export-pagelinks' ), 'pagelinks', 'wpExportPagelinks', $wgRequest->getCheck('pagelinks') ? true : false ) . '<br />';
  	// Enable this when we can do something useful exporting/importing image information. :)
 -	//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
 +	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
@@ -1113,7 +1138,7 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialImport.php
+diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@
@@ -1198,10 +1223,10 @@ diff -r 6c1f5422a04e -r f356979f2790 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesEn.php
+diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -2763,10 +2763,19 @@
+@@ -2763,10 +2763,20 @@
  'exportnohistory'   => "----
  '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
  'export-submit'     => 'Export',
@@ -1218,11 +1243,12 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesEn.php
 +'export-selfcontained' => 'Include image contents into the export file',
  'export-download'   => 'Save as file',
  'export-templates'  => 'Include templates',
++'export-pagelinks'  => 'Include linked articles',
 +'export-closure'    => 'Include subcategories',
  
  # Namespace 8 related
  'allmessages'               => 'System messages',
-@@ -2803,7 +2812,6 @@
+@@ -2803,7 +2813,6 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -1230,7 +1256,7 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesEn.php
  'importnopages'              => 'No pages to import.',
  'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
  'importunknownsource'        => 'Unknown import source type',
-@@ -2822,9 +2830,15 @@
+@@ -2822,9 +2831,15 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',
@@ -1247,10 +1273,10 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesRu.php
+diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -2321,10 +2321,19 @@
+@@ -2321,10 +2321,20 @@
  'exportnohistory'   => "----
  '''Замечание:''' экспорт полной истории изменений страниц отключен из-за проблем с производительностью.",
  'export-submit'     => 'Экспортировать',
@@ -1267,11 +1293,12 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesRu.php
 +'export-selfcontained' => 'Включать содержимое изображений в экспортный файл',
  'export-download'   => 'Предложить сохранить как файл',
  'export-templates'  => 'Включить шаблоны',
++'export-pagelinks'  => 'Включить статьи, связанные ссылками',
 +'export-closure'    => 'Включая подкатегории',
  
  # Namespace 8 related
  'allmessages'               => 'Системные сообщения',
-@@ -2360,7 +2369,6 @@
+@@ -2360,7 +2370,6 @@
  'import-comment'             => 'Примечание:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
@@ -1279,7 +1306,7 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesRu.php
  'importnopages'              => 'Нет страниц для импортирования.',
  'importfailed'               => 'Не удалось импортировать: $1',
  'importunknownsource'        => 'Неизвестный тип импортируемой страницы',
-@@ -2376,9 +2384,15 @@
+@@ -2376,9 +2385,15 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -1296,7 +1323,7 @@ diff -r 6c1f5422a04e -r f356979f2790 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6c1f5422a04e -r f356979f2790 skins/common/shared.css
+diff -r 6c1f5422a04e -r bb272e4819a3 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -311,3 +311,5 @@
