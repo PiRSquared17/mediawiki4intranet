@@ -89,6 +89,19 @@ function wfExportGetTemplates( $inputPages, $pageSet ) {
 }
 
 /**
+ * Expand a list of pages to include linked pages.
+ * @param $inputPages array, list of titles to look up
+ * @param $pageSet array, associative array indexed by titles for output
+ * @return array associative array index by titles
+ */
+function wfExportGetPagelinks( $inputPages, $pageSet ) {
+	return wfExportGetLinks( $inputPages, $pageSet,
+		'pagelinks',
+		array( 'pl_namespace AS namespace', 'pl_title AS title' ),
+		array( 'page_id=pl_from' ) );
+}
+
+/**
  * Expand a list of pages to include images used in those pages.
  * @param $inputPages array, list of titles to look up
  * @param $pageSet array, associative array indexed by titles for output
@@ -259,7 +272,10 @@ function wfSpecialExport( $page = '' ) {
 			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
 		}
 
-		// Enable this when we can do something useful exporting/importing image information. :)
+		if( $wgRequest->getCheck( 'pagelinks' ) ) {
+			$pageSet = wfExportGetPagelinks( $inputPages, $pageSet );
+		}
+
 		if( $wgRequest->getCheck( 'images' ) ) {
 			$pageSet = wfExportGetImages( $inputPages, $pageSet );
 		}
@@ -341,6 +357,7 @@ function wfSpecialExport( $page = '' ) {
 		$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
 
 	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', $wgRequest->getCheck('templates') ? true : false ) . '<br />';
+	$form .= Xml::checkLabel( wfMsg( 'export-pagelinks' ), 'pagelinks', 'wpExportPagelinks', $wgRequest->getCheck('pagelinks') ? true : false ) . '<br />';
 	// Enable this when we can do something useful exporting/importing image information. :)
 	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
 	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';

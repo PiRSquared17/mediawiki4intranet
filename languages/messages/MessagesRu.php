@@ -2333,6 +2333,7 @@ $1',
 'export-selfcontained' => 'Включать содержимое изображений в экспортный файл',
 'export-download'   => 'Предложить сохранить как файл',
 'export-templates'  => 'Включить шаблоны',
+'export-pagelinks'  => 'Включить статьи, связанные ссылками',
 'export-closure'    => 'Включая подкатегории',
 
 # Namespace 8 related
