@@ -76,12 +76,14 @@ class SpecialWikilog
 	 */
 	public function getDefaultOptions() {
 		global $wgWikilogNumArticles;
+		global $wgWikilogDefaultNotCategory;
 
 		$opts = new FormOptions();
 		$opts->add( 'view',     'summary' );
 		$opts->add( 'show',     'published' );
 		$opts->add( 'wikilog',  '' );
 		$opts->add( 'category', '' );
+		$opts->add( 'notcategory', '' );
 		$opts->add( 'author',   '' );
 		$opts->add( 'tag',      '' );
 		$opts->add( 'year',     '', FormOptions::INTNULL );
@@ -97,9 +99,12 @@ class SpecialWikilog
 	 */
 	public function webSetup( $parameters ) {
 		global $wgRequest, $wgWikilogExpensiveLimit;
+		global $wgWikilogDefaultNotCategory;
 
 		$opts = $this->getDefaultOptions();
 		$opts->fetchValuesFromRequest( $wgRequest );
+		if ( is_null( $wgRequest->getVal('notcategory') ) )
+			$opts['notcategory'] = $wgWikilogDefaultNotCategory;
 
 		# Collect inline parameters, they have precedence over query params.
 		$this->parseInlineParams( $parameters, $opts );
@@ -116,9 +121,12 @@ class SpecialWikilog
 	 */
 	public function feedSetup() {
 		global $wgRequest, $wgFeedLimit;
+		global $wgWikilogDefaultNotCategory;
 
 		$opts = $this->getDefaultOptions();
 		$opts->fetchValuesFromRequest( $wgRequest, array( 'show', 'limit' ) );
+		if ( is_null( $wgRequest->getVal('notcategory') ) )
+			$opts['notcategory'] = $wgWikilogDefaultNotCategory;
 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
@@ -348,6 +356,7 @@ class SpecialWikilog
 	 */
 	protected static function getQueryFormFields( FormOptions $opts ) {
 		global $wgWikilogEnableTags;
+		global $wgWikilogDefaultNotCategory;
 
 		$fields = array();
 
@@ -359,6 +368,11 @@ class SpecialWikilog
 		$fields['category'] = Xml::inputLabelSep(
 			wfMsg( 'wikilog-form-category' ), 'category', 'wl-category', 40,
 			str_replace( '_', ' ', $opts->consumeValue( 'category' ) )
+		);
+
+		$fields['notcategory'] = Xml::inputLabelSep(
+			wfMsg( 'wikilog-form-notcategory' ), 'notcategory', 'wl-notcategory', 40,
+			str_replace( '_', ' ', $opts->consumeValue( 'notcategory' ) )
 		);
 
 		$fields['author'] = Xml::inputLabelSep(
@@ -406,6 +420,9 @@ class SpecialWikilog
 		}
 		if ( ( $t = $opts['category'] ) ) {
 			$query->setCategory( $t );
+		}
+		if ( ( $t = $opts['notcategory'] ) ) {
+			$query->setNotCategory( $t );
 		}
 		if ( ( $t = $opts['author'] ) ) {
 			$query->setAuthor( $t );

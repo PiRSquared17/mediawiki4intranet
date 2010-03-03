@@ -18,6 +18,10 @@ $messages['en'] = array(
 	'right-wl-postcomment' => 'Post comments to wikilog articles',
 	'right-wl-moderation' => 'Moderation of wikilog article comments',
 
+	# Calendar
+	'wikilogcalendar' => 'Wikilog calendar',
+	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
+
 	# Special:Wikilog
 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
 	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
@@ -158,7 +162,8 @@ The comment will only appear after it is reviewed by a moderator.',
 	'wikilog-post-reply' => 'Post a new reply',
 	'wikilog-form-legend' => 'Search for wikilog posts',
 	'wikilog-form-wikilog' => 'Wikilog:',
-	'wikilog-form-category' => 'Category:',
+	'wikilog-form-category' => 'In category:',
+	'wikilog-form-notcategory' => 'Not in category:',
 	'wikilog-form-name' => 'Name:',
 	'wikilog-form-author' => 'Author:',
 	'wikilog-form-tag' => 'Tag:',
@@ -4862,6 +4867,8 @@ $messages['ru'] = array(
 	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
 	'wikilog-auto' => 'Викилог Авто',
 	'wikilog-help' => '{{ns:Help}}:Викилог',
+	'wikilogcalendar' => 'Календарь блога',
+	'wikilog-calendar-archive-link-title' => 'Записи $1 за $2',
 	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
 	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
 	'wikilog-specialwikilog-title' => 'Викилоги',
@@ -4967,7 +4974,8 @@ $messages['ru'] = array(
 	'wikilog-post-reply' => 'Написать новый ответ',
 	'wikilog-form-legend' => 'Поиск по заметкам викилога',
 	'wikilog-form-wikilog' => 'Викилог:',
-	'wikilog-form-category' => 'Категория:',
+	'wikilog-form-category' => 'В категории:',
+	'wikilog-form-notcategory' => 'Не в категории:',
 	'wikilog-form-name' => 'Имя:',
 	'wikilog-form-author' => 'Автор:',
 	'wikilog-form-tag' => 'Метка:',
