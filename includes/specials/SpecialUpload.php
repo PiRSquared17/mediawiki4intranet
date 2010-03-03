@@ -5,7 +5,7 @@
  */
 
 # Bug 60996 - cURL environment proxy ($ENV['http_proxy'], $ENV['no_proxy']) support
-require_once($IP.'/custisinstall/curl-env-proxy.php');
+require_once(dirname(dirname(dirname(__FILE__))).'/custisinstall/curl-env-proxy.php');
 
 # A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
 if (!function_exists('wfSpecialUpload'))
