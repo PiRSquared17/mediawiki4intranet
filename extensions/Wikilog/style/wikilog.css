@@ -240,4 +240,8 @@ table.wl-calendar {
 	color: gray;
 }
 
+.wl-calendar-nav a {
+	margin: 0 16px;
+}
+
 /* kate: indent-mode normal; space-indent off; tab-width 4; */

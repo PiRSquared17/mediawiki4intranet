@@ -21,6 +21,8 @@ $messages['en'] = array(
 	# Calendar
 	'wikilogcalendar' => 'Wikilog calendar',
 	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
+	'wikilog-calendar-prev' => '$1 ›',
+	'wikilog-calendar-next' => '‹ $1',
 
 	# Special:Wikilog
 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
