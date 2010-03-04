@@ -38,4 +38,5 @@ td.vb { vertical-align: bottom; }
 #prefooter1 img { top: 0; }
 .m_feedlink { margin-left: 10px; }
 .custom_box { font-size: 80%; padding: 0 .5em; }
-table.wl-calendar { font-size: 125%; }
+table.wl-calendar, .wl-calendar-nav { font-size: 125%; text-align: center; }
+.wl-calendar-month { font-size: 125%; text-align: center; margin: 8px 0 0 0; }
