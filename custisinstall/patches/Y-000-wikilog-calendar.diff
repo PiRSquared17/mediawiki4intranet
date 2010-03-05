@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1267794911 -10800
+# Date 1267795329 -10800
 Calendar support for Wikilog and MediaWiki Sidebar
 
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/SpecialWikilog.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/SpecialWikilog.php
 --- extensions/Wikilog/SpecialWikilog.php
 +++ extensions/Wikilog/SpecialWikilog.php
 @@ -155,6 +155,9 @@
@@ -16,7 +16,7 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/SpecialWikilog.php
  		# Handle special page inclusion.
  		if ( $this->including() ) {
  			# Get pager body.
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/Wikilog.i18n.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -18,6 +18,12 @@
@@ -41,7 +41,7 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/Wikilog.i18n.php
  	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
  	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
  	'wikilog-specialwikilog-title' => 'Викилоги',
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/Wikilog.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -124,6 +124,11 @@
@@ -81,7 +81,7 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/Wikilog.php
  	# ##
  	# #  Other global wikilog functions.
  	#
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogCalendar.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/WikilogCalendar.php
 --- /dev/null
 +++ extensions/Wikilog/WikilogCalendar.php
 @@ -0,0 +1,168 @@
@@ -253,7 +253,7 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogCalendar.php
 +        return $html;
 +    }
 +}
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogItemPager.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
 @@ -57,8 +57,8 @@
@@ -278,7 +278,7 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogItemPager.php
  
  	/**
  	 * Constructor.
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogMainPage.php
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/WikilogMainPage.php
 --- extensions/Wikilog/WikilogMainPage.php
 +++ extensions/Wikilog/WikilogMainPage.php
 @@ -95,6 +95,9 @@
@@ -291,10 +291,10 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/WikilogMainPage.php
  		# Display list of wikilog posts.
  		$body = $pager->getBody();
  		$body .= $pager->getNavigationBar();
-diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/style/wikilog.css
+diff -r 2f012c39365a -r b97e5f51fa4b extensions/Wikilog/style/wikilog.css
 --- extensions/Wikilog/style/wikilog.css
 +++ extensions/Wikilog/style/wikilog.css
-@@ -221,4 +221,34 @@
+@@ -221,4 +221,38 @@
  	margin: 0;
  }
  
@@ -321,7 +321,11 @@ diff -r 2f012c39365a -r be28a7f43145 extensions/Wikilog/style/wikilog.css
 +}
 +
 +.wl-calendar-nav a {
-+	margin: 0 16px;
++	white-space: nowrap;
++}
++
++.wl-calendar-nav a.mw-nextlink {
++	margin: 0 8px 0 0;
 +}
 +
 +.wl-calendar-month {
