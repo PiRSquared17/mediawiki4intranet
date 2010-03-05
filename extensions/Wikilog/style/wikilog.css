@@ -229,6 +229,7 @@ table.wl-calendar {
 .wl-calendar td {
 	text-align: right;
 	padding: 2px 3px 0 3px;
+	background-color: #f0f0f0;
 }
 
 .wl-calendar td.wl-calendar-day {
@@ -238,10 +239,16 @@ table.wl-calendar {
 
 .wl-calendar td.wl-calendar-other {
 	color: gray;
+	background-color: transparent;
+	font-weight: normal;
 }
 
 .wl-calendar-nav a {
 	margin: 0 16px;
+}
+
+.wl-calendar-month {
+	margin: 8px 0 0 0;
 }
 
 /* kate: indent-mode normal; space-indent off; tab-width 4; */
