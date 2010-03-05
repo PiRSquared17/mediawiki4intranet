@@ -222,8 +222,7 @@ div.wl-description div.wl-subtitle p {
 }
 
 table.wl-calendar {
-	margin-right: auto;
-	margin-left: auto;
+	margin: 0 auto 4px auto;
 }
 
 .wl-calendar td {
@@ -252,7 +251,7 @@ table.wl-calendar {
 }
 
 .wl-calendar-month {
-	margin: 8px 0 0 0;
+	margin: 4px 0 0 0;
 }
 
 /* kate: indent-mode normal; space-indent off; tab-width 4; */
