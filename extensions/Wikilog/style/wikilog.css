@@ -244,7 +244,11 @@ table.wl-calendar {
 }
 
 .wl-calendar-nav a {
-	margin: 0 16px;
+	white-space: nowrap;
+}
+
+.wl-calendar-nav a.mw-nextlink {
+	margin: 0 8px 0 0;
 }
 
 .wl-calendar-month {
