@@ -498,6 +498,10 @@ class WikilogArchivesPager
 	}
 
 	function getDefaultSort() {
+		global $wgRequest;
+		// A hack to set default sort direction
+		if ( !$wgRequest->getBool( 'asc' ) && ! $wgRequest->getBool( 'desc' ))
+			$wgRequest->setVal('desc', 1);
 		return 'wlp_pubdate';
 	}
 
