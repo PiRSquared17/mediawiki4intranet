@@ -1,11 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1267036522 -10800
+# Date 1268142760 -10800
 Wikilog extension debug:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
+Bug 61175 - default sort direction
 
-diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/Wikilog.php
+diff -r 2f012c39365a -r 44addde7da32 extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -423,16 +423,13 @@
@@ -32,7 +33,7 @@ diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/Wikilog.php
  			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
  			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
  			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
-diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/WikilogComment.php
+diff -r 2f012c39365a -r 44addde7da32 extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
 @@ -740,7 +740,7 @@
@@ -44,7 +45,7 @@ diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/WikilogComment.php
  		} else {
  			$extra = "";
  		}
-diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/WikilogHooks.php
+diff -r 2f012c39365a -r 44addde7da32 extensions/Wikilog/WikilogHooks.php
 --- extensions/Wikilog/WikilogHooks.php
 +++ extensions/Wikilog/WikilogHooks.php
 @@ -57,7 +57,7 @@
@@ -56,7 +57,21 @@ diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/WikilogHooks.php
  				$wi->getItemTitle()->invalidateCache();
  				$wi->getItemTitle()->purgeSquid();
  			}
-diff -r 2f012c39365a -r 87c7ea32511c extensions/Wikilog/WikilogUtils.php
+diff -r 2f012c39365a -r 44addde7da32 extensions/Wikilog/WikilogItemPager.php
+--- extensions/Wikilog/WikilogItemPager.php
++++ extensions/Wikilog/WikilogItemPager.php
+@@ -498,6 +498,10 @@
+ 	}
+ 
+ 	function getDefaultSort() {
++		global $wgRequest;
++		// A hack to set default sort direction
++		if ( !$wgRequest->getBool( 'asc' ) && ! $wgRequest->getBool( 'desc' ))
++			$wgRequest->setVal('desc', 1);
+ 		return 'wlp_pubdate';
+ 	}
+ 
+diff -r 2f012c39365a -r 44addde7da32 extensions/Wikilog/WikilogUtils.php
 --- extensions/Wikilog/WikilogUtils.php
 +++ extensions/Wikilog/WikilogUtils.php
 @@ -89,7 +89,7 @@
