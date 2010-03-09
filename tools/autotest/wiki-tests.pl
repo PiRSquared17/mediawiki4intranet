@@ -13,6 +13,7 @@ use POSIX qw(strftime);
 use HTTP::Cookies;
 use HTTP::Request::Common;
 use HTML::Entities;
+use XML::LibXML;
 
 use Encode::Escape;
 BEGIN { $\ = '' };
@@ -44,20 +45,23 @@ my $tests = {
         searchtitle  => 'Search title',
     },
     checkurl => {
-        ''           => 'Simply check URL for PHP errors',
+        ''           => 'Check URL for PHP errors and optionally validate it as XML',
         checkurl     => 'URL for checking',
+        validate     => 'Perform XML validation on downloaded content',
     },
     categorizedrc => {
         ''           => 'Check categorized Special:RecentChanges for PHP errors',
         checkcat     => 'Test',
     },
 };
+my $booleans = { validate => 1 };
 my @order = qw(login save random_search categorizedrc);
 
 # параметры
 my $params = {};
 my @url;
 my @tests;
+my $ct;
 
 while ($_ = shift)
 {
@@ -67,19 +71,39 @@ while ($_ = shift)
     }
     elsif (/^--/)
     {
-        $params->{lc $'} = shift;
+        my $p = lc $';
+        if (!$booleans->{$p})
+        {
+            my $v = shift;
+            if (!exists $ct->{$p})
+            {
+                $ct->{$p} = $v;
+            }
+            elsif (!ref $ct->{$p})
+            {
+                $ct->{$p} = [ $ct->{$p}, $v ];
+            }
+            else
+            {
+                push @{$ct->{$p}}, $v;
+            }
+        }
+        else
+        {
+            $ct->{$p} = 1;
+        }
     }
     elsif ($_ eq '-T')
     {
-        push @tests, shift;
+        push @tests, $ct = { '' => shift };
     }
     else
     {
         push @url, $_;
     }
 }
-@tests = @order unless @tests;
-@tests = grep { $tests->{$_} } @tests;
+@tests = map { { '' => $_ } } @order unless @tests;
+@tests = grep { $tests->{$_->{''}} } @tests;
 die logp()." no valid test(s) specified" unless @tests;
 
 # создаём юзерагента
@@ -90,8 +114,10 @@ for my $url (@url)
     $url =~ s/\/+$//so;
     for my $t (@tests)
     {
-        eval "test_$t(\$url, \$params, \$ua)";
-        die logp()." error during test $t on url $url:\n".$@ if $@;
+        no strict 'refs';
+        my $s = 'test_'.$t->{''};
+        eval { &$s($url, $t, $ua) };
+        die logp()." error during test ".$t->{''}." on url $url:\n".$@ if $@;
     }
 }
 exit 0;
@@ -100,11 +126,11 @@ sub help
 {
     print <<EOF;
 MediaWiki test script.
-USAGE: $0 [OPTIONS] [-T test] [-T test...] URL URL...
+USAGE: $0 [-T test1] [test1 options] [-T test2] [test2 options] ... URL1 URL2 ...
 OPTIONS:
--h                  print help and exit
--T test             run test 'test'
-TESTS:
+-h                  Print help and exit
+-T test             Run test 'test'. The same test may be ran multiple times.
+AVAILABLE TESTS:
 EOF
     foreach (keys %$tests)
     {
@@ -253,7 +279,21 @@ sub test_checkurl
         unless $response->code == 200;
     my $text = $response->content;
     check_php_warnings($text);
-    return $text;
+    if ($params->{validate})
+    {
+        my $parser = XML::LibXML->new();
+        $parser->line_numbers(1) if $parser->can('line_numbers'); # (XML::LibXML > 1.56)
+        $parser->load_ext_dtd(0);
+        $parser->expand_entities(1);
+        my $doc = eval { $parser->parse_string($text) };
+        if ($@)
+        {
+            my $m = $@;
+            $m =~ s/^\s*:\s*(\d+)\s*:\s*//so;
+            my $l = $1;
+            die logp()." XML validation failed at URL '$params->{checkurl}', LINE $l. ERROR: $m";
+        }
+    }
 }
 
 sub test_categorizedrc
@@ -265,7 +305,8 @@ sub test_categorizedrc
 sub check_php_warnings
 {
     my ($text) = @_;
-    if ($text =~ /^(.*?)<!DOCTYPE/iso)
+    if ($text =~ /^(.*?)<!DOCTYPE/iso ||
+        $text =~ /^(.*?)<\?\s*xml/iso)
     {
         $text = $1;
     }
