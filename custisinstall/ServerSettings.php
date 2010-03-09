@@ -62,6 +62,7 @@ $wgRCMaxAge = 50 * 365 * 86400;
 
 $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
+$wgGroupPermissions['*']['upload_by_url'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 $wgSphinxSearch_weights = array('page_title' => 2, 'old_text' => 1);
