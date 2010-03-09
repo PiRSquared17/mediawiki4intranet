@@ -1,7 +1,29 @@
-Index: languages/messages/MessagesRu.php
-===================================================================
---- languages/messages/MessagesRu.php	(revision 58865)
-+++ languages/messages/MessagesRu.php	(working copy)
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1268160744 -10800
+Create branch for patch 000-correct-noarticletext-ru
+
+diff -r 2f012c39365a -r b965859ad64b includes/specials/SpecialUserlogin.php
+--- includes/specials/SpecialUserlogin.php
++++ includes/specials/SpecialUserlogin.php
+@@ -843,12 +843,12 @@
+ 			$linkq .= '&uselang=' . $this->mLanguage;
+ 
+ 		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
+-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
++		$link .= wfMsg( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
+ 		$link .= '</a>';
+ 
+ 		# Don't show a "create account" link if the user can't
+ 		if( $this->showCreateOrLoginLink( $wgUser ) )
+-			$template->set( 'link', wfMsgHtml( $linkmsg, $link ) );
++			$template->set( 'link', wfMsg( $linkmsg, $link ) );
+ 		else
+ 			$template->set( 'link', '' );
+ 
+diff -r 2f012c39365a -r b965859ad64b languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
 @@ -809,7 +809,7 @@
  'noarticletext'                    => "В настоящий момент текст на данной странице отсутствует.
  Вы можете [[Special:Search/{{PAGENAME}}|найти упоминание данного названия]] в других статьях,
