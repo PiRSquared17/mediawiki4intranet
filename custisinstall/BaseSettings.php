@@ -110,6 +110,7 @@ require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/WikiBookmarks/WikiBookmarks.php');
 require_once($IP.'/extensions/SWFUpload/SWFUpload.php');
 require_once($IP.'/extensions/UserMagic/UserMagic.php');
+require_once($IP.'/extensions/slide/slide.php');
 
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = true;
