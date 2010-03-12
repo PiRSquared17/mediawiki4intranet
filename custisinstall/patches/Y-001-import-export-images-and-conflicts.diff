@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1267628193 -10800
+# Date 1268415294 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -12,7 +12,7 @@ installation.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 6c1f5422a04e -r bb272e4819a3 includes/Export.php
+diff -r 6c1f5422a04e -r c094188fb0e2 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -86,7 +86,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/Export.php
 +			$this->binaries = array();
 +			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
 +		}
-+		return $mp .
++		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
 +			Xml::element( 'mediawiki', array(
  			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
  			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
@@ -174,7 +174,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 6c1f5422a04e -r bb272e4819a3 includes/Import.php
+diff -r 6c1f5422a04e -r c094188fb0e2 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -87,6 +87,10 @@
@@ -800,7 +800,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 6c1f5422a04e -r bb272e4819a3 includes/filerepo/LocalFile.php
+diff -r 6c1f5422a04e -r c094188fb0e2 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@
@@ -896,7 +896,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialExport.php
+diff -r 6c1f5422a04e -r c094188fb0e2 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,28 +21,54 @@
@@ -1138,7 +1138,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialImport.php
+diff -r 6c1f5422a04e -r c094188fb0e2 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@
@@ -1223,7 +1223,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesEn.php
+diff -r 6c1f5422a04e -r c094188fb0e2 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2763,10 +2763,20 @@
@@ -1273,7 +1273,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesRu.php
+diff -r 6c1f5422a04e -r c094188fb0e2 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2321,10 +2321,20 @@
@@ -1323,7 +1323,7 @@ diff -r 6c1f5422a04e -r bb272e4819a3 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6c1f5422a04e -r bb272e4819a3 skins/common/shared.css
+diff -r 6c1f5422a04e -r c094188fb0e2 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -311,3 +311,5 @@
