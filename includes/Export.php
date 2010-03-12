@@ -370,7 +370,7 @@ class XmlDumpWriter {
 			$this->binaries = array();
 			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
 		}
-		return $mp .
+		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
 			Xml::element( 'mediawiki', array(
 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
