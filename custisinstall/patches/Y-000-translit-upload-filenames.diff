@@ -1,30 +1,11 @@
-Index: includes/filerepo/LocalFile.php
-===================================================================
---- includes/filerepo/LocalFile.php	(revision 47934)
-+++ includes/filerepo/LocalFile.php	(working copy)
-@@ -937,7 +937,7 @@
- 	function publish( $srcPath, $flags = 0 ) {
- 		$this->lock();
- 		$dstRel = $this->getRel();
--		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getName();
-+		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
- 		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
- 		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
- 		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-@@ -1729,7 +1795,8 @@
- 		$this->target = $target;
- 		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );
- 		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
--		$this->oldName = $this->file->getName();
-+		$this->oldName = $this->file->getPhys();
-+		/* FIXME getPhysFromTitle is needed */
- 		$this->newName = $this->file->repo->getNameFromTitle( $this->target );
- 		$this->oldRel = $this->oldHash . $this->oldName;
- 		$this->newRel = $this->newHash . $this->newName;
-Index: includes/filerepo/File.php
-===================================================================
---- includes/filerepo/File.php	(revision 47934)
-+++ includes/filerepo/File.php	(working copy)
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1268753658 -10800
+Create branch for patch 000-translit-upload-filenames
+
+diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/File.php
+--- includes/filerepo/File.php
++++ includes/filerepo/File.php
 @@ -19,6 +19,81 @@
   *
   * @ingroup FileRepo
@@ -100,14 +81,14 @@ Index: includes/filerepo/File.php
 +        'Ю' => 'YU',
 +        'Я' => 'YA',
 +    ));
-+    $s = preg_replace('/[^a-z_\d\.]+/is', '_', $s);
-+    return strtoupper($s);
++    $s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
++    return $s;
 +}
 +
  abstract class File {
  	const DELETED_FILE = 1;
  	const DELETED_COMMENT = 2;
-@@ -458,7 +533,7 @@
+@@ -465,7 +540,7 @@
  		}
  		$extension = $this->getExtension();
  		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType() );
@@ -116,7 +97,7 @@ Index: includes/filerepo/File.php
  		if ( $thumbExt != $extension ) {
  			$thumbName .= ".$thumbExt";
  		}
-@@ -716,17 +791,33 @@
+@@ -722,17 +797,33 @@
  	}
  
  	/**
@@ -152,3 +133,25 @@ Index: includes/filerepo/File.php
  	}
  
  	/** Get the relative path for an archive file */
+diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/LocalFile.php
+--- includes/filerepo/LocalFile.php
++++ includes/filerepo/LocalFile.php
+@@ -956,7 +956,7 @@
+ 	function publish( $srcPath, $flags = 0 ) {
+ 		$this->lock();
+ 		$dstRel = $this->getRel();
+-		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getName();
++		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
+ 		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
+ 		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
+ 		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
+@@ -1729,7 +1729,8 @@
+ 		$this->target = $target;
+ 		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );
+ 		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
+-		$this->oldName = $this->file->getName();
++		$this->oldName = $this->file->getPhys();
++		/* FIXME getPhysFromTitle is needed */
+ 		$this->newName = $this->file->repo->getNameFromTitle( $this->target );
+ 		$this->oldRel = $this->oldHash . $this->oldName;
+ 		$this->newRel = $this->newHash . $this->newName;
