@@ -42,7 +42,7 @@ class OldImageRenamer
 			$fn = $oi['oi_archive_name'];
 			if (($p = strpos($fn, '!')) !== false)
 			{
-				$nfn = $ts.substr($fn, $p);
+				$nfn = $ts.'!'.$file->getPhys();
 				if ($fn != $nfn)
 				{
 					if (!$file || $lastfilename != $oi['oi_name'])
@@ -93,23 +93,51 @@ class OldImageRenamer
 			}
 		}
 		$dbr->freeResult($res);
+		/* Transliterate existing upload file names */
+		global $wgTransliterateUploadFilenames;
+		if ($wgTransliterateUploadFilenames)
+		{
+			$res = $dbr->select('image', 'img_name', '1', __METHOD__, array('FOR UPDATE'));
+			while ($img = $dbr->fetchRow($res))
+			{
+				$file = wfLocalFile($img['img_name']);
+				$path = $file->repo->getZonePath('public') . $file->getHashPath();
+				$name = $file->getName();
+				$phys = $file->getPhys();
+				if ($name != $phys && file_exists($path.$name) && !file_exists($path.$phys))
+				{
+					if (rename($path.$name, $path.$phys))
+						$this->out("Renamed $path$name to $path$phys\n");
+					else
+						print "Error moving $path$name to $path$phys\n";
+				}
+			}
+			$dbr->freeResult($res);
+		}
 		$dbr->commit();
 	}
 	
 	function help() {
 		echo <<<END
-By default, old files in MediaWiki are stored containing timestamp of **next**
-revision in file names. This script renames them to contain **their** timestamp
+This script does 2 things:
+
+1) By default, old files in MediaWiki are stored containing timestamp of **next**
+revision in file names. This script renames them to contain **their own** timestamp
 in file names.
 
+2) With CustIS patch, if \$wgTransliterateUploadFilenames is true, all upload file
+names are transliterated during upload. So MediaWiki expects that filenames of
+already uploaded files are also transliterated. This script automatically checks
+them and transliterates if needed.
+
 Usage:
-php archive-image-renamer.php
+php file-upload-renamer.php
 
 END;
 	}
 }
 
-print "Going to check oldimage archive names for ".wfWikiID()."\n";
+print "Going to check upload filenames for ".wfWikiID()." (archive timestamps".($wgTransliterateUploadFilenames?" and transliteration":"").")\n";
 
 if( !isset( $options['quick'] ) ) {
 	print "Abort with control-c in the next five seconds... ";
