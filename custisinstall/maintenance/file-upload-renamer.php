@@ -42,15 +42,15 @@ class OldImageRenamer
 			$fn = $oi['oi_archive_name'];
 			if (($p = strpos($fn, '!')) !== false)
 			{
+				if (!$file || $lastfilename != $oi['oi_name'])
+				{
+					$lastfilename = $oi['oi_name'];
+					$file = wfLocalFile($oi['oi_name']);
+					$path = $file->repo->getZonePath('public') . '/archive/' . $file->getHashPath();
+				}
 				$nfn = $ts.'!'.$file->getPhys();
 				if ($fn != $nfn)
 				{
-					if (!$file || $lastfilename != $oi['oi_name'])
-					{
-						$lastfilename = $oi['oi_name'];
-						$file = wfLocalFile($oi['oi_name']);
-						$path = $file->repo->getZonePath('public') . '/archive/' . $file->getHashPath();
-					}
 					if ($this->remove_unexisting && !file_exists($path . $fn))
 					{
 						$dbr->delete('oldimage', $row, __METHOD__);
