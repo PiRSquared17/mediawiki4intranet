@@ -90,8 +90,8 @@ function wfTransliterate($s)
         'Ю' => 'YU',
         'Я' => 'YA',
     ));
-    $s = preg_replace('/[^a-z_\d\.]+/is', '_', $s);
-    return strtoupper($s);
+    $s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
+    return $s;
 }
 
 abstract class File {
