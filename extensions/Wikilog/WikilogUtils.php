@@ -282,7 +282,7 @@ class WikilogUtils
 			try
 			{
 				$dom = new DOMDocument();
-				$dom->loadHTML('<?xml encoding="UTF-8">' . $content);
+				@$dom->loadHTML('<?xml encoding="UTF-8">' . $content);
 				$summary = new DOMDocument();
 				$h = false;
 				# Dive straight into imported <html><body>
