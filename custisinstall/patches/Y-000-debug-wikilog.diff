@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1268831269 -10800
+# Date 1269023144 -10800
 Wikilog extension debug:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
 Bug 61175 - default sort direction
 
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/Wikilog.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -423,16 +423,13 @@
@@ -33,10 +33,24 @@ diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/Wikilog.php
  			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
  			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
  			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogComment.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
-@@ -740,7 +740,7 @@
+@@ -698,12 +698,7 @@
+ 
+ 		if ( $comment->mUserID ) {
+ 			$authorPlain = htmlspecialchars( $comment->mUserText );
+-			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
+-				array( 'content', 'parseinline', 'replaceafter' ),
+-				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
+-				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
+-				$comment->mUserText
+-			);
++			$authorFmt = wfMsgExt( 'wikilog-author-signature', array( 'parseinline' ), $comment->mUserText );
+ 		} else {
+ 			$authorPlain = htmlspecialchars( $comment->mAnonName );
+ 			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
+@@ -740,7 +735,7 @@
  			}
  		}
  		if ( $extra ) {
@@ -45,7 +59,7 @@ diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogComment.php
  		} else {
  			$extra = "";
  		}
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogFeed.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
 @@ -361,7 +361,6 @@
@@ -65,7 +79,7 @@ diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogFeed.php
  			$row->wlp_updated,
  			$itemTitle->getFullUrl()
  		);
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogHooks.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/WikilogHooks.php
 --- extensions/Wikilog/WikilogHooks.php
 +++ extensions/Wikilog/WikilogHooks.php
 @@ -57,7 +57,7 @@
@@ -77,7 +91,7 @@ diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogHooks.php
  				$wi->getItemTitle()->invalidateCache();
  				$wi->getItemTitle()->purgeSquid();
  			}
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogItemPager.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
 @@ -498,6 +498,10 @@
@@ -91,7 +105,7 @@ diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogItemPager.php
  		return 'wlp_pubdate';
  	}
  
-diff -r 2f012c39365a -r dbe47c4248bd extensions/Wikilog/WikilogUtils.php
+diff -r 2f012c39365a -r 930899fabdf4 extensions/Wikilog/WikilogUtils.php
 --- extensions/Wikilog/WikilogUtils.php
 +++ extensions/Wikilog/WikilogUtils.php
 @@ -89,7 +89,7 @@
