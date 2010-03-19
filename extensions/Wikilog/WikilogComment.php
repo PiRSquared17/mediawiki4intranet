@@ -698,12 +698,7 @@ class WikilogCommentFormatter
 
 		if ( $comment->mUserID ) {
 			$authorPlain = htmlspecialchars( $comment->mUserText );
-			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
-				array( 'content', 'parseinline', 'replaceafter' ),
-				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
-				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
-				$comment->mUserText
-			);
+			$authorFmt = wfMsgExt( 'wikilog-author-signature', array( 'parseinline' ), $comment->mUserText );
 		} else {
 			$authorPlain = htmlspecialchars( $comment->mAnonName );
 			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
