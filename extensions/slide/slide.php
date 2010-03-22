@@ -70,7 +70,10 @@ function S5SlideShow_UnknownAction($action, $article)
         global $wgRequest;
         $content = $wgRequest->getVal('wpTextbox1');
         if (!$content)
+        {
             $content = $_SESSION['wpTextbox1'];
+            unset($_SESSION['wpTextbox1']);
+        }
         $slideShow = new S5SlideShow($article->getTitle(), $content);
         if ($style = trim($wgRequest->getText('s5style')))
             $slideShow->style = $style;
