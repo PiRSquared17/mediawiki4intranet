@@ -612,7 +612,10 @@ class WikilogCommentFormatter
 				list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $comment->mCommentTitle );
 				$text = $parserOutput->getText();
 			} else {
+				global $wgParser, $wgUser, $wgTitle;
 				$text = $comment->getText();
+				$text = $wgParser->parse($text, $wgTitle, ParserOptions::newFromUser( $wgUser ));
+				$text = $text->getText();
 			}
 
 			if ( $text ) {
