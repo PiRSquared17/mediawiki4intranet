@@ -153,7 +153,7 @@ class S5SlideShow
         # generate content
         $fc = '';
 
-        $options =& ParserOptions::newFromUser($wgUser);
+        $options = ParserOptions::newFromUser($wgUser);
         $fileParser = clone $wgParser;
         $fileParser->setHook('slide', 'S5SlideShow::fakeSlide');
 
@@ -162,12 +162,12 @@ class S5SlideShow
             if ($this->pagebreak)
                 $ms = preg_split('/'.preg_quote($this->pagebreak).'$/mi', $slide['content']);
             else
-                $ms = array(0 => $slide);
+                $ms = array(0 => $slide['content']);
             $sc = count($ms);
             foreach ($ms as $i => $ss)
             {
                 $title = $slide['title'];
-                $output =& $fileParser->parse($ss."\n__NOTOC__\n__NOEDITSECTION__", $this->sTitle, $options);
+                $output = $fileParser->parse($ss."\n__NOTOC__\n__NOEDITSECTION__", $this->sTitle, $options);
                 $slideContent = $output->getText();
                 /* make slide lists incremental if needed */
                 if ($slide['inc'])
