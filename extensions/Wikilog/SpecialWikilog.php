@@ -163,9 +163,6 @@ class SpecialWikilog
 			$pager = new WikilogSummaryPager( $query, $opts['limit'], $this->including() );
 		}
 
-		global $wlCalPager;
-		$wlCalPager = $pager;
-
 		# Handle special page inclusion.
 		if ( $this->including() ) {
 			# Get pager body.
