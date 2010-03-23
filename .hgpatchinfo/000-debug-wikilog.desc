@@ -1,4 +1,4 @@
-Wikilog extension debug:
+Wikilog extension fixes:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
 Bug 61175 - Default sort direction
@@ -6,3 +6,4 @@ Bug 61149 - Show wikilog name in site feed
 Bug 51595 - Use DOM to extract summary from article content
 Bug 61632 - Make comment author signatures using generic mechanism
 Bug 61174 - Preview does not get parsed
+Bug 61174 - (prerequisite) $query->select(), $query->selectSQLText()
