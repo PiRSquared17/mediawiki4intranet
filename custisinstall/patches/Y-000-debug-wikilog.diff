@@ -1,7 +1,7 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1269270633 -10800
-Wikilog extension debug:
+# Date 1269346690 -10800
+Wikilog extension fixes:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
 Bug 61175 - Default sort direction
@@ -9,8 +9,9 @@ Bug 61149 - Show wikilog name in site feed
 Bug 51595 - Use DOM to extract summary from article content
 Bug 61632 - Make comment author signatures using generic mechanism
 Bug 61174 - Preview does not get parsed
+Bug 61174 - (prerequisite) $query->select(), $query->selectSQLText()
 
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/Wikilog.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -423,16 +423,13 @@
@@ -37,7 +38,7 @@ diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/Wikilog.php
  			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
  			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
  			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogComment.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
 @@ -612,7 +612,10 @@
@@ -74,7 +75,7 @@ diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogComment.php
  		} else {
  			$extra = "";
  		}
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogFeed.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
 @@ -361,7 +361,6 @@
@@ -94,7 +95,7 @@ diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogFeed.php
  			$row->wlp_updated,
  			$itemTitle->getFullUrl()
  		);
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogHooks.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogHooks.php
 --- extensions/Wikilog/WikilogHooks.php
 +++ extensions/Wikilog/WikilogHooks.php
 @@ -57,7 +57,7 @@
@@ -106,7 +107,7 @@ diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogHooks.php
  				$wi->getItemTitle()->invalidateCache();
  				$wi->getItemTitle()->purgeSquid();
  			}
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogItemPager.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
 @@ -498,6 +498,10 @@
@@ -120,7 +121,69 @@ diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogItemPager.php
  		return 'wlp_pubdate';
  	}
  
-diff -r 2f012c39365a -r 7c07352c6224 extensions/Wikilog/WikilogUtils.php
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogQuery.php
+--- extensions/Wikilog/WikilogQuery.php
++++ extensions/Wikilog/WikilogQuery.php
+@@ -141,6 +141,31 @@
+ 			str_pad( $date_end,   14, '0', STR_PAD_RIGHT )
+ 		);
+ 	}
++
++	/* Does $dbr->select with additional conditions taken from this query object */
++	public function select($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
++	{
++		return $dbr->query( $this->selectSQLText( $dbr, $tables, $fields, $conds, $function, $options, $join_conds ), $function );
++	}
++
++	/* Does $dbr->selectSQLText with additional conditions taken from this query object */
++	public function selectSQLText($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
++	{
++		$info = $this->getQueryInfo( $dbr );
++		if ( $tables )
++			$tables = array_merge( $info['tables'], $tables );
++		else
++			$tables = $info['tables'];
++		if ( $info['conds'] )
++			$conds = array_merge( $info['conds'], $conds );
++		if ( $info['options'] )
++			$options = array_merge( $info['options'], $options );
++		if ( $info['join_conds'] )
++			$join_conds = array_merge( $info['join_conds'], $join_conds );
++		if ( !$fields )
++			$fields = $info['fields'];
++		return $dbr->selectSQLText($tables, $fields, $conds, $function, $options, $join_conds);
++	}
+ }
+ 
+ /**
+@@ -211,7 +236,7 @@
+ 	 * @param $category Category title object or text.
+ 	 */
+ 	public function setCategory( $category ) {
+-		if ( is_object( $category ) ) {
++		if ( is_null( $category ) || is_object( $category ) ) {
+ 			$this->mCategory = $category;
+ 		} elseif ( is_string( $category ) ) {
+ 			$t = Title::makeTitleSafe( NS_CATEGORY, $category );
+@@ -226,7 +251,7 @@
+ 	 * @param $author User page title object or text.
+ 	 */
+ 	public function setAuthor( $author ) {
+-		if ( is_object( $author ) ) {
++		if ( is_null( $author ) || is_object( $author ) ) {
+ 			$this->mAuthor = $author;
+ 		} elseif ( is_string( $author ) ) {
+ 			$t = Title::makeTitleSafe( NS_USER, $author );
+@@ -546,7 +571,7 @@
+ 	 * @param $author User page title object or text.
+ 	 */
+ 	public function setAuthor( $author ) {
+-		if ( is_object( $author ) ) {
++		if ( is_null( $author ) || is_object( $author ) ) {
+ 			$this->mAuthor = $author;
+ 		} elseif ( is_string( $author ) ) {
+ 			$t = Title::makeTitleSafe( NS_USER, $author );
+diff -r 2f012c39365a -r 10d78459850f extensions/Wikilog/WikilogUtils.php
 --- extensions/Wikilog/WikilogUtils.php
 +++ extensions/Wikilog/WikilogUtils.php
 @@ -89,7 +89,7 @@
