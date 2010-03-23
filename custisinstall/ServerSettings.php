@@ -19,6 +19,7 @@ Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
 $wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
 $wgWikilogMaxCommentSize = 0x7FFFFFFF;
 $wgWikilogDefaultNotCategory = 'Скрытые';
+$wgWikilogSearchDropdowns = true;
 
 $egDraftsAutoSaveWait = 60;   // 1 minute
 
@@ -81,5 +82,3 @@ $wgDjvuOutputExtension = 'jpg';
 $wgPdfProcessor = 'gs';
 $wgPdfPostProcessor = $wgImageMagickConvertCommand;
 $wgPdfInfo = 'pdfinfo';
-
-?>
