@@ -112,20 +112,15 @@ class WikilogCalendar
     static function sidebarCalendar($pager)
     {
         global $wgRequest, $wgWikilogNumArticles;
-        $dbr = wfGetDB(DB_SLAVE);
-        $query = $pager->mQuery;
-        $info = $query->getQueryInfo($dbr);
-        $tables = $info['tables'];
-        $conds = $info['conds'] ? $info['conds'] : array();
-        $options = $info['options'] ? $info['options'] : array();
-        $join_conds = $info['join_conds'] ? $info['join_conds'] : array();
         list($limit) = $wgRequest->getLimitOffset($wgWikilogNumArticles, '');
         $offset = $wgRequest->getVal('offset');
-        if ($offset)
-            $conds[] = 'wlp_pubdate<' . $dbr->addQuotes($offset);
-        $options['LIMIT'] = intval($limit);
-        $options['ORDER BY'] = 'wlp_pubdate DESC';
-        $sql = $dbr->selectSQLText($tables, 'wikilog_posts.*', $conds, __FUNCTION__, $options, $join_conds);
+        $dbr = wfGetDB(DB_SLAVE);
+        $sql = $pager->mQuery->selectSQLText($dbr,
+            array(), 'wikilog_posts.*',
+            $offset ? array('wlp_pubdate<' . $dbr->addQuotes($offset)) : array(),
+            __FUNCTION__,
+            array('LIMIT' => $limit, 'ORDER BY' => 'wlp_pubdate DESC')
+        );
         $sql = "SELECT wlp_page, wlp_pubdate, COUNT(wlp_page) numposts FROM ($sql) derived GROUP BY SUBSTR(wlp_pubdate,1,8)";
         /* build date hash */
         $sp = Title::newFromText('Special:Wikilog');
