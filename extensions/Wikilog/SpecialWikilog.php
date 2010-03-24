@@ -423,6 +423,7 @@ class SpecialWikilog
 		global $wgWikilogEnableTags;
 		global $wgWikilogDefaultNotCategory;
 		global $wgWikilogSearchDropdowns;
+		global $wgLang;
 
 		$fields = array();
 		$formvalues = array();
@@ -465,10 +466,15 @@ class SpecialWikilog
 			}
 		}
 
+		$month_select = new XmlSelect( 'month', 'wl-month', $opts->consumeValue( 'month' ) );
+		$month_select->setAttribute( 'onchange', "{var wly=document.getElementById('wl-year');if(wly&&!wly.value){wly.value='".date('Y')."';}}" );
+		$month_select->addOption( wfMsg('monthsall'), '' );
+		for ($i = 1; $i <= 12; $i++)
+			$month_select->addOption( $wgLang->getMonthName( $i ), $i );
+		$year_field = Xml::input( 'year', 4, $opts->consumeValue( 'year' ), array( 'maxlength' => 4, 'id' => 'wl-year' ) );
 		$fields['date'] = array(
 			Xml::label( wfMsg( 'wikilog-form-date' ), 'wl-month' ),
-			Xml::monthSelector( $opts->consumeValue( 'month' ), '', 'wl-month' ) .
-				" " . Xml::input( 'year', 4, $opts->consumeValue( 'year' ), array( 'maxlength' => 4 ) )
+			$month_select->getHTML() . "&nbsp;" . $year_field
 		);
 		$opts->consumeValue( 'day' );	// ignore day, not really useful
 
