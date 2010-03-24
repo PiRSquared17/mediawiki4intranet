@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1269348196 -10800
+# Date 1269454940 -10800
 Depends on: Y-000-debug-wikilog.diff
 
 Bug 60624 - Support for exclusion of posts belonging to some category
 Bug 61174 - Selectfields in search
 
-diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/SpecialWikilog.php
+diff -r 10d78459850f -r 8ca2f1c16cf3 extensions/Wikilog/SpecialWikilog.php
 --- extensions/Wikilog/SpecialWikilog.php
 +++ extensions/Wikilog/SpecialWikilog.php
 @@ -76,12 +76,14 @@
@@ -82,7 +82,7 @@ diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/SpecialWikilog.php
  		$columns = array_chunk( $fields, ( count( $fields ) + 1 ) / 2, true );
  
  		$out = Xml::openElement( 'table', array( 'width' => '100%' ) ) .
-@@ -341,36 +349,117 @@
+@@ -341,42 +349,129 @@
  		return $out;
  	}
  
@@ -158,6 +158,7 @@ diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/SpecialWikilog.php
  		global $wgWikilogEnableTags;
 +		global $wgWikilogDefaultNotCategory;
 +		global $wgWikilogSearchDropdowns;
++		global $wgLang;
  
  		$fields = array();
 +		$formvalues = array();
@@ -219,8 +220,21 @@ diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/SpecialWikilog.php
 +			}
  		}
  
++		$month_select = new XmlSelect( 'month', 'wl-month', $opts->consumeValue( 'month' ) );
++		$month_select->setAttribute( 'onchange', "{var wly=document.getElementById('wl-year');if(wly&&!wly.value){wly.value='".date('Y')."';}}" );
++		$month_select->addOption( wfMsg('monthsall'), '' );
++		for ($i = 1; $i <= 12; $i++)
++			$month_select->addOption( $wgLang->getMonthName( $i ), $i );
++		$year_field = Xml::input( 'year', 4, $opts->consumeValue( 'year' ), array( 'maxlength' => 4, 'id' => 'wl-year' ) );
  		$fields['date'] = array(
-@@ -407,6 +496,9 @@
+ 			Xml::label( wfMsg( 'wikilog-form-date' ), 'wl-month' ),
+-			Xml::monthSelector( $opts->consumeValue( 'month' ), '', 'wl-month' ) .
+-				" " . Xml::input( 'year', 4, $opts->consumeValue( 'year' ), array( 'maxlength' => 4 ) )
++			$month_select->getHTML() . "&nbsp;" . $year_field
+ 		);
+ 		$opts->consumeValue( 'day' );	// ignore day, not really useful
+ 
+@@ -407,6 +502,9 @@
  		if ( ( $t = $opts['category'] ) ) {
  			$query->setCategory( $t );
  		}
@@ -230,7 +244,7 @@ diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/SpecialWikilog.php
  		if ( ( $t = $opts['author'] ) ) {
  			$query->setAuthor( $t );
  		}
-diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/Wikilog.i18n.php
+diff -r 10d78459850f -r 8ca2f1c16cf3 extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -158,7 +158,9 @@
@@ -255,7 +269,7 @@ diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/Wikilog.i18n.php
  	'wikilog-form-name' => 'Имя:',
  	'wikilog-form-author' => 'Автор:',
  	'wikilog-form-tag' => 'Метка:',
-diff -r 10d78459850f -r bd85396e374b extensions/Wikilog/WikilogQuery.php
+diff -r 10d78459850f -r 8ca2f1c16cf3 extensions/Wikilog/WikilogQuery.php
 --- extensions/Wikilog/WikilogQuery.php
 +++ extensions/Wikilog/WikilogQuery.php
 @@ -184,6 +184,7 @@
