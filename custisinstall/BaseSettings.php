@@ -25,6 +25,8 @@ $wgDBserver         = "localhost";
 $wgDBname           = "wiki";
 $wgDBuser           = "wiki";
 $wgDBpassword       = "wiki";
+$wgDBadminuser      = "wiki";
+$wgDBadminpassword  = "wiki";
 
 $wgDBprefix         = "";
 
@@ -151,5 +153,3 @@ $wgNamespacesToBeSearchedDefault = array(
     NS_HELP => 1,
     NS_CATEGORY => 1,
 );
-
-?>
