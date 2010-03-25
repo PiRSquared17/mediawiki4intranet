@@ -55,8 +55,12 @@ function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transfor
 {
     global $wgUserMessageAllowCustomization, $wgUser, $wgMessageCache;
     if ($wgUserMessageAllowCustomization[$key] && $wgUser && $wgUser->getID() &&
-        is_object($wgMessageCache) && $wgMessageCache->get($key.'/'.$wgUser->getName(), true, $langCode))
-        $key .= '/'.$wgUser->getName();
+        is_object($wgMessageCache))
+    {
+        $newkey = $key.'/'.$wgUser->getName();
+        if (!wfEmptyMsg($newkey, $wgMessageCache->get($newkey, true, $langCode)))
+            $key = $newkey;
+    }
     elseif (($p = strrpos($key, '/')) !== false &&
         $wgUserMessageAllowCustomization[substr($key, 0, $p)] &&
         User::newFromName(substr($key, $p+1)))
