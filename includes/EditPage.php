@@ -730,6 +730,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 
 		$fname = 'EditPage::attemptSave';
 		wfProfileIn( $fname );
@@ -910,7 +911,7 @@ class EditPage {
 		}
 
 		# Suppress edit conflict with self, except for section edits where merging is required.
-		if ( $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
+		if ( $wgSuppressSameUserConflicts && $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
 			wfDebug( "EditPage::editForm Suppressing edit conflict, same user.\n" );
 			$this->isConflict = false;
 		} else {
