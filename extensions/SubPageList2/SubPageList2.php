@@ -103,7 +103,7 @@ class SubpageList
     /* Page set specification */
     var $namespace = NULL;
     var $parent    = NULL;
-    var $category  = NULL;
+    var $category  = array();
     var $ignore    = NULL;
     var $deepmin   = '';
     var $deepmax   = '';
@@ -166,10 +166,14 @@ class SubpageList
     {
         if (($c = str_replace(' ', '_', $options['category'])) && $c != '-1')
         {
-            if ($this->checkCat($c))
-                $this->category = $c;
-            else
-                $this->error("Category '$c' is undefined.");
+            $cats = explode('|', $c);
+            foreach ($cats as $c)
+            {
+                if ($this->checkCat($c))
+                    $this->category[] = $c;
+                else
+                    $this->error("Category '$c' is undefined.");
+            }
         }
         if ($t = $options['template'])
             $this->template = $t;
@@ -200,7 +204,7 @@ class SubpageList
         }
         if ($o = strtolower($options['ordermethod']))
         {
-            if ($o == 'title' || $o == 'lastedit' || $o == 'pagecounter')
+            if ($o == 'title' || $o == 'lastedit' || $o == 'pagecounter' || $o == 'creation')
                 $this->ordermethod = $o;
             else
                 $this->error("Value '$o' is invalid for option order, valid values are TITLE, LASTEDIT, and PAGECOUNTER.");
@@ -257,7 +261,7 @@ class SubpageList
         $options = array();
         $order = strtoupper($this->order);
         $parent = '';
-        $page = $dbr->tableName('page');
+        $tables = array('page');
 
         if ($this->count)
             $options['LIMIT'] = $this->count;
@@ -271,6 +275,8 @@ class SubpageList
             $options['ORDER BY'] = '`page_namespace`, UPPER(`page_title`) ' . $order;
         else if ($this->ordermethod == 'pagecounter')
             $options['ORDER BY'] = '`page_counter` ' . $order;
+        else if ($this->ordermethod == 'creation')
+            $options['ORDER BY'] = '(SELECT rev_timestamp FROM `revision` WHERE rev_page=page_id ORDER BY rev_timestamp LIMIT 1) ' . $order;
         else // if ($this->ordermethod == 'lastedit')
             $options['ORDER BY'] = '`page_touched` ' . $order;
         if ($this->parent || !is_null($this->parent) && ($this->category || $deepness))
@@ -281,7 +287,6 @@ class SubpageList
             foreach ($this->ignore as $aignore)
                 $conditions[] = '`page_title` NOT LIKE ' . $dbr->addQuotes($parent . $aignore);
 
-        $tables = array('page');
         $conditions['page_is_redirect'] = 0;
         if ($parent || $deepness)
             $conditions[] = '`page_title` REGEXP ' . $dbr->addQuotes('^' . preg_quote($parent) . $deepness);
@@ -289,7 +294,8 @@ class SubpageList
         if ($this->category)
         {
             $tables[] = 'categorylinks';
-            $conditions[] = 'page_id=cl_from AND cl_to='.$dbr->addQuotes($this->category);
+            $conditions[] = 'page_id=cl_from';
+            $conditions['cl_to'] = $this->category;
         }
 
         $content = array();
