@@ -173,11 +173,45 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         return array_keys($sch);
     }
 
+    function columnList($items, $start_char)
+    {
+        /* If all $start_char's are more than 1-character strings, return normal list */
+        if (!$items || mb_strlen($start_char[0]) > 1)
+            return parent::columnList($items, $start_char);
+        $n = count($items);
+        for ($i = 0; $i < $n-1 && mb_strlen($start_char[$i+1]) == 1; $i++)
+        {
+            /* Group adjacent 1-char subtitles having only 1 item
+               with first subtitle having more than 1 item */
+            $s = $i;
+            while ($i < $n-1 && mb_strlen($start_char[$i+1]) == 1 &&
+                $start_char[$i] != $start_char[$i+1] &&
+                /* Don't group characters of different length */
+                strlen($start_char[$i]) == strlen($start_char[$i+1]))
+                $i++;
+            $e = $i;
+            while ($i < $n-1 && $start_char[$i] == $start_char[$i+1])
+                $i++;
+            /* Group last 1-char subtitle also */
+            if ($e == $s && ($i == $n-2 || mb_strlen($start_char[$i+1]) > 1))
+                $e = ++$i;
+            if ($e > $s)
+            {
+                $key = $start_char[$s] . '-' . $start_char[$e];
+                for ($j = $s; $j <= $i; $j++)
+                    $start_char[$j] = $key;
+            }
+        }
+        return parent::columnList($items, $start_char);
+    }
+
     function getPagesSection()
     {
         global $wgMinUncatPagesAlphaList;
         global $wgCategorySubcategorizedList;
+        global $wgSubcategorizedAlwaysExclude;
         global $wgOut;
+        /* If there is no articles, or if we are forced to show normal list - show it */
         if (!$this->articles || !$wgCategorySubcategorizedList && !$wgOut->useSubcategorizedList ||
             $wgCategorySubcategorizedList && !is_null($wgOut->useSubcategorizedList) &&
             !$wgOut->useSubcategorizedList)
@@ -186,16 +220,22 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         foreach ($this->titles as $t)
             $ids[] = $t->getArticleID();
         $dbr = wfGetDB(DB_SLAVE);
+        /* Exclude all parent categories */
         $supercats = $this->getAllParentCategories($dbr, $this->title);
+        /* Always exclude "special" categories, marked with
+           one of $wgSubcategorizedAlwaysExclude. */
+        if (is_array($wgSubcategorizedAlwaysExclude))
+            foreach ($wgSubcategorizedAlwaysExclude as $v)
+                $supercats[] = str_replace(' ', '_', $v);
         $where = array('cl_from' => $ids);
         foreach ($supercats as $k)
             $where[] = 'cl_to!='.$dbr->addQuotes($k);
-        $res = $dbr->select('categorylinks', '*', $where, __METHOD__,
-            array('ORDER BY' => 'cl_sortkey'));
+        $res = $dbr->select('categorylinks', '*', $where, __METHOD__, array('ORDER BY' => 'cl_sortkey'));
         $cl = array();
         while ($row = $dbr->fetchRow($res))
             $cl[$row['cl_to']][] = $row['cl_from'];
         $dbr->freeResult($res);
+        /* Make subcategorized article and subtitle list */
         $new = array();
         $newkey = array();
         $done = array();
@@ -210,6 +250,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
                 $done[$ids[$a]] = true;
             }
         }
+        /* Count unsubcategorized articles */
         $count_undone = 0;
         for ($i = count($this->articles)-1; $i >= 0; $i--)
             if (!$done[$i])
@@ -217,6 +258,8 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         $cutoff = $wgMinUncatPagesAlphaList;
         if (!$cutoff || $cutoff < 0)
             $cutoff = 10;
+        /* If there is less than $cutoff, show them all with
+           current category subtitle, else show normal alpha-list. */
         for ($i = count($this->articles)-1; $i >= 0; $i--)
         {
             if (!$done[$i])
@@ -228,6 +271,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
                     array_unshift($newkey, $this->title->getText());
             }
         }
+        /* Replace article and subtitle list and call parent */
         $this->articles = $new;
         $this->articles_start_char = $newkey;
         $this->nonplanar_short_list = true;
@@ -236,6 +280,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         return $html;
     }
 
+    /* Short list without subtitles, if not called from $this->getPagesSection() */
     function shortList($articles, $articles_start_char)
     {
         if ($this->nonplanar_short_list)
