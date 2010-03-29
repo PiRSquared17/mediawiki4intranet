@@ -14,23 +14,23 @@ if (!defined('MEDIAWIKI'))
     die();
 
 $wgExtensionFunctions[] = "wfCategoryTemplate";
-$wgExtensionMessagesFiles[CategoryTemplate] = dirname(__FILE__) . '/CategoryTemplate.i18n.php';
-$wgExtensionCredits[other][] = array (
-    name        => 'Add Article to Category with template',
-    description => 'Your MediaWiki will get an inputbox on each Category page, and you can create a new article directly to that category, based on Template:Category:<category_name> or simple [[Category:<category_name>]] string',
-    author      => 'Vitaliy Filippov, based on Liang Chen The BiGreat\'s extension', # http://www.liang-chen.com/myworld/content/view/36/70/
-    url         => 'http://lib.custis.ru/index.php/AddCategoryTemplate',
-    version     => '1.0 (2009-03-25)',
+$wgExtensionMessagesFiles['CategoryTemplate'] = dirname(__FILE__) . '/CategoryTemplate.i18n.php';
+$wgExtensionCredits['other'][] = array (
+    'name'        => 'Add Article to Category with template',
+    'description' => 'Your MediaWiki will get an inputbox on each Category page, and you can create a new article directly to that category, based on Template:Category:<category_name> or simple [[Category:<category_name>]] string',
+    'author'      => 'Vitaliy Filippov, based on Liang Chen The BiGreat\'s extension', # http://www.liang-chen.com/myworld/content/view/36/70/
+    'url'         => 'http://lib.custis.ru/index.php/CategoryTemplate_(MediaWiki)',
+    'version'     => '1.0 (2009-03-25)',
 );
 
 function wfCategoryTemplate()
 {
     global $wgHooks;
     wfLoadExtensionMessages('CategoryTemplate');
-    $wgHooks[CategoryPageView][] = '_cattemplatecategorychange';
+    $wgHooks['CategoryPageView'][] = 'efCategoryTemplateCategoryPageView';
 }
 
-function _cattemplatecategorychange($catpage)
+function efCategoryTemplateCategoryPageView($catpage)
 {
     global $wgOut, $wgScript, $wgContLang, $wgCanonicalNamespaceNames, $CategoryTemplateMessages;
     $boxtext = addslashes(wfMsg("addcategorytemplate-create-article"));
