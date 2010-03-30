@@ -175,8 +175,10 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
 
     function columnList($items, $start_char)
     {
-        /* If all $start_char's are more than 1-character strings, return normal list */
-        if (!$items || mb_strlen($start_char[0]) > 1)
+        global $wgCategoryGroupCharacters;
+        /* If all $start_char's are more than 1-character strings,
+           or if grouping is disabled through config, return normal list */
+        if (!$items || mb_strlen($start_char[0]) > 1 || !$wgCategoryGroupCharacters)
             return parent::columnList($items, $start_char);
         $n = count($items);
         for ($i = 0; $i < $n-1 && mb_strlen($start_char[$i+1]) == 1; $i++)
