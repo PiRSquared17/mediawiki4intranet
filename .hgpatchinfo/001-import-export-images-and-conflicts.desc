@@ -1,0 +1,10 @@
+Depends on: Y-000-translit-upload-filenames.diff
+
+Totally improved MediaWiki Import and Export engine with conflict detection,
+advanced export page list building options and support for exporting file data
+over HTTP or inside the export file.
+
+Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+installation.
+
+Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
