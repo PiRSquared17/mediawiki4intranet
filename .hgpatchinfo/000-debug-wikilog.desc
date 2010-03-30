@@ -7,3 +7,4 @@ Bug 51595 - Use DOM to extract summary from article content
 Bug 61632 - Make comment author signatures using generic mechanism
 Bug 61174 - Preview does not get parsed
 Bug 61174 - (prerequisite) $query->select(), $query->selectSQLText()
+Bug 62314 - Allow to reply from comment page
