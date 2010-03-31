@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1270050014 -14400
+# Date 1270052406 -14400
 Create branch for patch 000-debug-categorized-specialrecentchanges
 
-diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
+diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -66,7 +66,7 @@
@@ -23,13 +23,14 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  
  		$tables = array( 'recentchanges' );
  		$join_conds = array();
-@@ -274,11 +275,30 @@
+@@ -274,11 +275,31 @@
  		$namespace = $opts['namespace'];
  		$invert = $opts['invert'];
  
++		$categories = trim( $opts['categories'], " \t\n\r\0\x0B|" );
 +		// JOIN on categories
-+		if( $wgAllowCategorizedRecentChanges &&
-+		    ( $categories = array_map( 'trim', preg_split( '/[\s\|]*\|[\s\|]*/' , $opts['categories'] ) ) ) )
++		if( $wgAllowCategorizedRecentChanges && $categories &&
++		    ( $categories = preg_split( '/[\s\|]*\|[\s\|]*/', $categories ) ) )
 +		{
 +			foreach( $categories as &$cat )
 +				$cat = str_replace( ' ', '_', $cat );
@@ -56,7 +57,7 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  		}
  
  		wfRunHooks('SpecialRecentChangesQuery', array( &$conds, &$tables, &$join_conds, $opts ) );
-@@ -322,7 +342,6 @@
+@@ -322,7 +343,6 @@
  	 */
  	public function webOutput( $rows, $opts ) {
  		global $wgOut, $wgUser, $wgRCShowWatchingUsers, $wgShowUpdatedMarker;
@@ -64,7 +65,7 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  
  		$limit = $opts['limit'];
  
-@@ -333,10 +352,7 @@
+@@ -333,10 +353,7 @@
  
  		// And now for the content
  		$wgOut->setSyndicated( true );
@@ -76,7 +77,7 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  
  		$showWatcherCount = $wgRCShowWatchingUsers && $wgUser->getOption( 'shownumberswatching' );
  		$watcherCache = array();
-@@ -392,7 +408,7 @@
+@@ -392,7 +409,7 @@
  
  		$defaults = $opts->getAllValues();
  		$nondefaults = $opts->getChangedValues();
@@ -85,7 +86,7 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  
  		$panel = array();
  		$panel[] = $this->optionsPanel( $defaults, $nondefaults );
-@@ -529,6 +545,7 @@
+@@ -529,6 +546,7 @@
  		# Filter articles
  		$articles = array();
  		$a2r = array();
@@ -93,7 +94,7 @@ diff -r 2f012c39365a -r fa2d9129f59f includes/specials/SpecialRecentchanges.php
  		foreach( $rows AS $k => $r ) {
  			$nt = Title::makeTitle( $r->rc_namespace, $r->rc_title );
  			$id = $nt->getArticleID();
-@@ -539,8 +556,10 @@
+@@ -539,8 +557,10 @@
  			if( !isset($a2r[$id]) ) {
  				$a2r[$id] = array();
  			}
