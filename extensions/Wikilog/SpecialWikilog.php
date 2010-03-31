@@ -420,11 +420,14 @@ class SpecialWikilog
 		global $wgWikilogEnableTags;
 		global $wgWikilogDefaultNotCategory;
 		global $wgWikilogSearchDropdowns;
-		global $wgLang;
+		global $wgLang, $wgUser;
 
 		$fields = array();
 		$formvalues = array();
-		$formfields = array('wikilog' => true, 'category' => true, 'notcategory' => false, 'author' => true);
+		$formfields = array('wikilog' => true, 'category' => true);
+		if ( $wgUser && $wgUser->getID() )
+			$formfields['notcategory'] = false;
+		$formfields['author'] = true;
 		if ( $wgWikilogEnableTags )
 			$formfields['tag'] = false;
 
@@ -475,14 +478,17 @@ class SpecialWikilog
 		);
 		$opts->consumeValue( 'day' );	// ignore day, not really useful
 
-		$statusSelect = new XmlSelect( 'show', 'wl-status', $opts->consumeValue( 'show' ) );
-		$statusSelect->addOption( wfMsg( 'wikilog-show-all' ), 'all' );
-		$statusSelect->addOption( wfMsg( 'wikilog-show-published' ), 'published' );
-		$statusSelect->addOption( wfMsg( 'wikilog-show-drafts' ), 'drafts' );
-		$fields['status'] = array(
-			Xml::label( wfMsg( 'wikilog-form-status' ), 'wl-status' ),
-			$statusSelect->getHTML()
-		);
+		if( $wgUser && $wgUser->getID() )
+		{
+			$statusSelect = new XmlSelect( 'show', 'wl-status', $opts->consumeValue( 'show' ) );
+			$statusSelect->addOption( wfMsg( 'wikilog-show-all' ), 'all' );
+			$statusSelect->addOption( wfMsg( 'wikilog-show-published' ), 'published' );
+			$statusSelect->addOption( wfMsg( 'wikilog-show-drafts' ), 'drafts' );
+			$fields['status'] = array(
+				Xml::label( wfMsg( 'wikilog-form-status' ), 'wl-status' ),
+				$statusSelect->getHTML()
+			);
+		}
 
 		$fields['submit'] = Xml::submitbutton( wfMsg( 'allpagessubmit' ) );
 		return $fields;
