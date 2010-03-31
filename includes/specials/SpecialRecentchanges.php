@@ -66,7 +66,7 @@ class SpecialRecentChanges extends SpecialPage {
 	public function feedSetup() {
 		global $wgFeedLimit, $wgRequest;
 		$opts = $this->getDefaultOptions();
-		$opts->fetchValuesFromRequest( $wgRequest, array( 'days', 'limit', 'hideminor' ) );
+		$opts->fetchValuesFromRequest( $wgRequest );
 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
@@ -264,6 +264,7 @@ class SpecialRecentChanges extends SpecialPage {
 	 */
 	public function doMainQuery( $conds, $opts ) {
 		global $wgUser;
+		global $wgAllowCategorizedRecentChanges;
 
 		$tables = array( 'recentchanges' );
 		$join_conds = array();
@@ -274,11 +275,30 @@ class SpecialRecentChanges extends SpecialPage {
 		$namespace = $opts['namespace'];
 		$invert = $opts['invert'];
 
+		// JOIN on categories
+		if( $wgAllowCategorizedRecentChanges &&
+		    ( $categories = array_map( 'trim', preg_split( '/[\s\|]*\|[\s\|]*/' , $opts['categories'] ) ) ) )
+		{
+			foreach( $categories as &$cat )
+				$cat = str_replace( ' ', '_', $cat );
+			$tables[] = 'page';
+			$join_conds['page'] = array( 'INNER JOIN', array( 'page_title=rc_title', 'page_namespace=rc_namespace' ) );
+			if( $opts['categories_any'] )
+				$conds[] = "EXISTS (".$dbr->selectSQLText( 'categorylinks', '*', array( 'cl_from=page_id', 'cl_to' => $categories ) ).")";
+			else
+			{
+				foreach( $categories as $i => $cat )
+				{
+					$tables[] = "`categorylinks` cl$i";
+					$join_conds["`categorylinks` cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
+				}
+			}
+		}
+
 		// JOIN on watchlist for users
 		if( $uid ) {
 			$tables[] = 'watchlist';
-			$join_conds = array( 'watchlist' => array('LEFT JOIN',
-				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace") );
+			$join_conds['watchlist'] = array('LEFT JOIN', array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
 		}
 
 		wfRunHooks('SpecialRecentChangesQuery', array( &$conds, &$tables, &$join_conds, $opts ) );
@@ -322,7 +342,6 @@ class SpecialRecentChanges extends SpecialPage {
 	 */
 	public function webOutput( $rows, $opts ) {
 		global $wgOut, $wgUser, $wgRCShowWatchingUsers, $wgShowUpdatedMarker;
-		global $wgAllowCategorizedRecentChanges;
 
 		$limit = $opts['limit'];
 
@@ -333,10 +352,7 @@ class SpecialRecentChanges extends SpecialPage {
 
 		// And now for the content
 		$wgOut->setSyndicated( true );
-
-		if( $wgAllowCategorizedRecentChanges ) {
-			$this->filterByCategories( $rows, $opts );
-		}
+		$wgOut->setFeedAppendQuery( http_build_query( $opts->getAllValues() ) );
 
 		$showWatcherCount = $wgRCShowWatchingUsers && $wgUser->getOption( 'shownumberswatching' );
 		$watcherCache = array();
