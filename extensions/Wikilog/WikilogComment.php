@@ -612,7 +612,10 @@ class WikilogCommentFormatter
 				list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $comment->mCommentTitle );
 				$text = $parserOutput->getText();
 			} else {
+				global $wgParser, $wgUser, $wgTitle;
 				$text = $comment->getText();
+				$text = $wgParser->parse($text, $wgTitle, ParserOptions::newFromUser( $wgUser ));
+				$text = $text->getText();
 			}
 
 			if ( $text ) {
@@ -698,12 +701,7 @@ class WikilogCommentFormatter
 
 		if ( $comment->mUserID ) {
 			$authorPlain = htmlspecialchars( $comment->mUserText );
-			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
-				array( 'content', 'parseinline', 'replaceafter' ),
-				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
-				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
-				$comment->mUserText
-			);
+			$authorFmt = wfMsgExt( 'wikilog-author-signature', array( 'parseinline' ), $comment->mUserText );
 		} else {
 			$authorPlain = htmlspecialchars( $comment->mAnonName );
 			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
@@ -740,7 +738,7 @@ class WikilogCommentFormatter
 			}
 		}
 		if ( $extra ) {
-			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
+			$extra = implode( ' | ', $extra );
 		} else {
 			$extra = "";
 		}
@@ -897,7 +895,7 @@ class WikilogCommentFormatter
 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-page-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array(),
+					array( 'section' => false ),
 					'known'
 				);
 			}
@@ -905,7 +903,7 @@ class WikilogCommentFormatter
 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ),
+					array( 'action' => 'edit', 'section' => false ),
 					'known'
 				);
 			}
