@@ -275,9 +275,10 @@ class SpecialRecentChanges extends SpecialPage {
 		$namespace = $opts['namespace'];
 		$invert = $opts['invert'];
 
+		$categories = trim( $opts['categories'], " \t\n\r\0\x0B|" );
 		// JOIN on categories
-		if( $wgAllowCategorizedRecentChanges &&
-		    ( $categories = array_map( 'trim', preg_split( '/[\s\|]*\|[\s\|]*/' , $opts['categories'] ) ) ) )
+		if( $wgAllowCategorizedRecentChanges && $categories &&
+		    ( $categories = preg_split( '/[\s\|]*\|[\s\|]*/', $categories ) ) )
 		{
 			foreach( $categories as &$cat )
 				$cat = str_replace( ' ', '_', $cat );
