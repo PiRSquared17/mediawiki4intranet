@@ -331,6 +331,8 @@ class SpecialWikilog
 			$out .= Xml::openElement( 'table' );
 
 			foreach ( $fields as $row ) {
+				if ( !$row )
+					continue;
 				$out .= Xml::openElement( 'tr' );
 				if ( is_array( $row ) ) {
 					$out .= Xml::tags( 'td', array( 'align' => $align ), $row[0] );
@@ -444,9 +446,7 @@ class SpecialWikilog
 				if ( count( $values ) > 0 )
 				{
 					$select = new XmlSelect( $valueid, 'wl-'.$valueid, $formvalues[$valueid] );
-					/* Show "Any" option only if there is more than one possible value */
-					if ( count( $values ) > 1 )
-						$select->addOption( wfMsg('wikilog-form-all'), '' );
+					$select->addOption( wfMsg('wikilog-form-all'), '' );
 					foreach( $values as $o )
 						$select->addOption( $o[0], count($o) > 1 ? $o[1] : false );
 					$fields[$valueid] = array(
