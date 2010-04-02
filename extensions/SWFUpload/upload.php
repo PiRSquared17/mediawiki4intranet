@@ -37,6 +37,8 @@ if ($_POST['cookies'])
     $args = join('&', $args);
     $_SERVER['REQUEST_URI'] = preg_replace('#extensions/SWFUpload/upload\.php(\?.*)?$#s', 'index.php?' . $args, $_SERVER['REQUEST_URI']);
     chdir('../..');
+    error_reporting(E_ERROR | E_PARSE);
+    print "m";
     ob_start();
     require 'index.php';
     $ob = ob_get_contents();
