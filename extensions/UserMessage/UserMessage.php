@@ -28,11 +28,13 @@ editable through generic article edit interface (MediaWiki:...),
 to be customized on per-user basis.
 
 It is useful, for example, for (Bug 61726) personalization of
-MediaWiki:Edittools.
+MediaWiki:Edittools. Personalized messages will have names like
+MediaWiki:Edittools@UserName.
 
 USAGE (LocalSettings.php):
 
 require_once("extensions/UserMessage/UserMessage.php");
+$wgUserMessageDelimiter = '@'; // default
 $wgUserMessageAllowCustomization = array(
     'edittools' => true,
     // 'message_key' => true for each message that you want to allow to be customized
@@ -42,7 +44,7 @@ $wgUserMessageAllowCustomization = array(
 
 $wgExtensionCredits['other'][] = array(
     'name'         => 'User Message',
-    'version'      => '2010-03-25',
+    'version'      => '2010-04-05',
     'author'       => 'Vitaliy Filippov',
     'url'          => 'http://yourcmc.ru/wiki/index.php/UserMessage_(MediaWiki)',
     'description'  => 'Allows customization of MediaWiki:xxx messages on a per-user basis',
@@ -53,19 +55,33 @@ if (is_null($wgUserMessageAllowCustomization))
 
 function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transform)
 {
-    global $wgUserMessageAllowCustomization, $wgUser, $wgMessageCache;
+    global $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
+    global $wgUser, $wgMessageCache, $wgTitle, $wgContLang;
+    $delim = $wgUserMessageDelimiter;
+    if (!$delim)
+        $delim = '@';
     if ($wgUserMessageAllowCustomization[$key] && $wgUser && $wgUser->getID() &&
         is_object($wgMessageCache))
     {
-        $newkey = $key.'/'.$wgUser->getName();
+        $newkey = $key.$delim.$wgUser->getName();
         if (!wfEmptyMsg($newkey, $wgMessageCache->get($newkey, true, $langCode)))
             $key = $newkey;
     }
-    elseif (($p = strrpos($key, '/')) !== false &&
-        $wgUserMessageAllowCustomization[substr($key, 0, $p)] &&
-        User::newFromName(substr($key, $p+1)))
+    elseif (($p = mb_strrpos($key, $delim)) !== false &&
+        $wgUserMessageAllowCustomization[mb_substr($key, 0, $p)] &&
+        User::newFromName(mb_substr($key, $p+mb_strlen($delim))))
     {
-        $key = substr($key, 0, $p);
+        $key = mb_substr($key, 0, $p);
+        $useDB = true;
+    }
+    elseif ($key == 'editinginterface' &&
+        $wgTitle->getNamespace() == NS_MEDIAWIKI &&
+        ($newkey = $wgContLang->lcfirst($wgTitle->getText())) &&
+        mb_strrpos($newkey, $delim) !== false &&
+        $wgUserMessageAllowCustomization[mb_substr($newkey, 0, $p)] &&
+        User::newFromName(mb_substr($newkey, $p+mb_strlen($delim))))
+    {
+        $key = 'editingpersonalinterface';
         $useDB = true;
     }
     return true;
