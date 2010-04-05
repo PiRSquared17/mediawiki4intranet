@@ -22,13 +22,15 @@
  * listboxes (<select>) with charinsert items instead of simple hyperlinks.
  *
  * Usage syntax:
- * <listinsert>
+ * <listinsert [attributes]>
  * Item Name = Item Text
  * Item Name = Multiline \
  *             Item Text
  * Item Name = Prefix+Suffix \
  *             CharInsert-like syntax
  * </listinsert>
+ *
+ * [attributes] are copied to HTML <select> attributes without any change.
  *
  * @author Vitaliy Filippov <vitalif at mail.ru>
  * @addtogroup Extensions
