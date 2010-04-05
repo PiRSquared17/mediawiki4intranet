@@ -78,6 +78,7 @@ require_once($IP.'/extensions/ParserFunctions/ParserFunctions.php');
 define('MW_PARSER_VERSION', '1.6.1');
 require_once($IP.'/extensions/StringFunctions/StringFunctions.php');
 require_once($IP.'/extensions/CharInsert/CharInsert.php');
+require_once($IP.'/extensions/CharInsertList/CharInsertList.php');
 require_once($IP.'/extensions/Cite/Cite.php');
 require_once($IP.'/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php');
 require_once($IP.'/extensions/CategoryTree/CategoryTree.php');
