@@ -269,7 +269,7 @@ class Wikilog
 
 		if ( ( $wi = self::getWikilogInfo( $title ) ) ) {
 			if ( $title->isTalkPage() ) {
-				if ( $wgWikilogEnableComments && $wi->isItem() ) {
+				if ( $wgWikilogEnableComments ) {
 					$article = new WikilogCommentsPage( $title, $wi );
 				} else {
 					return true;
@@ -476,7 +476,7 @@ class WikilogInfo
 	function getTitle() { return $this->mWikilogTitle; }
 	function getItemName() { return $this->mItemName; }
 	function getItemTitle() { return $this->mItemTitle; }
-	function getItemTalkTitle() { return $this->mItemTitle->getTalkPage(); }
+	function getTalkTitle() { return $this->mItemTitle ? $this->mItemTitle->getTalkPage() : $this->mWikilogTitle->getTalkPage(); }
 
 	function getTrailing() { return $this->mTrailing; }
 }
