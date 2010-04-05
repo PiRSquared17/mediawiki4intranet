@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1269964627 -14400
+# Date 1270490251 -14400
 Wikilog extension fixes:
 Bug 58154 - fix caching error
 Bug 56056 - do not handle post subarticles as posts themselves
@@ -11,8 +11,9 @@ Bug 61632 - Make comment author signatures using generic mechanism
 Bug 61174 - Preview does not get parsed
 Bug 61174 - (prerequisite) $query->select(), $query->selectSQLText()
 Bug 62314 - Allow to reply from comment page
+Bug 62452 - Wikilog does not respect user timezones
 
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/Wikilog.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -423,16 +423,13 @@
@@ -39,7 +40,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/Wikilog.php
  			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
  			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
  			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogComment.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
 @@ -612,7 +612,10 @@
@@ -53,7 +54,12 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogComment.php
  			}
  
  			if ( $text ) {
-@@ -698,12 +701,7 @@
+@@ -694,16 +697,11 @@
+ 	 * @return Array with message parameters.
+ 	 */
+ 	public function getCommentMsgParams( $comment ) {
+-		global $wgContLang;
++		global $wgLang;
  
  		if ( $comment->mUserID ) {
  			$authorPlain = htmlspecialchars( $comment->mUserText );
@@ -67,6 +73,28 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogComment.php
  		} else {
  			$authorPlain = htmlspecialchars( $comment->mAnonName );
  			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
+@@ -713,8 +711,8 @@
+ 			);
+ 		}
+ 
+-		$date = $wgContLang->date( $comment->mTimestamp );
+-		$time = $wgContLang->time( $comment->mTimestamp );
++		$date = $wgLang->date( $comment->mTimestamp, true );
++		$time = $wgLang->time( $comment->mTimestamp, true );
+ 		$permalink = $this->getCommentPermalink( $comment, $date, $time );
+ 
+ 		$extra = array();
+@@ -731,8 +729,8 @@
+ 				# Comment was edited.
+ 				$extra[] = $this->mSkin->link( $comment->mCommentTitle,
+ 					wfMsgForContent( 'wikilog-comment-note-edited',
+-						$wgContLang->date( $comment->mUpdated, true ),
+-						$wgContLang->time( $comment->mUpdated, true )
++						$wgLang->date( $comment->mUpdated, true ),
++						$wgLang->time( $comment->mUpdated, true )
+ 					),
+ 					array( 'title' => wfMsg( 'wikilog-comment-history' ) ),
+ 					array( 'action' => 'history' ), 'known'
 @@ -740,7 +738,7 @@
  			}
  		}
@@ -76,7 +104,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogComment.php
  		} else {
  			$extra = "";
  		}
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogCommentsPage.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogCommentsPage.php
 --- extensions/Wikilog/WikilogCommentsPage.php
 +++ extensions/Wikilog/WikilogCommentsPage.php
 @@ -209,7 +209,7 @@
@@ -88,7 +116,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogCommentsPage.php
  			$wgOut->addHtml( $this->getPostCommentForm( $this->mSingleComment ) );
  		}
  
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogFeed.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogFeed.php
 --- extensions/Wikilog/WikilogFeed.php
 +++ extensions/Wikilog/WikilogFeed.php
 @@ -361,7 +361,6 @@
@@ -108,7 +136,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogFeed.php
  			$row->wlp_updated,
  			$itemTitle->getFullUrl()
  		);
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogHooks.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogHooks.php
 --- extensions/Wikilog/WikilogHooks.php
 +++ extensions/Wikilog/WikilogHooks.php
 @@ -57,7 +57,7 @@
@@ -120,9 +148,76 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogHooks.php
  				$wi->getItemTitle()->invalidateCache();
  				$wi->getItemTitle()->purgeSquid();
  			}
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogItemPager.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogItem.php
+--- extensions/Wikilog/WikilogItem.php
++++ extensions/Wikilog/WikilogItem.php
+@@ -163,7 +163,7 @@
+ 	 * parameters.
+ 	 */
+ 	public function getMsgParams( $extended = false, $pout = null ) {
+-		global $wgContLang, $wgWikilogEnableTags;
++		global $wgLang, $wgWikilogEnableTags;
+ 
+ 		$authors = array_keys( $this->mAuthors );
+ 		$authorsFmt = WikilogUtils::authorList( $authors );
+@@ -208,8 +208,8 @@
+ 			/* $5  */ count( $authors ),
+ 			/* $6  */ ( count( $authors ) > 0 ? $authors[0] : '' ),
+ 			/* $7  */ $authorsFmt,
+-			/* $8  */ $wgContLang->date( $this->mPubDate ),
+-			/* $9  */ $wgContLang->time( $this->mPubDate ),
++			/* $8  */ $wgLang->date( $this->mPubDate, true ),
++			/* $9  */ $wgLang->time( $this->mPubDate, true ),
+ 			/* $10 */ $commentsFmt,
+ 			/* $11 */ count( $categories ),
+ 			/* $12 */ $categoriesFmt,
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
+@@ -296,7 +296,7 @@
+ 	 * @todo (Req >= Mw 1.16) Remove bug 20431 workaround.
+ 	 */
+ 	function formatRow( $row ) {
+-		global $wgParser, $wgContLang;
++		global $wgParser, $wgLang;
+ 
+ 		# Retrieve article parser output and other data.
+ 		$item = WikilogItem::newFromRow( $row );
+@@ -316,14 +316,14 @@
+ 		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
+ 
+ 		$itemPubdate = $item->getPublishDate();
+-		$pubdate = $wgContLang->timeanddate( $itemPubdate, true );
+-		$publishedDate = $wgContLang->date( $itemPubdate );
+-		$publishedTime = $wgContLang->time( $itemPubdate );
++		$pubdate = $wgLang->timeanddate( $itemPubdate, true );
++		$publishedDate = $wgLang->date( $itemPubdate, true );
++		$publishedTime = $wgLang->time( $itemPubdate, true );
+ 
+ 		$itemUpdated = $item->getUpdatedDate();
+-		$updated = $wgContLang->timeanddate( $itemUpdated, true );
+-		$updatedDate = $wgContLang->date( $itemUpdated );
+-		$updatedTime = $wgContLang->time( $itemUpdated );
++		$updated = $wgLang->timeanddate( $itemUpdated, true );
++		$updatedDate = $wgLang->date( $itemUpdated, true );
++		$updatedTime = $wgLang->time( $itemUpdated, true );
+ 
+ 		# Template parameters.
+ 		$vars = array(
+@@ -449,11 +449,11 @@
+ 	}
+ 
+ 	function formatValue( $name, $value ) {
+-		global $wgContLang;
++		global $wgLang;
+ 
+ 		switch ( $name ) {
+ 			case 'wlp_pubdate':
+-				$s = $wgContLang->timeanddate( $value, true );
++				$s = $wgLang->timeanddate( $value, true );
+ 				if ( !$this->mCurrentRow->wlp_publish ) {
+ 					$s = Xml::wrapClass( $s, 'wl-draft-inline' );
+ 				}
 @@ -498,6 +498,10 @@
  	}
  
@@ -134,7 +229,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogItemPager.php
  		return 'wlp_pubdate';
  	}
  
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogQuery.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogQuery.php
 --- extensions/Wikilog/WikilogQuery.php
 +++ extensions/Wikilog/WikilogQuery.php
 @@ -141,6 +141,31 @@
@@ -196,7 +291,7 @@ diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogQuery.php
  			$this->mAuthor = $author;
  		} elseif ( is_string( $author ) ) {
  			$t = Title::makeTitleSafe( NS_USER, $author );
-diff -r 2f012c39365a -r 9db29ac385fe extensions/Wikilog/WikilogUtils.php
+diff -r 2f012c39365a -r 238d1fde0c72 extensions/Wikilog/WikilogUtils.php
 --- extensions/Wikilog/WikilogUtils.php
 +++ extensions/Wikilog/WikilogUtils.php
 @@ -89,7 +89,7 @@
