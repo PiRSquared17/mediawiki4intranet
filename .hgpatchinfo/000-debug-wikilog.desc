@@ -8,3 +8,4 @@ Bug 61632 - Make comment author signatures using generic mechanism
 Bug 61174 - Preview does not get parsed
 Bug 61174 - (prerequisite) $query->select(), $query->selectSQLText()
 Bug 62314 - Allow to reply from comment page
+Bug 62452 - Wikilog does not respect user timezones

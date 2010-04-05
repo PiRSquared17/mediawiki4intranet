@@ -697,7 +697,7 @@ class WikilogCommentFormatter
 	 * @return Array with message parameters.
 	 */
 	public function getCommentMsgParams( $comment ) {
-		global $wgContLang;
+		global $wgLang;
 
 		if ( $comment->mUserID ) {
 			$authorPlain = htmlspecialchars( $comment->mUserText );
@@ -711,8 +711,8 @@ class WikilogCommentFormatter
 			);
 		}
 
-		$date = $wgContLang->date( $comment->mTimestamp );
-		$time = $wgContLang->time( $comment->mTimestamp );
+		$date = $wgLang->date( $comment->mTimestamp, true );
+		$time = $wgLang->time( $comment->mTimestamp, true );
 		$permalink = $this->getCommentPermalink( $comment, $date, $time );
 
 		$extra = array();
@@ -729,8 +729,8 @@ class WikilogCommentFormatter
 				# Comment was edited.
 				$extra[] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsgForContent( 'wikilog-comment-note-edited',
-						$wgContLang->date( $comment->mUpdated, true ),
-						$wgContLang->time( $comment->mUpdated, true )
+						$wgLang->date( $comment->mUpdated, true ),
+						$wgLang->time( $comment->mUpdated, true )
 					),
 					array( 'title' => wfMsg( 'wikilog-comment-history' ) ),
 					array( 'action' => 'history' ), 'known'
