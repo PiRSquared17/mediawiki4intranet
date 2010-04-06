@@ -82,7 +82,7 @@ function efListInsertParserHook($text, $attrs, $parser)
     $select_attr = '';
     foreach ($attrs as $k => $v)
         $select_attr .= htmlspecialchars($k, ENT_QUOTES) . '="' . htmlspecialchars($v, ENT_QUOTES).'" ';
-    $html = '<select '.$select_attr.'onchange="if(this.value){var a=/^((.*|\\n|\\r)*([^\\\\]|\\n|\\r))?\\+((.*|\\n|\\r)*)$/.exec(this.value);if(a)insertTags(a[1].replace(\'\\\\+\',\'+\'),a[4].replace(\'\\\\+\',\'+\'),\'\');else{insertTags(this.value.replace(\'\\\\+\',\'+\'),\'\',\'\');}this.selectedIndex=0;}"><option value="">-</option>' . $html . '</select>';
+    $html = '<select '.$select_attr.'onchange="if(this.value){var p=-1;while((p=this.value.indexOf(\'+\',p+1))>0 && this.value.substr(p-1,1)==\'\\\\\'){}if(p>=0){insertTags(this.value.substr(0,p).replace(\'\\\\+\',\'+\'),this.value.substr(p+1).replace(\'\\\\+\',\'+\'),\'\');}else{insertTags(this.value.replace(\'\\\\+\',\'+\'),\'\',\'\');}this.selectedIndex=0;}"><option value="">-</option>' . $html . '</select>';
     return $html;
 }
 
