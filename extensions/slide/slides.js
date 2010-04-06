@@ -780,9 +780,12 @@ function setS5Cookie(snum)
 		if (c.length < 2)
 			a[i] = '';
 		else if (c[0] == sid)
+		{
 			a[i] = sid+':'+snum;
+			break;
+		}
 	}
-	if (i < a.length || !a.length)
+	if (i >= a.length || !a.length)
 		a.push(sid+':'+snum);
 	document.cookie='s5slide='+escape(a.join(','))+'; path=/';
 }
