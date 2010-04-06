@@ -1,13 +1,18 @@
-Index: extensions/Wikilog/WikilogMainPage.php
-===================================================================
---- extensions/Wikilog/WikilogMainPage.php	(revision 428)
-+++ extensions/Wikilog/WikilogMainPage.php	(working copy)
-@@ -249,7 +249,7 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1270560830 -14400
+Bug 51595 - Add dates automatically for new items
+Bug 62520 - Enlarge textbox
+
+diff -r 2f012c39365a -r 9e68da61bcd3 extensions/Wikilog/WikilogMainPage.php
+--- extensions/Wikilog/WikilogMainPage.php
++++ extensions/Wikilog/WikilogMainPage.php
+@@ -254,7 +254,7 @@
  		$fields[] = Xml::hidden( 'title', $this->mTitle->getPrefixedText() );
  		$fields[] = Xml::hidden( 'action', 'wikilog' );
  		$fields[] = Xml::inputLabel( wfMsg( 'wikilog-item-name' ),
 -			'wlItemName', 'wl-item-name', 25 );
-+			'wlItemName', 'wl-item-name', 25, date('Y-m-d ') );
++			'wlItemName', 'wl-item-name', 70, date('Y-m-d ') );
  		$fields[] = Xml::submitButton( wfMsg( 'wikilog-new-item-go' ),
  			array( 'name' => 'wlActionNewItem' ) );
  
