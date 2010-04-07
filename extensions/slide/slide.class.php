@@ -108,8 +108,11 @@ class S5SlideShow
         $attr['style'] = trim($attr['style']);
         if (!$attr['style'])
             $attr['style'] = 'default';
+        /* Is each slide to be scaled independently? */
+        $attr['scaled'] = strtolower(trim($attr['scaled']));
+        $attr['scaled'] = $attr['scaled'] == 'true' || $attr['scaled'] == 'yes' || $attr['scaled'] == 1;
         /* Extract values into $this */
-        foreach(split(' ', 'style title subtitle author footer subfooter headingmark incmark pagebreak') as $v)
+        foreach(split(' ', 'style title subtitle author footer subfooter headingmark incmark pagebreak scaled') as $v)
             $this->$v = $attr[$v];
     }
 
@@ -189,6 +192,7 @@ class S5SlideShow
         $replace['[style]'] = $this->style;
         $replace['[content]'] = $fc;
         $replace['[pageid]'] = $this->sArticle->getID();
+        $replace['[scaled]'] = $this->scaled ? 'true' : 'false';
 
         # substitute values
         $fileContent = str_replace(
