@@ -126,7 +126,6 @@ div.image p, #slide0 p {
 
 .external {border-bottom: 1px dotted gray;}
 html>body .external {border-bottom: none;}
-.external:after {content: " \274F"; font-size: smaller; color: #77B;}
 
 .incremental, .incremental *, .incremental *:after {color: #DDE; visibility: visible;}
 img.incremental {visibility: hidden;}
@@ -135,5 +134,6 @@ img.incremental {visibility: hidden;}
 
 /* diagnostics
 
+.external:after {content: " \274F"; font-size: smaller; color: #77B;}
 li:after {content: " [" attr(class) "]"; color: #F88;}
  */
