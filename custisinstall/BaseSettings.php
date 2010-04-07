@@ -118,7 +118,7 @@ require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/WikiBookmarks/WikiBookmarks.php');
 require_once($IP.'/extensions/SWFUpload/SWFUpload.php');
 require_once($IP.'/extensions/UserMagic/UserMagic.php');
-require_once($IP.'/extensions/slide/slide.php');
+require_once($IP.'/extensions/S5SlideShow/S5SlideShow.php');
 require_once($IP.'/extensions/UserMessage/UserMessage.php');
 
 $wgSVGConverter = "inkscape";
