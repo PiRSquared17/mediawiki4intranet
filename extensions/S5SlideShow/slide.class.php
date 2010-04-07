@@ -231,7 +231,7 @@ class S5SlideShow
         $url = $title->escapeLocalURL("action=slide");
         return "<div class=\"floatright\"><span>
 <a href=\"$url\" class=\"image\" title=\"Slide Show\" target=\"_blank\">
-<img src=\"$wgScriptPath/extensions/slide/".$slideShow->style."/preview.png\" alt=\"Slide Show\" width=\"240px\" /><br />
+<img src=\"$wgScriptPath/extensions/S5SlideShow/".$slideShow->style."/preview.png\" alt=\"Slide Show\" width=\"240px\" /><br />
 Slide Show</a></span></div>" . $wgParser->parse($content, $title, $wgParser->mOptions, false, false)->getText();
     }
 
