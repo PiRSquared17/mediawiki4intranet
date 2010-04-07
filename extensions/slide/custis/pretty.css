@@ -38,8 +38,9 @@ div#footer {font-size: 0.5em; font-weight: bold; padding: 1em 0;}
 #footer h2 {font-style: italic;}
 
 div.long {font-size: 0.75em;}
-.slide h1 {position: absolute; top: 0.7em; left: 87px; z-index: 1;
-  margin: 0; padding: 0.3em 0 0 50px; white-space: nowrap;
+.slide h1 {position: relative; z-index: 1;
+  margin: -2em 0 0.5em 0; padding: 0.3em 0 0 50px;
+  width: 80%;
   font: bold 150%/1em Helvetica, sans-serif;}
 .slide h3 {font-size: 130%;}
 h1 abbr {font-variant: small-caps;}
@@ -68,7 +69,6 @@ ul.urls {list-style: none; display: inline; margin: 0;}
 .note {display: none;}
 .external {border-bottom: 1px dotted gray;}
 html>body .external {border-bottom: none;}
-.external:after {content: " \274F"; font-size: smaller; color: #77B;}
 
 .incremental, .incremental *, .incremental *:after {color: #DDE; visibility: visible;}
 img.incremental {visibility: hidden;}

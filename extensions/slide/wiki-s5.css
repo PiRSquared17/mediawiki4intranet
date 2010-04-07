@@ -1,4 +1,4 @@
-﻿/*
+/*
 ** MediaWiki 'monobook' style sheet for CSS2-capable browsers.
 ** Copyright Gabriel Wicke - http://wikidev.net/
 ** License: GPL (http://www.gnu.org/copyleft/gpl.html)
@@ -74,7 +74,7 @@ ul {
     list-style-type: square;
     margin: 0.3em 0 0 1.5em;
     padding:0;
-    list-style-image: url("bullet.gif");
+    list-style-image: url("../../skins/monobook/bullet.gif");
 }
 ol {
     line-height: 1.5em;
@@ -356,31 +356,30 @@ div.townBox dl dd {
 */
 #bodyContent a[href ^="http://"],
 #bodyContent a[href ^="gopher://"] {
-    background: url(external.png) center right no-repeat;
     padding-right: 13px;
 }
 #bodyContent a[href ^="https://"],
 .link-https {
-    background: url("lock_icon.gif") center right no-repeat;
+    background: url("../../skins/monobook/lock_icon.gif") center right no-repeat;
     padding-right: 16px;
 }
 #bodyContent a[href ^="mailto:"],
 .link-mailto {
-    background: url("mail_icon.gif") center right no-repeat;
+    background: url("../../skins/monobook/mail_icon.gif") center right no-repeat;
     padding-right: 18px;
 }
 #bodyContent a[href ^="news://"] {
-    background: url("news_icon.png") center right no-repeat;
+    background: url("../../skins/monobook/news_icon.png") center right no-repeat;
     padding-right: 18px;
 }
 #bodyContent a[href ^="ftp://"],
 .link-ftp {
-    background: url("file_icon.gif") center right no-repeat;
+    background: url("../../skins/monobook/file_icon.gif") center right no-repeat;
     padding-right: 18px;
 }
 #bodyContent a[href ^="irc://"],
 .link-irc {
-    background: url("discussionitem_icon.gif")  center right no-repeat;
+    background: url("../../skins/monobook/discussionitem_icon.gif") center right no-repeat;
     padding-right: 18px;
 }
 /* disable interwiki styling */
