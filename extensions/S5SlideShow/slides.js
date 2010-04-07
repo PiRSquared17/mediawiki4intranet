@@ -508,9 +508,9 @@ function notOperaFix() {
 		slides.setAttribute('href',slideCSS); // Gecko fix
 	}
 	if (isIE && document.styleSheets && document.styleSheets[0]) {
-		document.styleSheets[0].addRule('img', 'behavior: url(extensions/slide/iepngfix.htc)');
-		document.styleSheets[0].addRule('div', 'behavior: url(extensions/slide/iepngfix.htc)');
-		document.styleSheets[0].addRule('.slide', 'behavior: url(extensions/slide/iepngfix.htc)');
+		document.styleSheets[0].addRule('img', 'behavior: url(extensions/S5SlideShow/iepngfix.htc)');
+		document.styleSheets[0].addRule('div', 'behavior: url(extensions/S5SlideShow/iepngfix.htc)');
+		document.styleSheets[0].addRule('.slide', 'behavior: url(extensions/S5SlideShow/iepngfix.htc)');
 	}
 }
 
@@ -600,7 +600,7 @@ function createNotesWindow() { // creates a window for our notes
 	if (!s5NotesWindow || s5NotesWindow.closed) { // Create the window if it doesn't exist
 		s5NotesWindowLoaded = false;
 		// Note: Safari has a tendency to ignore window options preferring to default to the settings of the parent window, grr.
-		s5NotesWindow = window.open('extensions/slide/s5-notes.html', 's5NotesWindow', 'top=0,left=0');
+		s5NotesWindow = window.open('extensions/S5SlideShow/s5-notes.html', 's5NotesWindow', 'top=0,left=0');
 	}
 	if (s5NotesWindowLoaded) { // Load the current note if the Note HTML has loaded
 		loadNote();
