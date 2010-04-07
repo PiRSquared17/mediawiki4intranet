@@ -3,6 +3,10 @@
 // Please see http://www.meyerweb.com/eric/tools/s5/credits.html for information 
 // about all the wonderful and talented contributors to this code!
 
+// Config:
+// window.s5ScaleEachSlide = true|false;
+// window.slideshowId = anything;
+
 var undef;
 var slideCSS = '';
 var snum = 0;
@@ -26,7 +30,6 @@ var countdown = {
 	end: 0,
 	remaining: 0
 };
-
 
 var isIE = navigator.appName == 'Microsoft Internet Explorer' && navigator.userAgent.indexOf('Opera') < 1 ? 1 : 0;
 var isOp = navigator.userAgent.indexOf('Opera') > -1 ? 1 : 0;
@@ -153,6 +156,8 @@ function go(step) {
 		if (snum < 0) snum = 0;
 	} else
 		snum = parseInt(jl.value);
+	if (s5ScaleEachSlide)
+		fontScale(); // Experimental slide font scaling
 	var nid = 'slide' + snum;
 	var ne = document.getElementById(nid);
 	if (!ne) {
@@ -172,6 +177,7 @@ function go(step) {
 		addClass(incrementals[snum][incpos - 1], 'current');
 	if (isOp) { //hallvord
 		location.hash = nid;
+		window.scrollTo(0);
 	} else {
 		ce.style.visibility = 'hidden'; 
 		ne.style.visibility = 'visible';
@@ -433,10 +439,9 @@ function createControls() {
 	addClass(hidden,'hideme');
 }
 
-function fontScale() {  // causes layout problems in FireFox that get fixed if browser's Reload is used; same may be true of other Gecko-based browsers
+var lastfontsize = 40;
+function fontScale() {
 	if (!s5mode) return false;
-	var vScale = 48;  // both yield 16 (the usual browser default) at 1024x768
-	var hScale = 64;  // perhaps should auto-calculate based on theme's declared value?
 	if (window.innerHeight) {
 		var vSize = window.innerHeight;
 		var hSize = window.innerWidth;
@@ -450,8 +455,22 @@ function fontScale() {  // causes layout problems in FireFox that get fixed if b
 		var vSize = 700;  // assuming 1024x768, minus chrome and such
 		var hSize = 1024; // these do not account for kiosk mode or Opera Show
 	}
-	var newSize = Math.min(Math.round(vSize/vScale),Math.round(hSize/hScale));
+	var newSize;
+	if (s5ScaleEachSlide)
+	{
+		// <vfilippov@custis.ru> Experimental font scaling for each slide independently
+		var doch = document.getElementById('slide'+snum).scrollHeight;
+		var docw = document.getElementById('slide'+snum).childNodes[1].scrollWidth;
+		newSize = Math.round(Math.min(lastfontsize/doch*vSize, lastfontsize/docw*hSize));
+	}
+	else
+	{
+		var vScale = 48;  // both yield 16 (the usual browser default) at 1024x768
+		var hScale = 64;  // perhaps should auto-calculate based on theme's declared value?
+		newSize = Math.min(Math.round(vSize/vScale),Math.round(hSize/hScale));
+	}
 	fontSize(newSize + 'px');
+	lastfontsize = newSize;
 	if (isGe) {  // hack to counter incremental reflow bugs
 		var obj = document.getElementsByTagName('body')[0];
 		obj.style.display = 'none';
@@ -770,7 +789,7 @@ function setS5Cookie(snum)
 	if (c)
 		a = c.split(',');
 	var i;
-	var sid = slideshowId;
+	var sid = window.slideshowId;
 	if (!sid)
 		sid = 0;
 	sid = ''+sid;
@@ -793,7 +812,7 @@ function setS5Cookie(snum)
 function getS5Cookie()
 {
 	var a, c;
-	var sid = slideshowId;
+	var sid = window.slideshowId;
 	if (!sid)
 		sid = 0;
 	sid = ''+sid;
