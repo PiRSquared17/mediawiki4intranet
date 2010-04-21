@@ -361,15 +361,17 @@ class SpecialWikilog
 		$query = clone $this->query;
 		$query->setWikilogTitle(NULL);
 		$res = $query->select( $dbr,
-			array(), 'w.page_namespace, w.page_title',
+			array(), 'p.page_namespace, p.page_title',
 			array(), __FUNCTION__,
 			array('GROUP BY' => 'wlp_parent', 'ORDER BY' => 'w.page_title')
 		);
 		$values = array();
 		while( $row = $dbr->fetchRow( $res ) )
 		{
-			$row = Title::makeTitleSafe( $row['page_namespace'], $row['page_title'] );
-			$values[] = array( $row->getText(), $row->getPrefixedText() );
+			$parts = explode( '/', $row['page_title'] );
+			$row = Title::makeTitleSafe( $row['page_namespace'], $parts[0] );
+			if ($row)
+				$values[] = array( $row->getText(), $row->getPrefixedText() );
 		}
 		$dbr->freeResult( $res );
 		$select_options['wikilog'] = $values;
