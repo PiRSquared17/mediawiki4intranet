@@ -244,7 +244,7 @@ class Linker {
 			$query['action'] = 'edit';
 			$query['redlink'] = '1';
 		}
-		if ( $target->isTalkPage() )
+		if ( $target->isTalkPage() && $query['action'] == 'edit' )
 		{
 			if ( !array_key_exists( 'section', $query ) )
 				$query['section'] = 'new';
