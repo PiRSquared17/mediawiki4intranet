@@ -179,7 +179,7 @@ class UserMailer {
 				$endl = "\n";
 			}
 			$ctype = (is_null($contentType) ? 
-					'text/plain; charset='.$wgOutputEncoding : $contentType);
+					$wgEmailContentType . '; charset='.$wgOutputEncoding : $contentType);
 			$headers =
 				"MIME-Version: 1.0$endl" .
 				"Content-type: $ctype$endl" .
