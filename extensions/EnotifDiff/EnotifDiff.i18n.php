@@ -30,6 +30,24 @@ To change your watchlist settings, visit
 Feedback and further assistance: <a href="{{fullurl:{{MediaWiki:Helppage}}}}">{{MediaWiki:Helppage}}</a>
 </i></p>
 </body>$DIFF',
+
+    'confirmemail_body'      =>
+'<body>
+<p>Someone, probably you, from IP address $1,
+has registered an account "<b>$2</b>" with this e-mail address on {{SITENAME}}.</p>
+
+<p>To confirm that this account really does belong to you and activate
+e-mail features on {{SITENAME}}, open this link in your browser:</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>If you did *not* register the account, follow this link
+to cancel the e-mail address confirmation:</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>This confirmation code will expire at $4.</p>
+</body>',
 );
 
 $messages['ru'] = array(
@@ -38,6 +56,7 @@ $messages['ru'] = array(
     'enotif-empty-summary'   => 'нет описания.',
     'enotif_lastvisited'     => '<a href="$1">Перейдите по ссылке</a> для просмотра всех изменений, произошедших с вашего последнего посещения.',
     'enotif_lastdiff'        => '<a href="$1">Перейдите по ссылке</a> для ознакомления с изменением.',
+
     'enotif_body'            =>
 '<body>
 <p><b>$WATCHINGUSERNAME,</b></p>
@@ -61,4 +80,24 @@ $REALDIFF
 Обратная связь и помощь: <a href="{{fullurl:{{MediaWiki:Helppage}}}}">{{MediaWiki:Helppage}}</a>
 </i></p>
 </body>$DIFF',
+
+    'confirmemail_body'      =>
+'<body>
+<p>Кто-то (возможно вы) с IP-адресом $1 зарегистрировал
+на сервере проекта {{SITENAME}} учётную запись «<b>$2</b>»,
+указав этот адрес электронной почты.</p>
+
+<p>Чтобы подтвердить, что вы эта учётная запись действительно
+принадлежит вам и включить возможность отправки электронной почты
+с сайта {{SITENAME}}, откройте приведённую ниже ссылку в браузере.</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>Если вы <b>*не* регистрировали</b> подобной учётной записи, то перейдите
+по следующей ссылке, чтобы отменить подтверждение адреса:</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>Код подтверждения действителен до $4.</p>
+</body>',
 );
