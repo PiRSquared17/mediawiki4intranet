@@ -259,8 +259,8 @@ class WikilogComment
 		if ( $this->mParentObj )
 		{
 			$to_ids[$this->mParentObj->mUserID] = true;
-			$args[5] = $this->mParentObj->mCommentTitle->getPrefixedText();
-			$args[6] = $this->mParentObj->mUserText;
+			$args[4] = $this->mParentObj->mCommentTitle->getPrefixedText();
+			$args[5] = $this->mParentObj->mUserText;
 		}
 		$saveExpUrls = WikilogParser::expandLocalUrls();
 		$popt = new ParserOptions( User::newFromId( $this->mUserID ) );
