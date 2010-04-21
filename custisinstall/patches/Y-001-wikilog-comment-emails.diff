@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1271866704 -14400
+# Date 1271867926 -14400
 Depends on: Y-000-html-emails.diff
 
 Bug 62693 - Wikilog comment email notification support
 
-diff -r 6fc96b521854 -r 4adb1e82d3e5 extensions/Wikilog/Wikilog.i18n.php
+diff -r 6fc96b521854 -r c6f6e5d53635 extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -115,6 +115,29 @@
@@ -69,7 +69,7 @@ diff -r 6fc96b521854 -r 4adb1e82d3e5 extensions/Wikilog/Wikilog.i18n.php
  	'wikilog-title-comments' => 'Комментарии — $1',
  	'wikilog-error-msg' => 'Викилог: $1',
  	'wikilog-error-title' => 'Ошибка викилога',
-diff -r 6fc96b521854 -r 4adb1e82d3e5 extensions/Wikilog/WikilogComment.php
+diff -r 6fc96b521854 -r c6f6e5d53635 extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
 @@ -60,6 +60,7 @@
@@ -144,8 +144,8 @@ diff -r 6fc96b521854 -r 4adb1e82d3e5 extensions/Wikilog/WikilogComment.php
 +		if ( $this->mParentObj )
 +		{
 +			$to_ids[$this->mParentObj->mUserID] = true;
-+			$args[5] = $this->mParentObj->mCommentTitle->getPrefixedText();
-+			$args[6] = $this->mParentObj->mUserText;
++			$args[4] = $this->mParentObj->mCommentTitle->getPrefixedText();
++			$args[5] = $this->mParentObj->mUserText;
 +		}
 +		$saveExpUrls = WikilogParser::expandLocalUrls();
 +		$popt = new ParserOptions( User::newFromId( $this->mUserID ) );
