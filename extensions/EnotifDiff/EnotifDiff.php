@@ -18,13 +18,13 @@ if (!defined('MEDIAWIKI'))
     die();
 
 $wgExtensionFunctions[] = "wfEnotifDiff";
-$wgExtensionMessagesFiles[EnotifDiff] = dirname(__FILE__) . '/EnotifDiff.i18n.php';
-$wgExtensionCredits[other][] = array (
-    name        => 'Differences in Enotify mail',
-    description => 'Your MediaWiki will get an ability to send page diffs in enotify mail messages',
-    author      => 'Vitaliy Filippov',
-    url         => 'http://lib.custis.ru/index.php/EnotifDiff',
-    version     => '1.0 (2009-04-01)',
+$wgExtensionMessagesFiles['EnotifDiff'] = dirname(__FILE__) . '/EnotifDiff.i18n.php';
+$wgExtensionCredits['other'][] = array (
+    'name'        => 'Differences in Enotify mail',
+    'description' => 'Your MediaWiki will get an ability to send page diffs in enotify mail messages',
+    'author'      => 'Vitaliy Filippov',
+    'url'         => 'http://lib.custis.ru/EnotifDiff',
+    'version'     => '1.0.1 (2010-04-21)',
 );
 
 function wfEnotifDiff()
@@ -33,21 +33,21 @@ function wfEnotifDiff()
     wfLoadExtensionMessages('EnotifDiff');
     wfAddPreferences(array(
         array(
-            name      => 'enotifsenddiffs',
-            section   => 'prefs-personal',
-            type      => PREF_TOGGLE_T,
+            'name'    => 'enotifsenddiffs',
+            'section' => 'prefs-personal',
+            'type'    => PREF_TOGGLE_T,
             'default' => 0,
         ),
         array(
-            name      => 'enotifsendmultiple',
-            section   => 'prefs-personal',
-            type      => PREF_TOGGLE_T,
+            'name'    => 'enotifsendmultiple',
+            'section' => 'prefs-personal',
+            'type'    => PREF_TOGGLE_T,
             'default' => 0,
         )
     ));
-    $wgHooks[EnotifComposeCommonMailtext][] = '_enotifdiff_compose_common_mailtext';
-    $wgHooks[EnotifPersonalizeMailtext][] = '_enotifdiff_personalize_mailtext';
-    $wgHooks[EnotifUserCondition][] = '_enotifdiff_user_condition';
+    $wgHooks['EnotifComposeCommonMailtext'][] = '_enotifdiff_compose_common_mailtext';
+    $wgHooks['EnotifPersonalizeMailtext'][] = '_enotifdiff_personalize_mailtext';
+    $wgHooks['EnotifUserCondition'][] = '_enotifdiff_user_condition';
     $wgEmailContentType = 'text/html';
 }
 
