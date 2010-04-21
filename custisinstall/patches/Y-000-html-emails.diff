@@ -1,7 +1,11 @@
-Index: includes/UserMailer.php
-===================================================================
---- includes/UserMailer.php	(revision 58851)
-+++ includes/UserMailer.php	(working copy)
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1271854899 -14400
+HTML email support, needed for Bug 25475 (diffs in enotify emails)
+
+diff -r 2f012c39365a -r 6fc96b521854 includes/UserMailer.php
+--- includes/UserMailer.php
++++ includes/UserMailer.php
 @@ -106,8 +106,10 @@
  	 * @return mixed True on success, a WikiError object on failure.
  	 */
@@ -23,6 +27,15 @@ Index: includes/UserMailer.php
  			$headers['Content-transfer-encoding'] = '8bit';
  			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>'; // FIXME
  			$headers['X-Mailer'] = 'MediaWiki mailer';
+@@ -177,7 +179,7 @@
+ 				$endl = "\n";
+ 			}
+ 			$ctype = (is_null($contentType) ? 
+-					'text/plain; charset='.$wgOutputEncoding : $contentType);
++					$wgEmailContentType . '; charset='.$wgOutputEncoding : $contentType);
+ 			$headers =
+ 				"MIME-Version: 1.0$endl" .
+ 				"Content-type: $ctype$endl" .
 @@ -369,6 +371,10 @@
  					// Already sent an email to this person
  					$userCondition .= ' AND wl_user != ' . intval( $userTalkId );
