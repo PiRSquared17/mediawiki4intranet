@@ -33,12 +33,12 @@ if (!defined('MEDIAWIKI'))
 */
 
 $wgExtensionCredits['specialpage'][] = array(
-    name           => 'PositivePageRate',
-    version        => '0.9 (2010-02-08)',
-    author         => 'Vitaliy Filippov',
-    url            => 'http://yourcmc.ru/wiki/index.php/PositivePageRate_(MediaWiki)',
-    description    => 'Yet another page rating system counting unique views and positive (and optionally negative) votes. It also enables a distinct user access log file.',
-    descriptionmsg => 'pprate-desc',
+    'name'           => 'PositivePageRate',
+    'version'        => '0.91 (2010-04-26)',
+    'author'         => 'Vitaliy Filippov',
+    'url'            => 'http://yourcmc.ru/wiki/index.php/PositivePageRate_(MediaWiki)',
+    'description'    => 'Yet another page rating system counting unique views and positive (and optionally negative) votes. It also enables a distinct user access log file.',
+    'descriptionmsg' => 'pprate-desc',
 );
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'PositivePageRate::LoadExtensionSchemaUpdates';
 $wgHooks['ArticleViewHeader'][] = 'PositivePageRate::ArticleViewHeader';
