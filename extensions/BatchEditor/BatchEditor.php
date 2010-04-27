@@ -162,6 +162,10 @@ function wfSpecialBatchEditor($par = null)
             $title = Title::newFromText($s_title);
             if (!$title)
                 continue;
+/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
+            if (!$s_title->userCanEdit() || method_exists($s_title, 'userCanReadEx') && !$s_title->userCanReadEx())
+                continue;
+/*op-patch|TS|2010-04-26|end*/
             $article = new Article($title);
             if ($article->mTitle->getArticleID() == 0)
                 $wgOut->addWikiText("== [[$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
