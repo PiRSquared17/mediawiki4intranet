@@ -41,6 +41,7 @@ function efCategoryTemplateCategoryPageView($catpage)
     $s2 = addslashes($wgContLang->getNsText(NS_IMAGE));
     $cat = $catpage->mTitle->getText();
     if (($title = Title::newFromText($wgContLang->getNsText(NS_TEMPLATE).":".$wgContLang->getNsText(NS_CATEGORY).":".$cat)) &&
+        (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx()) &&
         ($rev = Revision::newFromId($title->getLatestRevID())))
         $text = $rev->getText();
     else
