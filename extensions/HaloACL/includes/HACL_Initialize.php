@@ -172,12 +172,12 @@ haclfInitNamespaces();
 
 // mediawiki-groups that may access whitelists
 global $haclWhitelistGroups;
-$haclWhitelistGroups = array('sysop','bureaucrat');
+$haclWhitelistGroups = array('bureaucrat');
 
 // mediawiki-groups that may access other user template
 // mediawiki-groups that may access whitelists
 global $haclCrossTemplateAccess;
-$haclCrossTemplateAccess = array('sysop','bureaucrat');
+$haclCrossTemplateAccess = array('bureaucrat');
 
 $wgGroupPermissions['*']['propertyread'] = true;
 $wgGroupPermissions['*']['propertyformedit'] = true;
