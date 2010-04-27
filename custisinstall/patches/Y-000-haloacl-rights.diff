@@ -1,9 +1,9 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1272377229 -14400
+# User root@yourcmc.ru
+# Date 1272384471 -14400
 Bug 63447 - (HaloACL extension part) patch for MediaWiki right support
 
-diff -r 5876298878ad -r 2325a0cf456f extensions/CategoryTree/CategoryTreeFunctions.php
+diff -r 2f012c39365a -r 1e8025f95f11 extensions/CategoryTree/CategoryTreeFunctions.php
 --- extensions/CategoryTree/CategoryTreeFunctions.php
 +++ extensions/CategoryTree/CategoryTreeFunctions.php
 @@ -310,7 +310,9 @@
@@ -50,7 +50,7 @@ diff -r 5876298878ad -r 2325a0cf456f extensions/CategoryTree/CategoryTreeFunctio
  
  			#$trans = $title->getLocalizedText();
  			$trans = ''; #place holder for when translated titles are available
-diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.body.php
+diff -r 2f012c39365a -r 1e8025f95f11 extensions/DeleteBatch/DeleteBatch.body.php
 --- extensions/DeleteBatch/DeleteBatch.body.php
 +++ extensions/DeleteBatch/DeleteBatch.body.php
 @@ -231,8 +231,8 @@
@@ -104,7 +104,7 @@ diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.body.php
  		return true;
  	}
  
-diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.i18n.php
+diff -r 2f012c39365a -r 1e8025f95f11 extensions/DeleteBatch/DeleteBatch.i18n.php
 --- extensions/DeleteBatch/DeleteBatch.i18n.php
 +++ extensions/DeleteBatch/DeleteBatch.i18n.php
 @@ -32,6 +32,7 @@
@@ -115,7 +115,7 @@ diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.i18n.php
  	'deletebatch-file-bad-format' => 'The file should be plain text',
  	'deletebatch-file-missing' => 'Unable to read given file',
  	'deletebatch-select-script' => 'delete page script',
-diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.php
+diff -r 2f012c39365a -r 1e8025f95f11 extensions/DeleteBatch/DeleteBatch.php
 --- extensions/DeleteBatch/DeleteBatch.php
 +++ extensions/DeleteBatch/DeleteBatch.php
 @@ -26,3 +26,4 @@
@@ -123,7 +123,7 @@ diff -r 5876298878ad -r 2325a0cf456f extensions/DeleteBatch/DeleteBatch.php
  $wgSpecialPages['DeleteBatch'] = 'DeleteBatch';
  $wgSpecialPageGroups['DeleteBatch'] = 'pagetools';
 +
-diff -r 5876298878ad -r 2325a0cf456f includes/CategoryPage.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/CategoryPage.php
 --- includes/CategoryPage.php
 +++ includes/CategoryPage.php
 @@ -145,6 +145,11 @@
@@ -151,7 +151,21 @@ diff -r 5876298878ad -r 2325a0cf456f includes/CategoryPage.php
  		global $wgContLang;
  		$this->articles[] = $isRedirect
  			? '<span class="redirect-in-category">' . $this->getSkin()->makeKnownLinkObj( $title ) . '</span>'
-diff -r 5876298878ad -r 2325a0cf456f includes/LogEventsList.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/ChangesFeed.php
+--- includes/ChangesFeed.php
++++ includes/ChangesFeed.php
+@@ -112,6 +112,10 @@
+ 
+ 		foreach( $sorted as $obj ) {
+ 			$title = Title::makeTitle( $obj->rc_namespace, $obj->rc_title );
++/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
++			if( !$title || method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() )
++				continue;
++/*op-patch|TS|2009-04-27|end*/
+ 			$talkpage = $title->getTalkPage();
+ 			$item = new FeedItem(
+ 				$title->getPrefixedText(),
+diff -r 2f012c39365a -r 1e8025f95f11 includes/LogEventsList.php
 --- includes/LogEventsList.php
 +++ includes/LogEventsList.php
 @@ -230,6 +230,12 @@
@@ -167,7 +181,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/LogEventsList.php
  		$time = $wgLang->timeanddate( wfTimestamp(TS_MW, $row->log_timestamp), true );
  		// User links
  		if( self::isDeleted($row,LogPage::DELETED_USER) ) {
-diff -r 5876298878ad -r 2325a0cf456f includes/PageHistory.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/PageHistory.php
 --- includes/PageHistory.php
 +++ includes/PageHistory.php
 @@ -321,8 +321,14 @@
@@ -187,7 +201,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/PageHistory.php
  		if( $notificationtimestamp && ($row->rev_timestamp >= $notificationtimestamp) ) {
  			$s .= ' <span class="updatedmarker">' .  wfMsgHtml( 'updatedmarker' ) . '</span>';
  		}
-diff -r 5876298878ad -r 2325a0cf456f includes/QueryPage.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/QueryPage.php
 --- includes/QueryPage.php
 +++ includes/QueryPage.php
 @@ -399,6 +399,13 @@
@@ -204,7 +218,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/QueryPage.php
  				$line = $this->formatResult( $skin, $row );
  				if( $line ) {
  					$attr = ( isset( $row->usepatrol ) && $row->usepatrol && $row->patrolled == 0 )
-diff -r 5876298878ad -r 2325a0cf456f includes/Title.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -89,7 +89,11 @@
@@ -374,7 +388,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/Title.php
 +/*op-patch|TS|2009-06-19|end*/  
 +
  }
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialAllpages.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialAllpages.php
 --- includes/specials/SpecialAllpages.php
 +++ includes/specials/SpecialAllpages.php
 @@ -303,6 +303,11 @@
@@ -389,7 +403,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialAllpages.php
  					if( $t ) {
  						$link = ( $s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->makeKnownLinkObj( $t, htmlspecialchars( $t->getText() ), false, false ) .
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialListredirects.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialListredirects.php
 --- includes/specials/SpecialListredirects.php
 +++ includes/specials/SpecialListredirects.php
 @@ -39,6 +39,12 @@
@@ -405,7 +419,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialListredirects.php
  			if( $target ) {
  				$arr = $wgContLang->getArrow() . $wgContLang->getDirMark();
  				$targetLink = $skin->makeLinkObj( $target );
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialNewpages.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialNewpages.php
 --- includes/specials/SpecialNewpages.php
 +++ includes/specials/SpecialNewpages.php
 @@ -238,6 +238,12 @@
@@ -421,7 +435,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialNewpages.php
  		$time = $wgLang->timeAndDate( $result->rc_timestamp, true );
  		$plink = $this->skin->makeKnownLinkObj( $title, '', $this->patrollable( $result ) ? 'rcid=' . $result->rc_id : '' );
  		$hist = $this->skin->makeKnownLinkObj( $title, wfMsgHtml( 'hist' ), 'action=history' );
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialPrefixindex.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialPrefixindex.php
 --- includes/specials/SpecialPrefixindex.php
 +++ includes/specials/SpecialPrefixindex.php
 @@ -138,6 +138,11 @@
@@ -436,7 +450,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialPrefixindex.php
  					if( $t ) {
  						$link = ($s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->makeKnownLinkObj( $t, htmlspecialchars( $t->getText() ), false, false ) .
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialRecentchanges.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -348,6 +348,13 @@
@@ -453,7 +467,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialRecentchanges.php
  			if( $limit == 0 ) break;
  			$rc = RecentChange::newFromRow( $obj );
  			$rc->counter = $counter++;
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialSearch.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialSearch.php
 --- includes/specials/SpecialSearch.php
 +++ includes/specials/SpecialSearch.php
 @@ -1145,7 +1145,14 @@
@@ -471,7 +485,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialSearch.php
  		}
  		$out .= "</ul>\n";
  
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialWatchlist.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialWatchlist.php
 --- includes/specials/SpecialWatchlist.php
 +++ includes/specials/SpecialWatchlist.php
 @@ -328,6 +328,12 @@
@@ -487,7 +501,7 @@ diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialWatchlist.php
  		$rc->counter = $counter++;
  
  		if ( $wgShowUpdatedMarker ) {
-diff -r 5876298878ad -r 2325a0cf456f includes/specials/SpecialWhatlinkshere.php
+diff -r 2f012c39365a -r 1e8025f95f11 includes/specials/SpecialWhatlinkshere.php
 --- includes/specials/SpecialWhatlinkshere.php
 +++ includes/specials/SpecialWhatlinkshere.php
 @@ -238,6 +238,11 @@
