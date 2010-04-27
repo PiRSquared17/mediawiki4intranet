@@ -52,6 +52,11 @@ function enableHaloACL() {
     // Register special pages aliases file
     $wgExtensionAliasesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Aliases.php';
 
+    ///// Register specials pages
+    global $wgSpecialPages, $wgSpecialPageGroups;
+    $wgSpecialPages['HaloACL']      = array('HaloACLSpecial');
+    $wgSpecialPageGroups['HaloACL'] = 'hacl_group';
+
     ///// Set up autoloading; essentially all classes should be autoloaded!
     $wgAutoloadClasses['HACLEvaluator'] = $haclgIP . '/includes/HACL_Evaluator.php';
     $wgAutoloadClasses['HaloACLSpecial'] = $haclgIP . '/specials/HACL_ACLSpecial.php';
@@ -100,10 +105,6 @@ function haclfSetupExtension() {
     $wgHooks['userCan'][] = 'HACLEvaluator::userCan';
 
     wfLoadExtensionMessages('HaloACL');
-    ///// Register specials pages
-    global $wgSpecialPages, $wgSpecialPageGroups;
-    $wgSpecialPages['HaloACL']      = array('HaloACLSpecial');
-    $wgSpecialPageGroups['HaloACL'] = 'hacl_group';
 
     $wgHooks['ArticleSaveComplete'][]  = 'HACLParserFunctions::articleSaveComplete';
     $wgHooks['ArticleSaveComplete'][]  = 'HACLDefaultSD::articleSaveComplete';
@@ -142,16 +143,7 @@ function haclfSetupExtension() {
 		}
 		*/
 
-    $spns_text = $wgContLang->getNsText(NS_SPECIAL);
-    // register AddHTMLHeader functions for special pages
-    // to include javascript and css files (only on special page requests).
-    if (stripos($wgRequest->getRequestURL(), $spns_text.":HaloACL") !== false
-        || stripos($wgRequest->getRequestURL(), $spns_text."%3AHaloACL") !== false) {
-        $wgHooks['BeforePageDisplay'][]='haclAddHTMLHeader';
-    }else {
-        $wgHooks['BeforePageDisplay'][]='addNonSpecialPageHeader';
-
-    }
+    $wgHooks['BeforePageDisplay'][]='haclfAddPageHeader';
     
     //-- Hooks for ACL toolbar--
 	$wgHooks['EditPageBeforeEditButtons'][] = 'haclfAddToolbarForEditPage';
@@ -188,6 +180,14 @@ function haclfSetupExtension() {
     return true;
 }
 
+function haclfAddPageHeader(&$out)
+{
+    global $wgTitle;
+    if ($wgTitle->getNamespace() == NS_SPECIAL && $wgTitle->getText() == 'HaloACL')
+        return haclAddHTMLHeader($out);
+    else
+        return addNonSpecialPageHeader($out);
+}
 /**
  *  adding headers for non-special-pages
  *  atm only used for toolbar-realted stuff
