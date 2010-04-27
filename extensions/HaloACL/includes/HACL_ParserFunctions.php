@@ -1038,8 +1038,6 @@ class HACLParserFunctions {
 		$gCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_GROUP), NS_CATEGORY)->getPrefixedText();
 		$rCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_RIGHT), NS_CATEGORY)->getPrefixedText();
 		$sdCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR), NS_CATEGORY)->getPrefixedText();
-		//$rCat = $haclgContLang->getCategory(HACLLanguage::CAT_RIGHT);
-		//$sdCat = $haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR);
 		$isGroup = array_key_exists($gCat, $cats);
 		$isRight = array_key_exists($rCat, $cats);
 		$isSD    = array_key_exists($sdCat, $cats);
@@ -1272,7 +1270,6 @@ class HACLParserFunctions {
 	 */
 	private function assignedTo($params, $isAssignedTo = true) {
 		global $wgContLang, $haclgContLang;
-		$userNs = $wgContLang->getNsText(NS_USER);
 		$errMsgs = array();
 		$warnings = array();
 		$users = array();
@@ -1294,11 +1291,12 @@ class HACLParserFunctions {
 		// read assigned users and groups
 		foreach ($assignedTo as $assignee) {
 			$assignee = trim($assignee);
-			if (strpos($assignee, $userNs) === 0 ||
+			$t = Title::newFromText($assignee);
+			if ($t && $t->getNamespace() == NS_USER ||
 				$assignee == '*' || $assignee == '#') {
 				// user found
 				if ($assignee != '*' && $assignee != '#') {
-					$user = substr($assignee, strlen($userNs)+1);
+					$user = $t->getText();
 					// Check if the user exists
 					if (User::idFromName($user) == 0) {
 						// User does not exist => add a warning
