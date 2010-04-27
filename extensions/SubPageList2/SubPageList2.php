@@ -300,10 +300,10 @@ class SubpageList
 
         $content = array();
         $res = $dbr->select($tables, array('page_namespace', 'page_title'), $conditions, __METHOD__, $options);
-        while($row = $dbr->fetchObject($res))
+        while ($row = $dbr->fetchObject($res))
         {
             $title = Title::makeTitleSafe($row->page_namespace, $row->page_title);
-            if(is_object($title))
+            if (is_object($title) && (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx()))
             {
                 $article = new Article($title);
                 $content[] = $article;
@@ -399,5 +399,3 @@ class SubpageList
         return $text;
     }
 }
-
-?>
