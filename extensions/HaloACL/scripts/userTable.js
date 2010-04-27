@@ -38,9 +38,11 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
     this.mySelectFormatter = function(elLiner, oRecord, oColumn, oData) {
         var checkedFromJS = false;
         var groupsstring = ""+oRecord._oData.groups;
-        for(i=0;i<YAHOO.haloacl.clickedArrayUsers[panelid].length;i++){
-            if(YAHOO.haloacl.clickedArrayUsers[panelid][i] == oRecord._oData.name){
-                checkedFromJS = true;
+        if (YAHOO.haloacl.clickedArrayUsers[panelid]) {
+            for(i=0;i<YAHOO.haloacl.clickedArrayUsers[panelid].length;i++){
+                if(YAHOO.haloacl.clickedArrayUsers[panelid][i] == oRecord._oData.name){
+                    checkedFromJS = true;
+                }
             }
         }
        
