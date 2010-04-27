@@ -164,6 +164,14 @@ class WikiRevision {
 	}
 
 	function importOldRevision() {
+		# Check edit permission
+		if( !$this->getTitle()->userCanEdit() )
+		{
+			global $wgUser;
+			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
+			return false;
+		}
+
 		$dbw = wfGetDB( DB_MASTER );
 
 		# Sneak a single revision into place
@@ -257,6 +265,13 @@ class WikiRevision {
 				$this->timestamp . "\n" );
 			return;
 		}
+		# Check edit permission
+		if( !$this->getTitle()->userCanEdit() )
+		{
+			global $wgUser;
+			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
+			return false;
+		}
 		# Check if it exists already
 		// FIXME: use original log ID (better for backups)
 		$prior = $dbw->selectField( 'logging', '1',
@@ -294,7 +309,13 @@ class WikiRevision {
 
 	function importUpload()
 	{
-		wfDebug( __METHOD__ . ": STUB\n" );
+		# Check edit permission
+		if( !$this->getTitle()->userCanEdit() )
+		{
+			global $wgUser;
+			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
+			return false;
+		}
 
 		// @fixme upload() uses $wgUser, which is wrong here
 		// it may also create a page without our desire, also wrong potentially.

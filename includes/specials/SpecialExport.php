@@ -151,8 +151,15 @@ function wfExportAddPagesExec(&$state)
 	$closure = $state['closure'];
 	$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
 	if ($catpages)
+	{
 		foreach ($catpages as $title)
-			$state['pages'] .= "\n" . $title->getPrefixedText();
+		{
+/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
+			if (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx())
+/*op-patch|TS|2010-04-26|end*/
+				$state['pages'] .= "\n" . $title->getPrefixedText();
+		}
+	}
 	if (!$catname && strlen($state['catname']))
 		$state['errors'][] = array('export-invalid-catname', $state['catname']);
 	if ($modifydate)
@@ -279,6 +286,15 @@ function wfSpecialExport( $page = '' ) {
 		if( $wgRequest->getCheck( 'images' ) ) {
 			$pageSet = wfExportGetImages( $inputPages, $pageSet );
 		}
+
+/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
+		foreach ($pageSet as $page => $v)
+		{
+			$t = Title::newFromText($page);
+			if (method_exists($t, 'userCanReadEx') && !$t->userCanReadEx())
+				unset($pageSet[$page]);
+		}
+/*op-patch|TS|2010-04-26|end*/
 
 		$pages = array_keys( $pageSet );
 
