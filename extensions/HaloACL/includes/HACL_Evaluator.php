@@ -929,6 +929,8 @@ class HACLEvaluator {
 			
 		}
 	
+		if (function_exists('smwfGetStore'))
+			return true;
 		// Get all properties of the page
 		$semdata = smwfGetStore()->getSemanticData($t);
 		$props = $semdata->getProperties();

@@ -80,7 +80,7 @@ $haclgOpenWikiAccess = true;
 # false
 #    If it is <false>, semantic properties are not protected even if they have 
 #	 security descriptors.  
-$haclgProtectProperties = true;
+$haclgProtectProperties = false;
 
 ###
 # By design several databases can be connected to HaloACL. (However, in the first
@@ -100,7 +100,7 @@ $haclgBaseStore = HACL_STORE_SQL;
 # in that namespace, even if security descriptors for individual articles define
 # another set authorized users.
 # The name of the main namespace is 'Main'.
-$haclgUnprotectableNamespaces = array('Main');
+$haclgUnprotectableNamespaces = array();
 
 ###
 # This is the name of the master template that is used as default rights template
@@ -146,7 +146,7 @@ $haclgDefaultQuickAccessRightMasterTemplates = array(
 # If $haclgEvaluatorLog is <true>, you can specify the URL-parameter "hacllog=true".
 # In this case HaloACL echos the reason why actions are permitted or prohibited.
 #
-$haclgEvaluatorLog = false;
+$haclgEvaluatorLog = true;
 
 ##
 # This key is used for protected properties in Semantic Forms. SF has to embed
@@ -167,6 +167,7 @@ require_once('HACL_GlobalFunctions.php');
 # be the smallest even namespace number that is not in use yet. However, it
 # must not be smaller than 100.
 ##
+$haclgNamespaceIndex = 102;
 haclfInitNamespaces();
 
 // mediawiki-groups that may access whitelists
