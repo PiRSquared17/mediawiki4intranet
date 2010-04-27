@@ -1035,9 +1035,11 @@ class HACLParserFunctions {
 		// Get the direct parent categories of the article
 		$cats = self::$mInstance->mTitle->getParentCategories();
 
-		$gCat = $haclgContLang->getCategory(HACLLanguage::CAT_GROUP);
-		$rCat = $haclgContLang->getCategory(HACLLanguage::CAT_RIGHT);
-		$sdCat = $haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR);
+		$gCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_GROUP), NS_CATEGORY)->getPrefixedText();
+		$rCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_RIGHT), NS_CATEGORY)->getPrefixedText();
+		$sdCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR), NS_CATEGORY)->getPrefixedText();
+		//$rCat = $haclgContLang->getCategory(HACLLanguage::CAT_RIGHT);
+		//$sdCat = $haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR);
 		$isGroup = array_key_exists($gCat, $cats);
 		$isRight = array_key_exists($rCat, $cats);
 		$isSD    = array_key_exists($sdCat, $cats);
