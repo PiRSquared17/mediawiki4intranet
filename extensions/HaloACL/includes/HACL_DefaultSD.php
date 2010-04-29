@@ -116,7 +116,7 @@ class  HACLDefaultSD  {
 	 * @return true
 	 */
 	public static function articleSaveComplete(&$article, &$user, $text) {
-            global $wgUser;
+        global $wgUser, $wgRequest;
 		
 		if ($article->getTitle()->getNamespace() == HACL_NS_ACL) {
 			// No default SD for articles in the namespace ACL
@@ -132,43 +132,25 @@ class  HACLDefaultSD  {
 
         $sdAlreadyDefinied = false;
         $createCustomSD = false;
-		if (HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false) {
-			// There is already an SD for the article
+        if (HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false) {
+            // There is already an SD for the article
             $sdAlreadyDefinied = true;
         }
 
         // has user defined anohter template than default sd
         $articleContent = $article->getContent();
 
-        /*
-
-        $start =15+ strpos($articleContent,"{{#protectwith:");
-        $templateToProtectWith = substr($articleContent,$start);
-        $templateToProtectWith = substr($templateToProtectWith,0,strpos($templateToProtectWith, "}}"));
-
-        if($templateToProtectWith != null && $templateToProtectWith != "") {
-            $createCustomSD = true;
+        $prot = $wgRequest->getVal('haloacl_protect_with');
+        if ($prot)
+        {
+            $templateToProtectWith = $prot;
+            if (strpos($prot, 'Right/') !== false || $prot == 'unprotected')
+                $createCustomSD = true;
         }
 
-
-        // remove protectwith from articlecontent
-        $articleContent = preg_replace("/{{#protectwith:(.*)}}/is", "", $articleContent);
-
-        #$article->doEdit($articleContent, "processed by defaultsd-generation");
-        */
-		if (isset($_SESSION)) {
-			if (isset($_SESSION['haloacl_toolbar'])  && isset($_SESSION['haloacl_toolbar'][$user->getName()])){
-				$templateToProtectWith = $_SESSION['haloacl_toolbar'][$user->getName()];
-                                if(strpos($templateToProtectWith, 'Right/') !== false || $templateToProtectWith== 'unprotected'){
-                                    $createCustomSD = true;
-                                }
-				unset($_SESSION['haloacl_toolbar'][$user->getName()]);
-			}
-		}
-		
-		// Did the user define a default SD
+        // Did the user define a default SD
         // adding default sd to article
-		
+
 		if(!$sdAlreadyDefinied && !$createCustomSD) {
 			global $haclgContLang;
 
