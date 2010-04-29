@@ -695,11 +695,6 @@ function haclfAddToolbarForEditPage ($content_actions) {
         return $content_actions;
     }
     global $wgOut;
-/*    $wgOut->addHTML(
-"<script>
-    YAHOO.haloacl.toolbar.actualTitle = '{$content_actions->mTitle}';
-    YAHOO.haloacl.toolbar.loadContentToDiv('content','haclGetHACLToolbar',{title:'{$content_actions->mTitle}'});
-</script>");*/
     $wgOut->addHTML(HACLToolbar::haclGetHACLToolbar($content_actions->mTitle));
 
     return true;
@@ -708,22 +703,11 @@ function haclfAddToolbarForEditPage ($content_actions) {
 /**
 * This function is called from the hook 'EditPageBeforeEditButtons'. It adds the
 * ACL toolbar to a semantic form.
-*  
 */
 function haclfAddToolbarForSemanticForms($pageTitle, $html) {
-    $html = <<<HTML
-    		<script>
-	            YAHOO.haloacl.toolbar.actualTitle = '$pageTitle';
-	            YAHOO.haloacl.toolbar.loadContentToDiv('content','haclGetHACLToolbar',{title:'$pageTitle'});
-	        </script>
-HTML;
-
+    $html = HACLToolbar::haclGetHACLToolbar($pageTitle);
     return true;
 }
-
-
-
-
 
 function haclfRegisterACIcon(& $namespaceMappings) {
     global $haclgIP;
