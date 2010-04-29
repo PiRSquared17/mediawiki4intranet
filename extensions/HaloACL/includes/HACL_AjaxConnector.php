@@ -64,6 +64,7 @@ function unescape($source) {
 /*
  * defining ajax-callable functions
  */
+global $wgAjaxExportList;
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
 $wgAjaxExportList[] = "haclCreateManageACLPanels";
