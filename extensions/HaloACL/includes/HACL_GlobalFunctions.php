@@ -69,6 +69,7 @@ function enableHaloACL() {
     $wgAutoloadClasses['HACLResultFilter'] = $haclgIP . '/includes/HACL_ResultFilter.php';
     $wgAutoloadClasses['HACLQueryRewriter'] = $haclgIP . '/includes/HACL_QueryRewriter.php';
     $wgAutoloadClasses['HACLQuickacl'] = $haclgIP . '/includes/HACL_Quickacl.php';
+    $wgAutoloadClasses['HACLToolbar'] = $haclgIP . '/includes/HACL_Toolbar.php';
     
     // UI
     $wgAutoloadClasses['HACL_GenericPanel'] = $haclgIP . '/includes/HACL_GenericPanel.php';
@@ -144,12 +145,12 @@ function haclfSetupExtension() {
 		*/
 
     $wgHooks['BeforePageDisplay'][]='haclfAddPageHeader';
-    
+
     //-- Hooks for ACL toolbar--
-	$wgHooks['EditPageBeforeEditButtons'][] = 'haclfAddToolbarForEditPage';
+	$wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
 	$wgHooks['sfEditPageBeforeForm'][]      = 'haclfAddToolbarForSemanticForms';
-    
-    
+
+
     //-- includes for Ajax calls --
     global $wgUseAjax, $wgRequest;
     if ($wgUseAjax && $wgRequest->getVal('action') == 'ajax' ) {
@@ -198,7 +199,6 @@ function haclfAddPageHeader(&$out)
  */
 function addNonSpecialPageHeader(&$out) {
     global $haclgHaloScriptPath, $smwgDeployVersion;
-    haclAddJSLanguageScripts($out);
     if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
@@ -291,6 +291,8 @@ function addNonSpecialPageHeader(&$out) {
         // don't include prototype.js if SMWHalo is present
         $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/prototype.js\"></script>");
     }
+
+    haclAddJSLanguageScripts($out);
 
     return true;
 }
@@ -686,21 +688,19 @@ function haclAddJSLanguageScripts(& $jsm, $mode = "all", $namespace = -1, $pages
 /**
 * This function is called from the hook 'EditPageBeforeEditButtons'. It adds the
 * ACL toolbar to edited pages.
-*  
 */
 function haclfAddToolbarForEditPage ($content_actions) {
 
     if ($content_actions->mArticle->mTitle->mNamespace == HACL_NS_ACL) {
         return $content_actions;
     }
-    global $haclgIP;
-    $html = <<<HTML
-        <script>
-            YAHOO.haloacl.toolbar.actualTitle = '{$content_actions->mTitle}';
-            YAHOO.haloacl.toolbar.loadContentToDiv('content','haclGetHACLToolbar',{title:'{$content_actions->mTitle}'});
-        </script>
-HTML;
-    $content_actions->editFormTextBeforeContent = $html;
+    global $wgOut;
+/*    $wgOut->addHTML(
+"<script>
+    YAHOO.haloacl.toolbar.actualTitle = '{$content_actions->mTitle}';
+    YAHOO.haloacl.toolbar.loadContentToDiv('content','haclGetHACLToolbar',{title:'{$content_actions->mTitle}'});
+</script>");*/
+    $wgOut->addHTML(HACLToolbar::haclGetHACLToolbar($content_actions->mTitle));
 
     return true;
 }
@@ -711,7 +711,6 @@ HTML;
 *  
 */
 function haclfAddToolbarForSemanticForms($pageTitle, $html) {
-    global $haclgIP;
     $html = <<<HTML
     		<script>
 	            YAHOO.haloacl.toolbar.actualTitle = '$pageTitle';

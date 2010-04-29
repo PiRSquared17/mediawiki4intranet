@@ -24,16 +24,15 @@
  */
 #hacl_toolbarcontainer{
     min-width:750px;
-    height:20px;
     border:1px #ccc solid;
-    overflow:visible;
     margin:5px 0 5px 0;
     padding:2px 0;
 }
 
+#hacl_toolbarcontainer select{vertical-align:middle;}
+
 #hacl_toolbarcontainer_section1{
     float:left;
-    height:20px;
     border:1px #ccc solid;
     border-style: none solid none none;
     overflow:visible;
@@ -42,7 +41,6 @@
 
 #hacl_toolbarcontainer_section3{
     float:right;
-    height:20px;
     padding:3px 5px 0px 5px;
 }
 
