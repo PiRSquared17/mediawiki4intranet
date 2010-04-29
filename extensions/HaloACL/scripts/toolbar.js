@@ -123,25 +123,7 @@ YAHOO.haloacl.toolbar.callAction = function(action, parameterlist, callback){
  *  @param not used anymore, due to toolbar-changes
  */
 YAHOO.haloacl.toolbar_handleSaveClick = function(element){
-
-    //var textbox = $('wpTextbox1');
-    var tps = $('haloacl_toolbar_pagestate');
-    var state  = tps[tps.selectedIndex].text;
-
-    if (state == "protected"){
-        var tpw = $('haloacl_template_protectedwith');
-        var tmpvalue  = tpw[tpw.selectedIndex].text;
-        //textbox.value = textbox.value + "{{#protectwith:"+$('haloacl_template_protectedwith').value+"}}";
-        YAHOO.haloacl.toolbar.callAction('haclSetToolbarChoose',{tpl:tmpvalue});
-
-    }else{
-        //textbox.value = textbox.value + "{{#protectwith:unprotected}}";
-        YAHOO.haloacl.toolbar.callAction('haclSetToolbarChoose',{tpl:'unprotected'},function(result){
-           
-        });
-    }
-
-
+    $('haloacl_protect_with').value = $('haloacl_toolbar_pagestate').value == 'protected' ? $('haloacl_template_protectedwith').value : 'unprotected';
 };
 /**
  * initializes toolbar
@@ -149,18 +131,17 @@ YAHOO.haloacl.toolbar_handleSaveClick = function(element){
  */
 
 YAHOO.haloacl.toolbar_initToolbar = function(){
-	var value = $('wpSave').readAttribute('value');
-	var title = $('wpSave').readAttribute('title');
-	var accesskey = $('wpSave').readAttribute('accesskey');
-	var tabindex = $('wpSave').readAttribute('tabindex');
-	var name = $('wpSave').readAttribute('name');
-	$('wpSave').hide();
-	new Insertion.After('wpSave', '<input id="wpSaveReplacement" type="button" value="'+value+'" title="'+title+'" accesskey="'+accesskey+'" tabindex="'+tabindex+'" name="'+name+'" />');
-//        $('wpSave').writeAttribute("type","button");
-    $('wpSaveReplacement').writeAttribute("onClick","YAHOO.haloacl.toolbar_handleSaveClick(this);return false;");
+    YAHOO.util.Event.addListener(window, "load", YAHOO.haloacl.toolbar_initToolbar_real);
+}
+
+YAHOO.haloacl.toolbar_initToolbar_real = function(){
+    var e = document.createElement('input');
+    e.type = 'hidden';
+    e.id = e.name = 'haloacl_protect_with';
+    document.editform.appendChild(e);
+    YAHOO.util.Event.addListener(document.editform, "submit", function(){YAHOO.haloacl.toolbar_handleSaveClick(this);return false;});
     YAHOO.haloacl.toolbar_updateToolbar();
     YAHOO.haloacl.toolbar_templateChanged();
-
 }
 
 /**
@@ -250,8 +231,8 @@ YAHOO.haloacl.toolbar_templateChanged = function(){
  * @param result of request
  */
 YAHOO.haloacl.callbackSDpopupByName = function(result){
-	var tpw = $('haloacl_template_protectedwith');
-	var protectedWith = tpw[tpw.selectedIndex].text;
+    var tpw = $('haloacl_template_protectedwith');
+    var protectedWith = tpw[tpw.selectedIndex].text;
     if(result.status == '200'){
         YAHOO.haloaclrights.popup(result.responseText, protectedWith, 'toolbar');
     }else{
