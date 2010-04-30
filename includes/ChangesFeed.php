@@ -112,6 +112,10 @@ class ChangesFeed {
 
 		foreach( $sorted as $obj ) {
 			$title = Title::makeTitle( $obj->rc_namespace, $obj->rc_title );
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if( !$title || method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() )
+				continue;
+/*op-patch|TS|2009-04-27|end*/
 			$talkpage = $title->getTalkPage();
 			$item = new FeedItem(
 				$title->getPrefixedText(),
