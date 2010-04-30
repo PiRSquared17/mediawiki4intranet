@@ -163,7 +163,7 @@ function wfSpecialBatchEditor($par = null)
             if (!$title)
                 continue;
 /*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
-            if (!$s_title->userCanEdit() || method_exists($s_title, 'userCanReadEx') && !$s_title->userCanReadEx())
+            if (!$title->userCanEdit() || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
                 continue;
 /*op-patch|TS|2010-04-26|end*/
             $article = new Article($title);
