@@ -1,13 +1,36 @@
+/* jQuery-free version of OpenID javascript */
+
 var openid = {
 	current: 'openid',
-
+	chclass: function(c, a) {
+		var p;
+		if ((p = c.indexOf(' '+a)) >= 0)
+			return c.substr(0, p) + c.substr(p+a.length+1);
+		return c + ' ' + a;
+	},
+	choidclass: function(i) {
+		i.className = openid.chclass(i.className, 'openid_selected');
+	},
+	newclass: {
+		'openid_large_link' : 'openid_large_link openid_selected',
+		'openid_large_link openid_selected' : 'openid_large_link',
+		'openid_large_link' : 'openid_large_link openid_selected',
+		'openid_large_link openid_selected' : 'openid_large_link',
+	},
 	show: function(provider) {
-		$('#provider_form_' + openid.current).attr('style', 'display:none');
-		$('#provider_form_' + provider).attr('style', 'block');
-
-		$('#openid_provider_' + openid.current +'_icon, #openid_provider_' + openid.current + '_link').removeClass('openid_selected');
-		$('#openid_provider_' + provider +'_icon, #openid_provider_' + provider + '_link').addClass('openid_selected');
-
+		var i;
+		if (i = document.getElementById('provider_form_' + openid.current))
+			i.style.display = 'none';
+		if (i = document.getElementById('provider_form_' + provider))
+			i.style.display = '';
+		if (i = document.getElementById('openid_provider_' + openid.current + '_icon'))
+			openid.choidclass(i);
+		if (i = document.getElementById('openid_provider_' + openid.current + '_link'))
+			openid.choidclass(i);
+		if (i = document.getElementById('openid_provider_' + provider + '_icon'))
+			openid.choidclass(i);
+		if (i = document.getElementById('openid_provider_' + provider + '_link'))
+			openid.choidclass(i);
 		openid.current = provider;
 	},
 	update: function() {
@@ -15,22 +38,51 @@ var openid = {
 		var root = wgArticlePath;
 		root = root.replace('$1', '');
 
-		$.cookie('openid.provider', openid.current, { path: root, expires: 365 });
+		var exp = (new Date((new Date()).getTime()+365*86400)).toGMTString();
+		document.cookie = 'openidprovider='+escape(openid.current)+";path="+escape(root)+";expires="+exp;
 
 		if (openid.current !== 'openid') {
-			var param = $('#openid_provider_param_' + openid.current).val();
-			$.cookie('openid.param', param, { path: root, expires: 365 });
+			var param = document.getElementById('openid_provider_param_' + openid.current).value;
+			document.cookie = 'openidparam='+escape(param?param:'')+';path='+escape(root)+';expires='+exp;
 
-			$('#openid_url').val($('#openid_provider_url_' + openid.current).val().replace(/{.*}/, param));
+			document.getElementById('openid_url').value = document.getElementById('openid_provider_url_' + openid.current).value.replace(/{.*}/, param);
 		}
 	},
 	init: function() {
-		var provider = $.cookie('openid.provider');
+		var provider = openid.getCookie('openidprovider');
 		if (provider !== null) {
 			openid.show(provider);
-			$('#openid_provider_param_' + openid.current).val($.cookie('openid.param'));
+			document.getElementById('openid_provider_param_' + openid.current).value = openid.getCookie('openidparam');
 		}
-	}
+	},
+	addListener: function(obj, ev, handler) {
+		if (obj.addEventListener)
+			obj.addEventListener(ev, handler, false);
+		else if (obj.attachEvent)
+			obj.attachEvent(ev, handler);
+		else
+			obj["on"+ev] = handler;
+	},
+	getCookie: function(name)
+	{
+		var cookie = " " + document.cookie;
+		var search = " " + name + "=";
+		var setStr = null;
+		var offset = 0;
+		var end = 0;
+		if (cookie.length > 0) {
+			offset = cookie.indexOf(search);
+			if (offset != -1) {
+				offset += search.length;
+				end = cookie.indexOf(";", offset)
+				if (end == -1) {
+					end = cookie.length;
+				}
+				setStr = unescape(cookie.substring(offset, end));
+			}
+		}
+		return setStr;
+	},
 };
 
-$(document).ready(openid.init);
+openid.addListener(window, 'load', openid.init);
