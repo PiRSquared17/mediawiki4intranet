@@ -11,12 +11,6 @@ var openid = {
 	choidclass: function(i) {
 		i.className = openid.chclass(i.className, 'openid_selected');
 	},
-	newclass: {
-		'openid_large_link' : 'openid_large_link openid_selected',
-		'openid_large_link openid_selected' : 'openid_large_link',
-		'openid_large_link' : 'openid_large_link openid_selected',
-		'openid_large_link openid_selected' : 'openid_large_link',
-	},
 	show: function(provider) {
 		var i;
 		if (i = document.getElementById('provider_form_' + openid.current))
