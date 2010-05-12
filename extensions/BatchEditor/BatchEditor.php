@@ -136,8 +136,8 @@ function wfSpecialBatchEditor($par = null)
         if ($f)
         {
             if ($a_regexp)
-                $f = '#'.preg_replace('/([#\\\\])/', '\\\\\1', $f).'#';
-            $a_find[] = array($f, trim($ar[$a]));
+                $f = '#'.str_replace('#', "\\#", $f).'#';
+            $a_find[] = array($f, $a_regexp ? trim($ar[$a]) : $ar[$a]);
         }
     }
     # Regexps for deleting whole lines
@@ -148,7 +148,7 @@ function wfSpecialBatchEditor($par = null)
         $f = trim($f);
         if ($f)
         {
-            $f = '#^[ \t\r]*'.preg_replace('/([#\\\\])/', '\\\\\1', preg_quote($f)).'[ \t\r]*$#m';
+            $f = '#^[ \t\r]*'.str_replace('#', "\\#", preg_quote($f)).'[ \t\r]*$#m';
             $a_delete[] = $f;
         }
     }
