@@ -81,7 +81,7 @@ function wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closu
  * @param $pageSet array, associative array indexed by titles for output
  * @return array associative array index by titles
  */
-function wfExportGetTemplates( $inputPages, $pageSet ) {
+function wfExportGetTemplates( &$inputPages, &$pageSet ) {
 	return wfExportGetLinks( $inputPages, $pageSet,
 		'templatelinks',
 	 	array( 'tl_namespace AS namespace', 'tl_title AS title' ),
@@ -94,7 +94,7 @@ function wfExportGetTemplates( $inputPages, $pageSet ) {
  * @param $pageSet array, associative array indexed by titles for output
  * @return array associative array index by titles
  */
-function wfExportGetPagelinks( $inputPages, $pageSet ) {
+function wfExportGetPagelinks( &$inputPages, &$pageSet ) {
 	return wfExportGetLinks( $inputPages, $pageSet,
 		'pagelinks',
 		array( 'pl_namespace AS namespace', 'pl_title AS title' ),
@@ -107,7 +107,7 @@ function wfExportGetPagelinks( $inputPages, $pageSet ) {
  * @param $pageSet array, associative array indexed by titles for output
  * @return array associative array index by titles
  */
-function wfExportGetImages( $inputPages, $pageSet ) {
+function wfExportGetImages( &$inputPages, &$pageSet ) {
 	return wfExportGetLinks( $inputPages, $pageSet,
 		'imagelinks',
 		array( NS_FILE . ' AS namespace', 'il_to AS title' ),
@@ -118,29 +118,35 @@ function wfExportGetImages( $inputPages, $pageSet ) {
  * Expand a list of pages to include items used in those pages.
  * @private
  */
-function wfExportGetLinks( $inputPages, $pageSet, $table, $fields, $join ) {
+function wfExportGetLinks( &$inputPages, &$pageSet, $table, $fields, $join )
+{
 	$dbr = wfGetDB( DB_SLAVE );
-	foreach( $inputPages as $page ) {
-		$title = Title::newFromText( $page );
-		if( $title ) {
-			$pageSet[$title->getPrefixedText()] = true;
-			/// @fixme May or may not be more efficient to batch these
-			///        by namespace when given multiple input pages.
-			$result = $dbr->select(
-				array( 'page', $table ),
-				$fields,
-				array_merge( $join,
-					array(
-						'page_namespace' => $title->getNamespace(),
-						'page_title' => $title->getDBKey() ) ),
-				__METHOD__ );
-			foreach( $result as $row ) {
-				$template = Title::makeTitle( $row->namespace, $row->title );
-				$pageSet[$template->getPrefixedText()] = true;
+	$byns = array();
+	foreach( $inputPages as $title )
+		$byns[$title->getNamespace()][] = $title->getDBkey();
+	$added = 0;
+	foreach( $byns as $ns => $titles )
+	{
+		$result = $dbr->select(
+			array( 'page', $table ),
+			$fields,
+			array_merge( $join,
+				array(
+					'page_namespace' => $ns,
+					'page_title' => $titles ) ),
+			__METHOD__ );
+		foreach( $result as $row )
+		{
+			$add = Title::makeTitle( $row->namespace, $row->title );
+			if( !$pageSet[$add->getPrefixedText()] )
+			{
+				$pageSet[$add->getPrefixedText()] = true;
+				$inputPages[] = $add;
+				$added++;
 			}
 		}
 	}
-	return $pageSet;
+	return $added;
 }
 
 function wfExportAddPagesExec(&$state)
@@ -184,7 +190,7 @@ function wfExportAddPagesForm($state)
 }
 
 /**
- *
+ * Special page itself
  */
 function wfSpecialExport( $page = '' ) {
 	global $wgOut, $wgRequest, $wgSitename, $wgExportAllowListContributors;
@@ -270,30 +276,31 @@ function wfSpecialExport( $page = '' ) {
 
 		/* Split up the input and look up linked pages */
 		$inputPages = array();
+		$pageSet = array();
 		foreach (explode("\n", $page) as $p)
+		{
 			if ($p !== '' && $p !== null && ($p = Title::newFromText($p)))
-				$inputPages[] = $p->getPrefixedText();
-		$pageSet = array_flip( $inputPages );
-
-		if( $wgRequest->getCheck( 'templates' ) ) {
-			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
+			{
+				$inputPages[] = $p;
+				$pageSet[$p->getPrefixedText()] = true;
+			}
 		}
 
-		if( $wgRequest->getCheck( 'pagelinks' ) ) {
-			$pageSet = wfExportGetPagelinks( $inputPages, $pageSet );
-		}
-
-		if( $wgRequest->getCheck( 'images' ) ) {
-			$pageSet = wfExportGetImages( $inputPages, $pageSet );
-		}
+		$t = $wgRequest->getCheck( 'templates' ) ? 1 : 0;
+		$p = $wgRequest->getCheck( 'pagelinks' ) ? 1 : 0;
+		$i = $wgRequest->getCheck( 'images' ) ? 1 : 0;
+		do
+		{
+			$added = 0;
+			if( $t ) $added += wfExportGetTemplates( $inputPages, $pageSet );
+			if( $p ) $added += wfExportGetPagelinks( $inputPages, $pageSet );
+			if( $i ) $added += wfExportGetImages( $inputPages, $pageSet );
+		} while( $t+$p+$i > 1 && $added > 0 );
 
 /*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
-		foreach ($pageSet as $page => $v)
-		{
-			$t = Title::newFromText($page);
-			if (method_exists($t, 'userCanReadEx') && !$t->userCanReadEx())
-				unset($pageSet[$page]);
-		}
+		foreach ($inputPages as $title)
+			if (method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
+				unset($pageSet[$title->getPrefixedText()]);
 /*op-patch|TS|2010-04-26|end*/
 
 		$pages = array_keys( $pageSet );
