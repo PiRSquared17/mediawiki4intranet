@@ -95,6 +95,9 @@ class WikilogMainPage
 			$pager = new WikilogSummaryPager( $query );
 		}
 
+		global $wlCalPager;
+		$wlCalPager = $pager;
+
 		# Display list of wikilog posts.
 		$body = $pager->getBody();
 		$body .= $pager->getNavigationBar();
@@ -254,7 +257,7 @@ class WikilogMainPage
 		$fields[] = Xml::hidden( 'title', $this->mTitle->getPrefixedText() );
 		$fields[] = Xml::hidden( 'action', 'wikilog' );
 		$fields[] = Xml::inputLabel( wfMsg( 'wikilog-item-name' ),
-			'wlItemName', 'wl-item-name', 25 );
+			'wlItemName', 'wl-item-name', 70, date('Y-m-d ') );
 		$fields[] = Xml::submitButton( wfMsg( 'wikilog-new-item-go' ),
 			array( 'name' => 'wlActionNewItem' ) );
 
