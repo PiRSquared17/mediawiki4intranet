@@ -34,6 +34,8 @@ $wgExtensionCredits['parserhook'][] = array(
     'author' => 'Vitaliy Filippov, Martin Schallnahs, Rob Church'
 );
 
+/* $egSubpagelistDefaultTemplate = "Template:SubPageList_Default"; */
+
 /**
  * Hook in function
  */
@@ -164,6 +166,7 @@ class SubpageList
     /* Parse <subpagelist> options */
     function options($options)
     {
+        global $egSubpagelistDefaultTemplate;
         if (($c = str_replace(' ', '_', $options['category'])) && $c != '-1')
         {
             $cats = explode('|', $c);
@@ -177,6 +180,8 @@ class SubpageList
         }
         if ($t = $options['template'])
             $this->template = $t;
+        else if ($egSubpageListDefaultTemplate)
+            $this->template = $egSubpagelistDefaultTemplate;
         else
             $this->template = $this->language->getNsText(NS_TEMPLATE).':'.$this->title->getPrefixedText();
         if (($n = intval($options['count'])) > 0)
