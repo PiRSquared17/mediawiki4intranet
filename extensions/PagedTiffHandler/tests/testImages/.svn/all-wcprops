@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/62136/trunk/extensions/PagedTiffHandler/tests/testImages
+END
+caspian.tif
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/62021/trunk/extensions/PagedTiffHandler/tests/testImages/caspian.tif
+END
+SOURCES.txt
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/62136/trunk/extensions/PagedTiffHandler/tests/testImages/SOURCES.txt
+END
+multipage.tiff
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svnroot/mediawiki/!svn/ver/62021/trunk/extensions/PagedTiffHandler/tests/testImages/multipage.tiff
+END
