@@ -244,6 +244,13 @@ class Linker {
 			$query['action'] = 'edit';
 			$query['redlink'] = '1';
 		}
+		if ( $target->isTalkPage() && $query['action'] == 'edit' )
+		{
+			if ( !array_key_exists( 'section', $query ) )
+				$query['section'] = 'new';
+			else if ( !$query['section'] )
+				unset( $query['section'] );
+		}
 		$ret = $target->getLinkUrl( $query );
 		wfProfileOut( __METHOD__ );
 		return $ret;
