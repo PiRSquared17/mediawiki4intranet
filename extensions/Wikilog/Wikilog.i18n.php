@@ -18,6 +18,12 @@ $messages['en'] = array(
 	'right-wl-postcomment' => 'Post comments to wikilog articles',
 	'right-wl-moderation' => 'Moderation of wikilog article comments',
 
+	# Calendar
+	'wikilogcalendar' => 'Wikilog calendar',
+	'wikilog-calendar-archive-link-title' => '$1 posts for $2',
+	'wikilog-calendar-prev' => '$1 ›',
+	'wikilog-calendar-next' => '‹ $1',
+
 	# Special:Wikilog
 	'wikilog-specialwikilog-title' => 'Wikilogs', # Page title
 	'wikilog-specialwikilog' => 'Wikilog', # Special page name (DEPRECATED AFTER MW1.16)
@@ -115,6 +121,29 @@ Uncheck this box to keep the article as a draft.',
 	'wikilog-newtalk-text' => '<!-- blank page created by Wikilog -->',
 	'wikilog-newtalk-summary' => 'created automatically by Wikilog',
 
+	/* These messages are parsed inside the context of item page, so {{SUBPAGENAME}} refers to the item,
+	   and <a href=""> is a crunch to output links instead of just bold text. */
+	'wikilog-comment-email-subject' => '$2 - A new comment to {{SUBPAGENAME}}',
+	'wikilog-comment-email-body' =>
+'A new reply {{#if:$6|was added by [[{{ns:User}}:$2|$2]] to the following [[{{ns:User}}:$6|$6]]\'s
+comment to the post <html><a href="$3"></html>{{SUBPAGENAME}}<html></a></html>:
+
+<div style="border-style: solid; border-color: black; border-width: 0 0 0 3px; padding-left: 8px;">
+{{:$5}}
+</div>
+
+The reply was:|to <html><a href="$3"></html>{{SUBPAGENAME}}<html></a></html> was added by [[{{ns:User}}:$2|$2]]:}}
+
+<div style="border-style: solid; border-color: black; border-width: 0 0 0 3px; padding-left: 8px;">
+{{:$1}}
+</div>
+
+Available actions:
+
+* [[{{TALKPAGENAME}}#$4|Read the whole discussion]] of the post {{SUBPAGENAME}}.
+* <html><a href="$3"></html>Read the post {{SUBPAGENAME}}<html></a></html>.
+* [[$1|Read discussion thread]] beginning with this specific comment.',
+
 	# Atom and RSS feeds
 	'wikilog-feed-title' => '{{SITENAME}} - $1 [$2]', # $1 = title, $2 = content language
 	'wikilog-feed-description' => 'Read the most recent posts in this feed.',
@@ -158,7 +187,9 @@ The comment will only appear after it is reviewed by a moderator.',
 	'wikilog-post-reply' => 'Post a new reply',
 	'wikilog-form-legend' => 'Search for wikilog posts',
 	'wikilog-form-wikilog' => 'Wikilog:',
-	'wikilog-form-category' => 'Category:',
+	'wikilog-form-all' => 'Any',
+	'wikilog-form-category' => 'In category:',
+	'wikilog-form-notcategory' => 'Not in category:',
 	'wikilog-form-name' => 'Name:',
 	'wikilog-form-author' => 'Author:',
 	'wikilog-form-tag' => 'Tag:',
@@ -4862,6 +4893,8 @@ $messages['ru'] = array(
 	'wikilog-desc' => 'Добавляет возможность ведения блогов, создания гибрида вики и блога',
 	'wikilog-auto' => 'Викилог Авто',
 	'wikilog-help' => '{{ns:Help}}:Викилог',
+	'wikilogcalendar' => 'Календарь блога',
+	'wikilog-calendar-archive-link-title' => 'Записи $1 за $2',
 	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
 	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
 	'wikilog-specialwikilog-title' => 'Викилоги',
@@ -4939,6 +4972,30 @@ $messages['ru'] = array(
 	'wikilog-comment-feed-title1' => 'Комментарии от $2 (#$1)',
 	'wikilog-comment-feed-title2' => 'Комментарий от $2 к $3 (#$1)',
 	'wikilog-comment-feed-description' => 'Читать последние комментарии на этом канале.',
+
+	/* These messages are parsed inside the context of item page, so {{SUBPAGENAME}} refers to the item,
+	   and <a href=""> is a crunch to output links instead of just bold text. */
+	'wikilog-comment-email-subject' => '$2 - Новый комментарий к {{SUBPAGENAME}}',
+	'wikilog-comment-email-body' =>
+'Пользователь [[{{ns:User}}:$2|$2]] ответил на {{#if:$6|комментарий, оставленный
+[[{{ns:User}}:$6|$6]] к записи <html><a href="$3"></html>{{SUBPAGENAME}}<html></a></html>:
+
+<div style="border-style: solid; border-color: black; border-width: 0 0 0 3px; padding-left: 8px;">
+{{:$5}}
+</div>
+
+Ответ был таким:|запись <html><a href="$3"></html>{{SUBPAGENAME}}<html></a></html>:}}
+
+<div style="border-style: solid; border-color: black; border-width: 0 0 0 3px; padding-left: 8px;">
+{{:$1}}
+</div>
+
+Доступные действия:
+
+* [[{{TALKPAGENAME}}#$4|Просмотреть полное обсуждение]] записи {{SUBPAGENAME}}.
+* <html><a href="$3"></html>Прочитать запись {{SUBPAGENAME}}<html></a></html>.
+* [[$1|Просмотреть ветвь обсуждения]], содержащую данный комментарий, с начала.',
+
 	'wikilog-title-comments' => 'Комментарии — $1',
 	'wikilog-error-msg' => 'Викилог: $1',
 	'wikilog-error-title' => 'Ошибка викилога',
@@ -4967,7 +5024,9 @@ $messages['ru'] = array(
 	'wikilog-post-reply' => 'Написать новый ответ',
 	'wikilog-form-legend' => 'Поиск по заметкам викилога',
 	'wikilog-form-wikilog' => 'Викилог:',
-	'wikilog-form-category' => 'Категория:',
+	'wikilog-form-all' => 'Все',
+	'wikilog-form-category' => 'В категории:',
+	'wikilog-form-notcategory' => 'Не в категории:',
 	'wikilog-form-name' => 'Имя:',
 	'wikilog-form-author' => 'Автор:',
 	'wikilog-form-tag' => 'Метка:',
