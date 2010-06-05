@@ -60,6 +60,7 @@ class WikilogComment
 	 */
 	public  $mID			= null;		///< Comment ID.
 	public  $mParent		= null;		///< Parent comment ID.
+	public  $mParentObj		= null;		///< Parent comment object.
 	public  $mThread		= null;		///< Comment thread.
 	public  $mUserID		= null;		///< Comment author user id.
 	public  $mUserText		= null;		///< Comment author user name.
@@ -173,6 +174,7 @@ class WikilogComment
 		$delayed = array();
 
 		# Main update.
+		$sendtext = false;
 		if ( $this->mID ) {
 			$dbw->update( 'wikilog_comments', $data,
 				array( 'wlc_id' => $this->mID ), __METHOD__ );
@@ -183,8 +185,18 @@ class WikilogComment
 			$this->mID = $dbw->insertId();
 
 			# Now that we have an ID, we can generate the thread.
-			$this->mThread = self::getThreadHistory( $this->mID, $this->mParent );
+			$this->mThread = array();
+			if( $this->mParent )
+			{
+				if( !$this->mParentObj )
+					$this->mParentObj = WikilogComment::newFromID( $this->mItem, $this->mParent );
+				if( !$this->mParentObj || !$this->mParentObj->mThread )
+					throw new MWException( 'Invalid parent history.' );
+				$this->mThread = $this->mParentObj->mThread;
+			}
+			$this->mThread[] = self::padID( $this->mID );
 			$delayed['wlc_thread'] = implode( '/', $this->mThread );
+			$emailnotify = true;
 		}
 
 		# Save article with comment text.
@@ -215,6 +227,63 @@ class WikilogComment
 		$this->mItem->mTitle->invalidateCache();
 		$this->mItem->mTitle->getTalkPage()->invalidateCache();
 		$this->mItem->mParentTitle->invalidateCache();
+
+		# Notify item and parent comment authors about new comment
+		if ( $emailnotify )
+			$this->sendCommentEmails();
+	}
+
+	/**
+	 * Notify about new comment by email
+	 */
+	public function sendCommentEmails()
+	{
+		global $wgParser, $wgPasswordSender;
+		/* Message arguments:
+		 * $1 = full page name of comment page
+		 * $2 = name of a user who posted the new comment
+		 * $3 = full URL to Wikilog item
+		 * $4 = Wikilog item talk page anchor for the new comment
+		 * $5 (optional) = full page name of parent comment page
+		 * $6 (optional) = name of a user who posted the parent comment
+		 */
+		$args = array(
+			$this->mCommentTitle->getPrefixedText(),
+			$this->mUserText,
+			$this->mItem->mTitle->getFullURL(),
+			'c' . $this->mID,
+			'',
+			'',
+		);
+		$to_ids = array_flip( $this->mItem->mAuthors );
+		if ( $this->mParentObj )
+		{
+			$to_ids[$this->mParentObj->mUserID] = true;
+			$args[4] = $this->mParentObj->mCommentTitle->getPrefixedText();
+			$args[5] = $this->mParentObj->mUserText;
+		}
+		$saveExpUrls = WikilogParser::expandLocalUrls();
+		$popt = new ParserOptions( User::newFromId( $this->mUserID ) );
+		$subject = $wgParser->parse( wfMsgNoTrans( 'wikilog-comment-email-subject', $args ),
+			$this->mItem->mTitle, $popt, false, false );
+		$subject = strip_tags( $subject->getText() );
+		$body = $wgParser->parse( wfMsgNoTrans( 'wikilog-comment-email-body', $args ),
+			$this->mItem->mTitle, $popt, true, false );
+		$body = $body->getText();
+		WikilogParser::expandLocalUrls( $saveExpUrls );
+		$to = array();
+		foreach( $to_ids as $id => $true )
+		{
+			$email = new MailAddress( User::newFromId( $id )->getEmail() );
+			if( $email )
+				$to[] = $email;
+		}
+		$from = User::newFromId( $this->mUserID );
+		if ( $from && $from->getEmail() )
+			$from = new MailAddress( $from->getEmail(), $from->getRealName() );
+		else
+			$from = new MailAddress( $wgPasswordSender, 'WikiAdmin' );
+		UserMailer::send( $to, $from, $subject, $body );
 	}
 
 	/**
@@ -612,7 +681,10 @@ class WikilogCommentFormatter
 				list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $comment->mCommentTitle );
 				$text = $parserOutput->getText();
 			} else {
+				global $wgParser, $wgUser, $wgTitle;
 				$text = $comment->getText();
+				$text = $wgParser->parse($text, $wgTitle, ParserOptions::newFromUser( $wgUser ));
+				$text = $text->getText();
 			}
 
 			if ( $text ) {
@@ -694,16 +766,11 @@ class WikilogCommentFormatter
 	 * @return Array with message parameters.
 	 */
 	public function getCommentMsgParams( $comment ) {
-		global $wgContLang;
+		global $wgLang;
 
 		if ( $comment->mUserID ) {
 			$authorPlain = htmlspecialchars( $comment->mUserText );
-			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
-				array( 'content', 'parseinline', 'replaceafter' ),
-				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
-				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
-				$comment->mUserText
-			);
+			$authorFmt = wfMsgExt( 'wikilog-author-signature', array( 'parseinline' ), $comment->mUserText );
 		} else {
 			$authorPlain = htmlspecialchars( $comment->mAnonName );
 			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
@@ -713,8 +780,8 @@ class WikilogCommentFormatter
 			);
 		}
 
-		$date = $wgContLang->date( $comment->mTimestamp );
-		$time = $wgContLang->time( $comment->mTimestamp );
+		$date = $wgLang->date( $comment->mTimestamp, true );
+		$time = $wgLang->time( $comment->mTimestamp, true );
 		$permalink = $this->getCommentPermalink( $comment, $date, $time );
 
 		$extra = array();
@@ -731,8 +798,8 @@ class WikilogCommentFormatter
 				# Comment was edited.
 				$extra[] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsgForContent( 'wikilog-comment-note-edited',
-						$wgContLang->date( $comment->mUpdated, true ),
-						$wgContLang->time( $comment->mUpdated, true )
+						$wgLang->date( $comment->mUpdated, true ),
+						$wgLang->time( $comment->mUpdated, true )
 					),
 					array( 'title' => wfMsg( 'wikilog-comment-history' ) ),
 					array( 'action' => 'history' ), 'known'
@@ -740,7 +807,7 @@ class WikilogCommentFormatter
 			}
 		}
 		if ( $extra ) {
-			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
+			$extra = implode( ' | ', $extra );
 		} else {
 			$extra = "";
 		}
@@ -897,7 +964,7 @@ class WikilogCommentFormatter
 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-page-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array(),
+					array( 'section' => false ),
 					'known'
 				);
 			}
@@ -905,7 +972,7 @@ class WikilogCommentFormatter
 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ),
+					array( 'action' => 'edit', 'section' => false ),
 					'known'
 				);
 			}
