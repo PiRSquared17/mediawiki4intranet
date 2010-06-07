@@ -735,6 +735,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 
 		$fname = 'EditPage::attemptSave';
 		wfProfileIn( $fname );
@@ -915,7 +916,7 @@ class EditPage {
 		}
 
 		# Suppress edit conflict with self, except for section edits where merging is required.
-		if ( $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
+		if ( $wgSuppressSameUserConflicts && $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
 			wfDebug( "EditPage::editForm Suppressing edit conflict, same user.\n" );
 			$this->isConflict = false;
 		} else {
@@ -1987,8 +1988,8 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-math'),
 				'id'     => 'mw-editbutton-math',
-				'open'   => "<math>",
-				'close'  => "</math>",
+				'open'   => "<m>",
+				'close'  => "</m>",
 				'sample' => wfMsg('math_sample'),
 				'tip'    => wfMsg('math_tip'),
 				'key'    => 'C'
@@ -2005,7 +2006,7 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-sig'),
 				'id'     => 'mw-editbutton-signature',
-				'open'   => '--~~~~',
+				'open'   => '~~~~',
 				'close'  => '',
 				'sample' => '',
 				'tip'    => wfMsg('sig_tip'),
