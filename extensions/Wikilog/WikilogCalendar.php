@@ -114,12 +114,13 @@ class WikilogCalendar
         global $wgRequest, $wgWikilogNumArticles;
         list($limit) = $wgRequest->getLimitOffset($wgWikilogNumArticles, '');
         $offset = $wgRequest->getVal('offset');
+        $dir = $wgRequest->getVal('dir') == 'prev';
         $dbr = wfGetDB(DB_SLAVE);
         $sql = $pager->mQuery->selectSQLText($dbr,
             array(), 'wikilog_posts.*',
-            $offset ? array('wlp_pubdate<' . $dbr->addQuotes($offset)) : array(),
+            $offset ? array('wlp_pubdate' . ($dir ? '>' : '<') . $dbr->addQuotes($offset)) : array(),
             __FUNCTION__,
-            array('LIMIT' => $limit, 'ORDER BY' => 'wlp_pubdate DESC')
+            array('LIMIT' => $limit, 'ORDER BY' => 'wlp_pubdate' . ($dir ? ' ASC' : ' DESC'))
         );
         $sql = "SELECT wlp_page, wlp_pubdate, COUNT(wlp_page) numposts FROM ($sql) derived GROUP BY SUBSTR(wlp_pubdate,1,8)";
         /* build date hash */
