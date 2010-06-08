@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1269348178 -10800
+# Date 1276012859 -14400
 Depends on: Y-000-debug-wikilog.diff
 
 Bug 51595 - Wikilog calendar
 
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/SpecialWikilog.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/SpecialWikilog.php
 --- extensions/Wikilog/SpecialWikilog.php
 +++ extensions/Wikilog/SpecialWikilog.php
 @@ -155,6 +155,9 @@
@@ -18,7 +18,7 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/SpecialWikilog.php
  		# Handle special page inclusion.
  		if ( $this->including() ) {
  			# Get pager body.
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/Wikilog.i18n.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -18,6 +18,12 @@
@@ -43,7 +43,7 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/Wikilog.i18n.php
  	'right-wl-postcomment' => 'оставлять комментарии к статьям викилога',
  	'right-wl-moderation' => 'модерировать комментарии к статьям викилога',
  	'wikilog-specialwikilog-title' => 'Викилоги',
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/Wikilog.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/Wikilog.php
 --- extensions/Wikilog/Wikilog.php
 +++ extensions/Wikilog/Wikilog.php
 @@ -124,6 +124,11 @@
@@ -83,10 +83,10 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/Wikilog.php
  	# ##
  	# #  Other global wikilog functions.
  	#
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogCalendar.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/WikilogCalendar.php
 --- /dev/null
 +++ extensions/Wikilog/WikilogCalendar.php
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,164 @@
 +<?php
 +
 +# Wikilog Calendar
@@ -203,12 +203,13 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogCalendar.php
 +        global $wgRequest, $wgWikilogNumArticles;
 +        list($limit) = $wgRequest->getLimitOffset($wgWikilogNumArticles, '');
 +        $offset = $wgRequest->getVal('offset');
++        $dir = $wgRequest->getVal('dir') == 'prev';
 +        $dbr = wfGetDB(DB_SLAVE);
 +        $sql = $pager->mQuery->selectSQLText($dbr,
 +            array(), 'wikilog_posts.*',
-+            $offset ? array('wlp_pubdate<' . $dbr->addQuotes($offset)) : array(),
++            $offset ? array('wlp_pubdate' . ($dir ? '>' : '<') . $dbr->addQuotes($offset)) : array(),
 +            __FUNCTION__,
-+            array('LIMIT' => $limit, 'ORDER BY' => 'wlp_pubdate DESC')
++            array('LIMIT' => $limit, 'ORDER BY' => 'wlp_pubdate' . ($dir ? ' ASC' : ' DESC'))
 +        );
 +        $sql = "SELECT wlp_page, wlp_pubdate, COUNT(wlp_page) numposts FROM ($sql) derived GROUP BY SUBSTR(wlp_pubdate,1,8)";
 +        /* build date hash */
@@ -250,7 +251,7 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogCalendar.php
 +        return $html;
 +    }
 +}
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogItemPager.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
 @@ -57,8 +57,8 @@
@@ -275,7 +276,7 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogItemPager.php
  
  	/**
  	 * Constructor.
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogMainPage.php
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/WikilogMainPage.php
 --- extensions/Wikilog/WikilogMainPage.php
 +++ extensions/Wikilog/WikilogMainPage.php
 @@ -95,6 +95,9 @@
@@ -288,7 +289,7 @@ diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/WikilogMainPage.php
  		# Display list of wikilog posts.
  		$body = $pager->getBody();
  		$body .= $pager->getNavigationBar();
-diff -r 10d78459850f -r e629ca749daa extensions/Wikilog/style/wikilog.css
+diff -r 0018f1f35e99 -r 81aaa92b6c6a extensions/Wikilog/style/wikilog.css
 --- extensions/Wikilog/style/wikilog.css
 +++ extensions/Wikilog/style/wikilog.css
 @@ -221,4 +221,37 @@
