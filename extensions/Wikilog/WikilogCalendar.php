@@ -70,10 +70,10 @@ class WikilogCalendar
         else
             $prev = array('dir' => 'next', 'offset' => ($prevmonth = $months[count($months)-1]).'01000000', 'limit' => $urlLimit );
         $html = '<p class="wl-calendar-nav">';
-        if ($next)
-            $html .= $pager->makeLink(wfMsg('wikilog-calendar-next', self::monthName($nextmonth)), $next, 'next');
         if ($prev)
             $html .= $pager->makeLink(wfMsg('wikilog-calendar-prev', self::monthName(self::prevMonth($prevmonth))), $prev, 'prev');
+        if ($next)
+            $html .= $pager->makeLink(wfMsg('wikilog-calendar-next', self::monthName($nextmonth)), $next, 'next');
         $html .= '</p>';
         return $html;
     }
