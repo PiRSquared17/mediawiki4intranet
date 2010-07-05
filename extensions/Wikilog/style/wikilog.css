@@ -221,4 +221,12 @@ div.wl-description div.wl-subtitle p {
 	margin: 0;
 }
 
+.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
+
+.wl-unread {
+	display: block;
+	background-color: #ffe0e0;
+	font-weight: bold;
+}
+
 /* kate: indent-mode normal; space-indent off; tab-width 4; */
