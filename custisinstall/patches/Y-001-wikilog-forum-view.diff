@@ -1,9 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1278338885 -14400
+# Date 1278339127 -14400
+Depends on: Y-000-debug-wikilog.diff
+
 Bug 65519 - Wikilog forum view
 
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/Wikilog.i18n.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/Wikilog.i18n.php
 --- extensions/Wikilog/Wikilog.i18n.php
 +++ extensions/Wikilog/Wikilog.i18n.php
 @@ -61,6 +61,8 @@
@@ -41,7 +43,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/Wikilog.i18n.php
  	'wikilog-comment-note-item' => 'размещён в $1',
  	'wikilog-comment-note-edited' => 'последняя правка $1 в $2',
  	'wikilog-comment-anonsig' => '$3 (анонимно)',
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogComment.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogComment.php
 --- extensions/Wikilog/WikilogComment.php
 +++ extensions/Wikilog/WikilogComment.php
 @@ -71,6 +71,7 @@
@@ -77,7 +79,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogComment.php
  				array( 'title' => wfMsg( 'permalink' ) )
  			);
  		} else {
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogCommentsPage.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogCommentsPage.php
 --- extensions/Wikilog/WikilogCommentsPage.php
 +++ extensions/Wikilog/WikilogCommentsPage.php
 @@ -106,7 +106,7 @@
@@ -101,7 +103,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogCommentsPage.php
  		# Add feed links.
  		$wgOut->setSyndicated();
  	}
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogHooks.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogHooks.php
 --- extensions/Wikilog/WikilogHooks.php
 +++ extensions/Wikilog/WikilogHooks.php
 @@ -365,6 +365,7 @@
@@ -112,7 +114,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogHooks.php
  			$wgExtNewIndexes[] = array( "wikilog_comments", "wlc_timestamp", "{$dir}archives/patch-comments-indexes.sql" );
  		} else {
  			// TODO: PostgreSQL, SQLite, etc...
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItem.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogItem.php
 --- extensions/Wikilog/WikilogItem.php
 +++ extensions/Wikilog/WikilogItem.php
 @@ -376,4 +376,24 @@
@@ -140,7 +142,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItem.php
 +			$dbw->update( 'wikilog_visits', $set, $where, __METHOD__ );
 +	}
  }
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItemPage.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogItemPage.php
 --- extensions/Wikilog/WikilogItemPage.php
 +++ extensions/Wikilog/WikilogItemPage.php
 @@ -91,6 +91,11 @@
@@ -155,7 +157,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItemPage.php
  			# Override page title.
  			# NOTE (MW1.16+): Must come after parent::view().
  			$fullPageTitle = wfMsg( 'wikilog-title-item-full',
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItemPager.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogItemPager.php
 --- extensions/Wikilog/WikilogItemPager.php
 +++ extensions/Wikilog/WikilogItemPager.php
 @@ -380,6 +380,8 @@
@@ -207,7 +209,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogItemPager.php
  		return $fields;
  	}
  
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogQuery.php
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/WikilogQuery.php
 --- extensions/Wikilog/WikilogQuery.php
 +++ extensions/Wikilog/WikilogQuery.php
 @@ -365,14 +365,22 @@
@@ -250,7 +252,7 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/WikilogQuery.php
  		return array(
  			'tables' => $q_tables,
  			'fields' => $q_fields,
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/archives/patch-visits.sql
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/archives/patch-visits.sql
 --- /dev/null
 +++ extensions/Wikilog/archives/patch-visits.sql
 @@ -0,0 +1,10 @@
@@ -264,11 +266,11 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/archives/patch-visits.sq
 +  PRIMARY KEY (wlv_user, wlv_post)
 +) /*$wgDBTableOptions*/;
 +
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/style/wikilog.css
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/style/wikilog.css
 --- extensions/Wikilog/style/wikilog.css
 +++ extensions/Wikilog/style/wikilog.css
-@@ -221,4 +221,12 @@
- 	margin: 0;
+@@ -202,6 +202,14 @@
+ 	color: #EEEEEE;
  }
  
 +.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
@@ -279,8 +281,10 @@ diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/style/wikilog.css
 +	font-weight: bold;
 +}
 +
- /* kate: indent-mode normal; space-indent off; tab-width 4; */
-diff -r 0018f1f35e99 -r d0a6e7a07224 extensions/Wikilog/wikilog-tables.sql
+ /* wikilog tab */
+ 
+ div.wl-description {
+diff -r 0018f1f35e99 -r 7e21e22b9784 extensions/Wikilog/wikilog-tables.sql
 --- extensions/Wikilog/wikilog-tables.sql
 +++ extensions/Wikilog/wikilog-tables.sql
 @@ -73,6 +73,16 @@
