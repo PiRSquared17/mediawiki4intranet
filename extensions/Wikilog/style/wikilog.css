@@ -202,6 +202,14 @@ div.wl-comment-placeholder {
 	color: #EEEEEE;
 }
 
+.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
+
+.wl-unread {
+	display: block;
+	background-color: #ffe0e0;
+	font-weight: bold;
+}
+
 /* wikilog tab */
 
 div.wl-description {
@@ -219,14 +227,6 @@ div.wl-description div.wl-title {
 div.wl-description div.wl-subtitle p {
 	line-height: inherit;
 	margin: 0;
-}
-
-.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
-
-.wl-unread {
-	display: block;
-	background-color: #ffe0e0;
-	font-weight: bold;
 }
 
 /* kate: indent-mode normal; space-indent off; tab-width 4; */
