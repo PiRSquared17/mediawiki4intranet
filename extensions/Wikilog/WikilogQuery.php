@@ -365,12 +365,12 @@ class WikilogItemQuery
 			$q_conds[] = 'wlp_pubdate < ' . $db->addQuotes( $this->mDate->end );
 		}
 
-		# Last visit date
-		global $wgUser;
-		if ( $this->getOption( 'last-visit-date' ) && $wgUser->getID() ) {
-			$q_tables[] = 'page_last_visit';
-			$q_fields[] = 'pv_date wlp_last_visit';
-			$q_joins['page_last_visit'] = array( 'LEFT JOIN', array( 'pv_page = wlp_page', 'pv_user' => $wgUser->getID() ) );
+		# Add last comment timestamp, used in syndication feeds.
+		if ( $this->getOption( 'last-comment-timestamp' ) ) {
+			$q_tables[] = 'wikilog_comments';
+			$q_fields[] = 'MAX(wlc_updated) AS _wlp_last_comment_timestamp';
+			$q_joins['wikilog_comments'] = array( 'LEFT JOIN', 'wlp_page = wlc_post' );
+			$q_options['GROUP BY'] = 'wlp_page';
 		}
 
 		return array(
@@ -679,14 +679,6 @@ class WikilogCommentQuery
 		} elseif ( $join_wlp ) {
 			$q_tables[] = 'wikilog_posts';
 			$q_joins['wikilog_posts'] = array( 'JOIN', 'wlp_page = wlc_post' );
-		}
-
-		# Last visit date
-		global $wgUser;
-		if ( $wgUser->getID() ) {
-			$q_tables[] = 'page_last_visit';
-			$q_fields[] = 'pv_date wlc_last_visit';
-			$q_joins['page_last_visit'] = array( 'LEFT JOIN', array( 'pv_page = wlc_comment_page', 'pv_user' => $wgUser->getID() ) );
 		}
 
 		return array(

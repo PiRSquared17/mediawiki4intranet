@@ -71,7 +71,6 @@ class WikilogComment
 	public  $mCommentTitle  = null;		///< Comment page title.
 	public  $mCommentRev	= null;		///< Comment revision id.
 	public  $mText			= null;		///< Comment text.
-	public  $mVisited		= null;		///< Is comment already visited by current user after last change?
 
 	/**
 	 * Whether the text was changed, and thus a database update is required.
@@ -208,10 +207,6 @@ class WikilogComment
 		# Update number of comments
 		$this->mItem->updateNumComments( true );
 
-		# Mark comment posted/edited by a user already read by him
-		if ( $this->mUserID )
-			WikilogUtils::updateLastVisit( $this->mCommentPage, $this->mTimestamp, $this->mUserID );
-
 		# Commit
 		$dbw->commit();
 
@@ -315,7 +310,6 @@ class WikilogComment
 	 * @return New WikilogComment object.
 	 */
 	public static function newFromRow( &$item, $row ) {
-		global $wgUser;
 		$comment = new WikilogComment( $item );
 		$comment->mID           = intval( $row->wlc_id );
 		$comment->mParent       = intval( $row->wlc_parent );
@@ -327,7 +321,6 @@ class WikilogComment
 		$comment->mTimestamp    = wfTimestamp( TS_MW, $row->wlc_timestamp );
 		$comment->mUpdated      = wfTimestamp( TS_MW, $row->wlc_updated );
 		$comment->mCommentPage  = $row->wlc_comment_page;
-		$comment->mVisited      = $wgUser->getID() ? $row->wlc_last_visit && $row->wlc_last_visit >= $row->wlc_updated : true;
 
 		# This information may not be available for deleted comments.
 		if ( $row->wlc_page_title && $row->wlc_page_latest ) {
@@ -633,9 +626,6 @@ class WikilogCommentFormatter
 			$html .= $this->getCommentToolLinks( $comment );
 		}
 
-		# Update last visit
-		WikilogUtils::updateLastVisit( $comment->mCommentPage );
-
 		# Enclose everything in a div.
 		if ( $highlight ) {
 			$divclass[] = 'wl-comment-highlight';
@@ -848,7 +838,7 @@ class WikilogCommentFormatter
 				$title = $comment->mCommentTitle;
 			}
 			return $this->mSkin->link( $title,
-				wfMsgExt( 'wikilog-comment-permalink', array( 'parseinline' ), $date, $time, $comment->mVisited ? 1 : NULL ),
+				wfMsg( 'wikilog-comment-permalink', $date, $time ),
 				array( 'title' => wfMsg( 'permalink' ) )
 			);
 		} else {

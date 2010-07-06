@@ -48,7 +48,6 @@ class WikilogItem
 	public    $mAuthors     = array();	///< Array of authors.
 	public    $mTags        = array();	///< Array of tags.
 	public    $mNumComments = null;		///< Cached number of comments.
-	public    $mVisited     = null;		///< Is post already visited by current user?
 
 	/**
 	 * Constructor.
@@ -119,9 +118,6 @@ class WikilogItem
 			),
 			__METHOD__
 		);
-		# Mark post created/edited by a user already read by him
-		foreach ( $this->mAuthors as $text => $id )
-			WikilogUtils::updateLastVisit( $this->mID, $this->mUpdated, $id );
 	}
 
 	/**
@@ -139,21 +135,13 @@ class WikilogItem
 		if ( $force || is_null( $this->mNumComments ) ) {
 			$dbw = wfGetDB( DB_MASTER );
 
-			# Retrieve number of comments and max comment update timestamp
-			$result = $dbw->select( 'wikilog_comments', 'COUNT(*), MAX(wlc_updated)',
+			# Retrieve estimated number of comments
+			$count = $dbw->selectField( 'wikilog_comments', 'COUNT(*)',
 				array( 'wlc_post' => $this->getID() ), __METHOD__ );
-			$row = $dbw->fetchRow( $result );
-			$dbw->freeResult( $result );
-
-			$count = $row[0];
-			$talk_updated = $row[1];
-			if ( !$talk_updated )
-				$talk_updated = $this->getPublishDate();
-			$talk_updated = wfTimestamp( TS_MW, $talk_updated );
 
 			# Update wikilog_posts cache
 			$dbw->update( 'wikilog_posts',
-				array( 'wlp_num_comments' => $count, 'wlp_talk_updated' => $talk_updated ),
+				array( 'wlp_num_comments' => $count ),
 				array( 'wlp_page' => $this->getID() ),
 				__METHOD__
 			);
@@ -383,10 +371,9 @@ class WikilogItem
 			'wlp_publish',
 			'wlp_pubdate',
 			'wlp_updated',
-			'wlp_talk_updated',
 			'wlp_authors',
 			'wlp_tags',
-			'wlp_num_comments',
+			'wlp_num_comments'
 		);
 	}
 }
