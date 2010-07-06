@@ -612,10 +612,7 @@ class WikilogCommentFormatter
 				list( $article, $parserOutput ) = WikilogUtils::parsedArticle( $comment->mCommentTitle );
 				$text = $parserOutput->getText();
 			} else {
-				global $wgParser, $wgUser, $wgTitle;
 				$text = $comment->getText();
-				$text = $wgParser->parse($text, $wgTitle, ParserOptions::newFromUser( $wgUser ));
-				$text = $text->getText();
 			}
 
 			if ( $text ) {
@@ -697,11 +694,16 @@ class WikilogCommentFormatter
 	 * @return Array with message parameters.
 	 */
 	public function getCommentMsgParams( $comment ) {
-		global $wgLang;
+		global $wgContLang;
 
 		if ( $comment->mUserID ) {
 			$authorPlain = htmlspecialchars( $comment->mUserText );
-			$authorFmt = wfMsgExt( 'wikilog-author-signature', array( 'parseinline' ), $comment->mUserText );
+			$authorFmt = wfMsgExt( 'wikilog-simple-signature',
+				array( 'content', 'parseinline', 'replaceafter' ),
+				Xml::wrapClass( $this->mSkin->userLink( $comment->mUserID, $comment->mUserText ), 'wl-comment-author' ),
+				$this->mSkin->userTalkLink( $comment->mUserID, $comment->mUserText ),
+				$comment->mUserText
+			);
 		} else {
 			$authorPlain = htmlspecialchars( $comment->mAnonName );
 			$authorFmt = wfMsgForContent( 'wikilog-comment-anonsig',
@@ -711,8 +713,8 @@ class WikilogCommentFormatter
 			);
 		}
 
-		$date = $wgLang->date( $comment->mTimestamp, true );
-		$time = $wgLang->time( $comment->mTimestamp, true );
+		$date = $wgContLang->date( $comment->mTimestamp );
+		$time = $wgContLang->time( $comment->mTimestamp );
 		$permalink = $this->getCommentPermalink( $comment, $date, $time );
 
 		$extra = array();
@@ -729,8 +731,8 @@ class WikilogCommentFormatter
 				# Comment was edited.
 				$extra[] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsgForContent( 'wikilog-comment-note-edited',
-						$wgLang->date( $comment->mUpdated, true ),
-						$wgLang->time( $comment->mUpdated, true )
+						$wgContLang->date( $comment->mUpdated, true ),
+						$wgContLang->time( $comment->mUpdated, true )
 					),
 					array( 'title' => wfMsg( 'wikilog-comment-history' ) ),
 					array( 'action' => 'history' ), 'known'
@@ -738,7 +740,7 @@ class WikilogCommentFormatter
 			}
 		}
 		if ( $extra ) {
-			$extra = implode( ' | ', $extra );
+			$extra = wfMsgForContent( 'parentheses', $wgContLang->pipeList( $extra ) );
 		} else {
 			$extra = "";
 		}

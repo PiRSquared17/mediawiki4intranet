@@ -296,7 +296,7 @@ class WikilogTemplatePager
 	 * @todo (Req >= Mw 1.16) Remove bug 20431 workaround.
 	 */
 	function formatRow( $row ) {
-		global $wgParser, $wgLang;
+		global $wgParser, $wgContLang;
 
 		# Retrieve article parser output and other data.
 		$item = WikilogItem::newFromRow( $row );
@@ -316,14 +316,14 @@ class WikilogTemplatePager
 		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
 
 		$itemPubdate = $item->getPublishDate();
-		$pubdate = $wgLang->timeanddate( $itemPubdate, true );
-		$publishedDate = $wgLang->date( $itemPubdate, true );
-		$publishedTime = $wgLang->time( $itemPubdate, true );
+		$pubdate = $wgContLang->timeanddate( $itemPubdate, true );
+		$publishedDate = $wgContLang->date( $itemPubdate );
+		$publishedTime = $wgContLang->time( $itemPubdate );
 
 		$itemUpdated = $item->getUpdatedDate();
-		$updated = $wgLang->timeanddate( $itemUpdated, true );
-		$updatedDate = $wgLang->date( $itemUpdated, true );
-		$updatedTime = $wgLang->time( $itemUpdated, true );
+		$updated = $wgContLang->timeanddate( $itemUpdated, true );
+		$updatedDate = $wgContLang->date( $itemUpdated );
+		$updatedTime = $wgContLang->time( $itemUpdated );
 
 		# Template parameters.
 		$vars = array(
@@ -449,11 +449,11 @@ class WikilogArchivesPager
 	}
 
 	function formatValue( $name, $value ) {
-		global $wgLang;
+		global $wgContLang;
 
 		switch ( $name ) {
 			case 'wlp_pubdate':
-				$s = $wgLang->timeanddate( $value, true );
+				$s = $wgContLang->timeanddate( $value, true );
 				if ( !$this->mCurrentRow->wlp_publish ) {
 					$s = Xml::wrapClass( $s, 'wl-draft-inline' );
 				}
@@ -498,10 +498,6 @@ class WikilogArchivesPager
 	}
 
 	function getDefaultSort() {
-		global $wgRequest;
-		// A hack to set default sort direction
-		if ( !$wgRequest->getBool( 'asc' ) && ! $wgRequest->getBool( 'desc' ))
-			$wgRequest->setVal('desc', 1);
 		return 'wlp_pubdate';
 	}
 
