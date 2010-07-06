@@ -1,37 +1,16 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1267036280 -10800
+# Date 1278432642 -14400
 Add new section by default when editing a discussion page.
 
-diff -r 2f012c39365a -r dae2066690fc extensions/Wikilog/WikilogComment.php
---- extensions/Wikilog/WikilogComment.php
-+++ extensions/Wikilog/WikilogComment.php
-@@ -897,7 +897,7 @@
- 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
- 					wfMsg( 'wikilog-page-lc' ),
- 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
--					array(),
-+					array( 'section' => false ),
- 					'known'
- 				);
- 			}
-@@ -905,7 +905,7 @@
- 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
- 					wfMsg( 'wikilog-edit-lc' ),
- 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
--					array( 'action' => 'edit' ),
-+					array( 'action' => 'edit', 'section' => false ),
- 					'known'
- 				);
- 			}
-diff -r 2f012c39365a -r dae2066690fc includes/Linker.php
+diff -r 95e6fcaab11e -r ba0a8a5958fe includes/Linker.php
 --- includes/Linker.php
 +++ includes/Linker.php
 @@ -244,6 +244,13 @@
  			$query['action'] = 'edit';
  			$query['redlink'] = '1';
  		}
-+		if ( $target->isTalkPage() )
++		if ( $target->isTalkPage() && $query['action'] == 'edit' )
 +		{
 +			if ( !array_key_exists( 'section', $query ) )
 +				$query['section'] = 'new';
@@ -41,7 +20,7 @@ diff -r 2f012c39365a -r dae2066690fc includes/Linker.php
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
  		return $ret;
-diff -r 2f012c39365a -r dae2066690fc includes/SkinTemplate.php
+diff -r 95e6fcaab11e -r ba0a8a5958fe includes/SkinTemplate.php
 --- includes/SkinTemplate.php
 +++ includes/SkinTemplate.php
 @@ -597,6 +597,8 @@
