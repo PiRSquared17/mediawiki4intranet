@@ -257,7 +257,7 @@ class WikilogMainPage
 		$fields[] = Xml::hidden( 'title', $this->mTitle->getPrefixedText() );
 		$fields[] = Xml::hidden( 'action', 'wikilog' );
 		$fields[] = Xml::inputLabel( wfMsg( 'wikilog-item-name' ),
-			'wlItemName', 'wl-item-name', 70, date('Y-m-d ') );
+			'wlItemName', 'wl-item-name', 25 );
 		$fields[] = Xml::submitButton( wfMsg( 'wikilog-new-item-go' ),
 			array( 'name' => 'wlActionNewItem' ) );
 
