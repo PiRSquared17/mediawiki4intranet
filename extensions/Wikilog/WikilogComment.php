@@ -71,6 +71,7 @@ class WikilogComment
 	public  $mCommentTitle  = null;		///< Comment page title.
 	public  $mCommentRev	= null;		///< Comment revision id.
 	public  $mText			= null;		///< Comment text.
+	public  $mVisited		= null;		///< Is comment already visited by current user?
 
 	/**
 	 * Whether the text was changed, and thus a database update is required.
@@ -310,6 +311,7 @@ class WikilogComment
 	 * @return New WikilogComment object.
 	 */
 	public static function newFromRow( &$item, $row ) {
+		global $wgUser;
 		$comment = new WikilogComment( $item );
 		$comment->mID           = intval( $row->wlc_id );
 		$comment->mParent       = intval( $row->wlc_parent );
@@ -321,6 +323,7 @@ class WikilogComment
 		$comment->mTimestamp    = wfTimestamp( TS_MW, $row->wlc_timestamp );
 		$comment->mUpdated      = wfTimestamp( TS_MW, $row->wlc_updated );
 		$comment->mCommentPage  = $row->wlc_comment_page;
+		$comment->mVisited      = $wgUser->getID() ? $row->_wlc_visited : true;
 
 		# This information may not be available for deleted comments.
 		if ( $row->wlc_page_title && $row->wlc_page_latest ) {
@@ -840,7 +843,7 @@ class WikilogCommentFormatter
 				$title = $comment->mCommentTitle;
 			}
 			return $this->mSkin->link( $title,
-				wfMsg( 'wikilog-comment-permalink', $date, $time ),
+				wfMsgExt( 'wikilog-comment-permalink', array( 'parseinline' ), $date, $time, $comment->mVisited ? 1 : NULL ),
 				array( 'title' => wfMsg( 'permalink' ) )
 			);
 		} else {
@@ -897,7 +900,7 @@ class WikilogCommentFormatter
 				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-page-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array(),
+					array( 'section' => false ),
 					'known'
 				);
 			}
@@ -905,7 +908,7 @@ class WikilogCommentFormatter
 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,
 					wfMsg( 'wikilog-edit-lc' ),
 					array( 'title' => wfMsg( 'wikilog-comment-edit' ) ),
-					array( 'action' => 'edit' ),
+					array( 'action' => 'edit', 'section' => false ),
 					'known'
 				);
 			}

@@ -95,7 +95,8 @@ class WikilogCommentsPage
 
 		# This flags if we are viewing a single comment (subpage).
 		$this->mTrailing = $wi->getTrailing();
-		$this->mTalkTitle = $wi->getItemTalkTitle();
+		$this->mWikilog = $wi->getTitle();
+		$this->mTalkTitle = $wi->getTalkTitle();
 		if ( $this->mItem && $this->mTrailing ) {
 			$this->mSingleComment =
 				WikilogComment::newFromPageID( $this->mItem, $this->getID() );
@@ -106,22 +107,15 @@ class WikilogCommentsPage
 	 * Handler for action=view requests.
 	 */
 	public function view() {
-		global $wgRequest, $wgOut;
+		global $wgRequest, $wgOut, $wgUser;
 
 		if ( $wgRequest->getVal( 'diff' ) ) {
 			# Ignore comments if diffing.
 			return parent::view();
 		}
 
-		if ( !$this->mItem ) {
-			# There is no wikilog article associated with this discussion
-			# page. Act as a normal talk page in this case, leaving
-			# everything to the parent class.
-			return parent::view();
-		}
-
 		# Create our query object.
-		$query = new WikilogCommentQuery( $this->mItem );
+		$query = new WikilogCommentQuery( $this->mItem ? $this->mItem : $this->mWikilog );
 
 		if ( ( $feedFormat = $wgRequest->getVal( 'feed' ) ) ) {
 			# RSS or Atom feed requested. Ignore all other options.
@@ -153,19 +147,27 @@ class WikilogCommentsPage
 			# Note: Sorry for the three-level cascade of wfMsg()'s...
 			$fullPageTitle = wfMsg( 'wikilog-title-item-full',
 				$this->mItem->mName,
-				$this->mItem->mParentTitle->getPrefixedText()
+				$this->mWikilog->getPrefixedText()
 			);
 			$fullPageTitle = wfMsg( 'wikilog-title-comments', $fullPageTitle );
-			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem->mName ) );
+			$wgOut->setPageTitle( wfMsg( 'wikilog-title-comments', $this->mItem ? $this->mItem->mName : $this->mWikilog->getPrefixedText() ) );
 			$wgOut->setHTMLTitle( wfMsg( 'pagetitle', $fullPageTitle ) );
 		}
 
 		# Add a backlink to the original article.
-		$link = $this->mSkin->link( $this->mItem->mTitle, $this->mItem->mName );
+		if ($this->mItem)
+			$link = $this->mSkin->link( $this->mItem->mTitle, $this->mItem->mName );
+		else
+			$link = $this->mSkin->link( $this->mWikilog, $this->mWikilog->getPrefixedText() );
 		$wgOut->setSubtitle( wfMsg( 'wikilog-backlink', $link ) );
 
 		# Retrieve comments (or replies) from database and display them.
 		$this->viewComments( $query );
+
+		# Update last visit
+		if ( $this->mItem && $wgUser->getID() ) {
+			$this->mItem->updateLastVisit();
+		}
 
 		# Add feed links.
 		$wgOut->setSyndicated();
@@ -296,6 +298,9 @@ class WikilogCommentsPage
 		global $wgUser, $wgTitle, $wgScript, $wgRequest;
 		global $wgWikilogModerateAnonymous;
 
+		if (!$this->mItem && !$parent)
+			return '';
+
 		$comment = $this->mPostedComment;
 		$opts = $this->mFormOptions;
 
@@ -313,7 +318,7 @@ class WikilogCommentsPage
 		}
 
 		$form =
-			Xml::hidden( 'title', $this->getTitle()->getPrefixedText() ) .
+			Xml::hidden( 'title', ( $parent ? $parent->mCommentTitle : $this->getTitle()->getPrefixedText() ) ) .
 			Xml::hidden( 'action', 'wikilog' ) .
 			Xml::hidden( 'wpEditToken', $wgUser->editToken() ) .
 			( $parent ? Xml::hidden( 'wlParent', $parent->mID ) : '' );
