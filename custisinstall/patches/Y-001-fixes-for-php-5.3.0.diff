@@ -1,5 +1,6 @@
-From: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-Subject: [PATCH] t/001-fixes-for-php-5.3.0
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1278432695 -14400
 Depends on: Y-000-debug-wikilog.diff
 
 Patch includes several simple fixes required for MediaWiki to run under
@@ -7,16 +8,9 @@ more restrictive PHP 5.3.x.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
----
- extensions/Wikilog/WikilogHooks.php |    4 +++-
- includes/FileDeleteForm.php         |    2 +-
- languages/Language.php              |    2 +-
- 3 files changed, 5 insertions(+), 3 deletions(-)
-
-Index: includes/FileDeleteForm.php
-===================================================================
---- includes/FileDeleteForm.php	(revision 54846)
-+++ includes/FileDeleteForm.php	(working copy)
+diff -r b64d79c5381f -r af3a32bdf638 includes/FileDeleteForm.php
+--- includes/FileDeleteForm.php
++++ includes/FileDeleteForm.php
 @@ -108,7 +108,7 @@
  				$id = $title->getArticleID( GAID_FOR_UPDATE );
  				// Need to delete the associated article
@@ -26,33 +20,10 @@ Index: includes/FileDeleteForm.php
  					if( $article->doDeleteArticle( $reason, $suppress, $id ) ) {
  						global $wgRequest;
  						if( $wgRequest->getCheck( 'wpWatch' ) ) {
-Index: extensions/Wikilog/WikilogHooks.php
-===================================================================
---- extensions/Wikilog/WikilogHooks.php	(revision 428)
-+++ extensions/Wikilog/WikilogHooks.php	(working copy)
-@@ -141,7 +141,7 @@
- 	 * ArticleDeleteComplete hook handler function.
- 	 * Purges wikilog metadata when an article is deleted.
- 	 */
--	static function ArticleDeleteComplete( &$article, &$user, $reason, $id ) {
-+	static function ArticleDeleteComplete( &$article, &$user, $reason, $id = NULL ) {
- 		# Deleting comment through MW interface.
- 		if ( $article instanceof WikilogCommentsPage ) {
- 			$cmt =& $article->mSingleComment;
-@@ -153,6 +153,8 @@
- 
- 		# Retrieve wikilog information.
- 		$wi = Wikilog::getWikilogInfo( $article->getTitle() );
-+		if ( is_null($id) && $article )
-+			$id = $article->getId();
- 
- 		# Take special procedures if it is a wikilog page.
- 		if ( $wi ) {
-Index: languages/Language.php
-===================================================================
---- languages/Language.php	(revision 47934)
-+++ languages/Language.php	(working copy)
-@@ -1672,7 +1672,7 @@
+diff -r b64d79c5381f -r af3a32bdf638 languages/Language.php
+--- languages/Language.php
++++ languages/Language.php
+@@ -1755,7 +1755,7 @@
  	}
  
  	# Fill a MagicWord object with data from here
