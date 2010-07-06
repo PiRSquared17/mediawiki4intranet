@@ -92,9 +92,8 @@ class WikilogItemPage
 			parent::view();
 
 			# Update last visit
-			if ( $this->mItem && $wgUser->getID() ) {
-				$this->mItem->updateLastVisit( $this->mItem->getPublishDate() );
-			}
+			if ( $this->mItem )
+				WikilogUtils::updateLastVisit( $this->mItem->getID() );
 
 			# Override page title.
 			# NOTE (MW1.16+): Must come after parent::view().

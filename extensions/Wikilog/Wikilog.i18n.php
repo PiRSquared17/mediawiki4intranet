@@ -61,7 +61,7 @@ In order to publish articles and enable other wikilog features, it has to be cre
 	'wikilog-draft-title-mark' => '(draft)',
 	'wikilog-anonymous-mark' => '(anonymous)',
 
-	'wikilog-last-update' => 'Last Update',
+	'wikilog-talk-updated' => 'Talk Updated',
 
 	# Pager strings
 	'wikilog-pager-newest' => 'newest',
@@ -4896,7 +4896,7 @@ $messages['ru'] = array(
 	'wikilog-title' => 'Название',
 	'wikilog-actions' => 'Действия',
 	'wikilog-comments' => 'Комментарии',
-	'wikilog-last-update' => 'Последнее обновление',
+	'wikilog-talk-updated' => 'Обновлено обсуждение',
 	'wikilog-replies' => 'Ответы',
 	'wikilog-view-archives' => 'Архивы',
 	'wikilog-view-summary' => 'Описание',

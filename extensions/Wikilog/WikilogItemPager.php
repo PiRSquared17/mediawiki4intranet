@@ -182,6 +182,9 @@ class WikilogSummaryPager
 			$summary = WikilogUtils::wrapDiv( 'wl-summary', $content );
 		}
 
+		# Update last visit
+		WikilogUtils::updateLastVisit( $item->getID() );
+
 		# Summary entry footer.
 		$key = $this->mQuery->isSingleWikilog()
 			? 'wikilog-summary-footer-single'
@@ -413,7 +416,7 @@ class WikilogArchivesPager
 			'wlp_updated',
 			'wlw_title',
 			'wlp_title',
-			'_wlp_last_comment_timestamp',
+			'wlp_talk_updated',
 		);
 		return in_array( $field, $sortableFields );
 	}
@@ -432,6 +435,7 @@ class WikilogArchivesPager
 	}
 
 	function formatRow( $row ) {
+		global $wgUser;
 		$attribs = array();
 		$columns = array();
 		$this->mCurrentRow = $row;
@@ -448,11 +452,28 @@ class WikilogArchivesPager
 			$class = 'TablePager_col_' . htmlspecialchars( $field );
 			$columns[] = "<td class=\"$class\">$formatted</td>";
 		}
+		if ( $wgUser->getID() )
+		{
+			$dbr = wfGetDB( DB_SLAVE );
+			$result = $dbr->select(
+				array( 'wikilog_comments', 'page_last_visit' ),
+				'COUNT(*)',
+				array( 'wlc_updated > pv_date' ),
+				__METHOD__,
+				NULL,
+				array( 'page_last_visit' => array( 'LEFT JOIN', array( 'pv_page = wlc_comment_page', 'pv_user' => $wgUser->getID() ) ) )
+			);
+			$unread_comments = $dbr->fetchRow( $result );
+			$dbr->freeResult( $result );
+			$unread_comments = $unread_comments[0];
+			if ( $row->wlp_last_visit < $row->wlp_updated || $unread_comments )
+				$attribs['class'] .= ' wl-unread';
+		}
 		return Xml::tags( 'tr', $attribs, implode( "\n", $columns ) ) . "\n";
 	}
 
 	function formatValue( $name, $value ) {
-		global $wgLang, $wgUser;
+		global $wgLang;
 
 		switch ( $name ) {
 			case 'wlp_pubdate':
@@ -462,11 +483,8 @@ class WikilogArchivesPager
 				}
 				return $s;
 
-			case '_wlp_last_comment_timestamp':
-				$s = $wgLang->timeanddate( $value, true );
-				if ( $wgUser->getID() && $this->mCurrentRow->_wlp_last_visit_date < $value )
-					$s = Xml::wrapClass( $s, 'wl-unread' );
-				return $s;
+			case 'wlp_talk_updated':
+				return $wgLang->timeanddate( $value, true );
 
 			case 'wlp_updated':
 				return $value;
@@ -533,7 +551,7 @@ class WikilogArchivesPager
 
 		$fields['_wl_actions']			= wfMsgHtml( 'wikilog-actions' );
 
-		$fields['_wlp_last_comment_timestamp'] = wfMsgHtml( 'wikilog-last-update' );
+		$fields['wlp_talk_updated'] = wfMsgHtml( 'wikilog-talk-updated' );
 
 		return $fields;
 	}

@@ -202,11 +202,16 @@ div.wl-comment-placeholder {
 	color: #EEEEEE;
 }
 
-.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
+.TablePager .TablePager_col_wlp_talk_updated { padding: 0; text-align: center; }
 
-.wl-unread {
-	display: block;
-	background-color: #ffe0e0;
+.TablePager .wl-unread .TablePager_col_wlp_title {
+	background-position: 3px center;
+	padding-left: 22px;
+	background-image: url(wl-unread.gif);
+	background-repeat: no-repeat;
+}
+
+.TablePager .wl-unread td {
 	font-weight: bold;
 }
 

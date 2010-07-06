@@ -48,6 +48,7 @@ class WikilogItem
 	public    $mAuthors     = array();	///< Array of authors.
 	public    $mTags        = array();	///< Array of tags.
 	public    $mNumComments = null;		///< Cached number of comments.
+	public    $mVisited     = null;		///< Is post already visited by current user?
 
 	/**
 	 * Constructor.
@@ -118,6 +119,9 @@ class WikilogItem
 			),
 			__METHOD__
 		);
+		# Mark post created/edited by a user already read by him
+		foreach ( $this->mAuthors as $text => $id )
+			WikilogUtils::updateLastVisit( $this->mID, $this->mUpdated, $id );
 	}
 
 	/**
@@ -135,13 +139,21 @@ class WikilogItem
 		if ( $force || is_null( $this->mNumComments ) ) {
 			$dbw = wfGetDB( DB_MASTER );
 
-			# Retrieve estimated number of comments
-			$count = $dbw->selectField( 'wikilog_comments', 'COUNT(*)',
+			# Retrieve number of comments and max comment update timestamp
+			$result = $dbw->select( 'wikilog_comments', 'COUNT(*), MAX(wlc_updated)',
 				array( 'wlc_post' => $this->getID() ), __METHOD__ );
+			$row = $dbw->fetchRow( $result );
+			$dbw->freeResult( $result );
+
+			$count = $row[0];
+			$talk_updated = $row[1];
+			if ( !$talk_updated )
+				$talk_updated = $this->getPublishDate();
+			$talk_updated = wfTimestamp( TS_MW, $talk_updated );
 
 			# Update wikilog_posts cache
 			$dbw->update( 'wikilog_posts',
-				array( 'wlp_num_comments' => $count ),
+				array( 'wlp_num_comments' => $count, 'wlp_talk_updated' => $talk_updated ),
 				array( 'wlp_page' => $this->getID() ),
 				__METHOD__
 			);
@@ -371,29 +383,10 @@ class WikilogItem
 			'wlp_publish',
 			'wlp_pubdate',
 			'wlp_updated',
+			'wlp_talk_updated',
 			'wlp_authors',
 			'wlp_tags',
-			'wlp_num_comments'
+			'wlp_num_comments',
 		);
-	}
-
-	/**
-	 * Update last visit date of post discussion page
-	 * Must be set to $timestamp when used by WikilogItemPage
-	 */
-	public function updateLastVisit( $timestamp = NULL )
-	{
-		global $wgUser;
-		if ( !$wgUser->getID() )
-			return;
-		$timestamp = wfTimestamp( TS_MW, $timestamp );
-		$dbw = wfGetDB( DB_MASTER );
-		$where = array( 'wlv_post' => $this->getID(), 'wlv_user' => $wgUser->getID() );
-		$set = array( 'wlv_date' => $timestamp );
-		$last = $dbw->selectField( 'wikilog_visits', 'wlv_date', $where, __FUNCTION__, array('FOR UPDATE'));
-		if ( !$last )
-			$dbw->insert( 'wikilog_visits', $where + $set );
-		elseif ( $last < $timestamp)
-			$dbw->update( 'wikilog_visits', $set, $where, __METHOD__ );
 	}
 }

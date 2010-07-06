@@ -1,10 +1,9 @@
 --
--- Last visit dates for each post.
+-- Last visit dates for some Wiki pages (Wikilog posts and comments)
 --
-CREATE TABLE IF NOT EXISTS /*$wgDBprefix*/wikilog_visits (
-  wlv_user INTEGER UNSIGNED NOT NULL,
-  wlv_post INTEGER UNSIGNED NOT NULL,
-  wlv_date BINARY(14) NOT NULL,
-  PRIMARY KEY (wlv_user, wlv_post)
+CREATE TABLE IF NOT EXISTS /*$wgDBprefix*/page_last_visit (
+  pv_user INTEGER UNSIGNED NOT NULL,
+  pv_page INTEGER UNSIGNED NOT NULL,
+  pv_date BINARY(14) NOT NULL,
+  PRIMARY KEY (pv_user, pv_page)
 ) /*$wgDBTableOptions*/;
-

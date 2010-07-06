@@ -106,7 +106,7 @@ class WikilogCommentsPage
 	 * Handler for action=view requests.
 	 */
 	public function view() {
-		global $wgRequest, $wgOut, $wgUser;
+		global $wgRequest, $wgOut;
 
 		if ( $wgRequest->getVal( 'diff' ) ) {
 			# Ignore comments if diffing.
@@ -166,11 +166,6 @@ class WikilogCommentsPage
 
 		# Retrieve comments (or replies) from database and display them.
 		$this->viewComments( $query );
-
-		# Update last visit
-		if ( $this->mItem && $wgUser->getID() ) {
-			$this->mItem->updateLastVisit();
-		}
 
 		# Add feed links.
 		$wgOut->setSyndicated();
