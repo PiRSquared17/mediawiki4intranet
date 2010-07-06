@@ -124,6 +124,11 @@ $wgHooks['LinkBegin'][] = 'Wikilog::LinkBegin';
 $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
 $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
 
+// Calendar
+$wgEnableSidebarCache = false;
+$wgHooks['SkinBuildSidebar'][] = 'Wikilog::SkinBuildSidebar';
+$wgAutoloadClasses['WikilogCalendar'] = $dir . 'WikilogCalendar.php';
+
 // General Wikilog hooks
 $wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
 $wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
@@ -264,7 +269,7 @@ class Wikilog
 
 		if ( ( $wi = self::getWikilogInfo( $title ) ) ) {
 			if ( $title->isTalkPage() ) {
-				if ( $wgWikilogEnableComments && $wi->isItem() ) {
+				if ( $wgWikilogEnableComments ) {
 					$article = new WikilogCommentsPage( $title, $wi );
 				} else {
 					return true;
@@ -369,6 +374,24 @@ class Wikilog
 		return true;
 	}
 
+    /**
+     * SkinBuildSidebar hook handler function.
+     * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
+     */
+    static function SkinBuildSidebar($skin, &$bar)
+    {
+        global $wgTitle, $wgRequest, $wgWikilogNumArticles;
+        if (array_key_exists('wikilogcalendar', $bar))
+        {
+            global $wlCalPager;
+            if (!$wlCalPager)
+                unset($bar['wikilogcalendar']);
+            else
+                $bar['wikilogcalendar'] = WikilogCalendar::sidebarCalendar($wlCalPager);
+        }
+        return true;
+    }
+
 	# ##
 	# #  Other global wikilog functions.
 	#
@@ -456,7 +479,7 @@ class WikilogInfo
 	function getTitle() { return $this->mWikilogTitle; }
 	function getItemName() { return $this->mItemName; }
 	function getItemTitle() { return $this->mItemTitle; }
-	function getItemTalkTitle() { return $this->mItemTitle->getTalkPage(); }
+	function getTalkTitle() { return $this->mItemTitle ? $this->mItemTitle->getTalkPage() : $this->mWikilogTitle->getTalkPage(); }
 
 	function getTrailing() { return $this->mTrailing; }
 }

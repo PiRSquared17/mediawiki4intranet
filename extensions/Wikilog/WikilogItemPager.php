@@ -57,8 +57,8 @@ class WikilogSummaryPager
 	public $mLimitsShown = array( 5, 10, 20, 50 );
 
 	# Local variables.
-	protected $mQuery = null;			///< Wikilog item query data
-	protected $mIncluding = false;		///< If pager is being included
+	public $mQuery = null;			///< Wikilog item query data
+	public $mIncluding = false;		///< If pager is being included
 
 	/**
 	 * Constructor.
@@ -371,8 +371,8 @@ class WikilogArchivesPager
 	implements WikilogItemPager
 {
 	# Local variables.
-	protected $mQuery = null;			///< Wikilog item query data
-	protected $mIncluding = false;		///< If pager is being included
+	public $mQuery = null;			///< Wikilog item query data
+	public $mIncluding = false;		///< If pager is being included
 
 	/**
 	 * Constructor.
@@ -380,6 +380,8 @@ class WikilogArchivesPager
 	function __construct( WikilogItemQuery $query, $including = false ) {
 		# WikilogItemQuery object drives our queries.
 		$this->mQuery = $query;
+		$this->mQuery->setOption( 'last-comment-timestamp', true );
+		$this->mQuery->setOption( 'last-visit-date', true );
 		$this->mIncluding = $including;
 
 		# Parent constructor.
@@ -411,6 +413,7 @@ class WikilogArchivesPager
 			'wlp_updated',
 			'wlw_title',
 			'wlp_title',
+			'_wlp_last_comment_timestamp',
 		);
 		return in_array( $field, $sortableFields );
 	}
@@ -457,6 +460,12 @@ class WikilogArchivesPager
 				if ( !$this->mCurrentRow->wlp_publish ) {
 					$s = Xml::wrapClass( $s, 'wl-draft-inline' );
 				}
+				return $s;
+
+			case '_wlp_last_comment_timestamp':
+				$s = $wgLang->timeanddate( $value, true );
+				if ( $wgUser->getID() && $this->mCurrentRow->_wlp_last_visit_date < $value )
+					$s = Xml::wrapClass( $s, 'wl-unread' );
 				return $s;
 
 			case 'wlp_updated':
@@ -519,6 +528,9 @@ class WikilogArchivesPager
 			$fields['wlp_num_comments']	= wfMsgHtml( 'wikilog-comments' );
 
 		$fields['_wl_actions']			= wfMsgHtml( 'wikilog-actions' );
+
+		$fields['_wlp_last_comment_timestamp'] = wfMsgHtml( 'wikilog-last-update' );
+
 		return $fields;
 	}
 
