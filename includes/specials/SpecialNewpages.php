@@ -238,6 +238,12 @@ class SpecialNewpages extends SpecialPage {
 		$dm = $wgContLang->getDirMark();
 
 		$title = Title::makeTitleSafe( $result->rc_namespace, $result->rc_title );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		if (!$title->userCanReadEx()) {
+			return;
+		}
+/*op-patch|TS|2009-06-19|end*/  
+
 		$time = $wgLang->timeAndDate( $result->rc_timestamp, true );
 		$plink = $this->skin->makeKnownLinkObj( $title, '', $this->patrollable( $result ) ? 'rcid=' . $result->rc_id : '' );
 		$hist = $this->skin->makeKnownLinkObj( $title, wfMsgHtml( 'hist' ), 'action=history' );
