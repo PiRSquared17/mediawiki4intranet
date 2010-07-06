@@ -202,14 +202,6 @@ div.wl-comment-placeholder {
 	color: #EEEEEE;
 }
 
-.TablePager .TablePager_col__wlp_last_comment_timestamp { padding: 0; text-align: center; }
-
-.wl-unread {
-	display: block;
-	background-color: #ffe0e0;
-	font-weight: bold;
-}
-
 /* wikilog tab */
 
 div.wl-description {
@@ -227,39 +219,6 @@ div.wl-description div.wl-title {
 div.wl-description div.wl-subtitle p {
 	line-height: inherit;
 	margin: 0;
-}
-
-table.wl-calendar {
-	margin: 0 auto 4px auto;
-}
-
-.wl-calendar td {
-	text-align: right;
-	padding: 2px 3px 0 3px;
-	background-color: #f0f0f0;
-}
-
-.wl-calendar td.wl-calendar-day {
-	font-weight: bold;
-	background-color: #e0e0e0;
-}
-
-.wl-calendar td.wl-calendar-other {
-	color: gray;
-	background-color: transparent;
-	font-weight: normal;
-}
-
-.wl-calendar-nav a {
-	white-space: nowrap;
-}
-
-.wl-calendar-nav a.mw-prevlink {
-	margin: 0 8px 0 0;
-}
-
-.wl-calendar-month {
-	margin: 4px 0 0 0;
 }
 
 /* kate: indent-mode normal; space-indent off; tab-width 4; */

@@ -57,7 +57,7 @@ class WikilogHooks
 		if ( $title->isTalkPage() ) {
 			# ::WikilogCommentsPage::
 			# Invalidate cache of wikilog item page.
-			if ( $wi->getItemTitle() && $wi->getItemTitle()->exists() ) {
+			if ( $wi->getItemTitle()->exists() ) {
 				$wi->getItemTitle()->invalidateCache();
 				$wi->getItemTitle()->purgeSquid();
 			}
@@ -367,7 +367,6 @@ class WikilogHooks
 
 		if ( $wgDBtype == 'mysql' ) {
 			$wgExtNewTables[] = array( "wikilog_wikilogs", "{$dir}wikilog-tables.sql" );
-			$wgExtNewTables[] = array( "wikilog_visits", "{$dir}archives/patch-visits.sql" );
 			$wgExtNewIndexes[] = array( "wikilog_comments", "wlc_timestamp", "{$dir}archives/patch-comments-indexes.sql" );
 		} else {
 			// TODO: PostgreSQL, SQLite, etc...

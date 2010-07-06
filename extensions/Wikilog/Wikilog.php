@@ -124,11 +124,6 @@ $wgHooks['LinkBegin'][] = 'Wikilog::LinkBegin';
 $wgHooks['SkinTemplateTabAction'][] = 'Wikilog::SkinTemplateTabAction';
 $wgHooks['SkinTemplateTabs'][] = 'Wikilog::SkinTemplateTabs';
 
-// Calendar
-$wgEnableSidebarCache = false;
-$wgHooks['SkinBuildSidebar'][] = 'Wikilog::SkinBuildSidebar';
-$wgAutoloadClasses['WikilogCalendar'] = $dir . 'WikilogCalendar.php';
-
 // General Wikilog hooks
 $wgHooks['ArticleEditUpdates'][] = 'WikilogHooks::ArticleEditUpdates';
 $wgHooks['ArticleDeleteComplete'][] = 'WikilogHooks::ArticleDeleteComplete';
@@ -269,7 +264,7 @@ class Wikilog
 
 		if ( ( $wi = self::getWikilogInfo( $title ) ) ) {
 			if ( $title->isTalkPage() ) {
-				if ( $wgWikilogEnableComments ) {
+				if ( $wgWikilogEnableComments && $wi->isItem() ) {
 					$article = new WikilogCommentsPage( $title, $wi );
 				} else {
 					return true;
@@ -374,24 +369,6 @@ class Wikilog
 		return true;
 	}
 
-    /**
-     * SkinBuildSidebar hook handler function.
-     * Adds support for "* wikilogcalendar" on MediaWiki:Sidebar
-     */
-    static function SkinBuildSidebar($skin, &$bar)
-    {
-        global $wgTitle, $wgRequest, $wgWikilogNumArticles;
-        if (array_key_exists('wikilogcalendar', $bar))
-        {
-            global $wlCalPager;
-            if (!$wlCalPager)
-                unset($bar['wikilogcalendar']);
-            else
-                $bar['wikilogcalendar'] = WikilogCalendar::sidebarCalendar($wlCalPager);
-        }
-        return true;
-    }
-
 	# ##
 	# #  Other global wikilog functions.
 	#
@@ -446,13 +423,16 @@ class WikilogInfo
 		$ns = MWNamespace::getSubject( $origns );
 		$tns = MWNamespace::getTalk( $origns );
 
-		# If title contains a '/', treat as a wikilog article title.
-		$parts = explode('/', $title->getText());
-		if (count($parts) > 1 && ($this->mIsTalk || count($parts) == 2))
-		{
-			$this->mWikilogName = array_shift($parts);
-			$this->mItemName = array_shift($parts);
-			$this->mTrailing = implode('/', $parts);
+		if ( strpos( $title->getText(), '/' ) !== false ) {
+			# If title contains a '/', treat as a wikilog article title.
+			list( $this->mWikilogName, $this->mItemName ) =
+				explode( '/', $title->getText(), 2 );
+
+			if ( strpos( $this->mItemName, '/' ) !== false ) {
+				list( $this->mItemName, $this->mTrailing ) =
+					explode( '/', $this->mItemName, 2 );
+			}
+
 			$rawtitle = "{$this->mWikilogName}/{$this->mItemName}";
 			$this->mWikilogTitle = Title::makeTitle( $ns, $this->mWikilogName );
 			$this->mItemTitle = Title::makeTitle( $ns, $rawtitle );
@@ -476,7 +456,7 @@ class WikilogInfo
 	function getTitle() { return $this->mWikilogTitle; }
 	function getItemName() { return $this->mItemName; }
 	function getItemTitle() { return $this->mItemTitle; }
-	function getTalkTitle() { return $this->mItemTitle ? $this->mItemTitle->getTalkPage() : $this->mWikilogTitle->getTalkPage(); }
+	function getItemTalkTitle() { return $this->mItemTitle->getTalkPage(); }
 
 	function getTrailing() { return $this->mTrailing; }
 }

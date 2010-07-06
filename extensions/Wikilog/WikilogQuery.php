@@ -141,31 +141,6 @@ abstract class WikilogQuery
 			str_pad( $date_end,   14, '0', STR_PAD_RIGHT )
 		);
 	}
-
-	/* Does $dbr->select with additional conditions taken from this query object */
-	public function select($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
-	{
-		return $dbr->query( $this->selectSQLText( $dbr, $tables, $fields, $conds, $function, $options, $join_conds ), $function );
-	}
-
-	/* Does $dbr->selectSQLText with additional conditions taken from this query object */
-	public function selectSQLText($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
-	{
-		$info = $this->getQueryInfo( $dbr );
-		if ( $tables )
-			$tables = array_merge( $info['tables'], $tables );
-		else
-			$tables = $info['tables'];
-		if ( $info['conds'] )
-			$conds = array_merge( $info['conds'], $conds );
-		if ( $info['options'] )
-			$options = array_merge( $info['options'], $options );
-		if ( $info['join_conds'] )
-			$join_conds = array_merge( $info['join_conds'], $join_conds );
-		if ( !$fields )
-			$fields = $info['fields'];
-		return $dbr->selectSQLText($tables, $fields, $conds, $function, $options, $join_conds);
-	}
 }
 
 /**
@@ -184,7 +159,6 @@ class WikilogItemQuery
 	private $mWikilogTitle = null;			///< Filter by wikilog.
 	private $mPubStatus = self::PS_ALL;		///< Filter by published status.
 	private $mCategory = false;				///< Filter by category.
-	private $mNotCategory = false;			///< Exclude items belonging to this category.
 	private $mAuthor = false;				///< Filter by author.
 	private $mTag = false;					///< Filter by tag.
 	private $mDate = false;					///< Filter by date.
@@ -237,7 +211,7 @@ class WikilogItemQuery
 	 * @param $category Category title object or text.
 	 */
 	public function setCategory( $category ) {
-		if ( is_null( $category ) || is_object( $category ) ) {
+		if ( is_object( $category ) ) {
 			$this->mCategory = $category;
 		} elseif ( is_string( $category ) ) {
 			$t = Title::makeTitleSafe( NS_CATEGORY, $category );
@@ -248,26 +222,11 @@ class WikilogItemQuery
 	}
 
 	/**
-	 * Sets the category not to query for.
-	 * @param $category Category title object or text.
-	 */
-	public function setNotCategory( $category ) {
-		if ( is_object( $category ) ) {
-			$this->mNotCategory = $category;
-		} elseif ( is_string( $category ) ) {
-			$t = Title::makeTitleSafe( NS_CATEGORY, $category );
-			if ( $t !== null ) {
-				$this->mNotCategory = $t;
-			}
-		}
-	}
-
-	/**
 	 * Sets the author to query for.
 	 * @param $author User page title object or text.
 	 */
 	public function setAuthor( $author ) {
-		if ( is_null( $author ) || is_object( $author ) ) {
+		if ( is_object( $author ) ) {
 			$this->mAuthor = $author;
 		} elseif ( is_string( $author ) ) {
 			$t = Title::makeTitleSafe( NS_USER, $author );
@@ -316,7 +275,6 @@ class WikilogItemQuery
 	public function getWikilogTitle()	{ return $this->mWikilogTitle; }
 	public function getPubStatus()		{ return $this->mPubStatus; }
 	public function getCategory()		{ return $this->mCategory; }
-	public function getNotCategory()	{ return $this->mNotCategory; }
 	public function getAuthor()		{ return $this->mAuthor; }
 	public function getTag()			{ return $this->mTag; }
 	public function getDate()			{ return $this->mDate; }
@@ -357,21 +315,9 @@ class WikilogItemQuery
 
 		# Filter by category.
 		if ( $this->mCategory ) {
-			$q_tables[] = '`categorylinks` clyes';
-			$q_joins['`categorylinks` clyes'] = array( 'JOIN', '(wlp_page = clyes.cl_from OR wlp_parent = clyes.cl_from)' );
-			$q_conds['clyes.cl_to'] = $this->mCategory->getDBkey();
-		}
-
-		# Exclude items and blogs belonging to category.
-		if ( $this->mNotCategory ) {
-			# Items
-			$q_tables[] = '`categorylinks` clno';
-			$q_joins['`categorylinks` clno'] = array( 'LEFT JOIN', array( 'wlp_page = clno.cl_from', 'clno.cl_to' => $this->mNotCategory->getDBkey() ) );
-			$q_conds[] = 'clno.cl_to IS NULL';
-			# Blogs
-			$q_tables[] = '`categorylinks` clnob';
-			$q_joins['`categorylinks` clnob'] = array( 'LEFT JOIN', array( 'wlp_parent = clnob.cl_from', 'clnob.cl_to' => $this->mNotCategory->getDBkey() ) );
-			$q_conds[] = 'clnob.cl_to IS NULL';
+			$q_tables[] = 'categorylinks';
+			$q_joins['categorylinks'] = array( 'JOIN', 'wlp_page = cl_from' );
+			$q_conds['cl_to'] = $this->mCategory->getDBkey();
 		}
 
 		# Filter by author.
@@ -394,17 +340,12 @@ class WikilogItemQuery
 			$q_conds[] = 'wlp_pubdate < ' . $db->addQuotes( $this->mDate->end );
 		}
 
-		# Add last comment timestamp, used in syndication feeds and archive pager.
+		# Add last comment timestamp, used in syndication feeds.
 		if ( $this->getOption( 'last-comment-timestamp' ) ) {
-			$q_fields[] = 'IFNULL((SELECT MAX(wlc_updated) FROM wikilog_comments WHERE wlc_post=wlp_page), wlp_pubdate) AS _wlp_last_comment_timestamp';
-		}
-
-		# Last visit date
-		global $wgUser;
-		if ( $this->getOption( 'last-visit-date' ) && $wgUser->getID() ) {
-			$q_tables[] = 'wikilog_visits';
-			$q_fields[] = 'wlv_date _wlp_last_visit_date';
-			$q_joins['wikilog_visits'] = array( 'LEFT JOIN', array( 'wlv_post = wlp_page', 'wlv_user' => $wgUser->getID() ) );
+			$q_tables[] = 'wikilog_comments';
+			$q_fields[] = 'MAX(wlc_updated) AS _wlp_last_comment_timestamp';
+			$q_joins['wikilog_comments'] = array( 'LEFT JOIN', 'wlp_page = wlc_post' );
+			$q_options['GROUP BY'] = 'wlp_page';
 		}
 
 		return array(
@@ -436,10 +377,6 @@ class WikilogItemQuery
 
 		if ( $this->mCategory ) {
 			$query['category'] = $this->mCategory->getDBKey();
-		}
-
-		if ( $this->mNotCategory ) {
-			$query['notcategory'] = $this->mNotCategory->getDBKey();
 		}
 
 		if ( $this->mAuthor ) {
@@ -609,7 +546,7 @@ class WikilogCommentQuery
 	 * @param $author User page title object or text.
 	 */
 	public function setAuthor( $author ) {
-		if ( is_null( $author ) || is_object( $author ) ) {
+		if ( is_object( $author ) ) {
 			$this->mAuthor = $author;
 		} elseif ( is_string( $author ) ) {
 			$t = Title::makeTitleSafe( NS_USER, $author );
@@ -717,14 +654,6 @@ class WikilogCommentQuery
 		} elseif ( $join_wlp ) {
 			$q_tables[] = 'wikilog_posts';
 			$q_joins['wikilog_posts'] = array( 'JOIN', 'wlp_page = wlc_post' );
-		}
-
-		# Last visit date
-		global $wgUser;
-		if ( $wgUser->getID() ) {
-			$q_tables[] = 'wikilog_visits';
-			$q_fields[] = '( wlv_date >= wlc_updated ) _wlc_visited';
-			$q_joins['wikilog_visits'] = array( 'LEFT JOIN', array( 'wlv_post = wlc_post', 'wlv_user' => $wgUser->getID() ) );
 		}
 
 		return array(

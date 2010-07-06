@@ -57,8 +57,8 @@ class WikilogSummaryPager
 	public $mLimitsShown = array( 5, 10, 20, 50 );
 
 	# Local variables.
-	public $mQuery = null;			///< Wikilog item query data
-	public $mIncluding = false;		///< If pager is being included
+	protected $mQuery = null;			///< Wikilog item query data
+	protected $mIncluding = false;		///< If pager is being included
 
 	/**
 	 * Constructor.
@@ -296,7 +296,7 @@ class WikilogTemplatePager
 	 * @todo (Req >= Mw 1.16) Remove bug 20431 workaround.
 	 */
 	function formatRow( $row ) {
-		global $wgParser, $wgLang;
+		global $wgParser, $wgContLang;
 
 		# Retrieve article parser output and other data.
 		$item = WikilogItem::newFromRow( $row );
@@ -316,14 +316,14 @@ class WikilogTemplatePager
 		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
 
 		$itemPubdate = $item->getPublishDate();
-		$pubdate = $wgLang->timeanddate( $itemPubdate, true );
-		$publishedDate = $wgLang->date( $itemPubdate, true );
-		$publishedTime = $wgLang->time( $itemPubdate, true );
+		$pubdate = $wgContLang->timeanddate( $itemPubdate, true );
+		$publishedDate = $wgContLang->date( $itemPubdate );
+		$publishedTime = $wgContLang->time( $itemPubdate );
 
 		$itemUpdated = $item->getUpdatedDate();
-		$updated = $wgLang->timeanddate( $itemUpdated, true );
-		$updatedDate = $wgLang->date( $itemUpdated, true );
-		$updatedTime = $wgLang->time( $itemUpdated, true );
+		$updated = $wgContLang->timeanddate( $itemUpdated, true );
+		$updatedDate = $wgContLang->date( $itemUpdated );
+		$updatedTime = $wgContLang->time( $itemUpdated );
 
 		# Template parameters.
 		$vars = array(
@@ -371,8 +371,8 @@ class WikilogArchivesPager
 	implements WikilogItemPager
 {
 	# Local variables.
-	public $mQuery = null;			///< Wikilog item query data
-	public $mIncluding = false;		///< If pager is being included
+	protected $mQuery = null;			///< Wikilog item query data
+	protected $mIncluding = false;		///< If pager is being included
 
 	/**
 	 * Constructor.
@@ -380,8 +380,6 @@ class WikilogArchivesPager
 	function __construct( WikilogItemQuery $query, $including = false ) {
 		# WikilogItemQuery object drives our queries.
 		$this->mQuery = $query;
-		$this->mQuery->setOption( 'last-comment-timestamp', true );
-		$this->mQuery->setOption( 'last-visit-date', true );
 		$this->mIncluding = $including;
 
 		# Parent constructor.
@@ -413,7 +411,6 @@ class WikilogArchivesPager
 			'wlp_updated',
 			'wlw_title',
 			'wlp_title',
-			'_wlp_last_comment_timestamp',
 		);
 		return in_array( $field, $sortableFields );
 	}
@@ -452,20 +449,14 @@ class WikilogArchivesPager
 	}
 
 	function formatValue( $name, $value ) {
-		global $wgLang, $wgUser;
+		global $wgContLang;
 
 		switch ( $name ) {
 			case 'wlp_pubdate':
-				$s = $wgLang->timeanddate( $value, true );
+				$s = $wgContLang->timeanddate( $value, true );
 				if ( !$this->mCurrentRow->wlp_publish ) {
 					$s = Xml::wrapClass( $s, 'wl-draft-inline' );
 				}
-				return $s;
-
-			case '_wlp_last_comment_timestamp':
-				$s = $wgLang->timeanddate( $value, true );
-				if ( $wgUser->getID() && $this->mCurrentRow->_wlp_last_visit_date < $value )
-					$s = Xml::wrapClass( $s, 'wl-unread' );
 				return $s;
 
 			case 'wlp_updated':
@@ -507,10 +498,6 @@ class WikilogArchivesPager
 	}
 
 	function getDefaultSort() {
-		global $wgRequest;
-		// A hack to set default sort direction
-		if ( !$wgRequest->getBool( 'asc' ) && ! $wgRequest->getBool( 'desc' ))
-			$wgRequest->setVal('desc', 1);
 		return 'wlp_pubdate';
 	}
 
@@ -532,9 +519,6 @@ class WikilogArchivesPager
 			$fields['wlp_num_comments']	= wfMsgHtml( 'wikilog-comments' );
 
 		$fields['_wl_actions']			= wfMsgHtml( 'wikilog-actions' );
-
-		$fields['_wlp_last_comment_timestamp'] = wfMsgHtml( 'wikilog-last-update' );
-
 		return $fields;
 	}
 

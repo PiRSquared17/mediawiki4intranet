@@ -163,7 +163,7 @@ class WikilogItem
 	 * parameters.
 	 */
 	public function getMsgParams( $extended = false, $pout = null ) {
-		global $wgLang, $wgWikilogEnableTags;
+		global $wgContLang, $wgWikilogEnableTags;
 
 		$authors = array_keys( $this->mAuthors );
 		$authorsFmt = WikilogUtils::authorList( $authors );
@@ -208,8 +208,8 @@ class WikilogItem
 			/* $5  */ count( $authors ),
 			/* $6  */ ( count( $authors ) > 0 ? $authors[0] : '' ),
 			/* $7  */ $authorsFmt,
-			/* $8  */ $wgLang->date( $this->mPubDate, true ),
-			/* $9  */ $wgLang->time( $this->mPubDate, true ),
+			/* $8  */ $wgContLang->date( $this->mPubDate ),
+			/* $9  */ $wgContLang->time( $this->mPubDate ),
 			/* $10 */ $commentsFmt,
 			/* $11 */ count( $categories ),
 			/* $12 */ $categoriesFmt,
@@ -375,25 +375,5 @@ class WikilogItem
 			'wlp_tags',
 			'wlp_num_comments'
 		);
-	}
-
-	/**
-	 * Update last visit date of post discussion page
-	 * Must be set to $timestamp when used by WikilogItemPage
-	 */
-	public function updateLastVisit( $timestamp = NULL )
-	{
-		global $wgUser;
-		if ( !$wgUser->getID() )
-			return;
-		$timestamp = wfTimestamp( TS_MW, $timestamp );
-		$dbw = wfGetDB( DB_MASTER );
-		$where = array( 'wlv_post' => $this->getID(), 'wlv_user' => $wgUser->getID() );
-		$set = array( 'wlv_date' => $timestamp );
-		$last = $dbw->selectField( 'wikilog_visits', 'wlv_date', $where, __FUNCTION__, array('FOR UPDATE'));
-		if ( !$last )
-			$dbw->insert( 'wikilog_visits', $where + $set );
-		elseif ( $last < $timestamp)
-			$dbw->update( 'wikilog_visits', $set, $where, __METHOD__ );
 	}
 }

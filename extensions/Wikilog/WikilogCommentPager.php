@@ -72,8 +72,6 @@ abstract class WikilogCommentPager
 		# Prepare the comment formatter.
 		$this->mFormatter = $formatter ? $formatter :
 			new WikilogCommentFormatter( $this->getSkin() );
-		if (!$query->getItem())
-			$this->mFormatter->setShowItem(true);
 
 		# Parent constructor.
 		parent::__construct();
