@@ -1982,8 +1982,8 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-math'),
 				'id'     => 'mw-editbutton-math',
-				'open'   => "<math>",
-				'close'  => "</math>",
+				'open'   => "<m>",
+				'close'  => "</m>",
 				'sample' => wfMsg('math_sample'),
 				'tip'    => wfMsg('math_tip'),
 				'key'    => 'C'
@@ -2000,7 +2000,7 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-sig'),
 				'id'     => 'mw-editbutton-signature',
-				'open'   => '--~~~~',
+				'open'   => '~~~~',
 				'close'  => '',
 				'sample' => '',
 				'tip'    => wfMsg('sig_tip'),
