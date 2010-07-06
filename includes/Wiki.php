@@ -173,9 +173,17 @@ class MediaWiki {
 
 		$action = $this->getVal( 'Action' );
 		if( is_null($title) || $title->getDBkey() == '' ) {
+			$error = Title::getLastError();
 			$title = SpecialPage::getTitleFor( 'Badtitle' );
 			# Die now before we mess up $wgArticle and the skin stops working
-			throw new ErrorPageError( 'badtitle', 'badtitletext' );
+			if ( !$error )
+				$error = 'badtitle';
+			$errortext = $error;
+			if ( is_array( $errortext ) )
+				$errortext[0] .= 'text';
+			else
+				$errortext .= 'text';
+			throw new ErrorPageError( $error, $errortext );
 		} else if( $title->getInterwiki() != '' ) {
 			if( $rdfrom = $request->getVal( 'rdfrom' ) ) {
 				$url = $title->getFullURL( 'rdfrom=' . urlencode( $rdfrom ) );
