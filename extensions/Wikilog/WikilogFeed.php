@@ -361,6 +361,7 @@ class WikilogItemFeed
 		if ( !$limit ) $limit = $wgWikilogNumArticles;
 		parent::__construct( $title, $format, $query, $limit );
 		$this->mSiteFeed = $this->mQuery->getWikilogTitle() === null;
+		
 	}
 
 	public function getIndexField() {
@@ -506,7 +507,7 @@ class WikilogItemFeed
 		# Create new syndication entry.
 		$entry = new WlSyndicationEntry(
 			self::makeEntryId( $itemTitle ),
-			( $this->mSiteFeed ? $wikilogName . ' — ' : '' ) . $itemName,
+			$itemName,
 			$row->wlp_updated,
 			$itemTitle->getFullUrl()
 		);
