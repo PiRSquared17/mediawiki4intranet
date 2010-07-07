@@ -146,6 +146,8 @@ $wgLogo    = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
 $wgFavicon = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
 
 $wgDebugLogFile = false;
+$wgShowSQLErrors = true;
+
 $wgDefaultSkin  = 'monobook';
 
 $wgGroupPermissions['*']['edit'] = false;
