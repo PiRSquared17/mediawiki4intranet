@@ -69,6 +69,9 @@ $wgGroupPermissions['sysop']['deletebatch'] = true;
 $wgSphinxSearch_weights = array('page_title' => 2, 'old_text' => 1);
 $wgSphinxSearch_matches = 20;
 $wgSphinxMatchAll = 1;
+$wgSphinxSearch_host = 'localhost';
+$wgSphinxSearch_port = 3112;
+$wgSphinxSuggestMode = true;
 
 // Bug 57350 - PDF and Djvu (UNIX only)
 require_once($IP.'/extensions/PdfHandler/PdfHandler.php');
