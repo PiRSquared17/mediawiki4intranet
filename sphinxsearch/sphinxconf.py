@@ -154,9 +154,14 @@ if os.path.exists("sphinx.conf"):
   print "sphinx.conf already exists, delete or backup it before reconfiguring"
   quit()
 
+reindex_main = ''
+reindex_inc = ''
+
 lf = open("sphinx.conf", "w")
 for wiki in wikis:
   lf.write(wiki_conf(wiki))
+  reindex_main += ' main_'+wiki['wikiname']
+  reindex_inc += ' inc_'+wiki['wikiname']
 lf.write("""### General configuration ###
 
 indexer
@@ -176,3 +181,11 @@ searchd
 }
 """)
 lf.close()
+
+print """sphinx.conf created, move it to /etc/sphinxsearch/sphinx.conf
+Then, add the following to /etc/crontab:
+
+# Sphinx search: rebuild full indexes at night
+0 3 * * *       root    /usr/bin/indexer --quiet --rotate%s
+# Sphinx search: update smaller indexes regularly
+*/30 * * * *    root    /usr/bin/indexer --quiet --rotate%s""" % (reindex_main, reindex_inc)
