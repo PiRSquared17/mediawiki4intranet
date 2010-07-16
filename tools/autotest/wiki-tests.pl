@@ -249,8 +249,7 @@ sub test_search
     my $u1 = $su;
     $u = $title;
     Encode::_utf8_on($u);
-    $u =~ s/\s-\s/ /gso;
-    $u =~ tr/\\/ /;
+    $u =~ s!([-/])!\\$1!gso;
     Encode::_utf8_off($u);
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
@@ -263,6 +262,7 @@ sub test_search
             unless $response->code == 200;
         $text = $response->content;
         check_php_warnings($text);
+        #warn $text;
         @found = $text =~ /<li>(.*?)<\/li>/giso;
         decode_entities($_) for @found;
         return if grep { /\Q$title\E/is } @found;
