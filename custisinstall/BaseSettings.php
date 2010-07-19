@@ -1,5 +1,7 @@
 <?php
 
+setlocale(LC_ALL, 'ru_RU.UTF-8');
+
 if (defined('MW_INSTALL_PATH'))
     $IP = MW_INSTALL_PATH;
 else
@@ -126,16 +128,14 @@ require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
 $wgSVGConverter = "inkscape";
-$wgUseImageMagick = true;
+$wgUseImageMagick = false;
+$wgGDAlwaysResample = true;
 
 require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
-    # TODO move it into global settings (force UNIX installations use GD also)
-    $wgUseImageMagick = false;
-    $wgGDAlwaysResample = true;
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
 }
@@ -164,3 +164,5 @@ $wgNamespacesToBeSearchedDefault = array(
     NS_HELP => 1,
     NS_CATEGORY => 1,
 );
+
+$wgShellLocale = 'ru_RU.UTF-8';
