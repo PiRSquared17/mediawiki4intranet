@@ -1067,7 +1067,7 @@ class OutputPage {
 		if ( isset($wgTitle) ) {
 			$this->mDebugtext .= 'Original title: ' . $wgTitle->getPrefixedText() . "\n";
 		}
-		$this->setPageTitle( wfMsg( $title ) );
+		$this->setPageTitle( is_array( $title ) ? strip_tags( call_user_func_array( 'wfMsgExt', $title ) ) : wfMsg( $title ) );
 		$this->setHTMLTitle( wfMsg( 'errorpagetitle' ) );
 		$this->setRobotPolicy( 'noindex,nofollow' );
 		$this->setArticleRelated( false );
@@ -1075,8 +1075,12 @@ class OutputPage {
 		$this->mRedirect = '';
 		$this->mBodytext = '';
 
-		array_unshift( $params, 'parse' );
-		array_unshift( $params, $msg );
+		if ( is_array( $msg ) )
+			$params = $msg;
+		else {
+			array_unshift( $params, 'parse' );
+			array_unshift( $params, $msg );
+		}
 		$this->addHTML( call_user_func_array( 'wfMsgExt', $params ) );
 
 		$this->returnToMain();
