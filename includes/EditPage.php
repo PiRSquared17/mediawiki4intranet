@@ -579,7 +579,7 @@ class EditPage {
 				# If the form is incomplete, force to preview.
 				wfDebug( "$fname: Form data appears to be incomplete\n" );
 				wfDebug( "POST DATA: " . var_export( $_POST, true ) . "\n" );
-				$this->preview  = true;
+				$this->preview  = $request->getCheck( 'wpPreview' );
 			} else {
 				/* Fallback for live preview */
 				$this->preview = $request->getCheck( 'wpPreview' ) || $request->getCheck( 'wpLivePreview' );
@@ -605,7 +605,7 @@ class EditPage {
 					$this->preview = true;
 				}
 			}
-			$this->save = !$this->preview && !$this->diff;
+			$this->save = $request->getCheck('wpSave') && !$this->preview && !$this->diff;
 			if ( !preg_match( '/^\d{14}$/', $this->edittime )) {
 				$this->edittime = null;
 			}
@@ -735,6 +735,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 
 		$fname = 'EditPage::attemptSave';
 		wfProfileIn( $fname );
@@ -915,7 +916,7 @@ class EditPage {
 		}
 
 		# Suppress edit conflict with self, except for section edits where merging is required.
-		if ( $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
+		if ( $wgSuppressSameUserConflicts && $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
 			wfDebug( "EditPage::editForm Suppressing edit conflict, same user.\n" );
 			$this->isConflict = false;
 		} else {
@@ -1071,8 +1072,9 @@ class EditPage {
 	 */
 	function initialiseForm() {
 		$this->edittime = $this->mArticle->getTimestamp();
-		$this->textbox1 = $this->getContent( false );
-		if ( $this->textbox1 === false ) return false;
+		$text = $this->getContent( false );
+		if ( $text === false ) return false;
+		if ( $text !== NULL ) $this->textbox1 = $text;
 		wfProxyCheck();
 		return true;
 	}
@@ -1987,8 +1989,8 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-math'),
 				'id'     => 'mw-editbutton-math',
-				'open'   => "<math>",
-				'close'  => "</math>",
+				'open'   => "<m>",
+				'close'  => "</m>",
 				'sample' => wfMsg('math_sample'),
 				'tip'    => wfMsg('math_tip'),
 				'key'    => 'C'
@@ -2005,7 +2007,7 @@ END
 			array(
 				'image'  => $wgLang->getImageFile('button-sig'),
 				'id'     => 'mw-editbutton-signature',
-				'open'   => '--~~~~',
+				'open'   => '~~~~',
 				'close'  => '',
 				'sample' => '',
 				'tip'    => wfMsg('sig_tip'),
