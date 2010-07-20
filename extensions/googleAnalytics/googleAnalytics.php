@@ -8,8 +8,7 @@ $wgExtensionCredits['other'][] = array(
 	'name'           => 'Google Analytics Integration',
 	'version'        => '2.0.2',
 	'author'         => 'Tim Laqua',
-	'description'    => 'Inserts Google Analytics script (ga.js) in to MediaWiki pages for tracking.',
-	'descriptionurl' => 'googleanalytics-desc',
+	'descriptionmsg' => 'googleanalytics-desc',
 	'url'            => 'http://www.mediawiki.org/wiki/Extension:Google_Analytics_Integration',
 );
 
@@ -33,7 +32,7 @@ function efGoogleAnalyticsASAC( &$parser, &$text ) {
 	return true;
 }
 
-function efGoogleAnalyticsHookText(&$skin, &$text='') {
+function efGoogleAnalyticsHookText($skin, &$text='') {
 	$text .= efAddGoogleAnalytics();
 	return true;
 }
@@ -50,7 +49,6 @@ document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.
 </script>
 <script type="text/javascript">
 var pageTracker = _gat._getTracker("{$wgGoogleAnalyticsAccount}");
-pageTracker._initData();
 pageTracker._trackPageview();
 </script>
 GASCRIPT;
