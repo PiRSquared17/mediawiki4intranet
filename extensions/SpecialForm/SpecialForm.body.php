@@ -203,7 +203,7 @@ class SpecialForm extends SpecialPage {
 			}
 
 			if( $nt[$i]->getArticleID() != 0 ) {
-				$wgOut->showErrorPage( 'formarticleexists', 'formarticleexists', array( $title ) );
+				$wgOut->showErrorPage( 'formarticleexists', 'formarticleexiststext', array( $title ) );
 				return;
 			}
 		}
@@ -222,7 +222,7 @@ class SpecialForm extends SpecialPage {
 
 			$text .= '}}';
 
-			if( !$this->checkSave( $nt[$i], $text ) ) {
+			if( !$this->checkSave( $nt[$i], $text, $form ) ) {
 				# Just break here; output already sent
 				return;
 			}
@@ -235,7 +235,7 @@ class SpecialForm extends SpecialPage {
 
 			$status = $article->doEdit( $text, wfMsg( 'formsavesummary', $form->name ), EDIT_NEW );
 			if ( $status === false || ( is_object( $status ) && !$status->isOK() ) ) {
-				$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $title ) );
+				$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $title, $status->getWikiText() ) );
 				return; # Don't continue
 			}
 		}
@@ -258,17 +258,20 @@ class SpecialForm extends SpecialPage {
 		return $title;
 	}
 
-	# Had to crib some checks from EditPage.php, since they're not done in Article.php
-	function checkSave( $nt, $text ) {
+	// Had to crib some checks from EditPage.php, since they're not done in Article.php
+	function checkSave( $nt, $text, $form ) {
 		global $wgSpamRegex, $wgFilterCallback, $wgUser, $wgMaxArticleSize, $wgOut;
 
 		$matches = array();
 		$errortext = '';
 
-		$editPage = new FakeEditPage( $nt );
+		$editPage = new FakeEditPage( $nt, $form );
 
-		# FIXME: more specific errors, copied from EditPage.php
-		if( $wgSpamRegex && preg_match( $wgSpamRegex, $text, $matches ) ) {
+		$permErrors = $nt->getUserPermissionsErrors( 'create', $wgUser );
+		if ( $permErrors ) {
+			$wgOut->readOnlyPage( $text, true, $permErrorrs, 'createpage' );
+			return false;
+		} else if( $wgSpamRegex && preg_match( $wgSpamRegex, $text, $matches ) ) {
 			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
 			return false;
 		} else if( $wgFilterCallback && $wgFilterCallback( $nt, $text, 0 ) ) {
@@ -278,22 +281,22 @@ class SpecialForm extends SpecialPage {
 			# Hooks usually print their own error
 			return false;
 		} else if( $errortext != '' ) {
-			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
+			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $nt, $errortext ) );
 			return false;
 		} else if( $wgUser->isBlockedFrom( $nt, false ) ) {
-			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
+			$wgOut->blockedPage( false );
 			return false;
 		} else if( (int)(strlen($text) / 1024) > $wgMaxArticleSize ) {
-			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
+			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $nt, 'longpageerror' ) );
 			return false;
 		} else if( !$wgUser->isAllowed( 'edit' ) ) {
 			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
 			return false;
 		} else if( wfReadOnly() ) {
-			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
+			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $nt, wfMsg( 'readonlywarning', wfReadOnlyReason() ) ) );
 			return false;
 		} else if( $wgUser->pingLimiter() ) {
-			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext' );
+			$wgOut->showErrorPage( 'formsaveerror', 'formsaveerrortext', array( $nt, 'rate-limited' ) );
 			return false;
 		}
 
@@ -304,9 +307,38 @@ class SpecialForm extends SpecialPage {
 # Dummy class for extensions that support EditFilter hook
 class FakeEditPage {
 	var $mTitle;
+	var $mForm;
 
-	function FakeEditPage( &$nt ) {
+	function FakeEditPage( &$nt, $form ) {
 		$this->mTitle = $nt;
+		$this->mForm = $form;
+	}
+
+	function showEditForm( $formCallback = NULL ) {
+		global $wgOut, $wgTitle;
+		$self = SpecialPage::getTitleFor( wfMsgForContent( 'form' ) . '/' . $this->mForm->name );
+		$wgOut->addHTML(
+			Xml::openElement( 'form', array(
+					'method' => 'post',
+					'action' => $self->getLocalURL()
+				)
+			)
+		);
+		foreach( $_POST as $field => $value )
+			$wgOut->addHTML(
+				Xml::element( 'input',
+					array(
+						'type' => 'hidden',
+						'name' => $field,
+						'value' => $value,
+					)
+				)
+			);
+		if ( is_callable( $formCallback ) ) {
+			call_user_func_array( $formCallback, array( &$wgOut ) );
+		}
+		$wgOut->addHTML( Xml::element( 'input', array( 'type' => 'submit', 'value' => wfMsg( 'formsave' ) ) ) );
+		$wgOut->addHTML( Xml::closeElement( 'form' ) );
 	}
 }
 
