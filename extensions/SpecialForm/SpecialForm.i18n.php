@@ -1268,7 +1268,7 @@ $messages['ru'] = array(
 	'formindexmismatch-title' => 'Несоответствие образца и шаблона',
 	'formindexmismatch' => 'В этой форме есть несоответствие имени и шаблона в позиции $1.',
 	'formarticleexists' => 'Страница существует',
-	'formarticleexiststext' => 'Страница [[$1]] уже существует.',
+	'formarticleexiststext' => 'Страница «[[:$1]]» уже существует.',
 	'formbadpagename' => 'Плохое имя страницы',
 	'formbadrecaptcha' => 'Неправильное значение reCaptcha. Попробуйте ещё раз.',
 	'formbadpagenametext' => 'Введённые вами данные формы, приводят к ошибочному имени страницы, «$1».',
@@ -1276,7 +1276,7 @@ $messages['ru'] = array(
 Пожалуйста дозаполните {{PLURAL:$2|это поле|эти поля}}.',
 	'formsavesummary' => 'Новая страница, с помощью [[Special:Form/$1|формы $1]]',
 	'formsaveerror' => 'Ошибка при сохранении формы',
-	'formsaveerrortext' => 'При сохранении страницы «$1» возникла неизвестная ошибка.',
+	'formsaveerrortext' => 'При сохранении страницы «$1» возникла неизвестная ошибка. $2',
 );
 
 /** Slovak (Slovenčina)
