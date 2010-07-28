@@ -38,7 +38,6 @@ $wgDBmysql5         = true;
 $wgEnableUploads    = true;
 
 $wgLocalInterwiki   = $wgSitename;
-$wgDefaultSkin      = 'custis';
 
 $wgRightsPage = "";
 $wgRightsUrl = "";
@@ -147,7 +146,7 @@ $wgFavicon = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
 
 $wgDebugLogFile = false;
 
-$wgDefaultSkin  = 'monobook';
+$wgDefaultSkin = 'monobook';
 
 $wgGroupPermissions['*']['edit'] = false;
 
