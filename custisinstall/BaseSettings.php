@@ -126,6 +126,16 @@ require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
+# Wikilog
+require_once($IP.'/extensions/Wikilog/Wikilog.php');
+define('NS_BLOG', 100);
+Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
+$wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
+$wgWikilogMaxCommentSize = 0x7FFFFFFF;
+$wgWikilogDefaultNotCategory = 'Скрытые';
+$wgWikilogSearchDropdowns = true;
+$wgWikilogCommentsOnItemPage = true;
+
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = false;
 $wgGDAlwaysResample = true;
