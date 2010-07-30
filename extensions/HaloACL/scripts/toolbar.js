@@ -139,7 +139,7 @@ YAHOO.haloacl.toolbar_initToolbar_real = function(){
     e.type = 'hidden';
     e.id = e.name = 'haloacl_protect_with';
     document.editform.appendChild(e);
-    YAHOO.util.Event.addListener(document.editform, "submit", function(){YAHOO.haloacl.toolbar_handleSaveClick(this);return false;});
+    YAHOO.util.Event.addListener(document.editform, "submit", function(){YAHOO.haloacl.toolbar_handleSaveClick(this);return true;});
     YAHOO.haloacl.toolbar_updateToolbar();
     YAHOO.haloacl.toolbar_templateChanged();
 }
