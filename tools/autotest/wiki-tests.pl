@@ -311,7 +311,7 @@ sub check_php_warnings
     }
     $text =~ s!</[a-z0-9_:\-]+(\s+[^<>]*|\/)?>!!giso;
     my @warnings = $text =~ /(Warning|Error|Fatal):\s*([^\n]*?in[^\n]*?on\s+line[^\n]*)/giso;
-    die logp()." Discovered PHP warning(s):\n".join("\n", @warnings) if @warnings;
+    die logp()." Discovered PHP warning(s):\n".join("\n", @warnings)."\n\nIn $text\n" if @warnings;
     return 1;
 }
 
