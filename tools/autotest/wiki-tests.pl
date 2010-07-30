@@ -310,7 +310,7 @@ sub check_php_warnings
         $text = $1;
     }
     $text =~ s!</[a-z0-9_:\-]+(\s+[^<>]*|\/)?>!!giso;
-    my @warnings = $text =~ /Warning:\s*([^\n]*?in[^\n]*?on\s+line[^\n]*)/giso;
+    my @warnings = $text =~ /(Warning|Error|Fatal):\s*([^\n]*?in[^\n]*?on\s+line[^\n]*)/giso;
     die logp()." Discovered PHP warning(s):\n".join("\n", @warnings) if @warnings;
     return 1;
 }
