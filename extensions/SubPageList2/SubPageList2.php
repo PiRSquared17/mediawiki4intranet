@@ -70,7 +70,7 @@ function efFunctionHookGetSection($parser, $num)
 /**
  * Function called by the Hook, returns the wiki text
  */
-function efRenderSubpageList($input, $args, &$parser)
+function efRenderSubpageList($input, $args, $parser)
 {
     global $egInSubpageList;
     if (!$egInSubpageList)
