@@ -75,10 +75,24 @@ sub replicate
     my ($src, $dest) = @_;
     my $ua = MYLWPUserAgent->new;
     $ua->cookie_jar(HTTP::Cookies->new);
-    my $uri = URI->new($src->{url})->canonical;
+    my ($uri, $response);
+    # Логинимся в исходную вики, если надо
+    $uri = URI->new($src->{url})->canonical;
     $ua->credentials($uri->host_port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
+    if ($src->{user} && $src->{password})
+    {
+        $response = $ua->request(POST("$src->{url}/index.php?title=Special:UserLogin&action=submitlogin&type=login",
+            Content => [
+                wpName         => $src->{user},
+                wpPassword     => $src->{password},
+                wpLoginAttempt => 1,
+            ],
+        ));
+        die logp()." Could not login into source wiki under user '$src->{user}': ".$response->status_line
+            unless $response->code == 302;
+    }
     # Читаем список страниц категории
-    my $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
+    $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
     die logp()." Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
     my $text = $response->content;
     ($text) = $text =~ m!<textarea[^<>]*>(.*?)</textarea>!iso;
