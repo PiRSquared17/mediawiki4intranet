@@ -174,8 +174,8 @@ sub replicate
     print sprintf(logp()." Imported in %.2f seconds\n", $tp-$tx);
     $text = $response->content;
     # Извлекаем отчёт
-    ($text) = $text =~ /<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/iso;
-    for ($text)
+    my ($report) = $text =~ /<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/iso;
+    for ($report)
     {
         s/&nbsp;/ /giso;
         s/\s+/ /giso;
@@ -185,7 +185,9 @@ sub replicate
         s/^\s+//so;
         s/\s+$//so;
     }
-    print logp()." Report:\n$text\n";
+    die logp()." Could not replicate, no import report found in response content:\n$text\n"
+        unless $report;
+    print logp()." Report:\n$report\n";
     # Всё ОК
     1;
 }
