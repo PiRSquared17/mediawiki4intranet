@@ -1601,11 +1601,10 @@ class HACLParserFunctions {
 
 		$fromArticle = new Article($from);
 		$text = $fromArticle->getContent();
+		$fromArticle->doDelete("");
 
 		$toArticle = new Article($to);
 		$toArticle->doEdit($text,"");
-
-		$fromArticle->doDelete("");
 	}
 
 	/**
