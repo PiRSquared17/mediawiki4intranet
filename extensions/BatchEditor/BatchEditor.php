@@ -107,7 +107,7 @@ function wfSpecialBatchEditor($par = null)
 </td></tr>
 </table>
 </form>
-<?
+<?php
     $interface_form = ob_get_contents();
     ob_end_clean();
     $wgOut->addExtensionStyle($wgScriptPath . '/extensions/BatchEditor/BatchEditor.css');
@@ -244,5 +244,3 @@ class BatchEditorPage extends SpecialPage
         wfLoadExtensionMessages('BatchEditor');
     }
 }
-
-?>
