@@ -126,6 +126,8 @@ require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
+require_once($IP.'/extensions/SimpleForms/SimpleForms.php');
+
 # Wikilog
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
 define('NS_BLOG', 100);
