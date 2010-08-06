@@ -166,7 +166,10 @@ class SubpageList
     /* Parse <subpagelist> options */
     function options($options)
     {
-        global $egSubpagelistDefaultTemplate;
+        global $egSubpagelistDefaultTemplate, $wgTitle;
+        foreach ($options as $k => &$v)
+            $v = trim($this->preprocess($wgTitle, $v));
+        unset($v);
         if (($c = str_replace(' ', '_', $options['category'])) && $c != '-1')
         {
             $cats = explode('|', $c);
@@ -386,11 +389,23 @@ class SubpageList
         wfProfileIn(__METHOD__);
         $this->parser->clearState();
         $this->parser->setOutputType(Parser::OT_PREPROCESS);
-        $this->parser->setTitle($article->getTitle());
-        $this->parser->mRevisionId = $article->getRevIdFetched();
-        $this->parser->mRevisionTimestamp = $article->getTimestamp();
-        if (!$dom)
-            $dom = $article->getContent();
+        if ($article instanceof Title)
+        {
+            $title = $article;
+            $article = new Article($title);
+        }
+        else
+            $title = $article->getTitle();
+        $this->parser->setTitle($title);
+        if ($article)
+        {
+            $this->parser->mRevisionId = $article->getRevIdFetched();
+            $this->parser->mRevisionTimestamp = $article->getTimestamp();
+            if (!$dom && "$dom" !== "0")
+                $dom = $article->getContent();
+        }
+        if (!$dom && "$dom" !== "0")
+            return '';
         if (!is_object($dom))
         {
             wfRunHooks('ParserBeforeStrip', array(&$this->parser, &$dom, &$this->parser->mStripState));
