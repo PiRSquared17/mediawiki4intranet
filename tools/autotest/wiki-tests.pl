@@ -220,7 +220,7 @@ sub test_random_search
 
     # получаем редирект на случайную страницу
     my ($title, $i, $response, $text) = ('', 0);
-    while (length($title) < 2 && $i < 10)
+    while ((length($title) < 2 || $title eq 'Доступ запрещён' || $title eq 'Permission denied') && $i < 10)
     {
         $response = $ua->request(GET "$url/index.php/Special:Random");
         die logp()." Could not retrieve random page redirect from '$url/index.php/Special:Random': ".$response->status_line
