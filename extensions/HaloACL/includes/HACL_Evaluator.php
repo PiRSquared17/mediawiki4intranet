@@ -137,9 +137,6 @@ class HACLEvaluator {
 			return true;
 		}
 		
-		/******************************************************************
-		 * WTF?!!
-		 ******************************************************************
 		// no access to the page "Permission denied" is allowed.
 		// together with the TitlePatch which returns this page, this leads
 		// to MediaWiki's "Permission error"
@@ -152,7 +149,6 @@ class HACLEvaluator {
 			$result = $r;
 			return $r;
 	    }
-	     ******************************************************************/
 		
 		$articleID = (int) $title->getArticleID();
 		if ($articleID == 0) {
