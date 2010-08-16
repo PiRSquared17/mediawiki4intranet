@@ -77,3 +77,5 @@ $wgPdfPostProcessor = $wgImageMagickConvertCommand;
 $wgPdfInfo = 'pdfinfo';
 
 $wgDiff3 = '/usr/bin/diff3';
+
+$wgMaxImageArea = 5000*5000;
