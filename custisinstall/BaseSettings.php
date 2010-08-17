@@ -1,6 +1,7 @@
 <?php
 
 setlocale(LC_ALL, 'ru_RU.UTF-8');
+setlocale(LC_NUMERIC, 'C');
 
 if (defined('MW_INSTALL_PATH'))
     $IP = MW_INSTALL_PATH;
