@@ -136,6 +136,8 @@ $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
 
+$wgMaxFilenameLength = 50;
+
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = false;
 $wgGDAlwaysResample = true;
