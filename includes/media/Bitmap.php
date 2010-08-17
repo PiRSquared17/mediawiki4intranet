@@ -195,7 +195,7 @@ class BitmapHandler extends ImageHandler {
 
 			// Initialise the destination image to transparent instead of
 			// the default solid black, to support PNG and GIF transparency nicely
-			$background = imagecolorallocate( $dst_image, 0, 0, 0 );
+			$background = imagecolorallocatealpha( $dst_image, 0, 0, 0, 0x7f );
 			imagecolortransparent( $dst_image, $background );
 			imagealphablending( $dst_image, false );
 
