@@ -116,7 +116,6 @@ require_once($IP.'/extensions/SimpleTable/SimpleTable.php');
 require_once($IP.'/extensions/MagicNumberedHeadings/MagicNumberedHeadings.php');
 require_once($IP.'/extensions/MediaFunctions/MediaFunctions.php');
 require_once($IP.'/extensions/AllowGetParamsInWikilinks/AllowGetParamsInWikilinks.php');
-require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 require_once($IP.'/extensions/WikiBookmarks/WikiBookmarks.php');
 require_once($IP.'/extensions/SWFUpload/SWFUpload.php');
 require_once($IP.'/extensions/UserMagic/UserMagic.php');
