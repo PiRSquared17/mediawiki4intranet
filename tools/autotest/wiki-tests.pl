@@ -244,6 +244,7 @@ sub test_search
     my $title = $params->{searchtitle} || return;
     my $page = 1;
     my @found;
+    my @all_found;
     my $text;
     my $u;
     my $u1 = $su;
@@ -264,10 +265,11 @@ sub test_search
         check_php_warnings($text);
         @found = $text =~ /<li>(.*?)<\/li>/giso;
         decode_entities($_) for @found;
+        push @all_found, @found;
         return if grep { /\Q$title\E/is } @found;
         $page++;
     } while ($text =~ />\s*$page\s*</is);
-    die logp()." Not found: $title";
+    die logp()." Not found: $title. Found pages:\n".join("\n", @all_found)."\n";
 }
 
 sub test_checkurl
