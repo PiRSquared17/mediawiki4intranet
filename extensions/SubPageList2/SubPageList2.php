@@ -183,7 +183,7 @@ class SubpageList
         }
         if ($t = $options['template'])
             $this->template = $t;
-        else if ($egSubpagelistDefaultTemplate)
+        elseif ($egSubpagelistDefaultTemplate)
             $this->template = $egSubpagelistDefaultTemplate;
         else
             $this->template = $this->language->getNsText(NS_TEMPLATE).':'.$this->title->getPrefixedText();
