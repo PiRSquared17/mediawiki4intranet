@@ -126,6 +126,11 @@ require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
+# MWQuizzer
+$egMWQuizzerAdmins = array('VitaliyFilippov', 'StasFomin', 'WikiSysop');
+require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
+MediawikiQuizzer::setupNamespace(104);
+
 # Wikilog
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
 define('NS_BLOG', 100);
