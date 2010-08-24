@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1278432695 -14400
+# Date 1282649976 -14400
 Depends on: Y-000-debug-wikilog.diff
 
 Patch includes several simple fixes required for MediaWiki to run under
@@ -8,7 +8,7 @@ more restrictive PHP 5.3.x.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r b64d79c5381f -r af3a32bdf638 includes/FileDeleteForm.php
+diff -r 6b77a2bb86d2 -r 6ab561cf6d77 includes/FileDeleteForm.php
 --- includes/FileDeleteForm.php
 +++ includes/FileDeleteForm.php
 @@ -108,7 +108,7 @@
@@ -16,11 +16,11 @@ diff -r b64d79c5381f -r af3a32bdf638 includes/FileDeleteForm.php
  				// Need to delete the associated article
  				$article = new Article( $title );
 -				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, &$reason)) ) {
-+				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, $reason, $article->getId())) ) {
++				if( wfRunHooks('ArticleDelete', array(&$article, &$wgUser, &$reason, &$error)) ) {
  					if( $article->doDeleteArticle( $reason, $suppress, $id ) ) {
  						global $wgRequest;
  						if( $wgRequest->getCheck( 'wpWatch' ) ) {
-diff -r b64d79c5381f -r af3a32bdf638 languages/Language.php
+diff -r 6b77a2bb86d2 -r 6ab561cf6d77 languages/Language.php
 --- languages/Language.php
 +++ languages/Language.php
 @@ -1755,7 +1755,7 @@
