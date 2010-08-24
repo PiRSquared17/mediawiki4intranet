@@ -5432,9 +5432,7 @@ function haclSaveQuickacl($xml) {
  * @return <AjaxResponse> indicating if article exists, and if article is secured
  */
 function haclDoesArticleExists($articlename,$protect) {
-    global $haclgContLang, $wgContLang,
-    $wgCanonicalNamespaceNames;
-
+    global $haclgContLang, $wgContLang, $wgCanonicalNamespaceNames;
 
     $template = $haclgContLang->getSDTemplateName();
     $predefinedRightName = $haclgContLang->getPredefinedRightName();
@@ -5446,10 +5444,14 @@ function haclDoesArticleExists($articlename,$protect) {
     }
     if($protect == "namespace") {
         $response = new AjaxResponse();
-        $articlename = $wgContLang->getNsIndex($articlename);
 
-        if($articlename) {
-            $articlename = $wgContLang->getNsText($articlename);
+        if(strtolower(trim($articlename)) == 'main')
+            $articlename = 0;
+        else
+            $articlename = $wgContLang->getNsIndex($articlename);
+
+        if($articlename || $articlename === 0) {
+            $articlename = $articlename ? $wgContLang->getNsText($articlename) : 'Main';
             $sd = new Article(Title::newFromText("$ns:$protect/$articlename"));
             if($sd->exists()) {
                 $response->addText("sdexisting");
