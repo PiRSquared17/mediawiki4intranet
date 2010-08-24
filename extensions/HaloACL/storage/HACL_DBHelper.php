@@ -45,7 +45,7 @@ class HACLDBHelper {
      *      keys are not altered, if the table already exists.
      */
     public static function setupTable($table, $fields, $db, $verbose, $primaryKeys = "") {
-        global $wgDBname;
+        global $wgDBname, $wgDBTableOptions;
         HACLDBHelper::reportProgress("Setting up table $table ...\n",$verbose);
         if ($db->tableExists($table) === false) { // create new table
             $sql = 'CREATE TABLE ' . $wgDBname . '.' . $table . ' (';
@@ -61,7 +61,12 @@ class HACLDBHelper {
             if (!empty($primaryKeys)) {
                 $sql .= ", PRIMARY KEY(".$primaryKeys.")";
             }
-            $sql .= ') TYPE=myisam DEFAULT CHARSET=utf8 COLLATE=utf8_bin';
+            $topt = $wgDBTableOptions;
+            if (stripos($topt, "CHARSET") === false)
+                $topt .= " DEFAULT CHARSET=utf8";
+            if (stripos($topt, "COLLATE") === false)
+                $topt .= " COLLATE=utf8_bin";
+            $sql .= ") $topt";
             $db->query( $sql, 'HACLDBHelper::setupTable' );
             HACLDBHelper::reportProgress("   ... new table created\n",$verbose);
             return array();
