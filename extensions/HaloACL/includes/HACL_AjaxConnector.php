@@ -3566,7 +3566,7 @@ function haclSaveSecurityDescriptor($secDescXml) {
                         foreach($xml->xpath('//group') as $group) {
                             $foundModrights = true;
                             if($groups == '') {
-                                $groups = (string)$group;
+                                $groups = unescape((string)$group);
                             }else {
                                 $groups = $groups.",".unescape((string)$group);
                             }
