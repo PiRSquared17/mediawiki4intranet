@@ -93,7 +93,7 @@ $wgSubcategorizedAlwaysExclude = array('CustisWikiToLib',
 $wgGroupPermissions['*']['interwiki'] = false;
 $wgGroupPermissions['sysop']['interwiki'] = true;
 
-require_once($IP.'/extensions/Interwiki/SpecialInterwiki.php');
+require_once($IP.'/extensions/Interwiki/Interwiki.php');
 require_once($IP.'/extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php');
 
 require_once($IP.'/extensions/DocExport/DocExport.php');
