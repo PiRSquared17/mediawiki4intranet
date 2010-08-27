@@ -179,7 +179,7 @@ class SpecialInterwiki extends SpecialPage {
 		global $wgRequest, $wgOut;
 		$prefix = $wgRequest->getVal( 'wpInterwikiPrefix' );
 		$do = $wgRequest->getVal( 'wpInterwikiAction' );
-		if( preg_match( '/[\s:&=]/', $prefix ) ) {
+		if( $do != 'delete' && preg_match( '/[\s:&=]/', $prefix ) ) {
 			$this->error( 'interwiki-badprefix', htmlspecialchars( $prefix ) );
 			$this->showForm( $do );
 			return;
