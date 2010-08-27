@@ -153,7 +153,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
@@ -194,7 +194,8 @@ class Parser
 		$this->mLastSection = '';
 		$this->mDTopen = false;
 		$this->mIncludeCount = array();
-		$this->mStripState = new StripState;
+		if ( !$this->mStripState )
+			$this->mStripState = new StripState;
 		$this->mArgStack = false;
 		$this->mInPre = false;
 		$this->mLinkHolders = new LinkHolderArray( $this );
@@ -2161,10 +2162,10 @@ class Parser
 				wfProfileIn( __METHOD__."-paragraph" );
 				# No prefix (not in list)--go to paragraph mode
 				// XXX: use a stack for nestable elements like span, table and div
-				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
+				$openmatch = preg_match('/(?:<table|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
 				$closematch = preg_match(
-					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
-					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
+					'/(?:<\\/table|<blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
+					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<center)/iS', $t );
 				if ( $openmatch or $closematch ) {
 					$paragraphStack = false;
 					# TODO bug 5718: paragraph closed
@@ -3452,7 +3453,7 @@ class Parser
 	 * @private
 	 */
 	function formatHeadings( $text, $isMain=true ) {
-		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
+		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
 
 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
 		$showEditLink = $this->mOptions->getEditSection();
@@ -3595,6 +3596,8 @@ class Parser
 						$dot = 1;
 					}
 				}
+				if ($wgDotAfterTocnumber)
+					$numbering .= '.';
 			}
 
 			# The safe header is a version of the header text safe to use for links
@@ -3678,6 +3681,10 @@ class Parser
 
 			# Don't number the heading if it is the only one (looks silly)
 			if( $doNumberHeadings && count( $matches[3] ) > 1) {
+				# Bug 54239 - Ссылки на разделы с нумерацией
+				if (!$headNumberReplacer)
+					$headNumberReplacer = new ReplacementArray();
+				$headNumberReplacer->setPair('>'.trim($headline).'</a>', '>'.$numbering.' '.trim($headline).'</a>');
 				# the two are different if the line contains a link
 				$headline=$numbering . ' ' . $headline;
 			}
@@ -3727,6 +3734,10 @@ class Parser
 			}
 			$toc = $sk->tocList( $toc );
 		}
+
+		# Bug 54239 - Ссылки на разделы с нумерацией
+		if ($headNumberReplacer)
+			$text = $headNumberReplacer->replace($text);
 
 		# split up and insert constructed headlines
 
