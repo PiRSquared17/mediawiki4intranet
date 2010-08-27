@@ -310,7 +310,9 @@ class CategoryTree {
 		global $wgDBname;
 		$title = self::makeTitle( $category );
 
-		if ( ! $title ) return false; #TODO: error message?
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+		if ( ! $title || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx() ) return false; #TODO: error message?
+/*op-patch|TS|2010-04-27|end*/
 
 		# Retrieve page_touched for the category
 		$dbkey = $title->getDBkey();
@@ -362,7 +364,9 @@ class CategoryTree {
 		}
 		$title = self::makeTitle( $category );
 
-		if ( $title === false || $title === NULL ) return false;
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+		if ( $title === false || $title === NULL || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx() ) return false;
+/*op-patch|TS|2010-04-27|end*/
 
 		if ( isset( $attr['class'] ) ) $attr['class'] .= ' CategoryTreeTag';
 		else $attr['class'] = ' CategoryTreeTag';
@@ -489,6 +493,10 @@ class CategoryTree {
 				#TODO: translation support; ideally added to Title object
 				$t = Title::newFromRow( $row );
 			}
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if ( method_exists($t, 'userCanReadEx') && !$t->userCanReadEx() )
+				continue;
+/*op-patch|TS|2010-04-27|end*/
 
 			$cat = NULL;
 
@@ -541,6 +549,10 @@ class CategoryTree {
 		while ( $row = $dbr->fetchObject( $res ) ) {
 			#TODO: translation support; ideally added to Title object
 			$t = Title::newFromRow( $row );
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if ( method_exists($t, 'userCanReadEx') && !$t->userCanReadEx() )
+				continue;
+/*op-patch|TS|2010-04-27|end*/
 
 			#$trans = $title->getLocalizedText();
 			$trans = ''; #place holder for when translated titles are available
