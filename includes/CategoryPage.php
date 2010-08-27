@@ -145,6 +145,11 @@ class CategoryViewer {
 	 * @deprecated kept for compatibility, please use addSubcategoryObject instead
 	 */
 	function addSubcategory( $title, $sortkey, $pageLength ) {
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		if (!$title->userCanReadEx()) {
+			return;
+		}
+/*op-patch|TS|2009-06-19|end*/  
 		global $wgContLang;
 		// Subcategory; strip the 'Category' namespace from the link text.
 		$this->children[] = $this->getSkin()->makeKnownLinkObj(
@@ -191,6 +196,12 @@ class CategoryViewer {
 	 * Add a miscellaneous page
 	 */
 	function addPage( $title, $sortkey, $pageLength, $isRedirect = false ) {
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		if (!$title->userCanReadEx()) {
+			return;
+		}
+/*op-patch|TS|2009-06-19|end*/  
+		
 		global $wgContLang;
 		$this->articles[] = $isRedirect
 			? '<span class="redirect-in-category">' . $this->getSkin()->makeKnownLinkObj( $title ) . '</span>'
