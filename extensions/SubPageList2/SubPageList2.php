@@ -289,7 +289,7 @@ class SubpageList
             $options['ORDER BY'] = '`page_touched` ' . $order;
         if ($this->parent || !is_null($this->parent) && ($this->category || $deepness))
             $parent = str_replace(' ', '_', $this->parent);
-        else
+        elseif (is_null($this->parent))
             $parent = $this->title->getDBkey() . '/';
         if ($this->ignore)
             foreach ($this->ignore as $aignore)
@@ -401,10 +401,10 @@ class SubpageList
         {
             $this->parser->mRevisionId = $article->getRevIdFetched();
             $this->parser->mRevisionTimestamp = $article->getTimestamp();
-            if (!$dom && "$dom" !== "0")
+            if ($dom === NULL)
                 $dom = $article->getContent();
         }
-        if (!$dom && "$dom" !== "0")
+        if ($dom === NULL)
             return '';
         if (!is_object($dom))
         {
