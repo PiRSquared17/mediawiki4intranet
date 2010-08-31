@@ -30,17 +30,15 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 	die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
-define('HACL_HALOACL_VERSION', '1.0');
-
 define('HACL_STORE_SQL', 'HaclStoreSQL');
 // constant for special schema properties
-
 
 ###
 # This is the path to your installation of HaloACL as seen on your
 # local filesystem. Used against some PHP file path issues.
 ##
-$haclgIP = $IP . '/extensions/HaloACL';
+if (!$haclgIP)
+    $haclgIP = $IP . '/extensions/HaloACL';
 ##
 
 ###
@@ -48,7 +46,8 @@ $haclgIP = $IP . '/extensions/HaloACL';
 # web. Change it if required ($wgScriptPath is the path to the base directory
 # of your wiki). No final slash.
 ##
-$haclgHaloScriptPath = $wgScriptPath . '/extensions/HaloACL';
+if (!$haclgHaloScriptPath)
+    $haclgHaloScriptPath = 'extensions/HaloACL';
 
 ###
 # Set this variable to false to disable the patch that checks all titles
@@ -58,7 +57,18 @@ $haclgHaloScriptPath = $wgScriptPath . '/extensions/HaloACL';
 # denied" is returned. This is the best and securest way of protecting an article,
 # however, it slows down things a bit.
 ##
-$haclgEnableTitleCheck = false;
+if ($haclgEnableTitleCheck === NULL)
+    $haclgEnableTitleCheck = false;
+
+###
+# This variable controls the behaviour of unreadable articles included into other
+# articles. When it is a non-empty string, it is treated as the name of a message
+# inside MediaWiki: namespace (i.e. localisation message). When it is set to an
+# empty string, nothing is displayed in place of protected inclusion. When it is
+# set to boolean FALSE, inclusion directive is shown instead of article content.
+###
+if ($haclgInclusionDeniedMessage === NULL)
+    $haclgInclusionDeniedMessage = 'haloacl-inclusion-denied';
 
 ###
 # This flag applies to articles that have or inherit no security descriptor.
@@ -72,7 +82,8 @@ $haclgEnableTitleCheck = false;
 # false
 #    If it is <false>, no access is granted at all. Only the latest author of an 
 #    article can create a security descriptor. 
-$haclgOpenWikiAccess = true;
+if ($haclgOpenWikiAccess === NULL)
+    $haclgOpenWikiAccess = true;
 
 ###
 # true
@@ -80,7 +91,8 @@ $haclgOpenWikiAccess = true;
 # false
 #    If it is <false>, semantic properties are not protected even if they have 
 #	 security descriptors.  
-$haclgProtectProperties = false;
+if ($haclgProtectProperties === NULL)
+    $haclgProtectProperties = false;
 
 ###
 # By design several databases can be connected to HaloACL. (However, in the first
@@ -89,7 +101,8 @@ $haclgProtectProperties = false;
 # Possible values:
 # - HACL_STORE_SQL
 ##
-$haclgBaseStore = HACL_STORE_SQL;
+if ($haclgBaseStore === NULL)
+    $haclgBaseStore = HACL_STORE_SQL;
 
 ###
 # This array contains the names of all namespaces that can not be protected by
@@ -100,7 +113,8 @@ $haclgBaseStore = HACL_STORE_SQL;
 # in that namespace, even if security descriptors for individual articles define
 # another set authorized users.
 # The name of the main namespace is 'Main'.
-$haclgUnprotectableNamespaces = array();
+if ($haclgUnprotectableNamespaces === NULL)
+    $haclgUnprotectableNamespaces = array();
 
 ###
 # This is the name of the master template that is used as default rights template
@@ -146,7 +160,8 @@ $haclgDefaultQuickAccessRightMasterTemplates = array(
 # If $haclgEvaluatorLog is <true>, you can specify the URL-parameter "hacllog=true".
 # In this case HaloACL echos the reason why actions are permitted or prohibited.
 #
-$haclgEvaluatorLog = true;
+if ($haclgEvaluatorLog === NULL)
+    $haclgEvaluatorLog = true;
 
 ##
 # This key is used for protected properties in Semantic Forms. SF has to embed
@@ -154,8 +169,8 @@ $haclgEvaluatorLog = true;
 # and not visible to the user (i.e. user has no right to read.) The values of
 # all protected fields are encrypted with the given key.
 # YOU SHOULD CHANGE THIS KEY AND KEEP IT SECRET. 
-$haclgEncryptionKey = "Es war einmal ein Hase.";
-
+if ($haclgEncryptionKey === NULL)
+    $haclgEncryptionKey = "Es war einmal ein Hase.";
 
 # load global functions
 require_once('HACL_GlobalFunctions.php');
@@ -167,17 +182,18 @@ require_once('HACL_GlobalFunctions.php');
 # be the smallest even namespace number that is not in use yet. However, it
 # must not be smaller than 100.
 ##
-$haclgNamespaceIndex = 102;
+if (!$haclgNamespaceIndex)
+    $haclgNamespaceIndex = 102;
 haclfInitNamespaces();
 
 // mediawiki-groups that may access whitelists
-global $haclWhitelistGroups;
-$haclWhitelistGroups = array('bureaucrat');
+if ($haclWhitelistGroups === NULL)
+    $haclWhitelistGroups = array('bureaucrat');
 
 // mediawiki-groups that may access other user template
 // mediawiki-groups that may access whitelists
-global $haclCrossTemplateAccess;
-$haclCrossTemplateAccess = array('bureaucrat');
+if ($haclCrossTemplateAccess === NULL)
+    $haclCrossTemplateAccess = array('bureaucrat');
 
 $wgGroupPermissions['*']['propertyread'] = true;
 $wgGroupPermissions['*']['propertyformedit'] = true;
@@ -190,4 +206,3 @@ $wgGroupPermissions['*']['wysiwyg'] = true;
 $wgAvailableRights[] = 'propertyread';
 $wgAvailableRights[] = 'propertyformedit';
 $wgAvailableRights[] = 'propertyedit';
-
