@@ -126,6 +126,15 @@ require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
+# HaloACL
+if (!isset($egDisableHaloACL))
+{
+    require_once('extensions/HaloACL/includes/HACL_Initialize.php');
+    enableHaloACL();
+    $haclgInclusionDeniedMessage = '';
+    $haclgEnableTitleCheck = true;
+}
+
 # MWQuizzer
 $egMWQuizzerAdmins = array('VitaliyFilippov', 'StasFomin', 'WikiSysop');
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');

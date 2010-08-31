@@ -27,9 +27,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
-$haclgDoEnableTitleCheck = haclfDisableTitlePatch();
-
-
 /**
  * Switch on Halo Access Control Lists. This function must be called in
  * LocalSettings.php after HACL_Initialize.php was included and default values
@@ -70,7 +67,7 @@ function enableHaloACL() {
     $wgAutoloadClasses['HACLQueryRewriter'] = $haclgIP . '/includes/HACL_QueryRewriter.php';
     $wgAutoloadClasses['HACLQuickacl'] = $haclgIP . '/includes/HACL_Quickacl.php';
     $wgAutoloadClasses['HACLToolbar'] = $haclgIP . '/includes/HACL_Toolbar.php';
-    
+
     // UI
     $wgAutoloadClasses['HACL_GenericPanel'] = $haclgIP . '/includes/HACL_GenericPanel.php';
     $wgAutoloadClasses['HACL_helpPopup'] = $haclgIP . '/includes/HACL_helpPopup.php';
@@ -95,11 +92,16 @@ function enableHaloACL() {
  */
 function haclfSetupExtension() {
     wfProfileIn('haclfSetupExtension');
+
     global $haclgIP, $wgHooks, $wgParser, $wgExtensionCredits,
     $wgLanguageCode, $wgVersion, $wgRequest, $wgContLang;
 
-    global $haclgDoEnableTitleCheck;
-    haclfRestoreTitlePatch($haclgDoEnableTitleCheck);
+    /* Title patch is disabled until full initialization of extension.
+     * This was formerly done with haclfDisableTitleCheck() in the beginning
+     * of this file and haclfRestoreTitleCheck() here.
+     * But this does not allow changing $haclgEnableTitlePatch after enabling HaloACL.
+     */
+    define('HACL_HALOACL_VERSION', '1.0');
 
     //--- Register hooks ---
     global $wgHooks;
@@ -115,7 +117,6 @@ function haclfSetupExtension() {
     $wgHooks['PageRenderingHash'][]    = 'haclfPageRenderingHash';
     $wgHooks['SpecialMovepageAfterMove'][] = 'HACLParserFunctions::articleMove';
 
-
     global $haclgProtectProperties;
     if ($haclgProtectProperties === true) {
         $wgHooks['FilterQueryResults'][] = 'HACLResultFilter::filterResult';
@@ -126,12 +127,12 @@ function haclfSetupExtension() {
     }
 
     global $haclgNewUserTemplate, $haclgDefaultQuickAccessRights;
-    if (isset($haclgNewUserTemplate) || 
-    	isset($haclgDefaultQuickAccessRightMasterTemplates)) {
+    if (isset($haclgNewUserTemplate) ||
+        isset($haclgDefaultQuickAccessRightMasterTemplates)) {
         $wgHooks['UserLoginComplete'][] = 'HACLDefaultSD::newUser';
     }
 
-    #	$wgHooks['InternalParseBeforeLinks'][] = 'SMWParserExtensions::onInternalParseBeforeLinks'; // parse annotations in [[link syntax]]
+#    $wgHooks['InternalParseBeforeLinks'][] = 'SMWParserExtensions::onInternalParseBeforeLinks'; // parse annotations in [[link syntax]]
 
 	/*
 	 if( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
@@ -147,37 +148,36 @@ function haclfSetupExtension() {
     $wgHooks['BeforePageDisplay'][]='haclfAddPageHeader';
 
     //-- Hooks for ACL toolbar--
-	$wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
-	$wgHooks['sfEditPageBeforeForm'][]      = 'haclfAddToolbarForSemanticForms';
-
+    $wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
+    $wgHooks['sfEditPageBeforeForm'][]      = 'haclfAddToolbarForSemanticForms';
 
     //-- includes for Ajax calls --
     global $wgUseAjax, $wgRequest;
     if ($wgUseAjax && $wgRequest->getVal('action') == 'ajax' ) {
-		$funcName = isset( $_POST["rs"] ) 
-						? $_POST["rs"] 
-						: (isset( $_GET["rs"] ) ? $_GET["rs"] : NULL);
-    	if (strpos($funcName, 'hacl') === 0) {
-			require_once('HACL_Toolbar.php');
-			require_once('HACL_AjaxConnector.php');
-    	}
+        $funcName = isset( $_POST["rs"] )
+                        ? $_POST["rs"]
+                        : (isset( $_GET["rs"] ) ? $_GET["rs"] : NULL);
+        if (strpos($funcName, 'hacl') === 0) {
+            require_once('HACL_Toolbar.php');
+            require_once('HACL_AjaxConnector.php');
+        }
     }
-    
+
     //--- credits (see "Special:Version") ---
     $wgExtensionCredits['other'][]= array(
-        'name'=>'HaloACL',
-        'version'=>HACL_HALOACL_VERSION,
-        'author'=>"Thomas Schweitzer",
-        'url'=>'http://smwforum.ontoprise.de',
+        'name'        => 'HaloACL',
+        'version'     => HACL_HALOACL_VERSION,
+        'author'      => "Thomas Schweitzer",
+        'url'         => 'http://smwforum.ontoprise.de',
         'description' => 'Protect the content of your wiki.');
 
     // Register autocompletion icon
     $wgHooks['smwhACNamespaceMappings'][] = 'haclfRegisterACIcon';
 
-
     // Handle input fields of Semantic Forms
     $wgHooks['sfCreateFormField'][] = 'haclfHandleFormField';
     wfProfileOut('haclfSetupExtension');
+
     return true;
 }
 
@@ -198,7 +198,9 @@ function haclfAddPageHeader(&$out)
  * @return <type>
  */
 function addNonSpecialPageHeader(&$out) {
-    global $haclgHaloScriptPath, $smwgDeployVersion;
+    global $haclgHaloScriptPath, $smwgDeployVersion, $wgScriptPath;
+    if ($haclgHaloScriptPath{0} != '/')
+        $haclgHaloScriptPath = $wgScriptPath.'/'.$haclgHaloScriptPath;
     if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
