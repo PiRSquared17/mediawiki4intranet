@@ -3488,12 +3488,12 @@ class Title {
 	 */
 	private function checkAccessControl() {
 		if (!defined('HACL_HALOACL_VERSION')) {
-			//HaloACL is disabled
+			// HaloACL is disabled or not fully initialized
 			return $this;
 		}
 		global $haclgEnableTitleCheck;
 		if (isset($haclgEnableTitleCheck) && $haclgEnableTitleCheck === false) {
-			return $this;  
+			return $this;
 		}
 		static $permissionCache = array();
 		
@@ -3504,7 +3504,6 @@ class Title {
 		if ($this->getFullText() != $currentTitle) {
 			$action = 'read';
 		}
-//		echo $this->getText()."($action): ";
 		$index = $this->getFullText().'-'.$action; // A bug was fixed here thanks to Dave MacDonald
 		$allowed = @$permissionCache[$index];
 		if (!isset($allowed)) {
