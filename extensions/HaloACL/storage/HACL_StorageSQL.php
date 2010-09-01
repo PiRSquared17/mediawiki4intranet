@@ -648,14 +648,11 @@ class HACLStorageSQL {
         return ($obj !== false);
     }
 
-
     /***************************************************************************
      *
      * Functions for security descriptors (SD)
      *
      **************************************************************************/
-
-
 
     /**
      * Retrieves all SDs from
@@ -670,33 +667,45 @@ class HACLStorageSQL {
     {
         $dbr =& wfGetDB( DB_SLAVE );
 
-        $where = array();
+        $or = array(
+            'all' => 0x3F,
+            'page' => 0x01,
+            'category' => 0x02,
+            'namespace' => 0x04,
+            'property' => 0x08,
+            'standardacl' => 0x0F,
+            'acltemplate' => 0x10,
+            'defusertemplate' => 0x20,
+        );
+        $mask = 0;
         foreach ($types as $type)
+            $mask = $mask | $or["$type"];
+        $where = array();
+        if (($mask & 0x3F) != 0x3F)
         {
-            switch($type)
+            $t = array();
+            if ($mask & 0x01)
+                $t[] = 'page';
+            if ($mask & 0x02)
+                $t[] = 'category';
+            if ($mask & 0x04)
+                $t[] = 'namespace';
+            if ($mask & 0x08)
+                $t[] = 'property';
+            if (($mask & 0x30) == 0x30)
+                $t[] = 'right';
+            elseif ($mask & 0x30)
             {
-                case "all":
-                    break;
-                case "category":
-                case "property":
-                case "namespace":
-                case "page":
-                    $where['type'] = $type;
-                    break;
-                case "standardacl":
-                    $where['type'] = array('namespace', 'property', 'category', 'page');
-                    break;
-                case "acltemplate":
-                case "defusertemplate":
-                    $where['pe_id'] = 0;
-                    // strip leading "Template/"
-                    $u = $dbr->tableName('user');
-                    $where[] =
-                        "SUBSTRING(page_title FROM 10) " .
-                        ($type == 'acltemplate' ? "NOT " : "") . 
-                        "IN (SELECT user_name FROM $u)";
-                    break;
+                // strip leading "Template/"
+                $u = $dbr->tableName('user');
+                $where[] = "type='right' AND SUBSTRING(page_title FROM 10) " .
+                    ($mask & 0x10 ? '' : 'NOT') .
+                    " IN (SELECT user_name FROM $u)";
             }
+            if ($t)
+                $where[] = "type IN ('".implode("','", $t)."')";
+            if ($where)
+                $where = '(' . implode(') OR (', $where) . ')';
         }
 
         $sds = array();

@@ -23,7 +23,6 @@
  *
  */
 
-
 // defining customnode
 YAHOO.widget.ManageUserNode = function(oData, oParent, expanded, checked) {
     YAHOO.widget.ManageUserNode.superclass.constructor.call(this,oData,oParent,expanded);
@@ -56,11 +55,8 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
      */
     groupId: 0,
 
-
     information:"",
-
     description:"",
-
 
     /**
      * tree type
@@ -104,11 +100,9 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
             this.tree.createEvent("checkClick", this.tree);
         }
         this.tree.subscribe('clickEvent',this.checkClick);
-				
+
         this.subscribe("parentChange", this.customNodeParentChange);
-
     },
-
 
     /**
      * set group id
@@ -164,7 +158,6 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         return "ygtvcheck" + this.checkState;
     },
 
-
     /**
      * Invoked when the user clicks the check box
      */
@@ -184,9 +177,6 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         }
 
     },
-
-
-
 
     /**
      * Override to get the check click event
@@ -342,7 +332,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         this.tt1 = new YAHOO.widget.Tooltip("tt1_group"+this.labelElId, {
             context:this.labelElId,
             text:this.information,
-            zIndex :10
+            zIndex:10
         });
         sb[sb.length] = '</span></td>';
 
@@ -354,14 +344,9 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         sb[sb.length] = '>';
         sb[sb.length] = '<div class="ygtvspacer haloacl_manageuser_checkbox"></div></td>';
 
-
-
-
         return sb.join("");
     }
 });
-
-
 
 /*
  * treeview-dataconnect
@@ -370,15 +355,15 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
  * @param callback for asyncRequest
  */
 YAHOO.haloacl.manageUser.treeviewDataConnect = function(action,parameterlist,callback){
-    var url= "?action=ajax";
-    var appendedParams = '';
-    appendedParams = '&rs='+action;
-    var temparray = new Array();
-    for(param in parameterlist){
-        temparray.push(parameterlist[param]);
+    var url = "?action=ajax";
+    var querystring = "rs="+action;
+
+    if(parameterlist != null){
+        for(param in parameterlist){
+            querystring = querystring + "&rsargs[]="+parameterlist[param];
+        }
     }
-    appendedParams = appendedParams + "&rsargs="+ temparray;
-    YAHOO.util.Connect.asyncRequest('POST', url, callback,appendedParams);
+    YAHOO.util.Connect.asyncRequest('POST', url, callback, querystring);
 };
 
 /*
@@ -390,13 +375,12 @@ YAHOO.haloacl.manageUser.loadNodeData = function(node, fnLoadComplete)  {
 
     var nodeLabel = encodeURI(node.label);
 
-
-    //prepare our callback object
+    // prepare our callback object
     var callback = {
         panelid:"",
 
-        //if our XHR call is successful, we want to make use
-        //of the returned data and create child nodes.
+        // if our XHR call is successful, we want to make use
+        // of the returned data and create child nodes.
         success: function(oResponse) {
             YAHOO.haloacl.manageUser.buildNodesFromData(node,YAHOO.lang.JSON.parse(oResponse.responseText,panelid));
             oResponse.argument.fnLoadComplete();
@@ -416,10 +400,6 @@ YAHOO.haloacl.manageUser.loadNodeData = function(node, fnLoadComplete)  {
     },callback);
 
 };
-
-
-
-
 
 /*
  * function to build nodes from data
@@ -547,11 +527,8 @@ YAHOO.haloacl.manageUser.buildUserTree = function(tree,data) {
 
     };
 
-
-
     //tree.setDynamicLoad(loadNodeData);
     tree.draw();
-
 };
 
 

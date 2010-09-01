@@ -82,7 +82,6 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
      */
     groupId: 0,
 
-
     /**
      * tree type
      * rw=read/write, r=read
@@ -126,7 +125,6 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
 
         this.tree.subscribe('clickEvent',this.checkClick);
         this.subscribe("parentChange", this.customNodeParentChange);
-
     },
 
 
@@ -376,17 +374,11 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
             sb[sb.length] = '>';
             sb[sb.length] = '<div id="deletebutton_'+this.panelid+'_'+this.label+'" class="ygtvspacer" onClick="'+this.tree.labelClickAction+'(\''+this.label+'\',this);">&nbsp;</div></td>';
             YAHOO.haloacl.addTooltip('tooltip_deletebutton_'+this.panelid+'_'+this.label+'','deletebutton_'+this.panelid+'_'+this.label,"Click to remove Group from assigned Groups");
-
-
-
         }
-
 
         return sb.join("");
     }
 });
-
-
 
 /*
  * treeview-dataconnect
@@ -395,27 +387,15 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
  * @param callback for asyncRequest
  */
 YAHOO.haloacl.treeviewDataConnect = function(action,parameterlist,callback){
-    var url= "?action=ajax";
-    var appendedParams = '';
-    appendedParams = '&rs='+action;
-    var temparray = new Array();
-
-    /*
-    for(param in parameterlist){
-        temparray.push(parameterlist[param]);
-    }
-    */
+    var url = "?action=ajax";
     var querystring = "rs="+action;
 
     if(parameterlist != null){
         for(param in parameterlist){
-            // temparray.push(parameterlist[param]);
             querystring = querystring + "&rsargs[]="+parameterlist[param];
         }
     }
-
-    appendedParams = appendedParams + "&rsargs="+ temparray;
-    YAHOO.util.Connect.asyncRequest('POST', url, callback,querystring);
+    YAHOO.util.Connect.asyncRequest('POST', url, callback, querystring);
 };
 
 /*
@@ -429,13 +409,12 @@ YAHOO.haloacl.loadNodeData = function(node, fnLoadComplete)  {
 
     var panelid = node.tree.panelid;
 
-
-    //prepare our callback object
+    // prepare our callback object
     var callback = {
         panelid:"",
 
-        //if our XHR call is successful, we want to make use
-        //of the returned data and create child nodes.
+        // if our XHR call is successful, we want to make use
+        // of the returned data and create child nodes.
         success: function(oResponse) {
             YAHOO.haloacl.buildNodesFromData(node,YAHOO.lang.JSON.parse(oResponse.responseText));
             oResponse.argument.fnLoadComplete();
@@ -456,10 +435,6 @@ YAHOO.haloacl.loadNodeData = function(node, fnLoadComplete)  {
 
 };
 
-
-
-
-
 /*
  * function to build nodes from data
  * @param parent node / root
@@ -468,7 +443,7 @@ YAHOO.haloacl.loadNodeData = function(node, fnLoadComplete)  {
 YAHOO.haloacl.buildNodesFromData = function(parentNode,data,panelid){
     var loadNodeData = function(node, fnLoadComplete)  {
         var nodeLabel = encodeURI(node.label);
-        //prepare our callback object
+        // prepare our callback object
         var callback = {
             panelid:"",
             success: function(oResponse) {
@@ -490,7 +465,7 @@ YAHOO.haloacl.buildNodesFromData = function(parentNode,data,panelid){
 
     };
 
-    for(var i= 0, len = data.length; i<len; ++i){
+    for(var i = 0, len = data.length; i<len; ++i){
         var element = data[i];
 
         var elementWidth = 340;
@@ -606,7 +581,6 @@ YAHOO.haloacl.buildUserTree = function(tree,data) {
 
 };
 
-
 /*
  * builds mirrored, read only user tree for "assigned" panel from existing r/w user tree in "select" panel
  * @param tree
@@ -643,7 +617,6 @@ YAHOO.haloacl.buildUserTreeRO = function(rwTree,tree) {
             }
             */
 
-
             var groupsInTree = false;
             var groupsarray = YAHOO.haloacl.getGroupsArray(tree.panelid);
             for(var i=0;i<groupsarray.length;i++){
@@ -673,10 +646,7 @@ YAHOO.haloacl.buildUserTreeRO = function(rwTree,tree) {
     YAHOO.haloacl.treeviewDataConnect('haclGetGroupsForRightPanel',{
         query:'all'
     },callback);
-
 };
-
-
 
 /*
  * pre-"ticks" groups from an array. Used when displaying a right panel of an exisiting right
@@ -694,10 +664,6 @@ YAHOO.haloacl.preloadCheckedGroups = function(groups, tree) {
     }
 
 }
-
-
-
-
 
 /*
  * function to be called from outside to init a tree
@@ -743,6 +709,7 @@ YAHOO.haloacl.getCheckedNodesFromTree = function(tree, nodes){
 
     return checkedNodes;
 };
+
 /**
  *  applies filter on tree
  *  @param tree-instance
@@ -772,8 +739,7 @@ YAHOO.haloacl.applyFilterOnTree = function(tree,filtervalue){
             }
         };
         YAHOO.haloacl.treeviewDataConnect('haclGetGroupsForRightPanel',{
-            query:'all',
-            filtervalue:filtervalue
+            query:'all'
         },callback);
 
         //tree.setDynamicLoad(loadNodeData);
