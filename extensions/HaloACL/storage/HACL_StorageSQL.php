@@ -928,7 +928,7 @@ class HACLStorageSQL {
             return $sdIDs;
         }
         $res = $dbr->select('halo_acl_security_descriptors', 'sd_id',
-            array('pe_id != 0', 'sd_id' => $parentIDs), __METHOD__);
+            array("type != 'right'", 'sd_id' => $parentIDs), __METHOD__);
 
         while ($row = $dbr->fetchObject($res)) {
             $sdIDs[] = (int) $row->sd_id;
