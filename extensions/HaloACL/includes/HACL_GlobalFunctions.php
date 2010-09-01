@@ -189,6 +189,19 @@ function haclfAddPageHeader(&$out)
     else
         return addNonSpecialPageHeader($out);
 }
+
+/**
+ * Check $haclgHaloScriptPath and prepend it with $wgScriptPath
+ * if it is not yet absolute.
+ */
+function haclCheckScriptPath()
+{
+    global $haclgHaloScriptPath, $wgScriptPath;
+    if ($haclgHaloScriptPath{0} != '/')
+        $haclgHaloScriptPath = $wgScriptPath.'/'.$haclgHaloScriptPath;
+    return $haclgHaloScriptPath;
+}
+
 /**
  *  adding headers for non-special-pages
  *  atm only used for toolbar-realted stuff
@@ -198,9 +211,8 @@ function haclfAddPageHeader(&$out)
  * @return <type>
  */
 function addNonSpecialPageHeader(&$out) {
-    global $haclgHaloScriptPath, $smwgDeployVersion, $wgScriptPath;
-    if ($haclgHaloScriptPath{0} != '/')
-        $haclgHaloScriptPath = $wgScriptPath.'/'.$haclgHaloScriptPath;
+    global $haclgHaloScriptPath, $smwgDeployVersion;
+    haclCheckScriptPath();
     if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
         $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
@@ -307,9 +319,10 @@ function addNonSpecialPageHeader(&$out) {
  */
 function haclAddHTMLHeader(&$out) {
 
-    global $wgTitle,$wgUser;
+    global $wgTitle, $wgUser;
 
     global $haclgHaloScriptPath, $smwgDeployVersion;
+    haclCheckScriptPath();
 
     if ($wgTitle->getNamespace() != NS_SPECIAL) {
         return true;
@@ -670,6 +683,8 @@ function haclfArticleID($articleName, $defaultNS = NS_MAIN) {
  */
 function haclAddJSLanguageScripts(& $jsm, $mode = "all", $namespace = -1, $pages = array()) {
     global $haclgIP, $haclgHaloScriptPath, $wgUser;
+
+    haclCheckScriptPath();
 
     // content language file
     $jsm->addScript('<script type="text/javascript" src="'.$haclgHaloScriptPath . '/scripts/Language/HaloACL_Language.js'.  '"></script>', $mode, $namespace, $pages);
