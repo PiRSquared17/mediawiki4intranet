@@ -46,13 +46,13 @@ class HACL_GenericPanel {
         $this->panelid = $panelid;
 
         $this->header = <<<HTML
-	<!-- start of panel div-->
-	<div id="$panelid" class="panel haloacl_panel">
-		<!-- panel's top bar -->
-		<div id="title_$panelid" class="panel haloacl_panel_title">
-			<span class="haloacl_panel_expand-collapse">
+    <!-- start of panel div-->
+    <div id="$panelid" class="panel haloacl_panel">
+        <!-- panel's top bar -->
+        <div id="title_$panelid" class="panel haloacl_panel_title">
+            <span class="haloacl_panel_expand-collapse">
                             <a id="exp_col_link_$panelid" href="javascript:YAHOO.haloacl.viewGenericPanelContent_$panelid();">&nbsp;<div id="exp-collapse-button_$panelid" class="haloacl_panel_button_collapse"></div></a>
-			</span>
+            </span>
                         <div class="haloacl_panel_nameDescr">
                             <span id="haloacl_panel_name_$panelid" class="panel haloacl_panel_name">$title</span>
                             <span id="haloacl_panel_descr_$panelid" class="panel haloacl_panel_descr">$description</span>
@@ -79,9 +79,9 @@ HTML;
 
         if($showClose) {
             $this->header .= <<<HTML
-			<span id="closebutton_$panelid" class="button haloacl_panel_close">
-				<a href="javascript:YAHOO.haloacl.removePanel('$panelid');"><div id="close-button_$panelid" class="haloacl_panel_button_close"></div></a>
-			</span>
+            <span id="closebutton_$panelid" class="button haloacl_panel_close">
+                <a href="javascript:YAHOO.haloacl.removePanel('$panelid');"><div id="close-button_$panelid" class="haloacl_panel_button_close"></div></a>
+            </span>
 HTML;
         }
         $this->header .="</div>";

@@ -25,7 +25,7 @@
  * 
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
-	die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
+    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
  //--- Includes ---
@@ -39,83 +39,83 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * 
  */
 class  HACLResultFilter  {
-	
-	//--- Constants ---
-//	const XY= 0;		// the result has been added since the last time
-		
-	//--- Private fields ---
-	private $mXY;    		//string: comment
-	
-	/**
-	 * Constructor for  HACLResultFilter
-	 *
-	 * @param type $param
-	 * 		Name of the notification
-	 */		
-	function __construct() {
-//		$this->mXY = $xy;
-	}
-	
+    
+    //--- Constants ---
+//    const XY= 0;        // the result has been added since the last time
+        
+    //--- Private fields ---
+    private $mXY;            //string: comment
+    
+    /**
+     * Constructor for  HACLResultFilter
+     *
+     * @param type $param
+     *         Name of the notification
+     */        
+    function __construct() {
+//        $this->mXY = $xy;
+    }
+    
 
-	//--- getter/setter ---
-//	public function getXY()           {return $this->mXY;}
+    //--- getter/setter ---
+//    public function getXY()           {return $this->mXY;}
 
-//	public function setXY($xy)               {$this->mXY = $xy;}
-	
-	//--- Public methods ---
-	
-	
-	/**
-	 * This callback function for the parser hook "FilterQueryResults" removes
-	 * all protected pages from a query result.
-	 *
-	 * @param SMWQueryResult $qr
-	 * 		The query result that is modified
-	 */
-	public static function filterResult(SMWQueryResult &$qr) {
-		$msgAdded = false;
-		$newqr = $qr->newFromQueryResult();
+//    public function setXY($xy)               {$this->mXY = $xy;}
+    
+    //--- Public methods ---
+    
+    
+    /**
+     * This callback function for the parser hook "FilterQueryResults" removes
+     * all protected pages from a query result.
+     *
+     * @param SMWQueryResult $qr
+     *         The query result that is modified
+     */
+    public static function filterResult(SMWQueryResult &$qr) {
+        $msgAdded = false;
+        $newqr = $qr->newFromQueryResult();
         while ( $row = $qr->getNext() ) {
-			$newRow = array();
-			$firstField = true;
+            $newRow = array();
+            $firstField = true;
             foreach ($row as $field) {
                 $pr = $field->getPrintRequest();
                 $values = array();
                 $fieldEmpty = true;
                 while ( ($object = $field->getNextObject()) !== false ) {
-                	$allowed = true;
-                	if ($object->getTypeID() == '_wpg') {
-	                	// Link to another page which might be protected
-	                	global $wgUser;
-	                	wfRunHooks('userCan',
-				                	array($object->getTitle(),
-				                		  &$wgUser, "read", &$allowed));
-	                }
-	                if ($allowed) {
-	                	$values[] = $object;
-	                	$fieldEmpty = false;
-	                } else {
-	                	if (!$msgAdded) {
-	                		$newqr->addErrors(array(wfMsgForContent('hacl_sp_results_removed')));
-	                		$msgAdded = true;
-	                	}
-	                }
+                    $allowed = true;
+                    if ($object->getTypeID() == '_wpg') {
+                        // Link to another page which might be protected
+                        global $wgUser;
+                        wfRunHooks('userCan',
+                                    array($object->getTitle(),
+                                          &$wgUser, "read", &$allowed));
+                    }
+                    if ($allowed) {
+                        $values[] = $object;
+                        $fieldEmpty = false;
+                    } else {
+                        if (!$msgAdded) {
+                            $newqr->addErrors(array(wfMsgForContent('hacl_sp_results_removed')));
+                            $msgAdded = true;
+                        }
+                    }
                 }
                 if ($fieldEmpty && $firstField) {
-                	// The first field (subject) of the row is empty 
-                	// => skip the complete row
-                	break;
+                    // The first field (subject) of the row is empty 
+                    // => skip the complete row
+                    break;
                 }
-	            $newRow[] = new SMWResultArray($values, $pr);
-				$firstField = false;
+                $newRow[] = new SMWResultArray($values, $pr);
+                $firstField = false;
             }
             if (!empty($newRow)) {
-            	$newqr->addRow($newRow);
+                $newqr->addRow($newRow);
             }
         }
         $qr = $newqr;
-                	
-		return true;
-	}
-	//--- Private methods ---
+                    
+        return true;
+    }
+    //--- Private methods ---
 }
