@@ -50,7 +50,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
             elLiner.innerHTML = "<input onClick='YAHOO.haloacl.whitelistCheck(this);' type='checkbox' class='"+divid+"_users' name='"+oRecord._oData.name+"' />";
         }
     };
-    
+
 
     this.myNameFormatter = function(elLiner, oRecord, oColumn, oData) {
         elLiner.innerHTML = "<span class='"+divid+"_usersgroups' groups=\""+oRecord._oData.groups+"\">"+oRecord._oData.name+"</span>";
@@ -114,7 +114,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
         }
 
         var filter = $('datatable_filter_'+myDataTable.panelid).value;
-        
+
         return "rs=haclGetUsersForUserTable&rsargs[]="
         +myDataTable.query+"&rsargs[]="+sort
         +"&rsargs[]="+dir
@@ -150,7 +150,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
     }
     myDataTable.query = "";
 
-    
+
 
     //YAHOO.util.Event.addListener(myDataTable,"initEvent",myDataTable.checkAllSelectedUsers());
 
@@ -169,14 +169,14 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
 
     myDataTable.subscribe("postRenderEvent",function(){
         handlePagination();
-        
-        
+
+
     });
     // setting up clickevent-handling
     return myDataTable;
 
 
-   
+
 };
 
 // --------------------

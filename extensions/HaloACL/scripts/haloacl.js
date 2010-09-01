@@ -83,7 +83,7 @@ YAHOO.haloacl.buildMainTabView = function(containerName,requestedTitle,showWhite
     }else{
         YAHOO.haloacl.requestedTitle = "";
     }
-    
+
     var createACLActive = false;
     var manageUserActive = false;
     var manageACLActive = false;
@@ -208,7 +208,7 @@ YAHOO.haloacl.buildMainTabView = function(containerName,requestedTitle,showWhite
  *  @param target-container
  *
  */
-YAHOO.haloacl.buildSubTabView = function(containerName){    
+YAHOO.haloacl.buildSubTabView = function(containerName){
     YAHOO.haloacl.haloaclTabs = new YAHOO.widget.TabView(containerName);
     var manageAclActive = true;
     var manageDefaultTemplateActive = false;
@@ -350,7 +350,7 @@ YAHOO.haloacl.tabDataConnect = function() {
 
     var querystring = "rs="+tab.get('dataSrc');
     var postData = tab.get('postData');
-    
+
     if(postData != null){
         for(param in postData){
             querystring = querystring + "&rsargs[]="+postData[param];
@@ -538,7 +538,7 @@ YAHOO.haloacl.closePanel = function(panelid){
  */
 YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOnly, preload, preloadRightId){
 
-    
+
     YAHOO.haloacl.haloaclRightPanelTabs = new YAHOO.widget.TabView(containerName);
     var parameterlist = {
         panelid:containerName,
@@ -579,7 +579,7 @@ YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOn
         $(tab1.get('contentEl')).setAttribute('id','rightPanelSelectDeselectTab'+containerName);
         $(tab1.get('contentEl')).setAttribute('class','haloacl_rightPanelTab');
     }
-    
+
     var tab2 = new YAHOO.widget.Tab({
         label: gHACLLanguage.getMessage('assigned'),
         dataSrc:'haclRightPanelAssignedTab',
@@ -598,7 +598,7 @@ YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOn
     $(tab2.get('contentEl')).setAttribute('class','haloacl_rightPanelTab');
 
 
-    
+
 
 // ------
 

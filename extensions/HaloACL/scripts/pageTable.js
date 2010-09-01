@@ -31,7 +31,7 @@ YAHOO.haloacl.pageDataTable = function(divid) {
         }else{
             elLiner.innerHTML = "<input type='checkbox' class='"+divid+"_users' name='"+oRecord._oData.name+"' />";
         }
-            
+
     };
 
     // building shortcut for custom formatter
@@ -57,7 +57,7 @@ YAHOO.haloacl.pageDataTable = function(divid) {
     myDataSource.responseSchema = {
         resultsList: "records",
         fields: [
- 
+
         {
             key:"name"
         },
