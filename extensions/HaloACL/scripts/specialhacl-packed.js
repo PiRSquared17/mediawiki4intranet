@@ -294,7 +294,7 @@ YAHOO.haloacl.buildMainTabView = function(containerName,requestedTitle,showWhite
     }else{
         YAHOO.haloacl.requestedTitle = "";
     }
-    
+
     var createACLActive = false;
     var manageUserActive = false;
     var manageACLActive = false;
@@ -419,7 +419,7 @@ YAHOO.haloacl.buildMainTabView = function(containerName,requestedTitle,showWhite
  *  @param target-container
  *
  */
-YAHOO.haloacl.buildSubTabView = function(containerName){    
+YAHOO.haloacl.buildSubTabView = function(containerName){
     YAHOO.haloacl.haloaclTabs = new YAHOO.widget.TabView(containerName);
     var manageAclActive = true;
     var manageDefaultTemplateActive = false;
@@ -561,7 +561,7 @@ YAHOO.haloacl.tabDataConnect = function() {
 
     var querystring = "rs="+tab.get('dataSrc');
     var postData = tab.get('postData');
-    
+
     if(postData != null){
         for(param in postData){
             querystring = querystring + "&rsargs[]="+postData[param];
@@ -749,7 +749,7 @@ YAHOO.haloacl.closePanel = function(panelid){
  */
 YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOnly, preload, preloadRightId){
 
-    
+
     YAHOO.haloacl.haloaclRightPanelTabs = new YAHOO.widget.TabView(containerName);
     var parameterlist = {
         panelid:containerName,
@@ -790,7 +790,7 @@ YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOn
         $(tab1.get('contentEl')).setAttribute('id','rightPanelSelectDeselectTab'+containerName);
         $(tab1.get('contentEl')).setAttribute('class','haloacl_rightPanelTab');
     }
-    
+
     var tab2 = new YAHOO.widget.Tab({
         label: gHACLLanguage.getMessage('assigned'),
         dataSrc:'haclRightPanelAssignedTab',
@@ -809,7 +809,7 @@ YAHOO.haloacl.buildRightPanelTabView = function(containerName, predefine, readOn
     $(tab2.get('contentEl')).setAttribute('class','haloacl_rightPanelTab');
 
 
-    
+
 
 // ------
 
@@ -1342,7 +1342,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
 
         this.tree.subscribe('clickEvent',this.checkClick);
         this.subscribe("parentChange", this.customNodeParentChange);
-       
+
     },
 
 
@@ -1366,23 +1366,23 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
      * @for YAHOO.widget.CustomNode
      * @type string
      */
-    getCheckElId: function() { 
-        return "ygtvcheck" + this.index; 
+    getCheckElId: function() {
+        return "ygtvcheck" + this.index;
     },
 
     /**
      * Returns the check box element
      * @return the check html element (img)
      */
-    getCheckEl: function() { 
-        return document.getElementById(this.getCheckElId()); 
+    getCheckEl: function() {
+        return document.getElementById(this.getCheckElId());
     },
 
     /**
      * The style of the check element, derived from its current state
      * @return {string} the css style for the current check state
      */
-    getCheckStyle: function() { 
+    getCheckStyle: function() {
         return "ygtvcheck" + this.checkState;
     },
 
@@ -1407,13 +1407,13 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
 
     },
 
-    
+
 
 
     /**
      * Override to get the check click event
      */
-    onCheckClick: function() { 
+    onCheckClick: function() {
     },
 
     /**
@@ -1460,7 +1460,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
      * If the node has been rendered, update the html to reflect the current
      * state of the node.
      */
-    updateCheckHtml: function() { 
+    updateCheckHtml: function() {
         if (this.parent && this.parent.childrenRendered) {
             this.getCheckEl().className = this.getCheckStyle();
         }
@@ -1468,7 +1468,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
 
     /**
      * Updates the state.  The checked property is true if the state is 1 or 2
-     * 
+     *
      * @param the new check state
      */
     setCheckState: function(state) {
@@ -1523,7 +1523,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
     /**
      * Uncheck this node
      */
-    uncheck: function() { 
+    uncheck: function() {
         this.setCheckState(0);
         /*
         for (var i=0, l=this.children.length; i<l; i=i+1) {
@@ -1536,8 +1536,8 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
         this.updateCheckHtml();
     //this.updateParent();
     },
-    
-    setTreeType: function(newTreeType) { 
+
+    setTreeType: function(newTreeType) {
         this.treeType = newTreeType
     },
 
@@ -1548,7 +1548,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
     },
 */
     // Overrides YAHOO.widget.TextNode
-    getContentHtml: function() {                                                                                                                                           
+    getContentHtml: function() {
         var sb = [];
 
         if (this.treeType=="rw") {
@@ -1585,7 +1585,7 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
             sb[sb.length] = this.label;
 
             sb[sb.length] = '</span></td>';
-            
+
             sb[sb.length] = '<td';
             sb[sb.length] = ' id="' + this.getCheckElId() + '"';
             sb[sb.length] = ' class="' + this.getCheckStyle() + '-ro"';
@@ -1597,9 +1597,9 @@ YAHOO.extend(YAHOO.widget.CustomNode, YAHOO.widget.TextNode, {
 
         }
 
-        
-        return sb.join("");                                                                                                                                                
-    }  
+
+        return sb.join("");
+    }
 });
 
 
@@ -1715,7 +1715,7 @@ YAHOO.haloacl.buildNodesFromData = function(parentNode,data,panelid){
         }
 
         var tmpNode = new YAHOO.widget.CustomNode(element.name, parentNode,false);
-        
+
         tmpNode.textWidth = elementWidth;
 
         if(panelid == "undefined" || panelid == null){
@@ -1752,7 +1752,7 @@ YAHOO.haloacl.buildNodesFromData = function(parentNode,data,panelid){
 YAHOO.haloacl.filterNodesGroupUser = function(parentNode,filter){
 
     filter = filter.toLowerCase();
-    
+
     var nodes;
     nodes = parentNode.children;
 
@@ -1765,7 +1765,7 @@ YAHOO.haloacl.filterNodesGroupUser = function(parentNode,filter){
         } else {
             document.getElementById(n.getLabelElId()).parentNode.parentNode.style.display = "inline";
         }
-        
+
     /*
         if (n.checkState > 0) {
             var tmpNode = new YAHOO.widget.CustomNode(n.label, rwTree.getRoot(),false);
@@ -1832,7 +1832,7 @@ YAHOO.haloacl.buildUserTreeRO = function(rwTree,tree) {
 
     var callback = {
         success: function(oResponse) {
-            
+
             var data = YAHOO.lang.JSON.parse(oResponse.responseText);
             /*
             // das ganze rekursiv in funktion auslagern
@@ -1980,7 +1980,7 @@ YAHOO.haloacl.applyFilterOnTree = function(tree,filtervalue){
         var callback = {
             success: function(oResponse) {
                 tree.removeChildren(tree.getRoot());
-            
+
                 var data = YAHOO.lang.JSON.parse(oResponse.responseText);
                 YAHOO.haloacl.buildUserTree(tree,data);
             },
@@ -2090,7 +2090,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
      * @default "TextNode"
      */
     _type: "ACLNode",
-    
+
     valid: true,
 
     customNodeParentChange: function() {
@@ -2327,7 +2327,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
         }
 
         if (this.treeType=="readOnly") {
-            sb[sb.length] = 
+            sb[sb.length] =
 '<td>' +
 	'<span id="' + this.labelElId + '"' +
 	     ' class="haloacl_manageuser_list_title ' + this.labelStyle  + '"' +
@@ -2343,7 +2343,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 '<td>' +
 	'<div id="anchorPopup_'+this.groupId+'" ' +
 		 'class="' +
-		   (this.valid == true ? 'haloacl_infobutton' 
+		   (this.valid == true ? 'haloacl_infobutton'
 		                      : 'haloacl_warningbutton') +
 		 '" ' +
 		 'onclick="javascript:' +
@@ -2361,7 +2361,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<div style="width:18px!important" class="ygtvspacer"></div>' +
 '</td>';
 
-			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip'; 
+			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip';
             new YAHOO.widget.Tooltip('anchorPopup_'+this.groupId+'tooltip', {
                 context:'anchorPopup_'+this.groupId,
                 text:gHACLLanguage.getMessage(tt),
@@ -2369,7 +2369,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
             });
 
         } else {
-            sb[sb.length] = 
+            sb[sb.length] =
 '<td>' +
 	'<span id="manageUserRow_' + localLabel + '"' +
     		(this.title ? ' title="' + this.title + '"' : '') +
@@ -2381,7 +2381,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<span class="haloacl_manageacl_list_information_modified">'+
 		'<div id="anchorPopup_'+this.groupId+
 		   '" class="' +
-		   (this.valid == true ? 'haloacl_infobutton' 
+		   (this.valid == true ? 'haloacl_infobutton'
 		                      : 'haloacl_warningbutton') +
 		   '"'+
 		   ' onclick="javascript:YAHOO.haloaclrights.popup(\''+this.groupId+'\',\''+this.label+'\',\''+this.groupId+'\');return false;">'+
@@ -2422,7 +2422,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<div class="ygtvspacer"></div>' +
 '</td>';
 
-			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip'; 
+			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip';
             new YAHOO.widget.Tooltip('anchorPopup_'+this.groupId+'tooltip', {
                 context: 'anchorPopup_' + this.groupId,
                 text:    gHACLLanguage.getMessage(tt),
@@ -2829,7 +2829,7 @@ YAHOO.haloaclrights.treeviewDataConnect = function(action,parameterlist,callback
             }
         });
         xml+="</types>";
-        
+
         appendedParams = '&rs='+action+"&rsargs[]="+escape(xml);
     }
     if(dontusefilter && (dontusefilter == true || dontusefilter == "true")){
@@ -2900,14 +2900,14 @@ YAHOO.haloaclrights.buildNodesFromData = function(parentNode,data,panelid){
         if (!element.name) element.name = gHACLLanguage.getMessage('NoName');
 
         var tmpNode;
-        if (YAHOO.haloacl.checkedInRightstree 
+        if (YAHOO.haloacl.checkedInRightstree
             && YAHOO.haloacl.checkedInRightstree.indexOf(element.name) != -1){
             tmpNode = new YAHOO.widget.ACLNode(element.name, parentNode, false, true, element.valid);
         } else {
             tmpNode = new YAHOO.widget.ACLNode(element.name, parentNode, false, false, element.valid);
         }
         tmpNode.setGroupId(element.id);
-        
+
         var treetype = tmpNode.tree.type;
         tmpNode.setTreeType(treetype);
 
@@ -3051,7 +3051,7 @@ YAHOO.haloaclrights.buildUserTreeRO = function(tree,rwTree) {
  * @param dont use canModify-Filter
  */
 YAHOO.haloaclrights.buildTreeFirstLevelFromJson = function(tree,query,dontusefilter){
-    
+
     if(query == null){
         query = "all";
     }
@@ -3144,7 +3144,7 @@ YAHOO.haloaclrights.applyFilterOnTree = function(tree,filtervalue,dontusefilter)
             failure: function(oResponse) {
             }
         };
-        
+
         var query = "all";
         var foundType = false;
         if(!dontusefilter){
@@ -3230,7 +3230,7 @@ YAHOO.haloaclrights.getNewRightsTreeview = function(divname, panelid, type){
  */
 YAHOO.haloacl.userDataTable = function(divid,panelid) {
 
-    
+
 
     // custom defined formatter
     this.mySelectFormatter = function(elLiner, oRecord, oColumn, oData) {
@@ -3241,7 +3241,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
                 checkedFromJS = true;
             }
         }
-       
+
         if(oData == true || checkedFromJS == true){
             elLiner.innerHTML = "<input onClick='YAHOO.haloacl.handleDatatableClick_"+panelid+"(this);' id='checkbox_"+divid+"_"+oRecord._oData.name+"' type='checkbox' groups='"+groupsstring+"' checked='' class='"+divid+"_users' name='"+oRecord._oData.name+"' />";
         }else{
@@ -3252,7 +3252,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
             text:gHACLLanguage.getMessage('selectDeselectUser'),
             zIndex :10
         });
-            
+
     };
     this.myGroupFormatter = function(elLiner, oRecord, oColumn, oData) {
         var groupsstring = ""+oRecord._oData.groups;
@@ -3272,7 +3272,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
     //YAHOO.widget.DataTable.Formatter.myName = this.myNameFormatter;
 
     var myColumnDefs = [ // sortable:true enables sorting
- 
+
     {
         key:"name",
         label:gHACLLanguage.getMessage('name'),
@@ -3337,7 +3337,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
         }
 
         var filter = $('datatable_filter_'+myDataTable.panelid).value;
-        
+
         return "rs=haclGetUsersForUserTable&rsargs[]="
         +myDataTable.query+"&rsargs[]="+sort
         +"&rsargs[]="+dir
@@ -3372,7 +3372,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
         //var divid = myPaginator._containers.parentNode.id;
         if(YAHOO.haloacl.debug) console.log("should be:"+"right_tabview_create_acl_right_0");
         //if(YAHOO.haloacl.debug) console.log("is:"+divid);
-        
+
         var divid = myPaginator._containers[0].parentNode.children[0].children[0].children[0].id;
 
         if(YAHOO.haloacl.debug) console.log("changeRequest fired");
@@ -3398,7 +3398,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
 
     //myPaginator.subscribe("changeRequest",handlePagination);
 
-  
+
 
     // userdatatable configuration
     var myConfigs = {
@@ -3424,7 +3424,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
 
     myDataTable.panelid = panelid;
 
-    
+
     myDataTable.subscribe("postRenderEvent",function(){
         handlePagination(myPaginator.getState());
     });
@@ -3440,7 +3440,7 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
             eval(fncname);
         });
         */
-        
+
     });
 
 
@@ -3483,11 +3483,11 @@ YAHOO.haloacl.userDataTable = function(divid,panelid) {
 YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
     if(noDelete == "true") noDelete = true;
     if(noDelete == "false" || !noDelete) noDelete = false;
-    
+
     if(YAHOO.haloacl.debug) console.log("ROuserDataTableV2 called");
     var groupstring = "";
     var grouparray = YAHOO.haloacl.getGroupsArray(panelid);
-   
+
     if(grouparray != null){
         grouparray.each(function(item){
             if(groupstring == ""){
@@ -3518,7 +3518,7 @@ YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
 
         //console.log("users from groups array:");
         //console.log(result);
-        
+
         // handling users form user-datatable on select and deselct tab
         if(YAHOO.haloacl.debug) console.log("panelid"+panelid);
         if(YAHOO.haloacl.clickedArrayUsers[panelid] != null){
@@ -3551,7 +3551,7 @@ YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
 
                         }
                     });
-                
+
                     if(reallyAddUser == "user"){
                         result.each(function(tempEl){
                             if(tempEl.name == item){
@@ -3577,7 +3577,7 @@ YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
                         }
                         temp['deletable'] = "user";
                         result.push(temp);
-                        
+
 
                     }else if(reallyAddUser == "groupuser"){
                         result.each(function(temp){
@@ -3602,8 +3602,8 @@ YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
 
                     }
                 }
-              
-                
+
+
             });
         };
         return YAHOO.haloacl.ROuserDataTable(divid,panelid,result, noDelete);
@@ -3620,7 +3620,7 @@ YAHOO.haloacl.ROuserDataTableV2 = function(divid,panelid, noDelete){
         parameters:querystring
     });
 
-   
+
 };
 
 
@@ -3661,7 +3661,7 @@ YAHOO.haloacl.ROuserDataTable = function(divid,panelid,dataarray, noDelete) {
     YAHOO.widget.DataTable.Formatter.mySelect = this.mySelectFormatter;
 */
     var myColumnDefs = [ // sortable:true enables sorting
-   
+
     {
         key:"name",
         label:gHACLLanguage.getMessage('name'),
@@ -3674,7 +3674,7 @@ YAHOO.haloacl.ROuserDataTable = function(divid,panelid,dataarray, noDelete) {
         sortable:false,
         formatter:this.myGroupFormatter
     },
-    
+
     {
         key:"deletable",
         label:gHACLLanguage.getMessage('remove'),
@@ -3733,10 +3733,10 @@ YAHOO.haloacl.highlightAlreadySelectedUsersInDatatable = function(panelid,callba
     //if(YAHOO.haloacl.debug) console.log("autoselectevent fired for panel:"+panelid);
     //if(YAHOO.haloacl.debug) console.log("searching for users in following class:"+'.datatableDiv_'+panelid+'_users');
     //if(YAHOO.haloacl.debug) console.log("listing known selections for panel:");
-    
+
     /* non sorted part */
     /*
-    
+
     $$('.datatableDiv_'+panelid+'_usersgroups').each(function(item){
         $(item).removeClassName("groupselected");
     });
@@ -3753,7 +3753,7 @@ YAHOO.haloacl.highlightAlreadySelectedUsersInDatatable = function(panelid,callba
     $$('.haloacl_datatable_groupdiv'+panelid).each(function(divitem){
         if(YAHOO.haloacl.debug) console.log("processing divitem:");
         if(YAHOO.haloacl.debug) console.log(divitem);
-        
+
         var highlighted = new Array();
         var nonHighlighted = new Array();
         var groups = $(divitem).readAttribute("groups");
@@ -3800,13 +3800,13 @@ YAHOO.haloacl.highlightAlreadySelectedUsersInDatatable = function(panelid,callba
             }
         }catch(e){}
         var divname = $(divitem).readAttribute("name");
-        
+
         //var innerhtml =result+ '<div class="haloacl_infobutton" style="float:left;display:inline"></div><div id="tt1'+panelid+divname+'"></div>';
         var innerhtml =result+ '<div id="tt1'+panelid+divname+'"></div>';
 
 
         divitem.innerHTML = innerhtml;
-        
+
         var test = new YAHOO.widget.Tooltip('tt1'+panelid+divname, {
             context:divitem,
             text:result,
@@ -3907,7 +3907,7 @@ YAHOO.haloacl.highlightAlreadySelectedUsersInRODatatable = function(panelid){
 
     });
 //YAHOO.haloacl.debug = false;
- 
+
 };
 
 
@@ -3968,7 +3968,7 @@ YAHOO.haloacl.pageDataTable = function(divid) {
         }else{
             elLiner.innerHTML = "<input type='checkbox' class='"+divid+"_users' name='"+oRecord._oData.name+"' />";
         }
-            
+
     };
 
     // building shortcut for custom formatter
@@ -3994,7 +3994,7 @@ YAHOO.haloacl.pageDataTable = function(divid) {
     myDataSource.responseSchema = {
         resultsList: "records",
         fields: [
- 
+
         {
             key:"name"
         },
@@ -4181,7 +4181,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         this.tree.subscribe('clickEvent',this.checkClick);
 				
         this.subscribe("parentChange", this.customNodeParentChange);
-       
+
     },
 
 
@@ -4219,23 +4219,23 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
      * @for YAHOO.widget.CustomNode
      * @type string
      */
-    getCheckElId: function() { 
-        return "ygtvcheck" + this.index; 
+    getCheckElId: function() {
+        return "ygtvcheck" + this.index;
     },
 
     /**
      * Returns the check box element
      * @return the check html element (img)
      */
-    getCheckEl: function() { 
-        return document.getElementById(this.getCheckElId()); 
+    getCheckEl: function() {
+        return document.getElementById(this.getCheckElId());
     },
 
     /**
      * The style of the check element, derived from its current state
      * @return {string} the css style for the current check state
      */
-    getCheckStyle: function() { 
+    getCheckStyle: function() {
         return "ygtvcheck" + this.checkState;
     },
 
@@ -4260,13 +4260,13 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
     },
 
-    
+
 
 
     /**
      * Override to get the check click event
      */
-    onCheckClick: function() { 
+    onCheckClick: function() {
     },
 
     /**
@@ -4317,7 +4317,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
      * If the node has been rendered, update the html to reflect the current
      * state of the node.
      */
-    updateCheckHtml: function() { 
+    updateCheckHtml: function() {
         if (this.parent && this.parent.childrenRendered) {
             this.getCheckEl().className = this.getCheckStyle();
         }
@@ -4325,13 +4325,13 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
     /**
      * Updates the state.  The checked property is true if the state is 1 or 2
-     * 
+     *
      * @param the new check state
      */
-    setCheckState: function(state) { 
+    setCheckState: function(state) {
         this.checkState = state;
         this.checked = (state > 0);
-             
+
     },
 
     /**
@@ -4367,7 +4367,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
     /**
      * Uncheck this node
      */
-    uncheck: function() { 
+    uncheck: function() {
         this.setCheckState(0);
         /*
         for (var i=0, l=this.children.length; i<l; i=i+1) {
@@ -4380,14 +4380,14 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         this.updateCheckHtml();
     //this.updateParent();
     },
-    
-    setTreeType: function(newTreeType) { 
+
+    setTreeType: function(newTreeType) {
         this.treeType = newTreeType
     },
 
 
     // Overrides YAHOO.widget.TextNode
-    getContentHtml: function() {                                                                                                                                           
+    getContentHtml: function() {
         var sb = [];
         if(this.b2bChecked){
             this.check();
@@ -4431,9 +4431,9 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
 
 
-        
-        return sb.join("");                                                                                                                                                
-    }  
+
+        return sb.join("");
+    }
 });
 
 
@@ -4549,7 +4549,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
         tmpNode.setInformation(element.description);
 
         tmpNode.setTextWidth(elementWidth);
-        
+
         // recursive part, if children were supplied
         if(element.children != null){
             YAHOO.haloacl.buildNodesFromData(tmpNode,element.children,panelid);
@@ -4559,7 +4559,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
         }
 
         groupsInTree = true;
-        
+
     };
     if(!groupsInTree){
         if(parentNode.label == "Groups"){
@@ -4577,7 +4577,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
             $('haloacl_manageuser_count').innerHTML = parentNode.tree.getRoot().getNodeCount()*1-1;
         }
     }
-   
+
 
 };
 
@@ -4658,7 +4658,7 @@ YAHOO.haloacl.manageUser.buildTreeFirstLevelFromJson = function(tree){
 YAHOO.haloacl.getNewManageUserTree = function(divname,panelid){
     var instance = new YAHOO.widget.TreeView(divname);
     instance.panelid = panelid;
-   
+
     return instance;
 };
 
@@ -4704,7 +4704,7 @@ YAHOO.haloacl.manageUser.addNewSubgroupOnSameLevel = function(tree,groupname){
             elementWidth = nodeToAttachTo.getTextWidth();
         }
     }catch(e){
-        
+
     }
 
     if(nodeToAttachTo._type != "RootNode"){
@@ -4714,7 +4714,7 @@ YAHOO.haloacl.manageUser.addNewSubgroupOnSameLevel = function(tree,groupname){
         tmpNode.description = gHACLLanguage.getMessage('clickEditToCreate');
 
         tmpNode.setTextWidth(elementWidth);
-        
+
         nodeToAttachTo.collapse();
         nodeToAttachTo.expand();
         nodeToAttachTo.refresh();
@@ -4787,12 +4787,12 @@ YAHOO.haloacl.manageUser.addNewSubgroup = function(tree,groupname){
     tmpNode.description = gHACLLanguage.getMessage('clickEditToCreate');
 
     tmpNode.setTextWidth(elementWidth);
-    
+
     tmpNode.setDynamicLoad();
     nodeToAttachTo.collapse();
     nodeToAttachTo.expand();
 // nodeToAttachTo.refresh();
- 
+
 };
 
 /**
@@ -4883,7 +4883,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
             elLiner.innerHTML = "<input onClick='YAHOO.haloacl.whitelistCheck(this);' type='checkbox' class='"+divid+"_users' name='"+oRecord._oData.name+"' />";
         }
     };
-    
+
 
     this.myNameFormatter = function(elLiner, oRecord, oColumn, oData) {
         elLiner.innerHTML = "<span class='"+divid+"_usersgroups' groups=\""+oRecord._oData.groups+"\">"+oRecord._oData.name+"</span>";
@@ -4947,7 +4947,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
         }
 
         var filter = $('datatable_filter_'+myDataTable.panelid).value;
-        
+
         return "rs=haclGetUsersForUserTable&rsargs[]="
         +myDataTable.query+"&rsargs[]="+sort
         +"&rsargs[]="+dir
@@ -4983,7 +4983,7 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
     }
     myDataTable.query = "";
 
-    
+
 
     //YAHOO.util.Event.addListener(myDataTable,"initEvent",myDataTable.checkAllSelectedUsers());
 
@@ -5002,14 +5002,14 @@ YAHOO.haloacl.whitelistTable = function(divid,panelid) {
 
     myDataTable.subscribe("postRenderEvent",function(){
         handlePagination();
-        
-        
+
+
     });
     // setting up clickevent-handling
     return myDataTable;
 
 
-   
+
 };
 
 // --------------------
@@ -5060,13 +5060,13 @@ YAHOO.haloacl.AutoCompleter = function(fieldName, containerName) {
         resultsList: "records",
         fields : ["name", "name"]
     };
- 
+
 
     // Enable caching
    /// myDataSource.maxCacheEntries = 5;
 
     // Instantiate the AutoComplete
-   
+
 
     var oAC = new YAHOO.widget.AutoComplete(fieldName, containerName, myDataSource);
 
@@ -5097,7 +5097,7 @@ YAHOO.haloacl.AutoCompleter = function(fieldName, containerName) {
         oAC.sendQuery("");
     }
     oAC.textboxFocusEvent.subscribe(itemFocusHandler);
-          
+
   // Custom formatter to highlight the matching letters
     oAC.formatResult = function(oResultData, sQuery, sResultMatch) {
 
@@ -5213,7 +5213,7 @@ YAHOO.haloacl.notification.createDialogOk = function (renderedTo,title,content,c
     // Render the Dialog
     dialog.render('haloacl_notification'+YAHOO.haloacl.notification.counter);
     dialog.show();
-    
+
     if(YAHOO.haloacl.debug)console.log("create dialog finished");
 
 };
@@ -5379,9 +5379,9 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         //elLiner.innerHTML += '<div id="popup_'+oRecord._oData.id+'"></div>';
 
         }
-            
+
     };
-    
+
 
     this.myQuickNameFormatter = function(elLiner, oRecord, oColumn, oData) {
         elLiner.innerHTML = "<span class='"+divid+"_usersgroups' groups=\""+oRecord._oData.groups+"\">"+oRecord._oData.name+"</span>";
@@ -5400,7 +5400,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         sortable:false,
         formatter:this.myQuickNameFormatter
     },
-   
+
     {
         key:"checked",
         label:gHACLLanguage.getMessage('delete'),
@@ -5423,7 +5423,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         {
             key:"name"
         },
-        
+
         {
             key:"checked"
         }
@@ -5450,7 +5450,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         }
 
         var filter = $('datatable_filter_'+myDataTable.panelid).value;
-        
+
         return "rs=haclGetQuickACLData&rsargs[]="
         +myDataTable.query+"&rsargs[]="+sort
         +"&rsargs[]="+dir
@@ -5509,14 +5509,14 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         if(YAHOO.haloacl.debug) console.log("sending request");
         myDataSource.sendRequest('rs=haclGetQuickACLData&rsargs[]='+query+'&rsargs[]=name&rsargs[]=asc&rsargs[]=0&rsargs[]=5&rsargs[]="', oCallback);
         if(YAHOO.haloacl.debug) console.log("reqeust sent");
-        
+
     }
 
 
     // setting up clickevent-handling
     return myDataTable;
 
-   
+
 };
 
     // --------------------

@@ -40,13 +40,13 @@ YAHOO.haloacl.AutoCompleter = function(fieldName, containerName) {
         resultsList: "records",
         fields : ["name", "name"]
     };
- 
+
 
     // Enable caching
    /// myDataSource.maxCacheEntries = 5;
 
     // Instantiate the AutoComplete
-   
+
 
     var oAC = new YAHOO.widget.AutoComplete(fieldName, containerName, myDataSource);
 
@@ -77,7 +77,7 @@ YAHOO.haloacl.AutoCompleter = function(fieldName, containerName) {
         oAC.sendQuery("");
     }
     oAC.textboxFocusEvent.subscribe(itemFocusHandler);
-          
+
   // Custom formatter to highlight the matching letters
     oAC.formatResult = function(oResultData, sQuery, sResultMatch) {
 

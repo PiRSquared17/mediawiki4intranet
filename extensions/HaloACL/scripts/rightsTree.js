@@ -76,7 +76,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
      * @default "TextNode"
      */
     _type: "ACLNode",
-    
+
     valid: true,
 
     customNodeParentChange: function() {
@@ -313,7 +313,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
         }
 
         if (this.treeType=="readOnly") {
-            sb[sb.length] = 
+            sb[sb.length] =
 '<td>' +
 	'<span id="' + this.labelElId + '"' +
 	     ' class="haloacl_manageuser_list_title ' + this.labelStyle  + '"' +
@@ -329,7 +329,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 '<td>' +
 	'<div id="anchorPopup_'+this.groupId+'" ' +
 		 'class="' +
-		   (this.valid == true ? 'haloacl_infobutton' 
+		   (this.valid == true ? 'haloacl_infobutton'
 		                      : 'haloacl_warningbutton') +
 		 '" ' +
 		 'onclick="javascript:' +
@@ -347,7 +347,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<div style="width:18px!important" class="ygtvspacer"></div>' +
 '</td>';
 
-			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip'; 
+			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip';
             new YAHOO.widget.Tooltip('anchorPopup_'+this.groupId+'tooltip', {
                 context:'anchorPopup_'+this.groupId,
                 text:gHACLLanguage.getMessage(tt),
@@ -355,7 +355,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
             });
 
         } else {
-            sb[sb.length] = 
+            sb[sb.length] =
 '<td>' +
 	'<span id="manageUserRow_' + localLabel + '"' +
     		(this.title ? ' title="' + this.title + '"' : '') +
@@ -367,7 +367,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<span class="haloacl_manageacl_list_information_modified">'+
 		'<div id="anchorPopup_'+this.groupId+
 		   '" class="' +
-		   (this.valid == true ? 'haloacl_infobutton' 
+		   (this.valid == true ? 'haloacl_infobutton'
 		                      : 'haloacl_warningbutton') +
 		   '"'+
 		   ' onclick="javascript:YAHOO.haloaclrights.popup(\''+this.groupId+'\',\''+this.label+'\',\''+this.groupId+'\');return false;">'+
@@ -408,7 +408,7 @@ YAHOO.extend(YAHOO.widget.ACLNode, YAHOO.widget.TextNode, {
 	'<div class="ygtvspacer"></div>' +
 '</td>';
 
-			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip'; 
+			var tt = this.valid == true ? 'aclinfotooltip' : 'aclwarningtooltip';
             new YAHOO.widget.Tooltip('anchorPopup_'+this.groupId+'tooltip', {
                 context: 'anchorPopup_' + this.groupId,
                 text:    gHACLLanguage.getMessage(tt),
@@ -815,7 +815,7 @@ YAHOO.haloaclrights.treeviewDataConnect = function(action,parameterlist,callback
             }
         });
         xml+="</types>";
-        
+
         appendedParams = '&rs='+action+"&rsargs[]="+escape(xml);
     }
     if(dontusefilter && (dontusefilter == true || dontusefilter == "true")){
@@ -886,14 +886,14 @@ YAHOO.haloaclrights.buildNodesFromData = function(parentNode,data,panelid){
         if (!element.name) element.name = gHACLLanguage.getMessage('NoName');
 
         var tmpNode;
-        if (YAHOO.haloacl.checkedInRightstree 
+        if (YAHOO.haloacl.checkedInRightstree
             && YAHOO.haloacl.checkedInRightstree.indexOf(element.name) != -1){
             tmpNode = new YAHOO.widget.ACLNode(element.name, parentNode, false, true, element.valid);
         } else {
             tmpNode = new YAHOO.widget.ACLNode(element.name, parentNode, false, false, element.valid);
         }
         tmpNode.setGroupId(element.id);
-        
+
         var treetype = tmpNode.tree.type;
         tmpNode.setTreeType(treetype);
 
@@ -1037,7 +1037,7 @@ YAHOO.haloaclrights.buildUserTreeRO = function(tree,rwTree) {
  * @param dont use canModify-Filter
  */
 YAHOO.haloaclrights.buildTreeFirstLevelFromJson = function(tree,query,dontusefilter){
-    
+
     if(query == null){
         query = "all";
     }
@@ -1130,7 +1130,7 @@ YAHOO.haloaclrights.applyFilterOnTree = function(tree,filtervalue,dontusefilter)
             failure: function(oResponse) {
             }
         };
-        
+
         var query = "all";
         var foundType = false;
         if(!dontusefilter){
