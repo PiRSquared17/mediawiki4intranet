@@ -110,7 +110,7 @@ static function haclGetHACLToolbar($articleTitle) {
     if($protectedWith != "" && !in_array($protectedWith, $tpllist)) {
         $tpllist[] = $protectedWith;
         // Check if the template is valid or corrupted by missing groups, user,...
-        $validTmpl[] = (is_null($defaultSD) || $defaultSD->checkIntegrity() === true) 
+        $validTmpl[] = (is_null($defaultSD) || $defaultSD->checkIntegrity() === true)
                         ? 'true' : 'false';
     }
 
