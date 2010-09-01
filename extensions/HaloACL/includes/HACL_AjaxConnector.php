@@ -30,34 +30,34 @@
  * @return <string> unescaped string
  */
 function unescape($source) {
-	$decodedStr = '';
-	$pos = 0;
-	$len = strlen ($source);
+    $decodedStr = '';
+    $pos = 0;
+    $len = strlen ($source);
 
-	while ($pos < $len) {
-		$charAt = substr ($source, $pos, 1);
-		if ($charAt == '%') {
-			$pos++;
-			$charAt = substr ($source, $pos, 1);
-			if ($charAt == 'u') {
-				// we got a unicode character
-				$pos++;
-				$unicodeHexVal = substr ($source, $pos, 4);
-				$unicode = hexdec ($unicodeHexVal);
-				$decodedStr .= code2utf($unicode);
-				$pos += 4;
-			} else {
-				// we have an escaped ascii character
-				$hexVal = substr ($source, $pos, 2);
-				$decodedStr .= code2utf (hexdec ($hexVal));
-				$pos += 2;
-			}
-		} else {
-			$decodedStr .= $charAt;
-			$pos++;
-		}
-	}
-	return $decodedStr;
+    while ($pos < $len) {
+        $charAt = substr ($source, $pos, 1);
+        if ($charAt == '%') {
+            $pos++;
+            $charAt = substr ($source, $pos, 1);
+            if ($charAt == 'u') {
+                // we got a unicode character
+                $pos++;
+                $unicodeHexVal = substr ($source, $pos, 4);
+                $unicode = hexdec ($unicodeHexVal);
+                $decodedStr .= code2utf($unicode);
+                $pos += 4;
+            } else {
+                // we have an escaped ascii character
+                $hexVal = substr ($source, $pos, 2);
+                $decodedStr .= code2utf (hexdec ($hexVal));
+                $pos += 2;
+            }
+        } else {
+            $decodedStr .= $charAt;
+            $pos++;
+        }
+    }
+    return $decodedStr;
 }
 
 
@@ -1031,7 +1031,7 @@ function haclGetManageUserGroupPanel($panelid, $name="", $description="", $users
     }
     $content = <<<HTML
 
-		<div id="content_$panelid" class="panel haloacl_panel_content">
+        <div id="content_$panelid" class="panel haloacl_panel_content">
                     <div id="rightTypes_$panelid">
                     <div class="halocal_panel_content_row">
                         <div class="haloacl_panel_content_row_descr">
@@ -1421,7 +1421,7 @@ function haclGetRightsPanel($panelid, $predefine, $readOnly = false, $preload = 
 
     $content = <<<HTML
 
-		<div id="content_$panelid" class="yui-skin-sam panel haloacl_panel_content">
+        <div id="content_$panelid" class="yui-skin-sam panel haloacl_panel_content">
                     <div id="rightTypes_$panelid">
 HTML;
 
@@ -2211,10 +2211,10 @@ HTML;
 function haclGetModificationRightsPanel($panelid) {
 
     $html = <<<HTML
-	<!-- start of panel div-->
-	<div id="modificationRights" >
-		
-	</div> <!-- end of panel div -->
+    <!-- start of panel div-->
+    <div id="modificationRights" >
+        
+    </div> <!-- end of panel div -->
         <script type="javascript>
             YAHOO.haloacl.loadContentToDiv('modificationRights','haclGetRightsPanel',{panelid:'$panelid', predefine:'modification', readOnly:false, preload:false, preloadRightId:0});
         </script>
@@ -4331,7 +4331,7 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
             $groups = $subgroupsToCall;
         }
         foreach( $groups as $key => $value) {
-        	$valid = $value->checkIntegrity();
+            $valid = $value->checkIntegrity();
             if ($recursive) {
 
                 $parent = HACLGroup::newFromName($value->getGroupName());
@@ -4347,13 +4347,13 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
                                                'checked'=>'false', 
                                                'children'=>$subgroups,
                                                'description'=>$value->getGroupDescription(),
-                            				   'valid' => $valid);
+                                               'valid' => $valid);
                         } else {
                             $tempgroup = array('name' => $value->getGroupName(),
-                            				   'id'=>$value->getGroupId(),
-                            				   'checked'=>'false',
-                            				   'description'=>$value->getGroupDescription(),
-                            				   'valid' => $valid);
+                                               'id'=>$value->getGroupId(),
+                                               'checked'=>'false',
+                                               'description'=>$value->getGroupDescription(),
+                                               'valid' => $valid);
                         }
                         $array[] = $tempgroup;
                     }
@@ -4370,23 +4370,23 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
                             $subgroups = $subparent->getGroups(HACLGroup::OBJECT);
                             if(sizeof($subgroups) > 0) {
                                 $tempgroup = array('name'=>$value->getGroupName(),
-                                				   'id'=>$value->getGroupId(),
-                                				   'checked'=>'false',
-                                				   'description'=>$value->getGroupDescription(),
-                            				   	   'valid' => $valid);
+                                                   'id'=>$value->getGroupId(),
+                                                   'checked'=>'false',
+                                                   'description'=>$value->getGroupDescription(),
+                                                      'valid' => $valid);
                             }elseif(!$search) {
                                 $tempgroup = array('name'=>$value->getGroupName(),
-                                				   'id'=>$value->getGroupId(),
-                                				   'checked'=>'false',
-                                				   'children'=>'',
-                                				   'description'=>$value->getGroupDescription(),
-                            				       'valid' => $valid);
+                                                   'id'=>$value->getGroupId(),
+                                                   'checked'=>'false',
+                                                   'children'=>'',
+                                                   'description'=>$value->getGroupDescription(),
+                                                   'valid' => $valid);
                             }else {
                                 $tempgroup = array('name'=>$value->getGroupName(),
-                                				   'id'=>$value->getGroupId(),
-                                				   'checked'=>'false',
-                                				   'description'=>$value->getGroupDescription(),
-                            				       'valid' => $valid);
+                                                   'id'=>$value->getGroupId(),
+                                                   'checked'=>'false',
+                                                   'description'=>$value->getGroupDescription(),
+                                                   'valid' => $valid);
                             }
                             $array[] = $tempgroup;
                         } catch (HACLGroupException $e) { }
@@ -4402,23 +4402,23 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
         $groups = $parent->getGroups(HACLGroup::OBJECT);
         foreach( $groups as $key => $value ) {
             if($value->userCanModify($wgUser->getName()) || array_intersect_key($haclCrossTemplateAccess, $wgUser->getGroups()) != null ) {
-        		$valid = $value->checkIntegrity();
-            	
+                $valid = $value->checkIntegrity();
+                
                 $subparent = HACLGroup::newFromName($value->getGroupName());
                 $subgroups = $subparent->getGroups(HACLGroup::OBJECT);
                 if(sizeof($subgroups) > 0) {
                     $tempgroup = array('name'=>$value->getGroupName(),
-                    				   'id'=>$value->getGroupId(),
-                    				   'checked'=>'false',
-                    				   'description'=>$value->getGroupDescription(),
-                            		   'valid' => $valid);
+                                       'id'=>$value->getGroupId(),
+                                       'checked'=>'false',
+                                       'description'=>$value->getGroupDescription(),
+                                       'valid' => $valid);
                 }else {
                     $tempgroup = array('name'=>$value->getGroupName(),
-                    				   'id'=>$value->getGroupId(),
-                    				   'checked'=>'false',
-                    				   'children'=>'',
-                    				   'description'=>$value->getGroupDescription(),
-                            		   'valid' => $valid);
+                                       'id'=>$value->getGroupId(),
+                                       'checked'=>'false',
+                                       'children'=>'',
+                                       'description'=>$value->getGroupDescription(),
+                                       'valid' => $valid);
                 }
                 $array[] = $tempgroup;
             }
@@ -4491,10 +4491,10 @@ function haclGetACLs($typeXML, $filter = null) {
     $SDs = HACLStorage::getDatabase()->getSDs($types);
 
     foreach( $SDs as $key => $SD) {
- 		// check integrity of SD
- 		$valid = $SD->checkIntegrity();
- 		   	
-	    // processing default user templates
+         // check integrity of SD
+         $valid = $SD->checkIntegrity();
+                
+        // processing default user templates
         if(preg_match("/$template\//is",$SD->getSDName())) {
             if(($SD->getSDName() == "$template/$username") ||$dontCheckForCanMod || (array_intersect($wgUser->getGroups(), $haclCrossTemplateAccess) != null)) {
                 $tempRights = array();
@@ -4511,9 +4511,9 @@ function haclGetACLs($typeXML, $filter = null) {
                     }catch(Exception $e ) {}
                 }
                 $tempSD = array('id'=>$SD->getSDID(), 
-                				'name'=>$SD->getSDName(), 
-                				'rights'=>$tempRights, 
-                				'valid' => $valid);
+                                'name'=>$SD->getSDName(), 
+                                'rights'=>$tempRights, 
+                                'valid' => $valid);
                 $array[] = $tempSD;
             }
 
@@ -4533,9 +4533,9 @@ function haclGetACLs($typeXML, $filter = null) {
                 }catch(Exception $e ) {}
             }
             $tempSD = array('id'=>$SD->getSDID(), 
-            				'name'=>$SD->getSDName(), 
-            				'rights'=>$tempRights, 
-                			'valid' => $valid);
+                            'name'=>$SD->getSDName(), 
+                            'rights'=>$tempRights, 
+                            'valid' => $valid);
             $array[] = $tempSD;
         }
     }
@@ -5477,19 +5477,19 @@ function haclDoesArticleExists($articlename,$protect) {
     $response = new AjaxResponse();
     $article = new Article(Title::newFromText($articlename));
     if($article->exists()) {
-    	$sdtitle = Title::newFromText("$ns:$protect/$articlename");
+        $sdtitle = Title::newFromText("$ns:$protect/$articlename");
         $sd = new Article($sdtitle);
         if($sd->exists()) {
             $response->addText("sdexisting");
         }else {
-        	// The article might not be protectable as it is already protected
-        	// by a category or a namespace
-        	global $wgUser;
-        	if (HACLEvaluator::checkSDCreation($sdtitle, $wgUser) === false) {
-        		$response->addText("articleIsProtected");
-        	} else {
-            	$response->addText("true");
-        	}
+            // The article might not be protectable as it is already protected
+            // by a category or a namespace
+            global $wgUser;
+            if (HACLEvaluator::checkSDCreation($sdtitle, $wgUser) === false) {
+                $response->addText("articleIsProtected");
+            } else {
+                $response->addText("true");
+            }
         }
     }else {
         $response->addText("false");
