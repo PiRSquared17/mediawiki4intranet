@@ -18,10 +18,10 @@
 
 /**
  * This file contains the class HACLRight.
- * 
+ *
  * @author Thomas Schweitzer
  * Date: 17.04.2009
- * 
+ *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
@@ -33,38 +33,38 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  * This class describes an inline right in HaloACL.
- * 
+ *
  * An inline right contains the following data:
- * 
+ *
  * right_id
  *   The ID of the inline right. It is automatically generated when the right is
- *   stored in the database. 
+ *   stored in the database.
  * actions
- *   A bit-field of flags for the seven actions. The order of bits is: read (6), 
- *   formedit (5), edit (4), create (3), move(2), annotate (1), delete (0). So 
- *   the actions "r|ef|e|d" are encoded to the binary value 1110001. 
+ *   A bit-field of flags for the seven actions. The order of bits is: read (6),
+ *   formedit (5), edit (4), create (3), move(2), annotate (1), delete (0). So
+ *   the actions "r|ef|e|d" are encoded to the binary value 1110001.
  * groups
- *    A comma separated list of page IDs of the groups whose right is defined. 
- *    This can be empty if users are given. 
+ *    A comma separated list of page IDs of the groups whose right is defined.
+ *    This can be empty if users are given.
  * users
- *    A comma separated list of user IDs whose right is defined. This can be 
- *    empty if groups are given. 
+ *    A comma separated list of user IDs whose right is defined. This can be
+ *    empty if groups are given.
  * description
- *    The description that was given for the rule. 
+ *    The description that was given for the rule.
  * name
  *       A short name for the right.
  * origin_id
- *    The page ID of the wiki article where this rule was defined (i.e. a 
- *    security descriptor or a predefined right). 
- * 
+ *    The page ID of the wiki article where this rule was defined (i.e. a
+ *    security descriptor or a predefined right).
+ *
  * When properties of a right are changed, the method "save" has to be called
  * to store it in the database.
- * 
+ *
  * @author Thomas Schweitzer
- * 
+ *
  */
 class  HACLRight  {
-    
+
     //--- Constants ---
     //---- Operations ----
     const ALL_ACTIONS = 255;
@@ -76,13 +76,13 @@ class  HACLRight  {
     const CREATE   = 4;
     const MOVE     = 2;
     const DELETE   = 1;
-    
+
     //---- Mode parameter for getUsersEx/getGroupsEx ----
-    const NAME   = 0; 
+    const NAME   = 0;
     const ID     = 1;
     const OBJECT = 2;
-    
-            
+
+
     //--- Private fields ---
     private $mRightID = -1;        // int: ID of this right. This value is valid after
                                 //      the right has been saved in the database.
@@ -95,9 +95,9 @@ class  HACLRight  {
     private $mOriginID;            // int: ID of the security descriptor or
                                 //      predefined right that defines this right
     private $mName;                // string: the name of the right
-    
+
     /**
-     * Constructor for HACLRight. 
+     * Constructor for HACLRight.
      *
      * @param int $actions
      *         Actions that are granted by this rule. This is a bit-field of
@@ -106,39 +106,39 @@ class  HACLRight  {
      *      HACLRight::DELETE. According to the hierarchy of rights, missing
      *         rights are set automatically.
      * @param array<int/string>/string $groups
-     *         An array or a string of comma separated group names or IDs that 
-     *      get this right. Group names are converted and 
+     *         An array or a string of comma separated group names or IDs that
+     *      get this right. Group names are converted and
      *      internally stored as group IDs. Invalid values cause an exception.
      * @param array<int/string>/string $users
      *         An array or a string of comma separated of user names or IDs that
-     *      get this right. User names are converted and 
+     *      get this right. User names are converted and
      *      internally stored as user IDs. Invalid values cause an exception.
      * @param string $description
      *         A description of this right
      * @param int originID
-     *         ID of the security descriptor or predefined right that defines this 
+     *         ID of the security descriptor or predefined right that defines this
      *      right. Don't set this value if you create an inline right. It is set
      *         when the right is added to a security descriptor or inline right.
-     * @throws 
+     * @throws
      *         HACLGroupException(HACLGroupException::UNKOWN_GROUP)
      *             ... if a given group is invalid
      *         HACLException(HACLException::UNKOWN_USER)
      *             ... if the user is invalid
-     *      
-     */        
+     *
+     */
     function __construct($actions, $groups, $users, $description, $name, $originID=0) {
-                
+
         $this->mActions = $this->completeActions($actions);
-        
+
         $this->setGroups($groups);
         $this->setUsers($users);
-        
+
         $this->mDescription = $description;
         $this->mOriginID    = $originID;
         $this->mName        = $name;
-        
+
     }
-    
+
     //--- getter/setter ---
 
     public function getRightID()        {return $this->mRightID;}
@@ -148,26 +148,26 @@ class  HACLRight  {
     public function getDescription()    {return $this->mDescription;}
     public function getName()            {return $this->mName;}
     public function getOriginID()        {return $this->mOriginID;}
-    
+
     /**
      * Don't call this method!!
-     * Sets the ID of this inline right. The ID is set when the right is stored 
+     * Sets the ID of this inline right. The ID is set when the right is stored
      * in the database.
      *
      * @param int $rightID
      *         ID of this right.
-     */        
+     */
     public function setRightID($rightID) {
         $this->mRightID = $rightID;
     }
-    
+
     public function setActions($actions) {
         $this->mActions = $this->completeActions($actions);
     }
-    
+
     public function setDescription($description) {$this->mDescription = $description;}
     public function setName($name) {$this->mName = $name;}
-    
+
     /**
      * Don't call this method!!
      * Sets the ID of SD or PR that defines this inline right. The ID is set when
@@ -175,22 +175,22 @@ class  HACLRight  {
      *
      * @param int $originId
      *         ID of security descriptor or predefined right that defines this right.
-     */        
+     */
     public function setOriginID($originId)        {$this->mOriginID = $originId;}
-    
-    
+
+
     //--- Public methods ---
-    
+
     /**
      * Creates a new right object based on the ID of the right. The right must
      * exists in the database.
-     * 
+     *
      * @param int $rightID
      *         ID of the right.
-     * 
+     *
      * @return HACLRight
      *         A new right object.
-     * 
+     *
      * @throws
      *         HACLRightException(HACLRightException::UNKNOWN_RIGHT)
      *             ... if there is no right with this ID in the database
@@ -204,15 +204,15 @@ class  HACLRight  {
     }
 
     /**
-     * Returns the ID of an action for the given name of an action 
+     * Returns the ID of an action for the given name of an action
      *
      * @param string $actionName
-     *         The action, the user wants to perform. One of "read", "formedit", 
+     *         The action, the user wants to perform. One of "read", "formedit",
      *      "wysiwyg", "edit", "annotate", "create", "move" and "delete".
-     * 
+     *
      * @return int
      *         The ID of the action or 0 if the names is invalid.
-     * 
+     *
      */
     public static function getActionID($actionName) {
         $actionID = 0;
@@ -242,7 +242,7 @@ class  HACLRight  {
                 $actionID = HACLRight::DELETE;
                 break;
         }
-        return $actionID;        
+        return $actionID;
     }
 
     /**
@@ -253,25 +253,25 @@ class  HACLRight  {
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to modify this
      *         right. If <null>, the currently logged in user is assumed.
-     * 
+     *
      * @param boolean $throwException
-     *         If <true>, the exception 
+     *         If <true>, the exception
      *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *         is thrown, if the user can't modify the group.
-     * 
+     *
      * @return boolean
      *         One of these values is returned if no exception is thrown:
      *         <true>, if the user can modify this right and
      *         <false>, if not
-     * 
-     * @throws 
+     *
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
-     *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
-     *  
+     *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
+     *
      */
     public function userCanModify($user, $throwException = false) {
 
-        // Ask the origin (security desriptor/ predefined right) of this inline 
+        // Ask the origin (security desriptor/ predefined right) of this inline
         // right, if the user can modify this right
 
         $sd = HACLSecurityDescriptor::newFromID($this->mOriginID);
@@ -284,17 +284,17 @@ class  HACLRight  {
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to modify this
      *         group. If <null>, the currently logged in user is assumed.
-     * 
+     *
      * @return boolean
      *         One of these values is returned if no exception is thrown:
      *         <true>, if the user gets this right
      *         <false>, if not
-     * 
-     * @throws 
+     *
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
      *         HACLRightException(HACLRightException::RIGHT_NOT_GRANTED)
      *             ...if the right is not granted and an exception is requested
-     * 
+     *
      */
     public function grantedForUser($user, $throwException = false) {
         // Get the ID of the user who wants to get this right
@@ -303,12 +303,12 @@ class  HACLRight  {
         if (in_array($userID, $this->mUsers)) {
             return true;
         }
-        
+
         // Check if this right is granted to registered users (ID = -1)
         if ($userID > 0 && in_array(-1, $this->mUsers)) {
             return true;
         }
-        
+
         // Check if the user belongs to a group that gets this right
         $db = HACLStorage::getDatabase();
         foreach ($this->mGroups as $groupID) {
@@ -322,21 +322,21 @@ class  HACLRight  {
                 $user = User::newFromId($userID);
                 $userName = ($user) ? $user->getId() : "(User-ID: $userID)";
             }
-            throw new HACLRightException(HACLRightException::RIGHT_NOT_GRANTED, 
+            throw new HACLRightException(HACLRightException::RIGHT_NOT_GRANTED,
                                          $this->mRightID, $userName);
         }
         return false;
     }
-    
+
     /**
      * Sets the groups that get this right. The method "save" has to be called
      * to store the right in the database.
      *
      * @param array<int/string>/string $groups
-     *         An array or a string of comma separated group names or IDs that 
-     *      get this right. Group names are converted and 
+     *         An array or a string of comma separated group names or IDs that
+     *      get this right. Group names are converted and
      *      internally stored as group IDs. Invalid values cause an exception.
-     * @throws 
+     * @throws
      *         HACLGroupException(HACLGroupException::UNKOWN_GROUP)
      *             ... if a given group is invalid
      */
@@ -364,7 +364,7 @@ class  HACLRight  {
                     if (!$gid) {
                         throw new HACLGroupException(HACLGroupException::UNKOWN_GROUP, $mg);
                     }
-                    $this->mGroups[$i] = $gid; 
+                    $this->mGroups[$i] = $gid;
                 }
             }
         } else {
@@ -372,19 +372,19 @@ class  HACLRight  {
         }
 
     }
-    
+
     /**
      * Sets the users that get this right. The method "save" has to be called
      * to store the right in the database.
      *
      * @param array<int/string>/string $users
      *         An array or a string of comma separated of user names or IDs that
-     *      get this right. User names are converted and 
+     *      get this right. User names are converted and
      *      internally stored as user IDs. Invalid values cause an exception.
-     * @throws 
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
      *             ... if the user is invalid
-     *  
+     *
      */
     public function setUsers($users) {
         if (empty($users)) {
@@ -407,39 +407,39 @@ class  HACLRight  {
             $this->mUsers = array();
         }
     }
-    
-    
+
+
 
     /**
      * Don't call this method!!
-     *  
-     * Saves this right in the database. 
-     * 
-     * If the right already exists  the right's definition is changed. This 
-     * method is called, when the right is added to a security descriptor or a 
-     * predefined right. 
      *
-     * @throws 
-     *         Exception (on failure in database level) 
-     * 
+     * Saves this right in the database.
+     *
+     * If the right already exists  the right's definition is changed. This
+     * method is called, when the right is added to a security descriptor or a
+     * predefined right.
+     *
+     * @throws
+     *         Exception (on failure in database level)
+     *
      */
     public function save() {
         $this->mRightID = HACLStorage::getDatabase()->saveRight($this);
     }
-    
+
 
     /**
      * Returns all users who own this right. This does not include the users that
-     * are collected in groups. 
+     * are collected in groups.
      *
      * @param int $mode
      *         HACLRight::NAME:   The names of all users are returned.
      *         HACLRight::ID:     The IDs of all users are returned.
      *         HACLRight::OBJECT: User-objects for all users are returned.
-     * 
+     *
      * @return array(string/int/User)
      *         List of all direct users in this group.
-     *      
+     *
      */
     public function getUsersEx($mode) {
         if ($mode === self::ID) {
@@ -447,13 +447,13 @@ class  HACLRight  {
         }
         // retrieve the IDs of all users in this group
         $users = array();
-        
+
         foreach ($this->mUsers as $u) {
             if ($mode === self::NAME) {
                 $users[] = User::whoIs($u);
             } else if ($mode === self::OBJECT) {
                 $users[] = User::newFromId($u);
-            }  
+            }
         }
         return $users;
     }
@@ -461,16 +461,16 @@ class  HACLRight  {
     /**
      * Returns all groups who who own this right. These are only the groups that
      * are directly assigned to this right. This method does not collect all
-     * groups recursively from the hierarchy of groups. 
+     * groups recursively from the hierarchy of groups.
      *
      * @param int $mode
      *         HACLRight::NAME:   The names of all groups are returned.
      *         HACLRight::ID:     The IDs of all groups are returned.
      *         HACLRight::OBJECT: HACLGroup-objects for all groups are returned.
-     * 
+     *
      * @return array(string/int/HACLGroup)
      *         List of all direct groups in this group.
-     *      
+     *
      */
     public function getGroupsEx($mode) {
         // retrieve the IDs of all groups in this group
@@ -483,32 +483,32 @@ class  HACLRight  {
                 $groups[] = HACLGroup::nameForID($g);
             } else if ($mode === self::OBJECT) {
                 $groups[] = HACLGroup::newFromID($g);
-            }  
+            }
         }
         return $groups;
-        
+
     }
-    
-    
+
+
     /**
-     * Deletes this right from the database. All references to this right are 
+     * Deletes this right from the database. All references to this right are
      * deleted as well.
-     * 
+     *
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to delete this
      *         group. If <null>, the currently logged in user is assumed.
-     * 
+     *
      * @throws
-     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
+     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
     public function delete($user = null) {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteRight($this->mRightID);
     }
-    
+
     //--- Private methods ---
-    
+
     /**
      * Completes a given set of actions according to the hierarchy of actions.
      *
@@ -520,11 +520,11 @@ class  HACLRight  {
     private function completeActions($actions) {
         // Complete the hierarchy of rights
         if ($actions & (HACLRight::CREATE | HACLRight::MOVE | HACLRight::DELETE)) {
-            $actions |= HACLRight::READ | HACLRight::FORMEDIT | 
+            $actions |= HACLRight::READ | HACLRight::FORMEDIT |
                         HACLRight::ANNOTATE | HACLRight::WYSIWYG | HACLRight::EDIT;
         }
         if ($actions & HACLRight::EDIT) {
-            $actions |= HACLRight::READ | HACLRight::FORMEDIT| 
+            $actions |= HACLRight::READ | HACLRight::FORMEDIT|
                         HACLRight::ANNOTATE | HACLRight::WYSIWYG;
         }
         if ($actions & HACLRight::FORMEDIT) {
@@ -538,5 +538,5 @@ class  HACLRight  {
         }
         return $actions;
     }
-    
+
 }

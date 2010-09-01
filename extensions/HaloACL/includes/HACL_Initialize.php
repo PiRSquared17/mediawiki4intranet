@@ -18,13 +18,13 @@
 
 /**
  * This is the main entry file for the Halo-Access-Control-List extension.
- * It contains mainly constants for the configuration of the extension. This 
- * file has to be included in LocalSettings.php to enable the extension. The 
+ * It contains mainly constants for the configuration of the extension. This
+ * file has to be included in LocalSettings.php to enable the extension. The
  * constants defined here can be overwritten in LocalSettings.php. After that
  * the function enableHaloACL() must be called.
- * 
+ *
  * @author Thomas Schweitzer
- * 
+ *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
@@ -52,7 +52,7 @@ if (!$haclgHaloScriptPath)
 ###
 # Set this variable to false to disable the patch that checks all titles
 # for accessibility. Unfortunately, the Title-object does not check if an article
-# can be accessed. A patch adds this functionality and checks every title that is 
+# can be accessed. A patch adds this functionality and checks every title that is
 # created. If a title can not be accessed, a replacement title called "Permission
 # denied" is returned. This is the best and securest way of protecting an article,
 # however, it slows down things a bit.
@@ -74,23 +74,23 @@ if ($haclgInclusionDeniedMessage === NULL)
 # This flag applies to articles that have or inherit no security descriptor.
 #
 # true
-#    If this value is <true>, all articles that have no security descriptor are 
+#    If this value is <true>, all articles that have no security descriptor are
 #    fully accessible for HaloACL. Other extensions or $wgGroupPermissions can
-#     still prohibit access. 
-#    Remember that security descriptor are also inherited via categories or 
-#    namespaces. 
+#     still prohibit access.
+#    Remember that security descriptor are also inherited via categories or
+#    namespaces.
 # false
-#    If it is <false>, no access is granted at all. Only the latest author of an 
-#    article can create a security descriptor. 
+#    If it is <false>, no access is granted at all. Only the latest author of an
+#    article can create a security descriptor.
 if ($haclgOpenWikiAccess === NULL)
     $haclgOpenWikiAccess = true;
 
 ###
 # true
-#    If this value is <true>, semantic properties can be protected.  
+#    If this value is <true>, semantic properties can be protected.
 # false
-#    If it is <false>, semantic properties are not protected even if they have 
-#     security descriptors.  
+#    If it is <false>, semantic properties are not protected even if they have
+#     security descriptors.
 if ($haclgProtectProperties === NULL)
     $haclgProtectProperties = false;
 
@@ -106,8 +106,8 @@ if ($haclgBaseStore === NULL)
 
 ###
 # This array contains the names of all namespaces that can not be protected by
-# HaloACL. This bears the risk that users can block all articles of a namespace 
-# if it has no security descriptor yet. 
+# HaloACL. This bears the risk that users can block all articles of a namespace
+# if it has no security descriptor yet.
 # On the other hand, if each namespace would have a security descriptor, then
 # all authorized users for that namespace will be able to access all articles
 # in that namespace, even if security descriptors for individual articles define
@@ -120,14 +120,14 @@ if ($haclgUnprotectableNamespaces === NULL)
 # This is the name of the master template that is used as default rights template
 # for new users.
 # Every user can define his own default rights for new pages. He does this in a
-# security descriptor with the naming convention "ACL:Template/<username>". The 
+# security descriptor with the naming convention "ACL:Template/<username>". The
 # content of this article is assigned to security descriptors that are automatically
-# generated for new pages. 
+# generated for new pages.
 # However, for new users there is no default template. With this setting you can
-# specify a master template (a name of an article) that is used to create a 
+# specify a master template (a name of an article) that is used to create a
 # default template for new users.
-# The master template is a normal security descriptor that can contain the 
-# variable "{{{user}}}" that will be replaced by the user's name. 
+# The master template is a normal security descriptor that can contain the
+# variable "{{{user}}}" that will be replaced by the user's name.
 #$haclgNewUserTemplate = "ACL:Template/NewUserTemplate";
 
 ###
@@ -135,17 +135,17 @@ if ($haclgUnprotectableNamespaces === NULL)
 # rights templates for new users.
 # Every user can add right templates to his own quick access list. In addition
 # the system adds the rights that are specified in this array to every user's
-# quick access list when he logs in for the first time. 
+# quick access list when he logs in for the first time.
 # The given master templates are copied to the user's own right space defined
-# by the naming convention "ACL:Right/<username>/<Right name>". 
+# by the naming convention "ACL:Right/<username>/<Right name>".
 # The master templates must follow the naming convention "ACL:Template/QARMT/<Right name>".
 # (Please note the "ACL:Template" depends on the content language, i.e. in german
 # it will be "Rechte:Vorlage/QARMT/<Right name>".)
 # Example for user "Thomas":
-# The template "ACL:Template/QARMT/Private use" will be copied to 
-# "ACL:Right/Thomas/Private use". 
-# The master templates is are normal security descriptors that can contain the 
-# variable "{{{user}}}" that will be replaced by the user's name. 
+# The template "ACL:Template/QARMT/Private use" will be copied to
+# "ACL:Right/Thomas/Private use".
+# The master templates is are normal security descriptors that can contain the
+# variable "{{{user}}}" that will be replaced by the user's name.
 /*
 $haclgDefaultQuickAccessRightMasterTemplates = array(
     "ACL:Template/QARMT/Private use",
@@ -168,7 +168,7 @@ if ($haclgEvaluatorLog === NULL)
 # all values of input fields into the HTML of the form, even if fields are protected
 # and not visible to the user (i.e. user has no right to read.) The values of
 # all protected fields are encrypted with the given key.
-# YOU SHOULD CHANGE THIS KEY AND KEEP IT SECRET. 
+# YOU SHOULD CHANGE THIS KEY AND KEEP IT SECRET.
 if ($haclgEncryptionKey === NULL)
     $haclgEncryptionKey = "Es war einmal ein Hase.";
 

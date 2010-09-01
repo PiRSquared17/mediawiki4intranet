@@ -343,7 +343,7 @@ HTML;
                 //checks and warnings
                 var goAhead = false;
                 if (YAHOO.haloacl.hasGroupsOrUsers('right_tabview_create_acl_modificationrights')) {
-                    goAhead=true; 
+                    goAhead=true;
                     if (!YAHOO.haloacl.isNameInUserArray('right_tabview_create_acl_modificationrights', '$currentUser') && !YAHOO.haloacl.isNameInUsersGroupsArray('right_tabview_create_acl_modificationrights', '$currentUser')) {alert('$hacl_haloacl_mod_2'); }
                 } else {
                     alert("$hacl_haloacl_mod_3");
@@ -681,7 +681,7 @@ HTML;
                         <div class="haloacl_tab_section_content_row_content_element">
                             <input type="radio" class="create_acl_general_protect" name="create_acl_general_protect" id="hacl_general_protect_category" value="category" onClick="resetName();" />&nbsp;$hacl_createGeneralContent_7
                         </div>
-                  
+
 HTML;
         $html .= <<<HTML
             </div>
@@ -698,7 +698,7 @@ HTML;
                     </div>
                     <div class="haloacl_tab_section_content_row_content">
                         <div class="haloacl_tab_section_content_row_content_element">
- 
+
                             <input type="text" name="create_acl_general_name2" id="create_acl_general_name" value="" />
                             <div id="create_acl_general_name_container"></div>
 HTML;
@@ -740,7 +740,7 @@ HTML;
     $setexistingname = wfMsg('hacl_setexisting_name');
     $alreadyprotected = wfMsg('hacl_already_protected');
     $alreadyprotectedNSCat = wfMsg('hacl_already_protected_by_ns_or_cat');
-    
+
     $html .= <<<HTML
         </div>
 
@@ -776,7 +776,7 @@ HTML;
                 }
 
                 if (message == "") {
- 
+
                     // loading individual user panel
                     YAHOO.haloacl.loadContentToDiv('step2_$panelId','haclCreateRightContent',{predefine:YAHOO.haloacl.createAclStdDefine});
 
@@ -838,7 +838,7 @@ HTML;
             };
 
             YAHOO.haloacl.notification.subscribeToElement('step2_button_$panelId','click',step2callback);
- 
+
         </script>
     </div>
 
@@ -1112,7 +1112,7 @@ HTML;
                     var description = "";
 
                     var rightdesc = "";
-                    
+
                     var users = "";
                     var groups = "";
                     for(i=0;i<YAHOO.haloacl.clickedArrayUsers['right_tabview_$panelid'].length;i++){
@@ -1578,7 +1578,7 @@ HTML;
                                             item.checked = true;
                                         }
                                     });
-                                    
+
                                 }else{
                                     // remove all lower rights when this right is removed
                                     $$('.right_rights_$panelid').each(function(item){
@@ -1590,7 +1590,7 @@ HTML;
                             }
                         </script>
 
-                        
+
 
                     </div>
 HTML;
@@ -1697,7 +1697,7 @@ HTML;
         <script>
             /* define-for-javascript-handling */
             YAHOO.haloacl.panelDefinePanel_$panelid = "";
-   
+
 
             function loadUserTabIfNeeded(){
                 if(YAHOO.haloacl.panelDefinePanel_$panelid == 'modification' ||YAHOO.haloacl.panelDefinePanel_$panelid == 'individual'){
@@ -1886,7 +1886,7 @@ HTML;
                                     users = users+", U:"+YAHOO.haloacl.clickedArrayUsers['right_tabview_$panelid'][i];
                                 }
                             }
-                            
+
                             //var groupsarray = YAHOO.haloacl.getCheckedNodesFromTree(YAHOO.haloacl.treeInstanceright_tabview_$panelid);
                             for(i=0;i<YAHOO.haloacl.clickedArrayGroups['right_tabview_$panelid'].length;i++){
                                 if(YAHOO.haloacl.clickedArrayGroups['right_tabview_$panelid'][i] != ""){
@@ -1932,7 +1932,7 @@ HTML;
                     var description = $('right_description_$panelid').value;
                     var descrLong = description;
                     if (description.length > 80) description = description.substr(0,80)+"...";
-                    genericPanelSetDescr_$panelid(description,descrLong);    
+                    genericPanelSetDescr_$panelid(description,descrLong);
 
                 }
 
@@ -2023,7 +2023,7 @@ HTML;
                     xml+="</groups>";
                 }
 
-        
+
                 xml+="</inlineright>";
 
                 if(onlyReturnXML == true){
@@ -2213,7 +2213,7 @@ function haclGetModificationRightsPanel($panelid) {
     $html = <<<HTML
     <!-- start of panel div-->
     <div id="modificationRights" >
-        
+
     </div> <!-- end of panel div -->
         <script type="javascript>
             YAHOO.haloacl.loadContentToDiv('modificationRights','haclGetRightsPanel',{panelid:'$panelid', predefine:'modification', readOnly:false, preload:false, preloadRightId:0});
@@ -2305,7 +2305,7 @@ function haclRightPanelSelectDeselectTab($panelid, $predefine, $readOnly, $prelo
     <script type="text/javascript">
         YAHOO.haloacl.notification.clearAllNotification();
 
- 
+
 
         // user list on the right
 
@@ -2332,7 +2332,7 @@ function haclRightPanelSelectDeselectTab($panelid, $predefine, $readOnly, $prelo
         YAHOO.haloacl.treeInstance$panelid.labelClickAction = 'YAHOO.haloacl.labelClickAction_$panelid';
         YAHOO.haloacl.buildTreeFirstLevelFromJson(YAHOO.haloacl.treeInstance$panelid);
 
-       
+
         //filter event
         YAHOO.util.Event.addListener("filterSelectGroup_$panelid", "keyup", function(e){
             var filtervalue = document.getElementById("filterSelectGroup_$panelid").value;
@@ -2404,7 +2404,7 @@ function haclRightPanelSelectDeselectTab($panelid, $predefine, $readOnly, $prelo
             YAHOO.haloacl.highlightAlreadySelectedUsersInDatatable(panelid);
             }catch(e){}
         };
-        
+
         //YAHOO.util.Event.addListener("datatableDiv_$panelid", "click", handleDatatableClick);
         </script>
 HTML;
@@ -2489,7 +2489,7 @@ function haclRightPanelAssignedTab($panelid, $predefine, $readOnly, $preload=fal
 
         </div>
     <script type="text/javascript">
-       
+
         YAHOO.haloacl.notification.clearAllNotification();
 
         if(YAHOO.haloacl.hasGroupsOrUsers('$panelid') == true){
@@ -2773,7 +2773,7 @@ HTML;
     $html .= <<<HTML
     </div>
 
-    
+
 
 <script type="text/javascript">
 
@@ -2846,7 +2846,7 @@ HTML;
         $$('.haloacl_manageacl_filter').each(function(item){
             YAHOO.util.Event.addListener(item, "click", reloadaction);
         });
-        
+
 HTML;
     }
 
@@ -2950,7 +2950,7 @@ HTML;
     }
 
     $aclsavedmsg = wfMsg('hacl_createSaveContent_3');
-    
+
     $html .= <<<HTML
         <div class="haloacl_sd_container_$readOnly" id="SDRightsPanelContainer_$sdId">
         </div>
@@ -2963,7 +2963,7 @@ HTML;
             <div style="width:33%;float:left;text-align:center"><input type="button" style="color:red" value="$hacl_SDRightsPanelContainer_3" onclick="javascript:YAHOO.haloacl.removePanel('$panelid');YAHOO.haloacl.createacl_addRightPanel();" /></div>
             <div style="width:33%;float:left;text-align:right"><input id="haloacl_save_right" type="button" name="safeRight" value="$hacl_SDRightsPanelContainer_4" onclick="YAHOO.haloacl.buildCreateAcl_SecDesc();" /></div>
         </div>
-  
+
         <script type="javascript">
 
             var callback2 = function(result){
@@ -3054,7 +3054,7 @@ function haclGetRightsContainer($panelid, $type = "readOnly") {
         <script>
             YAHOO.haloacl.loadContentToDiv('SDRightsPanelContainer_$panelid','haclRightList',{panelid:'$panelid', type:'$type',nofilter:'true'});
         </script>
-        
+
 
         <script type="javascript">
 
@@ -3062,7 +3062,7 @@ function haclGetRightsContainer($panelid, $type = "readOnly") {
 
                 var panelid = '$panelid';
                 var checkedgroups = YAHOO.haloaclrights.getCheckedNodesFromRightsTree(YAHOO.haloaclrights.treeInstance$panelid, null);
-              
+
                     var counter = 0;
                     checkedgroups.each(function(actualtemplate){
 
@@ -3249,7 +3249,7 @@ HTML;
                 xml+="<inlineright>";
                 xml+="<panelid>subRight_$subSdId</panelid>";
                 xml+="<type>template</type>";
-              
+
                 xml+="<name>"+escape('$sdName')+"</name>";
 
                 xml+="</inlineright>";
@@ -3261,7 +3261,7 @@ HTML;
                 }
 
                 YAHOO.haloacl.sendXmlToAction(xml,'haclSaveTempRightToSession',callback);
-                          
+
             };
 HTML;
         // preventing deathlock
@@ -4297,8 +4297,6 @@ function haclGetGroupsForRightPanel($clickedGroup, $search=null, $recursive=fals
         }
     }
 
-
-
     //only json encode final result
     if ($level == 0) {
         $array = (json_encode($array));
@@ -4307,12 +4305,13 @@ function haclGetGroupsForRightPanel($clickedGroup, $search=null, $recursive=fals
     return $array;
 
 }
+
 /**
  * delivers data to treeview in managegroups
  *
  * @param <string> group, which will be expanded
  * @param <string> search-string from filter
- * @param <boolean> load all groups recursivly (no dynamic loading)
+ * @param <boolean> load all groups recursively (no dynamic loading)
  * @param <integer> internaly used indicator for recursion-level
  * @param <array> internally used array for recursion
  * @return <string> json-formed list of groups
@@ -4320,11 +4319,12 @@ function haclGetGroupsForRightPanel($clickedGroup, $search=null, $recursive=fals
 function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false,$level=0,$subgroupsToCall=null) {
     global $wgUser,$haclCrossTemplateAccess;
     $array = array();
-    if($search)$recursive = true;
+    if($search)
+        $recursive = true;
 
     // return first level
     if($clickedGroup == 'all' || $clickedGroup == "Groups") {
-    //get level 0 groups
+        //get level 0 groups
         if($level == 0) {
             $groups = HACLStorage::getDatabase()->getGroups();
         }else {
@@ -4337,23 +4337,23 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
                 $parent = HACLGroup::newFromName($value->getGroupName());
                 $subgroupsToCall = $parent->getGroups(HACLGroup::OBJECT);
                 if(sizeof($subgroupsToCall)> 0 || $level == 0) {
-                    $subgroups = haclGetGroupsForManageUser("all", $search, true, $level+1,$subgroupsToCall);
+                    $subgroups = haclGetGroupsForManageUser("all", $search, true, $level+1, $subgroupsToCall);
                 }
                 if($value->userCanModify($wgUser->getName()) || array_intersect_key($haclCrossTemplateAccess, $wgUser->getGroups()) != null ) {
                     if(!$search || stripos($value->getGroupName(),$search) !== false || (isset($subgroups) && (sizeof($subgroups) > 0))) {
                         if(isset($subgroups)) {
-                            $tempgroup = array('name'=>$value->getGroupName(),
-                                               'id'=>$value->getGroupId(),
-                                               'checked'=>'false', 
-                                               'children'=>$subgroups,
-                                               'description'=>$value->getGroupDescription(),
-                                               'valid' => $valid);
+                            $tempgroup = array('name'        => $value->getGroupName(),
+                                               'id'          => $value->getGroupId(),
+                                               'checked'     => 'false',
+                                               'children'    => $subgroups,
+                                               'description' => $value->getGroupDescription(),
+                                               'valid'       => $valid);
                         } else {
-                            $tempgroup = array('name' => $value->getGroupName(),
-                                               'id'=>$value->getGroupId(),
-                                               'checked'=>'false',
-                                               'description'=>$value->getGroupDescription(),
-                                               'valid' => $valid);
+                            $tempgroup = array('name'        => $value->getGroupName(),
+                                               'id'          => $value->getGroupId(),
+                                               'checked'     => 'false',
+                                               'description' => $value->getGroupDescription(),
+                                               'valid'       => $valid);
                         }
                         $array[] = $tempgroup;
                     }
@@ -4369,24 +4369,24 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
                             $subparent = HACLGroup::newFromName($value->getGroupName());
                             $subgroups = $subparent->getGroups(HACLGroup::OBJECT);
                             if(sizeof($subgroups) > 0) {
-                                $tempgroup = array('name'=>$value->getGroupName(),
-                                                   'id'=>$value->getGroupId(),
-                                                   'checked'=>'false',
-                                                   'description'=>$value->getGroupDescription(),
-                                                      'valid' => $valid);
+                                $tempgroup = array('name'        => $value->getGroupName(),
+                                                   'id'          => $value->getGroupId(),
+                                                   'checked'     => 'false',
+                                                   'description' => $value->getGroupDescription(),
+                                                   'valid'       => $valid);
                             }elseif(!$search) {
-                                $tempgroup = array('name'=>$value->getGroupName(),
-                                                   'id'=>$value->getGroupId(),
-                                                   'checked'=>'false',
-                                                   'children'=>'',
-                                                   'description'=>$value->getGroupDescription(),
-                                                   'valid' => $valid);
+                                $tempgroup = array('name'        => $value->getGroupName(),
+                                                   'id'          => $value->getGroupId(),
+                                                   'checked'     => 'false',
+                                                   'children'    => '',
+                                                   'description' => $value->getGroupDescription(),
+                                                   'valid'       => $valid);
                             }else {
-                                $tempgroup = array('name'=>$value->getGroupName(),
-                                                   'id'=>$value->getGroupId(),
-                                                   'checked'=>'false',
-                                                   'description'=>$value->getGroupDescription(),
-                                                   'valid' => $valid);
+                                $tempgroup = array('name'        => $value->getGroupName(),
+                                                   'id'          => $value->getGroupId(),
+                                                   'checked'     => 'false',
+                                                   'description' => $value->getGroupDescription(),
+                                                   'valid'       => $valid);
                             }
                             $array[] = $tempgroup;
                         } catch (HACLGroupException $e) { }
@@ -4396,47 +4396,42 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
             }
         }
 
-    }else {
+    } else {
         $parent = HACLGroup::newFromName($clickedGroup);
         //groups
         $groups = $parent->getGroups(HACLGroup::OBJECT);
         foreach( $groups as $key => $value ) {
             if($value->userCanModify($wgUser->getName()) || array_intersect_key($haclCrossTemplateAccess, $wgUser->getGroups()) != null ) {
                 $valid = $value->checkIntegrity();
-                
+
                 $subparent = HACLGroup::newFromName($value->getGroupName());
                 $subgroups = $subparent->getGroups(HACLGroup::OBJECT);
                 if(sizeof($subgroups) > 0) {
-                    $tempgroup = array('name'=>$value->getGroupName(),
-                                       'id'=>$value->getGroupId(),
-                                       'checked'=>'false',
-                                       'description'=>$value->getGroupDescription(),
-                                       'valid' => $valid);
+                    $tempgroup = array('name'        => $value->getGroupName(),
+                                       'id'          => $value->getGroupId(),
+                                       'checked'     => 'false',
+                                       'description' => $value->getGroupDescription(),
+                                       'valid'       => $valid);
                 }else {
-                    $tempgroup = array('name'=>$value->getGroupName(),
-                                       'id'=>$value->getGroupId(),
-                                       'checked'=>'false',
-                                       'children'=>'',
-                                       'description'=>$value->getGroupDescription(),
-                                       'valid' => $valid);
+                    $tempgroup = array('name'        => $value->getGroupName(),
+                                       'id'          => $value->getGroupId(),
+                                       'checked'     => 'false',
+                                       'children'    => '',
+                                       'description' => $value->getGroupDescription(),
+                                       'valid'       => $valid);
                 }
                 $array[] = $tempgroup;
             }
         }
     }
 
-
-
-    //only json encode final result
+    // only json encode final result
     if ($level == 0) {
         $array = (json_encode($array));
     }
 
     return $array;
-
-
 }
-
 
 /**
  *
@@ -4446,8 +4441,6 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
 function haclGetUsersWithGroups() {
     return (json_encode(HACLStorage::getDatabase()->getUsersWithGroups()));
 }
-
-
 
 /**
  *
@@ -4493,7 +4486,7 @@ function haclGetACLs($typeXML, $filter = null) {
     foreach( $SDs as $key => $SD) {
          // check integrity of SD
          $valid = $SD->checkIntegrity();
-                
+
         // processing default user templates
         if(preg_match("/$template\//is",$SD->getSDName())) {
             if(($SD->getSDName() == "$template/$username") ||$dontCheckForCanMod || (array_intersect($wgUser->getGroups(), $haclCrossTemplateAccess) != null)) {
@@ -4510,9 +4503,9 @@ function haclGetACLs($typeXML, $filter = null) {
                         $tempRights[] = array('id'=>$subSdId, 'description'=>"Template - ".$tempright->getSDName());
                     }catch(Exception $e ) {}
                 }
-                $tempSD = array('id'=>$SD->getSDID(), 
-                                'name'=>$SD->getSDName(), 
-                                'rights'=>$tempRights, 
+                $tempSD = array('id'=>$SD->getSDID(),
+                                'name'=>$SD->getSDName(),
+                                'rights'=>$tempRights,
                                 'valid' => $valid);
                 $array[] = $tempSD;
             }
@@ -4532,9 +4525,9 @@ function haclGetACLs($typeXML, $filter = null) {
                     $tempRights[] = array('id'=>$subSdId, 'description'=>"Template - ".$tempright->getSDName());
                 }catch(Exception $e ) {}
             }
-            $tempSD = array('id'=>$SD->getSDID(), 
-                            'name'=>$SD->getSDName(), 
-                            'rights'=>$tempRights, 
+            $tempSD = array('id'=>$SD->getSDID(),
+                            'name'=>$SD->getSDName(),
+                            'rights'=>$tempRights,
                             'valid' => $valid);
             $array[] = $tempSD;
         }
@@ -4999,9 +4992,9 @@ HTML;
                 </span>
                 <input type="button" value="$delete_selected" onClick="YAHOO.haloacl.deleteWhitelist()"; />
             </div>
-             
+
         </div>
-   
+
     </div>
     <div style="clear:both">&nbsp;</div>
 
@@ -5011,7 +5004,7 @@ HTML;
         <div id="whitelist_name_container"></div>
         <input style="margin-left:211px" type="button" value="Add Page" onClick="YAHOO.haloacl.saveWhitelist();" />
     </div>
-        
+
     <script type="javascript">
         YAHOO.haloacl.AutoCompleter('haloacl_whitelist_pagename', 'whitelist_name_container');
     </script>
@@ -5043,7 +5036,7 @@ HTML;
                 $('haloacl_whitelist_pagename').value = "";
                 if(YAHOO.haloacl.debug) console.log("callback4 end");
             };
-            
+
             YAHOO.haloacl.sendXmlToAction(xml,'haclSaveWhitelist',callback4);
 
         };
@@ -5067,7 +5060,7 @@ HTML;
                 YAHOO.haloacl.whitelistDatatableInstance.executeQuery("");
 
             };
-            
+
             YAHOO.haloacl.sendXmlToAction(xml,'haclDeleteWhitelist',callback6);
 
         };

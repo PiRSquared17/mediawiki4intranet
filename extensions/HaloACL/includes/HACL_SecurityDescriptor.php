@@ -18,10 +18,10 @@
 
 /**
  * This file contains the class HACLSecurityDescriptor.
- * 
+ *
  * @author Thomas Schweitzer
  * Date: 15.04.2009
- * 
+ *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
@@ -33,21 +33,21 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  * This class describes security descriptors or predefined rights in HaloACL.
- * 
+ *
  * Pages, categories, namespaces and properties are protected by a security
  * descriptor (SD). An SD is an article (with certain naming conventions) that
  * contains the rules that are applied to the protected object.
- * 
+ *
  * Each SD has an ID (the page ID of the article that contains the SD),
  * the page ID of the protected element, a type (page, category, namespace,
  * property) and a list of users and groups who can modify the SD.
- * 
+ *
  * Predefined rights have the same structure as security descriptors. So in the
- * following, SD is used as synonym for predefined right. SDs and PRs can be 
- * distinguished by their type $mPEType. 
- * 
+ * following, SD is used as synonym for predefined right. SDs and PRs can be
+ * distinguished by their type $mPEType.
+ *
  * @author Thomas Schweitzer
- * 
+ *
  */
 class  HACLSecurityDescriptor  {
 
@@ -62,21 +62,21 @@ class  HACLSecurityDescriptor  {
                                 // but a predefined right that aquivalent to
                                 // an SD by its structure.
 
-    
+
     //--- Private fields ---
     private $mSDID;            // int: Page ID of the article that defines this SD
     private $mPEID;            // int: Page ID of the protected element
     private $mSDName;        // string: The name of this SD
     private $mPEType;        // int: Type of the protected element (see constants PET_... above)
-    private $mManageGroups;    // array(int): IDs of the groups that can modify 
+    private $mManageGroups;    // array(int): IDs of the groups that can modify
                             //        the definition of this SD
-    private $mManageUsers;    // array(int): IDs of the users that can modify 
+    private $mManageUsers;    // array(int): IDs of the users that can modify
                             //        the definition of this SD
-    
+
     /**
      * Constructor for HACLSecurityDescriptor. If your create a new security
-     * descriptor, you have to call the method <save> to stored it in the 
-     * database. 
+     * descriptor, you have to call the method <save> to stored it in the
+     * database.
      *
      * @param int/string $SDID
      *         Article's page ID. If <null>, the class tries to find the correct ID
@@ -90,21 +90,21 @@ class  HACLSecurityDescriptor  {
      * @param int $peType
      *         Type of the protected element (see constants PET_...)
      * @param array<int/string>/string $manageGroups
-     *         An array or a string of comma separated group names or IDs that 
-     *      can modify the SD's definition. Group names are converted and 
+     *         An array or a string of comma separated group names or IDs that
+     *      can modify the SD's definition. Group names are converted and
      *      internally stored as group IDs. Invalid values cause an exception.
      * @param array<int/string>/string $manageUsers
      *         An array or a string of comma separated user names or IDs that
-     *      can modify the SD's definition. User names are converted and 
+     *      can modify the SD's definition. User names are converted and
      *      internally stored as user IDs. Invalid values cause an exception.
-     * @throws 
+     * @throws
      *         HACLSDException(HACLSDException::NO_PE_ID)
      *         HACLSDException(HACLSDException::UNKOWN_GROUP)
      *         HACLException(HACLException::UNKOWN_USER)
-     *      
-     */        
+     *
+     */
     function __construct($SDID, $SDName, $peID, $peType, $manageGroups, $manageUsers) {
-        
+
         if (is_null($SDID)) {
             $SDID = self::idForSD($SDName);
         }
@@ -125,9 +125,9 @@ class  HACLSecurityDescriptor  {
 
         $this->setManageGroups($manageGroups);
         $this->setManageUsers($manageUsers);
-        
+
     }
-    
+
     //--- getter/setter ---
 
     public function getSDID()            {return $this->mSDID;}
@@ -136,11 +136,11 @@ class  HACLSecurityDescriptor  {
     public function getPEType()            {return $this->mPEType;}
     public function getManageGroups()    {return $this->mManageGroups;}
     public function getManageUsers()    {return $this->mManageUsers;}
-        
+
 //    public function setXY($xy)               {$this->mXY = $xy;}
-    
+
     //--- Public methods ---
-    
+
     /**
      * Returns the ID of a protected element that is given by its name. The ID
      * depends on the type of the protected element:
@@ -151,11 +151,11 @@ class  HACLSecurityDescriptor  {
      * -PET_RIGHT: not applicable
      *
      * @param string $peName
-     *         Name of the protected object. For categories and properties, the 
+     *         Name of the protected object. For categories and properties, the
      *         namespace must be given
      * @param int $peType
      *         Type of the protected element. See PET-... constants of this class.
-     * 
+     *
      * @return int/bool
      *         ID of the protected element or <false>, if it does not exist.
      */
@@ -175,19 +175,19 @@ class  HACLSecurityDescriptor  {
         // return the page id
         $id = haclfArticleID($peName);
         return $id == 0 ? false : $id;
-        
+
     }
-    
+
     /**
      * Creates a new SD object based on the name of the SD. The SD must
      * exists in the database.
-     * 
+     *
      * @param string $SDName
      *         Name of the SD.
-     * 
+     *
      * @return HACLSecurityDescriptor
      *         A new SD object.
-     * @throws 
+     * @throws
      *         HACLSDException(HACLSDException::UNKNOWN_SD)
      *             ...if the requested SD in the not the database.
      */
@@ -202,47 +202,47 @@ class  HACLSecurityDescriptor  {
     /**
      * Creates a new SD object based on the ID of the SD. The SD must
      * exists in the database.
-     * 
+     *
      * @param int $SDID
      *         ID of the SD i.e. the ID of the article that defines the SD.
-     * 
+     *
      * @return HACLSecurityDescriptor
      *         A new SD object.
-     * @throws 
+     * @throws
      *         HACLSDException(HACLSDException::UNKNOWN_SD)
      *             ...if the requested SD in the not the database.
      */
     public static function newFromID($SDID) {
-        
+
         $sd = HACLStorage::getDatabase()->getSDByID($SDID);
         if ($sd === null) {
             throw new HACLSDException(HACLSDException::UNKNOWN_SD, $SDID);
         }
         return $sd;
     }
-    
+
     /**
      * Returns the page ID of the article that defines the SD with the name
      * $SDName.
      *
      * @param string $SDName
      *         Name of the SD
-     * 
+     *
      * @return int
      *         The ID of the SD's article or <null> if the article does not exist.
-     * 
+     *
      */
     public static function idForSD($SDName) {
         return haclfArticleID($SDName, HACL_NS_ACL);
     }
-    
+
     /**
      * Returns the name of the SD with the ID $SDID. This is the ID of the article
      * that defines the SD.
      *
      * @param int $SDID
      *         ID of the SD whose name is requested
-     * 
+     *
      * @return string
      *         Name of the SD with the given ID or <null> if there is no article
      *         that defines this SD
@@ -253,13 +253,13 @@ class  HACLSecurityDescriptor  {
         haclfRestoreTitlePatch($etc);
         return ($nt) ? $nt->getText() : null;
     }
-    
+
     /**
      * Checks if the SD with the ID $sdID exists in the database.
      *
      * @param int $sdID
      *         ID of the SD
-     * 
+     *
      * @return bool
      *         <true> if the SD exists
      *         <false> otherwise
@@ -267,17 +267,17 @@ class  HACLSecurityDescriptor  {
     public static function exists($sdID) {
         return HACLStorage::getDatabase()->sdExists($sdID);
     }
-    
+
     /**
      * Tries to find the ID of the security descriptor for the protected element
      * with the ID $peID.
      *
      * @param int $peID
      *         ID of the protected element
-     * 
+     *
      * @param int $peType
      *         Type of the protected element
-     * 
+     *
      * @return mixed int|bool
      *         int: ID of the security descriptor
      *         <false>, if there is no SD for the protected element
@@ -285,21 +285,21 @@ class  HACLSecurityDescriptor  {
     public static function getSDForPE($peID, $peType) {
         return HACLStorage::getDatabase()->getSDForPE($peID, $peType);
     }
-    
+
     /**
-     * Sets the users who can manage this SD. The SD has to be saved 
+     * Sets the users who can manage this SD. The SD has to be saved
      * afterwards to persists the changes in the database.
      *
      * @param mixed string|array(mixed int|string|User) $manageUsers
      *         If a single string is given, it contains a comma-separated list of
-     *         user names. 
+     *         user names.
      *         If an array is given, it can contain user-objects, names of users or
-     *      IDs of a users. If <null> or empty, the currently logged in user is 
+     *      IDs of a users. If <null> or empty, the currently logged in user is
      *      assumed.
-     *      There are two special user names: 
+     *      There are two special user names:
      *             '*' - anonymous user (ID:0)
      *            '#' - all registered users (ID: -1)
-     * @throws 
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
      *             ...if a user does not exist.
      */
@@ -322,19 +322,19 @@ class  HACLSecurityDescriptor  {
         } else {
             $this->mManageUsers = array();
         }
-        
+
     }
 
     /**
-     * Sets the groups who can manage this SD. The SD has to be saved 
+     * Sets the groups who can manage this SD. The SD has to be saved
      * afterwards to persists the changes in the database.
      *
      * @param mixed string|array(mixed int|string|User) $manageGroups
      *         If a single string is given, it contains a comma-separated list of
-     *         group names. 
-     *         If an array is given, it can contain IDs (int), names (string) or 
+     *         group names.
+     *         If an array is given, it can contain IDs (int), names (string) or
      *      objects (HACLGroup) for the group
-     * @throws 
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
      *             ...if a user does not exist.
      */
@@ -360,19 +360,19 @@ class  HACLSecurityDescriptor  {
         } else {
             $this->mManageGroups = array();
         }
-        
+
     }
-    
-    
+
+
     /**
      * The name of the security descriptor determines which element it protects.
      * This method returns the name and type of the element that is protected
      * by the security descriptor with the name $nameOfSD.
      *
      * @param string $nameOfSD
-     *         Name of the security descriptor that protects an element (with or 
+     *         Name of the security descriptor that protects an element (with or
      *         without namespace).
-     * 
+     *
      * @return array(string, string)
      *         Name of the protected element and its type (one of self::PET_CATEGORY
      *      etc). It the type is self::PET_RIGHT, the name is <null>.
@@ -386,9 +386,9 @@ class  HACLSecurityDescriptor  {
         if (strpos($nameOfSD, $ns) === 0) {
             $start = strlen($ns);
         }
-        
+
         // Determine the type of the protected element by the prefix
-        $types = array(self::PET_PAGE, self::PET_CATEGORY, 
+        $types = array(self::PET_PAGE, self::PET_CATEGORY,
                           self::PET_NAMESPACE, self::PET_PROPERTY,
                           self::PET_RIGHT);
         foreach ($types as $type) {
@@ -399,7 +399,7 @@ class  HACLSecurityDescriptor  {
                 if ($type === self::PET_CATEGORY) {
                     global $wgContLang;
                     $peName = $wgContLang->getNsText(NS_CATEGORY).':'.$peName;
-                } else if ($type === self::PET_PROPERTY && 
+                } else if ($type === self::PET_PROPERTY &&
                            defined('SMW_NS_PROPERTY')) {
                     global $wgContLang;
                     $peName = $wgContLang->getNsText(SMW_NS_PROPERTY).':'.$peName;
@@ -417,7 +417,7 @@ class  HACLSecurityDescriptor  {
     /**
      * The name of the protected element and its type determine the name of
      * its security descriptor.
-     * This method returns the complete name of the SD (with namespace) for a 
+     * This method returns the complete name of the SD (with namespace) for a
      * given protected element.
      *
      * @param string $nameOfPE
@@ -428,7 +428,7 @@ class  HACLSecurityDescriptor  {
      *        - HACLSecurityDescriptor::PET_NAMESPACE
      *        - HACLSecurityDescriptor::PET_PAGE
      *        - HACLSecurityDescriptor::PET_PROPERTY
-     * 
+     *
      * @return array(string, string)
      *         Name of the protected element and its type (one of self::PET_CATEGORY
      *      etc). It the type is self::PET_RIGHT, the name is <null>.
@@ -439,39 +439,39 @@ class  HACLSecurityDescriptor  {
         $ns = $haclgContLang->getNamespaces();
         $ns = $ns[HACL_NS_ACL].':';
         $prefix = $haclgContLang->getPetPrefix($peType).'/';
-        
+
         $sdName = $ns.$prefix.$nameOfPE;
         return $sdName;
-         
+
     }
 
     /**
-     * Saves the given predefined rights (PR) and adds them to this security 
+     * Saves the given predefined rights (PR) and adds them to this security
      * descriptor (SD).
-     * 
+     *
      * PRs and SDs have the same structure and are both managed in the class
      * HACLSecurityDescriptor. The type of PRs is PET_RIGHT. You can add PRs to PRs
-     * and SDs, but not SDs to SDs. 
-     * 
-     * The hierarchy of rights in the database is immediately updated. 
+     * and SDs, but not SDs to SDs.
+     *
+     * The hierarchy of rights in the database is immediately updated.
      * For each protected element (e.g. a page) all rights are stored in the
-     * database. The hierarchy of rights is materialized in the DB. If a PR is 
-     * added to an SD, add sub-rights of the PR are added to the element that 
+     * database. The hierarchy of rights is materialized in the DB. If a PR is
+     * added to an SD, add sub-rights of the PR are added to the element that
      * is protected by the SD. If a PR is added to a PR, all sub-rights are added
-     * to all elements whose SD includes the parent PR. 
+     * to all elements whose SD includes the parent PR.
      * For better performance, all predefined rights should be added at once and
      * not one after another.
-     * 
+     *
      * @param array<HACLSecurityDescriptor> $rights
      *         These rights are added. The type of their security descriptors must be
      *         PET_RIGHT.
-     * 
+     *
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to delete this
      *         SD. If <null> (default), the currently logged in user is assumed.
-     * 
+     *
      * @throws
-     *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
+     *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *         Exception
      *         ...in case of database failure
      *         HACLSDException(HACLSDException::CANNOT_ADD_SD)
@@ -481,41 +481,41 @@ class  HACLSecurityDescriptor  {
         if (empty($rights)) {
             return;
         }
-        
+
         // Check if all rights are predefined rights
         foreach ($rights as $r) {
             if ($r->getPEType() !== self::PET_RIGHT) {
-                throw new HACLSDException(HACLSDException::CANNOT_ADD_SD, 
+                throw new HACLSDException(HACLSDException::CANNOT_ADD_SD,
                                           $this->getSDName(), $r->getSDName());
             }
         }
 
         // Can the user modify this SD/PR
         $this->userCanModify($user, true);
-        
+
         // Update the hierarchy of SDs/PRs
         foreach ($rights as $r) {
             HACLStorage::getDatabase()->addRightToSD($this->getSDID(), $r->getSDID());
         }
 
         // Assign rights to all protected elements
-        $this->materializeRightsHierarchy();        
+        $this->materializeRightsHierarchy();
     }
-    
+
     /**
      * Adds several inline rights. The origin-ID of the inline rights are set
-     * and they are saved to the database. The new hierarchy of rights is 
+     * and they are saved to the database. The new hierarchy of rights is
      * materialized in the database. It is always faster to add all inline rights
-     * at once instead of one after another. 
+     * at once instead of one after another.
      *
      * @param array<HACLRight> $rights
      *         An array of inline rights
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to delete this
      *         SD. If <null> (default), the currently logged in user is assumed.
-     * 
+     *
      * @throws
-     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
+     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      */
     public function addInlineRights($rights, $user = null) {
         if (empty($rights)) {
@@ -526,7 +526,7 @@ class  HACLSecurityDescriptor  {
             $r->setOriginID($this->mSDID);
             $r->save();
         }
-        
+
         $this->materializeRightsHierarchy();
     }
 
@@ -537,27 +537,27 @@ class  HACLSecurityDescriptor  {
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to delete this
      *         SD. If <null> (default), the currently logged in user is assumed.
-     * 
+     *
      * @throws
-     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
-     *  
+     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
+     *
      */
     public function removeAllRights($user = null) {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteSD($this->mSDID, true);
     }
-    
+
     /**
-     * Returns a list of IDs of all inline rights of this SD. 
+     * Returns a list of IDs of all inline rights of this SD.
      *
      * @param bool $recursively
      *         If <true>, the whole hierarchy of rights of this SD is considered
      *                    and all derived inline rights are returned.
      *         If <false>, only the direct inline rights of this SD are returned.
-     * 
+     *
      * @return array<int>
      *         An array of inline right IDs. There are no duplicate IDs.
-     * 
+     *
      */
     public function getInlineRights($recursively = true) {
         if ($recursively) {
@@ -570,32 +570,32 @@ class  HACLSecurityDescriptor  {
         }
         // Get all direct rights of this SD
         $ir = HACLStorage::getDatabase()->getInlineRightsOfSDs($sdIDs);
-         
+
         return $ir;
     }
-    
+
     /**
      * Returns an array of IDs of predefined rights of this SD.
      *
      * @param bool $recursively
      *         <true>: The whole hierarchy of rights is returned.
      *         <false>: Only the direct rights of this SD are returned.
-     * 
+     *
      * @return array<int>
      *         Array of unique IDs of rights of this SD.
      */
     public function getPredefinedRights($recursively = true) {
-        
+
         $pr = HACLStorage::getDatabase()->getPredefinedRightsOfSD($this->getSDID(), $recursively);
-         
+
         return $pr;
-        
+
     }
 
     /**
      * Finds all (real) security descriptors that are related to this
-     * SD or PR. If $this is an SD, it is returned. If 
-     * $this is a PR, all SDs that include this right (via the hierarchy of 
+     * SD or PR. If $this is an SD, it is returned. If
+     * $this is a PR, all SDs that include this right (via the hierarchy of
      * rights) are returned.
      *
      * @return array<int>
@@ -610,16 +610,16 @@ class  HACLSecurityDescriptor  {
             return array($this->mSDID);
         }
     }
-    
+
     /**
      * This method checks the integrity of this SD. The integrity can be violated
      * by missing groups, users or predefined rights.
-     * 
+     *
      * return mixed bool / array
      *     <true> if the SD is valid,
      *  array(string=>bool) otherwise
      *         The array has the keys "groups", "users" and "rights" with boolean values.
-     *         If the value is <true>, at least one of the corresponding entities 
+     *         If the value is <true>, at least one of the corresponding entities
      *         is missing.
      */
     public function checkIntegrity() {
@@ -627,9 +627,9 @@ class  HACLSecurityDescriptor  {
         $missingUsers = false;
         $missingPR = false;
         $db = HACLStorage::getDatabase();
-        
+
         //== Check integrity of group managers ==
-         
+
         // Check for missing groups
         foreach ($this->mManageGroups as $gid) {
             if (!$db->groupExists($gid)) {
@@ -637,7 +637,7 @@ class  HACLSecurityDescriptor  {
                 break;
             }
         }
-        
+
         // Check for missing users
         foreach ($this->mManageUsers as $uid) {
             if ($uid > 0 && User::whoIs($uid) === false) {
@@ -645,10 +645,10 @@ class  HACLSecurityDescriptor  {
                 break;
             }
         }
-        
-        
+
+
         //== Check integrity of inline rights ==
-        
+
         $irIDs = $this->getInlineRights(false);
         foreach ($irIDs as $irID) {
             $ir = $db->getRightByID($irID);
@@ -669,7 +669,7 @@ class  HACLSecurityDescriptor  {
                 }
             }
         }
-        
+
         // Check for missing predefined rights
         $prIDs = $this->getPredefinedRights(false);
         foreach ($prIDs as $prid) {
@@ -678,7 +678,7 @@ class  HACLSecurityDescriptor  {
                 break;
             }
         }
-        
+
         if (!$missingGroups && !$missingPR && !$missingUsers) {
             return true;
         }
@@ -686,28 +686,28 @@ class  HACLSecurityDescriptor  {
                      'users'  => $missingUsers,
                      'rights' => $missingPR);
     }
-    
+
     /**
      * Checks if the given user can modify this SD.
      *
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to modify this
      *         SD. If <null>, the currently logged in user is assumed.
-     * 
+     *
      * @param boolean $throwException
-     *         If <true>, the exception 
+     *         If <true>, the exception
      *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *         is thrown, if the user can't modify the SD.
-     * 
+     *
      * @return boolean
      *         One of these values is returned if no exception is thrown:
      *         <true>, if the user can modify this SD and
      *         <false>, if not
-     * 
-     * @throws 
+     *
+     * @throws
      *         HACLException(HACLException::UNKOWN_USER)
-     *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
-     * 
+     *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
+     *
      */
     public function userCanModify($user, $throwException = false) {
         // Get the ID of the user who wants to add/modify the SD
@@ -720,7 +720,7 @@ class  HACLSecurityDescriptor  {
             // registered users can modify the SD
             return true;
         }
-        
+
         // Check if the user belongs to a SD that can modify the SD
         $db = HACLStorage::getDatabase();
         foreach ($this->mManageGroups as $groupID) {
@@ -735,81 +735,81 @@ class  HACLSecurityDescriptor  {
         if (in_array('sysop', $groups) || in_array('bureaucrat', $groups)) {
             return true;
         }
-        
+
         if ($throwException) {
             if (empty($userName)) {
                 // only user id is given => retrieve the name of the user
                 $userName = ($user) ? $user->getId() : "(User-ID: $userID)";
             }
-            throw new HACLSDException(HACLSDException::USER_CANT_MODIFY_SD, 
+            throw new HACLSDException(HACLSDException::USER_CANT_MODIFY_SD,
                                          $this->mSDName, $userName);
         }
         return false;
     }
 
     /**
-     * Saves this SD in the database. A SD needs a name and at least one group 
-     * or user who can modify the definition of this group. If no group or user 
+     * Saves this SD in the database. A SD needs a name and at least one group
+     * or user who can modify the definition of this group. If no group or user
      * is given, the specified or the current user gets this right. If no user is
      * logged in, the operation fails.
-     * 
-     * If the SD already exists and the given user has the right to modify the
-     * SD, the SDs definition is changed.    
      *
-     * 
+     * If the SD already exists and the given user has the right to modify the
+     * SD, the SDs definition is changed.
+     *
+     *
      * @param User/string $user
-     *         User-object or name of the user who wants to save this SD. If this 
-     *         value is empty or <null>, the current user is assumed. 
-     *  
-     * @throws 
+     *         User-object or name of the user who wants to save this SD. If this
+     *         value is empty or <null>, the current user is assumed.
+     *
+     * @throws
      *         HACLSDException(HACLSDException::NO_SD_ID)
      *         HACLException(HACLException::UNKOWN_USER)
      *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
-     *         Exception (on failure in database level) 
-     * 
+     *         Exception (on failure in database level)
+     *
      */
     public function save($user = null) {
-        
+
         // Get the page ID of the article that defines the SD
         if ($this->mSDID == 0) {
             throw new HACLSDException(HACLSDException::NO_SD_ID, $this->mSDName);
         }
-        
+
         if (count($this->mManageGroups) == 0 && count($this->mManageUsers) == 0) {
             // no user has the right to modify this right
             // => add the current user as manager
             global $wgUser;
             $this->mManageUsers[] = $wgUser->getId();
         }
-        
+
         $this->userCanModify($user, true);
 
         HACLStorage::getDatabase()->saveSD($this);
-        
+
     }
-    
-    
+
+
     /**
      * Deletes this security descriptor from the database.
      *
      * @param User/string/int $user
      *         User-object, name of a user or ID of a user who wants to delete this
      *         SD. If <null>, the currently logged in user is assumed.
-     * 
+     *
      * @throws
-     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD) 
+     *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
     public function delete($user = null) {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteSD($this->mSDID);
     }
-    
+
     /**
      * Rights are organized in a hierarchy. Security descriptors (SD) and predefined
      * rights (PR) (which are almost the same) can contain PRs and inline rights.
      * SDs protect elements (e.g. pages). For faster evaluation of rights, all
-     * inline rights that belong to an SD through the hierarchy of rights are 
+     * inline rights that belong to an SD through the hierarchy of rights are
      * assigned to the protected element in the database.
      *
      */
@@ -821,16 +821,16 @@ class  HACLSecurityDescriptor  {
         if (!empty($ir)) {
             $sd = $this->getSDsIncludingPR();
         }
-        
+
         // Add all inline rights to all protected elements (i.e. materialize the
         // hierarchy of rights)
         if (!empty($ir) && !empty($sd)) {
             HACLStorage::getDatabase()->setInlineRightsForProtectedElements($ir, $sd);
         }
-        
+
     }
-    
+
     //--- Private methods ---
-    
-    
+
+
 }
