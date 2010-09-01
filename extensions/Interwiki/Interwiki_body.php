@@ -179,7 +179,7 @@ class SpecialInterwiki extends SpecialPage {
 		global $wgRequest, $wgOut;
 		$prefix = $wgRequest->getVal( 'wpInterwikiPrefix' );
 		$do = $wgRequest->getVal( 'wpInterwikiAction' );
-		if( preg_match( '/[\s:&=]/', $prefix ) ) {
+		if( $do != 'delete' && preg_match( '/[\s:&=]/', $prefix ) ) {
 			$this->error( 'interwiki-badprefix', htmlspecialchars( $prefix ) );
 			$this->showForm( $do );
 			return;
@@ -201,8 +201,9 @@ class SpecialInterwiki extends SpecialPage {
 				$log->addEntry( 'iw_delete', $selfTitle, $reason, array( $prefix ) );
 			}
 			break;
-		case 'edit':
 		case 'add':
+			$prefix = mb_strtolower( $prefix );
+		case 'edit':
 			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
 			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
 			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;

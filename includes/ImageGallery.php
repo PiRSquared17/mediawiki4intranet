@@ -218,7 +218,7 @@ class ImageGallery
 	 *
 	 */
 	function toHTML() {
-		global $wgLang;
+		global $wgLang, $wgMaxFilenameLength;
 
 		$sk = $this->getSkin();
 
@@ -232,7 +232,7 @@ class ImageGallery
 		if( $this->mCaption )
 			$s .= "\n\t<caption>{$this->mCaption}</caption>";
 
-		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights );
+		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights, 'imagegallery' => true );
 		$i = 0;
 		foreach ( $this->mImages as $pair ) {
 			$nt = $pair[0];
@@ -289,7 +289,7 @@ class ImageGallery
 			}
 
 			$textlink = $this->mShowFilename ?
-				$sk->makeKnownLinkObj( $nt, htmlspecialchars( $wgLang->truncate( $nt->getText(), 20, '...' ) ) ) . "<br />\n" :
+				$sk->makeKnownLinkObj( $nt, htmlspecialchars( $wgLang->truncate( $nt->getText(), $wgMaxFilenameLength, '...' ) ) ) . "<br />\n" :
 				'' ;
 
 			# ATTENTION: The newline after <div class="gallerytext"> is needed to accommodate htmltidy which
