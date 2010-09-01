@@ -53,104 +53,103 @@ class HACLStorageSQL {
      */
     public function initDatabaseTables() {
 
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
         $verbose = true;
         HACLDBHelper::reportProgress("Setting up HaloACL ...\n",$verbose);
 
         // halo_acl_rights:
         //        description of each inline right
-        $table = $db->tableName('halo_acl_rights');
+        $table = $dbw->tableName('halo_acl_rights');
 
         HACLDBHelper::setupTable($table, array(
             'right_id'         => 'INT(8) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY',
-            'actions'         => 'INT(8) NOT NULL',
-            'groups'         => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
-            'users'         => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
-            'description'     => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
+            'actions'          => 'INT(8) NOT NULL',
+            'groups'           => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
+            'users'            => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
+            'description'      => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
             'name'             => 'Text CHARACTER SET utf8 COLLATE utf8_bin',
-            'origin_id'     => 'INT(8) UNSIGNED NOT NULL'),
-        $db, $verbose);
+            'origin_id'        => 'INT(8) UNSIGNED NOT NULL'),
+        $dbw, $verbose);
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_pe_rights:
         //         table of materialized inline rights for each protected element
-        $table = $db->tableName('halo_acl_pe_rights');
+        $table = $dbw->tableName('halo_acl_pe_rights');
 
         HACLDBHelper::setupTable($table, array(
-            'pe_id'     => 'INT(8) NOT NULL',
+            'pe_id'        => 'INT(8) NOT NULL',
             'type'         => 'ENUM(\'category\', \'page\', \'namespace\', \'property\', \'whitelist\') DEFAULT \'page\' NOT NULL',
             'right_id'     => 'INT(8) UNSIGNED NOT NULL'),
-        $db, $verbose, "pe_id,type,right_id");
+        $dbw, $verbose, "pe_id,type,right_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_rights_hierarchy:
         //        hierarchy of predefined rights
-        $table = $db->tableName('halo_acl_rights_hierarchy');
+        $table = $dbw->tableName('halo_acl_rights_hierarchy');
 
         HACLDBHelper::setupTable($table, array(
             'parent_right_id'     => 'INT(8) UNSIGNED NOT NULL',
             'child_id'            => 'INT(8) UNSIGNED NOT NULL'),
-        $db, $verbose, "parent_right_id,child_id");
+        $dbw, $verbose, "parent_right_id,child_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "parent_right_id, child_id");
 
         // halo_acl_security_descriptors:
         //        table for security descriptors and predefined rights
-        $table = $db->tableName('halo_acl_security_descriptors');
+        $table = $dbw->tableName('halo_acl_security_descriptors');
 
         HACLDBHelper::setupTable($table, array(
             'sd_id'     => 'INT(8) UNSIGNED NOT NULL PRIMARY KEY',
             'pe_id'     => 'INT(8)',
-            'type'         => 'ENUM(\'category\', \'page\', \'namespace\', \'property\', \'right\') DEFAULT \'page\' NOT NULL',
+            'type'      => 'ENUM(\'category\', \'page\', \'namespace\', \'property\', \'right\') DEFAULT \'page\' NOT NULL',
             'mr_groups' => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin',
-            'mr_users'     => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin'),
-        $db, $verbose);
+            'mr_users'  => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin'),
+        $dbw, $verbose);
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_groups:
         //        stores the ACL groups
-        $table = $db->tableName('halo_acl_groups');
+        $table = $dbw->tableName('halo_acl_groups');
 
         HACLDBHelper::setupTable($table, array(
             'group_id'   => 'INT(8) UNSIGNED NOT NULL PRIMARY KEY',
             'group_name' => 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL',
             'mg_groups'  => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin',
             'mg_users'   => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin'),
-        $db, $verbose);
+        $dbw, $verbose);
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_group_members:
         //        stores the hierarchy of groups and their users
-        $table = $db->tableName('halo_acl_group_members');
+        $table = $dbw->tableName('halo_acl_group_members');
 
         HACLDBHelper::setupTable($table, array(
             'parent_group_id'     => 'INT(8) UNSIGNED NOT NULL',
-            'child_type'         => 'ENUM(\'group\', \'user\') DEFAULT \'user\' NOT NULL',
-            'child_id'             => 'INT(8) NOT NULL'),
-        $db, $verbose, "parent_group_id,child_type,child_id");
+            'child_type'          => 'ENUM(\'group\', \'user\') DEFAULT \'user\' NOT NULL',
+            'child_id'            => 'INT(8) NOT NULL'),
+        $dbw, $verbose, "parent_group_id,child_type,child_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "parent_group_id, child_type, child_id");
 
         // halo_acl_special_pages:
         //        stores the IDs of special pages that have no article ID
-        $table = $db->tableName('halo_acl_special_pages');
+        $table = $dbw->tableName('halo_acl_special_pages');
 
         HACLDBHelper::setupTable($table, array(
             'id'     => 'INT(8) NOT NULL AUTO_INCREMENT',
-            'name'     => 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL'),
-        $db, $verbose, "id,name");
+            'name'   => 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL'),
+        $dbw, $verbose, "id,name");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "id,name");
 
-
-                // setup quickacl-table
-                $table = $db->tableName('halo_acl_quickacl');
+        // setup quickacl-table
+        $table = $dbw->tableName('halo_acl_quickacl');
 
         HACLDBHelper::setupTable($table, array(
             'sd_id'     => 'INT(8) NOT NULL',
             'user_id'     => 'INT(10) NOT NULL'),
-        $db, $verbose, "sd_id,user_id");
+        $dbw, $verbose, "sd_id,user_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "sd_id,user_id");
-        return true;
 
+        return true;
     }
 
     public function dropDatabaseTables() {
@@ -158,7 +157,7 @@ class HACLStorageSQL {
         $verbose = true;
 
         HACLDBHelper::reportProgress("Deleting all database content and tables generated by HaloACL ...\n\n",$verbose);
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
         $tables = array(
             'halo_acl_rights',
             'halo_acl_pe_rights',
@@ -169,8 +168,8 @@ class HACLStorageSQL {
             'halo_acl_special_pages',
             'halo_acl_quickacl');
         foreach ($tables as $table) {
-            $name = $db->tableName($table);
-            $db->query('DROP TABLE' . ($wgDBtype=='postgres'?'':' IF EXISTS'). $name, 'SMWSemanticStoreSQL2::drop');
+            $name = $dbw->tableName($table);
+            $dbw->query('DROP TABLE ' . ($wgDBtype == 'postgres' ? '' : ' IF EXISTS') . $name, __METHOD__);
             HACLDBHelper::reportProgress(" ... dropped table $name.\n", $verbose);
         }
         HACLDBHelper::reportProgress("All data removed successfully.\n",$verbose);
@@ -189,24 +188,12 @@ class HACLStorageSQL {
      *         ID of the group whose name is requested
      *
      * @return string
-     *         Name of the group with the given ID or <null> if there is no such
+     *         Name of the group with the given ID or <NULL> if there is no such
      *         group defined in the database.
      */
     public function groupNameForID($groupID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_groups');
-        $sql = "SELECT group_name FROM $gt ".
-            "WHERE group_id = '$groupID';";
-        $groupName = null;
-
-        $res = $db->query($sql);
-
-        if ($db->numRows($res) == 1) {
-            $row = $db->fetchObject($res);
-            $groupName = $row->group_name;
-        }
-        $db->freeResult($res);
-
+        $dbr =& wfGetDB( DB_SLAVE );
+        $groupName = $dbr->selectField('halo_acl_groups', 'group_name', array('group_id' => $groupID), __METHOD__);
         return $groupName;
     }
 
@@ -221,16 +208,14 @@ class HACLStorageSQL {
      *
      */
     public function saveGroup(HACLGroup $group) {
-        $db =& wfGetDB( DB_MASTER );
-
+        $dbw =& wfGetDB( DB_MASTER );
         $mgGroups = implode(',', $group->getManageGroups());
         $mgUsers  = implode(',', $group->getManageUsers());
-        $db->replace($db->tableName('halo_acl_groups'), null, array(
+        $dbw->replace('halo_acl_groups', NULL, array(
             'group_id'    =>  $group->getGroupID() ,
-            'group_name'    =>  $group->getGroupName() ,
+            'group_name'  =>  $group->getGroupName() ,
             'mg_groups'   =>  $mgGroups,
-            'mg_users'    =>  $mgUsers));
-
+            'mg_users'    =>  $mgUsers), __METHOD__);
     }
 
     /**
@@ -243,35 +228,18 @@ class HACLStorageSQL {
      *
      */
     public function getGroups() {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_groups');
-        $gmt = $db->tableName('halo_acl_group_members');
-    /*
-            $sql = "SELECT * FROM $gt
-        WHERE NOT EXISTS (
+        $dbr =& wfGetDB( DB_SLAVE );
+        $gt = $dbr->tableName('halo_acl_groups');
+        $gmt = $dbr->tableName('halo_acl_group_members');
 
-        SELECT child_id
-        FROM $gmt
-        WHERE $gmt.child_id = halo_acl_groups.group_id
-                AND $gmt.parent_group_id != $gmt.child_id
-        ) order by $gt.group_name
-
-            ";
-         *
-         */
-            $sql = "SELECT * FROM $gt
-        LEFT JOIN $gmt on $gt.group_id = $gmt.child_id
-                WHERE $gmt.parent_group_id is null OR $gmt.parent_group_id = $gmt.child_id
-
-            ";
-
-
+        $sql = "SELECT * FROM $gt LEFT JOIN $gmt on $gt.group_id = $gmt.child_id
+                WHERE $gmt.parent_group_id is NULL OR $gmt.parent_group_id = $gmt.child_id";
 
         $groups = array();
 
-        $res = $db->query($sql);
+        $res = $dbr->query($sql, __METHOD__);
 
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
 
             $groupID = $row->group_id;
             $groupName = $row->group_name;
@@ -281,7 +249,7 @@ class HACLStorageSQL {
             $groups[] = new HACLGroup($groupID, $groupName, $mgGroups, $mgUsers);
         }
 
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $groups;
     }
@@ -296,27 +264,24 @@ class HACLStorageSQL {
      *
      */
     public function getUsersWithGroups() {
-        $db =& wfGetDB( DB_SLAVE );
-        $ut = $db->tableName('user');
-        $gt = $db->tableName('halo_acl_groups');
-        $gmt = $db->tableName('halo_acl_group_members');
+        $dbr =& wfGetDB( DB_SLAVE );
+        $ut = $dbr->tableName('user');
+        $gt = $dbr->tableName('halo_acl_groups');
+        $gmt = $dbr->tableName('halo_acl_group_members');
         $sql = "SELECT user_id, group_id, group_name
-        FROM user
-        LEFT JOIN  $gmt ON  $gmt.child_id = user.user_id
-        LEFT JOIN $gt ON $gt.group_id = $gmt.parent_group_id
-            ";
-
+                FROM user
+                LEFT JOIN $gmt ON $gmt.child_id = user.user_id
+                LEFT JOIN $gt ON $gt.group_id = $gmt.parent_group_id";
 
         $users = array();
 
-        $res = $db->query($sql);
+        $res = $dbr->query($sql, __METHOD__);
 
-        $curUser = null;
+        $curUser = NULL;
 
+        while ($row = $dbr->fetchObject($res)) {
 
-        while ($row = $db->fetchObject($res)) {
-
-            if ($curUser <> $row->user_id) {
+            if ($curUser != $row->user_id) {
 
                 $curGroupArray = array();
                 $curUser = $row->user_id;
@@ -325,7 +290,7 @@ class HACLStorageSQL {
             $users[$row->user_id] = $curGroupArray;
         }
 
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $users;
     }
@@ -339,28 +304,26 @@ class HACLStorageSQL {
      *         Name of the requested group.
      *
      * @return HACLGroup
-     *         A new group object or <null> if there is no such group in the
+     *         A new group object or <NULL> if there is no such group in the
      *         database.
      *
      */
     public function getGroupByName($groupName) {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_groups');
-        $sql = "SELECT * FROM $gt ".
-            "WHERE group_name = '$groupName';";
-        $group = null;
+        $dbr =& wfGetDB( DB_SLAVE );
+        $gt = $dbr->tableName('halo_acl_groups');
+        $group = NULL;
 
-        $res = $db->query($sql);
+        $res = $dbr->select('halo_acl_groups', '*', array('group_name' => $groupName), __METHOD__);
 
-        if ($db->numRows($res) == 1) {
-            $row = $db->fetchObject($res);
+        if ($dbr->numRows($res) == 1) {
+            $row = $dbr->fetchObject($res);
             $groupID = $row->group_id;
             $mgGroups = self::strToIntArray($row->mg_groups);
             $mgUsers  = self::strToIntArray($row->mg_users);
 
             $group = new HACLGroup($groupID, $groupName, $mgGroups, $mgUsers);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $group;
     }
@@ -373,21 +336,18 @@ class HACLStorageSQL {
      *         ID of the requested group.
      *
      * @return HACLGroup
-     *         A new group object or <null> if there is no such group in the
+     *         A new group object or <NULL> if there is no such group in the
      *         database.
      *
      */
     public function getGroupByID($groupID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_groups');
-        $sql = "SELECT * FROM $gt ".
-            "WHERE group_id = '$groupID';";
-        $group = null;
+        $dbr =& wfGetDB( DB_SLAVE );
+        $group = NULL;
 
-        $res = $db->query($sql);
+        $res = $dbr->select('halo_acl_groups', '*', array('group_id' => $groupID), __METHOD__);
 
-        if ($db->numRows($res) == 1) {
-            $row = $db->fetchObject($res);
+        if ($dbr->numRows($res) == 1) {
+            $row = $dbr->fetchObject($res);
             $groupID = $row->group_id;
             $groupName = $row->group_name;
             $mgGroups = self::strToIntArray($row->mg_groups);
@@ -395,7 +355,7 @@ class HACLStorageSQL {
 
             $group = new HACLGroup($groupID, $groupName, $mgGroups, $mgUsers);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $group;
     }
@@ -410,13 +370,12 @@ class HACLStorageSQL {
      *
      */
     public function addUserToGroup($groupID, $userID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
-        $db->replace($db->tableName('halo_acl_group_members'), null, array(
-            'parent_group_id'    =>  $groupID ,
-            'child_type'    =>  'user' ,
-            'child_id '   =>  $userID));
-
+        $dbw->replace('halo_acl_group_members', NULL, array(
+            'parent_group_id' => $groupID,
+            'child_type'      => 'user',
+            'child_id '       => $userID), __METHOD__);
     }
 
     /**
@@ -431,13 +390,12 @@ class HACLStorageSQL {
      *
      */
     public function addGroupToGroup($parentGroupID, $childGroupID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
-        $db->replace($db->tableName('halo_acl_group_members'), null, array(
-            'parent_group_id'    =>  $parentGroupID ,
-            'child_type'    =>  'group' ,
-            'child_id '   =>  $childGroupID));
-
+        $dbw->replace('halo_acl_group_members', NULL, array(
+            'parent_group_id' => $parentGroupID,
+            'child_type'      => 'group',
+            'child_id '       => $childGroupID), __METHOD__);
     }
 
     /**
@@ -450,13 +408,12 @@ class HACLStorageSQL {
      *
      */
     public function removeUserFromGroup($groupID, $userID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
-        $db->delete($db->tableName('halo_acl_group_members'), array(
-            'parent_group_id'    => $groupID ,
-            'child_type'    =>  'user' ,
-            'child_id '   =>  $userID));
-
+        $dbw->delete('halo_acl_group_members', array(
+            'parent_group_id' => $groupID,
+            'child_type'      => 'user',
+            'child_id '       => $userID), __METHOD__);
     }
 
     /**
@@ -467,11 +424,8 @@ class HACLStorageSQL {
      *
      */
     public function removeAllMembersFromGroup($groupID) {
-        $db =& wfGetDB( DB_MASTER );
-
-        $db->delete($db->tableName('halo_acl_group_members'),
-        array('parent_group_id' => $groupID));
-
+        $dbw =& wfGetDB( DB_MASTER );
+        $dbw->delete('halo_acl_group_members', array('parent_group_id' => $groupID), __METHOD__);
     }
 
 
@@ -486,13 +440,11 @@ class HACLStorageSQL {
      *
      */
     public function removeGroupFromGroup($parentGroupID, $childGroupID) {
-        $db =& wfGetDB( DB_MASTER );
-
-        $db->delete($db->tableName('halo_acl_group_members'), array(
-            'parent_group_id'    =>  $parentGroupID,
-            'child_type'    =>  'group' ,
-            'child_id '   =>  $childGroupID));
-
+        $dbw =& wfGetDB( DB_MASTER );
+        $dbw->delete('halo_acl_group_members', array(
+            'parent_group_id' => $parentGroupID,
+            'child_type'      => 'group',
+            'child_id '       => $childGroupID), __METHOD__);
     }
 
     /**
@@ -507,20 +459,17 @@ class HACLStorageSQL {
      *
      */
     public function getMembersOfGroup($groupID, $memberType) {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_group_members');
-        $sql = "SELECT child_id FROM $gt ".
-            "WHERE parent_group_id = '$groupID' AND ".
-            "child_type='$memberType';";
-
-        $res = $db->query($sql);
+        $dbr =& wfGetDB( DB_SLAVE );
+        $res = $dbr->select('halo_acl_group_members', 'child_id', array(
+            'parent_group_id' => $groupID,
+            'child_type'      => $memberType), __METHOD__);
 
         $members = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $members[] = (int) $row->child_id;
         }
 
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $members;
 
@@ -538,34 +487,27 @@ class HACLStorageSQL {
      */
     public function getGroupsOfMember($userID) {
 
-
-
-        $db =& wfGetDB( DB_SLAVE );
-        $ut = $db->tableName('user');
-        $gt = $db->tableName('halo_acl_groups');
-        $gmt = $db->tableName('halo_acl_group_members');
+        $dbr =& wfGetDB( DB_SLAVE );
+        $ut = $dbr->tableName('user');
+        $gt = $dbr->tableName('halo_acl_groups');
+        $gmt = $dbr->tableName('halo_acl_group_members');
         $sql = "SELECT DISTINCT user_id, group_id, group_name
-        FROM user
-        LEFT JOIN  $gmt ON  $gmt.child_id = user.user_id
-        LEFT JOIN $gt ON $gt.group_id = $gmt.parent_group_id
-        WHERE user.user_id = $userID
-            ";
+                FROM user
+                LEFT JOIN $gmt ON  $gmt.child_id = user.user_id
+                LEFT JOIN $gt ON $gt.group_id = $gmt.parent_group_id
+                WHERE user.user_id = $userID";
 
-
-
-        $res = $db->query($sql);
+        $res = $dbr->query($sql, __METHOD__);
 
         $curGroupArray = array();
-
-
-        while ($row = $db->fetchObject($res)) {
-
-
-            $curGroupArray[] = array("id"=>$row->group_id, "name"=>$row->group_name);
-
+        while ($row = $dbr->fetchObject($res)) {
+            $curGroupArray[] = array(
+                'id' => $row->group_id,
+                'name' => $row->group_name
+            );
         }
 
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $curGroupArray;
 
@@ -597,25 +539,23 @@ class HACLStorageSQL {
      *
      */
     public function hasGroupMember($parentID, $childID, $memberType, $recursive) {
-        $db =& wfGetDB( DB_SLAVE );
-        $gt = $db->tableName('halo_acl_group_members');
+        $dbr =& wfGetDB( DB_SLAVE );
 
         // Ask for the immediate parents of $childID
-        $sql = "SELECT parent_group_id FROM $gt ".
-            "WHERE child_id = '$childID' AND ".
-            "child_type='$memberType';";
-
-        $res = $db->query($sql);
+        $res = $dbr->select('halo_acl_group_members', 'parent_group_id', array(
+            'child_id'   => $childID,
+            'child_type' => $memberType,
+        ), __METHOD__);
 
         $parents = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             if ($parentID == (int) $row->parent_group_id) {
-                $db->freeResult($res);
+                $dbr->freeResult($res);
                 return true;
             }
             $parents[] = (int) $row->parent_group_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         // $childID is not an immediate child of $parentID
         if (!$recursive || empty($parents)) {
@@ -627,43 +567,43 @@ class HACLStorageSQL {
         $ancestors = array();
         while (true) {
             // Check if one of the parent's parent is $parentID
-            $sql = "SELECT parent_group_id FROM $gt ".
-                "WHERE parent_group_id='$parentID' AND ".
-                "child_id in (".implode(',', $parents).") AND ".
-                "child_type='group';";
-
-            $res = $db->query($sql);
-            if ($db->numRows($res) == 1) {
+            $res = $dbr->select('halo_acl_group_members', 'parent_group_id', array(
+                'parent_group_id' => $parentID,
+                'child_id'        => $parents,
+                'child_type'      => 'group',
+            ), __METHOD__);
+            if ($dbr->numRows($res) == 1) {
                 // The request parent was found
-                $db->freeResult($res);
+                $dbr->freeResult($res);
                 return true;
             }
 
             // Parent was not found => retrieve all parents of the current set of
             // parents.
-            $sql = "SELECT DISTINCT parent_group_id FROM $gt WHERE ".
-            (empty($ancestors) ? ""
-            : "parent_group_id not in (".implode(',', $ancestors).") AND ").
-                "child_id in (".implode(',', $parents).") AND ".
-                "child_type='group';";
+            $where = array(
+                'child_id'   => $parents,
+                'child_type' => 'group',
+            );
+            if ($ancestors)
+                $where['parent_group_id'] = $ancestors;
 
-            $res = $db->query($sql);
-            if ($db->numRows($res) == 0) {
+            $res = $dbr->select('halo_acl_group_members', 'parent_group_id', $where, __METHOD__, array('DISTINCT'));
+            if ($dbr->numRows($res) == 0) {
                 // The request parent was found
-                $db->freeResult($res);
+                $dbr->freeResult($res);
                 return false;
             }
 
             $ancestors = array_merge($ancestors, $parents);
             $parents = array();
-            while ($row = $db->fetchObject($res)) {
+            while ($row = $dbr->fetchObject($res)) {
                 if ($parentID == (int) $row->parent_group_id) {
-                    $db->freeResult($res);
+                    $dbr->freeResult($res);
                     return true;
                 }
                 $parents[] = (int) $row->parent_group_id;
             }
-            $db->freeResult($res);
+            $dbr->freeResult($res);
         }
 
     }
@@ -681,18 +621,14 @@ class HACLStorageSQL {
      *
      */
     public function deleteGroup($groupID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
         // Delete the group from the hierarchy of groups (as parent and as child)
-        $table = $db->tableName('halo_acl_group_members');
-        $db->delete($table, array('parent_group_id' => $groupID));
-        $db->delete($table, array('child_type'    =>  'group',
-            'child_id '   =>  $groupID));
+        $dbw->delete('halo_acl_group_members', array('parent_group_id' => $groupID), __METHOD__);
+        $dbw->delete('halo_acl_group_members', array('child_type' => 'group', 'child_id' => $groupID), __METHOD__);
 
         // Delete the group's definition
-        $table = $db->tableName('halo_acl_groups');
-        $db->delete($table, array('group_id' => $groupID));
-
+        $dbw->delete('halo_acl_groups', array('group_id' => $groupID), __METHOD__);
     }
 
     /**
@@ -706,10 +642,9 @@ class HACLStorageSQL {
      *         <false> otherwise
      */
     public function groupExists($groupID) {
-        $db =& wfGetDB( DB_SLAVE );
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $obj = $db->selectRow($db->tableName('halo_acl_groups'),
-        array("group_id"), array("group_id" => $groupID));
+        $obj = $dbr->selectRow('halo_acl_groups', 'group_id', array('group_id' => $groupID), __METHOD__);
         return ($obj !== false);
     }
 
@@ -731,35 +666,49 @@ class HACLStorageSQL {
      *         Array of SD Objects
      *
      */
-    public function getSDs($types) {
-        $db =& wfGetDB( DB_SLAVE );
-        $sdt = $db->tableName('halo_acl_security_descriptors');
-        $p = $db->tableName('page');
-        $u = $db->tableName('user');
-        $sql = "SELECT * FROM $sdt
-        LEFT JOIN $p ON $p.page_id = $sdt.sd_id
-        WHERE 1=0";
+    public function getSDs($types)
+    {
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        foreach ($types as $type) {
-            switch($type) {
-                case "all": $sql .= " OR 1" ; break;
-                case "page": $sql .= " OR type='page'" ; break;
-                case "category": $sql .= " OR type='category'" ; break;
-                case "property": $sql .= " OR type='property'" ; break;
-                case "namespace": $sql .= " OR type='namespace'" ; break;
-                case "standardacl": $sql .= " OR (type='namespace' OR type='property' OR type='category' OR type='page')" ; break;
-                case "acltemplate": $sql .= " OR (pe_id='0' AND NOT (SUBSTRING($p.page_title FROM 10) IN (SELECT user_name FROM $u)))" ; break;
-                case "defusertemplate": $sql .= " OR (pe_id='0' AND (SUBSTRING($p.page_title FROM 10) IN (SELECT user_name FROM $u)))" ; break;
+        $where = array();
+        foreach ($types as $type)
+        {
+            switch($type)
+            {
+                case "all":
+                    break;
+                case "category":
+                case "property":
+                case "namespace":
+                case "page":
+                    $where['type'] = $type;
+                    break;
+                case "standardacl":
+                    $where['type'] = array('namespace', 'property', 'category', 'page');
+                    break;
+                case "acltemplate":
+                case "defusertemplate":
+                    $where['pe_id'] = 0;
+                    // strip leading "Template/"
+                    $u = $dbr->tableName('user');
+                    $where[] =
+                        "SUBSTRING(page_title FROM 10) " .
+                        ($type == 'acltemplate' ? "NOT " : "") . 
+                        "IN (SELECT user_name FROM $u)";
+                    break;
             }
         }
 
-                $sql .= " ORDER BY page_title";
         $sds = array();
-        $res = $db->query($sql);
-        while ($row = $db->fetchObject($res)) {
+        $res = $dbr->select(
+            array('halo_acl_security_descriptors', 'page'), '*', $where, __METHOD__,
+            array('ORDER BY' => 'page_title'),
+            array('page' => array('LEFT JOIN', array('page_id=sd_id')))
+        );
+        while ($row = $dbr->fetchObject($res)) {
             $sds[] = HACLSecurityDescriptor::newFromID($row->sd_id);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $sds;
     }
@@ -775,16 +724,16 @@ class HACLStorageSQL {
      *
      */
     public function saveSD(HACLSecurityDescriptor $sd) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
         $mgGroups = implode(',', $sd->getManageGroups());
         $mgUsers  = implode(',', $sd->getManageUsers());
-        $db->replace($db->tableName('halo_acl_security_descriptors'), null, array(
+        $dbw->replace('halo_acl_security_descriptors', NULL, array(
             'sd_id'       =>  $sd->getSDID() ,
-            'pe_id'        =>  $sd->getPEID(),
+            'pe_id'       =>  $sd->getPEID(),
             'type'        =>  $sd->getPEType(),
             'mr_groups'   =>  $mgGroups,
-            'mr_users'    =>  $mgUsers));
+            'mr_users'    =>  $mgUsers), __METHOD__);
 
     }
 
@@ -803,11 +752,11 @@ class HACLStorageSQL {
      *         ... on database failure
      */
     public function addRightToSD($parentRightID, $childRightID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
-        $db->replace($db->tableName('halo_acl_rights_hierarchy'), null, array(
+        $dbw->replace('halo_acl_rights_hierarchy', NULL, array(
             'parent_right_id' => $parentRightID,
-            'child_id'        => $childRightID));
+            'child_id'        => $childRightID), __METHOD__);
     }
 
     /**
@@ -827,22 +776,20 @@ class HACLStorageSQL {
      *         Exception
      *         ... on database failure
      */
-    public function setInlineRightsForProtectedElements($inlineRights,
-    $securityDescriptors) {
-        $db =& wfGetDB( DB_MASTER );
+    public function setInlineRightsForProtectedElements($inlineRights, $securityDescriptors) {
+        $dbw =& wfGetDB( DB_MASTER );
 
         foreach ($securityDescriptors as $sd) {
             // retrieve the protected element and its type
-            $obj = $db->selectRow($db->tableName('halo_acl_security_descriptors'),
-            array("pe_id","type"), array("sd_id" => $sd));
+            $obj = $dbw->selectRow('halo_acl_security_descriptors', 'pe_id, type', array('sd_id' => $sd), __METHOD__);
             if (!$obj) {
                 continue;
             }
             foreach ($inlineRights as $ir) {
-                $db->replace($db->tableName('halo_acl_pe_rights'), null, array(
-                    'pe_id'     =>  $obj->pe_id,
-                    'type'     =>  $obj->type,
-                    'right_id' =>  $ir));
+                $dbw->replace('halo_acl_pe_rights', NULL, array(
+                    'pe_id'    => $obj->pe_id,
+                    'type'     => $obj->type,
+                    'right_id' => $ir), __METHOD__);
             }
         }
     }
@@ -861,18 +808,18 @@ class HACLStorageSQL {
         if (empty($sdIDs)) {
             return array();
         }
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_rights');
-
-        $sql = "SELECT DISTINCT right_id FROM $t WHERE ".
-            "origin_id in (".implode(',', $sdIDs).");";
-        $res = $db->query($sql);
+        $dbr =& wfGetDB( DB_SLAVE );
+        $res = $dbr->select(
+            'halo_acl_rights', 'right_id',
+            array('origin_id' => $sdIDs), __METHOD__,
+            array('DISTINCT')
+        );
 
         $irs = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $irs[] = (int) $row->right_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
         return $irs;
     }
 
@@ -890,8 +837,7 @@ class HACLStorageSQL {
      *         An array of predefined right IDs without duplicates.
      */
     public function getPredefinedRightsOfSD($sdID, $recursively) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_rights_hierarchy');
+        $dbr =& wfGetDB( DB_SLAVE );
 
         $parentIDs = array($sdID);
         $childIDs = array();
@@ -900,14 +846,16 @@ class HACLStorageSQL {
             if (empty($parentIDs)) {
                 break;
             }
-            $sql = "SELECT DISTINCT child_id FROM $t WHERE ".
-                "parent_right_id in (".implode(',', $parentIDs).");";
-            $res = $db->query($sql);
+            $res = $dbr->select(
+                'halo_acl_rights_hierarchy', 'child_id',
+                array('parent_right_id' => $parentIDs), __METHOD__,
+                array('DISTINCT')
+            );
 
             $exclude = array_merge($exclude, $parentIDs);
             $parentIDs = array();
 
-            while ($row = $db->fetchObject($res)) {
+            while ($row = $dbr->fetchObject($res)) {
                 $cid = (int) $row->child_id;
                 if (!in_array($cid, $childIDs)) {
                     $childIDs[] = $cid;
@@ -917,8 +865,8 @@ class HACLStorageSQL {
                     $parentIDs[] = $cid;
                 }
             }
-            $numRows = $db->numRows($res);
-            $db->freeResult($res);
+            $numRows = $dbr->numRows($res);
+            $dbr->freeResult($res);
             if ($numRows == 0 || !$recursively) {
                 // No further children found
                 break;
@@ -940,21 +888,22 @@ class HACLStorageSQL {
      *      of PRs.
      */
     public function getSDsIncludingPR($prID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_rights_hierarchy');
+        $dbr =& wfGetDB( DB_SLAVE );
 
         $parentIDs = array();
         $childIDs = array($prID);
         $exclude = array();
         while (true) {
-            $sql = "SELECT DISTINCT parent_right_id FROM $t WHERE ".
-                "child_id in (".implode(',', $childIDs).");";
-            $res = $db->query($sql);
+            $res = $dbr->select(
+                'halo_acl_rights_hierarchy', 'parent_right_id',
+                array('child_id' => $childIDs), __METHOD__,
+                array('DISTINCT')
+            );
 
             $exclude = array_merge($exclude, $childIDs);
             $childIDs = array();
 
-            while ($row = $db->fetchObject($res)) {
+            while ($row = $dbr->fetchObject($res)) {
                 $prid = (int) $row->parent_right_id;
                 if (!in_array($prid, $parentIDs)) {
                     $parentIDs[] = $prid;
@@ -964,7 +913,7 @@ class HACLStorageSQL {
                     $childIDs[] = $prid;
                 }
             }
-            $db->freeResult($res);
+            $dbr->freeResult($res);
             if (empty($childIDs)) {
                 // No further children found
                 break;
@@ -978,15 +927,13 @@ class HACLStorageSQL {
         if (empty($parentIDs)) {
             return $sdIDs;
         }
-        $t = $db->tableName('halo_acl_security_descriptors');
-        $sql = "SELECT sd_id FROM $t ".
-            "WHERE pe_id != 0 AND sd_id in (".implode(',', $parentIDs).");";
-        $res = $db->query($sql);
+        $res = $dbr->select('halo_acl_security_descriptors', 'sd_id',
+            array('pe_id != 0', 'sd_id' => $parentIDs), __METHOD__);
 
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $sdIDs[] = (int) $row->sd_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $sdIDs;
 
@@ -1000,21 +947,17 @@ class HACLStorageSQL {
      *         ID of the requested SD.
      *
      * @return HACLSecurityDescriptor
-     *         A new SD object or <null> if there is no such SD in the
+     *         A new SD object or <NULL> if there is no such SD in the
      *         database.
      *
      */
     public function getSDByID($SDID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_security_descriptors');
-        $sql = "SELECT * FROM $t ".
-            "WHERE sd_id = '$SDID';";
-        $sd = null;
+        $dbr =& wfGetDB( DB_SLAVE );
+        $sd = NULL;
 
-        $res = $db->query($sql);
-
-        if ($db->numRows($res) == 1) {
-            $row = $db->fetchObject($res);
+        $res = $dbr->select('halo_acl_security_descriptors', '*', array('sd_id' => $SDID), __METHOD__);
+        if ($dbr->numRows($res) == 1) {
+            $row = $dbr->fetchObject($res);
             $sdID = (int)$row->sd_id;
             $peID = (int)$row->pe_id;
             $type   = $row->type;
@@ -1024,7 +967,7 @@ class HACLStorageSQL {
             $name = HACLSecurityDescriptor::nameForID($sdID);
             $sd = new HACLSecurityDescriptor($sdID, $name, $peID, $type, $mgGroups, $mgUsers);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $sd;
     }
@@ -1044,20 +987,16 @@ class HACLStorageSQL {
      *
      */
     public function deleteSD($SDID, $rightsOnly = false) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
         // Delete all inline rights that are defined by the SD (and the
         // references to them)
-        $t = $db->tableName('halo_acl_rights');
-        $sql = "SELECT right_id FROM $t ".
-            "WHERE origin_id = '$SDID';";
+        $res = $dbw->select('halo_acl_rights', 'right_id', array('origin_id' => $SDID), __METHOD__);
 
-        $res = $db->query($sql);
-
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbw->fetchObject($res)) {
             $this->deleteRight($row->right_id);
         }
-        $db->freeResult($res);
+        $dbw->freeResult($res);
 
         // Remove all inline rights from the hierarchy below $SDID from their
         // protected elements. This may remove too many rights => the parents
@@ -1065,42 +1004,40 @@ class HACLStorageSQL {
         $prs = $this->getPredefinedRightsOfSD($SDID, true);
         $irs = $this->getInlineRightsOfSDs($prs);
 
-        $peRights = $db->tableName('halo_acl_pe_rights');
-        $secDesc = $db->tableName('halo_acl_security_descriptors');
         if (!empty($irs)) {
             $sds = $this->getSDsIncludingPR($SDID);
             $sds[] = $SDID;
             foreach ($sds as $sd) {
                 // retrieve the protected element and its type
-                $obj = $db->selectRow($secDesc,
-                array("pe_id","type"),
-                array("sd_id" => $sd));
+                $obj = $dbw->selectRow('halo_acl_security_descriptors', 'pe_id, type',
+                    array('sd_id' => $sd), __METHOD__);
                 if (!$obj) {
                     continue;
                 }
 
                 foreach ($irs as $ir) {
-                    $db->delete($peRights, array('right_id' => $ir,
+                    $dbw->delete('halo_acl_pe_rights', array(
+                        'right_id' => $ir,
                         'pe_id' => $obj->pe_id,
-                        'type' => $obj->type));
+                        'type' => $obj->type), __METHOD__);
                 }
             }
         }
 
         // Get all direct parents of $SDID
-        $res = $db->select('halo_acl_rights_hierarchy', 'parent_right_id', "child_id = $SDID");
+        $res = $dbw->select('halo_acl_rights_hierarchy', 'parent_right_id',
+            array('child_id' => $SDID), __METHOD__);
         $parents = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbw->fetchObject($res)) {
             $parents[] = $row->parent_right_id;
         }
-        $db->freeResult($res);
+        $dbw->freeResult($res);
 
         // Delete the SD from the hierarchy of rights in halo_acl_rights_hierarchy
-        $table = $db->tableName('halo_acl_rights_hierarchy');
-        //        if (!$rightsOnly) {
-        //            $db->delete($table, array('child_id' => $SDID));
-        //        }
-        $db->delete($table, array('parent_right_id' => $SDID));
+        //if (!$rightsOnly) {
+        //    $dbw->delete('halo_acl_rights_hierarchy', array('child_id' => $SDID));
+        //}
+        $dbw->delete('halo_acl_rights_hierarchy', array('parent_right_id' => $SDID), __METHOD__);
 
         // Rematerialize the rights of the parents of $SDID
         foreach ($parents as $p) {
@@ -1110,10 +1047,8 @@ class HACLStorageSQL {
 
         // Delete the SD from the definition of SDs in halo_acl_security_descriptors
         if (!$rightsOnly) {
-            $table = $db->tableName('halo_acl_security_descriptors');
-            $db->delete($table, array('sd_id' => $SDID));
+            $dbw->delete('halo_acl_security_descriptors', array('sd_id' => $SDID), __METHOD__);
         }
-
     }
 
     /***************************************************************************
@@ -1137,27 +1072,26 @@ class HACLStorageSQL {
      *
      */
     public function saveRight(HACLRight $right) {
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_rights');
+        $dbw =& wfGetDB( DB_MASTER );
 
         $groups = implode(',', $right->getGroups());
         $users  = implode(',', $right->getUsers());
         $rightID = $right->getRightID();
         $setValues = array(
             'actions'     => $right->getActions(),
-            'groups'        => $groups,
-            'users'        => $users,
+            'groups'      => $groups,
+            'users'       => $users,
             'description' => $right->getDescription(),
             'name'        => $right->getName(),
             'origin_id'   => $right->getOriginID());
         if ($rightID == -1) {
             // right does not exist yet in the DB.
-            $db->insert($t, $setValues);
+            $dbw->insert('halo_acl_rights', $setValues);
             // retrieve the auto-incremented ID of the right
-            $rightID = $db->insertId();
+            $rightID = $dbw->insertId();
         } else {
             $setValues['right_id'] = $rightID;
-            $db->replace($t, null, $setValues);
+            $dbw->replace('halo_acl_rights', NULL, $setValues);
         }
 
         return $rightID;
@@ -1171,21 +1105,18 @@ class HACLStorageSQL {
      *         ID of the requested inline right.
      *
      * @return HACLRight
-     *         A new inline right object or <null> if there is no such right in the
+     *         A new inline right object or <NULL> if there is no such right in the
      *         database.
      *
      */
     public function getRightByID($rightID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_rights');
-        $sql = "SELECT * FROM $t ".
-            "WHERE right_id = '$rightID';";
-        $sd = null;
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $res = $db->query($sql);
+        $sd = NULL;
+        $res = $dbr->select('halo_acl_rights', '*', array('right_id' => $rightID), __METHOD__);
 
-        if ($db->numRows($res) == 1) {
-            $row = $db->fetchObject($res);
+        if ($dbr->numRows($res) == 1) {
+            $row = $dbr->fetchObject($res);
             $rightID = $row->right_id;
             $actions = $row->actions;
             $groups = self::strToIntArray($row->groups);
@@ -1197,7 +1128,7 @@ class HACLStorageSQL {
             $sd = new HACLRight($actions, $groups, $users, $description, $name, $originID);
             $sd->setRightID($rightID);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $sd;
     }
@@ -1230,23 +1161,23 @@ class HACLStorageSQL {
      *         An array of IDs of rights that match the given constraints.
      */
     public function getRights($peID, $type, $actionID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $rt = $db->tableName('halo_acl_rights');
-        $rpet = $db->tableName('halo_acl_pe_rights');
+        $dbr =& wfGetDB( DB_SLAVE );
+        $rt = $dbr->tableName('halo_acl_rights');
+        $rpet = $dbr->tableName('halo_acl_pe_rights');
 
         $sql = "SELECT rights.right_id FROM $rt AS rights, $rpet AS pe ".
             "WHERE pe.pe_id = $peID AND pe.type = '$type' AND ".
             "rights.right_id = pe.right_id AND".
             "(rights.actions & $actionID) != 0;";
-        $sd = null;
+        $sd = NULL;
 
-        $res = $db->query($sql);
+        $res = $dbr->query($sql, __METHOD__);
 
         $rightIDs = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $rightIDs[] = $row->right_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $rightIDs;
 
@@ -1261,16 +1192,13 @@ class HACLStorageSQL {
      *
      */
     public function deleteRight($rightID) {
-        $db =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB( DB_MASTER );
 
         // Delete the right from the definition of rights in halo_acl_rights
-        $table = $db->tableName('halo_acl_rights');
-        $db->delete($table, array('right_id' => $rightID));
+        $dbw->delete('halo_acl_rights', array('right_id' => $rightID), __METHOD__);
 
         // Delete all references to the right from protected elements
-        $table = $db->tableName('halo_acl_pe_rights');
-        $db->delete($table, array('right_id' => $rightID));
-
+        $dbw->delete('halo_acl_pe_rights', array('right_id' => $rightID), __METHOD__);
     }
 
     /**
@@ -1284,10 +1212,9 @@ class HACLStorageSQL {
      *         <false> otherwise
      */
     public function sdExists($sdID) {
-        $db =& wfGetDB( DB_SLAVE );
-
-        $obj = $db->selectRow($db->tableName('halo_acl_security_descriptors'),
-        array("sd_id"), array("sd_id" => $sdID));
+        $dbr =& wfGetDB( DB_SLAVE );
+        $obj = $dbr->selectRow('halo_acl_security_descriptors', 'sd_id',
+            array('sd_id' => $sdID), __METHOD__);
         return ($obj !== false);
     }
 
@@ -1305,12 +1232,10 @@ class HACLStorageSQL {
      *         <false>, if there is no SD for the protected element
      */
     public static function getSDForPE($peID, $peType) {
-        $db =& wfGetDB( DB_SLAVE );
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $obj = $db->selectRow($db->tableName('halo_acl_security_descriptors'),
-        array("sd_id"),
-        array("pe_id" => $peID,
-            "type"  => $peType));
+        $obj = $dbr->selectRow('halo_acl_security_descriptors', 'sd_id',
+            array('pe_id' => $peID, 'type' => $peType), __METHOD__);
         return ($obj === false) ? false : $obj->sd_id;
     }
 
@@ -1329,11 +1254,10 @@ class HACLStorageSQL {
      *         An array of page IDs of all articles that are part of the whitelist.
      */
     public function saveWhitelist($pageIDs) {
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_pe_rights');
+        $dbw =& wfGetDB( DB_MASTER );
 
         // delete old whitelist entries
-        $db->delete($t, array('type' => 'whitelist'));
+        $dbw->delete('halo_acl_pe_rights', array('type' => 'whitelist'), __METHOD__);
 
         $setValues = array();
         foreach ($pageIDs as $pid) {
@@ -1342,8 +1266,7 @@ class HACLStorageSQL {
                 'type'      => 'whitelist',
                 'right_id'  => 0);
         }
-        $db->insert($t, $setValues);
-
+        $dbw->insert('halo_acl_pe_rights', $setValues, __METHOD__);
     }
 
     /**
@@ -1354,15 +1277,14 @@ class HACLStorageSQL {
      *
      */
     public function getWhitelist() {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_pe_rights');
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $res = $db->select($t, 'pe_id', "type='whitelist'");
+        $res = $dbr->select('halo_acl_pe_rights', 'pe_id', array('type' => 'whitelist'), __METHOD__);
         $pageIDs = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $pageIDs[] = (int)$row->pe_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         return $pageIDs;
     }
@@ -1378,12 +1300,10 @@ class HACLStorageSQL {
      *         <false>, otherwise
      */
     public function isInWhitelist($pageID) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_pe_rights');
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $obj = $db->selectRow($t, array('pe_id'),
-        array('type'  => 'whitelist',
-            'pe_id' => $pageID));
+        $obj = $dbr->selectRow('halo_acl_pe_rights', 'pe_id',
+            array('type' => 'whitelist', 'pe_id' => $pageID), __METHOD__);
         return $obj !== false;
 
     }
@@ -1407,16 +1327,14 @@ class HACLStorageSQL {
      *         with normal page IDs.
      */
     public static function idForSpecial($name) {
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_special_pages');
+        $dbw =& wfGetDB( DB_MASTER );
 
-        $obj = $db->selectRow($t, array('id'),
-        array('name'  => $name));
+        $obj = $dbw->selectRow('halo_acl_special_pages', 'id', array('name' => $name), __METHOD__);
         if ($obj === false) {
             // ID not found => create a new one
-            $db->insert($t, array('name' => $name));
+            $dbw->insert('halo_acl_special_pages', array('name' => $name), __METHOD__);
             // retrieve the auto-incremented ID of the right
-            return -$db->insertId();
+            return -$dbw->insertId();
         } else {
             return -$obj->id;
         }
@@ -1433,11 +1351,8 @@ class HACLStorageSQL {
      *         The name of the page if the ID is valid. <0> otherwise
      */
     public static function specialForID($id) {
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_special_pages');
-
-        $obj = $db->selectRow($t, array('name'),
-        array('id' => -$id));
+        $dbw =& wfGetDB( DB_MASTER );
+        $obj = $dbw->selectRow('halo_acl_special_pages', 'name', array('id' => -$id), __METHOD__);
         return ($obj === false) ? 0 : $obj->name;
     }
 
@@ -1449,11 +1364,11 @@ class HACLStorageSQL {
      * @param string $values
      *         comma separated string of integer values
      * @return array(int)
-     *         Array of integers or <null> if the string was empty.
+     *         Array of integers or <NULL> if the string was empty.
      */
     private static function strToIntArray($values) {
         if (!is_string($values) || strlen($values) == 0) {
-            return null;
+            return NULL;
         }
         $values = explode(',', $values);
         $intValues = array();
@@ -1462,9 +1377,8 @@ class HACLStorageSQL {
                 $intValues[] = (int) trim($v);
             }
         }
-        return (count($intValues) > 0 ? $intValues : null);
+        return (count($intValues) > 0 ? $intValues : NULL);
     }
-
 
     /**
      * Returns all Articles names and ids
@@ -1474,44 +1388,26 @@ class HACLStorageSQL {
      *         List of IDs of all direct users or groups in this group.
      *
      */
-    public function getArticles($subName, $noACLs=false, $type =null) {
+    public function getArticles($subName, $noACLs = false, $type = NULL) {
+        global $haclgNamespaceIndex;
+        $dbr =& wfGetDB( DB_SLAVE );
 
-                $extendWhere = null;
-                if($type == "property"){
-                    $extendWhere = SMW_NS_PROPERTY;
-                }elseif($type == "category"){
-                    $extendWhere = NS_CATEGORY;
-                }elseif($type == "page"){
-                    $extendWhere = "0";
-                }
+        $where = array('lower(page_title) LIKE lower('.$dbr->addQuotes("%$subName%").')');
+        if ($type == "property")
+            $where['page_namespace'] = SMW_NS_PROPERTY;
+        elseif ($type == "category")
+            $where['page_namespace'] = NS_CATEGORY;
+        if ($noACLs)
+            $where[] = 'page_namespace != '.$haclgNamespaceIndex;
 
-        $db =& wfGetDB( DB_SLAVE );
-        $ut = $db->tableName('page');
-        $gt = $db->tableName('halo_acl_groups');
-        $gmt = $db->tableName('halo_acl_group_members');
-
-                if($extendWhere != null){
-                    $sql = "SELECT DISTINCT page_id, page_title FROM $ut WHERE lower(page_title) LIKE lower('%$subName%') AND page_namespace = '$extendWhere'";
-                }else{
-                    $sql = "SELECT DISTINCT page_id, page_title FROM $ut WHERE lower(page_title) LIKE lower('%$subName%')";
-                }
-                if($noACLs){
-                    $sql .= " and page_namespace != '300'";
-                }
-                $sql .= " ORDER BY page_title";
-
-
-        $res = $db->query($sql);
+        $res = $dbr->select('page', 'page_id, page_title', $where, __METHOD__, array('ORDER BY' => 'page_title'));
         $articleArray = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $articleArray[] = array("id"=>$row->page_id, "name"=>$row->page_title);
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
         return $articleArray;
     }
-
-
-
 
     /***************************************************************************
      *
@@ -1519,12 +1415,10 @@ class HACLStorageSQL {
      *
      **************************************************************************/
 
-
     public function saveQuickAcl($user_id, $sd_ids) {
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_quickacl');
+        $dbw =& wfGetDB( DB_MASTER );
         // delete old quickacl entries
-        $db->delete($t, array('user_id' => $user_id));
+        $dbw->delete('halo_acl_quickacl', array('user_id' => $user_id), __METHOD__);
 
         $setValues = array();
         foreach ($sd_ids as $sd_id) {
@@ -1532,32 +1426,29 @@ class HACLStorageSQL {
                 'sd_id'     => $sd_id,
                 'user_id'  => $user_id);
         }
-        $db->insert($t, $setValues);
-
+        $dbw->insert('halo_acl_quickacl', $setValues, __METHOD__);
     }
 
 
     public function getQuickacl($user_id) {
-        $db =& wfGetDB( DB_SLAVE );
-        $t = $db->tableName('halo_acl_quickacl');
+        $dbr =& wfGetDB( DB_SLAVE );
 
-        $res = $db->select($t, 'sd_id', "user_id=".$user_id."");
+        $res = $dbr->select('halo_acl_quickacl', 'sd_id', array('user_id' => $user_id), __METHOD__);
 
         $sd_ids = array();
-        while ($row = $db->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res)) {
             $sd_ids[] = (int)$row->sd_id;
         }
-        $db->freeResult($res);
+        $dbr->freeResult($res);
 
         $quickacl = new HACLQuickacl($user_id,$sd_ids);
         return $quickacl;
     }
 
     public function deleteQuickaclForSD($sdid){
-        $db =& wfGetDB( DB_MASTER );
-        $t = $db->tableName('halo_acl_quickacl');
+        $dbw =& wfGetDB( DB_MASTER );
         // delete old quickacl entries
-        $db->delete($t, array('sd_id' => $sdid));
+        $dbw->delete('halo_acl_quickacl', array('sd_id' => $sdid), __METHOD__);
         return true;
     }
 
