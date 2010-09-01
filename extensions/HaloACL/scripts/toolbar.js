@@ -48,7 +48,7 @@ YAHOO.haloacl.toolbar.loadContentToDiv = function(targetdiv, action, parameterli
 
 
     //    console.log($(targetdiv));
-    
+
     var querystring = "rs="+action;
 
     if(parameterlist != null){
@@ -161,7 +161,7 @@ YAHOO.haloacl.toolbar_updateToolbar = function(){
         try{
       	  $('haloacl_toolbar_popuplink').show();
         }catch(e){}
-		YAHOO.haloacl.toolbar_templateChanged();     
+		YAHOO.haloacl.toolbar_templateChanged();
     } else {
         $('haloacl_template_protectedwith').hide();
         $('haloacl_template_protectedwith_desc').hide();

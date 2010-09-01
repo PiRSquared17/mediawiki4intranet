@@ -80,7 +80,7 @@ YAHOO.haloacl.notification.createDialogOk = function (renderedTo,title,content,c
     // Render the Dialog
     dialog.render('haloacl_notification'+YAHOO.haloacl.notification.counter);
     dialog.show();
-    
+
     if(YAHOO.haloacl.debug)console.log("create dialog finished");
 
 };
