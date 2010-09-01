@@ -19,10 +19,10 @@
 /**
  * This file contains a filter for query results. Informations about protected pages
  * that would appear as result of a query are filtered.
- * 
+ *
  * @author Thomas Schweitzer
  * Date: 16.06.2009
- * 
+ *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
@@ -34,37 +34,37 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 
 /**
  * This class filters protected pages from a query result.
- * 
+ *
  * @author Thomas Schweitzer
- * 
+ *
  */
 class  HACLResultFilter  {
-    
+
     //--- Constants ---
 //    const XY= 0;        // the result has been added since the last time
-        
+
     //--- Private fields ---
     private $mXY;            //string: comment
-    
+
     /**
      * Constructor for  HACLResultFilter
      *
      * @param type $param
      *         Name of the notification
-     */        
+     */
     function __construct() {
 //        $this->mXY = $xy;
     }
-    
+
 
     //--- getter/setter ---
 //    public function getXY()           {return $this->mXY;}
 
 //    public function setXY($xy)               {$this->mXY = $xy;}
-    
+
     //--- Public methods ---
-    
-    
+
+
     /**
      * This callback function for the parser hook "FilterQueryResults" removes
      * all protected pages from a query result.
@@ -102,7 +102,7 @@ class  HACLResultFilter  {
                     }
                 }
                 if ($fieldEmpty && $firstField) {
-                    // The first field (subject) of the row is empty 
+                    // The first field (subject) of the row is empty
                     // => skip the complete row
                     break;
                 }
@@ -114,7 +114,7 @@ class  HACLResultFilter  {
             }
         }
         $qr = $newqr;
-                    
+
         return true;
     }
     //--- Private methods ---

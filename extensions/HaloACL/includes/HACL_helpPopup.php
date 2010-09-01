@@ -30,7 +30,7 @@
  *
  * @author hipath
  */
- 
+
 class HACL_helpPopup {
 
     private $saved = false;

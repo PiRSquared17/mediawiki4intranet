@@ -257,7 +257,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showDescription($description);
         $text .= self::$mInstance->showErrors($errMsgs);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
 
     }
@@ -342,7 +342,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showDescription($description);
         $text .= self::$mInstance->showErrors($errMsgs);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
     }
 
@@ -406,7 +406,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showRights($rights);
         $text .= self::$mInstance->showErrors($em);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
 
     }
@@ -530,7 +530,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showAssignees($users, $groups);
         $text .= self::$mInstance->showErrors($errMsgs);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
     }
 
@@ -583,7 +583,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showAssignees($users, $groups, false);
         $text .= self::$mInstance->showErrors($errMsgs);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
     }
 
@@ -637,7 +637,7 @@ class HACLParserFunctions {
         $text .= self::$mInstance->showAssignees($users, $groups);
         $text .= self::$mInstance->showErrors($errMsgs);
         $text .= self::$mInstance->showWarnings($warnings);
-        
+
         return $text;
     }
 
@@ -1265,7 +1265,7 @@ class HACLParserFunctions {
      * @param bool $isAssignedTo
      *         true  => parse the parameter "assignedTo"
      *         false => parse the parameter "members"
-     * @return array(users:array(string), groups:array(string), 
+     * @return array(users:array(string), groups:array(string),
      *               error messages:array(string), warnings: array(string))
      */
     private function assignedTo($params, $isAssignedTo = true) {
@@ -1311,7 +1311,7 @@ class HACLParserFunctions {
                 // group found
                 // Check if the group exists
                 if (HACLGroup::idForGroup($assignee) == null) {
-                    // Group does not exist => add a warning 
+                    // Group does not exist => add a warning
                     $warnings[] = wfMsgForContent("hacl_unknown_group", $assignee);
                 } else {
                     $groups[] = $assignee;
@@ -1534,7 +1534,7 @@ class HACLParserFunctions {
         }
         return $text;
     }
-    
+
     /**
      * Formats the wikitext for displaying the warnings of a parser function.
      *
@@ -1553,7 +1553,7 @@ class HACLParserFunctions {
             $text .= ":*".implode("\n:*", $messages);
         }
         return $text;
-        
+
     }
 
     /**

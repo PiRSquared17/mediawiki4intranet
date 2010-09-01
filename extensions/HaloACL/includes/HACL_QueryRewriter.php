@@ -19,10 +19,10 @@
 /**
  * This file contains the class HACLQueryRewriter that modifies queries so that
  * the content of protected properties can not be read.
- * 
+ *
  * @author Thomas Schweitzer
  * Date: 22.06.2009
- * 
+ *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
@@ -37,69 +37,69 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * semantic stores. These functions modify queries that ask for protected semantic
  * properties. These properties are removed from the queries.
  * One function processes ASK queries, the other SPARQL (with ASK and SPARQL syntax).
- * 
+ *
  * @author Thomas Schweitzer
- * 
+ *
  */
 class  HACLQueryRewriter  {
-    
+
     //--- Constants ---
-        
+
     //--- Private fields ---
 
     // array: The parsed sparql query that is treated
-    private $mQuery;                    
-    
-    
+    private $mQuery;
+
+
     // array(string->bool):
-    // Variables of a sparql query that are still bound after removing triples 
+    // Variables of a sparql query that are still bound after removing triples
     // have the value 'true', others are 'false'.
-    private $mBoundVariables = array();    
-    
+    private $mBoundVariables = array();
+
     // boolean:
     // <true> if the query was modified because of protected properties
     private $mModified = false;
-    
-    
+
+
     //--- Public methods ---
-    
-    
+
+
     /**
      * This function for the hook "RewriteQuery" modifies ASK queries. Constraints
      * and print requests for protected properties are removed.
      *
      * @param SMWQuery &$query
      *         This query is modified.
-     * 
+     *
      * @return bool true
      *         Returns <true> to keep the chain of hooks running.
      */
     public static function rewriteAskQuery(SMWQuery &$query) {
         $descr = $query->getDescription();
-        // Remove protected properties from the query description 
+        // Remove protected properties from the query description
         $qr = new HACLQueryRewriter();
-        
+
         $qr->pruneProtectedPropertiesFromAsk($descr);
         $queryString = $descr->getQueryString();
         $query->setQueryString($queryString);
-        
+
         $ep = $query->getExtraPrintouts();
         $query->setExtraPrintouts($qr->prunePrintRequests($ep));
-        
+
         if ($qr->mModified) {
             $query->addErrors(array(wfMsgForContent('hacl_sp_query_modified')));
         }
-        
+
         return true;
     }
 
     /**
-     * This function for the hook "RewriteSparqlQuery" modifies Sparql queries. 
+     * This function for the hook "RewriteSparqlQuery" modifies Sparql queries.
      * Constraints and print requests for protected properties are removed.
      *
      * @param SMWQuery &$query
      *         This query is modified.
-     * 
+     *
      * @return bool true
      *         Returns <true> to keep the chain of hooks running.
      */
@@ -110,7 +110,7 @@ class  HACLQueryRewriter  {
             // Remove protected properties from the query description with ask
             // syntax
             $qr->pruneProtectedPropertiesFromAsk($descr);
-            
+
             $queryString = $descr->getQueryString();
             $queryString = str_replace('&lt;','<',$queryString);
             $queryString = str_replace('&gt;','>',$queryString);
@@ -119,37 +119,37 @@ class  HACLQueryRewriter  {
             // handle query with SPARQL-syntax
             $qr->pruneSparqlQuery($query);
         }
-        
+
         $ep = $query->getExtraPrintouts();
         $query->setExtraPrintouts($qr->prunePrintRequests($ep));
-        
+
         if ($qr->mModified) {
             $query->addErrors(array(wfMsgForContent('hacl_sp_query_modified')));
         }
-    
+
         return true;
     }
 
-    
+
     //--- Private methods ---
 
     /**
      * This function recursively traverses the query's hierarchy and removes
-     * all protected property from descriptions and their print requests. 
+     * all protected property from descriptions and their print requests.
      *
      * @param SMWDescription $descr
      *         The description which is pruned.
      */
     private function pruneProtectedPropertiesFromAsk(SMWDescription $descr) {
-        // Remove protected properties from the print requests 
+        // Remove protected properties from the print requests
         $printRequests = $this->prunePrintRequests($descr->getPrintRequests());
         $descr->setPrintRequests($printRequests);
-        
+
         if (!($descr instanceof SMWConjunction ||
               $descr instanceof SMWDisjunction)) {
                return;
         }
-        
+
         $descriptions = $descr->getDescriptions();
         $remDescr = array();
         for ($i = 0, $num = count($descriptions); $i < $num; ++$i) {
@@ -161,7 +161,7 @@ class  HACLQueryRewriter  {
                 if ($wpv) {
                     $id = $wpv->getTitle()->getArticleID();
                     global $wgUser;
-                    $allowed = HACLEvaluator::hasPropertyRight($id, 
+                    $allowed = HACLEvaluator::hasPropertyRight($id,
                                                        $wgUser->getId(), HACLRight::READ);
                     if ($allowed) {
                         // Access to property is allowed => check for further
@@ -171,7 +171,7 @@ class  HACLQueryRewriter  {
                             $this->pruneProtectedPropertiesFromAsk($pd);
                         }
                     } else {
-                        $this->mModified = true;                                               
+                        $this->mModified = true;
                         $remDescr[] = $i;
                     }
                 }
@@ -180,7 +180,7 @@ class  HACLQueryRewriter  {
             }
         }
         $descr->removeDescriptions($remDescr);
-                
+
     }
 
     /**
@@ -189,7 +189,7 @@ class  HACLQueryRewriter  {
      *
      * @param array(SMWPrintRequest) $printRequests
      *         This array is pruned.
-     * 
+     *
      * @return array(SMWPrintRequest)
      *         The pruned array.
      */
@@ -201,12 +201,12 @@ class  HACLQueryRewriter  {
                 if ($wpv) {
                     $id = $wpv->getTitle()->getArticleID();
                     global $wgUser;
-                    $allowed = HACLEvaluator::hasPropertyRight($id, 
+                    $allowed = HACLEvaluator::hasPropertyRight($id,
                                                        $wgUser->getId(), HACLRight::READ);
-                    if (!$allowed) {            
-                        // Invalid print request => remove it   
-                        unset($printRequests[$key]);    
-                        $this->mModified = true;                            
+                    if (!$allowed) {
+                        // Invalid print request => remove it
+                        unset($printRequests[$key]);
+                        $this->mModified = true;
                     }
                 }
             }
@@ -227,25 +227,25 @@ class  HACLQueryRewriter  {
         if (!$store instanceof SMWTripleStore) {
             return;
         }
-        
+
         $prefixes = str_replace(':<', ': <', TSNamespaces::getAllPrefixes());
         $queryString = $prefixes . $query->getQueryString();
-            
+
         /* ARC2 static class inclusion */
         global $haclgIP;
         include_once("$haclgIP/arc/ARC2.php");
 
         /* parser instantiation */
         $parser = ARC2::getSPARQLParser();
-        
+
         /* parse a query */
         $parser->parse($queryString);
         if (!$parser->getErrors()) {
             $q = $parser->getQueryInfos();
-            
+
             $this->mQuery = &$q;
             $this->pruneProtectedPropertiesFromSparql($q);
-            
+
             $qs = $this->serializeSparqlQuery($q);
             if ($qs == 'SELECT WHERE' ||
                 strpos($qs, "WHERE") == strlen($qs) - 5) {
@@ -254,7 +254,7 @@ class  HACLQueryRewriter  {
                 $query->setQueryString("");
                 return;
             }
-            
+
             // replace IRIs in prefixes
             $prefixes = $q['prefixes'];
             foreach ($prefixes as $pre => $iri) {
@@ -262,7 +262,7 @@ class  HACLQueryRewriter  {
             }
 
             $query->setQueryString($qs);
-            
+
 //            print_r($q);
         }
         else {
@@ -270,9 +270,9 @@ class  HACLQueryRewriter  {
             $query->addErrors($parser->getErrors());
         }
     }
-    
+
     /**
-     * Prunes the parsed Sparql query. Protected properties and variables at 
+     * Prunes the parsed Sparql query. Protected properties and variables at
      * property position are marked as 'protected'. Variables that lose their
      * binding are removed from the result variables.
      *
@@ -290,13 +290,13 @@ class  HACLQueryRewriter  {
             // Query is not of type select
             return;
         }
-        
+
         // Mark patterns with protected properties as 'protected'
         $this->pruneSparqlPattern($q['pattern']);
-        
+
         // Mark filters with unbound variables as 'protected'
         $this->pruneUnboundFilters($q['pattern']);
-        
+
         // Remove unbound variables from result variables
         $resultVars = &$q['result_vars'];
         foreach ($this->mBoundVariables as $variable => $bound) {
@@ -309,9 +309,9 @@ class  HACLQueryRewriter  {
                 }
             }
         }
-        
+
     }
-    
+
     /**
      * This function recurses through the parsed Sparql query and marks triples
      * with protected properties as 'protected'.
@@ -347,7 +347,7 @@ class  HACLQueryRewriter  {
             default:
                 break;
         }
-        
+
     }
 
     /**
@@ -370,9 +370,9 @@ class  HACLQueryRewriter  {
             case 'filter':
                 $this->pruneUnboundFilter($pattern);
         }
-        
+
     }
-    
+
     /**
      * Marks a single filter pattern as 'protected' if it contains unbound
      * variables.
@@ -388,24 +388,24 @@ class  HACLQueryRewriter  {
 
         if ($op1['type'] == 'var') {
             $op1 = $op1['value'];
-            if (array_key_exists($op1, $this->mBoundVariables) 
+            if (array_key_exists($op1, $this->mBoundVariables)
                 && $this->mBoundVariables[$op1] === false) {
-                $patterns['protected'] = true; 
+                $patterns['protected'] = true;
             }
         }
-        
+
         if ($op2['type'] == 'var') {
             $op2 = $op2['value'];
-            if (array_key_exists($op2, $this->mBoundVariables) 
+            if (array_key_exists($op2, $this->mBoundVariables)
                 && $this->mBoundVariables[$op2] === false) {
-                $patterns['protected'] = true; 
+                $patterns['protected'] = true;
             }
         }
-        
+
     }
-    
+
     /**
-     * Marks all triples in a triple pattern which contain a protected property 
+     * Marks all triples in a triple pattern which contain a protected property
      * as 'protected'.
      *
      * @param array(string => array) $triples
@@ -420,7 +420,7 @@ class  HACLQueryRewriter  {
         $allProtected = true;
         foreach ($triples as &$t) {
             $allowed = true;
-                    
+
             if ($t['p_type'] == 'var') {
                 // Variables are not allowed for predicates
                 $allowed = false;
@@ -435,13 +435,13 @@ class  HACLQueryRewriter  {
                     haclfRestoreTitlePatch($etc);
                     $id = $prop->getArticleID();
                     global $wgUser;
-                    $allowed = HACLEvaluator::hasPropertyRight($id, 
+                    $allowed = HACLEvaluator::hasPropertyRight($id,
                                                        $wgUser->getId(), HACLRight::READ);
                 }
             }
-            
+
             if (!$allowed) {
-                // The triple contains a protected property. 
+                // The triple contains a protected property.
                 // => Triple will be ignored
                 $t['protected'] = true;
                 $this->mModified = true;
@@ -466,11 +466,11 @@ class  HACLQueryRewriter  {
                     $this->mBoundVariables[$t['o']] = true;
                 }
             }
-            
+
         }
         return $allProtected;
-    }    
-    
+    }
+
     /**
      * Creates a Sparql query string from the structure of a parsed query. Patterns
      * that are marked as protected are ignored.
@@ -490,23 +490,23 @@ class  HACLQueryRewriter  {
             // Query is not of type select
             return '';
         }
-        
+
         $qs = "SELECT ";
-        
+
         $vars = $q['result_vars'];
         foreach ($vars as $v) {
             $qs .= '?'.$v['value'].' ';
         }
-        
+
         $qs .= "WHERE";
-        
+
         $patterns = $q['pattern'];
-        
+
         $qs .= $this->serializePattern($patterns);
-        
+
         return $qs;
     }
-    
+
     /**
      * Creates a part of a sparql query string from a parsed sparql pattern.
      * Protected patterns are ignored.
@@ -533,11 +533,11 @@ class  HACLQueryRewriter  {
             case 'filter':
                 return $this->serializeFilter($pattern);
         }
-        
+
     }
 
     /**
-     * Generates the string representation of a group pattern. 
+     * Generates the string representation of a group pattern.
      *
      * @param array $patterns
      *         A group pattern
@@ -546,16 +546,16 @@ class  HACLQueryRewriter  {
      */
     private function serializeGroup($patterns) {
         $qs = "\n{";
-        
+
         foreach($patterns as $p) {
             $qs .= $this->serializePattern($p);
         }
         $qs .= "}\n";
         return $qs;
     }
-    
+
     /**
-     * Generates the string representation of a union pattern. 
+     * Generates the string representation of a union pattern.
      *
      * @param array $patterns
      *         A union pattern
@@ -563,7 +563,7 @@ class  HACLQueryRewriter  {
      *         String representation of the union pattern.
      */
     private function serializeUnion($patterns) {
-        $qs = '';    
+        $qs = '';
         $first = true;
         foreach($patterns as $p) {
             if (!$first) {
@@ -576,7 +576,7 @@ class  HACLQueryRewriter  {
     }
 
     /**
-     * Generates the string representation of a 'optional' pattern. 
+     * Generates the string representation of a 'optional' pattern.
      *
      * @param array $patterns
      *         A 'optional' pattern
@@ -592,7 +592,7 @@ class  HACLQueryRewriter  {
     }
 
     /**
-     * Generates the string representation of a filter pattern. 
+     * Generates the string representation of a filter pattern.
      *
      * @param array $patterns
      *         A filter pattern
@@ -611,19 +611,19 @@ class  HACLQueryRewriter  {
         } else if ($ob1['type'] == 'literal') {
             $op1 = '"'.$op1['value'].'"^^'.$op1['datatype'];
         }
-        
+
         if ($op2['type'] == 'var') {
             $op2 = '?' . $op2['value'];
         } else if ($op2['type'] == 'literal') {
             $op2 = '"'.$op2['value'].'"^^'.$op2['datatype'];
         }
-        
+
         $qs = "FILTER ($op1 $operator $op2)";
         return $qs;
     }
-    
+
     /**
-     * Generates the string representation of a triple pattern. 
+     * Generates the string representation of a triple pattern.
      *
      * @param array $patterns
      *         A triple pattern
@@ -641,7 +641,7 @@ class  HACLQueryRewriter  {
             if ($t['s_type'] == 'var') {
                 $subj = '?' . $subj;
             }
-            
+
             $pred = $t['p'];
             $obj = $t['o'];
             if ($t['o_type'] == 'var') {
@@ -650,10 +650,10 @@ class  HACLQueryRewriter  {
                 $obj = addslashes($obj);
                 $obj = '"'.$obj.'"^^'.$t['o_datatype'];
             }
-            
+
             $qs .= "\n$subj $pred $obj .\n";
         }
         return $qs;
     }
-    
+
 }
