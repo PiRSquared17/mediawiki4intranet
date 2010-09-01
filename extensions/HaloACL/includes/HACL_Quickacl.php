@@ -56,9 +56,9 @@ class HACLQuickacl {
     }
     
     public function addSD_ID($sdID) {
-    	if (!in_array($sdID, $this->sd_ids)) {
-    		$this->sd_ids[] = $sdID;
-    	}
+        if (!in_array($sdID, $this->sd_ids)) {
+            $this->sd_ids[] = $sdID;
+        }
     }
     
     public static function newForUserId($user_id){

@@ -134,16 +134,16 @@ function haclfSetupExtension() {
 
 #    $wgHooks['InternalParseBeforeLinks'][] = 'SMWParserExtensions::onInternalParseBeforeLinks'; // parse annotations in [[link syntax]]
 
-	/*
-	 if( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
-		$wgHooks['ParserFirstCallInit'][] = 'SMWParserExtensions::registerParserFunctions';
-		} else {
-		if ( class_exists( 'StubObject' ) && !StubObject::isRealObject( $wgParser ) ) {
-		$wgParser->_unstub();
-		}
-		SMWParserExtensions::registerParserFunctions( $wgParser );
-		}
-		*/
+    /*
+     if( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
+        $wgHooks['ParserFirstCallInit'][] = 'SMWParserExtensions::registerParserFunctions';
+        } else {
+        if ( class_exists( 'StubObject' ) && !StubObject::isRealObject( $wgParser ) ) {
+        $wgParser->_unstub();
+        }
+        SMWParserExtensions::registerParserFunctions( $wgParser );
+        }
+        */
 
     $wgHooks['BeforePageDisplay'][]='haclfAddPageHeader';
 
@@ -328,64 +328,64 @@ function haclAddHTMLHeader(&$out) {
         return true;
     } else {
 
-	    if (!defined('SMW_HALO_VERSION')) {
-	        // don't include prototype.js if SMWHalo is present
-	    	$out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/prototype.js\"></script>");
-	    }
+        if (!defined('SMW_HALO_VERSION')) {
+            // don't include prototype.js if SMWHalo is present
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/prototype.js\"></script>");
+        }
         haclAddJSLanguageScripts($out);
 
-		if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
-			// ---- SPECIAL-PAGE related stuff ---
-	
-	
-	        // -------------------
-	        // YAHOO Part
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yuiloader-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dom-min.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-min.js"></script>');
-	        #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-debug.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/logger-min.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/element-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/button-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/connection-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/json-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-dom-event.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/animation-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/tabview-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-min.js"></script>');
-	        #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-debug.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-min.js"></script>');
-	        #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-debug.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/paginator-min.js"></script>');
-	
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/container-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dragdrop-min.js"></script>');
-	        $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/autocomplete-min.js"></script>');
-	
-	        // -------------------
-	        // -------------------
-	
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/haloacl.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/groupuserTree.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/rightsTree.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/userTable.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/pageTable.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/manageUserTree.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/whitelistTable.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/autoCompleter.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/notification.js\"></script>");
-	        $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/quickaclTable.js\"></script>");
-		} else {
-			$out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/specialhacl-packed.js\"></script>");
-		}
+        if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
+            // ---- SPECIAL-PAGE related stuff ---
+    
+    
+            // -------------------
+            // YAHOO Part
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yuiloader-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dom-min.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-min.js"></script>');
+            #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-debug.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/logger-min.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/element-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/button-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/connection-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/json-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-dom-event.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/animation-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/tabview-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-min.js"></script>');
+            #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-debug.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-min.js"></script>');
+            #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-debug.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/paginator-min.js"></script>');
+    
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/container-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dragdrop-min.js"></script>');
+            $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/autocomplete-min.js"></script>');
+    
+            // -------------------
+            // -------------------
+    
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/haloacl.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/groupuserTree.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/rightsTree.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/userTable.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/pageTable.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/manageUserTree.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/whitelistTable.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/autoCompleter.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/notification.js\"></script>");
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/quickaclTable.js\"></script>");
+        } else {
+            $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/specialhacl-packed.js\"></script>");
+        }
 
         $out->addLink(array(
             'rel'   => 'stylesheet',
@@ -471,7 +471,7 @@ function haclfInitNamespaces() {
  * Set up (possibly localised) names for HaloACL
  */
 function haclfAddMagicWords(&$magicWords, $langCode) {
-//	$magicWords['ask']     = array( 0, 'ask' );
+//    $magicWords['ask']     = array( 0, 'ask' );
     return true;
 }
 
@@ -508,18 +508,18 @@ function haclfInitContentLanguage($langcode) {
  * Returns the ID and name of the given user.
  *
  * @param User/string/int $user
- * 		User-object, name of a user or ID of a user. If <null> (which is the
+ *         User-object, name of a user or ID of a user. If <null> (which is the
  *      default), the currently logged in user is assumed.
  *      There are two special user names:
- * 			'*' - anonymous user (ID:0)
- *			'#' - all registered users (ID: -1)
+ *             '*' - anonymous user (ID:0)
+ *            '#' - all registered users (ID: -1)
  * @return array(int,string)
- * 		(Database-)ID of the given user and his name. For the sake of
+ *         (Database-)ID of the given user and his name. For the sake of
  *      performance the name is not retrieved, if the ID of the user is
- * 		passed in parameter $user.
+ *         passed in parameter $user.
  * @throws
- * 		HACLException(HACLException::UNKOWN_USER)
- * 			...if the user does not exist.
+ *         HACLException(HACLException::UNKOWN_USER)
+ *             ...if the user does not exist.
  */
 function haclfGetUserID($user = null) {
     $userID = false;
@@ -577,11 +577,11 @@ function haclfGetUserID($user = null) {
  * Pages in the namespace ACL are not cacheable
  *
  * @param Article $article
- * 		Check, if this article can be cached
+ *         Check, if this article can be cached
  *
  * @return bool
- * 		<true>, for articles that are not in the namespace ACL
- * 		<false>, otherwise
+ *         <true>, for articles that are not in the namespace ACL
+ *         <false>, otherwise
  */
 function haclfIsFileCacheable($article) {
     return $article->getTitle()->getNamespace() != HACL_NS_ACL;
@@ -591,8 +591,8 @@ function haclfIsFileCacheable($article) {
  * The hash for the page cache depends on the user.
  *
  * @param string $hash
- * 		A reference to the hash. This the ID of the current user is appended
- * 		to this hash.
+ *         A reference to the hash. This the ID of the current user is appended
+ *         to this hash.
  *
  *
  */
@@ -621,8 +621,8 @@ function haclfPageRenderingHash($hash) {
  * haclfRestoreTitlePatch().
  *
  * @return bool
- * 		The current state of the Title-patch. This value has to be passed to
- * 		haclfRestoreTitlePatch().
+ *         The current state of the Title-patch. This value has to be passed to
+ *         haclfRestoreTitlePatch().
  */
 function haclfDisableTitlePatch() {
     global $haclgEnableTitleCheck;
@@ -635,7 +635,7 @@ function haclfDisableTitlePatch() {
  * See documentation of haclfDisableTitlePatch
  *
  * @param bool $etc
- * 		The former state of the title patch.
+ *         The former state of the title patch.
  */
 function haclfRestoreTitlePatch($etc) {
     global $haclgEnableTitleCheck;
@@ -649,15 +649,15 @@ function haclfRestoreTitlePatch($etc) {
  * normal pages are positive.
  *
  * @param string $articleName
- * 		Name of the article
+ *         Name of the article
  * @param int $defaultNS
- * 		The default namespace if no namespace is given in the name
+ *         The default namespace if no namespace is given in the name
  *
  * @return int
- * 		ID of the article:
- * 		>0: ID of an article in a normal namespace
- * 		=0: Name of the article is invalid
- * 		<0: ID of a Special Page
+ *         ID of the article:
+ *         >0: ID of an article in a normal namespace
+ *         =0: Name of the article is invalid
+ *         <0: ID of a Special Page
  *
  */
 function haclfArticleID($articleName, $defaultNS = NS_MAIN) {
