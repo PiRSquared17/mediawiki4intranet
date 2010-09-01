@@ -106,7 +106,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         this.tree.subscribe('clickEvent',this.checkClick);
 				
         this.subscribe("parentChange", this.customNodeParentChange);
-       
+
     },
 
 
@@ -144,23 +144,23 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
      * @for YAHOO.widget.CustomNode
      * @type string
      */
-    getCheckElId: function() { 
-        return "ygtvcheck" + this.index; 
+    getCheckElId: function() {
+        return "ygtvcheck" + this.index;
     },
 
     /**
      * Returns the check box element
      * @return the check html element (img)
      */
-    getCheckEl: function() { 
-        return document.getElementById(this.getCheckElId()); 
+    getCheckEl: function() {
+        return document.getElementById(this.getCheckElId());
     },
 
     /**
      * The style of the check element, derived from its current state
      * @return {string} the css style for the current check state
      */
-    getCheckStyle: function() { 
+    getCheckStyle: function() {
         return "ygtvcheck" + this.checkState;
     },
 
@@ -185,13 +185,13 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
     },
 
-    
+
 
 
     /**
      * Override to get the check click event
      */
-    onCheckClick: function() { 
+    onCheckClick: function() {
     },
 
     /**
@@ -242,7 +242,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
      * If the node has been rendered, update the html to reflect the current
      * state of the node.
      */
-    updateCheckHtml: function() { 
+    updateCheckHtml: function() {
         if (this.parent && this.parent.childrenRendered) {
             this.getCheckEl().className = this.getCheckStyle();
         }
@@ -250,13 +250,13 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
     /**
      * Updates the state.  The checked property is true if the state is 1 or 2
-     * 
+     *
      * @param the new check state
      */
-    setCheckState: function(state) { 
+    setCheckState: function(state) {
         this.checkState = state;
         this.checked = (state > 0);
-             
+
     },
 
     /**
@@ -292,7 +292,7 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
     /**
      * Uncheck this node
      */
-    uncheck: function() { 
+    uncheck: function() {
         this.setCheckState(0);
         /*
         for (var i=0, l=this.children.length; i<l; i=i+1) {
@@ -305,14 +305,14 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
         this.updateCheckHtml();
     //this.updateParent();
     },
-    
-    setTreeType: function(newTreeType) { 
+
+    setTreeType: function(newTreeType) {
         this.treeType = newTreeType
     },
 
 
     // Overrides YAHOO.widget.TextNode
-    getContentHtml: function() {                                                                                                                                           
+    getContentHtml: function() {
         var sb = [];
         if(this.b2bChecked){
             this.check();
@@ -356,9 +356,9 @@ YAHOO.extend(YAHOO.widget.ManageUserNode, YAHOO.widget.TextNode, {
 
 
 
-        
-        return sb.join("");                                                                                                                                                
-    }  
+
+        return sb.join("");
+    }
 });
 
 
@@ -474,7 +474,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
         tmpNode.setInformation(element.description);
 
         tmpNode.setTextWidth(elementWidth);
-        
+
         // recursive part, if children were supplied
         if(element.children != null){
             YAHOO.haloacl.buildNodesFromData(tmpNode,element.children,panelid);
@@ -484,7 +484,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
         }
 
         groupsInTree = true;
-        
+
     };
     if(!groupsInTree){
         if(parentNode.label == "Groups"){
@@ -502,7 +502,7 @@ YAHOO.haloacl.manageUser.buildNodesFromData = function(parentNode,data,panelid){
             $('haloacl_manageuser_count').innerHTML = parentNode.tree.getRoot().getNodeCount()*1-1;
         }
     }
-   
+
 
 };
 
@@ -583,7 +583,7 @@ YAHOO.haloacl.manageUser.buildTreeFirstLevelFromJson = function(tree){
 YAHOO.haloacl.getNewManageUserTree = function(divname,panelid){
     var instance = new YAHOO.widget.TreeView(divname);
     instance.panelid = panelid;
-   
+
     return instance;
 };
 
@@ -629,7 +629,7 @@ YAHOO.haloacl.manageUser.addNewSubgroupOnSameLevel = function(tree,groupname){
             elementWidth = nodeToAttachTo.getTextWidth();
         }
     }catch(e){
-        
+
     }
 
     if(nodeToAttachTo._type != "RootNode"){
@@ -639,7 +639,7 @@ YAHOO.haloacl.manageUser.addNewSubgroupOnSameLevel = function(tree,groupname){
         tmpNode.description = gHACLLanguage.getMessage('clickEditToCreate');
 
         tmpNode.setTextWidth(elementWidth);
-        
+
         nodeToAttachTo.collapse();
         nodeToAttachTo.expand();
         nodeToAttachTo.refresh();
@@ -712,12 +712,12 @@ YAHOO.haloacl.manageUser.addNewSubgroup = function(tree,groupname){
     tmpNode.description = gHACLLanguage.getMessage('clickEditToCreate');
 
     tmpNode.setTextWidth(elementWidth);
-    
+
     tmpNode.setDynamicLoad();
     nodeToAttachTo.collapse();
     nodeToAttachTo.expand();
 // nodeToAttachTo.refresh();
- 
+
 };
 
 /**

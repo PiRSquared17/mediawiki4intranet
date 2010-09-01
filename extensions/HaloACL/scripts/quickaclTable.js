@@ -52,9 +52,9 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         //elLiner.innerHTML += '<div id="popup_'+oRecord._oData.id+'"></div>';
 
         }
-            
+
     };
-    
+
 
     this.myQuickNameFormatter = function(elLiner, oRecord, oColumn, oData) {
         elLiner.innerHTML = "<span class='"+divid+"_usersgroups' groups=\""+oRecord._oData.groups+"\">"+oRecord._oData.name+"</span>";
@@ -73,7 +73,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         sortable:false,
         formatter:this.myQuickNameFormatter
     },
-   
+
     {
         key:"checked",
         label:gHACLLanguage.getMessage('delete'),
@@ -96,7 +96,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         {
             key:"name"
         },
-        
+
         {
             key:"checked"
         }
@@ -123,7 +123,7 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         }
 
         var filter = $('datatable_filter_'+myDataTable.panelid).value;
-        
+
         return "rs=haclGetQuickACLData&rsargs[]="
         +myDataTable.query+"&rsargs[]="+sort
         +"&rsargs[]="+dir
@@ -182,14 +182,14 @@ YAHOO.haloacl.quickaclTable = function(divid,panelid) {
         if(YAHOO.haloacl.debug) console.log("sending request");
         myDataSource.sendRequest('rs=haclGetQuickACLData&rsargs[]='+query+'&rsargs[]=name&rsargs[]=asc&rsargs[]=0&rsargs[]=5&rsargs[]="', oCallback);
         if(YAHOO.haloacl.debug) console.log("reqeust sent");
-        
+
     }
 
 
     // setting up clickevent-handling
     return myDataTable;
 
-   
+
 };
 
     // --------------------
