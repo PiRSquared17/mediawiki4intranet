@@ -34,19 +34,19 @@
  */
 class HACLStorage {
 
-	//--- Private fields---
-	
-	private static $mInstance; // HACLStorage: the only instance of this singleton
-	private static $mDatabase; // The actual database object
-	
-	//--- Constructor ---
-	
-	/**
-	 * Constructor.
-	 * Creates the object that handles the concrete database access.
-	 *
-	 */
-	private function __construct() {
+    //--- Private fields---
+    
+    private static $mInstance; // HACLStorage: the only instance of this singleton
+    private static $mDatabase; // The actual database object
+    
+    //--- Constructor ---
+    
+    /**
+     * Constructor.
+     * Creates the object that handles the concrete database access.
+     *
+     */
+    private function __construct() {
         global $haclgIP;
         if (self::$mDatabase == NULL) {
             global $haclgBaseStore;
@@ -57,37 +57,37 @@ class HACLStorage {
                 break;
             }
         }
-		
-	}
-	
-	//--- Public methods ---
-	
-	/**
-	 * Returns the single instance of this class.
-	 *
-	 * @return HACLStorage
-	 * 		The single instance of this class.
-	 */
-	public static function getInstance() {
+        
+    }
+    
+    //--- Public methods ---
+    
+    /**
+     * Returns the single instance of this class.
+     *
+     * @return HACLStorage
+     *         The single instance of this class.
+     */
+    public static function getInstance() {
         if (!isset(self::$mInstance)) {
             $c = __CLASS__;
             self::$mInstance = new $c;
         }
 
         return self::$mInstance;
-	}
-	
-	/**
-	 * Returns the actual database. 
-	 *
-	 * @return object
-	 * 		The object to access the database.
-	 */
-	public static function getDatabase() {
+    }
+    
+    /**
+     * Returns the actual database. 
+     *
+     * @return object
+     *         The object to access the database.
+     */
+    public static function getDatabase() {
         self::getInstance(); // Make sure, singleton is initialized
         return self::$mDatabase;
-	}
-	
-	
-	 
+    }
+    
+    
+     
 }

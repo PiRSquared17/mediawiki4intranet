@@ -27,7 +27,7 @@
  * 
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
-	die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
+    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
 define('HACL_STORE_SQL', 'HaclStoreSQL');
@@ -76,7 +76,7 @@ if ($haclgInclusionDeniedMessage === NULL)
 # true
 #    If this value is <true>, all articles that have no security descriptor are 
 #    fully accessible for HaloACL. Other extensions or $wgGroupPermissions can
-#	 still prohibit access. 
+#     still prohibit access. 
 #    Remember that security descriptor are also inherited via categories or 
 #    namespaces. 
 # false
@@ -90,7 +90,7 @@ if ($haclgOpenWikiAccess === NULL)
 #    If this value is <true>, semantic properties can be protected.  
 # false
 #    If it is <false>, semantic properties are not protected even if they have 
-#	 security descriptors.  
+#     security descriptors.  
 if ($haclgProtectProperties === NULL)
     $haclgProtectProperties = false;
 
@@ -148,11 +148,11 @@ if ($haclgUnprotectableNamespaces === NULL)
 # variable "{{{user}}}" that will be replaced by the user's name. 
 /*
 $haclgDefaultQuickAccessRightMasterTemplates = array(
-	"ACL:Template/QARMT/Private use",
-	"ACL:Template/QARMT/Public read",
-	"ACL:Template/QARMT/Public form edit",
-	"ACL:Template/QARMT/Public edit",
-	"ACL:Template/QARMT/Public full access",
+    "ACL:Template/QARMT/Private use",
+    "ACL:Template/QARMT/Public read",
+    "ACL:Template/QARMT/Public form edit",
+    "ACL:Template/QARMT/Public edit",
+    "ACL:Template/QARMT/Public full access",
 );
 */
 
