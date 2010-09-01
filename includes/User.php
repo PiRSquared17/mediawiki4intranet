@@ -503,10 +503,10 @@ class User {
 
 		// Ensure that the name can't be misresolved as a different title,
 		// such as with extra namespace keys at the start.
-		$parsed = Title::newFromText( $name );
+		$parsed = Title::newFromText( $name, NS_USER );
 		if( is_null( $parsed )
-			|| $parsed->getNamespace()
-			|| strcmp( $name, $parsed->getPrefixedText() ) ) {
+			|| $parsed->getNamespace() != NS_USER
+			|| strcmp( $name, $parsed->getText() ) ) {
 			wfDebugLog( 'username', __METHOD__ .
 				": '$name' invalid due to ambiguous prefixes" );
 			return false;
@@ -652,7 +652,7 @@ class User {
 
 		# Clean up name according to title rules
 		$t = ($validate === 'valid') ? 
-			Title::newFromText( $name ) : Title::makeTitle( NS_USER, $name );
+			Title::newFromText( $name, NS_USER ) : Title::makeTitle( NS_USER, $name );
 		# Check for invalid titles
 		if( is_null( $t ) ) {
 			return false;
