@@ -1029,7 +1029,6 @@ YAHOO.haloaclrights.buildUserTreeRO = function(tree,rwTree) {
 
 };
 
-
 /*
  * function to be called from outside to init a tree
  * @param tree-instance

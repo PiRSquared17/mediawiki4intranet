@@ -4303,7 +4303,6 @@ function haclGetGroupsForRightPanel($clickedGroup, $search=null, $recursive=fals
     }
 
     return $array;
-
 }
 
 /**
@@ -4429,6 +4428,7 @@ function haclGetGroupsForManageUser($clickedGroup,$search=null, $recursive=false
     if ($level == 0) {
         $array = (json_encode($array));
     }
+    wfDebug( __METHOD__ . var_export( $array, true ) . "\n" );
 
     return $array;
 }
@@ -4459,15 +4459,14 @@ function haclGetACLs($typeXML, $filter = null) {
 
     $template = $haclgContLang->getSDTemplateName();
 
-
     $types = array();
 
     if($typeXML == "all") {
         $types[] = "all";
-    }else {
+    } else {
         $typeXML = new SimpleXMLElement($typeXML);
         foreach($typeXML->xpath('//type') as $type) {
-            $types[] = $type;
+            $types[] = "$type";
         }
     }
 
@@ -4484,8 +4483,8 @@ function haclGetACLs($typeXML, $filter = null) {
     $SDs = HACLStorage::getDatabase()->getSDs($types);
 
     foreach( $SDs as $key => $SD) {
-         // check integrity of SD
-         $valid = $SD->checkIntegrity();
+        // check integrity of SD
+        $valid = $SD->checkIntegrity();
 
         // processing default user templates
         if(preg_match("/$template\//is",$SD->getSDName())) {

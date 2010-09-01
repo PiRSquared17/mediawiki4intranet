@@ -398,14 +398,14 @@ YAHOO.haloacl.loadContentToDiv = function(targetdiv, action, parameterlist){
     }
 
     new Ajax.Updater(targetdiv, "?action=ajax", {
-        //method:tab.get('loadMethod'),
+        //method:tab.get('loadMethod'), // WTF? tab undefined
         method:'post',
         // parameters: queryparameterlist,
         parameters: querystring,
         asynchronous:true,
         evalScripts:true,
         onSuccess: function(o) {
-            tab._loading = false;
+            //tab._loading = false; // WTF? tab undefined
             $(targetdiv).scrollTo();
             $(targetdiv).visible();
         },
