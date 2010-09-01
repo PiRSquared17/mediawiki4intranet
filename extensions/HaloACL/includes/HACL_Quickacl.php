@@ -54,13 +54,13 @@ class HACLQuickacl {
     public function getSD_IDs() {
         return $this->sd_ids;
     }
-    
+
     public function addSD_ID($sdID) {
         if (!in_array($sdID, $this->sd_ids)) {
             $this->sd_ids[] = $sdID;
         }
     }
-    
+
     public static function newForUserId($user_id){
         return HACLStorage::getDatabase()->getQuickacl($user_id);
 

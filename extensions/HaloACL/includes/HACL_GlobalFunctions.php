@@ -78,7 +78,7 @@ function enableHaloACL() {
     $wgAutoloadClasses['HACLGroupException']   = $haclgIP . '/exceptions/HACL_GroupException.php';
     $wgAutoloadClasses['HACLSDException']      = $haclgIP . '/exceptions/HACL_SDException.php';
     $wgAutoloadClasses['HACLRightException']   = $haclgIP . '/exceptions/HACL_RightException.php';
-    $wgAutoloadClasses['HACLWhitelistException'] = $haclgIP . '/exceptions/HACL_WhitelistException.php';    
+    $wgAutoloadClasses['HACLWhitelistException'] = $haclgIP . '/exceptions/HACL_WhitelistException.php';
 
     return true;
 }
@@ -336,21 +336,21 @@ function haclAddHTMLHeader(&$out) {
 
         if (!isset($smwgDeployVersion) || $smwgDeployVersion === false) {
             // ---- SPECIAL-PAGE related stuff ---
-    
-    
+
+
             // -------------------
             // YAHOO Part
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yahoo-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/yuiloader-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/event-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dom-min.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-min.js"></script>');
             #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/treeview-debug.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/logger-min.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/element-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/button-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/connection-min.js"></script>');
@@ -360,19 +360,19 @@ function haclAddHTMLHeader(&$out) {
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/tabview-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-min.js"></script>');
             #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datasource-debug.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-min.js"></script>');
             #$out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/datatable-debug.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/paginator-min.js"></script>');
-    
+
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/container-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/dragdrop-min.js"></script>');
             $out->addScript('<script type="text/javascript" src="'. $haclgHaloScriptPath .  '/yui/autocomplete-min.js"></script>');
-    
+
             // -------------------
             // -------------------
-    
+
             $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/haloacl.js\"></script>");
             $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/groupuserTree.js\"></script>");
             $out->addScript("<script type=\"text/javascript\" src=\"". $haclgHaloScriptPath .  "/scripts/rightsTree.js\"></script>");
