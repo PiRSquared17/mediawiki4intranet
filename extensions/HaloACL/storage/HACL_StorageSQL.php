@@ -480,7 +480,7 @@ class HACLStorageSQL {
      *
      * @param string $memberType
      *         'user' => ask for all user IDs
-     *      'group' => ask for all group IDs
+     *         'group' => ask for all group IDs
      * @return array(int)
      *         List of IDs of all direct users or groups in this group.
      *
@@ -493,7 +493,7 @@ class HACLStorageSQL {
         $gmt = $dbr->tableName('halo_acl_group_members');
         $sql = "SELECT DISTINCT user_id, group_id, group_name
                 FROM user
-                LEFT JOIN $gmt ON  $gmt.child_id = user.user_id
+                LEFT JOIN $gmt ON $gmt.child_id = user.user_id
                 LEFT JOIN $gt ON $gt.group_id = $gmt.parent_group_id
                 WHERE user.user_id = $userID";
 
@@ -538,74 +538,34 @@ class HACLStorageSQL {
      *         <false>, if not
      *
      */
-    public function hasGroupMember($parentID, $childID, $memberType, $recursive) {
+    public function hasGroupMember($parentID, $childID, $memberType, $recursive)
+    {
         $dbr =& wfGetDB( DB_SLAVE );
 
-        // Ask for the immediate parents of $childID
-        $res = $dbr->select('halo_acl_group_members', 'parent_group_id', array(
-            'child_id'   => $childID,
-            'child_type' => $memberType,
-        ), __METHOD__);
-
         $parents = array();
-        while ($row = $dbr->fetchObject($res)) {
-            if ($parentID == (int) $row->parent_group_id) {
-                $dbr->freeResult($res);
-                return true;
-            }
-            $parents[] = (int) $row->parent_group_id;
-        }
-        $dbr->freeResult($res);
 
-        // $childID is not an immediate child of $parentID
-        if (!$recursive || empty($parents)) {
-            return false;
-        }
-
-        // Check recursively, if one of the parent groups of $childID is $parentID
-
-        $ancestors = array();
-        while (true) {
-            // Check if one of the parent's parent is $parentID
-            $res = $dbr->select('halo_acl_group_members', 'parent_group_id', array(
-                'parent_group_id' => $parentID,
-                'child_id'        => $parents,
-                'child_type'      => 'group',
-            ), __METHOD__);
-            if ($dbr->numRows($res) == 1) {
-                // The request parent was found
-                $dbr->freeResult($res);
-                return true;
-            }
-
-            // Parent was not found => retrieve all parents of the current set of
-            // parents.
+        // Ask for the immediate parents of $childID
+        // Then check recursively, if one of the parent groups of $childID is $parentID
+        do
+        {
             $where = array(
-                'child_id'   => $parents,
-                'child_type' => 'group',
+                'child_id'   => $parents ? $parents : $childID,
+                'child_type' => $parents ? 'group' : $memberType,
             );
-            if ($ancestors)
-                $where['parent_group_id'] = $ancestors;
-
-            $res = $dbr->select('halo_acl_group_members', 'parent_group_id', $where, __METHOD__, array('DISTINCT'));
-            if ($dbr->numRows($res) == 0) {
-                // The request parent was found
-                $dbr->freeResult($res);
-                return false;
-            }
-
-            $ancestors = array_merge($ancestors, $parents);
-            $parents = array();
-            while ($row = $dbr->fetchObject($res)) {
-                if ($parentID == (int) $row->parent_group_id) {
-                    $dbr->freeResult($res);
-                    return true;
-                }
-                $parents[] = (int) $row->parent_group_id;
-            }
+            $yes = $dbr->selectField('halo_acl_group_members', 'parent_group_id', $where+array(
+                'parent_group_id' => $parentID,
+            ), __METHOD__);
+            if ($yes)
+                return true;
+            $res = $dbr->select('halo_acl_group_members', 'parent_group_id', $where, __METHOD__);
+            $new = false;
+            while ($row = $dbr->fetchRow($res))
+                if (!$parents[$row[0]])
+                    $new = $parents[$row[0]] = true;
             $dbr->freeResult($res);
-        }
+        } while ($recursive && $new);
 
+        return false;
     }
 
     /**
