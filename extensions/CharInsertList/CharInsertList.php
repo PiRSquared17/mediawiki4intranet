@@ -47,8 +47,8 @@ else
 $wgExtensionCredits['parserhook'][] = array(
     'name' => 'CharInsertList',
     'author' => 'VitaliyFilippov',
-    'svn-date' => '$LastChangedDate: 2008-06-17 00:54:29 +0400 (Втр, 17 Июн 2008) $',
-    'svn-revision' => '$LastChangedRevision: 36357 $',
+    'svn-date' => '$LastChangedDate$',
+    'svn-revision' => '$LastChangedRevision$',
     'url' => 'http://yourcmc.ru/wiki/CharInsertList_(MediaWiki)',
     'description' => 'Allows creation of HTML selectboxes for inserting non-standard characters',
 );
