@@ -23,8 +23,8 @@ if (!defined('MEDIAWIKI'))
 $wgExtensionCredits['hook'][] = array(
     'name'          => 'HttpAuth',
     'author'        => 'VitaliyFilippov',
-    'svn-date'      => '$LastChangedDate: 2008-06-17 00:54:29 +0400 (Втр, 17 Июн 2008) $',
-    'svn-revision'  => '$LastChangedRevision: 36357 $',
+    'svn-date'      => '$LastChangedDate$',
+    'svn-revision'  => '$LastChangedRevision$',
     'url'           => 'http://yourcmc.ru/wiki/CharInsertList_(MediaWiki)',
     'description'   => 'Allows using HTTP Basic authorization in your Wiki',
     /* TODO: add digest authentication support */
