@@ -21,13 +21,15 @@ class ChangesFeed {
 	public function execute( $feed, $rows, $limit = 0 , $hideminor = false, $lastmod = false ) {
 		global $messageMemc, $wgFeedCacheTimeout;
 		global $wgFeedClasses, $wgSitename, $wgContLanguageCode;
+		global $wgUser;
 
 		if ( !FeedUtils::checkFeedOutput( $this->format ) ) {
 			return;
 		}
 
-		$timekey = wfMemcKey( $this->type, $this->format, 'timestamp' );
-		$key = wfMemcKey( $this->type, $this->format, 'limit', $limit, 'minor', $hideminor );
+		$userid = $wgUser->getId();
+		$timekey = wfMemcKey( $this->type, $this->format, $userid, 'timestamp' );
+		$key = wfMemcKey( $this->type, $this->format, $userid, 'limit', $limit, 'minor', $hideminor );
 
 		FeedUtils::checkPurge($timekey, $key);
 
