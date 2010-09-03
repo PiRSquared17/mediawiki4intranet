@@ -549,7 +549,7 @@ class HACLStorageSQL {
         do
         {
             $where = array(
-                'child_id'   => $parents ? $parents : $childID,
+                'child_id'   => $parents ? array_keys($parents) : $childID,
                 'child_type' => $parents ? 'group' : $memberType,
             );
             $yes = $dbr->selectField('halo_acl_group_members', 'parent_group_id', $where+array(
