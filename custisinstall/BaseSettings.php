@@ -122,6 +122,7 @@ require_once($IP.'/extensions/UserMagic/UserMagic.php');
 require_once($IP.'/extensions/S5SlideShow/S5SlideShow.php');
 require_once($IP.'/extensions/UserMessage/UserMessage.php');
 require_once($IP.'/extensions/PlantUML/PlantUML.php');
+require_once($IP.'/extensions/HttpAuth/HttpAuth.php');
 
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
