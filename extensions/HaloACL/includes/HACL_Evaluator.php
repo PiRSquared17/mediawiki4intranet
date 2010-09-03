@@ -99,7 +99,6 @@ class HACLEvaluator {
 
         self::startLog($title, $user, $action);
 
-//        echo $title->getFullText().":".$action."\n";
         if ($title == null) {
             $result = true;
             self::finishLog("Title is <null>.", $result, true);
@@ -120,7 +119,7 @@ class HACLEvaluator {
             }
         }
 
-        //Special handling of action "wysiwyg". This is passed as
+        // Special handling of action "wysiwyg". This is passed as
         // "action=edit&mode=wysiwyg"
         if ($action == 'edit') {
             $action = $wgRequest->getVal('mode', 'edit');
@@ -142,7 +141,6 @@ class HACLEvaluator {
         // to MediaWiki's "Permission error"
         global $haclgContLang;
         if ($title->getText() == $haclgContLang->getPermissionDeniedPage()) {
-//            $r = $actionID == HACLRight::READ;
             $r = false;
             haclfRestoreTitlePatch($etc);
             self::finishLog('Special handling of "Permission denied" page.', $r, $r);
