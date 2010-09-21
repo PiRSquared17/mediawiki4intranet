@@ -60,7 +60,7 @@ function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transfor
     $delim = $wgUserMessageDelimiter;
     if (!$delim)
         $delim = '@';
-    if ($wgUserMessageAllowCustomization[$key] && $wgUser && $wgUser->getID() &&
+    if (array_key_exists($key, $wgUserMessageAllowCustomization) && $wgUser && $wgUser->getID() &&
         is_object($wgMessageCache))
     {
         $newkey = $key.$delim.$wgUser->getName();
