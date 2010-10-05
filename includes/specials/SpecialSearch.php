@@ -1145,7 +1145,14 @@ class SpecialSearchOld {
 		$out .= "<ul class='mw-search-results'>\n";
 
 		while( $result = $matches->next() ) {
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			if (($result->getTitle() != NULL) 
+			    && ($result->getTitle()->userCanReadEx())) {
+/*op-patch|TS|2009-06-19|end*/  
 			$out .= $this->showHit( $result, $terms );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			}
+/*op-patch|TS|2009-06-19|end*/  
 		}
 		$out .= "</ul>\n";
 
