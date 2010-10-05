@@ -916,6 +916,7 @@ class ImageHistoryList {
 			$params = array(
 				'width' => '120',
 				'height' => '120',
+				'imagehistory' => true,
 			);
 			$thumbnail = $file->transform( $params );
 			$options = array(
