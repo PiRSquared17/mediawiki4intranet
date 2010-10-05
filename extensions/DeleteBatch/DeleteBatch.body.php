@@ -231,8 +231,8 @@ class DeleteBatchForm {
 	function deletePage($line, $reason = '', &$db, $multi = false, $linenum = 0, $user = null) {
 		global $wgOut, $wgUser;
 		$page = Title::newFromText ($line);
-			if (is_null($page)) { /* invalid title? */
-			   	$wgOut->addWikiText( wfMsg('deletebatch-omitting-invalid', $line) );
+		if (is_null($page)) { /* invalid title? */
+			$wgOut->addWikiText( wfMsg('deletebatch-omitting-invalid', $line) );
 			if (!$multi) {
 				if (!is_null($user)) {
 					$wgUser = $user;
@@ -241,7 +241,18 @@ class DeleteBatchForm {
 			return false;
 		}
 		if (!$page->exists()) { /* no such page? */
-				$wgOut->addWikiText( wfMsg('deletebatch-omitting-nonexistant', $line) );
+			$wgOut->addWikiText( wfMsg('deletebatch-omitting-nonexistant', $line) );
+			if (!$multi) {
+				if (!is_null($user)) {
+					$wgUser = $user;
+				}
+			}
+			return false;
+		}
+
+		$allowed = wfRunHooks( 'userCan', array( &$page, &$wgUser, "delete", &$result ) );
+		if( !$allowed ) {
+			$wgOut->addWikiText( wfMsg('deletebatch-permission-denied', $line) );
 			if (!$multi) {
 				if (!is_null($user)) {
 					$wgUser = $user;
@@ -252,7 +263,7 @@ class DeleteBatchForm {
 
 		$db->begin();
 		if( NS_MEDIA == $page->getNamespace() ) {
-		   	$page = Title::makeTitle(NS_IMAGE, $page->getDBkey ());
+			$page = Title::makeTitle(NS_IMAGE, $page->getDBkey ());
 		}
 
 		/* this stuff goes like articleFromTitle in Wiki.php */
@@ -268,8 +279,8 @@ class DeleteBatchForm {
 		/* 	what is the generic reason for page deletion?
 			something about the content, I guess...
 		*/
-			$art->doDelete($reason);
-			$db->immediateCommit();
+		$art->doDelete($reason);
+		$db->immediateCommit();
 		return true;
 	}
 

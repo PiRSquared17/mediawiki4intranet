@@ -153,7 +153,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
@@ -194,7 +194,8 @@ class Parser
 		$this->mLastSection = '';
 		$this->mDTopen = false;
 		$this->mIncludeCount = array();
-		$this->mStripState = new StripState;
+		if ( !$this->mStripState )
+			$this->mStripState = new StripState;
 		$this->mArgStack = false;
 		$this->mInPre = false;
 		$this->mLinkHolders = new LinkHolderArray( $this );
@@ -2161,10 +2162,10 @@ class Parser
 				wfProfileIn( __METHOD__."-paragraph" );
 				# No prefix (not in list)--go to paragraph mode
 				// XXX: use a stack for nestable elements like span, table and div
-				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
+				$openmatch = preg_match('/(?:<table|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
 				$closematch = preg_match(
-					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
-					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
+					'/(?:<\\/table|<blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
+					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<center)/iS', $t );
 				if ( $openmatch or $closematch ) {
 					$paragraphStack = false;
 					# TODO bug 5718: paragraph closed
@@ -2771,6 +2772,7 @@ class Parser
 	 *  $piece['title']: the title, i.e. the part before the |
 	 *  $piece['parts']: the parameter array
 	 *  $piece['lineStart']: whether the brace was at the start of a line
+	 *  $piece['headLevel']: the shift value for all heading levels
 	 * @param PPFrame The current frame, contains template arguments
 	 * @return string the text of the template
 	 * @private
@@ -2787,6 +2789,9 @@ class Parser
 		$forceRawInterwiki = false; # Force interwiki transclusion to be done in raw mode not rendered
 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
+
+		if (!$piece['headLevel'])
+			$piece['headLevel'] = 0;
 
 		# Title object, where $text came from
 		$title = NULL;
@@ -2930,6 +2935,17 @@ class Parser
 				$ns = $this->mTitle->getNamespace();
 			}
 			$title = Title::newFromText( $part1, $ns );
+			if ( method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() ) {
+				global $haclgInclusionDeniedMessage;
+				$title = NULL;
+				if ( $haclgInclusionDeniedMessage ) {
+					$found = true;
+					$text = wfMsg( $haclgInclusionDeniedMessage );
+				} elseif ( $haclgInclusionDeniedMessage === '' ) {
+					$found = true;
+					$text = '';
+				}
+			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
 				# Check for language variants if the template is not found
@@ -3008,22 +3024,22 @@ class Parser
 			$newFrame = $frame->newChild( $args, $title );
 
 			if ( $nowiki ) {
-				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
+				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
 				# Expansion is eligible for the empty-frame cache
 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
 					$text = $this->mTplExpandCache[$titleText];
 				} else {
-					$text = $newFrame->expand( $text );
+					$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 					$this->mTplExpandCache[$titleText] = $text;
 				}
 			} else {
 				# Uncached expansion
-				$text = $newFrame->expand( $text );
+				$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 			}
 		}
 		if ( $isLocalObj && $nowiki ) {
-			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG );
+			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			$isLocalObj = false;
 		}
 
@@ -3448,7 +3464,7 @@ class Parser
 	 * @private
 	 */
 	function formatHeadings( $text, $isMain=true ) {
-		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
+		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
 
 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
 		$showEditLink = $this->mOptions->getEditSection();
@@ -3591,6 +3607,8 @@ class Parser
 						$dot = 1;
 					}
 				}
+				if ($wgDotAfterTocnumber)
+					$numbering .= '.';
 			}
 
 			# The safe header is a version of the header text safe to use for links

@@ -311,3 +311,5 @@ div.mw-warning-with-logexcerpt {
 div.mw-warning-with-logexcerpt ul li {
 	font-size: 90%;
 }
+
+.addpages div { display: inline-block; text-align: right; vertical-align: top; padding-right: 8px; }
