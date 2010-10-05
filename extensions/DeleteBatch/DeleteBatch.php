@@ -26,3 +26,4 @@ $wgExtensionAliasesFiles['DeleteBatch'] = $dir . 'DeleteBatch.alias.php';
 $wgAutoloadClasses['DeleteBatch'] = $dir. 'DeleteBatch.body.php';
 $wgSpecialPages['DeleteBatch'] = 'DeleteBatch';
 $wgSpecialPageGroups['DeleteBatch'] = 'pagetools';
+
