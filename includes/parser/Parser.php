@@ -153,7 +153,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
