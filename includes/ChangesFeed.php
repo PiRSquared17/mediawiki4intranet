@@ -21,13 +21,15 @@ class ChangesFeed {
 	public function execute( $feed, $rows, $limit = 0 , $hideminor = false, $lastmod = false ) {
 		global $messageMemc, $wgFeedCacheTimeout;
 		global $wgFeedClasses, $wgSitename, $wgContLanguageCode;
+		global $wgUser;
 
 		if ( !FeedUtils::checkFeedOutput( $this->format ) ) {
 			return;
 		}
 
-		$timekey = wfMemcKey( $this->type, $this->format, 'timestamp' );
-		$key = wfMemcKey( $this->type, $this->format, 'limit', $limit, 'minor', $hideminor );
+		$userid = $wgUser->getId();
+		$timekey = wfMemcKey( $this->type, $this->format, $userid, 'timestamp' );
+		$key = wfMemcKey( $this->type, $this->format, $userid, 'limit', $limit, 'minor', $hideminor );
 
 		FeedUtils::checkPurge($timekey, $key);
 
@@ -112,6 +114,10 @@ class ChangesFeed {
 
 		foreach( $sorted as $obj ) {
 			$title = Title::makeTitle( $obj->rc_namespace, $obj->rc_title );
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if( !$title || method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() )
+				continue;
+/*op-patch|TS|2009-04-27|end*/
 			$talkpage = $title->getTalkPage();
 			$item = new FeedItem(
 				$title->getPrefixedText(),
