@@ -105,6 +105,10 @@ require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
 require_once($IP.'/extensions/FullLocalImage.php');
 
+$wgGroupPermissions['bureaucrat']['usermerge'] = true;
+require_once($IP.'/extensions/UserMerge/UserMerge.php');
+require_once($IP.'/extensions/Renameuser/Renameuser.php');
+
 require_once($IP.'/extensions/MMHandler/MMHandler.php');
 /* for mindmap uploads */
 $wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
