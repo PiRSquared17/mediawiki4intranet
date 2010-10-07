@@ -242,8 +242,28 @@ class HACLEvaluator {
             if ($r) {
                 haclfRestoreTitlePatch($etc);
                 $result = true;
-                self::finishLog("Found an appropriate access right.", $result, true);
+                self::finishLog("Access allowed by page right.", $result, true);
                 return true;
+            }
+        }
+
+        // if the page is a category page, check the category right
+        if ($title->getNamespace() == NS_CATEGORY)
+        {
+            $hasSD = HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_CATEGORY) !== false;
+            if ($hasSD)
+            {
+                self::log("The article is a category page and this category is protected with a security descriptor.");
+
+                $r = self::hasRight($articleID, HACLSecurityDescriptor::PET_CATEGORY,
+                                    $userID, $actionID);
+                if ($r)
+                {
+                    haclfRestoreTitlePatch($etc);
+                    $result = true;
+                    self::finishLog("Access allowed for category page by category right.", $result, true);
+                    return true;
+                }
             }
         }
 
