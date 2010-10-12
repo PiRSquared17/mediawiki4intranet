@@ -931,12 +931,14 @@ class WikiImporter {
 			if( $this->workRevision )
 			{
 				/* Передаём путь к файлу, если он уже загружен */
-				if (substr($this->appenddata, 0, 12) == 'multipart://' &&
-				    ($p = $this->mSource->parts[substr($this->appenddata, 12)]))
-					$this->workRevision->setSrc($p['tempfile']);
+				if ( substr( $this->appenddata, 0, 12 ) == 'multipart://' )
+				{
+					if ( $p = $this->mSource->parts[ substr( $this->appenddata, 12 ) ] )
+						$this->workRevision->setSrc( $p['tempfile'] );
+				}
 				/* Иначе передаём URL */
 				else
-				$this->workRevision->setSrc( $this->appenddata );
+					$this->workRevision->setSrc( $this->appenddata );
 			}
 			break;
 		case "size":
