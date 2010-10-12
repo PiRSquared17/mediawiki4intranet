@@ -606,7 +606,7 @@ class XmlDumpWriter {
 			$img = wfFindFile( $row->page_title );
 			if( $img ) {
 				$out = '';
-				foreach( $img->getHistory($limit) as $ver ) {
+				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
 					$out .= $this->writeUpload( $ver );
 				}
 				$out .= $this->writeUpload( $img );
@@ -617,10 +617,12 @@ class XmlDumpWriter {
 	}
 
 	function writeUpload( $file ) {
-		if ($this->multipart)
+		if ( !$file->exists() )
+			return "";
+		if ( $this->multipart )
 		{
 			$partname = $file->isOld() ? $file->getArchiveName() : $file->getName();
-			$this->binaries[$partname] = $file->getPath();
+			$this->binaries[ $partname ] = $file->getPath();
 		}
 		return "    <upload>\n" .
 			$this->writeTimestamp( $file->getTimestamp() ) .
@@ -629,7 +631,7 @@ class XmlDumpWriter {
 			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
 			"      " . Xml::Element( 'src',
 			                      array('sha1' => $file->getSha1()),
-			                      $partname ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
+			                      $this->multipart ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
 			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
 			"    </upload>\n";
 	}
