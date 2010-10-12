@@ -39,6 +39,7 @@ $wgDBmysql5         = true;
 $wgEnableUploads    = true;
 
 $wgLocalInterwiki   = $wgSitename;
+$wgLocaltimezone    = "Europe/Moscow";
 
 $wgRightsPage = "";
 $wgRightsUrl = "";
