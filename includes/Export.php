@@ -342,6 +342,8 @@ class XmlDumpWriter {
 	var $binaries;
 	var $multipart;
 
+	var $currentpart;
+
 	/**
 	 * Returns the export schema version.
 	 * @return string
@@ -434,19 +436,34 @@ class XmlDumpWriter {
 		return "</mediawiki>\n";
 	}
 
-	function nextPart() {
-		if ($this->multipart && count($this->binaries) > 0)
+	function nextPart()
+	{
+		if ( $this->multipart && count( $this->binaries ) > 0 )
 		{
-			list($name) = array_keys($this->binaries);
-			$data = $this->binaries[$name];
-			unset($this->binaries[$name]);
-			$data = @file_get_contents($data);
-			return $this->boundary.
-				"\nContent-Type: application/binary\n" .
-				"Content-Transfer-Encoding: Little-Endian\n" .
-				"Content-ID: $name\n" .
-				"Content-Length: ".strlen($data)."\n\n" .
-				$data;
+			$data = '';
+			if ( !$this->currentpart )
+			{
+				list( $name ) = array_keys( $this->binaries );
+				$filename = $this->binaries[ $name ];
+				unset( $this->binaries[ $name ] );
+				$fp = fopen( $filename, "rb" );
+				if ( !$fp )
+					return $this->nextPart();
+				$this->currentpart = array(
+					'name' => $name,
+					'filename' => $filename,
+					'fp' => $fp,
+				);
+				$data = $this->boundary.
+					"\nContent-Type: application/binary\n" .
+					"Content-Transfer-Encoding: Little-Endian\n" .
+					"Content-ID: $name\n" .
+					"Content-Length: ".filesize($filename)."\n\n";
+			}
+			$data .= fread( $this->currentpart['fp'], 1048576 );
+			if ( feof( $this->currentpart['fp'] ) )
+				$this->currentpart = NULL;
+			return $data;
 		}
 		return '';
 	}
