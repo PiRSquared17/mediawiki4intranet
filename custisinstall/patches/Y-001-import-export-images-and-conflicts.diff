@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1286907334 -14400
+# Date 1286910925 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -12,7 +12,7 @@ installation.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
+diff -r 86e89552dd12 -r 5799b827e4ef includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -63,7 +63,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  			}
  			$output .= $this->author_list;
  			$output .= $this->writer->closePage();
-@@ -331,6 +338,10 @@
+@@ -331,6 +338,12 @@
   */
  class XmlDumpWriter {
  
@@ -71,10 +71,12 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
 +	var $binaries;
 +	var $multipart;
 +
++	var $currentpart;
++
  	/**
  	 * Returns the export schema version.
  	 * @return string
-@@ -352,7 +363,15 @@
+@@ -352,7 +365,15 @@
  	function openStream() {
  		global $wgContLanguageCode;
  		$ver = $this->schemaVersion();
@@ -91,30 +93,45 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
  			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
  			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
-@@ -415,6 +434,22 @@
+@@ -415,6 +436,37 @@
  		return "</mediawiki>\n";
  	}
  
-+	function nextPart() {
-+		if ($this->multipart && count($this->binaries) > 0)
++	function nextPart()
++	{
++		if ( $this->multipart && count( $this->binaries ) > 0 )
 +		{
-+			list($name) = array_keys($this->binaries);
-+			$data = $this->binaries[$name];
-+			unset($this->binaries[$name]);
-+			$data = @file_get_contents($data);
-+			return $this->boundary.
-+				"\nContent-Type: application/binary\n" .
-+				"Content-Transfer-Encoding: Little-Endian\n" .
-+				"Content-ID: $name\n" .
-+				"Content-Length: ".strlen($data)."\n\n" .
-+				$data;
++			$data = '';
++			if ( !$this->currentpart )
++			{
++				list( $name ) = array_keys( $this->binaries );
++				$filename = $this->binaries[ $name ];
++				unset( $this->binaries[ $name ] );
++				$fp = fopen( $filename, "rb" );
++				if ( !$fp )
++					return $this->nextPart();
++				$this->currentpart = array(
++					'name' => $name,
++					'filename' => $filename,
++					'fp' => $fp,
++				);
++				$data = $this->boundary.
++					"\nContent-Type: application/binary\n" .
++					"Content-Transfer-Encoding: Little-Endian\n" .
++					"Content-ID: $name\n" .
++					"Content-Length: ".filesize($filename)."\n\n";
++			}
++			$data .= fread( $this->currentpart['fp'], 1048576 );
++			if ( feof( $this->currentpart['fp'] ) )
++				$this->currentpart = NULL;
++			return $data;
 +		}
 +		return '';
 +	}
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -482,7 +517,7 @@
+@@ -482,7 +534,7 @@
  		} elseif( isset( $row->old_text ) ) {
  			// Raw text from the database may have invalid chars
  			$text = strval( Revision::getRevisionText( $row ) );
@@ -123,7 +140,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
  		} else {
-@@ -566,12 +601,12 @@
+@@ -566,12 +618,12 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
  	 */
@@ -138,7 +155,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  					$out .= $this->writeUpload( $ver );
  				}
  				$out .= $this->writeUpload( $img );
-@@ -582,13 +617,22 @@
+@@ -582,13 +634,22 @@
  	}
  
  	function writeUpload( $file ) {
@@ -165,7 +182,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  			"    </upload>\n";
  	}
  
-@@ -624,6 +668,10 @@
+@@ -624,6 +685,10 @@
  		$this->write( $string );
  	}
  
@@ -176,7 +193,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
+diff -r 86e89552dd12 -r 5799b827e4ef includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -87,6 +87,10 @@
@@ -592,23 +609,26 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "out_append $name" );
  		if( $name != $this->appendfield ) {
  			return $this->throwXMLerror( "Expected </{$this->appendfield}>, got </$name>" );
-@@ -835,7 +929,15 @@
+@@ -835,7 +929,17 @@
  			break;
  		case "src":
  			if( $this->workRevision )
+-				$this->workRevision->setSrc( $this->appenddata );
 +			{
 +				/* Передаём путь к файлу, если он уже загружен */
-+				if (substr($this->appenddata, 0, 12) == 'multipart://' &&
-+				    ($p = $this->mSource->parts[substr($this->appenddata, 12)]))
-+					$this->workRevision->setSrc($p['tempfile']);
++				if ( substr( $this->appenddata, 0, 12 ) == 'multipart://' )
++				{
++					if ( $p = $this->mSource->parts[ substr( $this->appenddata, 12 ) ] )
++						$this->workRevision->setSrc( $p['tempfile'] );
++				}
 +				/* Иначе передаём URL */
 +				else
- 				$this->workRevision->setSrc( $this->appenddata );
++					$this->workRevision->setSrc( $this->appenddata );
 +			}
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -853,7 +955,7 @@
+@@ -853,7 +957,7 @@
  	}
  
  	function in_revision( $parser, $name, $attribs ) {
@@ -617,7 +637,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "in_revision $name" );
  		switch( $name ) {
  		case "id":
-@@ -875,7 +977,7 @@
+@@ -875,7 +979,7 @@
  	}
  
  	function out_revision( $parser, $name ) {
@@ -626,7 +646,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "out_revision $name" );
  		$this->pop();
  		if( $name != "revision" ) {
-@@ -886,14 +988,17 @@
+@@ -886,14 +990,17 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -647,7 +667,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "in_logitem $name" );
  		switch( $name ) {
  		case "id":
-@@ -917,7 +1022,7 @@
+@@ -917,7 +1024,7 @@
  	}
  
  	function out_logitem( $parser, $name ) {
@@ -656,7 +676,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "out_logitem $name" );
  		$this->pop();
  		if( $name != "logitem" ) {
-@@ -935,7 +1040,7 @@
+@@ -935,7 +1042,7 @@
  	}
  
  	function in_upload( $parser, $name, $attribs ) {
@@ -665,7 +685,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "in_upload $name" );
  		switch( $name ) {
  		case "timestamp":
-@@ -943,6 +1048,8 @@
+@@ -943,6 +1050,8 @@
  		case "text":
  		case "filename":
  		case "src":
@@ -674,7 +694,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		case "size":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
-@@ -958,7 +1065,7 @@
+@@ -958,7 +1067,7 @@
  	}
  
  	function out_upload( $parser, $name ) {
@@ -683,7 +703,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "out_revision $name" );
  		$this->pop();
  		if( $name != "upload" ) {
-@@ -976,7 +1083,7 @@
+@@ -976,7 +1085,7 @@
  	}
  
  	function in_contributor( $parser, $name, $attribs ) {
@@ -692,7 +712,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "in_contributor $name" );
  		switch( $name ) {
  		case "username":
-@@ -992,7 +1099,7 @@
+@@ -992,7 +1101,7 @@
  	}
  
  	function out_contributor( $parser, $name ) {
@@ -701,7 +721,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		$this->debug( "out_contributor $name" );
  		$this->pop();
  		if( $name != "contributor" ) {
-@@ -1043,6 +1150,10 @@
+@@ -1043,6 +1152,10 @@
  			return $this->mString;
  		}
  	}
@@ -712,7 +732,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  }
  
  /**
-@@ -1050,20 +1161,131 @@
+@@ -1050,20 +1163,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -847,7 +867,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 86e89552dd12 -r af0246c79fa3 includes/filerepo/LocalFile.php
+diff -r 86e89552dd12 -r 5799b827e4ef includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@
@@ -943,7 +963,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 86e89552dd12 -r af0246c79fa3 includes/specials/SpecialExport.php
+diff -r 86e89552dd12 -r 5799b827e4ef includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,28 +21,54 @@
@@ -1282,7 +1302,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r 86e89552dd12 -r af0246c79fa3 includes/specials/SpecialImport.php
+diff -r 86e89552dd12 -r 5799b827e4ef includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@
@@ -1367,7 +1387,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 86e89552dd12 -r af0246c79fa3 languages/messages/MessagesEn.php
+diff -r 86e89552dd12 -r 5799b827e4ef languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2763,10 +2763,20 @@
@@ -1417,7 +1437,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r 86e89552dd12 -r af0246c79fa3 languages/messages/MessagesRu.php
+diff -r 86e89552dd12 -r 5799b827e4ef languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2321,10 +2321,20 @@
@@ -1467,7 +1487,7 @@ diff -r 86e89552dd12 -r af0246c79fa3 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 86e89552dd12 -r af0246c79fa3 skins/common/shared.css
+diff -r 86e89552dd12 -r 5799b827e4ef skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -311,3 +311,5 @@
