@@ -438,34 +438,35 @@ class XmlDumpWriter {
 
 	function nextPart()
 	{
-		if ( $this->multipart && count( $this->binaries ) > 0 )
+		$data = '';
+		if ( !$this->currentpart )
 		{
-			$data = '';
-			if ( !$this->currentpart )
-			{
-				list( $name ) = array_keys( $this->binaries );
-				$filename = $this->binaries[ $name ];
-				unset( $this->binaries[ $name ] );
-				$fp = fopen( $filename, "rb" );
-				if ( !$fp )
-					return $this->nextPart();
-				$this->currentpart = array(
-					'name' => $name,
-					'filename' => $filename,
-					'fp' => $fp,
-				);
-				$data = $this->boundary.
-					"\nContent-Type: application/binary\n" .
-					"Content-Transfer-Encoding: Little-Endian\n" .
-					"Content-ID: $name\n" .
-					"Content-Length: ".filesize($filename)."\n\n";
-			}
-			$data .= fread( $this->currentpart['fp'], 1048576 );
-			if ( feof( $this->currentpart['fp'] ) )
-				$this->currentpart = NULL;
-			return $data;
+			if ( !$this->multipart || !count( $this->binaries ) )
+				return '';
+			list( $name ) = array_keys( $this->binaries );
+			$filename = $this->binaries[ $name ];
+			unset( $this->binaries[ $name ] );
+			$fp = fopen( $filename, "rb" );
+			if ( !$fp )
+				return $this->nextPart();
+			$this->currentpart = array(
+				'name' => $name,
+				'filename' => $filename,
+				'fp' => $fp,
+			);
+			$data = $this->boundary.
+				"\nContent-Type: application/binary\n" .
+				"Content-Transfer-Encoding: Little-Endian\n" .
+				"Content-ID: $name\n" .
+				"Content-Length: ".filesize($filename)."\n\n";
 		}
-		return '';
+		$data .= fread( $this->currentpart['fp'], 1048576 );
+		if ( feof( $this->currentpart['fp'] ) )
+		{
+			fclose( $this->currentpart['fp'] );
+			$this->currentpart = NULL;
+		}
+		return $data;
 	}
 
 	/**
