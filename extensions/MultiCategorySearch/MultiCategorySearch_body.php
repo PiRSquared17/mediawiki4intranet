@@ -69,7 +69,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 		global $wgRequest, $wgOut, $wgVersion;
 
 		if( version_compare( $wgVersion, '1.8', '<' ) === true ) {
-			$wgOut->showErrorPage( "Error: Upgrade required", "The News Channel extension " .
+			$wgOut->showErrorPage( "Error: Upgrade required", "The MultiCategorySearch extension " .
 				"can't work on MediaWiki version older than 1.8. Please, upgrade." );
 			return;
 		}
@@ -162,8 +162,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 		}
 
 		if( $inCategoriesCount == 0 && $exCategoriesCount == 0 ) {
-			$wgOut->addHTML( '<h3>' . wfMsg( 'multicatsearch_no_params' ) .
-				'</h3><br /><hr /><br />' );
+			$wgOut->addHTML( '<h3>' . wfMsg( 'multicatsearch_no_params' ) . '</h3>' );
 			return;
 		}
 
@@ -191,7 +190,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 					"GROUP BY cl_from) AS matches " .
 				"WHERE matches.match_count = {$inCategoriesCount} " .
 					"AND {$pageTableName}.page_id = matches.cl_from " .
-				"ORDER BY {$pageTableName}.page_title";
+				"ORDER BY {$pageTableName}.page_namespace DESC, {$pageTableName}.page_title";
 		}
 		else {
 			$sqlQueryStr =
@@ -204,7 +203,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 					"GROUP BY cl_from) AS matches " .
 				"WHERE {$pageTableName}.page_id NOT IN(matches.cl_from) " .
 					"AND {$pageTableName}.page_namespace <> 8 " .	// exclude MediaWiki namespace
-				"ORDER BY {$pageTableName}.page_title";
+				"ORDER BY {$pageTableName}.page_namespace DESC, {$pageTableName}.page_title";
 		}
 
 		// check the cache and query the database if necessary
@@ -214,8 +213,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 				$res = $dbr->query( $sqlQueryStr, 'MultiCategorySearch::showResults', false );
 				$htresults = "";
 				if( $dbr->numRows($res) == 0 ) {
-					$htresults .=  '<h3>' . wfMsg( 'multicatsearch_no_result' ) .
-						'</h3><br /><hr /><br />' ;
+					$htresults .= '<h3>' . wfMsg( 'multicatsearch_no_result' ) . '</h3>';
 					$wgOut->addHTML($htresults);
 					if( $memcache_loaded == 1 ) {
 						MultiCategorySearch::getMCache()->set(
@@ -245,7 +243,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 			if( $dbr->numRows($res) >= $this->limit && !$this->including() ) {
 				$jumpLinks = wfViewPrevNext( $this->offset, $this->limit, 'Special:MultiCategorySearch',
 					$queryStr, ($dbr->numRows($res) <= $this->offset + $this->limit) ? true : false );
-				$htresults .= "<br />{$jumpLinks}<br />\n";
+				$htresults .= "<p>{$jumpLinks}</p>\n";
 			}
 	
 			$i = 0;
@@ -257,9 +255,8 @@ class MultiCategorySearch extends IncludableSpecialPage
 				if( $j++ == $this->limit && !$this->including() )
 					break;
 				$titleObj = Title::makeTitle( $row->ns, $row->title );
-				if( $j == 1 )
-					$startChar = $titleObj->getPrefixedText();
-				$catView->AddPage( $titleObj, '', 10000 );
+				$startChar = $titleObj->getText();
+				$catView->AddPage( $titleObj, $startChar, 10000 );
 			}
 			$htresults .= $catView->formatList( $catView->articles, $catView->articles_start_char );
 	
@@ -277,7 +274,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 			}
 		}
 
-		$wgOut->addHTML( $htresults.'<br /><hr /><br />' );
+		$wgOut->addHTML( $htresults . '<hr />' );
 
 		wfProfileOut( 'MultiCategorySearch::showResults' );
 	}
@@ -299,44 +296,35 @@ class MultiCategorySearch extends IncludableSpecialPage
 		$dropdownLists = $this->showDropdownLists();
 		$wgOut->addWikiText( $msgComment );
 		$wgOut->addHTML("
-	<br />
 	<form id=\"MultiCategorySearch\" method=\"{$this->paramsPassMethod}\" action=\"{$action}\">
+	{$dropdownLists}
 	<table border=\"0\">
-		{$dropdownLists}
 		<tr>
-			<td colspan=\"2\" align=\"left\">{$msgInCategories}</td>
+			<th align=\"left\" style=\"padding-right: 2em\">{$msgInCategories}</th>
+			<th align=\"left\">{$msgExCategories}</th>
 		</tr>");
-		for( $i = substr_count( $dropdownLists, '<select' ) + 1;
-			$i <= $this->inCategoriesNumber; $i++ ) {
-				$categoryTitle = count( $this->inCategories ) - 1 >= $i ?
-					$this->inCategories[$i] : '';
-				$wgOut->addHTML("
-		<tr>
-			<td colspan=\"2\">
-				<input tabindex=\"{$i}\" type=\"text\" size=\"40\" name=\"wpInCategory{$i}\" " .
-					"value=\"{$categoryTitle}\" />
-			</td>
-		</tr>");
+
+		$rows = array();
+		for ($k = 0, $i = substr_count( $dropdownLists, '<select' ) + 1;
+			$i <= $this->inCategoriesNumber; $i++, $k++)
+		{
+			$categoryTitle = $this->inCategories[$i];
+			$rows[$k][0] = Xml::input("wpInCategory$i", "40", $categoryTitle, array('tabindex' => $i, 'style' => 'width: 99%'));
 		}
-		$wgOut->addHTML("
-		<tr>
-			<td colspan=\"2\" align=\"left\">{$msgExCategories}</td>
-		</tr>");
-		for( $i = 1; $i <= $this->exCategoriesNumber; $i++ ) {
+		for ($i = 1; $i <= $this->exCategoriesNumber; $i++)
+		{
 			$j = $this->inCategoriesNumber + $i;
-			$categoryTitle = count( $this->exCategories ) - 1 >= $i ? $this->exCategories[$i] : '';
-			$wgOut->addHTML("
-		<tr>
-			<td colspan=\"2\">
-				<input tabindex=\"{$j}\" type=\"text\" size=\"40\" name=\"wpExCategory{$i}\" " .
-					"value=\"{$categoryTitle}\" />
-			</td>
-		</tr>");
+			$categoryTitle = $this->exCategories[$i];
+			$rows[$i-1][1] = Xml::input("wpExCategory$i", "40", $categoryTitle, array('tabindex' => $j, 'style' => 'width: 99%'));
 		}
+
+		for ($i = 0; $i < count($rows); $i++)
+			$wgOut->addHTML("<tr><td>".implode("</td><td>", $rows[$i])."</td></tr>");
+
 		$j = $this->inCategoriesNumber + $this->exCategoriesNumber + 1;
 		$wgOut->addHTML("
 		<tr>
-			<td colspan=\"2\" style=\"padding-top: 1em\" align=\"right\">
+			<td colspan=\"2\" style=\"padding-top: 1em\" align=\"center\">
 				<input tabindex=\"{$j}\" type=\"submit\" name=\"wpSubmitSearchParams\" " .
 					"value=\"{$msgSubmitButton}\" />
 			</td>
@@ -346,20 +334,9 @@ class MultiCategorySearch extends IncludableSpecialPage
 
 		if( $this->insertEditTools == true && $wgUseAjax == true &&
 			function_exists( 'charInsert' ) ) {
-				$currentPath = str_replace( '\\', '/', dirname(__FILE__) );
-				$curServerPath =
-					substr( $currentPath, stripos( $currentPath, $wgScriptPath . '/' ) );
-				$wgOut->addScript( "<script type=\"{$wgJsMimeType}\" " .
-					"src=\"{$curServerPath}/edittools.js\"></script>\n" );
-
-				$filename = dirname(__FILE__) . '/EditTools.htm';
-				$handle = fopen( $filename, 'rb' );
-				$contents = fread( $handle, filesize( $filename ) );
-				fclose( $handle );
-
-				$wgOut->addHtml( '<div class="mw-editTools">' );
-				$wgOut->addWikiText( $contents );
-				$wgOut->addHtml( '</div>' );
+			$wgOut->addHtml( '<div class="mw-editTools">' );
+			$wgOut->addWikiText( wfMsg('edittools') );
+			$wgOut->addHtml( '</div>' );
 		}
 	}
 
@@ -388,6 +365,7 @@ class MultiCategorySearch extends IncludableSpecialPage
 		return $subCategories;
 	}
 
+	// FIXME totally ugly and unusable at the moment:
 	// This function inserts drop-down lists for category selection (instead of simple text
 	// input fields)
 	function showDropdownLists() {
