@@ -85,6 +85,7 @@ require_once($IP.'/extensions/CharInsertList/CharInsertList.php');
 require_once($IP.'/extensions/Cite/Cite.php');
 require_once($IP.'/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php');
 require_once($IP.'/extensions/CategoryTree/CategoryTree.php');
+require_once($IP.'/extensions/MultiCategorySearch/MultiCategorySearch.php');
 
 $wgSubcategorizedAlwaysExclude = array('CustisWikiToLib',
     'CustisWikiToSMWiki', 'CustisWikiToSBWiki', 'CustisWikiToRDWiki',
