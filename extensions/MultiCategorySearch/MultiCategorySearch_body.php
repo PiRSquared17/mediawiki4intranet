@@ -62,11 +62,14 @@ class MultiCategorySearch extends IncludableSpecialPage
 		global $wgRequest;
 
 		SpecialPage::SpecialPage( 'MultiCategorySearch' );
+
 		list( $this->limit, $this->offset ) = $wgRequest->getLimitOffset( 100, 'searchlimit' );
 	}
 
 	function execute( $par ) {
 		global $wgRequest, $wgOut, $wgVersion;
+
+		wfLoadExtensionMessages( 'MultiCategorySearch' );
 
 		if( version_compare( $wgVersion, '1.8', '<' ) === true ) {
 			$wgOut->showErrorPage( "Error: Upgrade required", "The MultiCategorySearch extension " .

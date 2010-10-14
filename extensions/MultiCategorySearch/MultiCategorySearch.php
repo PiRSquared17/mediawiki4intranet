@@ -28,24 +28,8 @@ $wgExtensionCredits['specialpage'][] = array(
 	'url' => 'http://www.mediawiki.org/wiki/Extension:Multi-Category_Search'
 );
 
-$wgExtensionFunctions[] = 'wfSetupMultiCategorySearchExtension';
-
 $dir = dirname(__FILE__) . '/';
 $wgAutoloadClasses['MultiCategorySearch'] = $dir . 'MultiCategorySearch_body.php';
 $wgSpecialPages['MultiCategorySearch'] = 'MultiCategorySearch';
-//$wgExtensionMessagesFiles['MultiCategorySearch'] = $dir . 'MultiCategorySearch.i18n.php';
-
-function wfSetupMultiCategorySearchExtension() {
-	global $IP, $wgMessageCache;
-
-	if( !function_exists('efMultiCategorySearchMessages') ) {
-		require_once( 'MultiCategorySearch.i18n.php' );
-		foreach( efMultiCategorySearchMessages() as $lang => $messages )
-			$wgMessageCache->addMessages( $messages, $lang );
-	}
-
-	$title = Title::newFromText( 'MultiCategorySearch' );
-
-	return true;
-}
-?>
+$wgSpecialPageGroups['MultiCategorySearch'] = 'pages';
+$wgExtensionMessagesFiles['MultiCategorySearch'] = $dir . 'MultiCategorySearch.i18n.php';
