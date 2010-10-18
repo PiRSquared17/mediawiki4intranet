@@ -3127,6 +3127,7 @@ class Parser
 	{
 		$stack = array( array( $dom->node, 0 ) );
 		$foundlevel = false;
+		$newchild = NULL;
 		$newroot = NULL;
 		while( $stack )
 		{
@@ -3135,7 +3136,7 @@ class Parser
 			{
 				array_pop( $stack );
 				if ( $foundlevel )
-					$newroot = $newroot->parentNode;
+					$newchild = $newchild->parentNode;
 				continue;
 			}
 			$node = $ptr[0]->childNodes->item( $ptr[1] );
@@ -3153,9 +3154,11 @@ class Parser
 						foreach ( $stack as $inside )
 						{
 							$el = $inside[0]->cloneNode();
-							if ( $newroot )
-								$newroot->addChild( $el );
-							$newroot = $el;
+							if ( $newchild )
+								$newchild->addChild( $el );
+							else
+								$newroot = $el;
+							$newchild = $el;
 						}
 					}
 				}
@@ -3173,10 +3176,10 @@ class Parser
 					if ( !$v )
 						continue;
 					else
-						$newroot->appendChild( $newroot->ownerDocument->createTextNode( $v ) );
+						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
 				}
 				else
-					$newroot->appendChild( $node->cloneNode( true ) );
+					$newchild->appendChild( $node->cloneNode( true ) );
 				$content_started = true;
 			}
 		}
