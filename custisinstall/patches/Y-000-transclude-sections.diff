@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1287161536 -14400
+# Date 1287396897 -14400
 Bug 70192 - named section transclusion
 
-diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
+diff -r 2951a613ce57 -r 6771352d015b includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3069,6 +3069,10 @@
@@ -27,7 +27,7 @@ diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
  		$this->mTplDomCache[ $titleText ] = $dom;
  
  		if (! $title->equals($cacheTitle)) {
-@@ -3098,6 +3105,72 @@
+@@ -3098,6 +3105,75 @@
  	}
  
  	/**
@@ -37,6 +37,7 @@ diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
 +	{
 +		$stack = array( array( $dom->node, 0 ) );
 +		$foundlevel = false;
++		$newchild = NULL;
 +		$newroot = NULL;
 +		while( $stack )
 +		{
@@ -45,7 +46,7 @@ diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
 +			{
 +				array_pop( $stack );
 +				if ( $foundlevel )
-+					$newroot = $newroot->parentNode;
++					$newchild = $newchild->parentNode;
 +				continue;
 +			}
 +			$node = $ptr[0]->childNodes->item( $ptr[1] );
@@ -63,9 +64,11 @@ diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
 +						foreach ( $stack as $inside )
 +						{
 +							$el = $inside[0]->cloneNode();
-+							if ( $newroot )
-+								$newroot->addChild( $el );
-+							$newroot = $el;
++							if ( $newchild )
++								$newchild->addChild( $el );
++							else
++								$newroot = $el;
++							$newchild = $el;
 +						}
 +					}
 +				}
@@ -83,10 +86,10 @@ diff -r 2951a613ce57 -r a72839f5e483 includes/parser/Parser.php
 +					if ( !$v )
 +						continue;
 +					else
-+						$newroot->appendChild( $newroot->ownerDocument->createTextNode( $v ) );
++						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
 +				}
 +				else
-+					$newroot->appendChild( $node->cloneNode( true ) );
++					$newchild->appendChild( $node->cloneNode( true ) );
 +				$content_started = true;
 +			}
 +		}
