@@ -42,8 +42,6 @@ class HACLLanguageRu extends HACLLanguage {
 
 	protected $mPermissionDeniedPage = "Доступ запрещён";
 	
-	protected $mPermissionDeniedPageContent = "Вам запрещено данное действие на этой странице.\n\nВернуться на [[Заглавная страница|Заглавную страницу]].";
-	
 	protected $mParserFunctions = array(
 		HACLLanguage::PF_ACCESS				=> 'access', 
 		HACLLanguage::PF_MANAGE_RIGHTS		=> 'manage rights',
