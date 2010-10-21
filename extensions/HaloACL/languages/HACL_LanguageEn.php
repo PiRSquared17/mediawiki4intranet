@@ -42,8 +42,6 @@ class HACLLanguageEn extends HACLLanguage {
 
 	protected $mPermissionDeniedPage = "Permission denied";
 	
-	protected $mPermissionDeniedPageContent = "You are not allowed to perform the requested action on this page.\n\nReturn to [[Main Page]].";
-	
 	protected $mParserFunctions = array(
 		HACLLanguage::PF_ACCESS				=> 'access', 
 		HACLLanguage::PF_MANAGE_RIGHTS		=> 'manage rights',

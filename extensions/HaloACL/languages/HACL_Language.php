@@ -46,13 +46,12 @@ abstract class HACLLanguage {
 	const CAT_GROUP					= 14;
 	const CAT_RIGHT					= 15;
 	const CAT_SECURITY_DESCRIPTOR	= 16;
-			
 	
 	// the special message arrays ...
 	protected $mNamespaces;
 	protected $mNamespaceAliases = array();
 	protected $mPermissionDeniedPage;
-	protected $mPermissionDeniedPageContent;
+	protected $mPermissionDeniedPageContent = "{{:MediaWiki:hacl_permission_denied}}";
 	protected $mParserFunctions = array();
 	protected $mParserFunctionsParameters = array();
 	protected $mActionNames = array();
@@ -61,22 +60,19 @@ abstract class HACLLanguage {
 	protected $mPetPrefixes = array();
 	protected $mSDTemplateName;			// Part of the name of default SDs for users
 	protected $mPredefinedRightName;			// Part of the name of default SDs for users
-
-
-
-        public function getPredefinedRightName() {
-            return $this->mPredefinedRightName;
-        }
-
-
+	
+	public function getPredefinedRightName() {
+		return $this->mPredefinedRightName;
+	}
+	
 	/**
 	 * Function that returns an array of namespace identifiers.
 	 */
-
+	
 	public function getNamespaces() {
 		return $this->mNamespaces;
 	}
-
+	
 	/**
 	 * Function that returns an array of namespace aliases, if any.
 	 */
