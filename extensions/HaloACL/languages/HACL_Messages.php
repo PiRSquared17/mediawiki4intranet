@@ -26,79 +26,78 @@ $messages = array();
  * English
  */
 $messages['en'] = array(
-	/* general/maintenance messages */
-    'haloacl' 			=> 'HaloACL',
+    /* general/maintenance messages */
+    'haloacl'             => 'HaloACL',
     'hacl_special_page' => 'HaloACL',  // Name of the special page for administration
-    'specialpages-group-hacl_group'	=> 'HaloACL',
-    'hacl_tt_initializeDatabase'	=> 'Initialize or update the database tables for HaloACL.',
-    'hacl_initializeDatabase'		=> 'Initialize database',
-    'hacl_db_setupsuccess'			=> 'Setting up the database for HaloACL was successful.',
-    'hacl_haloacl_return'			=> 'Return to ',
-    'hacl_unknown_user'				=> 'The user "$1" is unknown.',
-    'hacl_unknown_group'			=> 'The group "$1" is unknown.',
-    'hacl_missing_parameter'		=> 'The parameter "$1" is missing.',
+    'specialpages-group-hacl_group'    => 'HaloACL',
+    'hacl_tt_initializeDatabase'    => 'Initialize or update the database tables for HaloACL.',
+    'hacl_initializeDatabase'        => 'Initialize database',
+    'hacl_db_setupsuccess'            => 'Setting up the database for HaloACL was successful.',
+    'hacl_haloacl_return'            => 'Return to ',
+    'hacl_unknown_user'                => 'The user "$1" is unknown.',
+    'hacl_unknown_group'            => 'The group "$1" is unknown.',
+    'hacl_missing_parameter'        => 'The parameter "$1" is missing.',
     'hacl_missing_parameter_values' => 'There are no valid values for parameter "$1".',
     'hacl_invalid_predefined_right' => 'A rights template with the name "$1" does not exist or it contains no valid rights definition.',
-    'hacl_invalid_action'			=> '"$1" is an invalid value for an action.',
-    'hacl_too_many_categories'		=> 'This article belongs to multiple categories ($1). Please remove it from them and leave it in only one category!',
-    'hacl_wrong_namespace'			=> 'Articles with rights or group definitions must belong to the namespace "ACL".',
+    'hacl_invalid_action'            => '"$1" is an invalid value for an action.',
+    'hacl_too_many_categories'        => 'This article belongs to multiple categories ($1). Please remove it from them and leave it in only one category!',
+    'hacl_wrong_namespace'            => 'Articles with rights or group definitions must belong to the namespace "ACL".',
     'hacl_group_must_have_members'  => 'A group must have at least one member (group or user).',
     'hacl_group_must_have_managers' => 'A group must have at least one manager (group or user).',
-    'hacl_invalid_parser_function'	=> 'The use of the "#$1" function in this article is not allowed.',
+    'hacl_invalid_parser_function'    => 'The use of the "#$1" function in this article is not allowed.',
     'hacl_right_must_have_rights'   => 'A right or security descriptor must contain rights or reference other rights.',
     'hacl_right_must_have_managers' => 'A right or security descriptor must have at least one manager (group or user).',
     'hacl_whitelist_must_have_pages' => 'The whitelist is empty. Please add pages .',
-    'hacl_add_to_group_cat'			=>'This article contains functions that define a group. They will not be taken into effect until you add the category "[[Category:ACL/Group]]".',   
-	'hacl_add_to_right_cat'			=> 'This article contains the functions that define a security descriptor or a right template. They will not be taken to effect until you add the category "[[Category:ACL/ACL]]" or "[[Category:ACL/Right]]".',
-    'hacl_add_to_whitelist'			=> 'The article contains functions that define a whitelist. This function may only be used in the "ACL:Whitelist" article.',
-    'hacl_pf_rightname_title'		=> "===$1===\n",
-    'hacl_pf_rights_title'			=> "===Right(s): $1===\n",
-    'hacl_pf_rights'				=> ":;Right(s):\n:: $1\n",
-    'hacl_pf_right_managers_title'	=> "===Right managers===\n",
+    'hacl_add_to_group_cat'            =>'This article contains functions that define a group. They will not be taken into effect until you add the category "[[Category:ACL/Group]]".',   
+    'hacl_add_to_right_cat'            => 'This article contains the functions that define a security descriptor or a right template. They will not be taken to effect until you add the category "[[Category:ACL/ACL]]" or "[[Category:ACL/Right]]".',
+    'hacl_add_to_whitelist'            => 'The article contains functions that define a whitelist. This function may only be used in the "ACL:Whitelist" article.',
+    'hacl_pf_rightname_title'        => "===$1===\n",
+    'hacl_pf_rights_title'            => "===Right(s): $1===\n",
+    'hacl_pf_rights'                => ":;Right(s):\n:: $1\n",
+    'hacl_pf_right_managers_title'    => "===Right managers===\n",
     'hacl_pf_predefined_rights_title' => "===Right templates===\n",
-    'hacl_pf_whitelist_title' 		=> "===Whitelist===\n",
-    'hacl_pf_group_managers_title'	=> "===Group managers===\n",
-    'hacl_pf_group_members_title'	=> "===Group members===\n",
-    'hacl_assigned_user'			=> 'Assigned users: ',
-    'hacl_assigned_groups'			=> 'Assigned groups:',
-    'hacl_user_member'				=> 'Users who are member of this group:',
-    'hacl_group_member'				=> 'Groups who are member of this group:',
-    'hacl_description'				=> 'Description:',
-    'hacl_error'					=> 'Errors:',
-    'hacl_warning'					=> 'Warnings:',
-    'hacl_consistency_errors'		=> '<h2>There are errors in ACL definition</h2>',
+    'hacl_pf_whitelist_title'         => "===Whitelist===\n",
+    'hacl_pf_group_managers_title'    => "===Group managers===\n",
+    'hacl_pf_group_members_title'    => "===Group members===\n",
+    'hacl_assigned_user'            => 'Assigned users: ',
+    'hacl_assigned_groups'            => 'Assigned groups:',
+    'hacl_user_member'                => 'Users who are member of this group:',
+    'hacl_group_member'                => 'Groups who are member of this group:',
+    'hacl_description'                => 'Description:',
+    'hacl_error'                    => 'Errors:',
+    'hacl_warning'                    => 'Warnings:',
+    'hacl_consistency_errors'        => '<h2>There are errors in ACL definition</h2>',
     'hacl_definitions_will_not_be_saved' => '(The definitions in this article will not be saved and they will not be taken to effect due to the following errors.)',
-	'hacl_will_not_work_as_expected'=> '(Because of the following warnings, the definition will not work as expected.)',
-    'hacl_errors_in_definition'		=> 'The definitions in this article have errors. Please refer to the details below!',
-    'hacl_anonymous_users'			=> 'anonymous users',
-    'hacl_registered_users'			=> 'registered users',
-    'hacl_acl_element_not_in_db'	=> 'No entry has been made in the ACL database about this article. It may have been deleted and restored. Please store it again with all the articles that use it ',
-    'hacl_whitelist_mismatch'		=> 'The whitelist in this article contains nonexistent articles. Please remove them and save the whitelist again.',
+    'hacl_will_not_work_as_expected'=> '(Because of the following warnings, the definition will not work as expected.)',
+    'hacl_errors_in_definition'        => 'The definitions in this article have errors. Please refer to the details below!',
+    'hacl_anonymous_users'            => 'anonymous users',
+    'hacl_registered_users'            => 'registered users',
+    'hacl_acl_element_not_in_db'    => 'No entry has been made in the ACL database about this article. It may have been deleted and restored. Please store it again with all the articles that use it ',
+    'hacl_whitelist_mismatch'        => 'The whitelist in this article contains nonexistent articles. Please remove them and save the whitelist again.',
     'hacl_unprotectable_namespace'  => 'This namespace cannot be protected. Please contact the wiki administrator.',
 
-	/* Messages for semantic protection (properties etc.) */
+    /* Messages for semantic protection (properties etc.) */
+    'hacl_sp_query_modified'        => "- The query was modified because it contains protected properties.\n",
+    'hacl_sp_empty_query'            => "- Your query consists only of protected properties. It was not executed.\n",
+    'hacl_sp_results_removed'        => "- Some results were removed due to access restrictions.\n",
+    'hacl_sp_cant_save_article'        => "'''The article contains the following protected properties:'''\n$1'''You do not have the permission to set their values. Please remove these properties and save again.'''",
 
-    'hacl_sp_query_modified'		=> "- The query was modified because it contains protected properties.\n",
-    'hacl_sp_empty_query'			=> "- Your query consists only of protected properties. It was not executed.\n",
-    'hacl_sp_results_removed'		=> "- Some results were removed due to access restrictions.\n",
-    'hacl_sp_cant_save_article'		=> "'''The article contains the following protected properties:'''\n$1'''You do not have the permission to set their values. Please remove these properties and save again.'''",
-
-	/* Messages for Special:ACL */
+    /* Messages for Special:ACL */
     'hacl_tab_create_acl' => 'Create ACL',
     'hacl_tab_manage_acls' => 'Manage ACLs',
     'hacl_tab_manage_user' => 'Manage Groups',
     'hacl_tab_manage_whitelist' => 'Manage Whitelist',
 
-	/* Messages for 'Create ACL' tab */
+    /* Messages for 'Create ACL' tab */
     'hacl_create_acl_subtab1' => 'Create standard ACL',
     'hacl_create_acl_subtab2' => 'Create ACL template',
     'hacl_create_acl_subtab3' => 'Create ACL default user template',
-	/* Messages for sub tab 'Create standard ACL' ("csa") */
 
+    /* Messages for sub tab 'Create standard ACL' ("csa") */
 
-	/* Messages for sub tab 'Create ACL template' ("cat") */
+    /* Messages for sub tab 'Create ACL template' ("cat") */
 
-	/* Messages for sub tab 'Create ACL default user template ("dut")' */
+    /* Messages for sub tab 'Create ACL default user template ("dut")' */
     'hacl_create_acl_dut_headline' => 'Create Access Control List (ACL) default user template',
     'hacl_create_acl_dut_info' => 'You can create your own ACL default user template in this tab.<br />New articles will be protected by this template automatically',
 
@@ -147,19 +146,17 @@ $messages['en'] = array(
     'hacl_create_acl_dut_save_button_discard' => 'Discard ACL',
     'hacl_create_acl_dut_save_button_save' => 'Save ACL',
 
-
-	/* Messages for 'Manage ACLs' tab */
+    /* Messages for 'Manage ACLs' tab */
     'hacl_manage_acls_subtab1' => 'Manage all ACLs',
     'hacl_manage_acls_subtab2' => 'Manage own default user template',
-	/* Messages for 'Manage User' tab */
-	/* Messages for 'Manage Whitelist' tab */
+    /* Messages for 'Manage User' tab */
+    /* Messages for 'Manage Whitelist' tab */
     'hacl_whitelist_headline' => 'Manage Whitelist',
     'hacl_whitelist_info' => 'You may edit and create the Whitelist in this tab',
     'hacl_whitelist_filter' => 'Filter:',
     'hacl_whitelist_pageset_header' => 'Page',
     'hacl_whitelist_pagename' => 'Page-Name:',
     'hacl_whitelist_addbutton' => 'Add Page',
-
 
     'hacl_createRightContent_help' => 'Click on <strong>&quot;Create right&quot;</strong> if you want to create a new right.<br /><br />Note: <br />You may create multiple rights e.g.:<br /> Right1 = Read only for User1 + Right 2 = Full access for User2 etc.<br /><br /> Choose <strong>&quot;Add right template&quot;</strong> if you wish to select a predefined ACL.',
 
@@ -238,7 +235,6 @@ $messages['en'] = array(
     'hacl_rightsPanel_allUsersRegistered' => 'all users registered',
     'hacl_rightsPanel_allAnonymousUsers' => 'all anonymous users',
     'hacl_rightsPanel_allUsers' => 'all users',
-
 
     'hacl_rightPanelSelectDeselectTab_1' => 'Groups and Users',
     'hacl_rightPanelSelectDeselectTab_2' => 'Filter in groups:',
@@ -327,11 +323,11 @@ $messages['en'] = array(
     'hacl_deletetplfromacl' => "Delete template from ACL",
     'hacl_addtpltoacl' => "Add template to ACL",
 
-  'hacl_tpl_already_exists' => "The template already exists",
+    'hacl_tpl_already_exists' => "The template already exists",
     'hacl_setexisting_name' => "Please enter a name of an existing element",
     'hacl_already_protected' => "The element is already protected. Please go to ManageACLs to change the ACL.",
     'hacl_already_protected_by_ns_or_cat' => "The element is already protected by a category or a namespace. You are not entitled to add a new right.",
-	'hacl_showacls' => "Show ACLs",
+    'hacl_showacls' => "Show ACLs",
     'hacl_groupdescription'=> 'Group description',
     'hacl_advancedToolbarTooltip'=>'Click here to open advanced access rights definition in a new tab',
     'hacl_reset_groupsettings'=>'Reset groupsettings',
@@ -342,85 +338,86 @@ $messages['en'] = array(
     'hacl_protected_label'=>'protected',
     'hacl_unprotected_label'=>'unprotected',
     'hacl_delete_link_header' => 'Delete',
+
+    'hacl_permission_denied' => "You are not allowed to perform the requested action on this page.\n\nReturn to [[Main Page]].",
 );
 
 /** 
  * German
  */
 $messages['de'] = array(
-	/* general/maintenance messages */
-    'haloacl' 			=> 'HaloACL',
+    /* general/maintenance messages */
+    'haloacl'             => 'HaloACL',
     'hacl_special_page' => 'HaloACL',   // Name of the special page for administration
-    'specialpages-group-hacl_group'	=> 'HaloACL',
-    'hacl_tt_initializeDatabase'	=> 'Initialisiert oder aktualisiert die Datenbanktabellen für HaloACL.',
-    'hacl_initializeDatabase'		=> 'Datenbank initialisieren',
-    'hacl_db_setupsuccess'			=> 'Die Datenbank für HaloACL wurde erfolgreich erstellt.',
-    'hacl_haloacl_return'			=> 'Zurück zu ',
-    'hacl_unknown_user'				=> 'Der Benutzer "$1" ist unbekannt.',
-    'hacl_unknown_group'			=> 'Die Gruppe "$1" ist unbekannt.',
-    'hacl_missing_parameter'		=> 'Der Parameter "$1" fehlt.',
+    'specialpages-group-hacl_group'    => 'HaloACL',
+    'hacl_tt_initializeDatabase'    => 'Initialisiert oder aktualisiert die Datenbanktabellen für HaloACL.',
+    'hacl_initializeDatabase'        => 'Datenbank initialisieren',
+    'hacl_db_setupsuccess'            => 'Die Datenbank für HaloACL wurde erfolgreich erstellt.',
+    'hacl_haloacl_return'            => 'Zurück zu ',
+    'hacl_unknown_user'                => 'Der Benutzer "$1" ist unbekannt.',
+    'hacl_unknown_group'            => 'Die Gruppe "$1" ist unbekannt.',
+    'hacl_missing_parameter'        => 'Der Parameter "$1" fehlt.',
     'hacl_missing_parameter_values' => 'Der Parameter "$1" hat keine gültigen Werte.',
     'hacl_invalid_predefined_right' => 'Es existiert keine Rechtevorlage mit dem Namen "$1" oder sie enthält keine gültige Rechtedefinition.',
-    'hacl_invalid_action'			=> '"$1" ist ein ungültiger Wert für eine Aktion.',
-    'hacl_too_many_categories'		=> 'Dieser Artikel gehört zu vielen Kategorien an ($1). Bitte entfernen Sie alle bis auf eine!',
-    'hacl_wrong_namespace'			=> 'Artikel mit Rechte- oder Gruppendefinitionen müssen zum Namensraum "Rechte" gehören.',
+    'hacl_invalid_action'            => '"$1" ist ein ungültiger Wert für eine Aktion.',
+    'hacl_too_many_categories'        => 'Dieser Artikel gehört zu vielen Kategorien an ($1). Bitte entfernen Sie alle bis auf eine!',
+    'hacl_wrong_namespace'            => 'Artikel mit Rechte- oder Gruppendefinitionen müssen zum Namensraum "Rechte" gehören.',
     'hacl_group_must_have_members'  => 'Eine Gruppe muss mindestens ein Mitglied haben (Gruppe oder Benutzer).',
     'hacl_group_must_have_managers' => 'Eine Gruppe muss mindestens einen Verwalter haben (Gruppe oder Benutzer).',
-    'hacl_invalid_parser_function'	=> 'Sie dürfen die Funktion "#$1" in diesem Artikel nicht verwenden.',
+    'hacl_invalid_parser_function'    => 'Sie dürfen die Funktion "#$1" in diesem Artikel nicht verwenden.',
     'hacl_right_must_have_rights'   => 'Ein Recht oder eine Sicherheitsbeschreibung müssen Rechte oder Verweise auf Rechte enthalten.',
     'hacl_right_must_have_managers' => 'Ein Recht oder eine Sicherheitsbeschreibung müssen mindestens einen Verwalter haben (Gruppe oder Benutzer).',
     'hacl_whitelist_must_have_pages' => 'Die Positivliste ist leer. Bitte fügen Sie Seiten hinzu.',
-    'hacl_add_to_group_cat'			=> 'Der Artikel enthält Funktionen zur Definition von Gruppen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Gruppe]]" hinzufügen.',
-    'hacl_add_to_right_cat'			=> 'Der Artikel enthält Funktionen zur Definition von Rechten oder Sicherheitsbeschreibungen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Recht]]" oder "[[Kategorie:Rechte/Sicherheitsbeschreibung]]" hinzufügen.',
-    'hacl_add_to_whitelist'			=> 'Der Artikel enthält Funktionen zur Definition einer "Positivliste". Diese Funktion darf nur im Artikel "Rechte:Positivliste" benutzt werden.',
-    'hacl_pf_rightname_title'		=> "===$1===\n",
-    'hacl_pf_rights_title'			=> "===Recht(e): $1===\n",
-    'hacl_pf_rights'				=> ":;Recht(e):\n:: $1\n",
-    'hacl_pf_right_managers_title'	=> "===Rechteverwalter===\n",
+    'hacl_add_to_group_cat'            => 'Der Artikel enthält Funktionen zur Definition von Gruppen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Gruppe]]" hinzufügen.',
+    'hacl_add_to_right_cat'            => 'Der Artikel enthält Funktionen zur Definition von Rechten oder Sicherheitsbeschreibungen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Recht]]" oder "[[Kategorie:Rechte/Sicherheitsbeschreibung]]" hinzufügen.',
+    'hacl_add_to_whitelist'            => 'Der Artikel enthält Funktionen zur Definition einer "Positivliste". Diese Funktion darf nur im Artikel "Rechte:Positivliste" benutzt werden.',
+    'hacl_pf_rightname_title'        => "===$1===\n",
+    'hacl_pf_rights_title'            => "===Recht(e): $1===\n",
+    'hacl_pf_rights'                => ":;Recht(e):\n:: $1\n",
+    'hacl_pf_right_managers_title'    => "===Rechteverwalter===\n",
     'hacl_pf_predefined_rights_title' => "===Rechtevorlagen===\n",
-    'hacl_pf_whitelist_title' 		=> "===Positivliste===\n",
-    'hacl_pf_group_managers_title'	=> "===Gruppenverwalter===\n",
-    'hacl_pf_group_members_title'	=> "===Gruppenmitglieder===\n",
-    'hacl_assigned_user'			=> 'Zugewiesene Benutzer: ',
-    'hacl_assigned_groups'			=> 'Zugewiesene Gruppen:',
-    'hacl_user_member'				=> 'Benutzer, die Mitglied dieser Gruppe sind:',
-    'hacl_group_member'				=> 'Gruppen, die Mitglied dieser Gruppe sind:',
-    'hacl_description'				=> 'Beschreibung:',
-    'hacl_error'					=> 'Fehler:',
-    'hacl_warning'					=> 'Warnungen:',
-    'hacl_consistency_errors'		=> '<h2>Fehler in der Rechtedefinition</h2>',
+    'hacl_pf_whitelist_title'         => "===Positivliste===\n",
+    'hacl_pf_group_managers_title'    => "===Gruppenverwalter===\n",
+    'hacl_pf_group_members_title'    => "===Gruppenmitglieder===\n",
+    'hacl_assigned_user'            => 'Zugewiesene Benutzer: ',
+    'hacl_assigned_groups'            => 'Zugewiesene Gruppen:',
+    'hacl_user_member'                => 'Benutzer, die Mitglied dieser Gruppe sind:',
+    'hacl_group_member'                => 'Gruppen, die Mitglied dieser Gruppe sind:',
+    'hacl_description'                => 'Beschreibung:',
+    'hacl_error'                    => 'Fehler:',
+    'hacl_warning'                    => 'Warnungen:',
+    'hacl_consistency_errors'        => '<h2>Fehler in der Rechtedefinition</h2>',
     'hacl_definitions_will_not_be_saved' => '(Wegen der folgenden Fehler werden die Definitionen dieses Artikel nicht gespeichert und haben keine Auswirkungen.)',
-	'hacl_will_not_work_as_expected'=> '(Wegen der folgenden Warnungen wird die Definition nicht wie erwartet angewendet.)',
-    'hacl_errors_in_definition'		=> 'Die Definitionen in diesem Artikel sind fehlerhaft. Bitte schauen Sie sich die folgenden Details an!',
-    'hacl_anonymous_users'			=> 'anonyme Benutzer',
-    'hacl_registered_users'			=> 'registrierte Benutzer',
-    'hacl_acl_element_not_in_db'	=> 'Zu diesem Artikel gibt es keinen Eintrag in der Rechtedatenbank. Vermutlich wurde er gelöscht und wiederhergestellt. Bitte speichern Sie ihn und alle Artikel die ihn verwenden neu.',
-    'hacl_whitelist_mismatch'		=> 'Die "Positivliste" in diesem Artikel enthält Artikel, die nicht existieren. Bitte entfernen Sie diese und speichern Sie die "Positivliste" erneut.' ,
+    'hacl_will_not_work_as_expected'=> '(Wegen der folgenden Warnungen wird die Definition nicht wie erwartet angewendet.)',
+    'hacl_errors_in_definition'        => 'Die Definitionen in diesem Artikel sind fehlerhaft. Bitte schauen Sie sich die folgenden Details an!',
+    'hacl_anonymous_users'            => 'anonyme Benutzer',
+    'hacl_registered_users'            => 'registrierte Benutzer',
+    'hacl_acl_element_not_in_db'    => 'Zu diesem Artikel gibt es keinen Eintrag in der Rechtedatenbank. Vermutlich wurde er gelöscht und wiederhergestellt. Bitte speichern Sie ihn und alle Artikel die ihn verwenden neu.',
+    'hacl_whitelist_mismatch'        => 'Die "Positivliste" in diesem Artikel enthält Artikel, die nicht existieren. Bitte entfernen Sie diese und speichern Sie die "Positivliste" erneut.' ,
     'hacl_unprotectable_namespace'  => 'Dieser Namensraum kann nicht geschützt werden. Bitte fragen Sie Ihren Wikiadministrator.',
 
-	/* Messages for semantic protection (properties etc.) */
+    /* Messages for semantic protection (properties etc.) */
+    'hacl_sp_query_modified'        => "- Ihre Anfrage wurde modifiziert, das sie geschützte Attribute enthält.\n",
+    'hacl_sp_empty_query'            => "- Ihre Anfrage besteht nur aus geschützten Attributen und konnte deshalb nicht ausgeführt werden.of protected properties.\n",
+    'hacl_sp_results_removed'        => "- Wegen Zugriffbeschränkungen wurden einige Resultate entfernt.\n",
+    'hacl_sp_cant_save_article'        => "'''Der Artikel enthält die folgenden geschützten Attribute:'''\n$1'''Sie haben nicht die Berechtigung, deren Werte zu setzen. Bitte entfernen Sie die Attribute und speichern Sie erneut.'''",
 
-    'hacl_sp_query_modified'		=> "- Ihre Anfrage wurde modifiziert, das sie geschützte Attribute enthält.\n",
-    'hacl_sp_empty_query'			=> "- Ihre Anfrage besteht nur aus geschützten Attributen und konnte deshalb nicht ausgeführt werden.of protected properties.\n",
-    'hacl_sp_results_removed'		=> "- Wegen Zugriffbeschränkungen wurden einige Resultate entfernt.\n",
-    'hacl_sp_cant_save_article'		=> "'''Der Artikel enthält die folgenden geschützten Attribute:'''\n$1'''Sie haben nicht die Berechtigung, deren Werte zu setzen. Bitte entfernen Sie die Attribute und speichern Sie erneut.'''",
-
-	/* Messages for Special:ACL */
+    /* Messages for Special:ACL */
     'hacl_tab_create_acl' => 'Recht erzeugen',
     'hacl_tab_manage_acls' => 'Rechte verwalten',
     'hacl_tab_manage_user' => 'Gruppen verwalten',
     'hacl_tab_manage_whitelist' => 'Positivliste verwalten',
 
-	/* Messages for 'Create ACL' tab */
+    /* Messages for 'Create ACL' tab */
     'hacl_create_acl_subtab1' => 'Standardrecht erzeugen',
     'hacl_create_acl_subtab2' => 'Rechtevorlage erzeugen',
     'hacl_create_acl_subtab3' => 'Persönliche Standardrechtevorlage erzeugen',
-	/* Messages for sub tab 'Create standard ACL' ("csa") */
 
+    /* Messages for sub tab 'Create standard ACL' ("csa") */
 
-	/* Messages for sub tab 'Create ACL template' ("cat") */
+    /* Messages for sub tab 'Create ACL template' ("cat") */
 
-	/* Messages for sub tab 'Create ACL default user template ("dut")' */
+    /* Messages for sub tab 'Create ACL default user template ("dut")' */
     'hacl_create_acl_dut_headline' => 'Standardrechtevorlage für Benutzer erzeugen',
     'hacl_create_acl_dut_info' => 'Auf dieser Seite können Sie Ihre persönliche Standardrechtevorlage erzeugen.<br/>Ihre neuen Artikel werden automatisch mit diesen Rechten geschützt.',
 
@@ -469,16 +466,15 @@ $messages['de'] = array(
     'hacl_create_acl_dut_save_button_discard' => 'Rechte verwerfen',
     'hacl_create_acl_dut_save_button_save' => 'Rechte speichern',
 
-	/* Messages for 'Manage ACLs' tab */
-	/* Messages for 'Manage User' tab */
-	/* Messages for 'Manage Whitelists' tab */
+    /* Messages for 'Manage ACLs' tab */
+    /* Messages for 'Manage User' tab */
+    /* Messages for 'Manage Whitelists' tab */
     'hacl_whitelists_headline' => 'Positivliste verwalten',
     'hacl_whitelists_info' => 'Auf dieser Seite können Sie die Positivliste erzeugen und bearbeiten.',
     'hacl_whitelists_filter' => 'Filter:',
     'hacl_whitelists_addlink' => 'Seite:',
     'hacl_whitelists_pagename' => 'Seitenname',
     'hacl_whitelists_addbutton' => 'Seite hinzufügen',
-
 
     'hacl_createRightContent_help' => 'Klicken Sie auf <strong>Recht erstellen</strong> um ein neues Recht zu erstellen. Sie können beliebige viele Rechte erstellen (bspw.: ein Recht welches Vollzugriff für bestimmte Nutzer erlaubt sowie ein Recht welches lediglich Lesezugriff für alle Nutzer realisiert).<br /><br />Wählen Sie <strong>Template hinzufügen</strong> wenn Sie vordefinierte ACL templates in in Ihre Rechtedefinition einbinden möchten.',
     'hacl_haloacl_tab_section_header_title' =>  'Rechte',
@@ -556,7 +552,6 @@ $messages['de'] = array(
     'hacl_rightsPanel_allUsersRegistered' => 'alle registrierten Nutzer',
     'hacl_rightsPanel_allAnonymousUsers' => 'alle anonymen Nutzer',
     'hacl_rightsPanel_allUsers' => 'alle Nutzer',
-
 
     'hacl_rightPanelSelectDeselectTab_1' => 'Gruppen und Nutzer',
     'hacl_rightPanelSelectDeselectTab_2' => 'Gruppenfilter:',
@@ -660,4 +655,6 @@ $messages['de'] = array(
     'hacl_protected_label' => 'geschützt',
     'hacl_unprotected_label' => 'ungeschützt',
     'hacl_delete_link_header' => '<span style="margin-right:-12px">Löschen</span>',
+
+    'hacl_permission_denied' => "Sie dürfen die gewünschte Aktion auf dieser Seite nicht durchführen.\n\nZurück zur [[Hauptseite]].",
 );
