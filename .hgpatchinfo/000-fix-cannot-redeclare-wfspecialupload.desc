@@ -1,1 +1,2 @@
-Create branch for patch 000-fix-cannot-redeclare-wfspecialupload
+Fix "Cannot redeclare wfSpecialUpload()" error message for unauthorized users
+Fix wfShellExec() for Windows >= XP
