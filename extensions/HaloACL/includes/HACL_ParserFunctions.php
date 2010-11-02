@@ -583,8 +583,11 @@ class HACLParserFunctions
      */
     public static function articleViewHeader(&$article, &$outputDone, &$pcache)
     {
-        self::$mInstance = new self($article->getTitle());
-        $pcache = false;
+        if ($article->getTitle()->getNamespace() == NS_ACL)
+        {
+            self::$mInstance = new self($article->getTitle());
+            $pcache = false;
+        }
         return true;
     }
 
@@ -626,7 +629,7 @@ class HACLParserFunctions
         if ($title->getNamespace() == HACL_NS_ACL)
         {
             //--- Remove old SD / Group ---
-            self::removeOldDef($title->getArticleID());
+            self::removeOldDef($title);
 
             //--- Create an instance for parsing this article
             self::$mInstance = new self($title);
@@ -666,7 +669,7 @@ class HACLParserFunctions
         if ($title->getNamespace() == HACL_NS_ACL)
         {
             //--- Remove old SD / Group ---
-            self::removeOldDef($title->getArticleID());
+            self::removeOldDef($title);
         }
         else
         {
@@ -730,8 +733,9 @@ class HACLParserFunctions
     //--- Private methods ---
 
     // Check if there is some corresponding definition in the ACL database and remove it.
-    private static function removeOldDef($id)
+    private static function removeOldDef($title)
     {
+        $id = $title->getArticleId();
         try
         {
             $group = HACLGroup::newFromID($id);
@@ -762,7 +766,7 @@ class HACLParserFunctions
             {
                 // Check if it is the whitelist
                 global $haclgContLang;
-                if ($article->getTitle()->getText() == $haclgContLang->getWhitelist(false))
+                if ($title->getText() == $haclgContLang->getWhitelist(false))
                 {
                     // Create an empty whitelist and save it.
                     $wl = new HACLWhitelist();
