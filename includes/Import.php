@@ -231,9 +231,6 @@ class WikiRevision {
 		$tempTitle = $GLOBALS['wgTitle'];
 		$GLOBALS['wgTitle'] = $this->title;
 
-		if ( class_exists( 'HACLParserFunctions' ) )
-			HACLParserFunctions::getInstance()->reset();
-
 		if( $created ) {
 			wfDebug( __METHOD__ . ": running onArticleCreate\n" );
 			Article::onArticleCreate( $this->title );
