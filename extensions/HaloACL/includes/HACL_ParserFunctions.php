@@ -693,6 +693,13 @@ class HACLParserFunctions {
                 }
             }
 
+            if (self::$mInstance->mTitle == null) {
+                wfDebug("HaloACL: No parser function found in the article: ".$article->getTitle()->getPrefixedText()."; reparsing text:\n$text\n");
+                global $wgParser;
+                $parser = clone $wgParser;
+                $options = $wgParser->getOptions();
+                $parser->parse($text, $article->getTitle(), $options);
+            }
         }
         if (self::$mInstance->mTitle == null) {
             // No parser function found in the article.
@@ -920,11 +927,12 @@ class HACLParserFunctions {
      *         false, if not
      */
     private function saveGroup() {
+
         $t = $this->mTitle;
         // group does not exist yet
         $group = new HACLGroup($t->getArticleID(), $t->getText(),
-        $this->mGroupManagerGroups,
-        $this->mGroupManagerUsers);
+            $this->mGroupManagerGroups,
+            $this->mGroupManagerUsers);
         $group->save();
         $group->removeAllMembers();
         foreach ($this->mGroupMembers as $m) {
