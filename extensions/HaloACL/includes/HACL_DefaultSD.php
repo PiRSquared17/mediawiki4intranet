@@ -434,13 +434,11 @@ class  HACLDefaultSD  {
         $userNs = $wgContLang->getNsText(NS_USER);
         $content = str_replace('{{{user}}}', $userNs.':'.$username, $content);
 
-        HACLParserFunctions::getInstance()->reset();
         // Create the destination article
         $newArticle = new Article($destTitle);
         $newArticle->doEdit($content, "Default access control template.", EDIT_NEW);
 
         return true;
     }
-
 
 }

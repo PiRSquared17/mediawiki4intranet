@@ -3814,9 +3814,6 @@ function haclSaveGroup($manageRightsXml,$parentgroup = null) {
         $sdarticle->doEdit($inline, "");
         $SDID = $sdarticle->getID();
 
-        // as a new article starts we have to reset the parser
-        HACLParserFunctions::getInstance()->reset();
-
         // new group saved
         // if new group is a subgroup we have to attach it to that
         if($parentgroup) {
