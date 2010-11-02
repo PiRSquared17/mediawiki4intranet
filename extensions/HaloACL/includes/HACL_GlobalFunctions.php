@@ -37,49 +37,71 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * This function installs the extension, sets up all autoloading, special pages
  * etc.
  */
-function enableHaloACL() {
-    global $haclgIP, $wgExtensionFunctions, $wgAutoloadClasses, $wgSpecialPages, $wgSpecialPageGroups, $wgHooks, $wgExtensionMessagesFiles, $wgJobClasses, $wgExtensionAliasesFiles;
+function enableHaloACL()
+{
+    global $haclgIP;
 
-    require_once("$haclgIP/includes/HACL_ParserFunctions.php");
-
+    // Register messages (MW=>1.11), special page aliases
+    global $wgExtensionFunctions, $wgExtensionMessagesFiles, $wgExtensionAliasesFiles;
     $wgExtensionFunctions[] = 'haclfSetupExtension';
-    $wgHooks['LanguageGetMagic'][] = 'haclfAddMagicWords'; // setup names for parser functions (needed here)
-    $wgExtensionMessagesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Messages.php'; // register messages (requires MW=>1.11)
-
-    // Register special pages aliases file
+    $wgExtensionMessagesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Messages.php';
     $wgExtensionAliasesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Aliases.php';
 
-    ///// Register specials pages
+    // Register special pages
     global $wgSpecialPages, $wgSpecialPageGroups;
-    $wgSpecialPages['HaloACL']      = array('HaloACLSpecial');
+    $wgSpecialPages['HaloACL'] = array('HaloACLSpecial');
     $wgSpecialPageGroups['HaloACL'] = 'hacl_group';
 
-    ///// Set up autoloading; essentially all classes should be autoloaded!
-    $wgAutoloadClasses['HACLEvaluator'] = $haclgIP . '/includes/HACL_Evaluator.php';
-    $wgAutoloadClasses['HaloACLSpecial'] = $haclgIP . '/specials/HACL_ACLSpecial.php';
-    $wgAutoloadClasses['HACLStorage'] = $haclgIP . '/includes/HACL_Storage.php';
-    $wgAutoloadClasses['HACLGroup'] = $haclgIP . '/includes/HACL_Group.php';
+    // Set up autoloading; essentially all classes should be autoloaded!
+    global $wgAutoloadClasses;
+    $wgAutoloadClasses['HACLParserFunctions']    = $haclgIP . '/includes/HACL_ParserFunctions.php';
+    $wgAutoloadClasses['HACLEvaluator']          = $haclgIP . '/includes/HACL_Evaluator.php';
+    $wgAutoloadClasses['HaloACLSpecial']         = $haclgIP . '/specials/HACL_ACLSpecial.php';
+    $wgAutoloadClasses['HACLStorage']            = $haclgIP . '/includes/HACL_Storage.php';
+    $wgAutoloadClasses['HACLGroup']              = $haclgIP . '/includes/HACL_Group.php';
     $wgAutoloadClasses['HACLSecurityDescriptor'] = $haclgIP . '/includes/HACL_SecurityDescriptor.php';
-    $wgAutoloadClasses['HACLRight'] = $haclgIP . '/includes/HACL_Right.php';
-    $wgAutoloadClasses['HACLWhitelist'] = $haclgIP . '/includes/HACL_Whitelist.php';
-    $wgAutoloadClasses['HACLDefaultSD'] = $haclgIP . '/includes/HACL_DefaultSD.php';
-    $wgAutoloadClasses['HACLResultFilter'] = $haclgIP . '/includes/HACL_ResultFilter.php';
-    $wgAutoloadClasses['HACLQueryRewriter'] = $haclgIP . '/includes/HACL_QueryRewriter.php';
-    $wgAutoloadClasses['HACLQuickacl'] = $haclgIP . '/includes/HACL_Quickacl.php';
-    $wgAutoloadClasses['HACLToolbar'] = $haclgIP . '/includes/HACL_Toolbar.php';
+    $wgAutoloadClasses['HACLRight']              = $haclgIP . '/includes/HACL_Right.php';
+    $wgAutoloadClasses['HACLWhitelist']          = $haclgIP . '/includes/HACL_Whitelist.php';
+    $wgAutoloadClasses['HACLDefaultSD']          = $haclgIP . '/includes/HACL_DefaultSD.php';
+    $wgAutoloadClasses['HACLResultFilter']       = $haclgIP . '/includes/HACL_ResultFilter.php';
+    $wgAutoloadClasses['HACLQueryRewriter']      = $haclgIP . '/includes/HACL_QueryRewriter.php';
+    $wgAutoloadClasses['HACLQuickacl']           = $haclgIP . '/includes/HACL_Quickacl.php';
+    $wgAutoloadClasses['HACLToolbar']            = $haclgIP . '/includes/HACL_Toolbar.php';
 
     // UI
-    $wgAutoloadClasses['HACL_GenericPanel'] = $haclgIP . '/includes/HACL_GenericPanel.php';
-    $wgAutoloadClasses['HACL_helpPopup'] = $haclgIP . '/includes/HACL_helpPopup.php';
+    $wgAutoloadClasses['HACL_GenericPanel']      = $haclgIP . '/includes/HACL_GenericPanel.php';
+    $wgAutoloadClasses['HACL_helpPopup']         = $haclgIP . '/includes/HACL_helpPopup.php';
 
-    //--- Autoloading for exception classes ---
-    $wgAutoloadClasses['HACLException']        = $haclgIP . '/exceptions/HACL_Exception.php';
-    $wgAutoloadClasses['HACLStorageException'] = $haclgIP . '/exceptions/HACL_StorageException.php';
-    $wgAutoloadClasses['HACLGroupException']   = $haclgIP . '/exceptions/HACL_GroupException.php';
-    $wgAutoloadClasses['HACLSDException']      = $haclgIP . '/exceptions/HACL_SDException.php';
-    $wgAutoloadClasses['HACLRightException']   = $haclgIP . '/exceptions/HACL_RightException.php';
+    // Autoloading for exception classes
+    $wgAutoloadClasses['HACLException']          = $haclgIP . '/exceptions/HACL_Exception.php';
+    $wgAutoloadClasses['HACLStorageException']   = $haclgIP . '/exceptions/HACL_StorageException.php';
+    $wgAutoloadClasses['HACLGroupException']     = $haclgIP . '/exceptions/HACL_GroupException.php';
+    $wgAutoloadClasses['HACLSDException']        = $haclgIP . '/exceptions/HACL_SDException.php';
+    $wgAutoloadClasses['HACLRightException']     = $haclgIP . '/exceptions/HACL_RightException.php';
     $wgAutoloadClasses['HACLWhitelistException'] = $haclgIP . '/exceptions/HACL_WhitelistException.php';
 
+    // HACLParserFunctions hooks
+    global $wgHooks;
+    $wgHooks['ArticleViewHeader'][]     = 'HACLParserFunctions::articleViewHeader';
+    $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
+    $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
+    $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
+    $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
+    $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
+
+    return true;
+}
+
+function haclfLanguageGetMagic(&$magicWords, $langCode)
+{
+    global $haclgContLang;
+    $magicWords['haclaccess']           = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_ACCESS));
+    $magicWords['haclpropertyaccess']   = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_PROPERTY_ACCESS));
+    $magicWords['haclpredefinedright']  = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_PREDEFINED_RIGHT));
+    $magicWords['haclwhitelist']        = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_WHITELIST));
+    $magicWords['haclmanagerights']     = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_RIGHTS));
+    $magicWords['haclmember']           = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_MEMBER));
+    $magicWords['haclmanagegroup']      = array( 0, $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_GROUP));
     return true;
 }
 
@@ -90,11 +112,12 @@ function enableHaloACL() {
  * The main things this function does are: register all hooks, set up extension
  * credits, and init some globals that are not for configuration settings.
  */
-function haclfSetupExtension() {
-    wfProfileIn('haclfSetupExtension');
+function haclfSetupExtension()
+{
+    wfProfileIn(__FUNCTION__);
 
     global $haclgIP, $wgHooks, $wgParser, $wgExtensionCredits,
-    $wgLanguageCode, $wgVersion, $wgRequest, $wgContLang;
+        $wgLanguageCode, $wgVersion, $wgRequest, $wgContLang;
 
     /* Title patch is disabled until full initialization of extension.
      * This was formerly done with haclfDisableTitleCheck() in the beginning
@@ -109,13 +132,9 @@ function haclfSetupExtension() {
 
     wfLoadExtensionMessages('HaloACL');
 
-    $wgHooks['ArticleSaveComplete'][]  = 'HACLParserFunctions::articleSaveComplete';
     $wgHooks['ArticleSaveComplete'][]  = 'HACLDefaultSD::articleSaveComplete';
-    $wgHooks['ArticleDelete'][]        = 'HACLParserFunctions::articleDelete';
-    $wgHooks['OutputPageBeforeHTML'][] = 'HACLParserFunctions::outputPageBeforeHTML';
     $wgHooks['IsFileCacheable'][]      = 'haclfIsFileCacheable';
     $wgHooks['PageRenderingHash'][]    = 'haclfPageRenderingHash';
-    $wgHooks['SpecialMovepageAfterMove'][] = 'HACLParserFunctions::articleMove';
 
     global $haclgProtectProperties;
     if ($haclgProtectProperties === true) {
@@ -132,24 +151,11 @@ function haclfSetupExtension() {
         $wgHooks['UserLoginComplete'][] = 'HACLDefaultSD::newUser';
     }
 
-#    $wgHooks['InternalParseBeforeLinks'][] = 'SMWParserExtensions::onInternalParseBeforeLinks'; // parse annotations in [[link syntax]]
-
-    /*
-     if( defined( 'MW_SUPPORTS_PARSERFIRSTCALLINIT' ) ) {
-        $wgHooks['ParserFirstCallInit'][] = 'SMWParserExtensions::registerParserFunctions';
-        } else {
-        if ( class_exists( 'StubObject' ) && !StubObject::isRealObject( $wgParser ) ) {
-        $wgParser->_unstub();
-        }
-        SMWParserExtensions::registerParserFunctions( $wgParser );
-        }
-        */
-
-    $wgHooks['BeforePageDisplay'][]='haclfAddPageHeader';
+    $wgHooks['BeforePageDisplay'][] = 'haclfAddPageHeader';
 
     //-- Hooks for ACL toolbar--
     $wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
-    $wgHooks['sfEditPageBeforeForm'][]      = 'haclfAddToolbarForSemanticForms';
+    $wgHooks['sfEditPageBeforeForm'][] = 'haclfAddToolbarForSemanticForms';
 
     //-- includes for Ajax calls --
     global $wgUseAjax, $wgRequest;
@@ -176,8 +182,17 @@ function haclfSetupExtension() {
 
     // Handle input fields of Semantic Forms
     $wgHooks['sfCreateFormField'][] = 'haclfHandleFormField';
-    wfProfileOut('haclfSetupExtension');
 
+    // HACLParserFunctions callbacks
+    $wgParser->setFunctionHook('haclaccess',            'HACLParserFunctions::access');
+    $wgParser->setFunctionHook('haclpropertyaccess',    'HACLParserFunctions::propertyAccess');
+    $wgParser->setFunctionHook('haclpredefinedright',   'HACLParserFunctions::predefinedRight');
+    $wgParser->setFunctionHook('haclwhitelist',         'HACLParserFunctions::whitelist');
+    $wgParser->setFunctionHook('haclmanagerights',      'HACLParserFunctions::manageRights');
+    $wgParser->setFunctionHook('haclmember',            'HACLParserFunctions::addMember');
+    $wgParser->setFunctionHook('haclmanagegroup',       'HACLParserFunctions::manageGroup');
+
+    wfProfileOut(__FUNCTION__);
     return true;
 }
 
@@ -466,14 +481,6 @@ function haclfInitNamespaces() {
 /**********************************************/
 /***** language settings                  *****/
 /**********************************************/
-
-/**
- * Set up (possibly localised) names for HaloACL
- */
-function haclfAddMagicWords(&$magicWords, $langCode) {
-//    $magicWords['ask']     = array( 0, 'ask' );
-    return true;
-}
 
 /**
  * Initialise a global language object for content language. This
