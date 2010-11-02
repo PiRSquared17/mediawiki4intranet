@@ -583,7 +583,7 @@ class HACLParserFunctions
      */
     public static function articleViewHeader(&$article, &$outputDone, &$pcache)
     {
-        if ($article->getTitle()->getNamespace() == NS_ACL)
+        if ($article->getTitle()->getNamespace() == HACL_NS_ACL)
         {
             self::$mInstance = new self($article->getTitle());
             $pcache = false;
