@@ -167,12 +167,12 @@ class  HACLGroup {
         // group ID given
             return $group;
         } else if (is_string($group)) {
-            // Name of group given
-                return haclfArticleID($group, HACL_NS_ACL);
-            } else if (is_a($group, 'HACLGroup')) {
-                // group object given
-                    return $group->getGroupID();
-                }
+        // Name of group given
+            return haclfArticleID($group, HACL_NS_ACL);
+        } else if (is_a($group, 'HACLGroup')) {
+        // group object given
+            return $group->getGroupID();
+        }
         // This should not happen
         return null;
     }
@@ -321,7 +321,7 @@ class  HACLGroup {
                 $userName = ($user) ? $user->getId() : "(User-ID: $userID)";
             }
             throw new HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP,
-            $this->mGroupName, $userName);
+                $this->mGroupName, $userName);
         }
         return false;
     }
