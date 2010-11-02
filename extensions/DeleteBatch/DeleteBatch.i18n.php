@@ -32,6 +32,7 @@ Uploaded file should contain page name and optional reason separated by a "|" ch
 	'deletebatch-link-back' => 'You can go back to the extension ',
 	'deletebatch-omitting-nonexistant' => 'Omitting non-existing page $1.',
 	'deletebatch-omitting-invalid' => 'Omitting invalid page $1.',
+	'deletebatch-permission-denied' => 'Permission denied for page $1.',
 	'deletebatch-file-bad-format' => 'The file should be plain text',
 	'deletebatch-file-missing' => 'Unable to read given file',
 	'deletebatch-select-script' => 'delete page script',
