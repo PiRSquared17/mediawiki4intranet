@@ -30,7 +30,7 @@ $wgEnableMWSuggest     = true;
 $wgOpenSearchTemplate  = true;
 
 $wgEmergencyContact    = "stas@custis.ru";
-$wgPasswordSender      = "stas@custis.ru";
+$wgPasswordSender      = "wiki-daemon@custis.ru";
 
 $wgAllowExternalImages     = true;
 $wgAllowExternalImagesFrom = array(
