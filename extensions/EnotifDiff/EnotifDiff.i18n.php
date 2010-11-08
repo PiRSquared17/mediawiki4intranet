@@ -13,7 +13,7 @@ $messages['en'] = array(
 <p>Dear <b>$WATCHINGUSERNAME</b>,</p>
 
 <p>The {{SITENAME}} page $PAGETITLE has been $CHANGEDORCREATED on $PAGEEDITDATE by $PAGEEDITOR,
-see <a href="$PAGETITLE_URL">$PAGETITLE_URL</a> for the current version.</p>
+see <a href="$PAGETITLE_URL">$PAGETITLE_URL_NOENC</a> for the current version.</p>
 
 <p>$NEWPAGE</p>
 
@@ -62,7 +62,7 @@ $messages['ru'] = array(
 <p><b>$WATCHINGUSERNAME,</b></p>
 <p>
 $PAGEEDITDATE страница проекта «{{SITENAME}}» $PAGETITLE была $CHANGEDORCREATED участником
-$PAGEEDITOR, см. <a href="$PAGETITLE_URL">$PAGETITLE_URL</a> для просмотра текущей версии.
+$PAGEEDITOR, см. <a href="$PAGETITLE_URL">$PAGETITLE_URL_NOENC</a> для просмотра текущей версии.
 </p>
 
 <p>$NEWPAGE</p>
