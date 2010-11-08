@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1271854899 -14400
+# Date 1289238583 -10800
 HTML email support, needed for Bug 25475 (diffs in enotify emails)
 
-diff -r 2f012c39365a -r 6fc96b521854 includes/UserMailer.php
+diff -r 2951a613ce57 -r 306baffa1404 includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
 @@ -106,8 +106,10 @@
@@ -55,7 +55,12 @@ diff -r 2f012c39365a -r 6fc96b521854 includes/UserMailer.php
  					), __METHOD__ );
  				$userArray = UserArray::newFromResult( $res );
  
-@@ -476,6 +481,7 @@
+@@ -472,10 +477,12 @@
+ 		$pagetitle = $this->title->getPrefixedText();
+ 		$keys['$PAGETITLE']          = $pagetitle;
+ 		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
++		$keys['$PAGETITLE_URL_NOENC']= urldecode($this->title->getFullUrl());
+ 
  		$keys['$PAGEMINOREDIT']      = $medit;
  		$keys['$PAGESUMMARY']        = $summary;
  
@@ -63,7 +68,7 @@ diff -r 2f012c39365a -r 6fc96b521854 includes/UserMailer.php
  		$subject = strtr( $subject, $keys );
  
  		# Reveal the page editor's address as REPLY-TO address only if
-@@ -580,6 +586,8 @@
+@@ -580,6 +587,8 @@
  			$wgLang->timeanddate( $this->timestamp, true, false, $timecorrection ),
  			$body);
  
