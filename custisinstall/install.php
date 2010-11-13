@@ -112,8 +112,8 @@ else
 
 if (!$WINDOWS)
 {
-    cmd("chown -R www-data:www-data $DIR");
-    cmd("chmod 000 $DIR/config");
+    cmd("sudo chown -R www-data:www-data $DIR");
+    cmd("sudo chmod 000 $DIR/config");
 }
 
 cmd(($WINDOWS ? "del" : "rm")." $DIR/extensions/CategoryTree/SubcatCat.i18n.php");
@@ -180,6 +180,7 @@ function run_commands()
         if (file_put_contents($filename, $SCRIPT))
         {
             system($WINDOWS ? $filename : "sh $filename");
+            unlink($filename);
         }
         else
         {
