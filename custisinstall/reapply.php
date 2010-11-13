@@ -5,7 +5,7 @@
 # Useful for manually updating Wiki installations
 # (c) Vitaliy Filippov, 2010
 
-$PATCHED_DIRS = explode(' ', 'includes languages skins/common')
+$PATCHED_DIRS = explode(' ', 'includes languages skins/common');
 $PATCHED_EXTENSIONS = explode(' ', 'CategoryTree AnyWikiDraw MediaFunctions Cite DeleteBatch Interwiki');
 $CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php');
 
