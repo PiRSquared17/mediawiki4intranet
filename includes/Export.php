@@ -28,7 +28,8 @@ class WikiExporter {
 	var $list_authors = false ; # Return distinct author list (when not returning full history)
 	var $author_list = "" ;
 
-	var $dumpUploads = false;
+	var $dumpUploads = false;   # Dump uploaded files into the export file
+	var $selfContained = false; # Make export file self-contained (multipart/related)
 
 	const FULL = 0;
 	const CURRENT = 1;
@@ -77,6 +78,7 @@ class WikiExporter {
 	}
 
 	public function openStream() {
+		$this->writer->multipart = $this->dumpUploads && $this->selfContained;
 		$output = $this->writer->openStream();
 		$this->sink->writeOpenStream( $output );
 	}
@@ -84,6 +86,9 @@ class WikiExporter {
 	public function closeStream() {
 		$output = $this->writer->closeStream();
 		$this->sink->writeCloseStream( $output );
+		/* Dump $this->writer->binaries into multipart/related */
+		while ($part = $this->writer->nextPart())
+			$this->sink->writePart($part);
 	}
 
 	/**
@@ -293,7 +298,8 @@ class WikiExporter {
 				if( isset( $last ) ) {
 					$output = '';
 					if( $this->dumpUploads ) {
-						$output .= $this->writer->writeUploads( $last );
+						$output .= $this->writer->writeUploads( $last,
+							$this->history == WikiExporter::CURRENT ? 1 : null );
 					}
 					$output .= $this->writer->closePage();
 					$this->sink->writeClosePage( $output );
@@ -308,7 +314,8 @@ class WikiExporter {
 		if( isset( $last ) ) {
 			$output = '';
 			if( $this->dumpUploads ) {
-				$output .= $this->writer->writeUploads( $last );
+				$output .= $this->writer->writeUploads( $last,
+					$this->history == WikiExporter::CURRENT ? 1 : null );
 			}
 			$output .= $this->author_list;
 			$output .= $this->writer->closePage();
@@ -331,6 +338,12 @@ class WikiExporter {
  */
 class XmlDumpWriter {
 
+	var $boundary;
+	var $binaries;
+	var $multipart;
+
+	var $currentpart;
+
 	/**
 	 * Returns the export schema version.
 	 * @return string
@@ -352,7 +365,15 @@ class XmlDumpWriter {
 	function openStream() {
 		global $wgContLanguageCode;
 		$ver = $this->schemaVersion();
-		return Xml::element( 'mediawiki', array(
+		$mp = '';
+		if ($this->multipart)
+		{
+			$this->boundary = '--'.time();
+			$this->binaries = array();
+			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
+		}
+		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
+			Xml::element( 'mediawiki', array(
 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
 			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
@@ -415,6 +436,38 @@ class XmlDumpWriter {
 		return "</mediawiki>\n";
 	}
 
+	function nextPart()
+	{
+		$data = '';
+		if ( !$this->currentpart )
+		{
+			if ( !$this->multipart || !count( $this->binaries ) )
+				return '';
+			list( $name ) = array_keys( $this->binaries );
+			$filename = $this->binaries[ $name ];
+			unset( $this->binaries[ $name ] );
+			$fp = fopen( $filename, "rb" );
+			if ( !$fp )
+				return $this->nextPart();
+			$this->currentpart = array(
+				'name' => $name,
+				'filename' => $filename,
+				'fp' => $fp,
+			);
+			$data = $this->boundary.
+				"\nContent-Type: application/binary\n" .
+				"Content-Transfer-Encoding: Little-Endian\n" .
+				"Content-ID: $name\n" .
+				"Content-Length: ".filesize($filename)."\n\n";
+		}
+		$data .= fread( $this->currentpart['fp'], 1048576 );
+		if ( feof( $this->currentpart['fp'] ) )
+		{
+			fclose( $this->currentpart['fp'] );
+			$this->currentpart = NULL;
+		}
+		return $data;
+	}
 
 	/**
 	 * Opens a <page> section on the output stream, with data
@@ -482,7 +535,7 @@ class XmlDumpWriter {
 		} elseif( isset( $row->old_text ) ) {
 			// Raw text from the database may have invalid chars
 			$text = strval( Revision::getRevisionText( $row ) );
-			$out .= "      " . Xml::elementClean( 'text',
+			$out .= "      " . Xml::ElementClean( 'text',
 				array( 'xml:space' => 'preserve' ),
 				strval( $text ) ) . "\n";
 		} else {
@@ -566,12 +619,12 @@ class XmlDumpWriter {
 	/**
 	 * Warning! This data is potentially inconsistent. :(
 	 */
-	function writeUploads( $row ) {
+	function writeUploads( $row, $limit = null ) {
 		if( $row->page_namespace == NS_IMAGE ) {
 			$img = wfFindFile( $row->page_title );
 			if( $img ) {
 				$out = '';
-				foreach( array_reverse( $img->getHistory() ) as $ver ) {
+				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
 					$out .= $this->writeUpload( $ver );
 				}
 				$out .= $this->writeUpload( $img );
@@ -582,13 +635,22 @@ class XmlDumpWriter {
 	}
 
 	function writeUpload( $file ) {
+		if ( !$file->exists() )
+			return "";
+		if ( $this->multipart )
+		{
+			$partname = $file->isOld() ? $file->getArchiveName() : $file->getName();
+			$this->binaries[ $partname ] = $file->getPath();
+		}
 		return "    <upload>\n" .
 			$this->writeTimestamp( $file->getTimestamp() ) .
 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
-			"      " . Xml::elementClean( 'comment', null, $file->getDescription() ) . "\n" .
-			"      " . Xml::element( 'filename', null, $file->getName() ) . "\n" .
-			"      " . Xml::element( 'src', null, $file->getFullUrl() ) . "\n" .
-			"      " . Xml::element( 'size', null, $file->getSize() ) . "\n" .
+			"      " . Xml::ElementClean( 'comment', null, $file->getDescription() ) . "\n" .
+			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
+			"      " . Xml::Element( 'src',
+			                      array('sha1' => $file->getSha1()),
+			                      $this->multipart ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
+			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
 			"    </upload>\n";
 	}
 
@@ -621,6 +683,10 @@ class DumpOutput {
 	}
 	
 	function writeLogItem( $rev, $string ) {
+		$this->write( $string );
+	}
+
+	function writePart( $string ) {
 		$this->write( $string );
 	}
 
