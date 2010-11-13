@@ -19,7 +19,7 @@ foreach($d as &$e)
     $e = "'$DIR/$e'";
 
 foreach($CREATED_FILES as $f)
-    unlink("$DIR/$f");
+    @unlink("$DIR/$f");
 system("svn revert -R ".implode(' ', $d));
 $patches = glob("$SELFDIR/patches/Y-*");
 sort($patches);
