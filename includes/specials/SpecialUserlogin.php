@@ -843,12 +843,12 @@ class LoginForm {
 			$linkq .= '&uselang=' . $this->mLanguage;
 
 		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
+		$link .= wfMsg( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
 		$link .= '</a>';
 
 		# Don't show a "create account" link if the user can't
 		if( $this->showCreateOrLoginLink( $wgUser ) )
-			$template->set( 'link', wfMsgHtml( $linkmsg, $link ) );
+			$template->set( 'link', wfMsg( $linkmsg, $link ) );
 		else
 			$template->set( 'link', '' );
 
