@@ -477,6 +477,7 @@ class EmailNotification {
 		$pagetitle = $this->title->getPrefixedText();
 		$keys['$PAGETITLE']          = $pagetitle;
 		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
+		$keys['$PAGETITLE_URL_NOENC']= urldecode($this->title->getFullUrl());
 
 		$keys['$PAGEMINOREDIT']      = $medit;
 		$keys['$PAGESUMMARY']        = $summary;
