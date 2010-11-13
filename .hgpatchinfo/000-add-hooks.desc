@@ -1,1 +1,2 @@
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
+Bug 71769, add hook for overriding grouping values for enhanced recent changes view
