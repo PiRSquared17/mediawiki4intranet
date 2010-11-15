@@ -484,6 +484,9 @@ class SpecialOpenIDLogin extends SpecialOpenID {
 	function updateUser( $user, $sreg, $ax, $force = false ) {
 		global $wgAllowRealName, $wgEmailAuthentication, $wgOpenIDTrustEmailAddress;
 
+		if (!$ax)
+			$ax = array();
+
 		// Nick name
 		if ( $this->updateOption( 'nickname', $user, $force ) ) {
 			if ( array_key_exists( 'nickname', $sreg ) && $sreg['nickname'] != $user->getOption( 'nickname' ) ) {
