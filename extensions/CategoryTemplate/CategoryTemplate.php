@@ -66,7 +66,7 @@ function checkname()
     var inp = document.getElementById('createboxInput');
     var l = 0;
     var txt = "$text";
-    txt = txt.replace('__FULLPAGENAME__', inp.value);
+    txt = txt.replace(/__FULLPAGENAME__/g, inp.value);
     if (inp.value.substr(0, l = "$s1:".length) != "$s1:")
     {
         l = 0;
