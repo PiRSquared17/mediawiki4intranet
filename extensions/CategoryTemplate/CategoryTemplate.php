@@ -1,13 +1,16 @@
 <?php
 
-/*
+/* This extension adds a textbox and a button to category pages, allowing
+ * to easily create pages inside the category. A template with name
+ * Template:Category:CATEGORY_NAME is used as a stub for the new page.
+ *
+ * @author Vitaliy Filippov <vitalif@mail.ru>
+ * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- *
- * @author Vitaliy Filippov <vitalif@mail.ru>
- * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
 if (!defined('MEDIAWIKI'))
@@ -43,9 +46,18 @@ function efCategoryTemplateCategoryPageView($catpage)
     if (($title = Title::newFromText($wgContLang->getNsText(NS_TEMPLATE).":".$wgContLang->getNsText(NS_CATEGORY).":".$cat)) &&
         (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx()) &&
         ($rev = Revision::newFromId($title->getLatestRevID())))
+    {
+        /* Fetch page template from Template:Category:CATEGORY_NAME */
         $text = $rev->getText();
+    }
     else
+    {
+        /* Default page template: add only category membership */
         $text = "\n\n\n[[".$wgContLang->getNsText(NS_CATEGORY).":$cat]]";
+    }
+    /* Transform _subst: into subst:. This allows to use {{_subst:MAGICWORD}} inside
+       the template without it being transformed instantly. */
+    $text = str_replace("{{_subst:", "{{subst:", $text);
     $text = str_replace("\n", "\\n", addslashes($text));
     $temp2 = <<<ENDFORM
 <!-- Add Article Extension Start -->
