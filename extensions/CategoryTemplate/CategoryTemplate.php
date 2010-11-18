@@ -35,7 +35,7 @@ function wfCategoryTemplate()
 
 function efCategoryTemplateCategoryPageView($catpage)
 {
-    global $wgOut, $wgScript, $wgContLang, $wgCanonicalNamespaceNames, $CategoryTemplateMessages;
+    global $wgOut, $wgScript, $wgParser, $wgContLang, $wgCanonicalNamespaceNames, $CategoryTemplateMessages;
     $boxtext = addslashes(wfMsg("addcategorytemplate-create-article"));
     $btext = addslashes(wfMsg("addcategorytemplate-submit"));
     $confirmtext = addslashes(wfMsg("addcategorytemplate-confirm"));
@@ -55,9 +55,6 @@ function efCategoryTemplateCategoryPageView($catpage)
         /* Default page template: add only category membership */
         $text = "\n\n\n[[".$wgContLang->getNsText(NS_CATEGORY).":$cat]]";
     }
-    /* Transform _subst: into subst:. This allows to use {{_subst:MAGICWORD}} inside
-       the template without it being transformed instantly. */
-    $text = str_replace("{{_subst:", "{{subst:", $text);
     $text = str_replace("\n", "\\n", addslashes($text));
     $temp2 = <<<ENDFORM
 <!-- Add Article Extension Start -->
@@ -68,6 +65,8 @@ function checkname()
 {
     var inp = document.getElementById('createboxInput');
     var l = 0;
+    var txt = "$text";
+    txt = txt.replace('__FULLPAGENAME__', inp.value);
     if (inp.value.substr(0, l = "$s1:".length) != "$s1:")
     {
         l = 0;
@@ -77,14 +76,14 @@ function checkname()
     if (l)
     {
         document.createbox.wpDestFile.value = inp.value.substr(l);
-        document.createbox.wpUploadDescription.value = "$text";
+        document.createbox.wpUploadDescription.value = txt;
         document.createbox.wpTextbox1.value = "";
         inp.value = 'Special:Upload';
     }
     else
     {
         document.createbox.wpUploadDescription.value = "";
-        document.createbox.wpTextbox1.value = "$text";
+        document.createbox.wpTextbox1.value = txt;
     }
     return inp.value!=inp.defaultValue || confirm("$confirmtext".replace("%s", document.createbox.createboxInput.value));
 }
