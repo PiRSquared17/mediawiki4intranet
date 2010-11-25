@@ -39,6 +39,7 @@ class WikiRevision {
 	var $type = "";
 	var $action = "";
 	var $params = "";
+	var $tempfile = NULL;
 
 	function setTitle( $title ) {
 		if( is_object( $title ) ) {
@@ -399,16 +400,18 @@ class WikiRevision {
 			return false;
 		}
 
-		/* Если файл прикреплён как multipart-часть, вернём его */
 		$src = $this->getSrc();
+		if (!$src)
+			return false;
+		/* Если файл прикреплён как multipart-часть, вернём его */
 		if (is_file( $src ))
 			return $src;
 
 		/* Иначе нужно заморочиться и скачать... */
-		$tempo = tempnam( wfTempDir(), 'download' );
-		$f = fopen( $tempo, 'wb' );
+		$this->tempfile = tempnam( wfTempDir(), 'download' );
+		$f = fopen( $this->tempfile, 'wb' );
 		if( !$f ) {
-			wfDebug( "IMPORT: couldn't write to temp file $tempo\n" );
+			wfDebug( "IMPORT: couldn't write to temp file ".$this->tempfile."\n" );
 			return false;
 		}
 
@@ -417,16 +420,21 @@ class WikiRevision {
 		if( !$data ) {
 			wfDebug( "IMPORT: couldn't fetch source $src\n" );
 			fclose( $f );
-			unlink( $tempo );
+			unlink( $this->tempfile );
 			return false;
 		}
 
 		fwrite( $f, $data );
 		fclose( $f );
 
-		return $tempo;
+		return $this->tempfile;
 	}
 
+	function __destruct()
+	{
+		if ( $this->tempfile && is_file( $this->tempfile ) )
+			unlink( $this->tempfile );
+	}
 }
 
 /**
