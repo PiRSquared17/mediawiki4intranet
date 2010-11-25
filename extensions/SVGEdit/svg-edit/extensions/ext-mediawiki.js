@@ -113,17 +113,12 @@ var mwSVG = {
 
 	/**
 	 * Fetch an SVG file from the MediaWiki system...
-	 * Requires ApiSVGProxy extension to be loaded.
 	 *
 	 * @param {String} target
 	 * @param {function(xmlSource, textStatus, xhr)} callback
 	 */
 	fetchSVG: function(target, callback) {
-		var params = {
-			action: 'svgproxy',
-			file: 'File:' + target
-		};
-		$.get(mwSVG.api(), params, callback, 'text');
+		$.get(mwSVG.config('wgFileFullUrl'), {}, callback, 'text');
 	},
 
 	/**
