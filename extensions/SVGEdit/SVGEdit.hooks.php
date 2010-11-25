@@ -1,6 +1,7 @@
 <?php
 /**
  * SVGEdit extension: hooks
+ * Backported into MediaWiki 1.14.1 -- Vitaliy Filippov <vitalif@mail.ru>
  * @copyright 2010 Brion Vibber <brion@pobox.com>
  */
 
@@ -16,9 +17,25 @@ class SVGEditHooks {
 	 * @param $skin Skin current skin
 	 */
 	public static function beforePageDisplay( $out, $skin ) {
-		$title = $out->getTitle();
-		if( $title && $title->getNamespace() == NS_FILE ) {
-			$out->addModules('ext.svgedit.editButton');
+		global $wgTitle, $wgScriptPath, $wgScriptExtension;
+		if( $wgTitle && $wgTitle->getNamespace() == NS_FILE &&
+			(!$_REQUEST['action'] || $_REQUEST['action'] == 'view' || $_REQUEST['action'] == 'purge') &&
+			preg_match( '/\.svg$/is', $wgTitle->getText() ) )
+		{
+			$out->addHTML(
+'<iframe id="svg-edit" style="display: none; position: fixed; left: 2.5%; top: 2.5%; width: 95%; height: 95%; z-index: 99999"></iframe>
+<input type="button" value="Edit drawing" onclick="triggerSVGEdit()" />
+<script language="JavaScript">
+if (!window.wgScriptExtension)
+    window.wgScriptExtension = "'.addslashes($wgScriptExtension).'";
+function triggerSVGEdit()
+{
+  var i = document.getElementById("svg-edit");
+  i.style.display = "";
+  i.src = wgScriptPath + "/extensions/SVGEdit/svg-edit/svg-editor.html";
+}
+</script>'
+			);
 		}
 		return true;
 	}

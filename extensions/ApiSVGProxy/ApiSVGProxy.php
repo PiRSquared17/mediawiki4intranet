@@ -5,6 +5,8 @@
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
+ * Backported into MediaWiki 1.14.1 -- Vitaliy Filippov <vitalif@mail.ru>
+ *
  * @file
  * @ingroup Extensions
  * @author Roan Kattouw <roan.kattouw@gmail.com>
@@ -36,3 +38,7 @@ $wgAutoloadClasses['ApiSVGProxy'] = $dir . 'ApiSVGProxy.body.php';
 $wgAPIModules['svgproxy'] = 'ApiSVGProxy';
 
 $wgExtensionMessagesFiles['ApiSVGProxy'] = dirname( __FILE__ ) . '/ApiSVGProxy.i18n.php';
+
+// MW < 1.15 compatibility
+if (!class_exists('ApiFormatRaw'))
+	$wgAutoloadClasses['ApiFormatRaw'] = $dir . 'ApiFormatRaw.php';
