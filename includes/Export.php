@@ -446,7 +446,7 @@ class XmlDumpWriter {
 			list( $name ) = array_keys( $this->binaries );
 			$filename = $this->binaries[ $name ];
 			unset( $this->binaries[ $name ] );
-			$fp = fopen( $filename, "rb" );
+			$fp = @fopen( $filename, "rb" );
 			if ( !$fp )
 				return $this->nextPart();
 			$this->currentpart = array(
@@ -460,10 +460,10 @@ class XmlDumpWriter {
 				"Content-ID: $name\n" .
 				"Content-Length: ".filesize($filename)."\n\n";
 		}
-		$data .= fread( $this->currentpart['fp'], 1048576 );
-		if ( feof( $this->currentpart['fp'] ) )
+		$data .= @fread( $this->currentpart['fp'], 1048576 );
+		if ( @feof( $this->currentpart['fp'] ) )
 		{
-			fclose( $this->currentpart['fp'] );
+			@fclose( $this->currentpart['fp'] );
 			$this->currentpart = NULL;
 		}
 		return $data;
