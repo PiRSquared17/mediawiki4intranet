@@ -230,7 +230,7 @@ svgEditor.addExtension("mediawiki", {
 			.text('Cancel')
 			.click(function() {
 				if (window.parent) {
-					window.parent.$('#svg-edit').remove();
+					window.parent.document.getElementById('svg-edit').style.display='none';
 				} else {
 					window.close();
 				}
