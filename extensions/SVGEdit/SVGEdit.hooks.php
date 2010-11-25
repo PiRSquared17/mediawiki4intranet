@@ -1,7 +1,6 @@
 <?php
 /**
  * SVGEdit extension: hooks
- * Backported into MediaWiki 1.14.1 -- Vitaliy Filippov <vitalif@mail.ru>
  * @copyright 2010 Brion Vibber <brion@pobox.com>
  */
 
@@ -18,7 +17,7 @@ class SVGEditHooks {
 	 */
 	public static function beforePageDisplay( $out, $skin ) {
 		global $wgTitle, $wgScriptPath, $wgScriptExtension;
-		if( $wgTitle && $wgTitle->getNamespace() == NS_FILE &&
+		if( $wgTitle && $wgTitle->getNamespace() == NS_FILE && ( $file = wfFindFile( $wgTitle ) ) &&
 			(!$_REQUEST['action'] || $_REQUEST['action'] == 'view' || $_REQUEST['action'] == 'purge') &&
 			preg_match( '/\.svg$/is', $wgTitle->getText() ) )
 		{
@@ -28,6 +27,7 @@ class SVGEditHooks {
 <script language="JavaScript">
 if (!window.wgScriptExtension)
     window.wgScriptExtension = "'.addslashes($wgScriptExtension).'";
+window.wgFileFullUrl = "'.addslashes($file->getFullUrl()).'";
 function triggerSVGEdit()
 {
   var i = document.getElementById("svg-edit");
