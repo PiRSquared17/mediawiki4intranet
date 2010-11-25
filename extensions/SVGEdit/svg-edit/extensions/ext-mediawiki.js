@@ -10,8 +10,6 @@
  *
  */
 
-var mediaWiki = window.parent.mediaWiki;
-
 /**
  * Utility class for building multipart form submission data.
  *
@@ -99,7 +97,7 @@ var mwSVG = {
 	 * @return mixed return value
 	 */
 	config: function(key) {
-		return mediaWiki.config.get(key);
+		return window.parent[key];
 	},
 
 	/**
@@ -162,16 +160,15 @@ var mwSVG = {
 	saveSVG: function(target, data, comment, callback) {
 		mwSVG.fetchToken(target, function(token) {
 			var multipart = new FormMultipart({
-				action: 'upload',
-				format: 'json',
-
-				filename: target,
+				wpDestFile: target,
+				wpSourceType: 'file',
 				comment: comment,
 				token: token,
-				ignorewarnings: 'true'
+				wpIgnoreWarning: 'true',
+				wpUpload: 'upload',
 			});
 			multipart.addPart({
-				name: 'file',
+				name: 'wpUploadFile',
 				filename: target,
 				type: 'image/svg+xml',
 				encoding: 'binary',
@@ -184,7 +181,7 @@ var mwSVG = {
 
 			var ajaxSettings = {
 				type: 'POST',
-				url: mwSVG.api(),
+				url: mwSVG.config('wgScriptPath') + '/index.php?title=Special:Upload',
 				contentType: multipart.contentType(),
 				data: multipart.toString(),
 				processData: false,
@@ -198,6 +195,7 @@ var mwSVG = {
 
 svgEditor.addExtension("mediawiki", {
 	callback: function() {
+
 		// Load up the original file!
 		var filename = mwSVG.config('wgTitle');
 		mwSVG.fetchSVG(filename, function(xmlSource, textStatus, xhr) {
@@ -219,7 +217,12 @@ svgEditor.addExtension("mediawiki", {
 				var svg = svgCanvas.getSvgString();
 				var comment = "Modified in svg-edit";
 				mwSVG.saveSVG(filename, svg, comment, function(data, textStatus, xhr) {
-					if (data.upload && data.upload.result == "Success") {
+					if (// For JSON responses
+						data && data.upload && data.upload.result == "Success" ||
+						// For HTML responses from Special:Upload
+						xhr.status == 200 && xhr.responseText.indexOf('<!DOCTYPE html') >= 0 &&
+						xhr.responseText.indexOf('var wgTitle = "'+filename.replace('"', '\\"')) >= 0)
+					{
 						// refresh parent window
 						window.parent.location = window.parent.location;
 					} else {
@@ -239,4 +242,3 @@ svgEditor.addExtension("mediawiki", {
 			});
 	}
 });
-
