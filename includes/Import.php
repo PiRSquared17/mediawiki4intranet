@@ -1201,13 +1201,13 @@ class ImportStreamSource {
 				/* Читаем данные */
 				$tempfile = tempnam(wfTempDir(), "imp");
 				$tempfp = fopen($tempfile, "wb");
-				if (is_numeric($part[content_length]))
+				if (is_numeric($part['content_length']))
 				{
 					$done = 0;
 					$buf = true;
-					while ($done < $part[content_length] && $buf)
+					while ($done < $part['content_length'] && $buf)
 					{
-						$buf = fread($this->mHandle, min(self::BUF_SIZE, $part[content_length] - $done));
+						$buf = fread($this->mHandle, min(self::BUF_SIZE, $part['content_length'] - $done));
 						if ($tempfp)
 							fwrite($tempfp, $buf);
 						$done += strlen($buf);
