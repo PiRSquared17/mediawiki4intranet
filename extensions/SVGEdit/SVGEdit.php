@@ -2,6 +2,7 @@
 
 /**
  * @copyright 2010 Brion Vibber <brion@pobox.com>
+ * Backported into MediaWiki 1.14.1 -- Vitaliy Filippov <vitalif@mail.ru>
  *
  * todo:
  * JS code: load on File pages (ok)
@@ -19,17 +20,3 @@
 $wgHooks['BeforePageDisplay'][] = 'SVGEditHooks::beforePageDisplay';
 
 $wgAutoloadClasses['SVGEditHooks'] = dirname( __FILE__ ) . '/SVGEdit.hooks.php';
-
-$myResourceTemplate = array(
-	'localBasePath' => dirname( __FILE__ ) . '/modules',
-	'remoteExtPath' => 'SVGEdit/modules',
-	'group' => 'ext.svgedit',
-);
-$wgResourceModules += array(
-	'ext.svgedit.editButton' => $myResourceTemplate + array(
-		'scripts' => 'ext.svgedit.editButton.js',
-		'messages' => array(
-			'svgedit-editbutton-edit',
-		),
-	),
-);
