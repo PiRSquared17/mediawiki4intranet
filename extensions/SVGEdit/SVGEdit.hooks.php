@@ -23,7 +23,7 @@ class SVGEditHooks {
 		{
 			$out->addHTML(
 '<iframe id="svg-edit" style="display: none; position: fixed; left: 2.5%; top: 2.5%; width: 95%; height: 95%; z-index: 99999"></iframe>
-<input type="button" value="Edit drawing" onclick="triggerSVGEdit()" />
+<input type="button" value="Edit drawing with SVGEdit" onclick="triggerSVGEdit()" style="font-weight: bold" />
 <script language="JavaScript">
 if (!window.wgScriptExtension)
     window.wgScriptExtension = "'.addslashes($wgScriptExtension).'";
