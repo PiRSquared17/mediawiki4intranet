@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1282918030 -14400
+# Date 1291048423 -10800
 Depends on: Y-000-debug-wikilog.diff
 
 Patch includes several simple fixes required for MediaWiki to run under
@@ -8,7 +8,7 @@ more restrictive PHP 5.3.x.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 1ef54a1524a3 -r 35b7a2128e61 extensions/Interwiki/Interwiki_body.php
+diff -r 2951a613ce57 -r cbb89bc3fcba extensions/Interwiki/Interwiki_body.php
 --- extensions/Interwiki/Interwiki_body.php
 +++ extensions/Interwiki/Interwiki_body.php
 @@ -179,7 +179,7 @@
@@ -31,7 +31,7 @@ diff -r 1ef54a1524a3 -r 35b7a2128e61 extensions/Interwiki/Interwiki_body.php
  			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
  			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
  			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
-diff -r 1ef54a1524a3 -r 35b7a2128e61 includes/FileDeleteForm.php
+diff -r 2951a613ce57 -r cbb89bc3fcba includes/FileDeleteForm.php
 --- includes/FileDeleteForm.php
 +++ includes/FileDeleteForm.php
 @@ -108,7 +108,7 @@
@@ -43,7 +43,19 @@ diff -r 1ef54a1524a3 -r 35b7a2128e61 includes/FileDeleteForm.php
  					if( $article->doDeleteArticle( $reason, $suppress, $id ) ) {
  						global $wgRequest;
  						if( $wgRequest->getCheck( 'wpWatch' ) ) {
-diff -r 1ef54a1524a3 -r 35b7a2128e61 languages/Language.php
+diff -r 2951a613ce57 -r cbb89bc3fcba includes/Title.php
+--- includes/Title.php
++++ includes/Title.php
+@@ -2445,7 +2445,7 @@
+ 				if( $nt->getText() != wfStripIllegalFilenameChars( $nt->getText() ) ) {
+ 					$errors[] = array('imageinvalidfilename');
+ 				}
+-				if( !File::checkExtensionCompatibility( $file, $nt->getDBKey() ) ) {
++				if( File::checkExtensionCompatibility( $file, $nt->getDBKey() ) === false ) {
+ 					$errors[] = array('imagetypemismatch');
+ 				}
+ 			}
+diff -r 2951a613ce57 -r cbb89bc3fcba languages/Language.php
 --- languages/Language.php
 +++ languages/Language.php
 @@ -1755,7 +1755,7 @@
