@@ -56,8 +56,6 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $wgMainCacheType = CACHE_NONE;
 $wgMemCachedServers = array();
 
-$wgInterwikiMagic = false;
-
 $wgRawHtml              = true;
 $wgAllowUserJs          = true;
 $wgNamespacesWithSubpages[NS_MAIN] = true;
