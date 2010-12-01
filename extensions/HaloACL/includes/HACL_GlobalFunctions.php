@@ -86,6 +86,7 @@ function enableHaloACL()
     $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
     $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
     $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
+    $wgHooks['ArticleUndelete'][]       = 'HACLParserFunctions::articleUndelete';
     $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
     $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
 
