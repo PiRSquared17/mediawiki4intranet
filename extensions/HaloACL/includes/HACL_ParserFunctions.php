@@ -629,7 +629,7 @@ class HACLParserFunctions
         if ($title->getNamespace() == HACL_NS_ACL)
         {
             //--- Remove old SD / Group ---
-            self::removeOldDef($title);
+            self::removeOldDef($title, true);
 
             //--- Create an instance for parsing this article
             self::$mInstance = new self($title);
@@ -653,6 +653,18 @@ class HACLParserFunctions
         return true;
     }
 
+    /* Also do handle article undeletes */
+    public static function articleUndelete(&$title, $isnew)
+    {
+        if ($title->getNamespace() == HACL_NS_ACL)
+        {
+            global $wgUser;
+            $article = new Article($title);
+            self::articleSaveComplete($article, $wgUser, $article->getContent());
+        }
+        return true;
+    }
+
     /**
      * This method is called, when an article is deleted. If the article
      * belongs to the namespace ACL (i.e. a right, SD, group or whitelist)
@@ -669,7 +681,7 @@ class HACLParserFunctions
         if ($title->getNamespace() == HACL_NS_ACL)
         {
             //--- Remove old SD / Group ---
-            self::removeOldDef($title);
+            self::removeOldDef($title, false);
         }
         else
         {
@@ -733,7 +745,7 @@ class HACLParserFunctions
     //--- Private methods ---
 
     // Check if there is some corresponding definition in the ACL database and remove it.
-    private static function removeOldDef($title)
+    private static function removeOldDef($title, $for_update = false)
     {
         $id = $title->getArticleId();
         try
@@ -754,13 +766,21 @@ class HACLParserFunctions
             {
                 $sd = HACLSecurityDescriptor::newFromID($id);
                 // It is a right or security descriptor
-                // => remove all current rights, however the right remains in
-                //    the hierarchy of rights, as it might be "revived"
-                $sd->removeAllRights();
-                // The empty right article can now be changed by everyone
-                $sd->setManageGroups(null);
-                $sd->setManageUsers("*,#");
-                $sd->save();
+                if ($for_update)
+                {
+                    // remove all current rights, however the right remains in
+                    // the hierarchy of rights, as it might be "revived"
+                    $sd->removeAllRights();
+                    // The empty right article can now be changed by everyone
+                    $sd->setManageGroups(null);
+                    $sd->setManageUsers("*,#");
+                    $sd->save();
+                }
+                else
+                {
+                    // delete SD permanently
+                    $sd->delete();
+                }
             }
             catch (HACLSDException $e)
             {
