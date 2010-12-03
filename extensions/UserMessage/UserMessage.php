@@ -34,15 +34,16 @@
 
 /* INSTALLATION */
 
-/* Copy source to extensions/UserMessage/ subdirectory of your Wiki installation
-   and add following lines to your LocalSettings.php:
-
-   require_once("extensions/UserMessage/UserMessage.php");
-   $wgUserMessageDelimiter = '@'; // default
-   $wgUserMessageAllowCustomization = array(
-       'edittools' => true,
-       // 'message_key' => true for each message that you want to allow to be customized
-   );
+/* 1. Copy source to extensions/UserMessage/ subdirectory of your Wiki installation
+   2. Add following lines to your LocalSettings.php:
+        require_once("extensions/UserMessage/UserMessage.php");
+        $wgUserMessageDelimiter = '@'; // default
+        $wgUserMessageAllowCustomization = array(
+            'edittools' => true,
+            // 'message_key' => true for each message that you want to allow to be customized
+        );
+   3. Put some text on MediaWiki:editingpersonalinterface page. This text will be shown to
+      users editing their personal interface messages.
 */
 
 $wgExtensionCredits['other'][] = array(
