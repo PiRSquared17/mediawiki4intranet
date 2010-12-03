@@ -95,7 +95,7 @@ class HACLEvaluator {
      *         true
      */
     public static function userCan($title, $user, $action, &$result) {
-        global $wgRequest;
+        global $wgRequest, $wgTitle;
 
         self::startLog($title, $user, $action);
 
@@ -149,9 +149,10 @@ class HACLEvaluator {
         }
 
         $articleID = (int) $title->getArticleID();
-        if ($articleID == 0) {
-            $articleID = haclfArticleID($title->getFullText());
-        }
+        if ($title->getText() === "")
+            $articleID = haclfArticleID($wgTitle->getPrefixedText());
+        if ($articleID == 0)
+            $articleID = haclfArticleID($title->getPrefixedText());
         $userID = $user->getId();
 
         if ($articleID == 0) {
