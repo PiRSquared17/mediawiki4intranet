@@ -21,30 +21,33 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-/*
+/* ABOUT */
 
-This extension allows to customize messages used by wfMsg(...),
-editable through generic article edit interface (MediaWiki:...),
-to be customized on per-user basis.
+/* This extension allows to customize messages used by wfMsg(...),
+   editable through generic article edit interface (MediaWiki:...),
+   to be customized on per-user basis.
 
-It is useful, for example, for (Bug 61726) personalization of
-MediaWiki:Edittools. Personalized messages will have names like
-MediaWiki:Edittools@UserName.
+   It is useful, for example, for (CustIS Bug 61726) personalization of
+   MediaWiki:Edittools. Personalized messages will have names like
+   MediaWiki:Edittools@UserName.
+*/
 
-USAGE (LocalSettings.php):
+/* INSTALLATION */
 
-require_once("extensions/UserMessage/UserMessage.php");
-$wgUserMessageDelimiter = '@'; // default
-$wgUserMessageAllowCustomization = array(
-    'edittools' => true,
-    // 'message_key' => true for each message that you want to allow to be customized
-);
+/* Copy source to extensions/UserMessage/ subdirectory of your Wiki installation
+   and add following lines to your LocalSettings.php:
 
+   require_once("extensions/UserMessage/UserMessage.php");
+   $wgUserMessageDelimiter = '@'; // default
+   $wgUserMessageAllowCustomization = array(
+       'edittools' => true,
+       // 'message_key' => true for each message that you want to allow to be customized
+   );
 */
 
 $wgExtensionCredits['other'][] = array(
     'name'         => 'User Message',
-    'version'      => '2010-04-05',
+    'version'      => '2010-12-03',
     'author'       => 'Vitaliy Filippov',
     'url'          => 'http://yourcmc.ru/wiki/index.php/UserMessage_(MediaWiki)',
     'description'  => 'Allows customization of MediaWiki:xxx messages on a per-user basis',
@@ -60,7 +63,7 @@ function efUserMessageIsPersonalMessage($title)
     /* Match keys like MediaWiki:Something_Customisable@UserName */
     return $title->getNamespace() == NS_MEDIAWIKI &&
         ($newkey = $wgContLang->lcfirst($title->getText())) &&
-        mb_strrpos($newkey, $wgUserMessageDelimiter) !== false &&
+        ($p = mb_strrpos($newkey, $wgUserMessageDelimiter)) !== false &&
         $wgUserMessageAllowCustomization[mb_substr($newkey, 0, $p)] &&
         User::newFromName(mb_substr($newkey, $p+mb_strlen($delim)));
 }
@@ -100,7 +103,7 @@ function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transfor
 
 function efUserMessageAllowEditPersonalMessages(&$title, &$user, $action, &$result)
 {
-    if (efUserMessageIsPersonalMessage($title) && $action == 'edit')
+    if (efUserMessageIsPersonalMessage($title) && ($action == 'edit' || $action == 'create'))
     {
         /* Allow to edit personal messages */
         $result = true;
