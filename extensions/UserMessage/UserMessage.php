@@ -50,39 +50,61 @@ $wgExtensionCredits['other'][] = array(
     'description'  => 'Allows customization of MediaWiki:xxx messages on a per-user basis',
 );
 $wgHooks['NormalizeMessageKey'][] = 'efUserMessageNormalizeMessageKey';
+$wgHooks['userCan'][] = 'efUserMessageAllowEditPersonalMessages';
 if (is_null($wgUserMessageAllowCustomization))
     $wgUserMessageAllowCustomization = array('edittools' => true);
+
+function efUserMessageIsPersonalMessage($title)
+{
+    global $wgContLang, $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
+    /* Match keys like MediaWiki:Something_Customisable@UserName */
+    return $title->getNamespace() == NS_MEDIAWIKI &&
+        ($newkey = $wgContLang->lcfirst($title->getText())) &&
+        mb_strrpos($newkey, $wgUserMessageDelimiter) !== false &&
+        $wgUserMessageAllowCustomization[mb_substr($newkey, 0, $p)] &&
+        User::newFromName(mb_substr($newkey, $p+mb_strlen($delim)));
+}
 
 function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transform)
 {
     global $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
-    global $wgUser, $wgMessageCache, $wgTitle, $wgContLang;
-    $delim = $wgUserMessageDelimiter;
-    if (!$delim)
-        $delim = '@';
+    global $wgUser, $wgMessageCache, $wgTitle;
+    if (!$wgUserMessageDelimiter)
+        $wgUserMessageDelimiter = '@';
     if (array_key_exists($key, $wgUserMessageAllowCustomization) && $wgUser && $wgUser->getID() &&
         is_object($wgMessageCache))
     {
-        $newkey = $key.$delim.$wgUser->getName();
+        /* This is a customisable message */
+        $newkey = $key.$wgUserMessageDelimiter.$wgUser->getName();
         if (!wfEmptyMsg($newkey, $wgMessageCache->get($newkey, true, $langCode)))
             $key = $newkey;
     }
-    elseif (($p = mb_strrpos($key, $delim)) !== false &&
+    elseif (($p = mb_strrpos($key, $wgUserMessageDelimiter)) !== false &&
         $wgUserMessageAllowCustomization[mb_substr($key, 0, $p)] &&
-        User::newFromName(mb_substr($key, $p+mb_strlen($delim))))
+        User::newFromName(mb_substr($key, $p+mb_strlen($wgUserMessageDelimiter))))
     {
+        /* Personal message is requested, but no such exists for a user,
+           so try a default one */
         $key = mb_substr($key, 0, $p);
         $useDB = true;
     }
     elseif ($key == 'editinginterface' &&
-        $wgTitle->getNamespace() == NS_MEDIAWIKI &&
-        ($newkey = $wgContLang->lcfirst($wgTitle->getText())) &&
-        mb_strrpos($newkey, $delim) !== false &&
-        $wgUserMessageAllowCustomization[mb_substr($newkey, 0, $p)] &&
-        User::newFromName(mb_substr($newkey, $p+mb_strlen($delim))))
+        efUserMessageIsPersonalMessage($wgTitle))
     {
+        /* We are editing a personal message */
         $key = 'editingpersonalinterface';
         $useDB = true;
+    }
+    return true;
+}
+
+function efUserMessageAllowEditPersonalMessages(&$title, &$user, $action, &$result)
+{
+    if (efUserMessageIsPersonalMessage($title) && $action == 'edit')
+    {
+        /* Allow to edit personal messages */
+        $result = true;
+        return false;
     }
     return true;
 }
