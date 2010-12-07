@@ -2119,7 +2119,7 @@ function wfShellExec( $cmd, &$retval=null ) {
 				$cmd = escapeshellarg( $script ) . " $time $mem $filesize " . escapeshellarg( $cmd );
 			}
 		}
-	} elseif ( php_uname( 's' ) == 'Windows NT' ) {
+	} elseif ( php_uname( 's' ) == 'Windows NT' && substr( php_uname( 'v' ), 6, 4 ) <= 6001 ) {
 		# This is a hack to work around PHP's flawed invocation of cmd.exe
 		# http://news.php.net/php.internals/21796
 		$cmd = '"' . $cmd . '"';
