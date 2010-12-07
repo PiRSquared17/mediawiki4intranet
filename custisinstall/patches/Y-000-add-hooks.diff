@@ -1,10 +1,22 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1289673493 -10800
+# Date 1291735922 -10800
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 
-diff -r 2951a613ce57 -r ab34df9e9d20 includes/ChangesList.php
+diff -r 2951a613ce57 -r ca2a932b855a extensions/PdfHandler/PdfHandler_body.php
+--- extensions/PdfHandler/PdfHandler_body.php
++++ extensions/PdfHandler/PdfHandler_body.php
+@@ -113,7 +113,7 @@
+ 		if ( !wfMkdirParents( dirname( $dstPath ) ) )
+ 			return $this->doThumbError( $width, $height, 'thumbnail_dest_directory' );
+ 
+-		$cmd = '(' . wfEscapeShellArg( $wgPdfProcessor );
++		$cmd = '(' . $wgPdfProcessor;
+ 		$cmd .= " -sDEVICE=jpeg -sOutputFile=- -dFirstPage={$page} -dLastPage={$page}";
+ 		$cmd .= " -r{$wgPdfHandlerDpi} -dBATCH -dNOPAUSE -q ". wfEscapeShellArg( $srcPath );
+ 		$cmd .= " | " . wfEscapeShellArg( $wgPdfPostProcessor );
+diff -r 2951a613ce57 -r ca2a932b855a includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
 @@ -552,6 +552,7 @@
@@ -15,7 +27,7 @@ diff -r 2951a613ce57 -r ab34df9e9d20 includes/ChangesList.php
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 2951a613ce57 -r ab34df9e9d20 includes/Wiki.php
+diff -r 2951a613ce57 -r ca2a932b855a includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
 @@ -142,6 +142,8 @@

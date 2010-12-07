@@ -72,7 +72,7 @@ $wgDjvuTxt = "djvutxt";
 $wgDjvuPostProcessor = "ppmtojpeg";
 $wgDjvuOutputExtension = 'jpg';
 
-$wgPdfProcessor = 'gs';
+$wgPdfProcessor = 'nice -n 20 gs';
 $wgPdfPostProcessor = $wgImageMagickConvertCommand;
 $wgPdfInfo = 'pdfinfo';
 
