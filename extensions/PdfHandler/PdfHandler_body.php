@@ -113,7 +113,7 @@ class PdfHandler extends ImageHandler {
 		if ( !wfMkdirParents( dirname( $dstPath ) ) )
 			return $this->doThumbError( $width, $height, 'thumbnail_dest_directory' );
 
-		$cmd = '(' . wfEscapeShellArg( $wgPdfProcessor );
+		$cmd = '(' . $wgPdfProcessor;
 		$cmd .= " -sDEVICE=jpeg -sOutputFile=- -dFirstPage={$page} -dLastPage={$page}";
 		$cmd .= " -r{$wgPdfHandlerDpi} -dBATCH -dNOPAUSE -q ". wfEscapeShellArg( $srcPath );
 		$cmd .= " | " . wfEscapeShellArg( $wgPdfPostProcessor );
