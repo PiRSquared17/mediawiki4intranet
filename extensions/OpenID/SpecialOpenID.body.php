@@ -264,13 +264,12 @@ class SpecialOpenID extends SpecialPage {
 
 		if ($ax_request) {
 			$auth_request->addExtension($ax_request);
-		}		
+		}
 
 		$process_url = $this->scriptUrl( $finish_page );
 
-		if ( $auth_request->shouldSendRedirect() ) {
-			$redirect_url = $auth_request->redirectURL( $trust_root,
-													   $process_url );
+		$redirect_url = $auth_request->redirectURL( $trust_root, $process_url );
+		if ( strlen( $redirect_url ) <= 2048 ) {
 			if ( Auth_OpenID::isFailure( $redirect_url ) ) {
 				displayError( "Could not redirect to server: " . $redirect_url->message );
 			} else {
