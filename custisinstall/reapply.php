@@ -6,7 +6,7 @@
 # (c) Vitaliy Filippov, 2010
 
 $PATCHED_DIRS = explode(' ', 'includes languages skins/common');
-$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree AnyWikiDraw MediaFunctions Cite DeleteBatch Interwiki');
+$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree AnyWikiDraw MediaFunctions Cite DeleteBatch Interwiki PdfHandler');
 $CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php');
 
 $SELFDIR = realpath(dirname(__FILE__));
