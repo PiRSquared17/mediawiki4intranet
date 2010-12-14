@@ -23,6 +23,15 @@
   *
   */
 
+class PdfThumbnailImage extends ThumbnailImage
+{
+	function toHtml( $options = array() )
+	{
+		$options['custom-url-link'] = $this->file->getURL() . '#page=' . $this->page;
+		return parent::toHtml( $options );
+	}
+}
+
 class PdfHandler extends ImageHandler {
 
 	function isEnabled() {
@@ -107,13 +116,13 @@ class PdfHandler extends ImageHandler {
 			return $this->doTHumbError( $width, $height, 'pdf_page_error' );
 
 		if ( $flags & self::TRANSFORM_LATER )
-			return new ThumbnailImage( $image, $dstUrl, $width,
+			return new PdfThumbnailImage( $image, $dstUrl, $width,
 						   $height, $dstPath, $page );
 
 		if ( !wfMkdirParents( dirname( $dstPath ) ) )
 			return $this->doThumbError( $width, $height, 'thumbnail_dest_directory' );
 
-		$cmd = '(' . wfEscapeShellArg( $wgPdfProcessor );
+		$cmd = '(' . $wgPdfProcessor;
 		$cmd .= " -sDEVICE=jpeg -sOutputFile=- -dFirstPage={$page} -dLastPage={$page}";
 		$cmd .= " -r{$wgPdfHandlerDpi} -dBATCH -dNOPAUSE -q ". wfEscapeShellArg( $srcPath );
 		$cmd .= " | " . wfEscapeShellArg( $wgPdfPostProcessor );
@@ -134,7 +143,7 @@ class PdfHandler extends ImageHandler {
 				wfHostname(), $retval, trim($err), $cmd ) );
 			return new MediaTransformError( 'thumbnail_error', $width, $height, $err );
 		} else {
-			return new ThumbnailImage( $image, $dstUrl, $width, $height, $dstPath, $page );
+			return new PdfThumbnailImage( $image, $dstUrl, $width, $height, $dstPath, $page );
 		}
 	}
 
