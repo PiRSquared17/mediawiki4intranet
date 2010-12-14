@@ -197,3 +197,5 @@ $wgNamespacesToBeSearchedDefault = array(
 );
 
 $wgShellLocale = 'ru_RU.UTF-8';
+
+$wgNoCopyrightWarnings = true;
