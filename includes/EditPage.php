@@ -1275,14 +1275,16 @@ class EditPage {
 			htmlspecialchars( wfMsg( 'edithelp' ) ).'</a> '.
 			htmlspecialchars( wfMsg( 'newwindow' ) );
 
-		global $wgRightsText;
-		if ( $wgRightsText ) {
-			$copywarnMsg = array( 'copyrightwarning',
-				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]',
-				$wgRightsText );
-		} else {
-			$copywarnMsg = array( 'copyrightwarning2',
-				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]' );
+		global $wgRightsText, $wgNoCopyrightWarnings;
+		if ( !$wgNoCopyrightWarnings ) {
+			if ( $wgRightsText ) {
+				$copywarnMsg = array( 'copyrightwarning',
+					'[[' . wfMsgForContent( 'copyrightpage' ) . ']]',
+					$wgRightsText );
+			} else {
+				$copywarnMsg = array( 'copyrightwarning2',
+					'[[' . wfMsgForContent( 'copyrightpage' ) . ']]' );
+			}
 		}
 
 		if ( $wgUser->getOption('showtoolbar') and !$this->isCssJsSubpage ) {
@@ -1429,7 +1431,8 @@ END
 );
 		$this->showTextbox1( $classes );
 
-		$wgOut->wrapWikiMsg( "<div id=\"editpage-copywarn\">\n$1\n</div>", $copywarnMsg );
+		if ( !$wgNoCopyrightWarnings )
+			$wgOut->wrapWikiMsg( "<div id=\"editpage-copywarn\">\n$1\n</div>", $copywarnMsg );
 		$wgOut->addHTML( <<<END
 {$this->editFormTextAfterWarn}
 {$metadata}
@@ -1464,16 +1467,7 @@ END
 
 		$this->showEditTools();
 
-		$wgOut->addHTML( <<<END
-{$this->editFormTextAfterTools}
-<div class='templatesUsed'>
-{$formattedtemplates}
-</div>
-<div class='hiddencats'>
-{$formattedhiddencats}
-</div>
-END
-);
+		$wgOut->addHTML( $this->editFormTextAfterTools );
 
 		if ( $this->isConflict && wfRunHooks( 'EditPageBeforeConflictDiff', array( &$this, &$wgOut ) ) ) {
 			$wgOut->wrapWikiMsg( '==$1==', "yourdiff" );
@@ -1487,6 +1481,17 @@ END
 		}
 		$wgOut->addHTML( $this->editFormTextBottom );
 		$wgOut->addHTML( "</form>\n" );
+
+		$wgOut->addHTML( <<<END
+<div class='templatesUsed'>
+{$formattedtemplates}
+</div>
+<div class='hiddencats'>
+{$formattedhiddencats}
+</div>
+END
+);
+
 		if ( !$wgUser->getOption( 'previewontop' ) ) {
 			$this->displayPreviewArea( $previewOutput, false );
 		}
