@@ -27,7 +27,8 @@ class PdfThumbnailImage extends ThumbnailImage
 {
 	function toHtml( $options = array() )
 	{
-		$options['custom-url-link'] = $this->file->getURL() . '#page=' . $this->page;
+		if ( $options['file-link'] )
+			$options['custom-url-link'] = $this->file->getURL() . '#page=' . $this->page;
 		return parent::toHtml( $options );
 	}
 }
