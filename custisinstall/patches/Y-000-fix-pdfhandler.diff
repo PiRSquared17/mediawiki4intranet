@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1292341713 -10800
+# Date 1292509033 -10800
 Bug 57350 - No wgPdfProcessor escape, add #page= into pdf links
 
-diff -r 2951a613ce57 -r 4c140a524836 extensions/PdfHandler/PdfHandler_body.php
+diff -r 2951a613ce57 -r 7789c58e6365 extensions/PdfHandler/PdfHandler_body.php
 --- extensions/PdfHandler/PdfHandler_body.php
 +++ extensions/PdfHandler/PdfHandler_body.php
-@@ -23,6 +23,15 @@
+@@ -23,6 +23,16 @@
    *
    */
  
@@ -14,7 +14,8 @@ diff -r 2951a613ce57 -r 4c140a524836 extensions/PdfHandler/PdfHandler_body.php
 +{
 +	function toHtml( $options = array() )
 +	{
-+		$options['custom-url-link'] = $this->file->getURL() . '#page=' . $this->page;
++		if ( $options['file-link'] )
++			$options['custom-url-link'] = $this->file->getURL() . '#page=' . $this->page;
 +		return parent::toHtml( $options );
 +	}
 +}
@@ -22,7 +23,7 @@ diff -r 2951a613ce57 -r 4c140a524836 extensions/PdfHandler/PdfHandler_body.php
  class PdfHandler extends ImageHandler {
  
  	function isEnabled() {
-@@ -107,13 +116,13 @@
+@@ -107,13 +117,13 @@
  			return $this->doTHumbError( $width, $height, 'pdf_page_error' );
  
  		if ( $flags & self::TRANSFORM_LATER )
@@ -38,7 +39,7 @@ diff -r 2951a613ce57 -r 4c140a524836 extensions/PdfHandler/PdfHandler_body.php
  		$cmd .= " -sDEVICE=jpeg -sOutputFile=- -dFirstPage={$page} -dLastPage={$page}";
  		$cmd .= " -r{$wgPdfHandlerDpi} -dBATCH -dNOPAUSE -q ". wfEscapeShellArg( $srcPath );
  		$cmd .= " | " . wfEscapeShellArg( $wgPdfPostProcessor );
-@@ -134,7 +143,7 @@
+@@ -134,7 +144,7 @@
  				wfHostname(), $retval, trim($err), $cmd ) );
  			return new MediaTransformError( 'thumbnail_error', $width, $height, $err );
  		} else {
