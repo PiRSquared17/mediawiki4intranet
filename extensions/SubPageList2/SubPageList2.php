@@ -168,7 +168,8 @@ class SubpageList
     {
         global $egSubpagelistDefaultTemplate, $wgTitle;
         foreach ($options as $k => &$v)
-            $v = trim($this->preprocess($wgTitle, $v));
+            if (trim($v))
+                $v = trim($this->preprocess($wgTitle, $v));
         unset($v);
         if (($c = str_replace(' ', '_', $options['category'])) && $c != '-1')
         {
