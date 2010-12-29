@@ -6,7 +6,13 @@ setlocale(LC_NUMERIC, 'C');
 if (defined('MW_INSTALL_PATH'))
     $IP = MW_INSTALL_PATH;
 else
-    $IP = realpath(dirname(__FILE__) . "/..");
+{
+    foreach (debug_backtrace() as $frame)
+        if (strtolower(substr($frame['file'], -strlen('LocalSettings.php'))) == 'localsettings.php')
+            $IP = realpath(dirname($frame['file']));
+    if (!$IP)
+        $IP = realpath(dirname(__FILE__) . '/..');
+}
 
 $path = array($IP, "$IP/includes", "$IP/includes/specials","$IP/languages");
 set_include_path(implode(PATH_SEPARATOR, $path) . PATH_SEPARATOR . get_include_path());
