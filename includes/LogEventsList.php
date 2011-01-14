@@ -230,6 +230,12 @@ class LogEventsList {
 		global $wgLang, $wgUser, $wgContLang;
 
 		$title = Title::makeTitle( $row->log_namespace, $row->log_title );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		if (!$title->userCanReadEx()) {
+			return '';
+		}
+/*op-patch|TS|2009-06-19|end*/  
+		
 		$time = $wgLang->timeanddate( wfTimestamp(TS_MW, $row->log_timestamp), true );
 		// User links
 		if( self::isDeleted($row,LogPage::DELETED_USER) ) {
