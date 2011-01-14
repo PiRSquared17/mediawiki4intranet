@@ -27,6 +27,7 @@ class Title {
 	//@{
 	static private $titleCache=array();
 	static private $interwikiCache=array();
+	static private $lastError=NULL;
 	//@}
 
 	/**
@@ -2012,6 +2013,7 @@ class Title {
 		global $wgContLang, $wgLocalInterwiki, $wgCapitalLinks;
 
 		# Initialisation
+		self::$lastError = NULL;
 		static $rxTc = false;
 		if( !$rxTc ) {
 			# Matching titles will be held as illegal.
@@ -2044,11 +2046,13 @@ class Title {
 		$dbkey = trim( $dbkey, '_' );
 
 		if ( '' == $dbkey ) {
+			self::$lastError = 'title-invalid-empty';
 			return false;
 		}
 
 		if( false !== strpos( $dbkey, UTF8_REPLACEMENT ) ) {
 			# Contained illegal UTF-8 sequences or forbidden Unicode chars.
+			self::$lastError = array( 'title-invalid-utf8', array(), UTF8_REPLACEMENT );
 			return false;
 		}
 
@@ -2076,6 +2080,7 @@ class Title {
 					if( !$firstPass ) {
 						# Can't make a local interwiki link to an interwiki link.
 						# That's just crazy!
+						self::$lastError = 'title-invalid-double-interwiki';
 						return false;
 					}
 
@@ -2087,6 +2092,7 @@ class Title {
 					if ( 0 == strcasecmp( $this->mInterwiki, $wgLocalInterwiki ) ) {
 						if( $dbkey == '' ) {
 							# Can't have an empty self-link
+							self::$lastError = 'title-invalid-empty';
 							return false;
 						}
 						$this->mInterwiki = '';
@@ -2124,7 +2130,13 @@ class Title {
 
 		# Reject illegal characters.
 		#
-		if( preg_match( $rxTc, $dbkey ) ) {
+		if( preg_match( $rxTc, $dbkey, $m, PREG_OFFSET_CAPTURE ) ) {
+			$marked = substr( $dbkey, 0, $m[0][1] ) . '--->' . $m[0][0] . '<---' . substr( $dbkey, $m[0][1] + strlen( $m[0][0] ) );
+			self::$lastError = array( 'title-invalid-characters', array(),
+				$m[0][0], mb_strlen( substr( $dbkey, 0, $m[0][1] ) ),
+				mb_strlen( $m[0][0] ),
+				$marked
+			);
 			return false;
 		}
 
@@ -2142,13 +2154,15 @@ class Title {
 		       substr( $dbkey, -2 ) == '/.' ||
 		       substr( $dbkey, -3 ) == '/..' ) )
 		{
+			self::$lastError = 'title-invalid-relative';
 			return false;
 		}
 
 		/**
 		 * Magic tilde sequences? Nu-uh!
 		 */
-		if( strpos( $dbkey, '~~~' ) !== false ) {
+		if( ( $p = strpos( $dbkey, '~~~' ) ) !== false ) {
+			self::$lastError = array( 'title-invalid-magic-tilde', array(), $p );
 			return false;
 		}
 
@@ -2159,9 +2173,12 @@ class Title {
 		 * in the database, and may edge over 255 bytes due to subpage syntax
 		 * for long titles, e.g. [[Special:Block/Long name]]
 		 */
-		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > 255 ) ||
-		  strlen( $dbkey ) > 512 )
+		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = 255 ) ) ||
+		  strlen( $dbkey ) > ( $max = 512 ) )
 		{
+			$chop = substr( $dbkey, 0, $max+1 );
+			$chop = mb_substr( $chop, 0, mb_strlen( $chop ) - 1 );
+			self::$lastError = array( 'title-invalid-too-long', array(), $max, $chop );
 			return false;
 		}
 
@@ -2186,6 +2203,7 @@ class Title {
 		if( $dbkey == '' &&
 			$this->mInterwiki == '' &&
 			$this->mNamespace != NS_MAIN ) {
+			self::$lastError = 'title-invalid-empty';
 			return false;
 		}
 		// Allow IPv6 usernames to start with '::' by canonicalizing IPv6 titles.
@@ -2198,6 +2216,7 @@ class Title {
 			IP::sanitizeIP( $dbkey ) : $dbkey;
 		// Any remaining initial :s are illegal.
 		if ( $dbkey !== '' && ':' == $dbkey{0} ) {
+			self::$lastError = 'title-invalid-leading-colon';
 			return false;
 		}
 
@@ -2208,6 +2227,13 @@ class Title {
 		$this->mTextform = str_replace( '_', ' ', $dbkey );
 
 		return true;
+	}
+
+	/**
+	 * Get last title creation error
+	 */
+	static function getLastError() {
+		return self::$lastError;
 	}
 
 	/**
