@@ -24,10 +24,11 @@
  * Usage syntax:
  * <listinsert [attributes]>
  * Item Name = Item Text
- * Item Name = Multiline \
+ * Item Name = Long and multiline \
  *             Item Text
- * Item Name = Prefix+Suffix \
+ * Item Name = What_is_inserted_before_cursor + What_is_inserted_after_cursor \
  *             CharInsert-like syntax
+ * Item Name = This is a real \+ character, not cursor marker (with slash)
  * </listinsert>
  *
  * [attributes] are copied to HTML <select> attributes without any change.
@@ -93,3 +94,4 @@ function efListInsertOption($line)
     $value = trim($value);
     return '<option value="'.htmlspecialchars($value, ENT_QUOTES).'">'.htmlspecialchars($name, ENT_QUOTES).'</option>';
 }
+
