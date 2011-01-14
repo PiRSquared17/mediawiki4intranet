@@ -1,15 +1,15 @@
 10
 
 dir
-67408
+80271
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/PagedTiffHandler/tests
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-04-06T16:01:45.414734Z
-64659
-daniel
+2010-12-01T10:11:49.506178Z
+77523
+ialex
 
 
 
@@ -29,17 +29,17 @@ dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 testImages
 dir
 
-PagedTiffHandlerTest.php
+ShowMetadata.php
 file
 
 
 
 
-2010-06-05T16:54:57.584785Z
-ae5b42205b41b998c0659f26bcb07547
-2010-04-06T16:01:45.414734Z
-64659
-daniel
+2011-01-14T15:02:09.094830Z
+76093166e1db6a902f664b8ceab3f332
+2010-09-03T18:13:46.379840Z
+72299
+ialex
 has-props
 
 
@@ -61,5 +61,39 @@ has-props
 
 
 
-6923
+1221
+
+PagedTiffHandlerTest.php
+file
+
+
+
+
+2011-01-14T15:02:09.094830Z
+45ddbfec4ea8a1604886ac82e93e676b
+2010-12-01T10:11:49.506178Z
+77523
+ialex
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12191
 
