@@ -33,9 +33,9 @@ $FILES_WIKIMEDIA = explode(' ',
     ' install-utils.inc opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
-    ' StringFunctions DeleteBatch MediaFunctions');
+    ' StringFunctions DeleteBatch');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler');
+    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions');
 $EXT_OUR = explode(' ',
     'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
     ' SphinxSearch SimpleTable CategoryTemplate PreferencesExtension EnotifDiff Drafts'.
