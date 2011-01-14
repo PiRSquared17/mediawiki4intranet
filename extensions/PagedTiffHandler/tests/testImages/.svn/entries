@@ -1,15 +1,15 @@
 10
 
 dir
-67408
+80271
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/PagedTiffHandler/tests/testImages
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-08T20:22:07.528288Z
-62136
-ialex
+2010-08-26T14:57:02.368258Z
+71699
+daniel
 
 
 
@@ -32,7 +32,7 @@ file
 
 
 
-2010-06-05T16:54:57.551676Z
+2010-12-29T17:50:46.444113Z
 0d6b8cdf7e040556d759f93b74fd36a8
 2010-02-05T13:14:18.366006Z
 62021
@@ -60,17 +60,17 @@ has-props
 
 298292
 
-SOURCES.txt
+380mhz.tiff
 file
 
 
 
 
-2010-06-05T16:54:57.555676Z
-d308f9da9643b6e6bed11f3d895941ce
-2010-02-08T20:22:07.528288Z
-62136
-ialex
+2011-01-14T15:02:09.082830Z
+5e4942602974348ce0a465c6023eb486
+2010-08-26T14:25:52.975497Z
+71698
+daniel
 has-props
 
 
@@ -92,7 +92,75 @@ has-props
 
 
 
-798
+20122
+
+truncated.tiff
+file
+
+
+
+
+2011-01-14T15:02:09.082830Z
+b278de4f457cc466345c5cf666604b42
+2010-08-17T15:15:28.849660Z
+71204
+daniel
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1000
+
+SOURCES.txt
+file
+
+
+
+
+2011-01-14T15:02:09.086830Z
+2a1ad8190805a7e958d9644505e8f3a8
+2010-08-26T14:57:02.368258Z
+71699
+daniel
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1031
 
 multipage.tiff
 file
@@ -100,7 +168,7 @@ file
 
 
 
-2010-06-05T16:54:57.559677Z
+2010-12-29T17:50:46.472113Z
 89d695eaf4c2fce5e04eb26c5d5c84e3
 2010-02-05T13:14:18.366006Z
 62021
