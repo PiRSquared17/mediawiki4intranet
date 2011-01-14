@@ -153,7 +153,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
@@ -194,7 +194,8 @@ class Parser
 		$this->mLastSection = '';
 		$this->mDTopen = false;
 		$this->mIncludeCount = array();
-		$this->mStripState = new StripState;
+		if ( !$this->mStripState )
+			$this->mStripState = new StripState;
 		$this->mArgStack = false;
 		$this->mInPre = false;
 		$this->mLinkHolders = new LinkHolderArray( $this );
@@ -2161,10 +2162,10 @@ class Parser
 				wfProfileIn( __METHOD__."-paragraph" );
 				# No prefix (not in list)--go to paragraph mode
 				// XXX: use a stack for nestable elements like span, table and div
-				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
+				$openmatch = preg_match('/(?:<table|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
 				$closematch = preg_match(
-					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
-					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
+					'/(?:<\\/table|<blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
+					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<center)/iS', $t );
 				if ( $openmatch or $closematch ) {
 					$paragraphStack = false;
 					# TODO bug 5718: paragraph closed
@@ -2934,6 +2935,17 @@ class Parser
 				$ns = $this->mTitle->getNamespace();
 			}
 			$title = Title::newFromText( $part1, $ns );
+			if ( method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() ) {
+				global $haclgInclusionDeniedMessage;
+				$title = NULL;
+				if ( $haclgInclusionDeniedMessage ) {
+					$found = true;
+					$text = wfMsg( $haclgInclusionDeniedMessage );
+				} elseif ( $haclgInclusionDeniedMessage === '' ) {
+					$found = true;
+					$text = '';
+				}
+			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
 				# Check for language variants if the template is not found
@@ -3073,6 +3085,10 @@ class Parser
 		$cacheTitle = $title;
 		$titleText = $title->getPrefixedDBkey();
 
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag = $title->getFragment() )
+			$titleText .= '#' . $frag;
+
 		if ( isset( $this->mTplRedirCache[$titleText] ) ) {
 			list( $ns, $dbk ) = $this->mTplRedirCache[$titleText];
 			$title = Title::makeTitle( $ns, $dbk );
@@ -3091,6 +3107,9 @@ class Parser
 		}
 
 		$dom = $this->preprocessToDom( $text, self::PTD_FOR_INCLUSION );
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag )
+			$dom = $this->tryExtractNamedSection( $dom, $frag );
 		$this->mTplDomCache[ $titleText ] = $dom;
 
 		if (! $title->equals($cacheTitle)) {
@@ -3099,6 +3118,75 @@ class Parser
 		}
 
 		return array( $dom, $title );
+	}
+
+	/**
+	 * CustIS Bug 70192 - try to extract a named section from DOM Document
+	 */
+	function tryExtractNamedSection( $dom, $frag )
+	{
+		$stack = array( array( $dom->node, 0 ) );
+		$foundlevel = false;
+		$newchild = NULL;
+		$newroot = NULL;
+		while( $stack )
+		{
+			$ptr = &$stack[ count( $stack ) - 1 ];
+			if ( $ptr[1] >= $ptr[0]->childNodes->length )
+			{
+				array_pop( $stack );
+				if ( $foundlevel )
+					$newchild = $newchild->parentNode;
+				continue;
+			}
+			$node = $ptr[0]->childNodes->item( $ptr[1] );
+			$ptr[1]++;
+			if ( !$foundlevel )
+			{
+				if ( $node->nodeName == 'h' )
+				{
+					$h = $node->nodeValue;
+					$l = $node->getAttribute( 'level' );
+					$h = trim( substr( $h, $l, -$l ) );
+					if ( $h == $frag )
+					{
+						$foundlevel = $l;
+						foreach ( $stack as $inside )
+						{
+							$el = $inside[0]->cloneNode();
+							if ( $newchild )
+								$newchild->addChild( $el );
+							else
+								$newroot = $el;
+							$newchild = $el;
+						}
+					}
+				}
+				elseif ( $node->childNodes->length )
+					$stack[] = array( $node, 0 );
+			}
+			else
+			{
+				if ( $node->nodeName == 'h' && $node->getAttribute( 'level' ) <= $foundlevel )
+					break;
+				if ( !$content_started && $node->nodeType == XML_TEXT_NODE )
+				{
+					// left-trim included section
+					$v = ltrim( $node->nodeValue );
+					if ( !$v )
+						continue;
+					else
+						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
+				}
+				else
+					$newchild->appendChild( $node->cloneNode( true ) );
+				$content_started = true;
+			}
+		}
+		unset( $ptr );
+		if ( $newroot )
+			$dom = new PPNode_DOM( $newroot );
+		return $dom;
 	}
 
 	/**
@@ -3452,7 +3540,7 @@ class Parser
 	 * @private
 	 */
 	function formatHeadings( $text, $isMain=true ) {
-		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
+		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
 
 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
 		$showEditLink = $this->mOptions->getEditSection();
@@ -3595,6 +3683,8 @@ class Parser
 						$dot = 1;
 					}
 				}
+				if ($wgDotAfterTocnumber)
+					$numbering .= '.';
 			}
 
 			# The safe header is a version of the header text safe to use for links
@@ -3678,6 +3768,10 @@ class Parser
 
 			# Don't number the heading if it is the only one (looks silly)
 			if( $doNumberHeadings && count( $matches[3] ) > 1) {
+				# Bug 54239 - Ссылки на разделы с нумерацией
+				if (!$headNumberReplacer)
+					$headNumberReplacer = new ReplacementArray();
+				$headNumberReplacer->setPair('>'.trim($headline).'</a>', '>'.$numbering.' '.trim($headline).'</a>');
 				# the two are different if the line contains a link
 				$headline=$numbering . ' ' . $headline;
 			}
@@ -3727,6 +3821,10 @@ class Parser
 			}
 			$toc = $sk->tocList( $toc );
 		}
+
+		# Bug 54239 - Ссылки на разделы с нумерацией
+		if ($headNumberReplacer)
+			$text = $headNumberReplacer->replace($text);
 
 		# split up and insert constructed headlines
 
