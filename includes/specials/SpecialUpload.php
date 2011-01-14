@@ -1437,7 +1437,7 @@ wgUploadAutoFill = {$autofill};
 	 * @return bool true if the file contains something looking like embedded scripts
 	 */
 	function detectScript($file, $mime, $extension) {
-		global $wgAllowTitlesInSVG;
+		global $wgAllowTitlesInSVG, $wgForbiddenTagsInUploads;
 
 		#ugly hack: for text files, always look at the entire file.
 		#For binarie field, just check the first K.
@@ -1485,7 +1485,9 @@ wgUploadAutoFill = {$autofill};
 		* when served with a generic content-type.
 		*/
 
-		$tags = array(
+		$tags = $wgForbiddenTagsInUploads;
+		if (!$tags)
+			$tags = array(
 			'<a href',
 			'<body',
 			'<head',

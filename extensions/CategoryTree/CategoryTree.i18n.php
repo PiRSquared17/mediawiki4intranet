@@ -34,7 +34,7 @@ If you have a very old browser, or have JavaScript disabled, it will not work.',
 	'categorytree-expand'           => 'expand',
 	'categorytree-collapse-bullet'  => '[<b>−</b>]', # do not translate or duplicate this message to other languages
 	'categorytree-expand-bullet'    => '[<b>+</b>]', # do not translate or duplicate this message to other languages
-	'categorytree-empty-bullet'     => '[<b>×</b>]', # do not translate or duplicate this message to other languages
+	'categorytree-empty-bullet'     => '[<b style="visibility:hidden">×</b>]', # do not translate or duplicate this message to other languages
 	'categorytree-page-bullet'      => '&nbsp;', # do not translate or duplicate this message to other languages
 
 	'categorytree-member-counts'    => 'contains {{PLURAL:$1|1 subcategory|$1 subcategories}}, {{PLURAL:$2|1 page|$2 pages}}, and {{PLURAL:$3|1 file|$3 files}}', # $1=subcategories, $2=subpages, $3=files, $4=total, $5=shown-in-tree
