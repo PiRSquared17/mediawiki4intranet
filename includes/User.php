@@ -491,6 +491,11 @@ class User {
 	static function isValidUserName( $name ) {
 		global $wgContLang, $wgMaxNameChars;
 
+		# Disable HaloACL title check as the main and/or
+		# user namespaces may be protected
+		if ( defined( 'HACL_HALOACL_VERSION' ) )
+			$hacl = haclfDisableTitlePatch();
+
 		if ( $name == ''
 		|| User::isIP( $name )
 		|| strpos( $name, '/' ) !== false
@@ -498,6 +503,8 @@ class User {
 		|| $name != $wgContLang->ucfirst( $name ) ) {
 			wfDebugLog( 'username', __METHOD__ .
 				": '$name' invalid due to empty, IP, slash, length, or lowercase" );
+			if ( defined( 'HACL_HALOACL_VERSION' ) )
+				haclfRestoreTitlePatch($hacl);
 			return false;
 		}
 
@@ -509,6 +516,8 @@ class User {
 			|| strcmp( $name, $parsed->getPrefixedText() ) ) {
 			wfDebugLog( 'username', __METHOD__ .
 				": '$name' invalid due to ambiguous prefixes" );
+			if ( defined( 'HACL_HALOACL_VERSION' ) )
+				haclfRestoreTitlePatch($hacl);
 			return false;
 		}
 
@@ -525,9 +534,13 @@ class User {
 		if( preg_match( $unicodeBlacklist, $name ) ) {
 			wfDebugLog( 'username', __METHOD__ .
 				": '$name' invalid due to blacklisted characters" );
+			if ( defined( 'HACL_HALOACL_VERSION' ) )
+				haclfRestoreTitlePatch($hacl);
 			return false;
 		}
 
+		if ( defined( 'HACL_HALOACL_VERSION' ) )
+			haclfRestoreTitlePatch($hacl);
 		return true;
 	}
 
@@ -640,6 +653,11 @@ class User {
 	 *                - 'creatable'  Valid for batch processes, login and account creation
 	 */
 	static function getCanonicalName( $name, $validate = 'valid' ) {
+		# Disable HaloACL title check as the main and/or
+		# user namespaces may be protected
+		if ( defined( 'HACL_HALOACL_VERSION' ) )
+			$hacl = haclfDisableTitlePatch();
+
 		# Force usernames to capital
 		global $wgContLang;
 		$name = $wgContLang->ucfirst( $name );
@@ -655,6 +673,8 @@ class User {
 			Title::newFromText( $name ) : Title::makeTitle( NS_USER, $name );
 		# Check for invalid titles
 		if( is_null( $t ) ) {
+			if ( defined( 'HACL_HALOACL_VERSION' ) )
+				haclfRestoreTitlePatch($hacl);
 			return false;
 		}
 
@@ -684,6 +704,8 @@ class User {
 			default:
 				throw new MWException( 'Invalid parameter value for $validate in '.__METHOD__ );
 		}
+		if ( defined( 'HACL_HALOACL_VERSION' ) )
+			haclfRestoreTitlePatch($hacl);
 		return $name;
 	}
 
