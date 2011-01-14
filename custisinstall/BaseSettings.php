@@ -119,6 +119,9 @@ require_once($IP.'/extensions/MMHandler/MMHandler.php');
 /* for mindmap uploads */
 $wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
 
+require_once($IP.'/extensions/PagedTiffHandler/PagedTiffHandler.php');
+unset($wgAutoloadClasses['PagedTiffHandlerSeleniumTestSuite']);
+
 $wgAllowCategorizedRecentChanges = true;
 
 require_once($IP.'/extensions/Calendar/Calendar.php');
