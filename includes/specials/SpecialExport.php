@@ -21,28 +21,54 @@
  * @ingroup SpecialPage
  */
 
-function wfExportGetPagesFromCategory( $title ) {
+function wfExportGetPagesFromCategory(&$catname, &$modifydate, &$namespace, $closure)
+{
+	if (!strlen($catname) || !($catname = Title::makeTitleSafe(NS_CATEGORY, $catname)))
+		$catname = NULL;
+	else
+		$catname = $catname->getDbKey();
+	if (!strlen($modifydate) || !($modifydate = wfTimestampOrNull(TS_MW, $modifydate)))
+		$modifydate = NULL;
+	if (!strlen($namespace) || !($namespace = Title::newFromText("$namespace:A", NS_MAIN)))
+		$namespace = NULL;
+	else
+		$namespace = $namespace->getNamespace();
+	$pages = array();
+	wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, $pages);
+	return array_values($pages);
+}
+
+function wfExportGetPagesFromCategoryR($catname, $modifydate, $namespace, $closure, &$pages)
+{
 	global $wgContLang;
 
-	$name = $title->getDBkey();
+	$dbr = wfGetDB(DB_SLAVE);
+	$from = array('page');
+	$where = array();
 
-	$dbr = wfGetDB( DB_SLAVE );
+	if (!is_null($catname))
+	{
+		$from[] = 'categorylinks';
+		$where[] = 'cl_from=page_id';
+		$where['cl_to'] = $catname;
+	}
 
-	list( $page, $categorylinks ) = $dbr->tableNamesN( 'page', 'categorylinks' );
-	$sql = "SELECT page_namespace, page_title FROM $page " .
-		"JOIN $categorylinks ON cl_from = page_id " .
-		"WHERE cl_to = " . $dbr->addQuotes( $name );
+	if (!is_null($modifydate))
+		$where[] = "page_touched>$modifydate";
 
-	$pages = array();
-	$res = $dbr->query( $sql, 'wfExportGetPagesFromCategory' );
-	while ( $row = $dbr->fetchObject( $res ) ) {
-		$n = $row->page_title;
-		if ($row->page_namespace) {
-			$ns = $wgContLang->getNsText( $row->page_namespace );
-			$n = $ns . ':' . $n;
+	if (!is_null($namespace))
+		$where['page_namespace'] = $namespace;
+
+	$res = $dbr->select($from, array('page_namespace', 'page_title'), $where, __METHOD__);
+	while ($row = $dbr->fetchRow($res))
+	{
+		$row = Title::makeTitleSafe($row['page_namespace'], $row['page_title']);
+		if ($row && !$pages[$row->getArticleId()])
+		{
+			$pages[$row->getArticleId()] = $row;
+			if ($closure && $row->getNamespace() == NS_CATEGORY)
+				wfExportGetPagesFromCategoryR($row->getDbKey(), $modifydate, $namespace, $closure, $pages);
 		}
-
-		$pages[] = $n;
 	}
 	$dbr->freeResult($res);
 
@@ -55,11 +81,24 @@ function wfExportGetPagesFromCategory( $title ) {
  * @param $pageSet array, associative array indexed by titles for output
  * @return array associative array index by titles
  */
-function wfExportGetTemplates( $inputPages, $pageSet ) {
+function wfExportGetTemplates( &$inputPages, &$pageSet ) {
 	return wfExportGetLinks( $inputPages, $pageSet,
 		'templatelinks',
 	 	array( 'tl_namespace AS namespace', 'tl_title AS title' ),
 		array( 'page_id=tl_from' ) );
+}
+
+/**
+ * Expand a list of pages to include linked pages.
+ * @param $inputPages array, list of titles to look up
+ * @param $pageSet array, associative array indexed by titles for output
+ * @return array associative array index by titles
+ */
+function wfExportGetPagelinks( &$inputPages, &$pageSet ) {
+	return wfExportGetLinks( $inputPages, $pageSet,
+		'pagelinks',
+		array( 'pl_namespace AS namespace', 'pl_title AS title' ),
+		array( 'page_id=pl_from' ) );
 }
 
 /**
@@ -68,7 +107,7 @@ function wfExportGetTemplates( $inputPages, $pageSet ) {
  * @param $pageSet array, associative array indexed by titles for output
  * @return array associative array index by titles
  */
-function wfExportGetImages( $inputPages, $pageSet ) {
+function wfExportGetImages( &$inputPages, &$pageSet ) {
 	return wfExportGetLinks( $inputPages, $pageSet,
 		'imagelinks',
 		array( NS_FILE . ' AS namespace', 'il_to AS title' ),
@@ -79,40 +118,79 @@ function wfExportGetImages( $inputPages, $pageSet ) {
  * Expand a list of pages to include items used in those pages.
  * @private
  */
-function wfExportGetLinks( $inputPages, $pageSet, $table, $fields, $join ) {
+function wfExportGetLinks( &$inputPages, &$pageSet, $table, $fields, $join )
+{
 	$dbr = wfGetDB( DB_SLAVE );
-	foreach( $inputPages as $page ) {
-		$title = Title::newFromText( $page );
-		if( $title ) {
-			$pageSet[$title->getPrefixedText()] = true;
-			/// @fixme May or may not be more efficient to batch these
-			///        by namespace when given multiple input pages.
-			$result = $dbr->select(
-				array( 'page', $table ),
-				$fields,
-				array_merge( $join,
-					array(
-						'page_namespace' => $title->getNamespace(),
-						'page_title' => $title->getDBKey() ) ),
-				__METHOD__ );
-			foreach( $result as $row ) {
-				$template = Title::makeTitle( $row->namespace, $row->title );
-				$pageSet[$template->getPrefixedText()] = true;
+	$byns = array();
+	foreach( $inputPages as $title )
+		$byns[$title->getNamespace()][] = $title->getDBkey();
+	$added = 0;
+	foreach( $byns as $ns => $titles )
+	{
+		$result = $dbr->select(
+			array( 'page', $table ),
+			$fields,
+			array_merge( $join,
+				array(
+					'page_namespace' => $ns,
+					'page_title' => $titles ) ),
+			__METHOD__ );
+		foreach( $result as $row )
+		{
+			$add = Title::makeTitle( $row->namespace, $row->title );
+			if( !$pageSet[$add->getPrefixedText()] )
+			{
+				$pageSet[$add->getPrefixedText()] = true;
+				$inputPages[] = $add;
+				$added++;
 			}
 		}
 	}
-	return $pageSet;
+	return $added;
+}
+
+function wfExportAddPagesExec(&$state)
+{
+	$catname = $state['catname'];
+	$modifydate = $state['modifydate'];
+	$namespace = $state['namespace'];
+	$closure = $state['closure'];
+	$catpages = wfExportGetPagesFromCategory($catname, $modifydate, $namespace, $closure);
+	if ($catpages)
+	{
+		foreach ($catpages as $title)
+		{
+/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
+			if (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx())
+/*op-patch|TS|2010-04-26|end*/
+				$state['pages'] .= "\n" . $title->getPrefixedText();
+		}
+	}
+	if (!$catname && strlen($state['catname']))
+		$state['errors'][] = array('export-invalid-catname', $state['catname']);
+	if ($modifydate)
+		$state['modifydate'] = wfTimestamp(TS_DB, $modifydate);
+	else if ($state['modifydate'])
+		$state['errors'][] = array('export-invalid-modifydate', $state['modifydate']);
+	if (!$namespace && strlen($state['namespace']))
+		$state['errors'][] = array('export-invalid-namespace', $state['namespace']);
+}
+
+function wfExportAddPagesForm($state)
+{
+	$form .= '<fieldset class="addpages">';
+	$form .= '<legend>' . wfMsgExt('export-addpages', 'parse') . '</legend>';// style="display: inline-block; text-align: right; vertical-align: top">
+	$form .= '<div class="ap_catname">' . Xml::inputLabel(wfMsg('export-catname'), 'catname', 'catname', 40, $state['catname']) .
+	         '<br />' . Xml::checkLabel(wfMsg('export-closure'), 'closure', 'wpExportClosure', $state['closure'] ? true : false) . '</div>';
+	$form .= '<div class="ap_namespace">' . Xml::inputLabel(wfMsg('export-namespace'), 'namespace', 'namespace', 20, $state['namespace']) . '</div>';
+	$form .= '<div class="ap_modifydate">' . Xml::inputLabel(wfMsg('export-modifydate'), 'modifydate', 'modifydate', 20, $state['modifydate']) . '</div>';
+	$form .= '<div class="ap_submit">' . Xml::submitButton(wfMsg('export-addcat'), array('name' => 'addcat')) . '</div>';
+	$form .= '</fieldset>';
+	return $form;
 }
 
 /**
- * Callback function to remove empty strings from the pages array.
- */
-function wfFilterPage( $page ) {
-	return $page !== '' && $page !== null;
-}
-
-/**
- *
+ * Special page itself
  */
 function wfSpecialExport( $page = '' ) {
 	global $wgOut, $wgRequest, $wgSitename, $wgExportAllowListContributors;
@@ -120,23 +198,15 @@ function wfSpecialExport( $page = '' ) {
 
 	$curonly = true;
 	$doexport = false;
+	$errors = array();
 
-	if ( $wgRequest->getCheck( 'addcat' ) ) {
-		$page = $wgRequest->getText( 'pages' );
-		$catname = $wgRequest->getText( 'catname' );
-
-		if ( $catname !== '' && $catname !== NULL && $catname !== false ) {
-			$t = Title::makeTitleSafe( NS_MAIN, $catname );
-			if ( $t ) {
-				/**
-				 * @fixme This can lead to hitting memory limit for very large
-				 * categories. Ideally we would do the lookup synchronously
-				 * during the export in a single query.
-				 */
-				$catpages = wfExportGetPagesFromCategory( $t );
-				if ( $catpages ) $page .= "\n" . implode( "\n", $catpages );
-			}
-		}
+	# FIXME OO approach (as in trunk) would probably be better here,
+	#       but I'm too lazy to backport it into 1.14.
+	$state = $_REQUEST;
+	if ($state['addcat'])
+	{
+		wfExportAddPagesExec($state);
+		$page = $state['pages'];
 	}
 	else if( $wgRequest->wasPosted() && $page == '' ) {
 		$page = $wgRequest->getText( 'pages' );
@@ -205,19 +275,33 @@ function wfSpecialExport( $page = '' ) {
 		}
 
 		/* Split up the input and look up linked pages */
-		$inputPages = array_filter( explode( "\n", $page ), 'wfFilterPage' );
-		$pageSet = array_flip( $inputPages );
-
-		if( $wgRequest->getCheck( 'templates' ) ) {
-			$pageSet = wfExportGetTemplates( $inputPages, $pageSet );
+		$inputPages = array();
+		$pageSet = array();
+		foreach (explode("\n", $page) as $p)
+		{
+			if ($p !== '' && $p !== null && ($p = Title::newFromText($p)))
+			{
+				$inputPages[] = $p;
+				$pageSet[$p->getPrefixedText()] = true;
+			}
 		}
 
-		/*
-		// Enable this when we can do something useful exporting/importing image information. :)
-		if( $wgRequest->getCheck( 'images' ) ) {
-			$pageSet = wfExportGetImages( $inputPages, $pageSet );
-		}
-		*/
+		$t = $wgRequest->getCheck( 'templates' ) ? 1 : 0;
+		$p = $wgRequest->getCheck( 'pagelinks' ) ? 1 : 0;
+		$i = $wgRequest->getCheck( 'images' ) ? 1 : 0;
+		do
+		{
+			$added = 0;
+			if( $t ) $added += wfExportGetTemplates( $inputPages, $pageSet );
+			if( $p ) $added += wfExportGetPagelinks( $inputPages, $pageSet );
+			if( $i ) $added += wfExportGetImages( $inputPages, $pageSet );
+		} while( $t+$p+$i > 1 && $added > 0 );
+
+/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
+		foreach ($inputPages as $title)
+			if (method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
+				unset($pageSet[$title->getPrefixedText()]);
+/*op-patch|TS|2010-04-26|end*/
 
 		$pages = array_keys( $pageSet );
 
@@ -241,6 +325,8 @@ function wfSpecialExport( $page = '' ) {
 
 		$exporter = new WikiExporter( $db, $history, $buffer );
 		$exporter->list_authors = $list_authors ;
+		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
+		$exporter->selfContained = $wgRequest->getCheck('selfcontained') ? true : false;
 		$exporter->openStream();
 
 		foreach( $pages as $page ) {
@@ -278,23 +364,27 @@ function wfSpecialExport( $page = '' ) {
 	$form = Xml::openElement( 'form', array( 'method' => 'post',
 		'action' => $self->getLocalUrl( 'action=submit' ) ) );
 
-	$form .= Xml::inputLabel( wfMsg( 'export-addcattext' )	, 'catname', 'catname', 40 ) . '&nbsp;';
-	$form .= Xml::submitButton( wfMsg( 'export-addcat' ), array( 'name' => 'addcat' ) ) . '<br />';
+	foreach ($errors as $e)
+		$form .= wfMsgExt($e[0], array('parse'), $e[1]);
+
+	$form .= wfExportAddPagesForm($state);
 
 	$form .= Xml::openElement( 'textarea', array( 'name' => 'pages', 'cols' => 40, 'rows' => 10 ) );
 	$form .= htmlspecialchars( $page );
 	$form .= Xml::closeElement( 'textarea' );
 	$form .= '<br />';
 
-	if( $wgExportAllowHistory ) {
-		$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', true ) . '<br />';
-	} else {
+	if( $wgExportAllowHistory )
+		$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', $wgRequest->getCheck('curonly') ? true : false ) . '<br />';
+	else
 		$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
-	}
-	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
+
+	$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', $wgRequest->getCheck('templates') ? true : false ) . '<br />';
+	$form .= Xml::checkLabel( wfMsg( 'export-pagelinks' ), 'pagelinks', 'wpExportPagelinks', $wgRequest->getCheck('pagelinks') ? true : false ) . '<br />';
 	// Enable this when we can do something useful exporting/importing image information. :)
-	//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
+	$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
 	$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
+	$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
 
 	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 	$form .= Xml::closeElement( 'form' );
