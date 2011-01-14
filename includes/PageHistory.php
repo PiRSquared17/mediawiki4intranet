@@ -321,8 +321,14 @@ class PageHistory {
 			$s .= ' ' . $this->mSkin->formatRevisionSize( $size );
 		}
 
-		$s .= $this->mSkin->revComment( $rev, false, true );
-
+/*op-patch|TS|2009-11-05|HaloACL|Protected properties|start*/
+		global $haclgProtectProperties;
+		if (!$haclgProtectProperties) {
+			// The comment for an article might reveal values of protected properties
+			$s .= $this->mSkin->revComment( $rev, false, true );
+		}
+/*op-patch|TS|2009-11-05|end*/  
+		
 		if( $notificationtimestamp && ($row->rev_timestamp >= $notificationtimestamp) ) {
 			$s .= ' <span class="updatedmarker">' .  wfMsgHtml( 'updatedmarker' ) . '</span>';
 		}
