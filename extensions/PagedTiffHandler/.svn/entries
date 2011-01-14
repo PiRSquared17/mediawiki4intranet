@@ -1,15 +1,15 @@
 10
 
 dir
-67408
+80271
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/PagedTiffHandler
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-05-27T15:56:53.950358Z
-66970
-demon
+2011-01-13T21:04:12.980192Z
+80191
+raymond
 has-props
 
 
@@ -35,11 +35,11 @@ file
 
 
 
-2010-06-05T16:54:57.603696Z
-aa03fb515e00c64eefb671715263c677
-2010-04-17T14:22:16.517595Z
-65159
-catrope
+2011-01-14T15:02:09.106830Z
+49573cf82ccc6f0207aaeafed450312e
+2010-11-04T01:29:10.661042Z
+75973
+reedy
 has-props
 
 
@@ -61,12 +61,9 @@ has-props
 
 
 
-10948
+10955
 
 tests
-dir
-
-selenium_copy_to_mediawiki_root
 dir
 
 PagedTiffHandler_body.php
@@ -75,11 +72,11 @@ file
 
 
 
-2010-06-05T16:54:57.603696Z
-f31435f336176374c91a9a2164eab313
-2010-05-27T15:56:53.950358Z
-66970
-demon
+2011-01-14T15:02:09.258830Z
+b399a6d31501f3040a7d936aebe07b03
+2010-11-05T16:30:21.791886Z
+76112
+simetrical
 has-props
 
 
@@ -101,7 +98,7 @@ has-props
 
 
 
-17705
+20020
 
 PagedTiffHandler.i18n.php
 file
@@ -109,10 +106,10 @@ file
 
 
 
-2010-06-05T16:54:57.603696Z
-93722caef75127152bd0212de6310f79
-2010-05-23T21:12:35.389865Z
-66809
+2011-01-14T15:02:09.258830Z
+b3bde3c67790780d88394102b3f26d51
+2011-01-13T21:04:12.980192Z
+80191
 raymond
 has-props
 
@@ -135,7 +132,7 @@ has-props
 
 
 
-34764
+44434
 
 PagedTiffHandler.php
 file
@@ -143,11 +140,11 @@ file
 
 
 
-2010-06-05T16:54:57.607677Z
-98917abfef87461a0098fdc7a44df795
-2010-04-17T13:23:23.790651Z
-65157
-catrope
+2011-01-14T15:02:09.258830Z
+5615318341728083c92eb9c52987e535
+2010-09-14T16:17:54.413959Z
+72988
+daniel
 has-props
 
 
@@ -169,7 +166,7 @@ has-props
 
 
 
-4029
+5028
 
 PagedTiffHandler.image.php
 file
@@ -177,11 +174,11 @@ file
 
 
 
-2010-06-05T16:54:57.607677Z
-ac56c89083317c5d4f61ebe65fbb97d3
-2010-04-17T14:22:16.517595Z
-65159
-catrope
+2011-01-14T15:02:09.258830Z
+2d5b6fc7902872ab20b66d614249aa22
+2010-12-26T20:40:27.149200Z
+79025
+brion
 has-props
 
 
@@ -203,5 +200,5 @@ has-props
 
 
 
-7874
+14243
 
