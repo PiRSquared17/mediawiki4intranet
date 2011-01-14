@@ -89,7 +89,11 @@ class Title {
 		$t = new Title();
 		$t->mDbkeyform = $key;
 		if( $t->secureAndSplit() )
-			return $t;
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			return $t->checkAccessControl();
+/*op-patch|TS|2009-06-19|end*/  
+//Replaced by patch		return $t;
+		
 		else
 			return NULL;
 	}
@@ -143,7 +147,10 @@ class Title {
 				$cachedcount++;
 				Title::$titleCache[$text] =& $t;
 			}
-			return $t;
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			return $t->checkAccessControl();
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch			return $t;
 		} else {
 			$ret = NULL;
 			return $ret;
@@ -169,7 +176,10 @@ class Title {
 
 		$t->mDbkeyform = str_replace( ' ', '_', $url );
 		if( $t->secureAndSplit() ) {
-			return $t;
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			return $t->checkAccessControl();
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch			return $t;
 		} else {
 			return NULL;
 		}
@@ -255,7 +265,11 @@ class Title {
 		$t->mArticleID = ( $ns >= 0 ) ? -1 : 0;
 		$t->mUrlform = wfUrlencode( $t->mDbkeyform );
 		$t->mTextform = str_replace( '_', ' ', $title );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		$t = $t->checkAccessControl();
 		return $t;
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch		return $t;
 	}
 
 	/**
@@ -272,7 +286,10 @@ class Title {
 		$t = new Title();
 		$t->mDbkeyform = Title::makeName( $ns, $title, $fragment );
 		if( $t->secureAndSplit() ) {
-			return $t;
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			return $t->checkAccessControl();
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch			return $t;
 		} else {
 			return NULL;
 		}
@@ -3396,4 +3413,104 @@ class Title {
 		}
 		return $redirs;
 	}
+
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+	
+	/**
+	 * This function is called from the patches for HaloACL for secure listings 
+	 * (e.g. Spcecial:AllPages). It checks, whether the current user is allowed
+	 * to read the article for this title object. For normal pages this is 
+	 * evaluate in the method <userCanRead>. 
+	 * However, the special pages that generate listings, often create title 
+	 * objects before the can check their accessibility. The fallback mechanism
+	 * of HaloACL creates the title "Permission denied" for the article that 
+	 * must not be accessed. The listings would then show a link to "Permission
+	 * denied". So this function returns "false" for the title "Permission denied"
+	 * as well. 
+	 *
+	 * @return 
+	 * 		true, if this title can be read
+	 * 		false, if the title is protected or "Permission denied".
+	 */
+	public function userCanReadEx() {
+		if (!defined('HACL_HALOACL_VERSION')) {
+			//HaloACL is disabled
+			return true;
+		}
+		global $haclgContLang;
+		return $this->mTextform !== $haclgContLang->getPermissionDeniedPage() 
+		       && $this->userCanRead();
+	}
+	
+	/**
+	 * This function checks, if this title is accessible for the action of the
+	 * current request. If the action is unknown it is assumed to be "read".
+	 * If the title is not accessible, the new title "Permission denied" is 
+	 * returned. This is a fallback to protect titles if all other security 
+	 * patches fail.
+	 * 
+	 * While a page is rendered, the same title is often checked several times. 
+	 * To speed things up, the results of an accessibility check are internally
+	 * cached.  
+	 * 
+	 * This function can be disabled in HACL_Initialize.php or LocalSettings.php
+	 * by setting the variable $haclgEnableTitleCheck = false.
+	 *
+	 * @return 
+	 * 		$this, if access is granted on this title or
+	 * 		the title for "Permission denied" if not.
+	 */
+	private function checkAccessControl() {
+		if (!defined('HACL_HALOACL_VERSION')) {
+			// HaloACL is disabled or not fully initialized
+			return $this;
+		}
+		global $haclgEnableTitleCheck;
+		if (isset($haclgEnableTitleCheck) && $haclgEnableTitleCheck === false) {
+			return $this;
+		}
+		static $permissionCache = array();
+		
+		global $wgRequest;
+		$action = $wgRequest->getVal( 'action', 'read');
+		$currentTitle = $wgRequest->getVal('title');
+		$currentTitle = str_replace( '_', ' ', $currentTitle);
+		if ($this->getFullText() != $currentTitle) {
+			$action = 'read';
+		}
+		$index = $this->getFullText().'-'.$action; // A bug was fixed here thanks to Dave MacDonald
+		$allowed = @$permissionCache[$index];
+		if (!isset($allowed)) {
+			switch ($action) {
+				case 'create':
+					$allowed = $this->userCanCreate();
+					break;
+				case 'edit':
+					$allowed = $this->userCanEdit();
+					break;
+				case 'move':
+					$allowed = $this->userCanMove();
+					break;
+				case 'annotate':
+					$allowed = $this->userCan($action);
+					break;
+				default:
+					$allowed = $this->userCanRead();
+			}
+			$permissionCache[$index] = $allowed;
+		}
+		if ($allowed === false) {
+//			echo "no\n";
+			global $haclgContLang;
+			$etc = $haclgEnableTitleCheck;
+			$haclgEnableTitleCheck = false;
+			$t = Title::newFromURL($haclgContLang->getPermissionDeniedPage());
+			$haclgEnableTitleCheck = $etc;
+			return $t;
+		}
+//		echo "yes\n";
+		return $this;
+	}
+/*op-patch|TS|2009-06-19|end*/  
+
 }
