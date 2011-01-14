@@ -131,6 +131,11 @@ function fillDestFilename(id) {
 		fname = path.substring(backslash+1, 10000);
 	}
 
+	// Find and make extension lower-case
+	var dot = fname.lastIndexOf('.');
+	if (dot >= 0)
+		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
+
 	// Capitalise first letter and replace spaces by underscores
 	fname = fname.charAt(0).toUpperCase().concat(fname.substring(1,10000)).replace(/ /g, '_');
 
