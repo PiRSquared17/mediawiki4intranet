@@ -4,6 +4,12 @@
  * @ingroup SpecialPage
  */
 
+# Bug 60996 - cURL environment proxy ($ENV['http_proxy'], $ENV['no_proxy']) support
+require_once(dirname(dirname(dirname(__FILE__))).'/custisinstall/curl-env-proxy.php');
+
+# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
+if (!function_exists('wfSpecialUpload'))
+{
 
 /**
  * Entry point
@@ -184,6 +190,7 @@ class UploadForm {
 		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
 		curl_setopt( $ch, CURLOPT_URL, $url);
 		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
+		curl_set_env_proxy( $ch, $url ); # Set proxy from environment settings
 		curl_exec( $ch );
 		$error = curl_errno( $ch ) ? true : false;
 		$errornum =  curl_errno( $ch );
@@ -1808,4 +1815,6 @@ wgUploadAutoFill = {$autofill};
 			$out->addHTML( '</div>' );
 		}
 	}
+}
+
 }
