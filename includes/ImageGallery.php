@@ -218,7 +218,7 @@ class ImageGallery
 	 *
 	 */
 	function toHTML() {
-		global $wgLang;
+		global $wgLang, $wgMaxFilenameLength;
 
 		$sk = $this->getSkin();
 
@@ -289,7 +289,7 @@ class ImageGallery
 			}
 
 			$textlink = $this->mShowFilename ?
-				$sk->makeKnownLinkObj( $nt, htmlspecialchars( $wgLang->truncate( $nt->getText(), 20, '...' ) ) ) . "<br />\n" :
+				$sk->makeKnownLinkObj( $nt, htmlspecialchars( $wgLang->truncate( $nt->getText(), $wgMaxFilenameLength, '...' ) ) ) . "<br />\n" :
 				'' ;
 
 			# ATTENTION: The newline after <div class="gallerytext"> is needed to accommodate htmltidy which
