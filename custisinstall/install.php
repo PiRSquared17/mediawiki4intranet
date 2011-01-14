@@ -33,7 +33,7 @@ $FILES_WIKIMEDIA = explode(' ',
     ' install-utils.inc opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
-    ' ExtensionDistributor StringFunctions DeleteBatch MediaFunctions');
+    ' StringFunctions DeleteBatch MediaFunctions');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
     'PdfHandler Interwiki googleAnalytics Renameuser UserMerge');
 $EXT_OUR = explode(' ',
