@@ -35,7 +35,7 @@ $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
     ' StringFunctions DeleteBatch MediaFunctions');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge');
+    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler');
 $EXT_OUR = explode(' ',
     'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
     ' SphinxSearch SimpleTable CategoryTemplate PreferencesExtension EnotifDiff Drafts'.
