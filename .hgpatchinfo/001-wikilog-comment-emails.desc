@@ -1,0 +1,3 @@
+Depends on: Y-000-html-emails.diff
+
+Bug 62693 - Wikilog comment email notification support
