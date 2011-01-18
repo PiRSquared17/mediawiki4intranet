@@ -250,7 +250,8 @@ sub test_search
     my $u1 = $su;
     $u = $title;
     Encode::_utf8_on($u);
-    $u =~ s!([-/\.\(\)\!\#])!\\$1!gso;
+    $u =~ s!([/\.\(\)\!\#])!\\$1!gso;
+    $u =~ s!(\s)-!$1\\-!gso;
     Encode::_utf8_off($u);
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
