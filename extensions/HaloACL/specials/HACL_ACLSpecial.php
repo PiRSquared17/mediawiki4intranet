@@ -42,6 +42,11 @@ class HaloACLSpecial extends SpecialPage
         'whitelist'   => 1,
     );
 
+    var $aclTargetTypes = array(
+        'protect' => array('page' => 1, 'namespace' => 1, 'category' => 1, 'property' => 1),
+        'define' => array('right' => 1, 'template' => 1),
+    );
+
     /* Identical to Xml::element, but does no htmlspecialchars() on $contents */
     static function xelement($element, $attribs = null, $contents = '', $allowShortTag = true)
     {
@@ -54,6 +59,11 @@ class HaloACLSpecial extends SpecialPage
 
     public function __construct()
     {
+        if (!defined('SMW_NS_PROPERTY'))
+        {
+            $this->hasProp = false;
+            unset($this->aclTargetTypes['protect']['property']);
+        }
         parent::__construct('HaloACL');
     }
 
@@ -77,6 +87,9 @@ class HaloACLSpecial extends SpecialPage
     public function html_acllist(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
+        $aclOwnTemplate = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template');
+        if ($aclOwnTemplate)
+            $aclOwnTemplate = HACLSecurityDescriptor::newFromId($aclOwnTemplate);
         haclCheckScriptPath();
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLList.tpl.php');
@@ -108,43 +121,46 @@ class HaloACLSpecial extends SpecialPage
         $wgOut->addHTML($html);
     }
 
-    public function html_quickaccess(&$q)
+    /* Manage Quick Access ACL list */
+    public function html_quickaccess(&$args)
     {
-        global $wgOut;
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $wgRequest;
+        haclCheckScriptPath();
+        /* Handle save */
+        $args = $wgRequest->getValues();
+        if ($args['save'])
+        {
+            $ids = array();
+            foreach ($args as $k => $v)
+                if (substr($k, 0, 3) == 'qa_')
+                    $ids[] = substr($k, 3);
+            HACLStorage::getDatabase()->saveQuickAcl($wgUser->getId(), $ids);
+            wfGetDB(DB_MASTER)->commit();
+            header("Location: $wgScript?title=Special:HaloACL&action=quickaccess");
+            exit;
+        }
         /* Load data */
-        $dbr = wfGetDB(DB_SLAVE);
-        $templates = HACLStorage::getDatabase()->getSDs(
-            'acltemplate', $q['like'] ? array('page_title LIKE '.$dbr->addQuotes('%'.$q['like'].'%')) : ''
-        );
+        $templates = HACLStorage::getDatabase()->getSDs2('right', $args['like']);
+        if ($aclOwnTemplate = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template'))
+        {
+            $aclOwnTemplate = HACLSecurityDescriptor::newFromId($aclOwnTemplate);
+            $aclOwnTemplate->owntemplate = true;
+            array_unshift($templates, $aclOwnTemplate);
+        }
         $quickacl = HACLQuickacl::newForUserId($wgUser->getId());
         $quickacl_ids = array_flip($quickacl->getSD_IDs());
         foreach ($templates as $sd)
-            $sd->selected = array_key_exists($sd->getSDId(), $quickacl_ids);
-        /* Build HTML code */
-        $html = wfMsg('hacl_quickaccess_manage');
-        $form = self::xelement('label', array('for' => 'hacl_qafilter'), wfMsg('hacl_filter'));
-        $form .= Xml::element('input', array('type' => 'text', 'name' => 'like', 'id' => 'hacl_qafilter', 'value' => $q['like']), '');
-        $form .= Xml::submitButton(wfMsg('hacl_filter_submit'));
-        $form = self::xelement('form', array('action' => '?action=quickaccess'), $form);
-        $form = self::xelement('legend', NULL, wfMsg('hacl_filter_sds')) . $form;
-        $form = self::xelement('fieldset', NULL, $form);
-        $html .= $form;
-        if (!$templates)
-            $html .= wfMsg('hacl_empty_list');
-        else
         {
-            $list = '';
-            foreach ($templates as &$sd)
-            {
-                $li = Xml::check('qa_'.$sd->getSDId(), $sd['selected']);
-                $li .= ' ' . htmlspecialchars($sd->getSDName());
-                $list .= "<li>$li</li>";
-            }
-            $list = "<ul>$list</ul>";
-            $list .= Xml::submitButton(wfMsg('hacl_quickacl_save'));
-            $list = "<form action='?action=quickaccess&save=1' method='POST'>$list</form>";
-            $html .= $list;
+            $sd->selected = array_key_exists($sd->getSDId(), $quickacl_ids);
+            $sd->editlink = $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName();
+            $sd->viewlink = Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl();
         }
+        /* Run template */
+        ob_start();
+        require(dirname(__FILE__).'/HACL_QuickACL.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        $wgOut->setPageTitle(wfMsg('hacl_quickaccess_manage'));
         $wgOut->addHTML($html);
     }
 
@@ -164,5 +180,45 @@ class HaloACLSpecial extends SpecialPage
     {
         global $wgOut;
         
+    }
+
+    /* AJAXly loaded ACL list */
+    static function haclAcllist($t, $n, $limit = 100)
+    {
+        global $wgScript, $wgTitle, $haclgHaloScriptPath, $wgUser;
+        haclCheckScriptPath();
+        /* Load data */
+        $t = $t ? explode(',', $t) : NULL;
+        if (!$limit)
+            $limit = 101;
+        $sds = HACLStorage::getDatabase()->getSDs2($t, $n, $limit);
+        if (count($sds) == $limit)
+        {
+            array_pop($sds);
+            $max = true;
+        }
+        $lists = array();
+        foreach ($sds as $sd)
+        {
+            $d = array(
+                'name' => $sd->getSDName(),
+                'real' => $sd->getSDName(),
+                'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName(),
+                'viewlink' => Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl(),
+            );
+            if ($p = strpos($d['real'], '/'))
+            {
+                $d['real'] = substr($d['real'], $p+1);
+                if ($sd->getPEType() == 'template' && $d['real'] == $wgUser->getName())
+                    $d['real'] = wfMsg('hacl_acllist_own_template', $d['real']);
+            }
+            $lists[$sd->getPEType()][] = $d;
+        }
+        /* Run template */
+        ob_start();
+        require(dirname(__FILE__).'/HACL_ACLListContents.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
     }
 }

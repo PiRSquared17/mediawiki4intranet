@@ -2,7 +2,8 @@ var allActions = [ 'create', 'delete', 'edit', 'move', 'read' ];
 var groupClosureCache = {};
 var aclRights = {};
 var aclClosure = {};
-var user_hint, target_hint, inc_hint, last_target = '';
+var aclLastTarget = {};
+var user_hint, target_hint, inc_hint, last_target = '', last_target_name = '';
 
 userNsRegexp = userNsRegexp ? new RegExp(userNsRegexp, 'gi') : '';
 groupPrefixRegexp = groupPrefixRegexp ? new RegExp(groupPrefixRegexp, 'gi') : '';
@@ -10,34 +11,63 @@ groupPrefixRegexp = groupPrefixRegexp ? new RegExp(groupPrefixRegexp, 'gi') : ''
 if (!String.prototype.trim)
     String.prototype.trim = function() { return this.replace(/^\s*/, '').replace(/\s*$/, ''); }
 
-// change target ACL page name/type
-function target_change()
+// target ACL page name/type change
+// total_change==true only when onchange is fired (element loses focus)
+function target_change(total_change)
 {
     var what = document.getElementById('acl_what').value;
     var an = document.getElementById('acl_name');
+    // check if target type changed
     if (last_target != what)
     {
         if (last_target)
         {
-            if (what == 'Template')
+            // remember name for each type separately
+            aclLastTarget[last_target] = an.value;
+            if (aclLastTarget[what])
+                an.value = aclLastTarget[what];
+            else if (what == 'template')
                 an.value = wgUserName;
             else
                 an.value = '';
+            last_target_name = an.value;
             target_hint.change();
         }
         last_target = what;
     }
     var name = an.value.trim();
+    if (last_target_name.length && last_target_name == name && !total_change)
+        return;
+    last_target_name = name;
     if (name.length)
     {
         var pn = document.getElementById('acl_pn');
-        var t = aclNsText+':'+what+'/'+name;
+        var t = aclNsText+':'+petPrefix[what]+'/'+name;
         pn.innerHTML = t;
         pn.href = wgScript+'/'+t;
         document.getElementById('wpTitle').value = t;
+        document.getElementById('acl_delete_link').href = wgScript + '?title=' + encodeURI(t) + '&action=delete';
+        if (total_change)
+            sajax_do_call('haclSDExists', [ what, name ], pe_exists_ajax);
     }
+    if (!name.length || !total_change)
+        document.getElementById('acl_exists_hint').style.display = 'none';
+    document.getElementById('acl_delete_link').style.display = name.length ? '' : 'none';
     document.getElementById('acl_pns').style.display = name.length ? '' : 'none';
     document.getElementById('acl_pnhint').style.display = name.length ? 'none' : '';
+}
+
+// react to item existence check
+function pe_exists_ajax(request)
+{
+    if (request.status != 200)
+        return;
+    var exists = eval('('+request.responseText+')'); // json parse
+    if (exists)
+        document.getElementById('acl_exists_hint').style.display = '';
+    else
+        document.getElementById('acl_delete_link').style.display = 'none';
+    document.getElementById('wpSave').value = exists ? msgEditSave : msgEditCreate;
 }
 
 // add ACL inclusion
@@ -427,7 +457,7 @@ function acl_init_editor()
     target_hint = new SHint('acl_name', 'hacl',
         function (h, v)
         {
-            var wv = w1.value.toLowerCase();
+            var wv = w1.value;
             if (wv == 'right' || wv == 'template')
                 return;
             if (wv != 'namespace' && !v.length)
@@ -439,7 +469,7 @@ function acl_init_editor()
     // do not hint template and right targets
     target_hint.focus = function(f)
     {
-        target_hint.tip_div.style.display = w1.value != 'Template' && w1.value != 'Right' && (f || target_hint.nodefocus) ? '' : 'none';
+        target_hint.tip_div.style.display = w1.value != 'template' && w1.value != 'right' && (f || target_hint.nodefocus) ? '' : 'none';
         target_hint.nodefocus = undefined;
     };
     target_hint.onset = target_change;

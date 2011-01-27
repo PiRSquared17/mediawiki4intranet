@@ -75,9 +75,9 @@ class HACLStorageSQL {
         $table = $dbw->tableName('halo_acl_pe_rights');
 
         HACLDBHelper::setupTable($table, array(
-            'pe_id'        => 'INT(8) NOT NULL',
-            'type'         => 'ENUM(\'category\', \'page\', \'namespace\', \'property\', \'whitelist\') DEFAULT \'page\' NOT NULL',
-            'right_id'     => 'INT(8) UNSIGNED NOT NULL'),
+            'pe_id'    => 'INT(8) NOT NULL',
+            'type'     => "ENUM('category','page','namespace','property','whitelist') DEFAULT 'page' NOT NULL",
+            'right_id' => 'INT(8) UNSIGNED NOT NULL'),
         $dbw, $verbose, "pe_id,type,right_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
@@ -86,8 +86,8 @@ class HACLStorageSQL {
         $table = $dbw->tableName('halo_acl_rights_hierarchy');
 
         HACLDBHelper::setupTable($table, array(
-            'parent_right_id'     => 'INT(8) UNSIGNED NOT NULL',
-            'child_id'            => 'INT(8) UNSIGNED NOT NULL'),
+            'parent_right_id' => 'INT(8) UNSIGNED NOT NULL',
+            'child_id'        => 'INT(8) UNSIGNED NOT NULL'),
         $dbw, $verbose, "parent_right_id,child_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "parent_right_id, child_id");
 
@@ -96,12 +96,12 @@ class HACLStorageSQL {
         $table = $dbw->tableName('halo_acl_security_descriptors');
 
         HACLDBHelper::setupTable($table, array(
-            'sd_id'     => 'INT(8) UNSIGNED NOT NULL PRIMARY KEY',
+            'sd_id'     => 'INT(8) UNSIGNED NOT NULL',
             'pe_id'     => 'INT(8)',
-            'type'      => 'ENUM(\'category\', \'page\', \'namespace\', \'property\', \'right\') DEFAULT \'page\' NOT NULL',
+            'type'      => "ENUM('category','page','namespace','property','right','template') DEFAULT 'page' NOT NULL",
             'mr_groups' => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin',
             'mr_users'  => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin'),
-        $dbw, $verbose);
+        $dbw, $verbose, 'sd_id');
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_groups:
@@ -109,11 +109,11 @@ class HACLStorageSQL {
         $table = $dbw->tableName('halo_acl_groups');
 
         HACLDBHelper::setupTable($table, array(
-            'group_id'   => 'INT(8) UNSIGNED NOT NULL PRIMARY KEY',
+            'group_id'   => 'INT(8) UNSIGNED NOT NULL',
             'group_name' => 'VARCHAR(255) CHARACTER SET utf8 COLLATE utf8_bin NOT NULL',
             'mg_groups'  => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin',
             'mg_users'   => 'TEXT CHARACTER SET utf8 COLLATE utf8_bin'),
-        $dbw, $verbose);
+        $dbw, $verbose, 'group_id');
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
 
         // halo_acl_group_members:
@@ -744,18 +744,17 @@ class HACLStorageSQL {
      *         Exception
      *
      */
-    public function saveSD(HACLSecurityDescriptor $sd) {
-        $dbw =& wfGetDB( DB_MASTER );
-
+    public function saveSD(HACLSecurityDescriptor $sd)
+    {
+        $dbw = wfGetDB(DB_MASTER);
         $mgGroups = implode(',', $sd->getManageGroups());
-        $mgUsers  = implode(',', $sd->getManageUsers());
+        $mgUsers = implode(',', $sd->getManageUsers());
         $dbw->replace('halo_acl_security_descriptors', NULL, array(
-            'sd_id'       =>  $sd->getSDID() ,
-            'pe_id'       =>  $sd->getPEID(),
-            'type'        =>  $sd->getPEType(),
-            'mr_groups'   =>  $mgGroups,
-            'mr_users'    =>  $mgUsers), __METHOD__);
-
+            'sd_id'     => $sd->getSDID(),
+            'pe_id'     => $sd->getPEID(),
+            'type'      => $sd->getPEType(),
+            'mr_groups' => $mgGroups,
+            'mr_users'  => $mgUsers), __METHOD__);
     }
 
     /**
@@ -772,9 +771,9 @@ class HACLStorageSQL {
      *         Exception
      *         ... on database failure
      */
-    public function addRightToSD($parentRightID, $childRightID) {
-        $dbw =& wfGetDB( DB_MASTER );
-
+    public function addRightToSD($parentRightID, $childRightID)
+    {
+        $dbw = wfGetDB(DB_MASTER);
         $dbw->replace('halo_acl_rights_hierarchy', NULL, array(
             'parent_right_id' => $parentRightID,
             'child_id'        => $childRightID), __METHOD__);
@@ -1461,18 +1460,20 @@ class HACLStorageSQL {
      *
      **************************************************************************/
 
-    public function saveQuickAcl($user_id, $sd_ids) {
-        $dbw =& wfGetDB( DB_MASTER );
+    public function saveQuickAcl($user_id, $sd_ids)
+    {
+        $dbw = wfGetDB(DB_MASTER);
+
         // delete old quickacl entries
         $dbw->delete('halo_acl_quickacl', array('user_id' => $user_id), __METHOD__);
 
-        $setValues = array();
-        foreach ($sd_ids as $sd_id) {
-            $setValues[] = array(
-                'sd_id'     => $sd_id,
-                'user_id'  => $user_id);
-        }
-        $dbw->insert('halo_acl_quickacl', $setValues, __METHOD__);
+        $rows = array();
+        foreach ($sd_ids as $sd_id)
+            $rows[] = array(
+                'sd_id'   => $sd_id,
+                'user_id' => $user_id
+            );
+        $dbw->insert('halo_acl_quickacl', $rows, __METHOD__);
     }
 
 
