@@ -113,15 +113,16 @@ class HACLLanguageDe extends HACLLanguage
     );
 
     public $mPetAliases = array(
-        'page'      => HACLSecurityDescriptor::PET_PAGE,
-        'category'  => HACLSecurityDescriptor::PET_CATEGORY,
-        'namespace' => HACLSecurityDescriptor::PET_NAMESPACE,
-        'property'  => HACLSecurityDescriptor::PET_PROPERTY,
-        'right'     => HACLSecurityDescriptor::PET_RIGHT,
-        'seite'     => HACLSecurityDescriptor::PET_PAGE,
-        'kategorie' => HACLSecurityDescriptor::PET_CATEGORY,
-        'namensraum' => HACLSecurityDescriptor::PET_NAMESPACE,
-        'attribut'  => HACLSecurityDescriptor::PET_PROPERTY,
-        'recht'     => HACLSecurityDescriptor::PET_RIGHT,
+        'page'      => 'page',
+        'category'  => 'category',
+        'namespace' => 'namespace',
+        'property'  => 'property',
+        'right'     => 'right',
+        'seite'     => 'page',
+        'kategorie' => 'category',
+        'namensraum' => 'namespace',
+        'attribut'  => 'property',
+        'recht'     => 'right',
+        'template'  => 'template',
     );
 }

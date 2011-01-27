@@ -822,15 +822,14 @@ class HACLParserFunctions
             $exists = false;
             switch ($this->mType)
             {
-                case 'sd':
-                case 'right':
-                    $exists = HACLSecurityDescriptor::exists($id);
-                    break;
                 case 'group':
                     $exists = HACLGroup::exists($id);
                     break;
                 case 'whitelist':
                     $exists = $id == HACLWhitelist::exists();
+                    break;
+                default:
+                    $exists = HACLSecurityDescriptor::exists($id);
                     break;
             }
             if (!$exists)
@@ -893,6 +892,7 @@ class HACLParserFunctions
             case 'group':
                 return $this->saveGroup();
                 break;
+            case 'template':
             case 'right':
                 return $this->saveSecurityDescriptor(true);
                 break;

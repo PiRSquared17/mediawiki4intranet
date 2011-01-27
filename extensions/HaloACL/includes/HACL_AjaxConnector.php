@@ -67,6 +67,7 @@ global $wgAjaxExportList;
 $wgAjaxExportList[] = 'haclAutocomplete';
 $wgAjaxExportList[] = 'haclAcllist';
 $wgAjaxExportList[] = 'haclGroupClosure';
+$wgAjaxExportList[] = 'haclSDExists';
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
 $wgAjaxExportList[] = "haclCreateManageACLPanels";
@@ -236,50 +237,10 @@ function haclAutocomplete($t, $n, $limit = 11)
     return $html;
 }
 
-function haclAcllist($t, $n, $limit = 100)
+function haclAcllist()
 {
-    global $wgScript, $wgTitle, $haclgHaloScriptPath;
-    haclCheckScriptPath();
-    $t = $t ? explode(',', $t) : NULL;
-    if (!$limit)
-        $limit = 101;
-    $sds = HACLStorage::getDatabase()->getSDs2($t, $n, $limit);
-    if (count($sds) == $limit)
-    {
-        array_pop($sds);
-        $max = true;
-    }
-    $lt = '';
-    $lists = array();
-    $tpl = '<li><a title="$name" href="$editlink">$real</a>&nbsp; <a title="'.
-        wfMsg('hacl_acllist_view').'" href="$viewlink"><img src="'.$haclgHaloScriptPath.
-        '/skins/images/view.png" /></a><a title="'.
-        wfMsg('hacl_acllist_edit').'" href="$editlink"><img src="'.$haclgHaloScriptPath.
-        '/skins/images/edit.png" /></a></li>';
-    foreach ($sds as $sd)
-    {
-        $d = array(
-            'name' => $sd->getSDName(),
-            'real' => $sd->getSDName(),
-            'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName(),
-            'viewlink' => Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl(),
-        );
-        if ($p = strpos($d['real'], '/'))
-            $d['real'] = substr($d['real'], $p+1);
-        $t = $tpl;
-        foreach ($d as $k => $v)
-            $t = str_replace('$'.$k, $v, $t);
-        $lists[$sd->getPEType()] .= $t;
-    }
-    $html = '';
-    foreach (array('namespace', 'category', 'right', 'template', 'page') as $k)
-        if ($lists[$k])
-            $html .= wfMsg('hacl_acllist_'.$k) . '<ul>' . $lists[$k] . '</ul>';
-    if (!$lists)
-        $html = wfMsg('hacl_no_acls');
-    if ($max)
-        $html .= '<p>...</p>';
-    return $html;
+    $a = func_get_args();
+    return call_user_func_array(array('HaloACLSpecial', 'haclAcllist'), $a);
 }
 
 function haclGroupClosure($n)
@@ -299,6 +260,14 @@ function haclGroupClosure($n)
         return 'false';
     // FIXME json_encode requires PHP >= 5.2.0
     return json_encode($members);
+}
+
+function haclSDExists($type, $name)
+{
+    $peID = HACLSecurityDescriptor::peIDforName($name, $type);
+    if (!$peID)
+        return 'false';
+    return HACLStorage::getDatabase()->getSDForPE($peID, $type) ? 'true' : 'false';
 }
 
 /**** OLD ****/
