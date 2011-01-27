@@ -24,13 +24,8 @@
  * Date: 22.06.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class contains two static functions that hook into the query processing of the
