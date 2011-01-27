@@ -20,11 +20,8 @@
 *   Author: kai
 */
 
-
-
-class HACLDBHelper {
-
-
+class HACLDBHelper
+{
     /**
      * Make sure the table of the given name has the given fields, provided
      * as an array with entries fieldname => typeparams. typeparams should be

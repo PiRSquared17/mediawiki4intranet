@@ -36,7 +36,7 @@ class HACLException extends Exception {
 	// An unknown user is given for a group 
 	// Parameters:
 	// 1 - name of the user
-	const UNKOWN_USER = 1;
+	const UNKNOWN_USER = 1;
 	
 	// An internal error occurred
 	// Parameters:
@@ -71,7 +71,7 @@ class HACLException extends Exception {
     protected function createMessage($args) {
     	$msg = "";
     	switch ($args[0]) {
-    		case self::UNKOWN_USER:
+    		case self::UNKNOWN_USER:
     			$msg = "The user $args[1] is unknown.";
     			break;
    			case self::INTERNAL_ERROR:

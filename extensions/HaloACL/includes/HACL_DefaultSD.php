@@ -23,14 +23,8 @@
  * Date: 22.05.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined( 'MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class manages the default security descriptor for users.
@@ -69,33 +63,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * @author Thomas Schweitzer
  *
  */
-class  HACLDefaultSD  {
-
-    //--- Constants ---
-//    const XY= 0;        // the result has been added since the last time
-
-    //--- Private fields ---
-    private $mXY;            //string: comment
-
-    /**
-     * Constructor for  HACLDefaultSD
-     *
-     * @param type $param
-     *         Name of the notification
-     */
-    function __construct() {
-//        $this->mXY = $xy;
-    }
-
-
-    //--- getter/setter ---
-//    public function getXY()           {return $this->mXY;}
-
-//    public function setXY($xy)               {$this->mXY = $xy;}
-
-    //--- Public methods ---
-
-
+class HACLDefaultSD
+{
     /**
      * This method is called, after an article has been saved. If the article
      * belongs to the namespace ACL (i.e. a right, SD, group or whitelist)
@@ -115,15 +84,18 @@ class  HACLDefaultSD  {
      *
      * @return true
      */
-    public static function articleSaveComplete(&$article, &$user, $text) {
+    public static function articleSaveComplete(&$article, &$user, $text)
+    {
         global $wgUser, $wgRequest;
 
-        if ($article->getTitle()->getNamespace() == HACL_NS_ACL) {
+        if ($article->getTitle()->getNamespace() == HACL_NS_ACL)
+        {
             // No default SD for articles in the namespace ACL
             return true;
         }
 
-        if ($user->isAnon()) {
+        if ($user->isAnon())
+        {
             // Don't create default SDs for anonymous users
             return true;
         }
@@ -132,7 +104,8 @@ class  HACLDefaultSD  {
 
         $sdAlreadyDefinied = false;
         $createCustomSD = false;
-        if (HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false) {
+        if (HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false)
+        {
             // There is already an SD for the article
             $sdAlreadyDefinied = true;
         }
@@ -204,7 +177,7 @@ class  HACLDefaultSD  {
                 // Create the default SD for the saved article
                 // Get the content of the default SD
 
-                                #$defaultSDArticle = new Article($defaultSD);
+                #$defaultSDArticle = new Article($defaultSD);
                 #$content = $defaultSDArticle->getContent();
 
                 // Create the new SD
@@ -214,7 +187,7 @@ class  HACLDefaultSD  {
                 #$etc = haclfDisableTitlePatch();
                 $newSD = Title::newFromText($newSDName);
                 #haclfRestoreTitlePatch($etc);
-                                $content = "
+                $content = "
 {{#predefined right:rights=".$defaultSDName."}}
 {{#manage rights:assigned to=User:".$wgUser->getName()."}}
 [[Category:ACL/ACL]]

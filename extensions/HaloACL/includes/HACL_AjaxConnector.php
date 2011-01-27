@@ -2132,15 +2132,15 @@ HTML;
             $footerextension .= <<<HTML
                 <script type="javascript>
 HTML;
-            if ($actions & HACLRight::EDIT)  $footerextension .= "$('checkbox_right_edit_$panelid').checked = true;";
-            if ($actions & HACLRight::CREATE)  $footerextension .= "$('checkbox_right_create_$panelid').checked = true;";
-            if ($actions & HACLRight::MOVE)  $footerextension .= "$('checkbox_right_move_$panelid').checked = true;";
-            if ($actions & HACLRight::DELETE)  $footerextension .= "$('checkbox_right_delete_$panelid').checked = true;";
-            if ($actions & HACLRight::READ)  $footerextension .= "$('checkbox_right_read_$panelid').checked = true;";
-            if ($actions & HACLRight::FORMEDIT)  $footerextension .= "$('checkbox_right_formedit_$panelid').checked = true;";
-            if ($actions & HACLRight::ANNOTATE)  $footerextension .= "$('checkbox_right_annotate_$panelid').checked = true;";
-            if ($actions & HACLRight::WYSIWYG)  $footerextension .= "$('checkbox_right_wysiwyg_$panelid').checked = true;";
-            if($actions & HACLRight::EDIT && $actions & HACLRight::CREATE && $actions & HACLRight::MOVE && $actions & HACLRight::DELETE && $actions & HACLRight::READ && $actions & HACLRight::FORMEDIT && $actions & HACLRight::ANNOTATE && $actions & HACLRight::WYSIWYG) $footerextension .= "$('checkbox_right_fullaccess_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_EDIT)  $footerextension .= "$('checkbox_right_edit_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_CREATE)  $footerextension .= "$('checkbox_right_create_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_MOVE)  $footerextension .= "$('checkbox_right_move_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_DELETE)  $footerextension .= "$('checkbox_right_delete_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_READ)  $footerextension .= "$('checkbox_right_read_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_FORMEDIT)  $footerextension .= "$('checkbox_right_formedit_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_ANNOTATE)  $footerextension .= "$('checkbox_right_annotate_$panelid').checked = true;";
+            if ($actions & HACLLanguage::RIGHT_WYSIWYG)  $footerextension .= "$('checkbox_right_wysiwyg_$panelid').checked = true;";
+            if($actions & HACLLanguage::RIGHT_EDIT && $actions & HACLLanguage::RIGHT_CREATE && $actions & HACLLanguage::RIGHT_MOVE && $actions & HACLLanguage::RIGHT_DELETE && $actions & HACLLanguage::RIGHT_READ && $actions & HACLLanguage::RIGHT_FORMEDIT && $actions & HACLLanguage::RIGHT_ANNOTATE && $actions & HACLLanguage::RIGHT_WYSIWYG) $footerextension .= "$('checkbox_right_fullaccess_$panelid').checked = true;";
             $footerextension .= "</script>";
 
         } else {
@@ -3185,14 +3185,14 @@ function haclGetSDRightsPanel($sdId, $readOnly = false,$autosave = true) {
             $xml .= "</groups>";
             $xml .= "<rights>";
             $actions = $rightToSave->getActions();
-            if ($actions & HACLRight::EDIT)  $xml .= "<right>edit</right>";
-            if ($actions & HACLRight::CREATE)  $xml .= "<right>create</right>";
-            if ($actions & HACLRight::MOVE)  $xml .= "<right>move</right>";
-            if ($actions & HACLRight::DELETE)  $xml .= "<right>delete</right>";
-            if ($actions & HACLRight::READ)  $xml .= "<right>read</right>";
-            if ($actions & HACLRight::FORMEDIT)  $xml .= "<right>formedit</right>";
-            if ($actions & HACLRight::ANNOTATE)  $xml .= "<right>annotate</right>";
-            if ($actions & HACLRight::WYSIWYG)  $xml .= "<right>wysiwyg</right>";
+            if ($actions & HACLLanguage::RIGHT_EDIT)  $xml .= "<right>edit</right>";
+            if ($actions & HACLLanguage::RIGHT_CREATE)  $xml .= "<right>create</right>";
+            if ($actions & HACLLanguage::RIGHT_MOVE)  $xml .= "<right>move</right>";
+            if ($actions & HACLLanguage::RIGHT_DELETE)  $xml .= "<right>delete</right>";
+            if ($actions & HACLLanguage::RIGHT_READ)  $xml .= "<right>read</right>";
+            if ($actions & HACLLanguage::RIGHT_FORMEDIT)  $xml .= "<right>formedit</right>";
+            if ($actions & HACLLanguage::RIGHT_ANNOTATE)  $xml .= "<right>annotate</right>";
+            if ($actions & HACLLanguage::RIGHT_WYSIWYG)  $xml .= "<right>wysiwyg</right>";
             $xml .= "</rights>";
             $xml .= "</inlineright>";
             haclSaveTempRightToSession($xml);
