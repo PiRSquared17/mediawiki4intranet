@@ -727,9 +727,8 @@ class HACLStorageSQL {
             array('ORDER BY' => 'page_title'),
             array('page' => array('LEFT JOIN', array('page_id=sd_id')))
         );
-        while ($row = $dbr->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res))
             $sds[] = HACLSecurityDescriptor::newFromID($row->sd_id);
-        }
         $dbr->freeResult($res);
 
         return $sds;
@@ -1253,14 +1252,39 @@ class HACLStorageSQL {
      *         int: ID of the security descriptor
      *         <false>, if there is no SD for the protected element
      */
-    public static function getSDForPE($peID, $peType) {
-        $dbr =& wfGetDB( DB_SLAVE );
-
+    public static function getSDForPE($peID, $peType)
+    {
+        $dbr = wfGetDB( DB_SLAVE );
         $obj = $dbr->selectRow('halo_acl_security_descriptors', 'sd_id',
             array('pe_id' => $peID, 'type' => $peType), __METHOD__);
         return ($obj === false) ? false : $obj->sd_id;
     }
 
+    public static function getSDs2($type = NULL, $prefix = NULL, $limit = NULL)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        $options = array('ORDER BY' => 'page_title');
+        if ($limit)
+            $options['LIMIT'] = $limit;
+        $where = array('sd_id=page_id');
+        if ($type !== NULL)
+            $where['type'] = $type;
+        if (strlen($prefix))
+            $where[] = 'page_title LIKE '.$dbr->addQuotes("$prefix%").' OR page_title LIKE '.$dbr->addQuotes("%/$prefix%");
+        $res = $dbr->select(array('halo_acl_security_descriptors', 'page'),
+            'sd_id, pe_id, type, mr_groups, mr_users, page_namespace, page_title',
+            $where, __METHOD__,
+            $options
+        );
+        $rights = array();
+        foreach ($res as $r)
+            $rights[] = new HACLSecurityDescriptor(
+                $r->sd_id, $r->page_title, $r->pe_id,
+                $r->type, $r->mg_groups ? $r->mg_groups : array(),
+                $r->mg_users ? $r->mg_users : array()
+            );
+        return $rights;
+    }
 
     /***************************************************************************
      *

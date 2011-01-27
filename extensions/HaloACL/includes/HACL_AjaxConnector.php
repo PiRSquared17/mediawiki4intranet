@@ -64,7 +64,8 @@ function unescape($source) {
  * defining ajax-callable functions
  */
 global $wgAjaxExportList;
-$wgAjaxExportList[] = 'haclUserHint';
+$wgAjaxExportList[] = 'haclAutocomplete';
+$wgAjaxExportList[] = 'haclAcllist';
 $wgAjaxExportList[] = 'haclGroupClosure';
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
@@ -113,10 +114,11 @@ $wgAjaxExportList[] = "haclDoesArticleExists";
 $wgAjaxExportList[] = "haclSDpopupByName";
 $wgAjaxExportList[] = "haclRemovePanelForTemparray";
 
-function haclUserHint($t, $n)
+function haclAutocomplete($t, $n, $limit = 11)
 {
-    $limit = 11;
-    $html = '';
+    if (!$limit)
+        $limit = 11;
+    $a = array();
     $dbr = wfGetDB(DB_SLAVE);
     if ($t == 'user')
     {
@@ -126,47 +128,157 @@ function haclUserHint($t, $n)
             __METHOD__,
             array('ORDER BY' => 'user_name', 'LIMIT' => $limit)
         );
-        $i = 0;
         while ($row = $r->fetchRow())
-        {
-            if ((++$i) > 10)
-                $html .= '<div class="hacl_tt">...</div>';
-            else
-            {
-                $rn = $row[1];
-                if (!$rn)
-                    $rn = $row[0];
-                $n = $row[0];
-                $html .=
-                    '<div id="hi_'.$i.'" class="hacl_ti" title="'.
-                    htmlspecialchars($n).
-                    '">'.
-                    htmlspecialchars($rn).'</div>';
-            }
-        }
-        if (!$i)
-            $html .= wfMsg('hacl_no_users');
+            $a[] = array($row[1] ? $row[1] : $row[0], $row[0]);
     }
     elseif ($t == 'group')
     {
+        $ip = 'hi_';
         $r = HACLStorage::getDatabase()->getGroups($n, $limit);
-        $i = 0;
         foreach ($r as $group)
         {
-            if ((++$i) > 10)
-                $html .= '<div class="hacl_tt">...</div>';
-            else
+            $n = $group->getGroupName();
+            if (($p = strpos($n, '/')) !== false)
+                $n = substr($n, $p+1);
+            $a[] = array($n, $n);
+        }
+    }
+    elseif ($t == 'page')
+    {
+        $ip = 'ti_';
+        $n = str_replace(' ', '_', $n);
+        $where = array();
+        $etc = haclfDisableTitlePatch();
+        $tt = Title::newFromText($n.'X');
+        if ($tt->getNamespace() != NS_MAIN)
+        {
+            $n = substr($tt->getDBkey(), 0, -1);
+            $where['page_namespace'] = $tt->getNamespace();
+        }
+        haclfRestoreTitlePatch($etc);
+        $where[] = 'page_title LIKE '.$dbr->addQuotes($n.'%');
+        $r = $dbr->select(
+            'page', 'page_title, page_namespace',
+            $where, __METHOD__,
+            array('ORDER BY' => 'page_namespace, page_title', 'LIMIT' => $limit)
+        );
+        while ($row = $r->fetchRow())
+        {
+            $t = Title::newFromText($row[0], $row[1]);
+            if ($t->userCanRead())
             {
-                $n = $group->getGroupName();
-                if (($p = strpos($n, '/')) !== false)
-                    $n = substr($n, $p+1);
-                $n = htmlspecialchars($n);
-                $html .= '<div id="hi_'.$i.'" class="hacl_ti" title="'.$n.'">'.$n.'</div>';
+                $t = $t->getPrefixedText();
+                $a[] = array($t, $t);
             }
         }
-        if (!$i)
-            $html .= wfMsg('hacl_no_groups');
     }
+    elseif ($t == 'namespace')
+    {
+        $ip = 'ti_';
+        global $wgCanonicalNamespaceNames;
+        $ns = $wgCanonicalNamespaceNames;
+        $ns[0] = 'Main';
+        ksort($ns);
+        $limit = count($ns)+1;
+        $n = mb_strtolower($n);
+        $nl = mb_strlen($n);
+        foreach ($ns as $k => $v)
+            if ($k >= 0 && mb_strtolower(mb_substr($v, 0, $nl)) == $n)
+                $a[] = array($v, $v);
+    }
+    elseif ($t == 'category')
+    {
+        $ip = 'ti_';
+        $where = array(
+            'page_namespace' => NS_CATEGORY,
+            'page_title LIKE '.$dbr->addQuotes(str_replace(' ', '_', $n).'%')
+        );
+        $r = $dbr->select(
+            'page', 'page_title',
+            $where, __METHOD__,
+            array('ORDER BY' => 'page_title', 'LIMIT' => $limit)
+        );
+        while ($row = $r->fetchRow())
+        {
+            $t = Title::newFromText($row[0], NS_CATEGORY);
+            if ($t->userCanRead())
+            {
+                $t = $t->getText();
+                $a[] = array($t, $t);
+            }
+        }
+    }
+    elseif (substr($t, 0, 3) == 'sd/')
+    {
+        $ip = 'ri_';
+        foreach (HACLStorage::getDatabase()->getSDs2(substr($t, 3), $n, $limit) as $sd)
+        {
+            $rn = $sd->getSDName();
+            if ($p = strpos($rn, '/'))
+                $rn = substr($rn, $p+1);
+            $a[] = array($rn, $sd->getSDName());
+        }
+    }
+    $i = 0;
+    $html = '';
+    foreach ($a as $item)
+    {
+        if ((++$i) >= $limit)
+            $html .= '<div class="hacl_tt">...</div>';
+        else
+            $html .=
+                '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
+                htmlspecialchars($item[1]).'">'.
+                htmlspecialchars($item[0]).'</div>';
+    }
+    if (!$i)
+        $html = '<div class="hacl_tt">'.wfMsg('hacl_autocomplete_no_'.$t.'s').'</div>';
+    return $html;
+}
+
+function haclAcllist($t, $n, $limit = 100)
+{
+    global $wgScript, $wgTitle, $haclgHaloScriptPath;
+    haclCheckScriptPath();
+    $t = $t ? explode(',', $t) : NULL;
+    if (!$limit)
+        $limit = 101;
+    $sds = HACLStorage::getDatabase()->getSDs2($t, $n, $limit);
+    if (count($sds) == $limit)
+    {
+        array_pop($sds);
+        $max = true;
+    }
+    $lt = '';
+    $lists = array();
+    $tpl = '<li><a title="$name" href="$editlink">$real</a>&nbsp; <a title="'.
+        wfMsg('hacl_acllist_view').'" href="$viewlink"><img src="'.$haclgHaloScriptPath.
+        '/skins/images/view.png" /></a><a title="'.
+        wfMsg('hacl_acllist_edit').'" href="$editlink"><img src="'.$haclgHaloScriptPath.
+        '/skins/images/edit.png" /></a></li>';
+    foreach ($sds as $sd)
+    {
+        $d = array(
+            'name' => $sd->getSDName(),
+            'real' => $sd->getSDName(),
+            'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName(),
+            'viewlink' => Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl(),
+        );
+        if ($p = strpos($d['real'], '/'))
+            $d['real'] = substr($d['real'], $p+1);
+        $t = $tpl;
+        foreach ($d as $k => $v)
+            $t = str_replace('$'.$k, $v, $t);
+        $lists[$sd->getPEType()] .= $t;
+    }
+    $html = '';
+    foreach (array('namespace', 'category', 'right', 'template', 'page') as $k)
+        if ($lists[$k])
+            $html .= wfMsg('hacl_acllist_'.$k) . '<ul>' . $lists[$k] . '</ul>';
+    if (!$lists)
+        $html = wfMsg('hacl_no_acls');
+    if ($max)
+        $html .= '<p>...</p>';
     return $html;
 }
 

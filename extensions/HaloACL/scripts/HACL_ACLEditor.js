@@ -1,25 +1,33 @@
-var aclRightPrefix = 'Right';
-var aclNsText = 'ACL';
-var msgStartTyping = 'Start typing to display $1 list...';
-var userNsRegexp = '(^|,\s*)Участник:';
-var groupPrefixRegexp = '(^|,\s*)Group:';
+var allActions = [ 'create', 'delete', 'edit', 'move', 'read' ];
 var groupClosureCache = {};
 var aclRights = {};
 var aclClosure = {};
-var user_hint;
+var user_hint, target_hint, inc_hint, last_target = '';
 
 userNsRegexp = userNsRegexp ? new RegExp(userNsRegexp, 'gi') : '';
 groupPrefixRegexp = groupPrefixRegexp ? new RegExp(groupPrefixRegexp, 'gi') : '';
 
+if (!String.prototype.trim)
+    String.prototype.trim = function() { return this.replace(/^\s*/, '').replace(/\s*$/, ''); }
+
 // change target ACL page name/type
 function target_change()
 {
-    var isr = document.getElementById('acl_right').checked;
-    document.getElementById('p_sd').className = isr ? 'inactive' : '';
-    document.getElementById('p_right').className = isr ? '' : 'inactive';
-    var what = isr ? aclRightPrefix : document.getElementById('acl_what').value;
-    var name = document.getElementById(isr ? 'acl_right_name' : 'acl_name').value.trim();
-    var pns = document.getElementById('acl_pns');
+    var what = document.getElementById('acl_what').value;
+    var an = document.getElementById('acl_name');
+    if (last_target != what)
+    {
+        if (last_target)
+        {
+            if (what == 'Template')
+                an.value = wgUserName;
+            else
+                an.value = '';
+            target_hint.change();
+        }
+        last_target = what;
+    }
+    var name = an.value.trim();
     if (name.length)
     {
         var pn = document.getElementById('acl_pn');
@@ -27,10 +35,9 @@ function target_change()
         pn.innerHTML = t;
         pn.href = wgScript+'/'+t;
         document.getElementById('wpTitle').value = t;
-        pns.style.display = '';
     }
-    else
-        pns.style.display = 'none';
+    document.getElementById('acl_pns').style.display = name.length ? '' : 'none';
+    document.getElementById('acl_pnhint').style.display = name.length ? 'none' : '';
 }
 
 // add ACL inclusion
@@ -48,8 +55,8 @@ function parse_sd()
 {
     var t = document.getElementById('acl_def').value;
     var m = t.match(/\{\{\s*\#access:\s*[^\}]*?\}\}/ig);
-    var r = {}, i, j, k, h, act, ass;
-    for (i in m)
+    var r = {}, i = 0, j, k, h, act, ass;
+    while (m[i])
     {
         ass = /[:\|]\s*assigned\s+to\s*=\s*([^\|\}]*)/i.exec(m[i]);
         ass = (ass[1] || '');
@@ -65,7 +72,7 @@ function parse_sd()
         {
             if (act[j] == '*')
             {
-                act = [ 'create', 'delete', 'edit', 'move', 'read' ];
+                act = allActions;
                 break;
             }
             else if (h[act[j]])
@@ -84,18 +91,21 @@ function parse_sd()
                 r[ass[k]][act[j]] = true;
             }
         }
+        i++;
     }
     // assigned to manage rights
     var m1 = t.match(/\{\{\s*\#manage\s+rights:\s*[^\}]*?\}\}/ig);
-    for (i in m1)
+    i = 0;
+    while (m1[i])
     {
         ass = /[:\|]\s*assigned\s+to\s*=\s*([^\|\}]*)/i.exec(m1[i]);
-        ass = (ass[1] || '').trim().split(/[,\s*],[,\s]*/);
+        ass = (ass[1] || '').trim().split(/[,\s*]*,[,\s]*/);
         for (k in ass)
         {
             r[ass[k]] = r[ass[k]] || {};
             r[ass[k]]['manage'] = true;
         }
+        i++;
     }
     return r;
 }
@@ -193,7 +203,7 @@ function save_sd(rights)
         if (i.length)
         {
             i = i.sort().join(', ');
-            if (i == 'create, delete, edit, move, read')
+            if (i == allActions.join(', '))
                 i = '*';
             m[i] = m[i] || [];
             m[i].push(j);
@@ -213,9 +223,26 @@ function act_change(e)
     if (e.disabled)
         return;
     var g_to = get_grant_to();
-    var a = e.id.substr(4);
-    var direct = aclRights[g_to] && aclRights[g_to][a];
-    var grp = aclClosure[g_to] && aclClosure[g_to][a] || aclRights['#'] && aclRights['#'][a];
+    var a = e.id.substr(4), direct, grp;
+    if (a == 'all')
+    {
+        var act = allActions;
+        direct = grp = true;
+        for (var i in act)
+        {
+            i = act[i];
+            direct = direct && aclRights[g_to] && aclRights[g_to][i];
+            grp = grp &&
+                (aclClosure[g_to] && aclClosure[g_to][i] ||
+                aclRights['#'] && aclRights['#'][i]);
+        }
+    }
+    else
+    {
+        direct = aclRights[g_to] && aclRights[g_to][a];
+        grp = aclClosure[g_to] && aclClosure[g_to][a] ||
+            aclRights['#'] && aclRights['#'][a];
+    }
     // grant if not yet
     if (e.checked && !direct && !grp)
         grant(g_to, a, true);
@@ -236,7 +263,9 @@ function to_type_change()
 function to_name_change()
 {
     var g_to = get_grant_to();
-    var act = [ 'read', 'edit', 'create', 'delete', 'move', 'manage' ];
+    var act = allActions.slice(0);
+    act.push('manage', 'all');
+    var all_direct = true, all_grp = true;
     var c, l, direct, grp;
     for (var a in act)
     {
@@ -245,6 +274,17 @@ function to_name_change()
         l = document.getElementById('act_label_'+a);
         direct = g_to && aclRights[g_to] && aclRights[g_to][a];
         grp = g_to && (aclClosure[g_to] && aclClosure[g_to][a] || aclRights['#'] && aclRights['#'][a]);
+        // all = all except manage
+        if (a == 'all')
+        {
+            direct = all_direct;
+            grp = all_grp;
+        }
+        else if (a != 'manage')
+        {
+            all_direct = all_direct && direct;
+            all_grp = all_grp && grp;
+        }
         c.checked = direct || grp;
         // disable checkbox if right is granted through some group
         c.disabled = !g_to || grp;
@@ -269,32 +309,107 @@ function get_grant_to()
 }
 
 // grant/revoke g_act to/from g_to and update textbox with definition
+// g_act is: one of allActions, or 'manage', or 'all'
 function grant(g_to, g_act, g_yes)
 {
+    if (g_act == 'all')
+        act = allActions;
+    else
+        act = [ g_act ];
     if (g_yes)
     {
-        aclRights[g_to] = aclRights[g_to] || {};
-        aclRights[g_to][g_act] = true;
+        for (var a in act)
+        {
+            aclRights[g_to] = aclRights[g_to] || {};
+            aclRights[g_to][act[a]] = true;
+        }
     }
-    else if (aclRights[g_to])
-        delete aclRights[g_to][g_act];
+    else
+    {
+        for (var a in act)
+            if (aclRights[g_to])
+                delete aclRights[g_to][act[a]];
+    }
+    if (g_act == 'all')
+        for (var a in allActions)
+            document.getElementById('act_'+allActions[a]).checked = g_yes;
+    else
+    {
+        var c = aclRights[g_to];
+        if (c)
+            for (var a in allActions)
+                c = c && aclRights[g_to][allActions[a]];
+        document.getElementById('act_all').checked = c;
+    }
     save_sd(aclRights);
     if (g_to.substr(0, 6) == 'Group/')
         fill_closure();
 }
 
-// create input autocompleter for users/groups and init to_name_change()
-(function()
+// escape &<>"'
+function htmlspecialchars(s)
 {
+    var r = { '&' : '&amp;', '<' : '&lt;', '>' : '&gt;', '"' : '&quot;', '\'' : '&apos;' };
+    for (var i in r)
+        s = s.replace(i, r[i]);
+    return s;
+}
+
+// get autocomplete html code for the case when to_name is empty
+function get_empty_hint()
+{
+    var tt = document.getElementById('to_type').value;
+    var involved = [], n, j = 0;
+    if (tt == 'group' || tt == 'user')
+    {
+        var x = {};
+        for (n in aclRights)
+            for (j in aclRights[n])
+            {
+                x[n] = true;
+                break;
+            }
+        for (n in aclClosure)
+            for (j in aclClosure[n])
+            {
+                x[n] = true;
+                break;
+            }
+        j = 0;
+        for (var n in x)
+        {
+            if ((tt == 'group') == (n.substr(0, 6) == 'Group/'))
+            {
+                n = htmlspecialchars(n.replace(/^User:|^Group\//, ''));
+                involved.push('<div id="hi_'+(++j)+'" class="hacl_ti" title="'+n+'">'+n+'</div>');
+            }
+        }
+    }
+    if (!involved.length)
+        return '<div class="hacl_tt">'+msgStartTyping[tt]+'</div>';
+    return '<div class="hacl_tt">'+msgAffected[tt]+'</div>'+involved.join('');
+}
+
+// initialize ACL editor
+function acl_init_editor()
+{
+    // create autocompleter for user/group name
     var w = document.getElementById('to_type');
-    user_hint = new SHint(
-        'to_name', 'hacl', msgStartTyping.replace('$1', w.value),
-        function (h, v) { sajax_do_call('haclUserHint', [ w.value, v ], function (request) { if (request.status == 200) h.change_ajax(request.responseText) }) });
+    user_hint = new SHint('to_name', 'hacl',
+        function (h, v)
+        {
+            if (!v.length)
+                h.change_ajax(get_empty_hint());
+            else
+                sajax_do_call('haclAutocomplete', [ w.value, v ],
+                    function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+        });
     user_hint.change_old = user_hint.change;
     user_hint.change = function(ev)
     {
         // onchange for to_name
-        user_hint.msg_hint = msgStartTyping.replace('$1', w.value);
+        if (!user_hint.element.value.trim())
+            user_hint.msg_hint = get_empty_hint();
         user_hint.element.style.display = w.value == '*' || w.value == '#' ? 'none' : '';
         if (w.value == '*' || w.value == '#')
             user_hint.focus(false);
@@ -305,4 +420,36 @@ function grant(g_to, g_act, g_yes)
     user_hint.init();
     exAttach('to_name', 'change', to_name_change);
     to_name_change();
-}) ();
+    // init protection target
+    target_change();
+    // create autocompleter for protection target
+    var w1 = document.getElementById('acl_what');
+    target_hint = new SHint('acl_name', 'hacl',
+        function (h, v)
+        {
+            var wv = w1.value.toLowerCase();
+            if (wv == 'right' || wv == 'template')
+                return;
+            if (wv != 'namespace' && !v.length)
+                h.tip_div.innerHTML = '<div class="hacl_tt">'+msgStartTyping[wv]+'</div>';
+            else
+                sajax_do_call('haclAutocomplete', [ wv, v ],
+                    function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+        });
+    // do not hint template and right targets
+    target_hint.focus = function(f)
+    {
+        target_hint.tip_div.style.display = w1.value != 'Template' && w1.value != 'Right' && (f || target_hint.nodefocus) ? '' : 'none';
+        target_hint.nodefocus = undefined;
+    };
+    target_hint.onset = target_change;
+    target_hint.max_height = 400;
+    target_hint.init();
+    // create autocompleter for ACL inclusion
+    inc_hint = new SHint('inc_acl', 'hacl',
+        function (h, v) {
+            sajax_do_call('haclAutocomplete', [ 'sd/right', v ],
+                function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+        });
+    inc_hint.init();
+}
