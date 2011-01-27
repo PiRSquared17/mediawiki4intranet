@@ -72,6 +72,7 @@ class HACLLanguageEn extends HACLLanguage
         'delete'    => 'Delete',
         'move'      => 'Move',
         'manage'    => 'Manage',
+        'all'       => 'Full Access',
     );
 
     public $mPetPrefixes = array(

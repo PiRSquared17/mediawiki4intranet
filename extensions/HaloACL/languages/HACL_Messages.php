@@ -76,12 +76,62 @@ $messages['en'] = array(
     'hacl_whitelist_mismatch'           => 'The whitelist in this article contains nonexistent articles. Please remove them and save the whitelist again.',
     'hacl_unprotectable_namespace'      => 'This namespace cannot be protected. Please contact the wiki administrator.',
 
+    /* NEW */
     'hacl_invalid_prefix'               =>
 'This page does not protect anything, create any rights or right templates.
 Either it is supposed to be included into other ACL definitions, or is created incorrectly.
 If you want to protect some pages, ACL page must be named as one of: ACL:Page/*, ACL:Category/*, ACL:Namespace/*, ACL:Property/*, ACL:Right/*, ACL:Template/*.',
     'hacl_pe_not_exists'                => 'The element supposed to be protected with this ACL does not exist.',
-    'hacl_no_users'                     => 'No users found',
+
+    'hacl_autocomplete_no_users'        => 'No users found',
+    'hacl_autocomplete_no_groups'       => 'No groups found',
+    'hacl_autocomplete_no_pages'        => 'No pages found',
+    'hacl_autocomplete_no_namespaces'   => 'No namespaces found',
+    'hacl_autocomplete_no_categorys'    => 'No categories found',
+    'hacl_autocomplete_no_propertys'    => 'No properties found',
+    'hacl_autocomplete_no_rights'       => 'No right templates found',
+
+    'hacl_acl_create'                   => 'Create ACL definition',
+    'hacl_acl_edit'                     => 'Edit ACL definition: $1',
+    'hacl_edit_definition_text'         => 'Definition text:',
+    'hacl_edit_definition_target'       => 'Definition target:',
+    'hacl_edit_modify_definition'       => 'Modify definition:',
+    'hacl_edit_include_right'           => 'Include predefined right:',
+    'hacl_edit_include_do'              => 'Include',
+    'hacl_edit_save'                    => 'Save ACL',
+    'hacl_edit_create'                  => 'Create ACL',
+    'hacl_edit_enter_name_first'        => 'Enter name first to save ACL.',
+    'hacl_edit_protect'                 => 'Protect:',
+    'hacl_edit_define'                  => 'Define:',
+    'hacl_edit_prompt_page'             => 'Start typing to display page list...',
+    'hacl_edit_prompt_user'             => 'Start typing to display user list...',
+    'hacl_edit_prompt_group'            => 'Start typing to display group list...',
+    'hacl_edit_prompt_category'         => 'Start typing to display category list...',
+    'hacl_edit_users_affected'          => 'Users affected:',
+    'hacl_edit_groups_affected'         => 'Groups affected:',
+
+    'hacl_edit_user'                    => 'User',
+    'hacl_edit_group'                   => 'Group',
+    'hacl_edit_all'                     => 'All users',
+    'hacl_edit_reg'                     => 'Registered users',
+    'hacl_define_page'                  => 'Protect page:',
+    'hacl_define_namespace'             => 'Protect namespace:',
+    'hacl_define_category'              => 'Protect category:',
+    'hacl_define_property'              => 'Protect property:',
+    'hacl_define_right'                 => 'Define right:',
+    'hacl_define_template'              => 'Define own template:',
+
+    'hacl_acllist'                      => 'Halo Access Control Lists',
+    'hacl_acllist_create_acl'           => 'Create new ACL definition',
+    'hacl_acllist_page'                 => 'Protected pages:',
+    'hacl_acllist_namespace'            => 'Protected namespaces:',
+    'hacl_acllist_category'             => 'Protected categories:',
+    'hacl_acllist_property'             => 'Protected properties:',
+    'hacl_acllist_right'                => 'Predefined rights:',
+    'hacl_acllist_template'             => 'User templates:',
+    'hacl_acllist_edit'                 => 'Edit',
+    'hacl_acllist_view'                 => 'View',
+    /* /NEW */
 
     /* Messages for semantic protection (properties etc.) */
     'hacl_sp_query_modified'            => "- The query was modified because it contains protected properties.\n",

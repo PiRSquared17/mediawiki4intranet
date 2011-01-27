@@ -109,7 +109,7 @@ class HACLSecurityDescriptor
             $SDID = self::idForSD($SDName);
         $this->mSDID = 0+$SDID;
         $this->mSDName = $SDName;
-        if (is_string($peID))
+        if (!is_numeric($peID))
         {
             $peName = $peID;
             $peID = self::peIDforName($peID, $peType);

@@ -805,9 +805,9 @@ class HACLParserFunctions
     /* Return HTML consistency check status for pages in ACL namespace */
     private function consistencyCheckHtml()
     {
-        if ($this->mTitle->getNamespace() != HACL_NS_ACL)
-            return '';
         $id = $this->mTitle->getArticleId();
+        if ($this->mTitle->getNamespace() != HACL_NS_ACL || !$id)
+            return '';
 
         global $haclgContLang;
         $msg = $this->checkConsistency();

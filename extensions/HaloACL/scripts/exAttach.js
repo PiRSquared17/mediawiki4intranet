@@ -16,7 +16,7 @@ var exAttachHandler = function(ev, k, i, func)
   if (!ev) var ev = window.event;
   var t = ev.target;
   if (!t) t = ev.srcElement;
-  if (t.nodeType == 3) t = t.parentNode; // Safari bug
+  if (t && t.nodeType == 3) t = t.parentNode; // Safari bug
   var nt = t;
   while (nt && (!nt[k] || nt[k] != i))
     nt = nt.parentNode;

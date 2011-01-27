@@ -76,19 +76,35 @@ class HaloACLSpecial extends SpecialPage
 
     public function html_acllist(&$q)
     {
-        global $wgOut;
-        
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
+        haclCheckScriptPath();
+        ob_start();
+        require(dirname(__FILE__).'/HACL_ACLList.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        $wgOut->setPageTitle(wfMsg('hacl_acllist'));
+        $wgOut->addHTML($html);
     }
 
     public function html_acl(&$q)
     {
-        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang, $wgContLang;
+        $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
+        if (!($q['sd'] &&
+            ($t = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
+            ($aclArticle = new Article($t)) &&
+            $aclArticle->exists() &&
+            ($aclSD = HACLStorage::getDatabase()->getSDByID($aclArticle->getId()))))
+        {
+            $aclArticle = NULL;
+            $aclSD = NULL;
+        }
         haclCheckScriptPath();
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
-        $wgOut->setPageTitle(wfMsg('hacl_acl_editor'));
+        $wgOut->setPageTitle($aclSD ? wfMsg('hacl_acl_edit', $aclSD->getSDName()) : wfMsg('hacl_acl_create'));
         $wgOut->addHTML($html);
     }
 
