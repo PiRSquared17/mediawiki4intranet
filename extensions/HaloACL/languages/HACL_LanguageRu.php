@@ -51,19 +51,22 @@ class HACLLanguageRu extends HACLLanguage
         HACLLanguage::PFP_RIGHTS        => 'rights',
         HACLLanguage::PFP_PAGES         => 'pages',
         HACLLanguage::PFP_MEMBERS       => 'members',
-        HACLLanguage::PFP_NAME          => 'name'
+        HACLLanguage::PFP_NAME          => 'name',
     );
 
     public $mActionNames = array(
         HACLLanguage::RIGHT_READ         => 'read',
-        HACLLanguage::RIGHT_FORMEDIT     => 'formedit',  // TODO remove (formedit = edit)
-        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',   // TODO remove (wysiwyg = edit)
         HACLLanguage::RIGHT_EDIT         => 'edit',
         HACLLanguage::RIGHT_CREATE       => 'create',
-        HACLLanguage::RIGHT_MOVE         => 'move',      // TODO remove (move = delete + create)
-        HACLLanguage::RIGHT_ANNOTATE     => 'annotate',  // TODO remove (annotate = edit)
         HACLLanguage::RIGHT_DELETE       => 'delete',
+        HACLLanguage::RIGHT_MOVE         => 'move',
         HACLLanguage::RIGHT_ALL_ACTIONS  => '*',
+        'read'      => 'Read',
+        'edit'      => 'Edit',
+        'create'    => 'Create',
+        'delete'    => 'Delete',
+        'move'      => 'Move',
+        'manage'    => 'Manage',
     );
 
     public $mPetPrefixes = array(

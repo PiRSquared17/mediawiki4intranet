@@ -60,11 +60,12 @@ function unescape($source) {
     return $decodedStr;
 }
 
-
 /*
  * defining ajax-callable functions
  */
 global $wgAjaxExportList;
+$wgAjaxExportList[] = 'haclUserHint';
+$wgAjaxExportList[] = 'haclGroupClosure';
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
 $wgAjaxExportList[] = "haclCreateManageACLPanels";
@@ -112,6 +113,83 @@ $wgAjaxExportList[] = "haclDoesArticleExists";
 $wgAjaxExportList[] = "haclSDpopupByName";
 $wgAjaxExportList[] = "haclRemovePanelForTemparray";
 
+function haclUserHint($t, $n)
+{
+    $limit = 11;
+    $html = '';
+    $dbr = wfGetDB(DB_SLAVE);
+    if ($t == 'user')
+    {
+        $r = $dbr->select(
+            'user', 'user_name, user_real_name',
+            array('user_name LIKE '.$dbr->addQuotes($n.'%').' OR user_real_name LIKE '.$dbr->addQuotes($n.'%')),
+            __METHOD__,
+            array('ORDER BY' => 'user_name', 'LIMIT' => $limit)
+        );
+        $i = 0;
+        while ($row = $r->fetchRow())
+        {
+            if ((++$i) > 10)
+                $html .= '<div class="hacl_tt">...</div>';
+            else
+            {
+                $rn = $row[1];
+                if (!$rn)
+                    $rn = $row[0];
+                $n = $row[0];
+                $html .=
+                    '<div id="hi_'.$i.'" class="hacl_ti" title="'.
+                    htmlspecialchars($n).
+                    '">'.
+                    htmlspecialchars($rn).'</div>';
+            }
+        }
+        if (!$i)
+            $html .= wfMsg('hacl_no_users');
+    }
+    elseif ($t == 'group')
+    {
+        $r = HACLStorage::getDatabase()->getGroups($n, $limit);
+        $i = 0;
+        foreach ($r as $group)
+        {
+            if ((++$i) > 10)
+                $html .= '<div class="hacl_tt">...</div>';
+            else
+            {
+                $n = $group->getGroupName();
+                if (($p = strpos($n, '/')) !== false)
+                    $n = substr($n, $p+1);
+                $n = htmlspecialchars($n);
+                $html .= '<div id="hi_'.$i.'" class="hacl_ti" title="'.$n.'">'.$n.'</div>';
+            }
+        }
+        if (!$i)
+            $html .= wfMsg('hacl_no_groups');
+    }
+    return $html;
+}
+
+function haclGroupClosure($n)
+{
+    $st = HACLStorage::getDatabase();
+    $members = array();
+    foreach (explode(',', $n) as $k)
+    {
+        if ($i = HACLGroup::idForGroup($k))
+        {
+            $members[$k] = $st->getGroupMembersRecursive($i);
+            $members[$k]['user'] = $st->getUserNames(@array_keys($members[$k]['user']));
+            $members[$k]['group'] = $st->getGroupNames(@array_keys($members[$k]['group']));
+        }
+    }
+    if (!$members)
+        return 'false';
+    // FIXME json_encode requires PHP >= 5.2.0
+    return json_encode($members);
+}
+
+/**** OLD ****/
 
 /*
  * testfunction, that just returns "testtext"

@@ -942,9 +942,7 @@ class HACLEvaluator
         }
         // Articles with protected properties are protected if an unauthorized
         // user wants to edit it
-        if ($actionID != HACLLanguage::RIGHT_WYSIWYG &&
-            $actionID != HACLLanguage::RIGHT_EDIT &&
-            $actionID != HACLLanguage::RIGHT_ANNOTATE) {
+        if ($actionID != HACLLanguage::RIGHT_EDIT) {
 
             $a = @$wgRequest->data['action'];
             if (isset($a)) {
@@ -1009,21 +1007,20 @@ class HACLEvaluator
      *         <false>: Access to the property is denied.
      *      -1: $action is not concerned with properties.
      */
-    private static function checkPropertyAccess(Title $title, User $user, $action) {
-        if (self::$mMode == HACLEvaluator::DENY_DIFF) {
+    private static function checkPropertyAccess(Title $title, User $user, $action)
+    {
+        if (self::$mMode == HACLEvaluator::DENY_DIFF)
             return false;
-        }
-        if (self::$mMode == HACLEvaluator::ALLOW_PROPERTY_READ
-            && $action == 'propertyread') {
-                return true;
-        }
+        if (self::$mMode == HACLEvaluator::ALLOW_PROPERTY_READ && $action == 'propertyread')
+            return true;
 
-        switch ($action) {
+        switch ($action)
+        {
             case 'propertyread':
                 $actionID = HACLLanguage::RIGHT_READ;
                 break;
             case 'propertyformedit':
-                $actionID = HACLLanguage::RIGHT_FORMEDIT;
+                $actionID = HACLLanguage::RIGHT_EDIT;
                 break;
             case 'propertyedit':
                 $actionID = HACLLanguage::RIGHT_EDIT;
@@ -1032,9 +1029,8 @@ class HACLEvaluator
                 // No property access requested
                 return -1;
         }
-        if (self::$mSavePropertiesAllowed) {
+        if (self::$mSavePropertiesAllowed)
             return true;
-        }
         return self::hasPropertyRight($title, $user->getId(), $actionID);
     }
 
@@ -1053,43 +1049,48 @@ class HACLEvaluator
      *         <true>, if values have been added, removed or changed,
      *         <false>, if values are exactly the same.
      */
-    private static function propertyValuesChanged(SMWPropertyValue $property,
-                                                  SMWSemanticData $oldValues,
-                                                  SMWSemanticData $newValues) {
-
-
+    private static function propertyValuesChanged(
+        SMWPropertyValue $property, SMWSemanticData $oldValues,
+        SMWSemanticData $newValues)
+    {
         // Get all old values of the property
         $oldPV = $oldValues->getPropertyValues($property);
         $oldValues = array();
         self::$mMode = HACLEvaluator::ALLOW_PROPERTY_READ;
-        foreach ($oldPV as $v) {
+        foreach ($oldPV as $v)
             $oldValues[$v->getHash()] = false;
-        }
         self::$mMode = HACLEvaluator::NORMAL;
 
         // Get all new values of the property
         $newPV = $newValues->getPropertyValues($property);
-        foreach ($newPV as $v) {
+        foreach ($newPV as $v)
+        {
             self::$mMode = HACLEvaluator::ALLOW_PROPERTY_READ;
             $wv = $v->getWikiValue();
-            if (empty($wv)) {
+            if (empty($wv))
+            {
                 // A property has an empty value => can be ignored
                 continue;
             }
 
             $nv = $v->getHash();
             self::$mMode = HACLEvaluator::NORMAL;
-            if (array_key_exists($nv, $oldValues)) {
+            if (array_key_exists($nv, $oldValues))
+            {
                 // Old value was not changed
                 $oldValues[$nv] = true;
-            } else {
+            }
+            else
+            {
                 // A new value was added
                 return true;
             }
         }
 
-        foreach ($oldValues as $stillThere) {
-            if (!$stillThere) {
+        foreach ($oldValues as $stillThere)
+        {
+            if (!$stillThere)
+            {
                 // A property value has been deleted
                 return true;
             }
