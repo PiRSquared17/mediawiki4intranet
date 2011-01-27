@@ -33,66 +33,75 @@ include_once($haclgIP . '/includes/HACL_SecurityDescriptor.php');
  *
  * @author Thomas Schweitzer
  */
-class HACLLanguageEn extends HACLLanguage {
+class HACLLanguageEn extends HACLLanguage
+{
+    public $mNamespaces = array(
+        HACL_NS_ACL       => 'ACL',
+        HACL_NS_ACL_TALK  => 'ACL_talk'
+    );
 
-	protected $mNamespaces = array(
-		HACL_NS_ACL       => 'ACL',
-		HACL_NS_ACL_TALK  => 'ACL_talk'
-	);
+    public $mPermissionDeniedPage = "Permission denied";
 
-	protected $mPermissionDeniedPage = "Permission denied";
-	
-	protected $mParserFunctions = array(
-		HACLLanguage::PF_ACCESS				=> 'access', 
-		HACLLanguage::PF_MANAGE_RIGHTS		=> 'manage rights',
-		HACLLanguage::PF_MANAGE_GROUP		=> 'manage group',
-		HACLLanguage::PF_PREDEFINED_RIGHT	=> 'predefined right',
-		HACLLanguage::PF_PROPERTY_ACCESS	=> 'property access',
-		HACLLanguage::PF_WHITELIST			=> 'whitelist',
-		HACLLanguage::PF_MEMBER				=> 'member'
-	);
-	
-	protected $mParserFunctionsParameters = array(
-		HACLLanguage::PFP_ASSIGNED_TO	=> 'assigned to', 
-		HACLLanguage::PFP_ACTIONS		=> 'actions', 
-		HACLLanguage::PFP_DESCRIPTION	=> 'description', 
-		HACLLanguage::PFP_RIGHTS		=> 'rights', 
-		HACLLanguage::PFP_PAGES			=> 'pages', 
-		HACLLanguage::PFP_MEMBERS		=> 'members',
-		HACLLanguage::PFP_NAME			=> 'name'		
-	);
-	
-	protected $mActionNames = array(
-		HACLRight::READ     => 'read',
-		HACLRight::FORMEDIT => 'formedit',
-		HACLRight::WYSIWYG	=> 'wysiwyg',
-		HACLRight::EDIT     => 'edit',
-		HACLRight::CREATE   => 'create',
-		HACLRight::MOVE     => 'move',
-		HACLRight::ANNOTATE => 'annotate',
-		HACLRight::DELETE   => 'delete',
-		HACLRight::ALL_ACTIONS => '*'
-	);
-	
-	protected $mCategories = array(
-		HACLLanguage::CAT_GROUP		=> 'Category:ACL/Group',
-		HACLLanguage::CAT_RIGHT		=> 'Category:ACL/Right',
-		HACLLanguage::CAT_SECURITY_DESCRIPTOR => 'Category:ACL/ACL',
-	);
-	
-	protected $mWhitelist = "Whitelist";
-	
-	protected $mPetPrefixes = array(
-		HACLSecurityDescriptor::PET_PAGE	  => 'Page',
-		HACLSecurityDescriptor::PET_CATEGORY  => 'Category',
-		HACLSecurityDescriptor::PET_NAMESPACE => 'Namespace',
-		HACLSecurityDescriptor::PET_PROPERTY  => 'Property',
-		HACLSecurityDescriptor::PET_RIGHT	  => 'Right'
-	);
-	
-	protected $mSDTemplateName = "Template";
-        protected $mPredefinedRightName = "Right";
-	
+    public $mParserFunctions = array(
+        HACLLanguage::PF_ACCESS             => 'access',
+        HACLLanguage::PF_MANAGE_RIGHTS      => 'manage rights',
+        HACLLanguage::PF_MANAGE_GROUP       => 'manage group',
+        HACLLanguage::PF_PREDEFINED_RIGHT   => 'predefined right',
+        HACLLanguage::PF_PROPERTY_ACCESS    => 'property access',
+        HACLLanguage::PF_WHITELIST          => 'whitelist',
+        HACLLanguage::PF_MEMBER             => 'member'
+    );
+
+    public $mParserFunctionsParameters = array(
+        HACLLanguage::PFP_ASSIGNED_TO   => 'assigned to',
+        HACLLanguage::PFP_ACTIONS       => 'actions',
+        HACLLanguage::PFP_DESCRIPTION   => 'description',
+        HACLLanguage::PFP_RIGHTS        => 'rights',
+        HACLLanguage::PFP_PAGES         => 'pages',
+        HACLLanguage::PFP_MEMBERS       => 'members',
+        HACLLanguage::PFP_NAME          => 'name'
+    );
+
+    public $mActionNames = array(
+        HACLLanguage::RIGHT_READ         => 'read',
+        HACLLanguage::RIGHT_FORMEDIT     => 'formedit',  // TODO remove (formedit = edit)
+        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',   // TODO remove (wysiwyg = edit)
+        HACLLanguage::RIGHT_EDIT         => 'edit',
+        HACLLanguage::RIGHT_CREATE       => 'create',
+        HACLLanguage::RIGHT_MOVE         => 'move',      // TODO remove (move = delete + create)
+        HACLLanguage::RIGHT_ANNOTATE     => 'annotate',  // TODO remove (annotate = edit)
+        HACLLanguage::RIGHT_DELETE       => 'delete',
+        HACLLanguage::RIGHT_ALL_ACTIONS  => '*',
+    );
+
+    public $mPetPrefixes = array(
+        'page'      => 'Page',
+        'category'  => 'Category',
+        'namespace' => 'Namespace',
+        'property'  => 'Property',
+        'right'     => 'Right',
+    );
+
+    public $mPredefinedRightName = 'Right';
+    public $mSDTemplateName = 'Template';
+
+    public $mWhitelist = 'Whitelist';
+
+    public $mPrefixes = array(
+        'group'     => 'group',
+        'template'  => 'right',
+        'page'      => 'sd',
+        'category'  => 'sd',
+        'namespace' => 'sd',
+        'property'  => 'sd',
+        'right'     => 'right',
+    );
+
+    public $mPetAliases = array(
+        'page'      => 'page',
+        'category'  => 'category',
+        'namespace' => 'namespace',
+        'property'  => 'property',
+        'right'     => 'right',
+    );
 }
-
-

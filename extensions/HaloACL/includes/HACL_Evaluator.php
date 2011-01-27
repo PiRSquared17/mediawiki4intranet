@@ -1,48 +1,41 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-*   This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of heavily modified "Web 1.0" HaloACL-extension.
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * $Id: $
+ *
+ * Copyright 2009, ontoprise GmbH
+ *
+ * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * This is the main class for the evaluation of user rights for a protected object.
  * It implements the function "userCan" that is called from MW for granting or
  * denying access to articles.
- *
- * @author Thomas Schweitzer
- * Date: 13.03.2009
- *
  */
 if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
-
 /**
- *
- *
  * @author Thomas Schweitzer
- *
  */
-class HACLEvaluator {
-
-    //--- Constants ---
-
+class HACLEvaluator
+{
     //---- Constants for the modes of the evaluator ----
     const NORMAL = 0;
     const DENY_DIFF = 1;
@@ -71,11 +64,7 @@ class HACLEvaluator {
     function __construct() {
     }
 
-
-    //--- getter/setter ---
-
     //--- Public methods ---
-
 
     /**
      * This function is called from the userCan-hook of MW. This method decides
@@ -119,6 +108,7 @@ class HACLEvaluator {
             }
         }
 
+        // FIXME remove wysiwyg action rights
         // Special handling of action "wysiwyg". This is passed as
         // "action=edit&mode=wysiwyg"
         if ($action == 'edit') {
@@ -151,20 +141,23 @@ class HACLEvaluator {
         $articleID = (int) $title->getArticleID();
         if ($title->getText() === "")
             $articleID = haclfArticleID($wgTitle->getPrefixedText());
-        if ($articleID == 0)
+        if (!$articleID)
             $articleID = haclfArticleID($title->getPrefixedText());
         $userID = $user->getId();
 
-        if ($articleID == 0) {
+        if (!$articleID)
+        {
             // The article does not exist yet
-            if ($actionID == HACLRight::CREATE || $actionID == HACLRight::EDIT) {
+            if ($actionID == HACLLanguage::RIGHT_CREATE || $actionID == HACLLanguage::RIGHT_EDIT)
+            {
                 self::log('Article does not exist yet. Checking right to create.');
 
                 // Check right for creation of default SD template. Users
                 // can only create their own template. Sysops and bureaucrats
                 // can create them for everyone.
                 list ($r, $sd) = HACLDefaultSD::userCanModify($title, $user);
-                if ($sd) {
+                if ($sd)
+                {
                     haclfRestoreTitlePatch($etc);
                     $result = $r;
                     self::finishLog("Checked right for creating the default user template.", $r, $r);
@@ -173,7 +166,8 @@ class HACLEvaluator {
 
                 // Check if the user is allowed to create an SD
                 $allowed = self::checkSDCreation($title, $user);
-                if ($allowed == false) {
+                if ($allowed == false)
+                {
                     haclfRestoreTitlePatch($etc);
                     $result = false;
                     self::finishLog("Checked right for creating a security descriptor.", $result, false);
@@ -191,7 +185,8 @@ class HACLEvaluator {
 
         // Check rights for managing ACLs
         list($r, $sd) = self::checkACLManager($title, $user, $actionID);
-        if ($sd) {
+        if ($sd)
+        {
             // User tries to access an ACL article
             haclfRestoreTitlePatch($etc);
             $result = $r;
@@ -220,7 +215,7 @@ class HACLEvaluator {
             // The requested article is edited. Nevertheless, the passed $action
             // might be "read" as MW tries to show the articles source
             // => prophibit this, if it contains properties without read-access
-            $allowed = self::checkProperties($title, $userID, HACLRight::EDIT);
+            $allowed = self::checkProperties($title, $userID, HACLLanguage::RIGHT_EDIT);
         } else {
             $allowed = $savePage || self::checkProperties($title, $userID, $actionID);
         }
@@ -290,7 +285,7 @@ class HACLEvaluator {
 
         // check the whitelist
         if (HACLWhitelist::isInWhitelist($articleID)) {
-            $r = $actionID == HACLRight::READ;
+            $r = $actionID == HACLLanguage::RIGHT_READ;
             // articles in the whitelist can be read
             haclfRestoreTitlePatch($etc);
             $result = $r;
@@ -844,53 +839,75 @@ class HACLEvaluator {
      *             <true>, if there is an SD for the article
      *             <false>, if not
      */
-    private static function checkACLManager(Title $t, $user, $actionID) {
-        if ($t->getNamespace() != HACL_NS_ACL) {
+    private static function checkACLManager(Title $t, $user, $actionID)
+    {
+        // Require ACL namespace
+        if ($t->getNamespace() != HACL_NS_ACL)
             return array(true, false);
-        }
 
         $userID = $user->getId();
-        if ($userID == 0) {
-            // No access for anonymous users
+        // No access for anonymous users to ACL pages
+        if (!$userID)
             return array(false, true);
-        }
 
-        // Check if this is a default SD template
-        list($r, $sd) = HACLDefaultSD::userCanModify($t, $user);
-        if ($sd) {
-            return array($r, $sd);
-        }
-
-        if ($actionID == HACLRight::READ) {
-            // Read access for all registered users
+        // Read access for all registered users
+        if ($actionID == HACLLanguage::RIGHT_READ)
             return array(true, true);
-        }
 
-        // Check for groups
-        try {
-            $group = HACLGroup::newFromID($t->getArticleID());
-            return array($group->userCanModify($userID), true);
-        } catch (HACLGroupException $e) {
-            // Check for security descriptors
-            try {
-                $sd = HACLSecurityDescriptor::newFromID($t->getArticleID());
-                return array($sd->userCanModify($userID), true);
-            } catch (HACLSDException $e) {
-                // Check for the Whitelist
-                global $haclgContLang;
-                if ($t->getText() == $haclgContLang->getWhitelist(false)) {
-                    // User must be a sysop
-                    return array(HACLWhitelist::userCanModify($userID), true);
-                }
+        // Sysops and bureaucrats can modify anything
+        $groups = $user->getGroups();
+        if (in_array('sysop', $groups) || in_array('bureaucrat', $groups))
+            return array(true, true);
+
+        try
+        {
+            switch (self::hacl_type($t))
+            {
+                // Group
+                case 'group':
+                    $group = HACLGroup::newFromID($t->getArticleID());
+                    return array($group->userCanModify($userID), true);
+                // SD or right
+                case 'right':
+                case 'sd':
+                    $sd = HACLSecurityDescriptor::newFromID($t->getArticleID());
+                    return array($sd->userCanModify($userID), true);
+                // Whitelist
+                case 'whitelist':
+                    global $haclgContLang;
+                    if ($t->getText() == $haclgContLang->getWhitelist(false))
+                        return array(HACLWhitelist::userCanModify($userID), true);
+                    break;
+            }
+        }
+        catch (HACLSDException $e)
+        {
+            if ($e->getCode() == HACLSDException::NO_PE_ID ||
+                $e->getCode() == HACLSDException::UNKNOWN_SD)
+            {
+                // Always allow to modify non-saved SDs, because
+                // we can't check access yet
+                return array(true, true);
             }
         }
 
-        // Sysops and bureaucrats can modify the SD
-        $groups = $user->getGroups();
-        if (in_array('sysop', $groups) || in_array('bureaucrat', $groups)) {
-            return array(true, true);
-        }
         return array(false, true);
+    }
+
+    /* Check is $title corresponds to some HaloACL definition page
+       Returns 'group', 'sd', 'whitelist', 'defaultsd' or FALSE */
+    static function hacl_type($title)
+    {
+        global $haclgContLang;
+        $text = is_object($title) ? $title->getText() : $title;
+        if ($text == $haclgContLang->mWhitelist)
+            return 'whitelist';
+        elseif (($p = strpos($text, '/')) === false)
+            return false;
+        $prefix = mb_strtolower(substr($text, 0, $p));
+        if ($t = $haclgContLang->mPrefixes[$prefix])
+            return $t;
+        return false;
     }
 
     /**
@@ -919,15 +936,15 @@ class HACLEvaluator {
             return true;
         }
 
-        if ($actionID == HACLRight::READ) {
+        if ($actionID == HACLLanguage::RIGHT_READ) {
             // The article is only read but not edited => action is allowed
             return true;
         }
         // Articles with protected properties are protected if an unauthorized
         // user wants to edit it
-        if ($actionID != HACLRight::WYSIWYG &&
-            $actionID != HACLRight::EDIT &&
-            $actionID != HACLRight::ANNOTATE) {
+        if ($actionID != HACLLanguage::RIGHT_WYSIWYG &&
+            $actionID != HACLLanguage::RIGHT_EDIT &&
+            $actionID != HACLLanguage::RIGHT_ANNOTATE) {
 
             $a = @$wgRequest->data['action'];
             if (isset($a)) {
@@ -1003,13 +1020,13 @@ class HACLEvaluator {
 
         switch ($action) {
             case 'propertyread':
-                $actionID = HACLRight::READ;
+                $actionID = HACLLanguage::RIGHT_READ;
                 break;
             case 'propertyformedit':
-                $actionID = HACLRight::FORMEDIT;
+                $actionID = HACLLanguage::RIGHT_FORMEDIT;
                 break;
             case 'propertyedit':
-                $actionID = HACLRight::EDIT;
+                $actionID = HACLLanguage::RIGHT_EDIT;
                 break;
             default:
                 // No property access requested

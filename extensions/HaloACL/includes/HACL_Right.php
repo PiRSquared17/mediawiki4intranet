@@ -23,13 +23,8 @@
  * Date: 17.04.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class describes an inline right in HaloACL.
@@ -66,16 +61,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
 class  HACLRight  {
 
     //--- Constants ---
-    //---- Operations ----
-    const ALL_ACTIONS = 255;
-    const READ     = 128;
-    const FORMEDIT = 64;
-    const WYSIWYG  = 32;
-    const ANNOTATE = 16;
-    const EDIT     = 8;
-    const CREATE   = 4;
-    const MOVE     = 2;
-    const DELETE   = 1;
 
     //---- Mode parameter for getUsersEx/getGroupsEx ----
     const NAME   = 0;
@@ -101,9 +86,9 @@ class  HACLRight  {
      *
      * @param int $actions
      *         Actions that are granted by this rule. This is a bit-field of
-     *      the ORed values HACLRight::READ, HACLRight::FORMEDIT, HACLRight::WYSIWYG,
-     *      HACLRight::EDIT, HACLRight::CREATE, HACLRight::MOVE, HACLRight::ANNOTATE,
-     *      HACLRight::DELETE. According to the hierarchy of rights, missing
+     *      the ORed values HACLLanguage::RIGHT_READ, HACLLanguage::RIGHT_FORMEDIT, HACLLanguage::RIGHT_WYSIWYG,
+     *      HACLLanguage::RIGHT_EDIT, HACLLanguage::RIGHT_CREATE, HACLLanguage::RIGHT_MOVE, HACLLanguage::RIGHT_ANNOTATE,
+     *      HACLLanguage::RIGHT_DELETE. According to the hierarchy of rights, missing
      *         rights are set automatically.
      * @param array<int/string>/string $groups
      *         An array or a string of comma separated group names or IDs that
@@ -120,9 +105,9 @@ class  HACLRight  {
      *      right. Don't set this value if you create an inline right. It is set
      *         when the right is added to a security descriptor or inline right.
      * @throws
-     *         HACLGroupException(HACLGroupException::UNKOWN_GROUP)
+     *         HACLGroupException(HACLGroupException::UNKNOWN_GROUP)
      *             ... if a given group is invalid
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ... if the user is invalid
      *
      */
@@ -218,28 +203,28 @@ class  HACLRight  {
         $actionID = 0;
         switch ($actionName) {
             case "read":
-                $actionID = HACLRight::READ;
+                $actionID = HACLLanguage::RIGHT_READ;
                 break;
             case "formedit":
-                $actionID = HACLRight::FORMEDIT;
+                $actionID = HACLLanguage::RIGHT_FORMEDIT;
                 break;
             case "wysiwyg":
-                $actionID = HACLRight::WYSIWYG;
+                $actionID = HACLLanguage::RIGHT_WYSIWYG;
                 break;
             case "edit":
-                $actionID = HACLRight::EDIT;
+                $actionID = HACLLanguage::RIGHT_EDIT;
                 break;
             case "annotate":
-                $actionID = HACLRight::ANNOTATE;
+                $actionID = HACLLanguage::RIGHT_ANNOTATE;
                 break;
             case "create":
-                $actionID = HACLRight::CREATE;
+                $actionID = HACLLanguage::RIGHT_CREATE;
                 break;
             case "move":
-                $actionID = HACLRight::MOVE;
+                $actionID = HACLLanguage::RIGHT_MOVE;
                 break;
             case "delete":
-                $actionID = HACLRight::DELETE;
+                $actionID = HACLLanguage::RIGHT_DELETE;
                 break;
         }
         return $actionID;
@@ -265,7 +250,7 @@ class  HACLRight  {
      *         <false>, if not
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
@@ -291,7 +276,7 @@ class  HACLRight  {
      *         <false>, if not
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLRightException(HACLRightException::RIGHT_NOT_GRANTED)
      *             ...if the right is not granted and an exception is requested
      *
@@ -337,7 +322,7 @@ class  HACLRight  {
      *      get this right. Group names are converted and
      *      internally stored as group IDs. Invalid values cause an exception.
      * @throws
-     *         HACLGroupException(HACLGroupException::UNKOWN_GROUP)
+     *         HACLGroupException(HACLGroupException::UNKNOWN_GROUP)
      *             ... if a given group is invalid
      */
     public function setGroups($groups) {
@@ -362,7 +347,7 @@ class  HACLRight  {
                     // convert a group name to a group ID
                     $gid = HACLGroup::idForGroup(trim($mg));
                     if (!$gid) {
-                        throw new HACLGroupException(HACLGroupException::UNKOWN_GROUP, $mg);
+                        throw new HACLGroupException(HACLGroupException::UNKNOWN_GROUP, $mg);
                     }
                     $this->mGroups[$i] = $gid;
                 }
@@ -382,7 +367,7 @@ class  HACLRight  {
      *      get this right. User names are converted and
      *      internally stored as user IDs. Invalid values cause an exception.
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ... if the user is invalid
      *
      */
@@ -519,22 +504,22 @@ class  HACLRight  {
      */
     private function completeActions($actions) {
         // Complete the hierarchy of rights
-        if ($actions & (HACLRight::CREATE | HACLRight::MOVE | HACLRight::DELETE)) {
-            $actions |= HACLRight::READ | HACLRight::FORMEDIT |
-                        HACLRight::ANNOTATE | HACLRight::WYSIWYG | HACLRight::EDIT;
+        if ($actions & (HACLLanguage::RIGHT_CREATE | HACLLanguage::RIGHT_MOVE | HACLLanguage::RIGHT_DELETE)) {
+            $actions |= HACLLanguage::RIGHT_READ | HACLLanguage::RIGHT_FORMEDIT |
+                        HACLLanguage::RIGHT_ANNOTATE | HACLLanguage::RIGHT_WYSIWYG | HACLLanguage::RIGHT_EDIT;
         }
-        if ($actions & HACLRight::EDIT) {
-            $actions |= HACLRight::READ | HACLRight::FORMEDIT|
-                        HACLRight::ANNOTATE | HACLRight::WYSIWYG;
+        if ($actions & HACLLanguage::RIGHT_EDIT) {
+            $actions |= HACLLanguage::RIGHT_READ | HACLLanguage::RIGHT_FORMEDIT|
+                        HACLLanguage::RIGHT_ANNOTATE | HACLLanguage::RIGHT_WYSIWYG;
         }
-        if ($actions & HACLRight::FORMEDIT) {
-            $actions |= HACLRight::READ;
+        if ($actions & HACLLanguage::RIGHT_FORMEDIT) {
+            $actions |= HACLLanguage::RIGHT_READ;
         }
-        if ($actions & HACLRight::ANNOTATE) {
-            $actions |= HACLRight::READ;
+        if ($actions & HACLLanguage::RIGHT_ANNOTATE) {
+            $actions |= HACLLanguage::RIGHT_READ;
         }
-        if ($actions & HACLRight::WYSIWYG) {
-            $actions |= HACLRight::READ;
+        if ($actions & HACLLanguage::RIGHT_WYSIWYG) {
+            $actions |= HACLLanguage::RIGHT_READ;
         }
         return $actions;
     }

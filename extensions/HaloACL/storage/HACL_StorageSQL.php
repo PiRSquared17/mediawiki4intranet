@@ -24,9 +24,6 @@
  *
  */
 
-global $haclgIP;
-require_once $haclgIP . '/storage/HACL_DBHelper.php';
-
 /**
  * This class encapsulates all methods that care about the database tables of
  * the HaloACL extension. This is the implementation for the SQL database.
