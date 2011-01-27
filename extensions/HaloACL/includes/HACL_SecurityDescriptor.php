@@ -67,7 +67,7 @@ class HACLSecurityDescriptor
     private $mSDID;            // int: Page ID of the article that defines this SD
     private $mPEID;            // int: Page ID of the protected element
     private $mSDName;          // string: The name of this SD
-    private $mPEType;          // int: Type of the protected element (see constants PET_... above)
+    private $mPEType;          // string: Type of the protected element (see constants PET_... above)
     private $mManageGroups;    // array(int): IDs of the groups that can modify
                                //             the definition of this SD
     private $mManageUsers;     // array(int): IDs of the users that can modify

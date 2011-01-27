@@ -50,9 +50,9 @@ abstract class HACLLanguage {
     //---- Operations ----
     const RIGHT_ALL_ACTIONS = 255;
     const RIGHT_READ        = 128;
-    const RIGHT_FORMEDIT    = 64;
-    const RIGHT_WYSIWYG     = 32;
-    const RIGHT_ANNOTATE    = 16;
+#    const RIGHT_FORMEDIT    = 64; # removed, formedit = edit
+#    const RIGHT_WYSIWYG     = 32; # removed, wysiwyg = edit
+#    const RIGHT_ANNOTATE    = 16; # removed, annotate = edit
     const RIGHT_EDIT        = 8;
     const RIGHT_CREATE      = 4;
     const RIGHT_MOVE        = 2;

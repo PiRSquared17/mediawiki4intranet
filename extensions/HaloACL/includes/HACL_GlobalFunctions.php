@@ -72,6 +72,9 @@ function enableHaloACL()
         'HACLToolbar'               => "$haclgIP/includes/HACL_Toolbar.php",
         'HACLDBHelper'              => "$haclgIP/storage/HACL_DBHelper.php",
 
+        // VMX::Template (http://yourcmc.ru/wiki/VMX::Template)
+        'VMXTemplate'               => "$haclgIP/includes/VMXTemplate.php",
+
         // UI
         'HaloACLSpecial'            => "$haclgIP/specials/HACL_ACLSpecial.php",
         'HACL_GenericPanel'         => "$haclgIP/includes/HACL_GenericPanel.php",

@@ -205,52 +205,50 @@ class HACLStorageSQL {
      *
      */
     public function saveGroup(HACLGroup $group) {
-        $dbw =& wfGetDB( DB_MASTER );
+        $dbw =& wfGetDB(DB_MASTER);
         $mgGroups = implode(',', $group->getManageGroups());
         $mgUsers  = implode(',', $group->getManageUsers());
         $dbw->replace('halo_acl_groups', NULL, array(
-            'group_id'    =>  $group->getGroupID() ,
-            'group_name'  =>  $group->getGroupName() ,
-            'mg_groups'   =>  $mgGroups,
-            'mg_users'    =>  $mgUsers), __METHOD__);
+            'group_id'   => $group->getGroupID() ,
+            'group_name' => $group->getGroupName() ,
+            'mg_groups'  => $mgGroups,
+            'mg_users'   => $mgUsers), __METHOD__);
     }
 
     /**
-     * Retrieves all groups from
-     * the database.
-     *
+     * Retrieves all groups from the database.
+     * [starting with $prefix]
+     * [maximum $limit]
      *
      * @return Array
      *         Array of Group Objects
-     *
      */
-    public function getGroups() {
-        $dbr =& wfGetDB( DB_SLAVE );
-        $gt = $dbr->tableName('halo_acl_groups');
-        $gmt = $dbr->tableName('halo_acl_group_members');
-
-        $sql = "SELECT * FROM $gt LEFT JOIN $gmt on $gt.group_id = $gmt.child_id
-                WHERE $gmt.parent_group_id is NULL OR $gmt.parent_group_id = $gmt.child_id";
+    public function getGroups($prefix = NULL, $limit = NULL)
+    {
+        $dbr =& wfGetDB(DB_SLAVE);
+        $options = array('ORDER BY' => 'group_name');
+        if ($limit !== NULL)
+            $options['LIMIT'] = $limit;
+        $res = $dbr->select(
+            'halo_acl_groups', '*',
+            array($prefix === NULL ? 1 : 'group_name LIKE '.$dbr->addQuotes("%/$prefix%")),
+            __METHOD__,
+            $options
+        );
 
         $groups = array();
-
-        $res = $dbr->query($sql, __METHOD__);
-
-        while ($row = $dbr->fetchObject($res)) {
-
+        while ($row = $dbr->fetchObject($res))
+        {
             $groupID = $row->group_id;
             $groupName = $row->group_name;
             $mgGroups = self::strToIntArray($row->mg_groups);
-            $mgUsers  = self::strToIntArray($row->mg_users);
-
+            $mgUsers = self::strToIntArray($row->mg_users);
             $groups[] = new HACLGroup($groupID, $groupName, $mgGroups, $mgUsers);
         }
 
         $dbr->freeResult($res);
-
         return $groups;
     }
-
 
     /**
      * Retrieves all users and the groups they are attached to
@@ -450,7 +448,7 @@ class HACLStorageSQL {
      *
      * @param string $memberType
      *         'user' => ask for all user IDs
-     *      'group' => ask for all group IDs
+     *         'group' => ask for all group IDs
      * @return array(int)
      *         List of IDs of all direct users or groups in this group.
      *
@@ -537,7 +535,7 @@ class HACLStorageSQL {
      */
     public function hasGroupMember($parentID, $childID, $memberType, $recursive)
     {
-        $dbr =& wfGetDB( DB_SLAVE );
+        $dbr = wfGetDB( DB_SLAVE );
 
         $parents = array();
 
@@ -563,6 +561,64 @@ class HACLStorageSQL {
         } while ($recursive && $new);
 
         return false;
+    }
+
+    public function getGroupMembersRecursive($groupID, $children = NULL)
+    {
+        if (!$children)
+        {
+            $a = array();
+            $children = array(&$a);
+        }
+        $dbr = wfGetDB(DB_SLAVE);
+        $r = $dbr->select('halo_acl_group_members', 'child_type, child_id', array('parent_group_id' => $groupID), __METHOD__);
+        while ($obj = $dbr->fetchRow($r))
+        {
+            if (!$children[0][$obj[0]][$obj[1]])
+            {
+                $children[0][$obj[0]][$obj[1]] = true;
+                if ($obj[0] == 'group')
+                    getGroupMembersRecursive($obj[1], $children);
+            }
+        }
+        return $children[0];
+    }
+
+    public function getUserNames($user_ids)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        $rows = array();
+        if ($user_ids)
+        {
+            $res = $dbr->select('user', 'user_id, user_name, user_real_name', array('user_id' => $user_ids), __METHOD__);
+            while ($r = $dbr->fetchRow($res))
+            {
+                unset($r[0]);
+                unset($r[1]);
+                unset($r[2]);
+                $rows[] = $r;
+            }
+        }
+        return $rows;
+    }
+
+    public function getGroupNames($group_ids)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        $rows = array();
+        if ($group_ids)
+        {
+            $res = $dbr->select('halo_acl_groups', '*', array('group_id' => $group_ids), __METHOD__);
+            while ($r = $dbr->fetchRow($res))
+            {
+                unset($r[0]);
+                unset($r[1]);
+                unset($r[2]);
+                unset($r[3]);
+                $rows[] = $r;
+            }
+        }
+        return $rows;
     }
 
     /**
