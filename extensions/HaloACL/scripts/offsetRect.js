@@ -16,7 +16,7 @@ function getOffsetRect(elem) {
     var scrollLeft = window.pageXOffset || docElem.scrollLeft || body.scrollLeft
     var clientTop = docElem.clientTop || body.clientTop || 0
     var clientLeft = docElem.clientLeft || body.clientLeft || 0
-    var top  = box.top +  scrollTop - clientTop
+    var top = box.top + scrollTop - clientTop
     var left = box.left + scrollLeft - clientLeft
 
     return { top: Math.round(top), left: Math.round(left) }

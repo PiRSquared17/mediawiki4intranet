@@ -67,6 +67,7 @@ class HACLLanguageRu extends HACLLanguage
         'delete'    => 'Delete',
         'move'      => 'Move',
         'manage'    => 'Manage',
+        'all'       => 'Full Access',
     );
 
     public $mPetPrefixes = array(
@@ -75,6 +76,7 @@ class HACLLanguageRu extends HACLLanguage
         'namespace' => 'Namespace',
         'property'  => 'Property',
         'right'     => 'Right',
+        'template'  => 'Template',
     );
 
     public $mPredefinedRightName = 'Right';
