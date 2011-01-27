@@ -1,203 +1,132 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-* 
-*   This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute 
-*   it and/or modify it under the terms of the GNU General Public License as 
-*   published by the Free Software Foundation; either version 3 of the License, 
-*   or (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will 
-*   be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+/* Copyright 2009, ontoprise GmbH
+ *
+ * "Web 1.0" HaloACL.
+ Totally rewritten Special:HaloACL which does not use any AJAX at all!
+ * (because it's fucking buggy)
+ *
+ * The HaloACL-Extension is free software; you can redistribute
+ * it and/or modify it under the terms of the GNU General Public License as
+ * published by the Free Software Foundation; either version 3 of the License,
+ * or (at your option) any later version.
+ *
+ * The HaloACL-Extension is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * A special page for defining and managing Access Control Lists.
  *
- *
  * @author Thomas Schweitzer
  */
 
-if (!defined('MEDIAWIKI')) die();
+if (!defined('MEDIAWIKI'))
+    die();
 
+class HaloACLSpecial extends SpecialPage
+{
+    static $actions = array(
+        'acllist'     => 1,
+        'acl'         => 1,
+        'quickaccess' => 1,
+        'grouplist'   => 1,
+        'group'       => 1,
+        'whitelist'   => 1,
+    );
 
-global $IP;
-require_once( $IP . "/includes/SpecialPage.php" );
-
-/*
- * Standard class that is resopnsible for the creation of the Special Page
- */
-class HaloACLSpecial extends SpecialPage {
-
-    public function __construct() {
-        parent::__construct('HaloACL');
-
+    /* Identical to Xml::element, but does no htmlspecialchars() on $contents */
+    static function xelement($element, $attribs = null, $contents = '', $allowShortTag = true)
+    {
+        if (is_null($contents))
+            return Xml::openElement($element, $attribs);
+        elseif ($contents == '')
+            return Xml::element($element, $attribs, $contents, $allowShortTag);
+        return Xml::openElement($element, $attribs) . $contents . Xml::closeElement($element);
     }
 
-    /**
-     * Overloaded function that is responsible for the creation of the Special Page
-     */
-    public function execute() {
+    public function __construct()
+    {
+        parent::__construct('HaloACL');
+    }
 
-        global $wgOut, $wgRequest, $wgLang,$wgUser;
-
-        if($wgUser->isLoggedIn()) {
+    public function execute()
+    {
+        global $wgOut, $wgRequest, $wgUser;
+        $q = $wgRequest->getValues();
+        if ($wgUser->isLoggedIn())
+        {
             wfLoadExtensionMessages('HaloACL');
             $wgOut->setPageTitle(wfMsg('hacl_special_page'));
-
-            $this->createMainTabContainer();
-        }else {
-            $html = <<<HTML
-                <h3>Only registered users are allowed to create and manage access rights.
-            </h3>
-            
-            <h3>
-            Please login first!</h3>
-            <p>
-HTML;
+            if (!self::$actions[$q['action']])
+                $q['action'] = 'acllist';
+            $f = 'html_'.$q['action'];
+            $html = $this->$f($q);
             $wgOut->addHTML($html);
         }
-
-
+        else
+            $wgOut->showErrorPage('hacl_login_first_title', 'hacl_login_first_text');
     }
 
-    private function createMainTabContainer() {
+    public function html_acllist(&$q)
+    {
         global $wgOut;
-        global $wgRequest;
-        global $wgUser;
-
-        global $haclWhitelistGroups;
-
-
-        $spt = SpecialPage::getTitleFor("HaloACL");
-        $url = $spt->getFullURL();
-
-        // checking if user can access whitelist
-        if(array_intersect($wgUser->getGroups(), $haclWhitelistGroups) != null) {
-            $showWhitelist = "true";
-        }else {
-            $showWhitelist = "false";
-        }
-
-        $html = <<<HTML
-            <div id="haloaclContent" class="yui-skin-sam">
-            <div id="haloacl_panel_container"></div>
-
-    <div id="haloaclmainView" class="yui-navset"></div>
-</div>
-<script type="text/javascript">
-    // bugfix for ontoskin 3
-    $("bodyContent").setAttribute("style","overflow:visible");
-
-    YAHOO.haloacl.specialPageUrl = "$url";
-
-HTML;
-        $articleTitle = null;
-        $activeTab = null;
-        if(array_key_exists("articletitle", $wgRequest->data)) {
-            $articleTitle = $wgRequest->data['articletitle'];
-        }
-
-        if(array_key_exists("activetab", $wgRequest->data)) {
-            $activeTab = $wgRequest->data['activetab'];
-        }else {
-            $activeTab = "createACL";
-        }
-        $activeSubTab = null;
-        if(array_key_exists("activesubtab", $wgRequest->data)) {
-            $activeSubTab = $wgRequest->data['activesubtab'];
-        }
-
-        if($activeSubTab != null) {
-            $html .="
-            YAHOO.haloacl.activeSubTab = '$activeSubTab';
-                ";
-        }
-
-        $html .="
-            YAHOO.haloacl.buildMainTabView('haloaclmainView','$articleTitle','$showWhitelist','$activeTab');
-            ";
-
-        $html .= <<<HTML
-            try{
-                //var myLogReader = new YAHOO.widget.LogReader();
-            }catch(e){}
-            </script>
-HTML;
-        $wgOut->addHTML($html);
+        
     }
 
-    private function testPage() {
-        global $wgOut, $wgRequest, $wgLang;
+    public function html_acl(&$q)
+    {
+        global $wgOut;
+        
+    }
 
-        $action = $wgRequest->getText('action');
-        if ($action == "initHaloACLDB") {
-        // Initialize the database tables for HaloACL and show the
-        // results on the special page.
-            global $haclgIP, $wgOut;
-            require_once("$haclgIP/includes/HACL_Storage.php");
-
-            $wgOut->disable(); // raw output
-            ob_start();
-            print "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\"  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">\n<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\" lang=\"en\" dir=\"ltr\">\n<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\" /><title>Setting up Storage for Semantic MediaWiki</title></head><body><p><pre>";
-            header( "Content-type: text/html; charset=UTF-8" );
-            print "Initializing the HaloACL database...";
-            $result = HACLStorage::getDatabase()->initDatabaseTables();
-            print '</pre></p>';
-            if ($result === true) {
-                print '<p><b>' . wfMsg('hacl_db_setupsuccess') . "</b></p>\n";
-            }
-            $returntitle = Title::makeTitle(NS_SPECIAL, 'HaloACL');
-            $special = $wgLang->getNamespaces();
-            $special = $special[NS_SPECIAL];
-            print '<p> ' . wfMsg('hacl_haloacl_return'). '<a href="' .
-                htmlspecialchars($returntitle->getFullURL()) .
-                '">'.$special.":".wfMsg('hacl_special_page')."</a></p>\n";
-            print '</body></html>';
-            ob_flush();
-            flush();
-            return;
-
-        } if ($action == "HaloACLTest") {
-            self::test();
-        } else {
-            $ttInitializeDatabase = wfMsg('hacl_tt_initializeDatabase');
-            $initializeDatabase   = wfMsg('hacl_initializeDatabase');
-            $html = <<<HTML
-<form name="initHaloACLDB" action="" method="POST">
-<input type="hidden" name="action" value="initHaloACLDB" />
-<input type="submit" value="$initializeDatabase"/>
-</form>
-
-<form name="HaloACLTest" action="" method="POST">
-<input type="hidden" name="action" value="HaloACLTest" />
-<input type="submit" value="Test"/>
-</form>
-HTML;
-            //			  <button id="hacl-initdb-btn" style="float:left;"
-            //			          onmouseover="Tip('$ttInitializeDatabase')">
-            //	      	     $initializeDatabase
-            //			  </button>
-            $wgOut->addHTML($html);
+    public function html_quickaccess(&$q)
+    {
+        global $wgOut;
+        $dbr = wfGetDB(DB_SLAVE);
+        $templates = HACLStorage::getDatabase()->getSDs('acltemplate', $q['like'] ? array('page_title LIKE '.$dbr->addQuotes('%'.$q['like'].'%')) : '');
+        $quickacl = HACLQuickacl::newForUserId($wgUser->getId());
+        $quickacl_ids = array_flip($quickacl->getSD_IDs());
+        foreach ($templates as &$sd)
+            $sd = array('sd' => $sd, 'selected' => array_key_exists($sd->getSDId(), $quickacl_ids));
+        $html = wfMsg('hacl_quickaccess_manage');
+        $form = self::xelement('label', array('for' => 'hacl_qafilter'), wfMsg('hacl_filter'));
+        $form .= Xml::element('input', array('type' => 'text', 'name' => 'like', 'id' => 'hacl_qafilter', 'value' => $q['like']), '');
+        $form .= Xml::submitButton(wfMsg('hacl_filter_submit'));
+        $form = self::xelement('form', array('action' => '?action=quickaccess'), $form);
+        $form = self::xelement('legend', NULL, wfMsg('hacl_filter_sds')) . $form;
+        $form = self::xelement('fieldset', NULL, $form);
+        $html .= $form;
+        if (!$templates)
+            $html .= wfMsg('hacl_empty_list');
+        $list = '';
+        foreach ($templates as &$sd)
+        {
+            $li = Xml::checkbox
+            $li .= ' ' . htmlspecialchars($sd->getSDName());
+            $list .= self::xelement('li', NULL, $li);
         }
     }
 
-    /**
-     * Function for testing new stuff
-     *
-     */
-    private function test() {
-
-        global $haclgIP;
-        require_once "$haclgIP/tests/testcases/TestDatabase.php";
-        $tc = new TestDatabase();
-        $tc->runTest();
+    public function html_grouplist(&$q)
+    {
+        global $wgOut;
+        
     }
 
+    public function html_group(&$q)
+    {
+        global $wgOut;
+        
+    }
+
+    public function html_whitelist(&$q)
+    {
+        global $wgOut;
+        
+    }
 }

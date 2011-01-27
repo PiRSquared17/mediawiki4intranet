@@ -39,15 +39,13 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * @author Thomas Schweitzer
  *
  */
-class  HACLWhitelist  {
-
-    //--- Constants ---
-//    const XY= 0;        // the result has been added since the last time
+class HACLWhitelist
+{
 
     //--- Private fields ---
-    private $mPages = array();            //array(string): The names of all pages
-                                        //  (with namespace) that define the
-                                        //  whitelist
+
+    // array(string): The names of all pages (with namespace) that define the whitelist
+    private $mPages = array();
 
     /**
      * Constructor for HACLWhitelist. The new object has to be saved to store the
@@ -62,14 +60,10 @@ class  HACLWhitelist  {
         $this->mPages = $pages;
     }
 
-
-    //--- getter/setter ---
-    public function getPages()           {return $this->mPages;}
-
-//    public function setXY($xy)               {$this->mXY = $xy;}
+    //--- Getters ---
+    public function getPages()  { return $this->mPages; }
 
     //--- Public methods ---
-
 
     /**
      * Creates a HACLWhitelist-object based on the content of the database.
@@ -78,21 +72,29 @@ class  HACLWhitelist  {
      *         A whitelist object that contains all whitelist pages that are stored
      *         in the database.
      */
-    public static function newFromDB() {
+    public static function newFromDB()
+    {
         // Read the IDS of all pages that are part of the whitelist
         $pageIDs = HACLStorage::getDatabase()->getWhitelist();
         $pages = array();
         // Transform page-IDs to page names
         $etc = haclfDisableTitlePatch();
-        foreach ($pageIDs as $pid) {
+        foreach ($pageIDs as $pid)
             $t = Title::newFromID($pid);
-            if ($t) {
+            if ($t)
                 $pages[] = $t->getFullText();
-            }
-        }
         haclfRestoreTitlePatch($etc);
 
         return new HACLWhitelist($pages);
+    }
+
+    /* Returns article ID if whitelist does exist or 0 else */
+    public static function exists()
+    {
+        $etc = haclfDisableTitlePatch();
+        $exists = Title::newFromText($haclgContLang->getWhitelist());
+        haclfRestoreTitlePatch($etc);
+        return $exists->getArticleID();
     }
 
     /**
@@ -161,7 +163,7 @@ class  HACLWhitelist  {
      *         <false>, if not
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         If requested: HACLWhitelistException(HACLWhitelistException::USER_CANT_MODIFY_WHITELIST)
      *
      */

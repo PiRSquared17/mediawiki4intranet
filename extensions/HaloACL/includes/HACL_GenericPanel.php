@@ -25,7 +25,6 @@
  *
  */
 
-
 class HACL_GenericPanel {
 
     private $saved = false;

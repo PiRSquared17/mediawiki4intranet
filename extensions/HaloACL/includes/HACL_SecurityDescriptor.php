@@ -1,20 +1,26 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-*  This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of heavily modified "Web 1.0" HaloACL-extension.
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * $Id: $
+ *
+ * Copyright 2009, ontoprise GmbH
+ *
+ * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * This file contains the class HACLSecurityDescriptor.
@@ -23,13 +29,8 @@
  * Date: 15.04.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
+if (!defined('MEDIAWIKI'))
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
 
 /**
  * This class describes security descriptors or predefined rights in HaloACL.
@@ -49,29 +50,28 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * @author Thomas Schweitzer
  *
  */
-class  HACLSecurityDescriptor  {
-
+class HACLSecurityDescriptor 
+{
     //--- Constants ---
 
     //---- Types of protected elements ----
-     const PET_PAGE      = 'page';         // Protect pages
-    const PET_CATEGORY  = 'category';    // Protect instances of a category
-    const PET_NAMESPACE = 'namespace';    // Protect instances of a namespace
+    const PET_PAGE      = 'page';       // Protect pages
+    const PET_CATEGORY  = 'category';   // Protect instances of a category
+    const PET_NAMESPACE = 'namespace';  // Protect instances of a namespace
     const PET_PROPERTY  = 'property';   // Protect values of a property
-    const PET_RIGHT     = 'right';        // This is not an actual security descriptor
-                                // but a predefined right that aquivalent to
-                                // an SD by its structure.
-
+    const PET_RIGHT     = 'right';      // This is not an actual security descriptor
+                                        // but a predefined right that is equivalent to
+                                        // an SD by its structure.
 
     //--- Private fields ---
     private $mSDID;            // int: Page ID of the article that defines this SD
     private $mPEID;            // int: Page ID of the protected element
-    private $mSDName;        // string: The name of this SD
-    private $mPEType;        // int: Type of the protected element (see constants PET_... above)
+    private $mSDName;          // string: The name of this SD
+    private $mPEType;          // int: Type of the protected element (see constants PET_... above)
     private $mManageGroups;    // array(int): IDs of the groups that can modify
-                            //        the definition of this SD
-    private $mManageUsers;    // array(int): IDs of the users that can modify
-                            //        the definition of this SD
+                               //             the definition of this SD
+    private $mManageUsers;     // array(int): IDs of the users that can modify
+                               //             the definition of this SD
 
     /**
      * Constructor for HACLSecurityDescriptor. If your create a new security
@@ -91,53 +91,48 @@ class  HACLSecurityDescriptor  {
      *         Type of the protected element (see constants PET_...)
      * @param array<int/string>/string $manageGroups
      *         An array or a string of comma separated group names or IDs that
-     *      can modify the SD's definition. Group names are converted and
-     *      internally stored as group IDs. Invalid values cause an exception.
+     *         can modify the SD's definition. Group names are converted and
+     *         internally stored as group IDs. Invalid values cause an exception.
      * @param array<int/string>/string $manageUsers
      *         An array or a string of comma separated user names or IDs that
-     *      can modify the SD's definition. User names are converted and
-     *      internally stored as user IDs. Invalid values cause an exception.
+     *         can modify the SD's definition. User names are converted and
+     *         internally stored as user IDs. Invalid values cause an exception.
      * @throws
      *         HACLSDException(HACLSDException::NO_PE_ID)
-     *         HACLSDException(HACLSDException::UNKOWN_GROUP)
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLSDException(HACLSDException::UNKNOWN_GROUP)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *
      */
-    function __construct($SDID, $SDName, $peID, $peType, $manageGroups, $manageUsers) {
-
-        if (is_null($SDID)) {
+    function __construct($SDID, $SDName, $peID, $peType, $manageGroups, $manageUsers)
+    {
+        if (is_null($SDID))
             $SDID = self::idForSD($SDName);
-        }
-        $this->mSDID   = 0+$SDID;
+        $this->mSDID = 0+$SDID;
         $this->mSDName = $SDName;
-        if (is_string($peID)) {
+        if (is_string($peID))
+        {
             $peName = $peID;
             $peID = self::peIDforName($peID, $peType);
-            if ($peID === false) {
+            if ($peID === false)
                 throw new HACLSDException(HACLSDException::NO_PE_ID, $peName, $peType);
-            }
         }
         $this->mPEID   = $peID;
         $this->mPEType = $peType;
-        if ($peType == self::PET_RIGHT) {
+        if ($peType == self::PET_RIGHT)
             $this->mPEID = 0;
-        }
 
         $this->setManageGroups($manageGroups);
         $this->setManageUsers($manageUsers);
-
     }
 
     //--- getter/setter ---
 
-    public function getSDID()            {return $this->mSDID;}
-    public function getPEID()            {return $this->mPEID;}
-    public function getSDName()            {return $this->mSDName;}
-    public function getPEType()            {return $this->mPEType;}
-    public function getManageGroups()    {return $this->mManageGroups;}
-    public function getManageUsers()    {return $this->mManageUsers;}
-
-//    public function setXY($xy)               {$this->mXY = $xy;}
+    public function getSDID()           { return $this->mSDID; }
+    public function getPEID()           { return $this->mPEID; }
+    public function getSDName()         { return $this->mSDName; }
+    public function getPEType()         { return $this->mPEType; }
+    public function getManageGroups()   { return $this->mManageGroups; }
+    public function getManageUsers()    { return $this->mManageUsers; }
 
     //--- Public methods ---
 
@@ -159,23 +154,23 @@ class  HACLSecurityDescriptor  {
      * @return int/bool
      *         ID of the protected element or <false>, if it does not exist.
      */
-    public static function peIDforName($peName, $peType) {
-        if ($peType === self::PET_NAMESPACE) {
+    public static function peIDforName($peName, $peType)
+    {
+        if ($peType === self::PET_NAMESPACE)
+        {
             // $peName is a namespace => get its ID
             global $wgContLang;
             $peName = str_replace(' ', '_', trim(str_replace('_', ' ', $peName)));
             $idx = $wgContLang->getNsIndex($peName);
-            if ($idx == false) {
+            if ($idx == false)
                 return (strtolower($peName) == 'main') ? 0 : false;
-            }
             return $idx;
-        } else if ($peType === self::PET_RIGHT) {
-            return false;
         }
+        elseif ($peType === self::PET_RIGHT)
+            return false;
         // return the page id
         $id = haclfArticleID($peName);
         return $id == 0 ? false : $id;
-
     }
 
     /**
@@ -212,8 +207,8 @@ class  HACLSecurityDescriptor  {
      *         HACLSDException(HACLSDException::UNKNOWN_SD)
      *             ...if the requested SD in the not the database.
      */
-    public static function newFromID($SDID) {
-
+    public static function newFromID($SDID)
+    {
         $sd = HACLStorage::getDatabase()->getSDByID($SDID);
         if ($sd === null) {
             throw new HACLSDException(HACLSDException::UNKNOWN_SD, $SDID);
@@ -300,7 +295,7 @@ class  HACLSecurityDescriptor  {
      *             '*' - anonymous user (ID:0)
      *            '#' - all registered users (ID: -1)
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ...if a user does not exist.
      */
     public function setManageUsers($manageUsers) {
@@ -335,7 +330,7 @@ class  HACLSecurityDescriptor  {
      *         If an array is given, it can contain IDs (int), names (string) or
      *      objects (HACLGroup) for the group
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ...if a user does not exist.
      */
     public function setManageGroups($manageGroups) {
@@ -353,7 +348,7 @@ class  HACLSecurityDescriptor  {
                 }
                 $gid = HACLGroup::idForGroup($mg);
                 if (!$gid) {
-                    throw new HACLGroupException(HACLGroupException::UNKOWN_GROUP, $mg);
+                    throw new HACLGroupException(HACLGroupException::UNKNOWN_GROUP, $mg);
                 }
                 $this->mManageGroups[$i] = (int) $gid;
             }
@@ -705,44 +700,43 @@ class  HACLSecurityDescriptor  {
      *         <false>, if not
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         If requested: HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
-    public function userCanModify($user, $throwException = false) {
+    public function userCanModify($user, $throwException = false)
+    {
         // Get the ID of the user who wants to add/modify the SD
         list($userID, $userName) = haclfGetUserID($user);
         // Check if the user can modify the SD
-        if (in_array($userID, $this->mManageUsers)) {
+        if (in_array($userID, $this->mManageUsers))
             return true;
-        }
-        if ($userID > 0 && in_array(-1, $this->mManageUsers)) {
-            // registered users can modify the SD
+        if ($userID > 0 && in_array(-1, $this->mManageUsers))
+        {
+            // -1 means that all registered users can modify the SD
             return true;
         }
 
-        // Check if the user belongs to a SD that can modify the SD
+        // Check if the user belongs to a group that can modify the SD
         $db = HACLStorage::getDatabase();
-        foreach ($this->mManageGroups as $groupID) {
-            if ($db->hasGroupMember($groupID, $userID, HACLGroup::USER, true)) {
+        foreach ($this->mManageGroups as $groupID)
+            if ($db->hasGroupMember($groupID, $userID, HACLGroup::USER, true))
                 return true;
-            }
-        }
 
-        // Sysops and bureaucrats can modify the SD
+        // Sysops and bureaucrats can modify anything
         $user = User::newFromId($userID);
         $groups = $user->getGroups();
-        if (in_array('sysop', $groups) || in_array('bureaucrat', $groups)) {
+        if (in_array('sysop', $groups) || in_array('bureaucrat', $groups))
             return true;
-        }
 
-        if ($throwException) {
-            if (empty($userName)) {
+        if ($throwException)
+        {
+            if (empty($userName))
+            {
                 // only user id is given => retrieve the name of the user
                 $userName = ($user) ? $user->getId() : "(User-ID: $userID)";
             }
-            throw new HACLSDException(HACLSDException::USER_CANT_MODIFY_SD,
-                                         $this->mSDName, $userName);
+            throw new HACLSDException(HACLSDException::USER_CANT_MODIFY_SD, $this->mSDName, $userName);
         }
         return false;
     }
@@ -763,7 +757,7 @@ class  HACLSecurityDescriptor  {
      *
      * @throws
      *         HACLSDException(HACLSDException::NO_SD_ID)
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *         Exception (on failure in database level)
      *
@@ -829,8 +823,4 @@ class  HACLSecurityDescriptor  {
         }
 
     }
-
-    //--- Private methods ---
-
-
 }

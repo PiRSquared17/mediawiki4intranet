@@ -162,7 +162,7 @@ class  HACLQueryRewriter  {
                     $id = $wpv->getTitle()->getArticleID();
                     global $wgUser;
                     $allowed = HACLEvaluator::hasPropertyRight($id,
-                                                       $wgUser->getId(), HACLRight::READ);
+                                                       $wgUser->getId(), HACLLanguage::RIGHT_READ);
                     if ($allowed) {
                         // Access to property is allowed => check for further
                         // subqueries of the property
@@ -202,7 +202,7 @@ class  HACLQueryRewriter  {
                     $id = $wpv->getTitle()->getArticleID();
                     global $wgUser;
                     $allowed = HACLEvaluator::hasPropertyRight($id,
-                                                       $wgUser->getId(), HACLRight::READ);
+                                                       $wgUser->getId(), HACLLanguage::RIGHT_READ);
                     if (!$allowed) {
                         // Invalid print request => remove it
                         unset($printRequests[$key]);
@@ -436,7 +436,7 @@ class  HACLQueryRewriter  {
                     $id = $prop->getArticleID();
                     global $wgUser;
                     $allowed = HACLEvaluator::hasPropertyRight($id,
-                                                       $wgUser->getId(), HACLRight::READ);
+                                                       $wgUser->getId(), HACLLanguage::RIGHT_READ);
                 }
             }
 
