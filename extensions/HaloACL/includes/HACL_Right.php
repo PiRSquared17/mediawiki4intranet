@@ -85,24 +85,23 @@ class  HACLRight  {
      * Constructor for HACLRight.
      *
      * @param int $actions
-     *         Actions that are granted by this rule. This is a bit-field of
-     *      the ORed values HACLLanguage::RIGHT_READ, HACLLanguage::RIGHT_FORMEDIT, HACLLanguage::RIGHT_WYSIWYG,
-     *      HACLLanguage::RIGHT_EDIT, HACLLanguage::RIGHT_CREATE, HACLLanguage::RIGHT_MOVE, HACLLanguage::RIGHT_ANNOTATE,
-     *      HACLLanguage::RIGHT_DELETE. According to the hierarchy of rights, missing
-     *         rights are set automatically.
+     *         Actions that are granted by this rule. This is a bit-field of the ORed values
+     *         HACLLanguage::RIGHT_READ, HACLLanguage::RIGHT_EDIT,
+     *         HACLLanguage::RIGHT_CREATE, HACLLanguage::RIGHT_DELETE.
+     *         According to the hierarchy of rights, missing rights are set automatically.
      * @param array<int/string>/string $groups
      *         An array or a string of comma separated group names or IDs that
-     *      get this right. Group names are converted and
-     *      internally stored as group IDs. Invalid values cause an exception.
+     *         get this right. Group names are converted and
+     *         internally stored as group IDs. Invalid values cause an exception.
      * @param array<int/string>/string $users
      *         An array or a string of comma separated of user names or IDs that
-     *      get this right. User names are converted and
-     *      internally stored as user IDs. Invalid values cause an exception.
+     *         get this right. User names are converted and
+     *         internally stored as user IDs. Invalid values cause an exception.
      * @param string $description
      *         A description of this right
      * @param int originID
      *         ID of the security descriptor or predefined right that defines this
-     *      right. Don't set this value if you create an inline right. It is set
+     *         right. Don't set this value if you create an inline right. It is set
      *         when the right is added to a security descriptor or inline right.
      * @throws
      *         HACLGroupException(HACLGroupException::UNKNOWN_GROUP)
@@ -111,8 +110,8 @@ class  HACLRight  {
      *             ... if the user is invalid
      *
      */
-    function __construct($actions, $groups, $users, $description, $name, $originID=0) {
-
+    function __construct($actions, $groups, $users, $description, $name, $originID = 0)
+    {
         $this->mActions = $this->completeActions($actions);
 
         $this->setGroups($groups);
@@ -121,7 +120,6 @@ class  HACLRight  {
         $this->mDescription = $description;
         $this->mOriginID    = $originID;
         $this->mName        = $name;
-
     }
 
     //--- getter/setter ---
@@ -192,39 +190,32 @@ class  HACLRight  {
      * Returns the ID of an action for the given name of an action
      *
      * @param string $actionName
-     *         The action, the user wants to perform. One of "read", "formedit",
-     *      "wysiwyg", "edit", "annotate", "create", "move" and "delete".
+     *         The action, the user wants to perform. One of "read",
+     *         "edit", "create" and "delete".
      *
      * @return int
      *         The ID of the action or 0 if the names is invalid.
      *
      */
-    public static function getActionID($actionName) {
+    public static function getActionID($actionName)
+    {
         $actionID = 0;
-        switch ($actionName) {
+        switch ($actionName)
+        {
             case "read":
                 $actionID = HACLLanguage::RIGHT_READ;
-                break;
-            case "formedit":
-                $actionID = HACLLanguage::RIGHT_FORMEDIT;
-                break;
-            case "wysiwyg":
-                $actionID = HACLLanguage::RIGHT_WYSIWYG;
                 break;
             case "edit":
                 $actionID = HACLLanguage::RIGHT_EDIT;
                 break;
-            case "annotate":
-                $actionID = HACLLanguage::RIGHT_ANNOTATE;
-                break;
             case "create":
                 $actionID = HACLLanguage::RIGHT_CREATE;
                 break;
-            case "move":
-                $actionID = HACLLanguage::RIGHT_MOVE;
-                break;
             case "delete":
                 $actionID = HACLLanguage::RIGHT_DELETE;
+                break;
+            case "move":
+                $actionID = HACLLanguage::RIGHT_MOVE;
                 break;
         }
         return $actionID;
@@ -426,19 +417,19 @@ class  HACLRight  {
      *         List of all direct users in this group.
      *
      */
-    public function getUsersEx($mode) {
-        if ($mode === self::ID) {
+    public function getUsersEx($mode)
+    {
+        if ($mode === self::ID)
             return $this->mUsers;
-        }
         // retrieve the IDs of all users in this group
         $users = array();
 
-        foreach ($this->mUsers as $u) {
-            if ($mode === self::NAME) {
+        foreach ($this->mUsers as $u)
+        {
+            if ($mode === self::NAME)
                 $users[] = User::whoIs($u);
-            } else if ($mode === self::OBJECT) {
+            elseif ($mode === self::OBJECT)
                 $users[] = User::newFromId($u);
-            }
         }
         return $users;
     }
@@ -457,23 +448,21 @@ class  HACLRight  {
      *         List of all direct groups in this group.
      *
      */
-    public function getGroupsEx($mode) {
+    public function getGroupsEx($mode)
+    {
         // retrieve the IDs of all groups in this group
-        if ($mode === self::ID) {
+        if ($mode === self::ID)
             return $this->mGroups;
-        }
         $groups = array();
-        foreach ($this->mGroups as $g) {
-            if ($mode === self::NAME) {
+        foreach ($this->mGroups as $g)
+        {
+            if ($mode === self::NAME)
                 $groups[] = HACLGroup::nameForID($g);
-            } else if ($mode === self::OBJECT) {
+            elseif ($mode === self::OBJECT)
                 $groups[] = HACLGroup::newFromID($g);
-            }
         }
         return $groups;
-
     }
-
 
     /**
      * Deletes this right from the database. All references to this right are
@@ -487,7 +476,8 @@ class  HACLRight  {
      *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
-    public function delete($user = null) {
+    public function delete($user = NULL)
+    {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteRight($this->mRightID);
     }
@@ -502,26 +492,13 @@ class  HACLRight  {
      * @return int
      *         Bitfield of all derived actions
      */
-    private function completeActions($actions) {
+    private function completeActions($actions)
+    {
         // Complete the hierarchy of rights
-        if ($actions & (HACLLanguage::RIGHT_CREATE | HACLLanguage::RIGHT_MOVE | HACLLanguage::RIGHT_DELETE)) {
-            $actions |= HACLLanguage::RIGHT_READ | HACLLanguage::RIGHT_FORMEDIT |
-                        HACLLanguage::RIGHT_ANNOTATE | HACLLanguage::RIGHT_WYSIWYG | HACLLanguage::RIGHT_EDIT;
-        }
-        if ($actions & HACLLanguage::RIGHT_EDIT) {
-            $actions |= HACLLanguage::RIGHT_READ | HACLLanguage::RIGHT_FORMEDIT|
-                        HACLLanguage::RIGHT_ANNOTATE | HACLLanguage::RIGHT_WYSIWYG;
-        }
-        if ($actions & HACLLanguage::RIGHT_FORMEDIT) {
+        if ($actions & (HACLLanguage::RIGHT_CREATE | HACLLanguage::RIGHT_DELETE))
+            $actions |= HACLLanguage::RIGHT_READ | HACLLanguage::RIGHT_EDIT;
+        if ($actions & HACLLanguage::RIGHT_EDIT)
             $actions |= HACLLanguage::RIGHT_READ;
-        }
-        if ($actions & HACLLanguage::RIGHT_ANNOTATE) {
-            $actions |= HACLLanguage::RIGHT_READ;
-        }
-        if ($actions & HACLLanguage::RIGHT_WYSIWYG) {
-            $actions |= HACLLanguage::RIGHT_READ;
-        }
         return $actions;
     }
-
 }

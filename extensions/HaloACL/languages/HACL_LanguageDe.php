@@ -60,14 +60,20 @@ class HACLLanguageDe extends HACLLanguage
 
     public $mActionNames = array(
         HACLLanguage::RIGHT_READ         => 'lesen',
-        HACLLanguage::RIGHT_FORMEDIT     => 'formulareditieren',
-        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',
+#        HACLLanguage::RIGHT_FORMEDIT     => 'formulareditieren',
+#        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',
+#        HACLLanguage::RIGHT_ANNOTATE     => 'annotieren',
         HACLLanguage::RIGHT_EDIT         => 'editieren',
         HACLLanguage::RIGHT_CREATE       => 'erzeugen',
         HACLLanguage::RIGHT_MOVE         => 'verschieben',
-        HACLLanguage::RIGHT_ANNOTATE     => 'annotieren',
         HACLLanguage::RIGHT_DELETE       => 'löschen',
         HACLLanguage::RIGHT_ALL_ACTIONS  => '*',
+        'read'      => 'Lesen',
+        'edit'      => 'Editieren',
+        'create'    => 'Erzeugen',
+        'delete'    => 'Löschen',
+        'move'      => 'Verschieben',
+        'manage'    => 'Verwalten',
     );
 
     public $mCategories = array(

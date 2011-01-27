@@ -81,6 +81,7 @@ $messages['en'] = array(
 Either it is supposed to be included into other ACL definitions, or is created incorrectly.
 If you want to protect some pages, ACL page must be named as one of: ACL:Page/*, ACL:Category/*, ACL:Namespace/*, ACL:Property/*, ACL:Right/*, ACL:Template/*.',
     'hacl_pe_not_exists'                => 'The element supposed to be protected with this ACL does not exist.',
+    'hacl_no_users'                     => 'No users found',
 
     /* Messages for semantic protection (properties etc.) */
     'hacl_sp_query_modified'            => "- The query was modified because it contains protected properties.\n",

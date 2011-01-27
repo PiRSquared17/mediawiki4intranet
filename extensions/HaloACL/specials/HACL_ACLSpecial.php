@@ -1,17 +1,20 @@
 <?php
-/* Copyright 2009, ontoprise GmbH
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of heavily modified "Web 1.0" HaloACL-extension.
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * $Id: $
  *
- * "Web 1.0" HaloACL.
- Totally rewritten Special:HaloACL which does not use any AJAX at all!
- * (because it's fucking buggy)
+ * Copyright 2009, ontoprise GmbH
  *
- * The HaloACL-Extension is free software; you can redistribute
- * it and/or modify it under the terms of the GNU General Public License as
- * published by the Free Software Foundation; either version 3 of the License,
- * or (at your option) any later version.
+ * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- * The HaloACL-Extension is distributed in the hope that it will
- * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
@@ -65,8 +68,7 @@ class HaloACLSpecial extends SpecialPage
             if (!self::$actions[$q['action']])
                 $q['action'] = 'acllist';
             $f = 'html_'.$q['action'];
-            $html = $this->$f($q);
-            $wgOut->addHTML($html);
+            $this->$f($q);
         }
         else
             $wgOut->showErrorPage('hacl_login_first_title', 'hacl_login_first_text');
@@ -80,19 +82,29 @@ class HaloACLSpecial extends SpecialPage
 
     public function html_acl(&$q)
     {
-        global $wgOut;
-        
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
+        haclCheckScriptPath();
+        ob_start();
+        require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        $wgOut->setPageTitle(wfMsg('hacl_acl_editor'));
+        $wgOut->addHTML($html);
     }
 
     public function html_quickaccess(&$q)
     {
         global $wgOut;
+        /* Load data */
         $dbr = wfGetDB(DB_SLAVE);
-        $templates = HACLStorage::getDatabase()->getSDs('acltemplate', $q['like'] ? array('page_title LIKE '.$dbr->addQuotes('%'.$q['like'].'%')) : '');
+        $templates = HACLStorage::getDatabase()->getSDs(
+            'acltemplate', $q['like'] ? array('page_title LIKE '.$dbr->addQuotes('%'.$q['like'].'%')) : ''
+        );
         $quickacl = HACLQuickacl::newForUserId($wgUser->getId());
         $quickacl_ids = array_flip($quickacl->getSD_IDs());
-        foreach ($templates as &$sd)
-            $sd = array('sd' => $sd, 'selected' => array_key_exists($sd->getSDId(), $quickacl_ids));
+        foreach ($templates as $sd)
+            $sd->selected = array_key_exists($sd->getSDId(), $quickacl_ids);
+        /* Build HTML code */
         $html = wfMsg('hacl_quickaccess_manage');
         $form = self::xelement('label', array('for' => 'hacl_qafilter'), wfMsg('hacl_filter'));
         $form .= Xml::element('input', array('type' => 'text', 'name' => 'like', 'id' => 'hacl_qafilter', 'value' => $q['like']), '');
@@ -103,13 +115,21 @@ class HaloACLSpecial extends SpecialPage
         $html .= $form;
         if (!$templates)
             $html .= wfMsg('hacl_empty_list');
-        $list = '';
-        foreach ($templates as &$sd)
+        else
         {
-            $li = Xml::checkbox
-            $li .= ' ' . htmlspecialchars($sd->getSDName());
-            $list .= self::xelement('li', NULL, $li);
+            $list = '';
+            foreach ($templates as &$sd)
+            {
+                $li = Xml::check('qa_'.$sd->getSDId(), $sd['selected']);
+                $li .= ' ' . htmlspecialchars($sd->getSDName());
+                $list .= "<li>$li</li>";
+            }
+            $list = "<ul>$list</ul>";
+            $list .= Xml::submitButton(wfMsg('hacl_quickacl_save'));
+            $list = "<form action='?action=quickaccess&save=1' method='POST'>$list</form>";
+            $html .= $list;
         }
+        $wgOut->addHTML($html);
     }
 
     public function html_grouplist(&$q)
