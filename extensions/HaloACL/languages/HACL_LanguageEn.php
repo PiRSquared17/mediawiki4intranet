@@ -22,12 +22,6 @@
  */
 if (!defined('MEDIAWIKI')) die();
 
-global $haclgIP;
-include_once($haclgIP . '/languages/HACL_Language.php');
-include_once($haclgIP . '/includes/HACL_Right.php');
-include_once($haclgIP . '/includes/HACL_SecurityDescriptor.php');
-
-
 /**
  * English language labels for important HaloACL labels (namespaces, ,...).
  *
@@ -64,14 +58,20 @@ class HACLLanguageEn extends HACLLanguage
 
     public $mActionNames = array(
         HACLLanguage::RIGHT_READ         => 'read',
-        HACLLanguage::RIGHT_FORMEDIT     => 'formedit',  // TODO remove (formedit = edit)
-        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',   // TODO remove (wysiwyg = edit)
+#        HACLLanguage::RIGHT_FORMEDIT     => 'formedit',  # removed (formedit = edit)
+#        HACLLanguage::RIGHT_WYSIWYG      => 'wysiwyg',   # removed (wysiwyg = edit)
+#        HACLLanguage::RIGHT_ANNOTATE     => 'annotate',  # removed (annotate = edit)
         HACLLanguage::RIGHT_EDIT         => 'edit',
         HACLLanguage::RIGHT_CREATE       => 'create',
-        HACLLanguage::RIGHT_MOVE         => 'move',      // TODO remove (move = delete + create)
-        HACLLanguage::RIGHT_ANNOTATE     => 'annotate',  // TODO remove (annotate = edit)
+        HACLLanguage::RIGHT_MOVE         => 'move',
         HACLLanguage::RIGHT_DELETE       => 'delete',
         HACLLanguage::RIGHT_ALL_ACTIONS  => '*',
+        'read'      => 'Read',
+        'edit'      => 'Edit',
+        'create'    => 'Create',
+        'delete'    => 'Delete',
+        'move'      => 'Move',
+        'manage'    => 'Manage',
     );
 
     public $mPetPrefixes = array(

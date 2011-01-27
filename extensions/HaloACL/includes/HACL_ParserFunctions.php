@@ -216,17 +216,16 @@ class HACLParserFunctions
                 $this->mInlineRights[] = $ir;
                 $this->mFingerprints[] = $fingerprint;
             }
-        } else {
-            $this->mDefinitionValid = false;
         }
+        else
+            $this->mDefinitionValid = false;
 
         // Format the defined right in Wikitext
-        if (!empty($name)) {
-            $text = wfMsgForContent('hacl_pf_rightname_title', $name)
-            .wfMsgForContent('hacl_pf_rights', implode(' ,', $actions));
-        } else {
-            $text = wfMsgForContent('hacl_pf_rights_title', implode(' ,', $actions));
-        }
+        if (!empty($name))
+            $text = wfMsgForContent('hacl_pf_rightname_title', $name).
+                wfMsgForContent('hacl_pf_rights', implode(', ', $actions));
+        else
+            $text = wfMsgForContent('hacl_pf_rights_title', implode(', ', $actions));
         $text .= $this->showAssignees($users, $groups);
         $text .= $this->showDescription($description);
         $text .= $this->showErrors($errMsgs);
@@ -1215,9 +1214,10 @@ class HACLParserFunctions
         $groups = array();
 
         $assignedToPN = $isAssignedTo
-                        ? $haclgContLang->getParserFunctionParameter(HACLLanguage::PFP_ASSIGNED_TO)
-                        : $haclgContLang->getParserFunctionParameter(HACLLanguage::PFP_MEMBERS);
-        if (!array_key_exists($assignedToPN, $params)) {
+            ? $haclgContLang->getParserFunctionParameter(HACLLanguage::PFP_ASSIGNED_TO)
+            : $haclgContLang->getParserFunctionParameter(HACLLanguage::PFP_MEMBERS);
+        if (!array_key_exists($assignedToPN, $params))
+        {
             // The parameter "assigned to" is missing.
             $errMsgs[] = wfMsgForContent('hacl_missing_parameter', $assignedToPN);
             return array($users, $groups, $errMsgs);
@@ -1228,36 +1228,49 @@ class HACLParserFunctions
         $assignedTo = $params[$assignedToPN];
         $assignedTo = explode(',', $assignedTo);
         // read assigned users and groups
-        foreach ($assignedTo as $assignee) {
+        foreach ($assignedTo as $assignee)
+        {
             $assignee = trim($assignee);
             $t = Title::newFromText($assignee);
             if ($t && $t->getNamespace() == NS_USER ||
-                $assignee == '*' || $assignee == '#') {
+                $assignee == '*' || $assignee == '#')
+            {
                 // user found
-                if ($assignee != '*' && $assignee != '#') {
+                if ($assignee != '*' && $assignee != '#')
+                {
                     $user = $t->getText();
                     // Check if the user exists
-                    if (User::idFromName($user) == 0) {
+                    if (User::idFromName($user) == 0)
+                    {
                         // User does not exist => add a warning
                         $warnings[] = wfMsgForContent("hacl_unknown_user", $user);
-                    } else {
-                        $users[] = $user;
                     }
-                } else {
-                    $users[] = $assignee;
+                    else
+                        $users[] = $user;
                 }
-            } else {
+                else
+                    $users[] = $assignee;
+            }
+            else
+            {
+                if ($p = strpos($assignee, ':'))
+                {
+                    // Allow Group:X syntax
+                    $assignee = substr($assignee, 0, $p) . '/' . substr($assignee, $p+1);
+                }
                 // group found
                 // Check if the group exists
-                if (HACLGroup::idForGroup($assignee) == null) {
+                if (HACLGroup::idForGroup($assignee) == NULL)
+                {
                     // Group does not exist => add a warning
                     $warnings[] = wfMsgForContent("hacl_unknown_group", $assignee);
-                } else {
-                    $groups[] = $assignee;
                 }
+                else
+                    $groups[] = $assignee;
             }
         }
-        if (count($users) == 0 && count($groups) == 0) {
+        if (count($users) == 0 && count($groups) == 0)
+        {
             // No users/groups specified at all => add error message
             $errMsgs[] = wfMsgForContent('hacl_missing_parameter_values', $assignedToPN);
         }
