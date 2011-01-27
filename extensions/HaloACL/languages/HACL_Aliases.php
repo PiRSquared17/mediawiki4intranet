@@ -17,7 +17,7 @@
 */
 
 /**
- * 
+ *
  * Aliases for special pages
  *
  */

@@ -27,9 +27,7 @@ if ( !defined( 'MEDIAWIKI' ) ) {
     die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
 }
 
-//--- Includes ---
 global $haclgIP;
-//require_once("$haclgIP/...");
 
 /**
  * This class describes a group in HaloACL.
@@ -43,22 +41,20 @@ global $haclgIP;
  * @author Thomas Schweitzer
  *
  */
-class  HACLGroup {
+class HACLGroup {
 
-//--- Constants ---
-    const NAME   = 0;        // Mode parameter for getUsers/getGroups
-    const ID     = 1;        // Mode parameter for getUsers/getGroups
-    const OBJECT = 2;        // Mode parameter for getUsers/getGroups
+    //--- Constants ---
+    const NAME   = 0;       // Mode parameter for getUsers/getGroups
+    const ID     = 1;       // Mode parameter for getUsers/getGroups
+    const OBJECT = 2;       // Mode parameter for getUsers/getGroups
     const USER   = 'user';  // Child type for users
     const GROUP  = 'group'; // Child type for groups
 
     //--- Private fields ---
-    private $mGroupID;            // int: Page ID of the article that defines this group
-    private $mGroupName;        // string: The name of this group
-    private $mManageGroups;        // array(int): IDs of the groups that can modify
-    //        the definition of this group
-    private $mManageUsers;        // array(int): IDs of the users that can modify
-    //        the definition of this group
+    private $mGroupID;      // int: Page ID of the article that defines this group
+    private $mGroupName;    // string: The name of this group
+    private $mManageGroups; // array(int): IDs of the groups that can modify this group
+    private $mManageUsers;  // array(int): IDs of the users that can modify this group
 
     /**
      * Constructor for HACLGroup
@@ -78,31 +74,27 @@ class  HACLGroup {
      *      can modify the group's definition. User names are converted and
      *      internally stored as user IDs. Invalid values cause an exception.
      * @throws
-     *         HACLGroupException(HACLGroupException::UNKOWN_GROUP)
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLGroupException(HACLGroupException::UNKNOWN_GROUP)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *
      */
-    function __construct($groupID, $groupName, $manageGroups, $manageUsers) {
-
-        if (is_null($groupID)) {
+    function __construct($groupID, $groupName, $manageGroups, $manageUsers)
+    {
+        if (is_null($groupID))
             $groupID = self::idForGroup($groupName);
-        }
         $this->mGroupID = 0+$groupID;
         $this->mGroupName = $groupName;
 
         $this->setManageGroups($manageGroups);
         $this->setManageUsers($manageUsers);
-
     }
 
-    //--- getter/setter ---
+    //--- getters ---
 
-    public function getGroupID() {return $this->mGroupID;}
-    public function getGroupName() {return $this->mGroupName;}
-    public function getManageGroups() {return $this->mManageGroups;}
-    public function getManageUsers() {return $this->mManageUsers;}
-
-    //    public function setXY($xy)               {$this->mXY = $xy;}
+    public function getGroupID()        { return $this->mGroupID; }
+    public function getGroupName()      { return $this->mGroupName; }
+    public function getManageGroups()   { return $this->mManageGroups; }
+    public function getManageUsers()    { return $this->mManageUsers; }
 
     //--- Public methods ---
 
@@ -121,11 +113,11 @@ class  HACLGroup {
      *             ...if the requested group in the not the database.
      *
      */
-    public static function newFromName($groupName) {
+    public static function newFromName($groupName)
+    {
         $group = HACLStorage::getDatabase()->getGroupByName($groupName);
-        if ($group === null) {
+        if ($group === null)
             throw new HACLGroupException(HACLGroupException::UNKNOWN_GROUP, $groupName);
-        }
         return $group;
     }
 
@@ -283,12 +275,13 @@ class  HACLGroup {
      *         <false>, if not
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         If requested: HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *
      */
-    public function userCanModify($user, $throwException = false) {
-    // Get the ID of the user who wants to add/modify the group
+    public function userCanModify($user, $throwException = false)
+    {
+        // Get the ID of the user who wants to add/modify the group
         list($userID, $userName) = haclfGetUserID($user);
         // Check if the user can modify the group
         if (in_array($userID, $this->mManageUsers)) {
@@ -342,7 +335,7 @@ class  HACLGroup {
      *
      * @throws
      *         HACLGroupException(HACLGroupException::NO_GROUP_ID)
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *         Exception (on failure in database level)
      *
@@ -374,7 +367,7 @@ class  HACLGroup {
      *             '*' - anonymous user (ID:0)
      *            '#' - all registered users (ID: -1)
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ...if a user does not exist.
      */
     public function setManageUsers($manageUsers) {
@@ -409,7 +402,7 @@ class  HACLGroup {
      *         If an array is given, it can contain IDs (int), names (string) or
      *      objects (HACLGroup) for the group
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ...if a user does not exist.
      */
     public function setManageGroups($manageGroups) {
@@ -427,7 +420,7 @@ class  HACLGroup {
                 }
                 $gid = self::idForGroup($mg);
                 if (!$gid) {
-                    throw new HACLGroupException(HACLGroupException::UNKOWN_GROUP, $mg);
+                    throw new HACLGroupException(HACLGroupException::UNKNOWN_GROUP, $mg);
                 }
                 $this->mManageGroups[$i] = (int) $gid;
             }
@@ -449,16 +442,15 @@ class  HACLGroup {
      *         group. If <null>, the currently logged in user is assumed.
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *
      */
     public function addUser($user, $mgUser=null) {
-    // Check if $mgUser can modifiy this group.
+        // Check if $mgUser can modify this group.
         $this->userCanModify($mgUser, true);
         list($userID, $userName) = haclfGetUserID($user);
         HACLStorage::getDatabase()->addUserToGroup($this->mGroupID, $userID);
-
     }
 
     /**
@@ -472,7 +464,7 @@ class  HACLGroup {
      *         group. If <null>, the currently logged in user is assumed.
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *         HACLGroupException(HACLGroupException::INVALID_GROUP_ID)
      *
@@ -520,16 +512,15 @@ class  HACLGroup {
      *         group. If <null>, the currently logged in user is assumed.
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *
      */
     public function removeUser($user, $mgUser=null) {
-    // Check if $mgUser can modifiy this group.
+        // Check if $mgUser can modify this group.
         $this->userCanModify($mgUser, true);
         list($userID, $userName) = haclfGetUserID($user);
         HACLStorage::getDatabase()->removeUserFromGroup($this->mGroupID, $userID);
-
     }
 
     /**
@@ -543,7 +534,7 @@ class  HACLGroup {
      *         group. If <null>, the currently logged in user is assumed.
      *
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *         HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *         HACLGroupException(HACLGroupException::INVALID_GROUP_ID)
      *
@@ -650,16 +641,13 @@ class  HACLGroup {
      *             ...if the ID of the group is invalid
      *
      */
-    public function hasGroupMember($group, $recursive) {
+    public function hasGroupMember($group, $recursive)
+    {
         $groupID = self::idForGroup($group);
-
-        if ($groupID === 0) {
-            throw new HACLGroupException(HACLGroupException::INVALID_GROUP_ID,
-            $groupID);
-
-        }
+        if ($groupID === 0)
+            throw new HACLGroupException(HACLGroupException::INVALID_GROUP_ID, $groupID);
         return HACLStorage::getDatabase()
-        ->hasGroupMember($this->mGroupID, $groupID, self::GROUP, $recursive);
+            ->hasGroupMember($this->mGroupID, $groupID, self::GROUP, $recursive);
     }
 
     /**
@@ -677,16 +665,16 @@ class  HACLGroup {
      *         <true>, if $group is a member of this group
      *         <false>, if not
      * @throws
-     *         HACLException(HACLException::UNKOWN_USER)
+     *         HACLException(HACLException::UNKNOWN_USER)
      *             ...if the user does not exist.
      *
      */
-    public function hasUserMember($user, $recursive) {
+    public function hasUserMember($user, $recursive)
+    {
         $userID = haclfGetUserID($user);
         return HACLStorage::getDatabase()
-        ->hasGroupMember($this->mGroupID, $userID[0], self::USER, $recursive);
+            ->hasGroupMember($this->mGroupID, $userID[0], self::USER, $recursive);
     }
-
 
     /**
      * Deletes this group from the database. All references to this group in the
@@ -700,7 +688,8 @@ class  HACLGroup {
      *     HACLGroupException(HACLGroupException::USER_CANT_MODIFY_GROUP)
      *
      */
-    public function delete($user = null) {
+    public function delete($user = null)
+    {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteGroup($this->mGroupID);
     }
@@ -710,24 +699,23 @@ class  HACLGroup {
      * containing users and groups
      * @return <string>
      */
-    public function getGroupDescription() {
+    public function getGroupDescription()
+    {
         $result = "";
-        foreach($this->getUsers(HACLGroup::NAME) as $i) {
-            if($result == "") {
+        foreach ($this->getUsers(HACLGroup::NAME) as $i)
+        {
+            if (!$result)
                 $result = "U:$i";
-            }else {
+            else
                 $result .= ", U:$i";
-            }
         }
-        foreach($this->getGroups(HACLGroup::NAME) as $i) {
-            if($result == "") {
+        foreach ($this->getGroups(HACLGroup::NAME) as $i)
+        {
+            if (!$result)
                 $result = "G:$i";
-            }else {
+            else
                 $result .= ", G:$i";
-            }
         }
         return $result;
     }
-//--- Private methods ---
-
 }

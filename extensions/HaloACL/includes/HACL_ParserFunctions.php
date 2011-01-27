@@ -1,19 +1,25 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
- *  This file is part of the HaloACL-Extension.
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of heavily modified "Web 1.0" HaloACL-extension.
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * $Id: $
  *
- *   The HaloACL-Extension is free software; you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License as published by
- *   the Free Software Foundation; either version 3 of the License, or
- *   (at your option) any later version.
+ * Copyright 2009, ontoprise GmbH
  *
- *   The HaloACL-Extension is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
 /**
@@ -23,13 +29,8 @@
  * Date: 30.04.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
-//--- Includes ---
-global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * The class HACLParserFunctions contains all parser functions of the HaloACL
@@ -41,9 +42,6 @@ global $haclgIP;
  * - manage rights
  * - member
  * - manage group
- *
- * @author Thomas Schweitzer
- *
  */
 class HACLParserFunctions
 {
@@ -87,7 +85,7 @@ class HACLParserFunctions
     private $mDefinitionValid = true;
 
     // string: Type of the definition: group, right, sd, whitelist, invalid
-    private $mType = 'invalid';
+    private $mType = false;
 
     // HACLParserFunctions: Currently used instance of this class
     private static $mInstance = null;
@@ -106,6 +104,7 @@ class HACLParserFunctions
     public function __construct($title)
     {
         $this->mTitle = $title;
+        $this->mType = HACLEvaluator::hacl_type($this->mTitle);
     }
 
     public static function access(&$parser)
@@ -518,7 +517,6 @@ class HACLParserFunctions
             $this->mDefinitionValid = false;
         }
 
-
         // Format the group members in Wikitext
         $text = wfMsgForContent('hacl_pf_group_members_title');
         $text .= $this->showAssignees($users, $groups, false);
@@ -593,13 +591,12 @@ class HACLParserFunctions
 
     /**
      * This method is called just before an article's HTML is sent to the
-     * client. If the article contains definitions for ACLs, their consistency
+     * client. If the article corresponds to any ACL definitions, their consistency
      * is checked and error messages are added to the article.
      *
      * @param unknown_type $out
      * @param unknown_type $text
      * @return bool true
-     *
      */
     public static function outputPageBeforeHTML(&$out, &$text)
     {
@@ -744,59 +741,60 @@ class HACLParserFunctions
 
     //--- Private methods ---
 
-    // Check if there is some corresponding definition in the ACL database and remove it.
+    // Check if there is a corresponding definition in the ACL database and remove it.
     private static function removeOldDef($title, $for_update = false)
     {
         $id = $title->getArticleId();
         try
         {
-            $group = HACLGroup::newFromID($id);
-            // It is a group
-            // => remove all current members, however the group remains in the
-            //    hierarchy of groups, as it might be "revived"
-            $group->removeAllMembers();
-            // The empty group article can now be changed by everyone
-            $group->setManageGroups(null);
-            $group->setManageUsers("*,#");
-            $group->save();
-        }
-        catch (HACLGroupException $e)
-        {
-            try
+            switch (HACLEvaluator::hacl_type($title))
             {
-                $sd = HACLSecurityDescriptor::newFromID($id);
-                // It is a right or security descriptor
-                if ($for_update)
-                {
-                    // remove all current rights, however the right remains in
-                    // the hierarchy of rights, as it might be "revived"
-                    $sd->removeAllRights();
-                    // The empty right article can now be changed by everyone
-                    $sd->setManageGroups(null);
-                    $sd->setManageUsers("*,#");
-                    $sd->save();
-                }
-                else
-                {
-                    // delete SD permanently
-                    $sd->delete();
-                }
-            }
-            catch (HACLSDException $e)
-            {
-                // Check if it is the whitelist
-                global $haclgContLang;
-                if ($title->getText() == $haclgContLang->getWhitelist(false))
-                {
+                case 'defaultsd':
+                case 'sd':
+                    $sd = HACLSecurityDescriptor::newFromID($id);
+                    // It is a right or security descriptor
+                    if ($for_update)
+                    {
+                        // remove all current rights, however the right remains in
+                        // the hierarchy of rights, as it might be "revived"
+                        $sd->removeAllRights();
+                        // The empty right article can now be changed by everyone
+                        $sd->setManageGroups(null);
+                        $sd->setManageUsers('*,#');
+                        $sd->save();
+                    }
+                    else
+                    {
+                        // delete SD permanently
+                        $sd->delete();
+                    }
+                    break;
+                case 'group':
+                    $group = HACLGroup::newFromID($id);
+                    // It is a group
+                    // => remove all current members, however the group remains in the
+                    //    hierarchy of groups, as it might be "revived"
+                    $group->removeAllMembers();
+                    // The empty group article can now be changed by everyone
+                    $group->setManageGroups(NULL);
+                    $group->setManageUsers('*,#');
+                    $group->save();
+                    break;
+                case 'whitelist':
                     // Create an empty whitelist and save it.
                     $wl = new HACLWhitelist();
                     $wl->save();
-                }
+                    break;
             }
+        }
+        catch (Exception $e)
+        {
+            // Just ignore any exceptions
         }
     }
 
-    private static function parse($text, $title)
+    /* Parse wikitext inside a separate parser to overcome its non-reenterability */
+    static function parse($text, $title)
     {
         global $wgParser;
         if (!self::$mParser)
@@ -805,31 +803,42 @@ class HACLParserFunctions
         self::$mParser->parse($text, $title, $options);
     }
 
-    /**
-     * Returns HTML code with consistency check status
-     */
+    /* Return HTML consistency check status for pages in ACL namespace */
     private function consistencyCheckHtml()
     {
+        if ($this->mTitle->getNamespace() != HACL_NS_ACL)
+            return '';
+        $id = $this->mTitle->getArticleId();
+
         global $haclgContLang;
         $msg = $this->checkConsistency();
 
-        // Check if this article is already represented in the database
-        $id = $this->mTitle->getArticleID();
-        $etc = haclfDisableTitlePatch();
-        $wl = Title::newFromText($haclgContLang->getWhitelist());
-        haclfRestoreTitlePatch($etc);
-        $wlid = $wl->getArticleID();
+        // Article does not correspond to any ACL definition
+        if (!$this->mType)
+            return '';
 
-        $isWhitelist = ($id == $wlid);
-        if ($msg === true &&
-            !HACLGroup::exists($id) &&
-            !HACLSecurityDescriptor::exists($id) &&
-            !$isWhitelist)
+        if ($msg === true)
         {
-            $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
+            // Check if the article is already represented in HaloACL storage
+            $exists = false;
+            switch ($this->mType)
+            {
+                case 'sd':
+                case 'right':
+                    $exists = HACLSecurityDescriptor::exists($id);
+                    break;
+                case 'group':
+                    $exists = HACLGroup::exists($id);
+                    break;
+                case 'whitelist':
+                    $exists = $id == HACLWhitelist::exists();
+                    break;
+            }
+            if (!$exists)
+                $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
         }
 
-        if ($isWhitelist)
+        if ($this->mType == 'whitelist')
         {
             // Check if the whitelist defined in the article matches the
             // whitelist in the database. Articles that did no exist when the
@@ -865,7 +874,6 @@ class HACLParserFunctions
         return '';
     }
 
-
     /**
      * This class collects all functions for ACLs of an article. The collected
      * definitions are finally saved to the database with this method.
@@ -877,14 +885,12 @@ class HACLParserFunctions
      */
     private function saveDefinition()
     {
-        // Check if all definitions for ACL are consistent.
-        if ($this->checkConsistency() !== true || !$this->mDefinitionValid)
+        // Check if all definitions for ACL are valid and consistent.
+        if ($this->checkConsistency() !== true)
             return NULL;
 
         switch ($this->mType)
         {
-            case 'invalid':
-                return NULL;
             case 'group':
                 return $this->saveGroup();
                 break;
@@ -897,6 +903,8 @@ class HACLParserFunctions
             case 'whitelist':
                 return $this->saveWhitelist();
                 break;
+            default:
+                return NULL;
         }
     }
 
@@ -907,8 +915,8 @@ class HACLParserFunctions
      *         true, if saving was successful
      *         false, if not
      */
-    private function saveGroup() {
-
+    private function saveGroup()
+    {
         $t = $this->mTitle;
         // group does not exist yet
         $group = new HACLGroup($t->getArticleID(), $t->getText(),
@@ -916,13 +924,10 @@ class HACLParserFunctions
             $this->mGroupManagerUsers);
         $group->save();
         $group->removeAllMembers();
-        foreach ($this->mGroupMembers as $m) {
+        foreach ($this->mGroupMembers as $m)
             $group->addGroup($m);
-        }
-        foreach ($this->mUserMembers as $m) {
+        foreach ($this->mUserMembers as $m)
             $group->addUser($m);
-        }
-
         return true;
     }
 
@@ -938,31 +943,42 @@ class HACLParserFunctions
      *         true, if saving was successful
      *         false, if not
      */
-    private function saveSecurityDescriptor($isRight) {
+    private function saveSecurityDescriptor($isRight)
+    {
         $t = $this->mTitle;
-        try {
+        try
+        {
             $sd = HACLSecurityDescriptor::newFromID($t->getArticleID());
             // The right already exists. => delete the rights it contains
             $sd->removeAllRights();
-        } catch (HACLSDException $e) {
         }
-        list($pe, $peType) = HACLSecurityDescriptor::nameOfPE($t->getText());
-        $sd = new HACLSecurityDescriptor($t->getArticleID(), $t->getText(), $pe,
-                                        $peType,
-                                        $this->mRightManagerGroups,
-                                        $this->mRightManagerUsers);
-        $sd->save();
+        catch (HACLSDException $e)
+        {
+        }
 
-        // add all inline rights
-        $sd->addInlineRights($this->mInlineRights);
-        // add all property rights
-        $sd->addInlineRights($this->mPropertyRights);
-        // add all predefined rights
-        $sd->addPredefinedRights($this->mPredefinedRights);
+        try
+        {
+            list($pe, $peType) = HACLSecurityDescriptor::nameOfPE($t->getText());
+            $sd = new HACLSecurityDescriptor(
+                $t->getArticleID(), $t->getText(), $pe, $peType,
+                $this->mRightManagerGroups, $this->mRightManagerUsers
+            );
+            $sd->save();
+
+            // add all inline rights
+            $sd->addInlineRights($this->mInlineRights);
+            // add all property rights
+            $sd->addInlineRights($this->mPropertyRights);
+            // add all predefined rights
+            $sd->addPredefinedRights($this->mPredefinedRights);
+        }
+        catch (HACLSDException $e)
+        {
+            return false;
+        }
 
         return true;
     }
-
 
     /**
      * Saves the whitelist based on the definitions given in the current article.
@@ -971,13 +987,16 @@ class HACLParserFunctions
      *         true, if saving was successful
      *         false, if not
      */
-    private function saveWhitelist() {
-        try {
+    private function saveWhitelist()
+    {
+        try
+        {
             $wl = new HACLWhitelist($this->mWhitelist);
             $wl->save();
-        } catch (HACLWhitelistException $e) {
-            // Some articles could not be added to the whitelist, because they
-            // do not exits
+        }
+        catch (HACLWhitelistException $e)
+        {
+            // Non-existing articles could not be added to the whitelist
         }
         return true;
     }
@@ -987,30 +1006,20 @@ class HACLParserFunctions
      * The following conditions must be met:
      *
      * Groups:
-     *     - belong to Category:ACL/Group
-     *  - Namespace must be ACL
      *  - must have members (users or groups)
-     *    - must have managers (users or groups)
+     *  - must have managers (users or groups)
      *
      * Predefined Rights:
-     *     - belong to Category:ACL/Right
-     *  - Namespace must be ACL
-     *    - must have managers (users or groups)
+     *  - must have managers (users or groups)
      *  - must have inline or predefined rights
      *
      * Security Descriptors:
-     *     - belong to Category:ACL/ACL
-     *  - Namespace must be ACL
-     *    - must have managers (users or groups)
+     *  - must have managers (users or groups)
      *  - must have inline or predefined rights
      *  - a namespace can only be protected if it is not member of $haclgUnprotectableNamespaces
      *
      * Whitelist:
      *  - must have a list of pages
-     *
-     * As side-effect the type of the definition is determined and stored in
-     * $this->mType. The possibles values are 'group', 'right', 'sd', 'whitelist'
-     * and 'invalid'.
      *
      * @return array(string)|bool
      *         An array of error messages of <true>, if the parser functions are
@@ -1022,136 +1031,75 @@ class HACLParserFunctions
         global $haclgContLang;
         $msg = array();
 
-        // Get the direct parent categories of the article
-        $cats = $this->mTitle->getParentCategories();
-
-        $gCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_GROUP), NS_CATEGORY)->getPrefixedText();
-        $rCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_RIGHT), NS_CATEGORY)->getPrefixedText();
-        $sdCat = Title::newFromText($haclgContLang->getCategory(HACLLanguage::CAT_SECURITY_DESCRIPTOR), NS_CATEGORY)->getPrefixedText();
-        $isGroup = array_key_exists($gCat, $cats);
-        $isRight = array_key_exists($rCat, $cats);
-        $isSD    = array_key_exists($sdCat, $cats);
-        $isWhitelist = $this->mTitle->getFullText() == $haclgContLang->getWhitelist();
-
-        // Page must belong only to one category
-        $belongsToCat = array();
-        if ($isGroup) {
-            $belongsToCat[] = $gCat;
-            $this->mType = 'group';
-        }
-        if ($isRight) {
-            $belongsToCat[] = $rCat;
-            $this->mType = 'right';
-        }
-        if ($isSD) {
-            $belongsToCat[] = $sdCat;
-            $this->mType = 'sd';
-        }
-        if ($isWhitelist) {
-            $this->mType = 'whitelist';
-        }
-
-        if (count($belongsToCat) > 1 ||
-            (count($belongsToCat) == 1 && $isWhitelist) ) {
-            $msg[] = wfMsgForContent('hacl_too_many_categories',
-            implode(', ', $belongsToCat));
-            $this->mType = 'invalid';
-        }
-
         // The namespace must be ACL
-        if ($this->mTitle->getNamespace() != HACL_NS_ACL) {
+        if ($this->mTitle->getNamespace() != HACL_NS_ACL)
             $msg[] = wfMsgForContent('hacl_wrong_namespace');
-        }
 
         // Check if the definition of a group is complete and valid
-        if ($isGroup) {
+        if ($this->mType == 'group')
+        {
             // check for members
             if (count($this->mGroupMembers) == 0 &&
-                count($this->mUserMembers) == 0) {
+                count($this->mUserMembers) == 0)
                 $msg[] = wfMsgForContent('hacl_group_must_have_members');
-            }
             // check for managers
             if (count($this->mGroupManagerGroups) == 0 &&
-                count($this->mGroupManagerUsers) == 0) {
+                count($this->mGroupManagerUsers) == 0)
                 $msg[] = wfMsgForContent('hacl_group_must_have_managers');
-            }
         }
 
         // Check if the definition of a right or security descriptor is complete and valid
-        if ($isRight || $isSD) {
+        if ($this->mType == 'right' || $this->mType == 'sd')
+        {
             // check for inline or predefined rights
             if (count($this->mInlineRights) == 0 &&
                 count($this->mPredefinedRights) == 0 &&
-                count($this->mPropertyRights) == 0) {
+                count($this->mPropertyRights) == 0)
                 $msg[] = wfMsgForContent('hacl_right_must_have_rights');
-            }
             // check for managers
             if (count($this->mRightManagerGroups) == 0 &&
-                count($this->mRightManagerUsers) == 0) {
+                count($this->mRightManagerUsers) == 0)
                 $msg[] = wfMsgForContent('hacl_right_must_have_managers');
-            }
         }
 
         // Check if the definition of a whitelist is complete and valid
-        if ($isWhitelist) {
-            // check for whitelist
-            if (count($this->mWhitelist) == 0) {
-                $msg[] = wfMsgForContent('hacl_whitelist_must_have_pages');
-            }
-        }
-        if ($this->mType != 'invalid') {
-            // Check for invalid parser functions
-            $ivpf = $this->findInvalidParserFunctions($this->mType);
-            $msg = array_merge($msg, $ivpf);
-        }
+        if ($isWhitelist && count($this->mWhitelist) == 0)
+            $msg[] = wfMsgForContent('hacl_whitelist_must_have_pages');
 
-        if (!$isRight && !$isSD && !$isGroup && !$isWhitelist) {
-            // This is no whitelist, right, SD or group, but parser functions
-            // are applied
+        // Check for invalid parser functions
+        $ivpf = $this->findInvalidParserFunctions($this->mType);
+        $msg = array_merge($msg, $ivpf);
 
-            // Are functions for groups present?
-            if (count($this->mGroupManagerGroups) > 0 ||
-                count($this->mGroupManagerUsers) > 0 ||
-                count($this->mUserMembers) > 0 ||
-                count($this->mGroupMembers) > 0) {
-                $msg[] = wfMsgForContent('hacl_add_to_group_cat');
-            }
-            // Are functions for rights/SDs present?
-            if (count($this->mRightManagerGroups) > 0 ||
-                count($this->mRightManagerUsers) > 0 ||
-                count($this->mInlineRights) > 0 ||
-                count($this->mPropertyRights) > 0 ||
-                count($this->mPredefinedRights) > 0) {
-                $msg[] = wfMsgForContent('hacl_add_to_right_cat');
-            }
-
-            // Are functions for a whitelist present?
-            if (count($this->mWhitelist) > 0) {
-                $msg[] = wfMsgForContent('hacl_add_to_whitelist');
-            }
-
+        if (!$this->mType)
+        {
+            // No known prefix matched - this is really not a error, but a warning
+            // FIXME add the list of valid prefixes into warning text
+            $msg[] = wfMsgForContent('hacl_invalid_prefix');
         }
 
-        // a namespace can only be protected if it is not member of
-        // $haclgUnprotectableNamespaces
-        global $haclgUnprotectableNamespaces;
-        if ($isSD) {
+        if ($this->mType == 'sd')
+        {
             $sdName = $this->mTitle->getFullText();
             list($pe, $peType) = HACLSecurityDescriptor::nameOfPE($sdName);
-            if ($peType == HACLSecurityDescriptor::PET_NAMESPACE) {
-                if (in_array($pe, $haclgUnprotectableNamespaces)) {
-                    // This namespace can not be protected
-                    $msg[] = wfMsgForContent('hacl_unprotectable_namespace');
-                }
+            // Check if the protected element for a security descriptor does exist
+            if (HACLSecurityDescriptor::peIDforName($pe, $peType) === false)
+                $msg[] = wfMsgForContent('hacl_pe_not_exists', $this->mTitle->getText());
+            global $haclgUnprotectableNamespaces;
+            // a namespace can only be protected if it is not member of
+            // $haclgUnprotectableNamespaces
+            if ($haclgUnprotectableNamespaces &&
+                $peType == HACLSecurityDescriptor::PET_NAMESPACE &&
+                in_array($pe, $haclgUnprotectableNamespaces))
+            {
+                // This namespace can not be protected
+                $msg[] = wfMsgForContent('hacl_unprotectable_namespace');
             }
         }
 
-        if (count($msg) == 0 && !$this->mDefinitionValid) {
+        if (!$msg && !$this->mDefinitionValid)
             $msg[] = wfMsgForContent('hacl_errors_in_definition');
-        }
 
-        return count($msg) == 0 ? true : $msg;
-
+        return !$msg ? true : $msg;
     }
 
     /**
@@ -1164,7 +1112,8 @@ class HACLParserFunctions
      * @return array(string)
      *         An array of error messages. (May be empty.)
      */
-    private function findInvalidParserFunctions($type) {
+    private function findInvalidParserFunctions($type)
+    {
         $msg = array();
         global $haclgContLang;
 
@@ -1199,7 +1148,6 @@ class HACLParserFunctions
                     $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_RIGHTS));
             }
         }
-
         if (count($this->mGroupManagerGroups) > 0 ||
             count($this->mGroupManagerUsers) > 0) {
             if ($type == 'right' || $type == 'sd' || $type == 'whitelist') {
