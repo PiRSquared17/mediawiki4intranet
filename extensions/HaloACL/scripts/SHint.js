@@ -1,27 +1,45 @@
 /* Подсказки в текстовых полях ввода. Использование:
-   var hint = new SHint(input, style_prefix, msg_hint, fill_handler);
-   SHint.init();
+     var hint = new SHint(input, style_prefix, fill_handler);
+     SHint.init();
    Параметры конструктора:
-   input - текстовое поле ввода, для которого делаем подсказку (ID или само)
-   style_prefix - префикс стилей, используются
+     input - текстовое поле ввода, для которого делаем подсказку (ID или само)
+     style_prefix - префикс стилей, используются
        P_tip (стиль окошка подсказки),
        P_tt (стиль простого текста в нём),
        P_ti (стиль элемента подсказки),
        P_ti_a (стиль выбранного элемента подсказки)
-   msg_hint - текст предложения ко вводу
-   fill_handler(Hint, value) - функция, по значению value дёргающая
-       загрузку подсказок и передающая HTML-код в Hint.change_ajax()
+     fill_handler(SHint, value) - функция, по значению value дёргающая
+       загрузку подсказок и передающая HTML-код в SHint.change_ajax()
        все элементы с классом P_ti в HTML-коде считаются подсказками
        значение берётся из их атрибута title=""
+       Также эта же функция может присвоить предложение ко вводу, если
+       value пустое. Присваивать в SHint.tip_div.innerHTML.
+   Поля:
+     element - поле ввода
+     tip_div - <div> подсказки
+     max_height - максимальная высота подсказки (в пикселах),
+       дальше будет прокрутка. Задавать следует ДО вызова init().
+   Функции:
+     onset(ev, e) - callback для установки значения поля ввода в значение от
+       элемента e (ev, e - см.ниже).
+     change, keydown, keyup, keypress, change, e_focus, e_blur, e_mousedown -
+       exAttach'ные обработчики соответствующих событий на поле ввода.
+       exAttach'ность означает, что передаётся два параметра (ev, e),
+       где ev - объект события, e - элемент, на котором оно РЕАЛЬНО произошло,
+       значение возврата = 1 трактуется как "stop bubble", = 2 как
+       "stop bubble" + "do not take default action"
+   Требуется:
+     exAttach.js
+     offsetRect.js
+   Страница: http://yourcmc.ru/wiki/SHint_JS
 */
-var SHint = function(input, style_prefix, msg_hint, fill_handler)
+var SHint = function(input, style_prefix, fill_handler)
 {
     var sl = this;
     sl.style_prefix = style_prefix;
     if (typeof(input) == 'string')
         input = document.getElementById(input);
     sl.element = input;
-    sl.msg_hint = msg_hint;
     sl.fill_handler = fill_handler;
     sl.focus = function(f)
     {
@@ -49,11 +67,11 @@ var SHint = function(input, style_prefix, msg_hint, fill_handler)
         sl.change(ev);
         return 0;
     };
-    sl.keypress = function(ev, e)
+    sl.keydown = function(ev, e)
     {
         return ev.keyCode == 10 || ev.keyCode == 13 ? 2 : 0;
     };
-    sl.keydown = function(ev, e)
+    sl.keypress = function(ev, e)
     {
         if (ev.keyCode == 38) // up
             sl.change_highlight(ev, -1);
@@ -64,15 +82,32 @@ var SHint = function(input, style_prefix, msg_hint, fill_handler)
             var x;
             if (x = document.getElementById(sl.current))
                 sl.set(null, x);
+            return 2;
         }
         else
             return 0;
+        // scrolling
+        var c;
+        if (sl.current && (c = document.getElementById(sl.current)))
+        {
+            var t = sl.tip_div;
+            var ct = getOffset(c).top + t.scrollTop - t.style.top.substr(0, t.style.top.length-2);
+            var ch = c.scrollHeight;
+            if (ct+ch-t.offsetHeight > t.scrollTop)
+                t.scrollTop = ct+ch-t.offsetHeight;
+            else if (ct < t.scrollTop)
+                t.scrollTop = ct;
+        }
         return 2;
     };
     sl.change_ajax = function(text)
     {
         sl.current = '';
         sl.tip_div.innerHTML = text;
+        sl.tip_div.scrollTop = 0;
+        if (sl.scriptMaxHeight)
+            sl.tip_div.style.height = (sl.tip_div.scrollHeight > sl.max_height
+                ? sl.max_height : sl.tip_div.scrollHeight) + 'px';
         sl.find_attach(sl.tip_div);
     };
     sl.find_attach = function(e)
@@ -96,10 +131,7 @@ var SHint = function(input, style_prefix, msg_hint, fill_handler)
         var t = sl.tip_div;
         var n = sl.element;
         var v = n.value.trim();
-        if (!v.length)
-            t.innerHTML = '<div class="'+sl.style_prefix+'_tt">'+sl.msg_hint+'</div>';
-        else
-            sl.fill_handler(sl, v);
+        sl.fill_handler(sl, v);
     };
     sl.set = function(ev, e)
     {
@@ -122,13 +154,28 @@ var SHint = function(input, style_prefix, msg_hint, fill_handler)
         t.style.display = 'none';
         t.style.position = 'absolute';
         t.style.top = (p.top+e.offsetHeight) + 'px';
+        t.style.zIndex = 1000;
         t.style.left = p.left + 'px';
+        if (sl.max_height)
+        {
+            t.style.overflowY = 'scroll';
+            try { t.style.overflow = '-moz-scrollbars-vertical'; } catch(exc) {}
+            t.style.maxHeight = sl.max_height+'px';
+            if (!t.style.maxHeight)
+                sl.scriptMaxHeight = true;
+        }
         document.body.appendChild(t);
         exAttach(document, 'mousedown', sl.d_mousedown);
         exAttach(t, 'mousedown', sl.t_mousedown);
         exAttach(e, 'mousedown', sl.e_mousedown);
-        exAttach(e, 'keydown', sl.keydown);
-        exAttach(e, 'keypress', sl.keypress);
+        var msie = navigator.userAgent.match('MSIE') && !navigator.userAgent.match('Opera');
+        if (msie)
+            exAttach(e, 'keydown', sl.keypress);
+        else
+        {
+            exAttach(e, 'keydown', sl.keydown);
+            exAttach(e, 'keypress', sl.keypress);
+        }
         exAttach(e, 'keyup', sl.keyup);
         exAttach(e, 'change', sl.change);
         exAttach(e, 'focus', sl.h_focus);

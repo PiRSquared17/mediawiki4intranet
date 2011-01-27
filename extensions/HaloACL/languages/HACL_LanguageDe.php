@@ -74,6 +74,7 @@ class HACLLanguageDe extends HACLLanguage
         'delete'    => 'Löschen',
         'move'      => 'Verschieben',
         'manage'    => 'Verwalten',
+        'all'       => 'Full Access',
     );
 
     public $mCategories = array(
