@@ -59,9 +59,13 @@ class HACLSecurityDescriptor
     const PET_CATEGORY  = 'category';   // Protect instances of a category
     const PET_NAMESPACE = 'namespace';  // Protect instances of a namespace
     const PET_PROPERTY  = 'property';   // Protect values of a property
-    const PET_RIGHT     = 'right';      // This is not an actual security descriptor
-                                        // but a predefined right that is equivalent to
-                                        // an SD by its structure.
+
+    //---- Types of predefined rights ----
+    // This is not an actual security descriptor
+    // but a predefined right that is equivalent to
+    // an SD by its structure.
+    const PET_TEMPLATE  = 'template';   // default user template
+    const PET_RIGHT     = 'right';      // general right template
 
     //--- Private fields ---
     private $mSDID;            // int: Page ID of the article that defines this SD
@@ -116,7 +120,7 @@ class HACLSecurityDescriptor
             if ($peID === false)
                 throw new HACLSDException(HACLSDException::NO_PE_ID, $peName, $peType);
         }
-        $this->mPEID   = $peID;
+        $this->mPEID = $peID;
         $this->mPEType = $peType;
         if ($peType == self::PET_RIGHT)
             $this->mPEID = 0;
@@ -168,6 +172,11 @@ class HACLSecurityDescriptor
         }
         elseif ($peType === self::PET_RIGHT)
             return false;
+        elseif ($peType === self::PET_TEMPLATE)
+        {
+            $u = User::newFromName($peName);
+            return $u ? $u->getId() : false;
+        }
         // return the page id
         $id = haclfArticleID($peName);
         return $id == 0 ? false : $id;
@@ -358,7 +367,6 @@ class HACLSecurityDescriptor
 
     }
 
-
     /**
      * The name of the security descriptor determines which element it protects.
      * This method returns the name and type of the element that is protected
@@ -370,43 +378,36 @@ class HACLSecurityDescriptor
      *
      * @return array(string, string)
      *         Name of the protected element and its type (one of self::PET_CATEGORY
-     *      etc). It the type is self::PET_RIGHT, the name is <null>.
+     *         etc). It the type is self::PET_RIGHT, the name is <null>.
      */
-    public static function nameOfPE($nameOfSD) {
-        global $haclgContLang;
-        $ns = $haclgContLang->getNamespaces();
-        $ns = $ns[HACL_NS_ACL].':';
-        $start = 0;
-        //Ignore the namespace
-        if (strpos($nameOfSD, $ns) === 0) {
-            $start = strlen($ns);
+    public static function nameOfPE($nameOfSD)
+    {
+        global $wgContLang, $haclgContLang;
+        $ns = $wgContLang->getNsText(HACL_NS_ACL).':';
+
+        // Ignore the namespace
+        if (strpos($nameOfSD, $ns) === 0)
+            $nameOfSD = substr($nameOfSD, strlen($ns));
+
+        $p = strpos($nameOfSD, '/');
+        if (!$p)
+            return array(NULL, 'right');
+
+        $prefix = mb_strtolower(substr($nameOfSD, 0, $p));
+        if ($type = $haclgContLang->mPetAliases[$prefix])
+        {
+            $peName = substr($nameOfSD, $p+1);
+            if ($type == 'category')
+                $peName = $wgContLang->getNsText(NS_CATEGORY).':'.$peName;
+            elseif ($type == 'property' && defined('SMW_NS_PROPERTY'))
+                $peName = $wgContLang->getNsText(SMW_NS_PROPERTY).':'.$peName;
+            elseif ($type == 'right')
+                $peName = NULL;
+            return array($peName, $type);
         }
 
-        // Determine the type of the protected element by the prefix
-        $types = array(self::PET_PAGE, self::PET_CATEGORY,
-                          self::PET_NAMESPACE, self::PET_PROPERTY,
-                          self::PET_RIGHT);
-        foreach ($types as $type) {
-            $prefix = $haclgContLang->getPetPrefix($type).'/';
-            if (strpos($nameOfSD, $prefix, $start) === $start) {
-                // type found
-                $peName = substr($nameOfSD, $start+strlen($prefix));
-                if ($type === self::PET_CATEGORY) {
-                    global $wgContLang;
-                    $peName = $wgContLang->getNsText(NS_CATEGORY).':'.$peName;
-                } else if ($type === self::PET_PROPERTY &&
-                           defined('SMW_NS_PROPERTY')) {
-                    global $wgContLang;
-                    $peName = $wgContLang->getNsText(SMW_NS_PROPERTY).':'.$peName;
-                }
-                if ($type === self::PET_RIGHT) {
-                    $peName = null;
-                }
-                return array($peName, $type);
-            }
-        }
-        // SD ist probably a right
-        return array(null, self::PET_RIGHT);
+        // Right by default
+        return array(NULL, 'right');
     }
 
     /**
@@ -762,14 +763,14 @@ class HACLSecurityDescriptor
      *         Exception (on failure in database level)
      *
      */
-    public function save($user = null) {
-
+    public function save($user = null)
+    {
         // Get the page ID of the article that defines the SD
-        if ($this->mSDID == 0) {
+        if ($this->mSDID == 0)
             throw new HACLSDException(HACLSDException::NO_SD_ID, $this->mSDName);
-        }
 
-        if (count($this->mManageGroups) == 0 && count($this->mManageUsers) == 0) {
+        if (count($this->mManageGroups) == 0 && count($this->mManageUsers) == 0)
+        {
             // no user has the right to modify this right
             // => add the current user as manager
             global $wgUser;
@@ -779,9 +780,7 @@ class HACLSecurityDescriptor
         $this->userCanModify($user, true);
 
         HACLStorage::getDatabase()->saveSD($this);
-
     }
-
 
     /**
      * Deletes this security descriptor from the database.

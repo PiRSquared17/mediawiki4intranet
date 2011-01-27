@@ -41,69 +41,82 @@ class HACLDBHelper
      *      than one. This is a comma separated list of column names. The primary
      *      keys are not altered, if the table already exists.
      */
-    public static function setupTable($table, $fields, $db, $verbose, $primaryKeys = "") {
+    public static function setupTable($table, $fields, $db, $verbose, $primaryKeys = "")
+    {
         global $wgDBname, $wgDBTableOptions;
-        HACLDBHelper::reportProgress("Setting up table $table ...\n",$verbose);
-        if ($db->tableExists($table) === false) { // create new table
+        HACLDBHelper::reportProgress("Setting up table $table ...\n", $verbose);
+        if ($db->tableExists($table) === false)
+        {
+            // create new table
             $sql = 'CREATE TABLE ' . $wgDBname . '.' . $table . ' (';
             $first = true;
-            foreach ($fields as $name => $type) {
-                if ($first) {
+            foreach ($fields as $name => $type)
+            {
+                if ($first)
                     $first = false;
-                } else {
+                else
                     $sql .= ',';
-                }
                 $sql .= $name . '  ' . $type;
             }
-            if (!empty($primaryKeys)) {
+            if (!empty($primaryKeys))
                 $sql .= ", PRIMARY KEY(".$primaryKeys.")";
-            }
             $topt = $wgDBTableOptions;
             if (stripos($topt, "CHARSET") === false)
                 $topt .= " DEFAULT CHARSET=utf8";
             if (stripos($topt, "COLLATE") === false)
                 $topt .= " COLLATE=utf8_bin";
             $sql .= ") $topt";
-            $db->query( $sql, 'HACLDBHelper::setupTable' );
-            HACLDBHelper::reportProgress("   ... new table created\n",$verbose);
+            $db->query( $sql, __METHOD__ );
+            HACLDBHelper::reportProgress("   ... new table created\n", $verbose);
             return array();
-        } else { // check table signature
+        }
+        else
+        {
+            // check table signature
             HACLDBHelper::reportProgress("   ... table exists already, checking structure ...\n",$verbose);
-            $res = $db->query( 'DESCRIBE ' . $table, 'HACLDBHelper::setupTable' );
+            $res = $db->query( 'DESCRIBE ' . $table, __METHOD__ );
             $curfields = array();
             $result = array();
-            while ($row = $db->fetchObject($res)) {
+            while ($row = $db->fetchObject($res))
+            {
                 $type = strtoupper($row->Type);
-                if ($row->Null != 'YES') {
+                if ($row->Null != 'YES')
                     $type .= ' NOT NULL';
-                }
                 $curfields[$row->Field] = $type;
             }
             $position = 'FIRST';
-            foreach ($fields as $name => $type) {
-                if ( !array_key_exists($name,$curfields) ) {
+            foreach ($fields as $name => $type)
+            {
+                if (!array_key_exists($name, $curfields))
+                {
                     HACLDBHelper::reportProgress("   ... creating column $name ... ",$verbose);
-                    $db->query("ALTER TABLE $table ADD `$name` $type $position", 'HACLDBHelper::setupTable');
+                    $db->query("ALTER TABLE $table ADD `$name` $type $position", __METHOD__);
                     $result[$name] = 'new';
                     HACLDBHelper::reportProgress("done \n",$verbose);
-                } elseif ($curfields[$name] != $type && stripos("auto_increment", $type) == -1) {
-                    HACLDBHelper::reportProgress("   ... changing type of column $name from '$curfields[$name]' to '$type' ... ",$verbose);
-                    $db->query("ALTER TABLE $table CHANGE `$name` `$name` $type $position", 'HACLDBHelper::setupTable');
+                }
+                elseif (strtolower($curfields[$name]) != strtolower($type) && stripos($type, "auto_increment") === false)
+                {
+                    HACLDBHelper::reportProgress("   ... changing type of column $name from '$curfields[$name]' to '$type' ... ", $verbose);
+                    $db->query("ALTER TABLE $table CHANGE `$name` `$name` $type", __METHOD__);
                     $result[$name] = 'up';
                     $curfields[$name] = false;
                     HACLDBHelper::reportProgress("done.\n",$verbose);
-                } else {
+                }
+                else
+                {
                     HACLDBHelper::reportProgress("   ... column $name is fine\n",$verbose);
                     $curfields[$name] = false;
                 }
                 $position = "AFTER $name";
             }
-            foreach ($curfields as $name => $value) {
-                if ($value !== false) { // not encountered yet --> delete
-                    HACLDBHelper::reportProgress("   ... deleting obsolete column $name ... ",$verbose);
-                    $db->query("ALTER TABLE $table DROP COLUMN `$name`", 'HACLDBHelper::setupTable');
+            foreach ($curfields as $name => $value)
+            {
+                if ($value !== false) // not encountered yet --> delete
+                {
+                    HACLDBHelper::reportProgress("   ... deleting obsolete column $name ... ", $verbose);
+                    $db->query("ALTER TABLE $table DROP COLUMN `$name`", __METHOD__);
                     $result[$name] = 'del';
-                    HACLDBHelper::reportProgress("done.\n",$verbose);
+                    HACLDBHelper::reportProgress("done.\n", $verbose);
                 }
             }
             HACLDBHelper::reportProgress("   ... table $table set up successfully.\n",$verbose);
@@ -227,7 +240,7 @@ class HACLDBHelper
             if ($labelcol !== NULL) { // apply string conditions
 
                 $sql_conds .= ' AND ( ';
-                
+
                 foreach ($requestoptions->getStringConditions() as $strcond) {
                     $string = str_replace(array('_', ' '), array('\_', '\_'), $strcond->string);
                     switch ($strcond->condition) {

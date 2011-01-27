@@ -867,7 +867,7 @@ class HACLEvaluator
                 case 'group':
                     $group = HACLGroup::newFromID($t->getArticleID());
                     return array($group->userCanModify($userID), true);
-                // SD or right
+                // SD, right, template
                 case 'right':
                 case 'sd':
                     $sd = HACLSecurityDescriptor::newFromID($t->getArticleID());
@@ -895,7 +895,7 @@ class HACLEvaluator
     }
 
     /* Check is $title corresponds to some HaloACL definition page
-       Returns 'group', 'sd', 'whitelist', 'defaultsd' or FALSE */
+       Returns 'group', 'sd', 'whitelist', 'template' or FALSE */
     static function hacl_type($title)
     {
         global $haclgContLang;

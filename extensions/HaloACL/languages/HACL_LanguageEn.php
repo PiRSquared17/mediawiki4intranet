@@ -81,6 +81,7 @@ class HACLLanguageEn extends HACLLanguage
         'namespace' => 'Namespace',
         'property'  => 'Property',
         'right'     => 'Right',
+        'template'  => 'Template',
     );
 
     public $mPredefinedRightName = 'Right';
@@ -104,5 +105,6 @@ class HACLLanguageEn extends HACLLanguage
         'namespace' => 'namespace',
         'property'  => 'property',
         'right'     => 'right',
+        'template'  => 'template',
     );
 }

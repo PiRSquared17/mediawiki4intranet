@@ -101,6 +101,7 @@ class HACLLanguageRu extends HACLLanguage
         'namespace' => 'namespace',
         'property'  => 'property',
         'right'     => 'right',
+        'template'  => 'template',
         'категория' => 'category',
     );
 }
