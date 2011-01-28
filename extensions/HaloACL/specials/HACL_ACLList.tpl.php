@@ -9,10 +9,10 @@
 <div id="acl_list" style="border: 1px solid gray; width: 500px; height: 500px; padding: 5px; overflow-y: scroll; overflow: -moz-scrollbars-vertical; float: left"></div>
 
 <div style="float: left; margin: 0 8px">
-<p><b>Filter by name:</b></p>
+<p><b><?= wfMsg('hacl_acllist_filter_name') ?></b></p>
 <p><input type="text" id="acl_filter" onchange="change_filter()" onkeyup="change_filter()" style="width: 400px" /></p>
 
-<p><b>Filter by type:</b></p>
+<p><b><?= wfMsg('hacl_acllist_filter_type') ?></b></p>
 <p><input type="checkbox" id="atg_all" checked="checked" onclick="change_filter(this)" onchange="change_filter(this)" /> <label for="atg_all"><?= wfMsg('hacl_acllist_typegroup_all') ?></label></p>
 <ul>
 <?php foreach($this->aclTargetTypes as $t => $l) { ?>

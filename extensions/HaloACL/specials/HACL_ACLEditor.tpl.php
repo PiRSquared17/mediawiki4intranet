@@ -108,7 +108,7 @@ foreach($haclgContLang->mPetPrefixes as $k => $v)
 
 exAttach(window, 'load', function() {
 <?php if ($aclSD) {
-list($t, $n) = explode('/', $aclSD->getSDName());
+list($t, $n) = explode('/', $aclSD->getSDName(), 2);
 $title = Title::newFromId($aclSD->getSDID());
 $aclType = $aclSD->getPEType();
 ?>
