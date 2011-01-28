@@ -129,6 +129,8 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_acllist_no_acls'              => '<span style="color:red;font-weight:bold">No matching ACL definitions found.</span>',
     'hacl_acllist_edit_own_template'    => 'Edit own default template',
 
+    'hacl_acllist_filter_name'          => 'Filter by name:',
+    'hacl_acllist_filter_type'          => 'Filter by type:',
     'hacl_acllist_typegroup_all'        => 'All definitions',
     'hacl_acllist_typegroup_protect'    => 'Rights for:',
     'hacl_acllist_typegroup_define'     => 'Templates:',
