@@ -1,11 +1,3 @@
-<p>
- <b><a href="<?= $wgScript ?>?title=Special:HaloACL&action=acl"><?= wfMsg('hacl_acllist_create_acl') ?></a></b>
- <?php if ($aclOwnTemplate) { ?>
- &nbsp; &nbsp; <b><a title="<?= htmlspecialchars($aclOwnTemplate->getSDName()) ?>" href="<?= $wgScript . '?title=Special:HaloACL&action=acl&sd=' . htmlspecialchars($aclOwnTemplate->getSDName()) ?>"><?= wfMsg('hacl_acllist_edit_own_template') ?></a></b>
- <?php } ?>
- &nbsp; &nbsp; <b><a href="<?= $wgScript ?>?title=Special:HaloACL&action=quickaccess">Manage Quick ACL</a></b>
-</p>
-
 <div id="acl_list" style="border: 1px solid gray; width: 500px; height: 500px; padding: 5px; overflow-y: scroll; overflow: -moz-scrollbars-vertical; float: left"></div>
 
 <div style="float: left; margin: 0 8px">

@@ -12,6 +12,7 @@
 <?php if ($templates) { ?>
 <p><?= wfMsg('hacl_quickaccess_hint') ?></p>
 <form action="<?= $wgScript ?>?title=Special:HaloACL&action=quickaccess&save=1" method="POST">
+ <input type="hidden" name="like" value="<?= htmlspecialchars($args['like']) ?>" />
  <ul>
   <?php foreach ($templates as $sd) { ?>
    <li>
@@ -27,5 +28,5 @@
  <p><input type="submit" value="<?= wfMsg('hacl_quickaccess_save') ?>" /></p>
 </form>
 <?php } else { ?>
- <?= wfMsg('hacl_empty_list') ?>
+ <?= wfMsg('hacl_quickaccess_empty') ?>
 <?php } ?>

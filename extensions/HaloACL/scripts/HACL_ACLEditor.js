@@ -1,7 +1,19 @@
+/* This script requires global variables:
+   aclNsText: HACL_NS_ACL namespace name
+   msgStartTyping: { page =>, user =>, group =>, category => }
+   msgEditSave
+   msgEditCreate
+   msgAffected: { user =>, group => }
+   userNsRegexp: regexp matching (,|^)+localised user namespace name
+   groupPrefixRegexp: same for group prefix
+   petPrefix: { PET_XX => prefix } from haclgContLang */
+
 var allActions = [ 'create', 'delete', 'edit', 'move', 'read' ];
 var groupClosureCache = {};
+var predefCache = {};
 var aclRights = {};
 var aclClosure = {};
+var aclPredefined = {};
 var aclLastTarget = {};
 var user_hint, target_hint, inc_hint, last_target = '', last_target_name = '';
 
@@ -70,21 +82,19 @@ function pe_exists_ajax(request)
     document.getElementById('wpSave').value = exists ? msgEditSave : msgEditCreate;
 }
 
-// add ACL inclusion
+// add predefined ACL inclusion
 function include_acl()
 {
-    var t = document.getElementById('acl_def').value;
     var inc = document.getElementById('inc_acl').value;
-    t = t.replace(/\{\{\s*#predefined\s+right\s*:\s*([^\}]*)\}\}\s*/ig, function(m, m1) { return m1.trim() == inc ? '' : m });
-    t = t + "{{#predefined right: "+inc+"}}\n";
-    document.getElementById('acl_def').value = t;
+    aclPredefined[inc] = true;
+    save_sd();
 }
 
 // parse definition text from textbox
 function parse_sd()
 {
     var t = document.getElementById('acl_def').value;
-    var m = t.match(/\{\{\s*\#access:\s*[^\}]*?\}\}/ig);
+    var m = t.match(/\{\{\s*\#access\s*:\s*[^\}]*?\}\}/ig) || [];
     var r = {}, i = 0, j, k, h, act, ass;
     while (m[i])
     {
@@ -124,7 +134,7 @@ function parse_sd()
         i++;
     }
     // assigned to manage rights
-    var m1 = t.match(/\{\{\s*\#manage\s+rights:\s*[^\}]*?\}\}/ig);
+    var m1 = t.match(/\{\{\s*\#manage\s+rights\s*:\s*[^\}]*?\}\}/ig) || [];
     i = 0;
     while (m1[i])
     {
@@ -137,7 +147,46 @@ function parse_sd()
         }
         i++;
     }
-    return r;
+    // ACL inclusions
+    var m2 = t.match(/\{\{\s*\#predefined\s+right\s*:\s*[^\}]*?\}\}/ig) || [];
+    i = 0;
+    aclPredefined = {};
+    while (m2[i])
+    {
+        ass = /[:\|]\s*rights\s*=\s*([^\|\}]*)/i.exec(m2[i]);
+        ass = (ass[1] || '').trim().split(/[,\s*]*,[,\s]*/);
+        for (k in ass)
+            aclPredefined[ass[k]] = true;
+        i++;
+    }
+    // Save aclRights
+    aclRights = r;
+    check_errors();
+}
+
+// Check for errors (now: at least 1 manager defined)
+function check_errors()
+{
+    var has_managers = false, has_rights = false;
+    for (var m in aclRights)
+    {
+        for (var a in aclRights[m])
+        {
+            if (a == 'manage')
+                has_managers = true;
+            else
+                has_rights = true;
+        }
+        if (has_rights && has_managers)
+            break;
+    }
+    for (var m in aclPredefined)
+    {
+        has_rights = true;
+        break;
+    }
+    document.getElementById('acl_define_rights').style.display = has_rights ? 'none' : '';
+    document.getElementById('acl_define_manager').style.display = has_managers ? 'none' : '';
 }
 
 // fill in aclRights with closure data
@@ -146,43 +195,58 @@ function closure_ajax(request)
     if (request.status != 200)
         return;
     var d = eval('('+request.responseText+')'); // JSON parse
-    if (d)
-        for (var g in d)
-            groupClosureCache[g] = d[g];
+    if (d && d['groups'])
+        for (var g in d['groups'])
+            groupClosureCache[g] = d['groups'][g];
+    if (d && d['rights'])
+        for (var g in d['rights'])
+            predefCache[g] = d['rights'][g];
 }
 
-// modify closure, append d = [ group1, group2, ... ]
-function closure_groups(d)
+// modify closure, append d = [ group1, group2, ... ],
+// append predefined rights sd = [ right1, ... ]
+function closure_groups_sd(d, sd)
 {
-    var w;
+    var c = false;
+    // Groups
     for (var g in d)
     {
+        c = true;
         g = d[g];
-        for (var u in (groupClosureCache[g] || {})['user'])
+        if (groupClosureCache[g])
         {
-            for (var r in aclRights[g])
+            for (var m in groupClosureCache[g])
             {
-                w = 'User:'+groupClosureCache[g]['user'][u].user_name;
-                aclClosure[w] = aclClosure[w] || {};
-                aclClosure[w][r] = true;
-            }
-        }
-        for (var u in (groupClosureCache[g] || {})['group'])
-        {
-            for (var r in aclRights[g])
-            {
-                w = 'Group/'+groupClosureCache[g]['group'][u].group_name;
-                aclClosure[w] = aclClosure[w] || {};
-                aclClosure[w][r] = true;
+                aclClosure[m] = aclClosure[m] || {};
+                for (var a in aclRights[g])
+                    aclClosure[m][a] = true;
             }
         }
     }
+    // Predefined rights
+    for (var r in sd)
+    {
+        c = true;
+        r = sd[r];
+        if (predefCache[r])
+        {
+            for (var m in predefCache[r])
+            {
+                aclClosure[m] = aclClosure[m] || {};
+                for (var a in predefCache[r][m])
+                    aclClosure[m][a] = true;
+            }
+        }
+    }
+    // refresh hint
+    if (c && !user_hint.element.value.trim().length)
+        user_hint.change_ajax(get_empty_hint());
 }
 
 // parse ACL and re-fill closure
 function parse_make_closure()
 {
-    aclRights = parse_sd();
+    parse_sd();
     fill_closure();
 }
 
@@ -201,22 +265,36 @@ function fill_closure()
                 fetch.push(k);
         }
     }
-    if (fetch.length)
-        sajax_do_call('haclGroupClosure', [ fetch.join(',') ], function(request) { closure_ajax(request); closure_groups(g); });
-    else if (g.length)
-        closure_groups(g);
+    var sd = [];
+    var fetch_sd = [];
+    for (var k in aclPredefined)
+    {
+        sd.push(k);
+        if (!predefCache[k])
+            fetch_sd.push(k);
+    }
+    if (fetch.length || fetch_sd.length)
+    {
+        sajax_do_call(
+            'haclGroupClosure',
+            [ fetch.join(','), fetch_sd.join('[') ],
+            function(request) { closure_ajax(request); closure_groups_sd(g, sd); }
+        );
+    }
+    else if (g.length || sd.length)
+        closure_groups_sd(g, sd);
 }
 
 // save definition text into textbox
-function save_sd(rights)
+function save_sd()
 {
     var r, i, j, k, m, h, man;
     // remove old definitions
     var t = document.getElementById('acl_def').value;
-    t = t.replace(/\{\{\s*\#(access|manage\s+rights):\s*[^\}]*?\}\}\s*/ig, '');
+    t = t.replace(/\{\{\s*\#(access|manage\s+rights|predefined\s*right):\s*[^\}]*?\}\}\s*/ig, '');
     // build {{#manage rights: }}
     m = [];
-    r = rights;
+    r = aclRights;
     for (j in r)
         if (r[j]['manage'])
             m.push(j);
@@ -242,9 +320,15 @@ function save_sd(rights)
     r = '';
     for (j in m)
         r += '{{#access: assigned to = '+m[j].join(", ")+' | actions = '+j+"}}\n";
+    // include predefined rights
+    var predef = [];
+    for (var i in aclPredefined)
+        predef.push(i);
     // add definitions
     t = t + r + man;
+    t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
     document.getElementById('acl_def').value = t;
+    check_errors();
 }
 
 // onchange for action checkboxes
@@ -371,7 +455,7 @@ function grant(g_to, g_act, g_yes)
                 c = c && aclRights[g_to][allActions[a]];
         document.getElementById('act_all').checked = c;
     }
-    save_sd(aclRights);
+    save_sd();
     if (g_to.substr(0, 6) == 'Group/')
         fill_closure();
 }
@@ -416,7 +500,7 @@ function get_empty_hint()
         }
     }
     if (!involved.length)
-        return '<div class="hacl_tt">'+msgStartTyping[tt]+'</div>';
+        return '<div class="hacl_tt">'+msgAffected['no'+tt]+' '+msgStartTyping[tt]+'</div>';
     return '<div class="hacl_tt">'+msgAffected[tt]+'</div>'+involved.join('');
 }
 
