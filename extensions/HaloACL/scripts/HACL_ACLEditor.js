@@ -373,7 +373,8 @@ function to_type_change()
 {
     document.getElementById('to_name').value = '';
     to_name_change();
-    user_hint.change();
+    // force refresh hint (for the case when value didn't change)
+    user_hint.fill_handler(user_hint, '');
 }
 
 // additional onchange for to_name - load to_name's rights from aclClosure
