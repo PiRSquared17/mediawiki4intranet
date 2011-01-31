@@ -87,6 +87,8 @@ class HaloACLSpecial extends SpecialPage
                 'media' => 'screen, projection',
                 'href' => $haclgHaloScriptPath.'/skins/haloacl.css',
             ));
+            if ($f == 'html_acllist')
+                $wgOut->addHTML('<p style="margin-top: -8px">'.wfMsgExt('hacl_acllist_hello', 'parseinline').'</p>');
             $this->_actions($q);
             $this->$f($q);
         }
