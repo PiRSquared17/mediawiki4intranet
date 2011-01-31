@@ -138,6 +138,7 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_action_whitelist'             => 'Manage whitelist',
 
     'hacl_acllist'                      => 'Halo Access Control Lists',
+    'hacl_acllist_hello'                => 'Hi, this is \'\'\'HaloACL[http://4intra.net/ <sup>4</sup>IN]\'\'\', the best MediaWiki rights extension. You can get help [http://wiki.4intra.net/HaloACL here]. Select function below to start working:',
     'hacl_acllist_empty'                => '<span style="color:red;font-weight:bold">No matching ACL definitions found.</span>',
     'hacl_acllist_filter_name'          => 'Filter by name:',
     'hacl_acllist_filter_type'          => 'Filter by type:',
