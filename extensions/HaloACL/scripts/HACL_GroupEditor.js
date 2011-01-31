@@ -371,7 +371,7 @@ HACLGroupEditor.prototype.find_set = function(who, prefix, h, e)
 // handler for selection of autocomplete item
 HACLGroupEditor.prototype.set_handler = function(ge, hint, ev, e)
 {
-    var old_target = ev.target || ev.srcElement;
+    var old_target = ev ? ev.target || ev.srcElement : null;
     var chk = document.getElementById('c'+e.id);
     if (chk.disabled)
         return;
