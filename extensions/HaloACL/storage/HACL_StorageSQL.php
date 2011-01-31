@@ -225,7 +225,8 @@ class HACLStorageSQL {
      */
     public function getGroups($prefix = NULL, $limit = NULL)
     {
-        $dbr =& wfGetDB(DB_SLAVE);
+        $dbr = wfGetDB(DB_SLAVE);
+
         $options = array('ORDER BY' => 'group_name');
         if ($limit !== NULL)
             $options['LIMIT'] = $limit;
@@ -245,8 +246,6 @@ class HACLStorageSQL {
             $mgUsers = self::strToIntArray($row->mg_users);
             $groups[] = new HACLGroup($groupID, $groupName, $mgGroups, $mgUsers);
         }
-
-        $dbr->freeResult($res);
         return $groups;
     }
 
@@ -815,31 +814,31 @@ class HACLStorageSQL {
     }
 
     /**
-     * Returns the IDs of all direct inline rights of all given security
+     * Returns all direct inline rights of all given security
      * descriptor IDs.
      *
      * @param array<int> $sdIDs
      *         Array of security descriptor IDs.
+     * @param boolean $asObject
+     *         If true, return an array of HACLRight objects.
+     *         If false, return an array of right IDs.
      *
      * @return array<int>
-     *         An array of inline right IDs without duplicates.
+     *         An array of inline right IDs or HACLRight objects.
      */
-    public function getInlineRightsOfSDs($sdIDs) {
-        if (empty($sdIDs)) {
+    public function getInlineRightsOfSDs($sdIDs, $asObject = false)
+    {
+        if (empty($sdIDs))
             return array();
-        }
-        $dbr =& wfGetDB( DB_SLAVE );
+        $dbr = wfGetDB( DB_SLAVE );
         $res = $dbr->select(
-            'halo_acl_rights', 'right_id',
-            array('origin_id' => $sdIDs), __METHOD__,
-            array('DISTINCT')
+            'halo_acl_rights', '*',
+            array('origin_id' => $sdIDs), __METHOD__
         );
 
         $irs = array();
-        while ($row = $dbr->fetchObject($res)) {
-            $irs[] = (int) $row->right_id;
-        }
-        $dbr->freeResult($res);
+        while ($row = $dbr->fetchObject($res))
+            $irs[] = $asObject ? self::rowToRight($row) : (int)$row->right_id;
         return $irs;
     }
 
@@ -1006,8 +1005,9 @@ class HACLStorageSQL {
      *         in the hierarchy of rights).
      *
      */
-    public function deleteSD($SDID, $rightsOnly = false) {
-        $dbw =& wfGetDB( DB_MASTER );
+    public function deleteSD($SDID, $rightsOnly = false)
+    {
+        $dbw = wfGetDB( DB_MASTER );
 
         // Delete all inline rights that are defined by the SD (and the
         // references to them)
@@ -1031,16 +1031,13 @@ class HACLStorageSQL {
                 // retrieve the protected element and its type
                 $obj = $dbw->selectRow('halo_acl_security_descriptors', 'pe_id, type',
                     array('sd_id' => $sd), __METHOD__);
-                if (!$obj) {
+                if (!$obj)
                     continue;
-                }
 
-                foreach ($irs as $ir) {
-                    $dbw->delete('halo_acl_pe_rights', array(
-                        'right_id' => $ir,
-                        'pe_id' => $obj->pe_id,
-                        'type' => $obj->type), __METHOD__);
-                }
+                $dbw->delete('halo_acl_pe_rights', array(
+                    'right_id' => $irs,
+                    'pe_id' => $obj->pe_id,
+                    'type' => $obj->type), __METHOD__);
             }
         }
 
@@ -1048,9 +1045,8 @@ class HACLStorageSQL {
         $res = $dbw->select('halo_acl_rights_hierarchy', 'parent_right_id',
             array('child_id' => $SDID), __METHOD__);
         $parents = array();
-        while ($row = $dbw->fetchObject($res)) {
+        while ($row = $dbw->fetchObject($res))
             $parents[] = $row->parent_right_id;
-        }
         $dbw->freeResult($res);
 
         // Delete the SD from the hierarchy of rights in halo_acl_rights_hierarchy
@@ -1129,27 +1125,29 @@ class HACLStorageSQL {
      *         database.
      *
      */
-    public function getRightByID($rightID) {
-        $dbr =& wfGetDB( DB_SLAVE );
-
-        $sd = NULL;
+    public function getRightByID($rightID)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
         $res = $dbr->select('halo_acl_rights', '*', array('right_id' => $rightID), __METHOD__);
+        if ($dbr->numRows($res) == 1)
+            return self::rowToRight($dbr->fetchObject($res));
+        return NULL;
+    }
 
-        if ($dbr->numRows($res) == 1) {
-            $row = $dbr->fetchObject($res);
-            $rightID = $row->right_id;
-            $actions = $row->actions;
-            $groups = self::strToIntArray($row->groups);
-            $users  = self::strToIntArray($row->users);
-            $description = $row->description;
-            $name        = $row->name;
-            $originID    = $row->origin_id;
-
-            $sd = new HACLRight($actions, $groups, $users, $description, $name, $originID);
-            $sd->setRightID($rightID);
-        }
-        $dbr->freeResult($res);
-
+    /**
+     * Converts DB row fetched with fetchObject() into HACLRight object
+     */
+    public function rowToRight($row)
+    {
+        $rightID     = $row->right_id;
+        $actions     = $row->actions;
+        $groups      = self::strToIntArray($row->groups);
+        $users       = self::strToIntArray($row->users);
+        $description = $row->description;
+        $name        = $row->name;
+        $originID    = $row->origin_id;
+        $sd = new HACLRight($actions, $groups, $users, $description, $name, $originID);
+        $sd->setRightID($rightID);
         return $sd;
     }
 
@@ -1159,23 +1157,13 @@ class HACLStorageSQL {
      *
      * @param int $peID
      *         ID of the protected element
-     * @param strint $type
+     * @param string $type
      *         Type of the protected element: One of
-     *        HACLSecurityDescriptor::PET_PAGE
-     *         HACLSecurityDescriptor::PET_CATEGORY
-     *         HACLSecurityDescriptor::PET_NAMESPACE
-     *         HACLSecurityDescriptor::PET_PROPERTY
+     *         HACLSecurityDescriptor::PET_*
      *
      * @param int $actionID
      *         ID of the action. One of
-     *         HACLRight::READ
-     *         HACLRight::FORMEDIT
-     *         HACLRight::WYSIWYG
-     *         HACLRight::EDIT
-     *         HACLRight::ANNOTATE
-     *         HACLRight::CREATE
-     *         HACLRight::MOVE
-     *         HACLRight::DELETE;
+     *         HACLLanguage::RIGHT_*
      *
      * @return array<int>
      *         An array of IDs of rights that match the given constraints.

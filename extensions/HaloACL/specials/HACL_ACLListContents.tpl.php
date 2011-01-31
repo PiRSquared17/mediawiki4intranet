@@ -1,5 +1,5 @@
 <?php if (!$lists) { ?>
-<?= wfMsg('hacl_acllist_no_acls') ?>
+<?= wfMsg('hacl_acllist_empty') ?>
 <?php }
 foreach (array('namespace', 'category', 'right', 'template', 'page', 'property') as $k) {
  if ($lists[$k]) { ?>

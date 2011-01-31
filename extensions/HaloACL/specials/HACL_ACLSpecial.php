@@ -23,9 +23,9 @@
  */
 
 /**
- * A special page for defining and managing Access Control Lists.
+ * A special page for defining and managing HaloACL objects
  *
- * @author Thomas Schweitzer
+ * @author Vitaliy Filippov
  */
 
 if (!defined('MEDIAWIKI'))
@@ -57,6 +57,7 @@ class HaloACLSpecial extends SpecialPage
         return Xml::openElement($element, $attribs) . $contents . Xml::closeElement($element);
     }
 
+    /* Constructor of HaloACL special page class */
     public function __construct()
     {
         if (!defined('SMW_NS_PROPERTY'))
@@ -67,9 +68,10 @@ class HaloACLSpecial extends SpecialPage
         parent::__construct('HaloACL');
     }
 
+    /* Entry point */
     public function execute()
     {
-        global $wgOut, $wgRequest, $wgUser;
+        global $wgOut, $wgRequest, $wgUser, $haclgHaloScriptPath;
         $q = $wgRequest->getValues();
         if ($wgUser->isLoggedIn())
         {
@@ -78,19 +80,23 @@ class HaloACLSpecial extends SpecialPage
             if (!self::$actions[$q['action']])
                 $q['action'] = 'acllist';
             $f = 'html_'.$q['action'];
+            $wgOut->addLink(array(
+                'rel' => 'stylesheet',
+                'type' => 'text/css',
+                'media' => 'screen, projection',
+                'href' => $haclgHaloScriptPath.'/skins/haloacl.css',
+            ));
+            $this->_actions($q);
             $this->$f($q);
         }
         else
             $wgOut->showErrorPage('hacl_login_first_title', 'hacl_login_first_text');
     }
 
+    /* View list of all ACL definitions, filtered and loaded using AJAX */
     public function html_acllist(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
-        $aclOwnTemplate = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template');
-        if ($aclOwnTemplate)
-            $aclOwnTemplate = HACLSecurityDescriptor::newFromId($aclOwnTemplate);
-        haclCheckScriptPath();
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLList.tpl.php');
         $html = ob_get_contents();
@@ -99,25 +105,29 @@ class HaloACLSpecial extends SpecialPage
         $wgOut->addHTML($html);
     }
 
+    /* Create/edit ACL definition using interactive editor */
     public function html_acl(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang, $wgContLang;
         $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
         if (!($q['sd'] &&
-            ($t = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
-            ($aclArticle = new Article($t)) &&
-            $aclArticle->exists() &&
-            ($aclSD = HACLStorage::getDatabase()->getSDByID($aclArticle->getId()))))
+            ($aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
+            ($aclArticle = new Article($aclTitle)) &&
+            $aclArticle->exists()))
         {
+            $aclTitle = NULL;
             $aclArticle = NULL;
-            $aclSD = NULL;
         }
-        haclCheckScriptPath();
+        else
+        {
+            $aclSDName = $aclTitle->getText();
+            list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($sdName);
+        }
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
-        $wgOut->setPageTitle($aclSD ? wfMsg('hacl_acl_edit', $aclSD->getSDName()) : wfMsg('hacl_acl_create'));
+        $wgOut->setPageTitle($aclTitle ? wfMsg('hacl_acl_edit', $aclTitle->getText()) : wfMsg('hacl_acl_create'));
         $wgOut->addHTML($html);
     }
 
@@ -125,7 +135,6 @@ class HaloACLSpecial extends SpecialPage
     public function html_quickaccess(&$args)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $wgRequest;
-        haclCheckScriptPath();
         /* Handle save */
         $args = $wgRequest->getValues();
         if ($args['save'])
@@ -136,7 +145,7 @@ class HaloACLSpecial extends SpecialPage
                     $ids[] = substr($k, 3);
             HACLStorage::getDatabase()->saveQuickAcl($wgUser->getId(), $ids);
             wfGetDB(DB_MASTER)->commit();
-            header("Location: $wgScript?title=Special:HaloACL&action=quickaccess");
+            header("Location: $wgScript?title=Special:HaloACL&action=quickaccess&like=".urlencode($args['like']));
             exit;
         }
         /* Load data */
@@ -152,7 +161,7 @@ class HaloACLSpecial extends SpecialPage
         foreach ($templates as $sd)
         {
             $sd->selected = array_key_exists($sd->getSDId(), $quickacl_ids);
-            $sd->editlink = $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName();
+            $sd->editlink = $wgScript.'?title=Special:HaloACL&action=acl&sd='.urlencode($sd->getSDName());
             $sd->viewlink = Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl();
         }
         /* Run template */
@@ -164,33 +173,142 @@ class HaloACLSpecial extends SpecialPage
         $wgOut->addHTML($html);
     }
 
+    /* Add header with available actions */
+    public function _actions(&$q)
+    {
+        global $wgScript, $wgOut, $wgUser;
+        $ownt = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template');
+        if ($ownt)
+            $ownt = Title::newFromId($ownt);
+        $act = $q['action'];
+        if ($act == 'acl' && $q['sd'])
+        {
+            if ($ownt && Title::newFromText($q['sd'], HACL_NS_ACL)->getArticleId() == $ownt->getArticleId())
+                $act = 'owntemplate';
+            else
+                $act = 'acledit';
+        }
+        elseif ($act == 'group' && $q['sd'])
+            $act = 'groupedit';
+        $html = array();
+        foreach (array('acllist', 'acl', 'owntemplate', 'quickaccess', 'grouplist', 'group', 'whitelist') as $action)
+        {
+            $a = '<b>'.wfMsg("hacl_action_$action").'</b>';
+            if ($act != $action)
+            {
+                $url = "$wgScript?title=Special:HaloACL&action=$action";
+                if ($action == 'owntemplate')
+                {
+                    if ($ownt)
+                        $url = "$wgScript?title=Special:HaloACL&action=acl&sd=".$ownt->getText();
+                    else
+                        continue;
+                }
+                $a = '<a href="'.htmlspecialchars($url).'">'.$a.'</a>';
+            }
+            $html[] = $a;
+        }
+        $html = '<p>'.implode(' &nbsp; &nbsp; ', $html).'</p>';
+        $wgOut->addHTML($html);
+    }
+
+    /* Manage groups */
     public function html_grouplist(&$q)
     {
-        global $wgOut;
-        
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
+        ob_start();
+        require(dirname(__FILE__).'/HACL_GroupList.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        $wgOut->setPageTitle(wfMsg('hacl_grouplist'));
+        $wgOut->addHTML($html);
     }
 
+    /* Create or edit a group */
     public function html_group(&$q)
     {
-        global $wgOut;
+        global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $wgContLang, $haclgContLang;
         
+        /* Run template */
+        ob_start();
+        require(dirname(__FILE__).'/HACL_GroupEditor.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        $wgOut->setPageTitle($groupTitle ? wfMsg('hacl_grp_editing', $groupTitle->getText()) : wfMsg('hacl_grp_creating'));
+        $wgOut->addHTML($html);
     }
 
+    /* Manage page whitelist */
     public function html_whitelist(&$q)
     {
         global $wgOut;
         
     }
 
-    /* AJAXly loaded ACL list */
-    static function haclAcllist($t, $n, $limit = 100)
+    /* Recursively get rights of SD by name or ID */
+    static function getRights($sdnameorid)
+    {
+        if (!$sdnameorid)
+            return array();
+        if (!is_numeric($sdnameorid))
+        {
+            if ($t = Title::newFromText($sdnameorid, HACL_NS_ACL))
+                $sdid = $t->getArticleId();
+        }
+        else
+            $sdid = $sdnameorid;
+        if (!$sdid)
+            return array();
+        $st = HACLStorage::getDatabase();
+        $res = array();
+        /* Inline rights */
+        $rights = $st->getInlineRightsOfSDs($sdid, true);
+        foreach ($rights as $r)
+        {
+            /* get action names */
+            $actmask = $r->getActions();
+            $actions = array();
+            if ($actmask & HACLLanguage::RIGHT_READ)
+                $actions[] = 'read';
+            if ($actmask & HACLLanguage::RIGHT_EDIT)
+                $actions[] = 'edit';
+            if ($actmask & HACLLanguage::RIGHT_CREATE)
+                $actions[] = 'create';
+            if ($actmask & HACLLanguage::RIGHT_MOVE)
+                $actions[] = 'move';
+            if ($actmask & HACLLanguage::RIGHT_DELETE)
+                $actions[] = 'delete';
+            $members = array();
+            /* get user names */
+            foreach ($st->getUserNames($r->getUsers()) as $u)
+                $members[] = 'User:'.$u['user_name'];
+            /* get group names */
+            foreach ($st->getGroupNames($r->getGroups()) as $g)
+                $members[] = 'Group/'.$g['group_name'];
+            /* merge into result */
+            foreach ($members as $m)
+                foreach ($actions as $a)
+                    $res[$m][$a] = true;
+        }
+        /* Predefined rights */
+        $predef = $st->getPredefinedRightsOfSD($sdid, false);
+        foreach ($predef as $id)
+        {
+            $sub = self::getRights($id);
+            foreach ($sub as $m => $acts)
+                foreach ($acts as $a => $true)
+                    $res[$m][$a] = true;
+        }
+        return $res;
+    }
+
+    /* "Real" ACL list, loaded using AJAX */
+    static function haclAcllist($t, $n, $limit = 101)
     {
         global $wgScript, $wgTitle, $haclgHaloScriptPath, $wgUser;
         haclCheckScriptPath();
         /* Load data */
         $t = $t ? explode(',', $t) : NULL;
-        if (!$limit)
-            $limit = 101;
         $sds = HACLStorage::getDatabase()->getSDs2($t, $n, $limit);
         if (count($sds) == $limit)
         {
@@ -203,7 +321,7 @@ class HaloACLSpecial extends SpecialPage
             $d = array(
                 'name' => $sd->getSDName(),
                 'real' => $sd->getSDName(),
-                'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.$sd->getSDName(),
+                'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.urlencode($sd->getSDName()),
                 'viewlink' => Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl(),
             );
             if ($p = strpos($d['real'], '/'))
@@ -217,6 +335,37 @@ class HaloACLSpecial extends SpecialPage
         /* Run template */
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLListContents.tpl.php');
+        $html = ob_get_contents();
+        ob_end_clean();
+        return $html;
+    }
+
+    /* "Real" group list, loaded using AJAX */
+    static function haclGrouplist($n, $limit = 101)
+    {
+        global $wgScript, $haclgHaloScriptPath;
+        haclCheckScriptPath();
+        /* Load data */
+        $groups = HACLStorage::getDatabase()->getGroups($n, $limit);
+        if (count($groups) == $limit)
+        {
+            array_pop($groups);
+            $max = true;
+        }
+        foreach ($groups as &$g)
+        {
+            $g = array(
+                'name' => $g->getGroupName(),
+                'real' => $g->getGroupName(),
+                'editlink' => $wgScript.'?title=Special:HaloACL&action=group&group='.urlencode($g->getGroupName()),
+                'viewlink' => Title::newFromText($g->getGroupName(), HACL_NS_ACL)->getLocalUrl(),
+            );
+            if ($p = strpos($g['real'], '/'))
+                $g['real'] = substr($g['real'], $p+1);
+        }
+        /* Run template */
+        ob_start();
+        require(dirname(__FILE__).'/HACL_GroupListContents.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
         return $html;

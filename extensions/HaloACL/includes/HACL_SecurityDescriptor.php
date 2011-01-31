@@ -171,7 +171,7 @@ class HACLSecurityDescriptor
             return $idx;
         }
         elseif ($peType === self::PET_RIGHT)
-            return false;
+            return 0;
         elseif ($peType === self::PET_TEMPLATE)
         {
             $u = User::newFromName($peName);
@@ -793,7 +793,8 @@ class HACLSecurityDescriptor
      *     HACLSDException(HACLSDException::USER_CANT_MODIFY_SD)
      *
      */
-    public function delete($user = null) {
+    public function delete($user = null)
+    {
         $this->userCanModify($user, true);
         return HACLStorage::getDatabase()->deleteSD($this->mSDID);
     }
