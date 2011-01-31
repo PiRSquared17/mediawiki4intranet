@@ -1,3 +1,5 @@
+// FIXME HACL_GroupEditor.js uses a JS class, but this does not :(
+
 /* This script requires global variables:
    aclNsText: HACL_NS_ACL namespace name
    msgStartTyping: { page =>, user =>, group =>, category => }
@@ -164,7 +166,7 @@ function parse_sd()
     check_errors();
 }
 
-// Check for errors (now: at least 1 manager defined)
+// Check for errors (now: at least 1 manager defined, at least 1 action defined)
 function check_errors()
 {
     var has_managers = false, has_rights = false;
@@ -217,6 +219,7 @@ function closure_groups_sd(d, sd)
         {
             for (var m in groupClosureCache[g])
             {
+                m = groupClosureCache[g][m];
                 aclClosure[m] = aclClosure[m] || {};
                 for (var a in aclRights[g])
                     aclClosure[m][a] = true;

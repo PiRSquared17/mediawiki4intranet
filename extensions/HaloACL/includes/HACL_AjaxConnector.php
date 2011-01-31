@@ -64,11 +64,14 @@ function unescape($source) {
  * defining ajax-callable functions
  */
 global $wgAjaxExportList;
+/* NEW */
 $wgAjaxExportList[] = 'haclAutocomplete';
 $wgAjaxExportList[] = 'haclAcllist';
 $wgAjaxExportList[] = 'haclGroupClosure';
 $wgAjaxExportList[] = 'haclSDExists';
 $wgAjaxExportList[] = 'haclGrouplist';
+$wgAjaxExportList[] = 'haclGroupExists';
+/* /NEW */
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
 $wgAjaxExportList[] = "haclCreateManageACLPanels";
@@ -116,12 +119,13 @@ $wgAjaxExportList[] = "haclDoesArticleExists";
 $wgAjaxExportList[] = "haclSDpopupByName";
 $wgAjaxExportList[] = "haclRemovePanelForTemparray";
 
-function haclAutocomplete($t, $n, $limit = 11)
+function haclAutocomplete($t, $n, $limit = 11, $checkbox_prefix = false)
 {
     if (!$limit)
         $limit = 11;
     $a = array();
     $dbr = wfGetDB(DB_SLAVE);
+    // Users
     if ($t == 'user')
     {
         $r = $dbr->select(
@@ -131,8 +135,9 @@ function haclAutocomplete($t, $n, $limit = 11)
             array('ORDER BY' => 'user_name', 'LIMIT' => $limit)
         );
         while ($row = $r->fetchRow())
-            $a[] = array($row[1] ? $row[1] : $row[0], $row[0]);
+            $a[] = array($row[1] ? $row[0] . ' (' . $row[1] . ')' : $row[0], $row[0]);
     }
+    // HaloACL Groups
     elseif ($t == 'group')
     {
         $ip = 'hi_';
@@ -145,11 +150,13 @@ function haclAutocomplete($t, $n, $limit = 11)
             $a[] = array($n, $n);
         }
     }
+    // MediaWiki Pages
     elseif ($t == 'page')
     {
         $ip = 'ti_';
         $n = str_replace(' ', '_', $n);
         $where = array();
+        // Check if namespace is specified within $n
         $etc = haclfDisableTitlePatch();
         $tt = Title::newFromText($n.'X');
         if ($tt->getNamespace() != NS_MAIN)
@@ -158,6 +165,7 @@ function haclAutocomplete($t, $n, $limit = 11)
             $where['page_namespace'] = $tt->getNamespace();
         }
         haclfRestoreTitlePatch($etc);
+        // Select page titles
         $where[] = 'page_title LIKE '.$dbr->addQuotes($n.'%');
         $r = $dbr->select(
             'page', 'page_title, page_namespace',
@@ -167,6 +175,7 @@ function haclAutocomplete($t, $n, $limit = 11)
         while ($row = $r->fetchRow())
         {
             $t = Title::newFromText($row[0], $row[1]);
+            // Filter unreadable
             if ($t->userCanRead())
             {
                 $t = $t->getPrefixedText();
@@ -174,6 +183,7 @@ function haclAutocomplete($t, $n, $limit = 11)
             }
         }
     }
+    // Namespaces
     elseif ($t == 'namespace')
     {
         $ip = 'ti_';
@@ -181,6 +191,7 @@ function haclAutocomplete($t, $n, $limit = 11)
         $ns = $wgCanonicalNamespaceNames;
         $ns[0] = 'Main';
         ksort($ns);
+        // Unlimited
         $limit = count($ns)+1;
         $n = mb_strtolower($n);
         $nl = mb_strlen($n);
@@ -188,6 +199,7 @@ function haclAutocomplete($t, $n, $limit = 11)
             if ($k >= 0 && mb_strtolower(mb_substr($v, 0, $nl)) == $n)
                 $a[] = array($v, $v);
     }
+    // Categories
     elseif ($t == 'category')
     {
         $ip = 'ti_';
@@ -203,6 +215,7 @@ function haclAutocomplete($t, $n, $limit = 11)
         while ($row = $r->fetchRow())
         {
             $t = Title::newFromText($row[0], NS_CATEGORY);
+            // Filter unreadable
             if ($t->userCanRead())
             {
                 $t = $t->getText();
@@ -210,6 +223,7 @@ function haclAutocomplete($t, $n, $limit = 11)
             }
         }
     }
+    // ACL definitions of type = substr($t, 3)
     elseif (substr($t, 0, 3) == 'sd/')
     {
         $ip = 'ri_';
@@ -221,20 +235,42 @@ function haclAutocomplete($t, $n, $limit = 11)
             $a[] = array($rn, $sd->getSDName());
         }
     }
+    // No items
+    if (!$a)
+        return '<div class="hacl_tt">'.wfMsg('hacl_autocomplete_no_'.$t.'s').'</div>';
+    // More than (limit-1) items => add '...' at the end of list
+    if (count($a) >= $limit)
+    {
+        array_pop($a);
+        $max = true;
+    }
     $i = 0;
     $html = '';
-    foreach ($a as $item)
+    if ($checkbox_prefix)
     {
-        if ((++$i) >= $limit)
-            $html .= '<div class="hacl_tt">...</div>';
-        else
-            $html .=
-                '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
+        // This is used by Group Editor: display autocomplete list with checkboxes
+        $ip = $checkbox_prefix . '_';
+        foreach ($a as $item)
+        {
+            $i++;
+            $html .= '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
+                htmlspecialchars($item[1]).'"><input style="cursor: pointer" type="checkbox" id="c'.$ip.$i.
+                '" /> '.htmlspecialchars($item[0]).'</div>';
+        }
+    }
+    else
+    {
+        // This is used by ACL Editor: simple autocomplete lists for editboxes
+        foreach ($a as $item)
+        {
+            $i++;
+            $html .= '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
                 htmlspecialchars($item[1]).'">'.
                 htmlspecialchars($item[0]).'</div>';
+        }
     }
-    if (!$i)
-        $html = '<div class="hacl_tt">'.wfMsg('hacl_autocomplete_no_'.$t.'s').'</div>';
+    if ($max)
+        $html .= '<div class="hacl_tt">...</div>';
     return $html;
 }
 
@@ -274,15 +310,23 @@ function haclGroupClosure($groups, $predefined = '')
         if ($k)
             $rights[$k] = HaloACLSpecial::getRights($k);
     // FIXME json_encode requires PHP >= 5.2.0
-    return json_encode(array('group' => $members, 'rights' => $rights));
+    return json_encode(array('groups' => $members, 'rights' => $rights));
 }
 
 function haclSDExists($type, $name)
 {
+    // FIXME this does not return incorrect SD definitions
     $peID = HACLSecurityDescriptor::peIDforName($name, $type);
     if (!$peID)
         return 'false';
     return HACLStorage::getDatabase()->getSDForPE($peID, $type) ? 'true' : 'false';
+}
+
+function haclGroupExists($name)
+{
+    global $haclgContLang;
+    $grpTitle = Title::newFromText($haclgContLang->mGroupPrefix.'/'.$name, HACL_NS_ACL);
+    return $grpTitle && $grpTitle->getArticleId() ? 'true' : 'false';
 }
 
 /**** OLD ****/

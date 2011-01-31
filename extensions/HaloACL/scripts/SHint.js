@@ -41,10 +41,11 @@ var SHint = function(input, style_prefix, fill_handler)
         input = document.getElementById(input);
     sl.element = input;
     sl.fill_handler = fill_handler;
+    sl.nodefocus = false;
     sl.focus = function(f)
     {
         sl.tip_div.style.display = f || sl.nodefocus ? '' : 'none';
-        sl.nodefocus = undefined;
+        sl.nodefocus = false;
     };
     sl.change_highlight = function(ev, e)
     {
@@ -53,9 +54,9 @@ var SHint = function(input, style_prefix, fill_handler)
             !(e = document.getElementById(sl.current.replace(/\d+/,function(m){return ''+(parseInt(m)+e)})))))
             return false;
         if (sl.current && (c = document.getElementById(sl.current)))
-            c.className = sl.style_prefix+'_ti';
+            c.className = c.className.replace(sl.style_prefix+'_ti_a', sl.style_prefix+'_ti');
         sl.current = e.id;
-        e.className = sl.style_prefix+'_ti_a';
+        e.className = e.className.replace(sl.style_prefix+'_ti', sl.style_prefix+'_ti_a');
         return false;
     };
     sl.keyup = function(ev, e)
@@ -131,7 +132,11 @@ var SHint = function(input, style_prefix, fill_handler)
         var t = sl.tip_div;
         var n = sl.element;
         var v = n.value.trim();
-        sl.fill_handler(sl, v);
+        if (v != sl.curValue)
+        {
+            sl.curValue = v;
+            sl.fill_handler(sl, v);
+        }
     };
     sl.set = function(ev, e)
     {
@@ -142,9 +147,12 @@ var SHint = function(input, style_prefix, fill_handler)
     };
     sl.h_focus = function() { sl.focus(true); return 1; };
     sl.h_blur = function() { sl.focus(false); return 1; };
-    sl.t_mousedown = function() { sl.nodefocus = true; return 1; };
-    sl.d_mousedown = function() { sl.focus(false); return 0; };
-    sl.e_mousedown = function() { return 1; };
+    sl.t_mousedown = function() { sl.nodefocus++; };
+    sl.d_mousedown = function()
+    {
+        sl.focus(false);
+    };
+    sl.e_mousedown = function() { sl.nodefocus++; };
     sl.init = function()
     {
         var e = sl.element;
@@ -165,9 +173,9 @@ var SHint = function(input, style_prefix, fill_handler)
                 sl.scriptMaxHeight = true;
         }
         document.body.appendChild(t);
-        exAttach(document, 'mousedown', sl.d_mousedown);
-        exAttach(t, 'mousedown', sl.t_mousedown);
-        exAttach(e, 'mousedown', sl.e_mousedown);
+        sl.element._e_SHint = sl;
+        sl.tip_div._t_SHint = sl;
+        SHint.SHints.push(sl);
         var msie = navigator.userAgent.match('MSIE') && !navigator.userAgent.match('Opera');
         if (msie)
             exAttach(e, 'keydown', sl.keypress);
@@ -183,3 +191,27 @@ var SHint = function(input, style_prefix, fill_handler)
         sl.change(null);
     };
 };
+
+SHint.SHints = [];
+
+SHint.GlobalMouseDown = function(ev, e)
+{
+    var target = ev.target || ev.srcElement;
+    var esh;
+    while (target)
+    {
+        if (esh = target._e_SHint)
+            break;
+        else if (target._t_SHint)
+        {
+            target._t_SHint.nodefocus = true;
+            return;
+        }
+        target = target.parentNode;
+    }
+    for (var i in SHint.SHints)
+        if (SHint.SHints[i] != esh)
+            SHint.SHints[i].focus(false);
+};
+
+exAttach(window, 'load', function() { exAttach(document, 'mousedown', SHint.GlobalMouseDown) });

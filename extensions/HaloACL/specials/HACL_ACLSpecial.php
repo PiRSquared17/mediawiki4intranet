@@ -72,6 +72,7 @@ class HaloACLSpecial extends SpecialPage
     public function execute()
     {
         global $wgOut, $wgRequest, $wgUser, $haclgHaloScriptPath;
+        haclCheckScriptPath();
         $q = $wgRequest->getValues();
         if ($wgUser->isLoggedIn())
         {
@@ -112,6 +113,7 @@ class HaloACLSpecial extends SpecialPage
         $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
         if (!($q['sd'] &&
             ($aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
+            HACLEvaluator::hacl_type($aclTitle) == 'sd' &&
             ($aclArticle = new Article($aclTitle)) &&
             $aclArticle->exists()))
         {
@@ -188,7 +190,7 @@ class HaloACLSpecial extends SpecialPage
             else
                 $act = 'acledit';
         }
-        elseif ($act == 'group' && $q['sd'])
+        elseif ($act == 'group' && $q['group'])
             $act = 'groupedit';
         $html = array();
         foreach (array('acllist', 'acl', 'owntemplate', 'quickaccess', 'grouplist', 'group', 'whitelist') as $action)
@@ -228,13 +230,23 @@ class HaloACLSpecial extends SpecialPage
     public function html_group(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $wgContLang, $haclgContLang;
-        
+        if (!($q['group'] &&
+            ($grpTitle = Title::newFromText($q['group'], HACL_NS_ACL)) &&
+            HACLEvaluator::hacl_type($grpTitle) == 'group' &&
+            ($grpArticle = new Article($grpTitle)) &&
+            $grpArticle->exists()))
+        {
+            $grpTitle = NULL;
+            $grpArticle = NULL;
+        }
+        else
+            list($grpPrefix, $grpName) = explode('/', $grpTitle->getText(), 2);
         /* Run template */
         ob_start();
         require(dirname(__FILE__).'/HACL_GroupEditor.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
-        $wgOut->setPageTitle($groupTitle ? wfMsg('hacl_grp_editing', $groupTitle->getText()) : wfMsg('hacl_grp_creating'));
+        $wgOut->setPageTitle($grpTitle ? wfMsg('hacl_grp_editing', $grpTitle->getText()) : wfMsg('hacl_grp_creating'));
         $wgOut->addHTML($html);
     }
 
