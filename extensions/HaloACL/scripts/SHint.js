@@ -129,9 +129,7 @@ var SHint = function(input, style_prefix, fill_handler)
     };
     sl.change = function(ev)
     {
-        var t = sl.tip_div;
-        var n = sl.element;
-        var v = n.value.trim();
+        var v = sl.element.value.trim();
         if (v != sl.curValue)
         {
             sl.curValue = v;
