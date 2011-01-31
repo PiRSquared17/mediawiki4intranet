@@ -68,6 +68,7 @@ $wgAjaxExportList[] = 'haclAutocomplete';
 $wgAjaxExportList[] = 'haclAcllist';
 $wgAjaxExportList[] = 'haclGroupClosure';
 $wgAjaxExportList[] = 'haclSDExists';
+$wgAjaxExportList[] = 'haclGrouplist';
 $wgAjaxExportList[] = "haclAjaxTestFunction";
 $wgAjaxExportList[] = "haclCreateACLPanels";
 $wgAjaxExportList[] = "haclCreateManageACLPanels";
@@ -243,23 +244,37 @@ function haclAcllist()
     return call_user_func_array(array('HaloACLSpecial', 'haclAcllist'), $a);
 }
 
-function haclGroupClosure($n)
+function haclGrouplist()
+{
+    $a = func_get_args();
+    return call_user_func_array(array('HaloACLSpecial', 'haclGrouplist'), $a);
+}
+
+// Return group members for each group of $groups='group1,group2,...',
+// + returns rights for each predefined right of $predefined='sd1[sd2,...'
+// predefined right names are joined by [ as it is forbidden by MediaWiki in titles
+function haclGroupClosure($groups, $predefined = '')
 {
     $st = HACLStorage::getDatabase();
     $members = array();
-    foreach (explode(',', $n) as $k)
+    foreach (explode(',', $groups) as $k)
     {
-        if ($i = HACLGroup::idForGroup($k))
+        if ($k && ($i = HACLGroup::idForGroup($k)))
         {
-            $members[$k] = $st->getGroupMembersRecursive($i);
-            $members[$k]['user'] = $st->getUserNames(@array_keys($members[$k]['user']));
-            $members[$k]['group'] = $st->getGroupNames(@array_keys($members[$k]['group']));
+            $m = $st->getGroupMembersRecursive($i);
+            $members[$k] = array();
+            foreach ($st->getUserNames(@array_keys($m['user'])) as $u)
+                $members[$k][] = 'User:'.$u['user_name'];
+            foreach ($st->getGroupNames(@array_keys($m['group'])) as $g)
+                $members[$k][] = 'Group/'.$g['group_name'];
         }
     }
-    if (!$members)
-        return 'false';
+    $rights = array();
+    foreach (explode('[', $predefined) as $k)
+        if ($k)
+            $rights[$k] = HaloACLSpecial::getRights($k);
     // FIXME json_encode requires PHP >= 5.2.0
-    return json_encode($members);
+    return json_encode(array('group' => $members, 'rights' => $rights));
 }
 
 function haclSDExists($type, $name)

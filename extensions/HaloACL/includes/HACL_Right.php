@@ -126,11 +126,11 @@ class  HACLRight  {
 
     public function getRightID()        {return $this->mRightID;}
     public function getActions()        {return $this->mActions;}
-    public function getGroups()            {return $this->mGroups;}
-    public function getUsers()            {return $this->mUsers;}
+    public function getGroups()         {return $this->mGroups;}
+    public function getUsers()          {return $this->mUsers;}
     public function getDescription()    {return $this->mDescription;}
-    public function getName()            {return $this->mName;}
-    public function getOriginID()        {return $this->mOriginID;}
+    public function getName()           {return $this->mName;}
+    public function getOriginID()       {return $this->mOriginID;}
 
     /**
      * Don't call this method!!
@@ -346,7 +346,6 @@ class  HACLRight  {
         } else {
             $this->mGroups = array();
         }
-
     }
 
     /**
@@ -383,8 +382,6 @@ class  HACLRight  {
             $this->mUsers = array();
         }
     }
-
-
 
     /**
      * Don't call this method!!
