@@ -1,81 +1,76 @@
 <form action="<?= $wgScript ?>?action=submit" method="POST">
 <input type="hidden" name="wpEditToken" value="<?= htmlspecialchars($wgUser->editToken()) ?>" />
-<input type="hidden" name="wpEdittime" value="<?= $groupTitle ? $groupArticle->getTimestamp() : '' ?>" />
+<input type="hidden" name="wpEdittime" value="<?= $grpTitle ? $grpArticle->getTimestamp() : '' ?>" />
 <input type="hidden" name="wpStarttime" value="<?= wfTimestampNow() ?>" />
-<input type="hidden" id="wpTitle" name="title" value="<?= $groupTitle ? htmlspecialchars($groupTitle()->getPrefixedText()) : '' ?>" />
+<input type="hidden" id="wpTitle" name="title" value="<?= $grpTitle ? htmlspecialchars($grpTitle->getPrefixedText()) : '' ?>" />
 <table class="acle">
 <tr>
- <td style="vertical-align: top; width: 400px">
+ <td style="vertical-align: top; width: 500px">
+  <p>
+   <b><?= wfMsg('hacl_grp_name') ?></b>
+   <input type="text" id="grp_name" style="width: 200px" onchange="GE.name_change(true)" onkeyup="GE.name_change()"  />
+  </p>
   <p><b><?= wfMsg('hacl_grp_definition_text') ?></b></p>
-  <p><textarea id="group_def" name="wpTextbox1" rows="6" style="width: 400px" onchange="parse_make_closure()"><?= $groupTitle ? htmlspecialchars($groupArticle->getContent()) : '' ?></textarea></p>
+  <p><textarea id="grp_def" name="wpTextbox1" rows="6" style="width: 500px" onchange="GE.parse_fill_indirect()"><?= $grpTitle ? htmlspecialchars($grpArticle->getContent()) : '' ?></textarea></p>
  </td>
  <td style="vertical-align: top">
   <table>
    <tr>
     <th colspan="2"><?= wfMsg('hacl_grp_members') ?></th>
+   </tr>
+   <tr>
+    <th><?= wfMsg('hacl_grp_users') ?></th>
+    <td><input type="text" id="member_users" style="width: 200px" autocomplete="off" /></td>
+   </tr>
+   <tr>
+    <th><?= wfMsg('hacl_grp_groups') ?></th>
+    <td><input type="text" id="member_groups" style="width: 200px" autocomplete="off" /></td>
+   </tr>
+   <tr>
     <th colspan="2"><?= wfMsg('hacl_grp_managers') ?></th>
    </tr>
    <tr>
     <th><?= wfMsg('hacl_grp_users') ?></th>
-    <td><input type="text" id="member_users" style="width: 200px" /></td>
-    <th><?= wfMsg('hacl_grp_users') ?></th>
-    <td><input type="text" id="manager_users" style="width: 200px" /></td>
+    <td><input type="text" id="manager_users" style="width: 200px" autocomplete="off" /></td>
    </tr>
    <tr>
     <th><?= wfMsg('hacl_grp_groups') ?></th>
-    <td><input type="text" id="member_groups" style="width: 200px" /></td>
-    <th><?= wfMsg('hacl_grp_groups') ?></th>
-    <td><input type="text" id="manager_groups" style="width: 200px" /></td>
+    <td><input type="text" id="manager_groups" style="width: 200px" autocomplete="off" /></td>
    </tr>
   </table>
  </td>
 </tr>
 </table>
-<p id="group_pns">
- <span><a id="group_pn" href="#"></a></span>
- <input type="submit" name="wpSave" value="<?= wfMsg($groupArticle ? 'hacl_grp_save' : 'hacl_grp_create') ?>" id="wpSave" />
- <a id="group_delete_link" href="<?= $groupTitle ? $groupTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_grp_delete') ?></a>
+<p id="grp_pns">
+ <span><a id="grp_pn" class="acl_pn" href="#"></a></span>
+ <input type="submit" name="wpSave" value="<?= wfMsg($grpTitle ? 'hacl_grp_save' : 'hacl_grp_create') ?>" id="wpSave" />
+ <a id="grp_delete_link" href="<?= $grpTitle ? $grpTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_grp_delete') ?></a>
 </p>
-<p id="group_pnhint" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
-<p id="group_exists_hint" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
-<p id="group_define_members" style="display: none"><?= wfMsg('hacl_grp_define_members') ?></p>
-<p id="group_define_manager" style="display: none"><?= wfMsg('hacl_grp_define_manager') ?></p>
+<p id="grp_pnhint" class="acl_error" style="display: none"><?= wfMsg('hacl_grp_enter_name_first') ?></p>
+<p id="grp_exists_hint" class="acl_info" style="display: none"><?= wfMsg('hacl_grp_exists') ?></p>
+<p id="grp_define_member" class="acl_error" style="display: none"><?= wfMsg('hacl_grp_define_members') ?></p>
+<p id="grp_define_manager" class="acl_error" style="display: none"><?= wfMsg('hacl_grp_define_managers') ?></p>
 </form>
 
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/exAttach.js"></script>
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/offsetRect.js"></script>
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/SHint.js"></script>
+<script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/HACL_GroupEditor.js"></script>
 
 <script language="JavaScript">
-var aclNsText = '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>';
-var msgStartTyping = {
-    'page' : '<?= wfMsg('hacl_edit_prompt_page') ?>',
-    'user' : '<?= wfMsg('hacl_edit_prompt_user') ?>',
-    'group' : '<?= wfMsg('hacl_edit_prompt_group') ?>',
-    'category' : '<?= wfMsg('hacl_edit_prompt_category') ?>'
-};
-var msgEditSave = '<?= wfMsg('hacl_grp_save') ?>';
-var msgEditCreate = '<?= wfMsg('hacl_grp_create') ?>';
-var msgAffected = {
-    'user'      : '<?= wfMsg('hacl_edit_users_affected') ?>',
-    'group'     : '<?= wfMsg('hacl_edit_groups_affected') ?>',
-    'nouser'    : '<?= wfMsg('hacl_edit_no_users_affected') ?>',
-    'nogroup'   : '<?= wfMsg('hacl_edit_no_groups_affected') ?>'
-};
-var userNsRegexp = '(^|,\s*)Участник:';
-var groupPrefixRegexp = '(^|,\s*)Group:';
-
-exAttach(window, 'load', function() {
-<?php if ($groupTitle) {
-list($t, $n) = explode('/', $groupTitle->getText(), 2); ?>
-document.getElementById('group_name').value = "<?= addslashes($n) ?>";
-parse_make_closure();
-<? } ?>
-group_init_editor();
-<?php if ($groupTitle) { ?>
-document.getElementById('group_exists_hint').style.display = '';
-<? } ?>
+var GE;
+exAttach(window, 'load', function()
+{
+    var msg = {
+    <?php foreach (explode(' ',
+        'grp_save grp_create no_member_user no_member_group no_manager_user no_manager_group'.
+        ' current_member_user current_member_group current_manager_user current_manager_group'.
+        ' regexp_user regexp_group start_typing_user start_typing_group'
+    ) as $msg)
+        print "'$msg': '".addslashes(wfMsgNoTrans("hacl_$msg"))."',\n"; ?>
+'group_prefix' : '<?= $grpTitle ? $grpPrefix : $haclgContLang->mGroupPrefix ?>',
+'NS_ACL' : '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>'
+    };
+    GE = new HACLGroupEditor(msg, "<?= addslashes($grpName) ?>");
 });
 </script>
-
-<script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/HACL_GroupEditor.js"></script>

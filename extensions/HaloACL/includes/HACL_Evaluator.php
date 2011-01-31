@@ -895,7 +895,7 @@ class HACLEvaluator
     }
 
     /* Check is $title corresponds to some HaloACL definition page
-       Returns 'group', 'sd', 'whitelist', 'template' or FALSE */
+       Returns 'group', 'sd', 'whitelist' or FALSE */
     static function hacl_type($title)
     {
         global $haclgContLang;

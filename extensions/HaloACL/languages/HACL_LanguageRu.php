@@ -81,6 +81,7 @@ class HACLLanguageRu extends HACLLanguage
 
     public $mPredefinedRightName = 'Right';
     public $mSDTemplateName = 'Template';
+    public $mGroupPrefix = 'Group';
 
     public $mWhitelist = 'Whitelist';
 

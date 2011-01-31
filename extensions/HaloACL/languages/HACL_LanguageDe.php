@@ -95,6 +95,7 @@ class HACLLanguageDe extends HACLLanguage
 
     public $mSDTemplateName = 'Vorlage';
     public $mPredefinedRightName = 'Recht';
+    public $mGroupPrefix = 'Group';
 
     public $mPrefixes = array(
         'group'     => 'group',

@@ -2,7 +2,7 @@
 <input type="hidden" name="wpEditToken" value="<?= htmlspecialchars($wgUser->editToken()) ?>" />
 <input type="hidden" name="wpEdittime" value="<?= $aclTitle ? $aclArticle->getTimestamp() : '' ?>" />
 <input type="hidden" name="wpStarttime" value="<?= wfTimestampNow() ?>" />
-<input type="hidden" id="wpTitle" name="title" value="<?= $aclTitle ? htmlspecialchars($aclTitle()->getPrefixedText()) : '' ?>" />
+<input type="hidden" id="wpTitle" name="title" value="<?= $aclTitle ? htmlspecialchars($aclTitle->getPrefixedText()) : '' ?>" />
 <table class="acle">
 <tr>
  <td style="vertical-align: top; width: 500px">
@@ -54,14 +54,14 @@
 </tr>
 </table>
 <p id="acl_pns">
- <span><a id="acl_pn" href="#"></a></span>
+ <span><a id="acl_pn" class="acl_pn" href="#"></a></span>
  <input type="submit" name="wpSave" value="<?= wfMsg($aclArticle ? 'hacl_edit_save' : 'hacl_edit_create') ?>" id="wpSave" />
  <a id="acl_delete_link" href="<?= $aclArticle ? $aclTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_edit_delete') ?></a>
 </p>
-<p id="acl_pnhint" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
-<p id="acl_exists_hint" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
-<p id="acl_define_rights"><?= wfMsg('hacl_edit_define_rights') ?></p>
-<p id="acl_define_manager"><?= wfMsg('hacl_edit_define_manager') ?></p>
+<p id="acl_pnhint" class="acl_error" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
+<p id="acl_exists_hint" class="acl_info" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
+<p id="acl_define_rights" class="acl_error"><?= wfMsg('hacl_edit_define_rights') ?></p>
+<p id="acl_define_manager" class="acl_error"><?= wfMsg('hacl_edit_define_manager') ?></p>
 </form>
 
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/exAttach.js"></script>
@@ -72,8 +72,8 @@
 var aclNsText = '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>';
 var msgStartTyping = {
     'page' : '<?= wfMsg('hacl_edit_prompt_page') ?>',
-    'user' : '<?= wfMsg('hacl_edit_prompt_user') ?>',
-    'group' : '<?= wfMsg('hacl_edit_prompt_group') ?>',
+    'user' : '<?= wfMsg('hacl_start_typing_user') ?>',
+    'group' : '<?= wfMsg('hacl_start_typing_group') ?>',
     'category' : '<?= wfMsg('hacl_edit_prompt_category') ?>'
 };
 var msgEditSave = '<?= wfMsg('hacl_edit_save') ?>';

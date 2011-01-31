@@ -511,9 +511,9 @@ function haclfArticleID($articleName, $defaultNS = NS_MAIN)
 }
 
 /**
-* This function is called from the hook 'EditPageBeforeEditButtons'. It adds the
-* ACL toolbar to edited pages.
-*/
+ * This function is called from the hook 'EditPageBeforeEditButtons'. It adds the
+ * ACL toolbar to edited pages.
+ */
 function haclfAddToolbarForEditPage($content_actions)
 {
     if ($content_actions->mArticle->mTitle->mNamespace == HACL_NS_ACL)
