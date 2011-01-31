@@ -22,7 +22,7 @@ To look at the commands which would be run, but do not run them:
 
 $SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1';
 $SVN_WIKIMEDIA_TRUNK = 'http://svn.wikimedia.org/svnroot/mediawiki/trunk';
-$SVN_OUR = 'https://svn.office.custis.ru/mediawiki';
+$SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 
 /* File set config */
 
