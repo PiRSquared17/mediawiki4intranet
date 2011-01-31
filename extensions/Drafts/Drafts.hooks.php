@@ -58,7 +58,7 @@ class DraftHooks {
 	) {
 		global $wgUser, $wgRequest, $wgOut, $wgTitle, $wgLang;
 		// Check permissions
-		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() ) {
+		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() && $wgTitle ) {
 			// Get draft
 			$draft = Draft::newFromID( $wgRequest->getIntOrNull( 'draft' ) );
 			// Load form values
@@ -82,9 +82,10 @@ class DraftHooks {
 					);
 				}
 				// Load draft with info
-				$draft->setTitle( Title::newFromText(
-					$wgRequest->getText( 'wpDraftTitle' ) )
-				);
+				$title = Title::newFromText( $wgRequest->getText( 'wpDraftTitle' ) );
+				if ( !$title )
+					$title = $wgTitle;
+				$draft->setTitle( $title );
 				$draft->setSection( $wgRequest->getInt( 'wpSection' ) );
 				$draft->setStartTime( $wgRequest->getText( 'wpStarttime' ) );
 				$draft->setEditTime( $wgRequest->getText( 'wpEdittime' ) );
