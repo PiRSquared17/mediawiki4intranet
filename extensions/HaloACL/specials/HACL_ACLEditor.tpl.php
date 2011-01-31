@@ -1,20 +1,8 @@
-<style type="text/css">
-.acle p { margin: 0 0 8px 0; }
-p.inactive, p.inactive input, p.inactive select { color: gray; }
-#acl_pn { padding: 4px; border: 2px dashed orange; }
-#acl_exists_hint { padding: 4px 0; color: orange; font-weight: bold; }
-.hacl_tip { border: 1px solid gray; color: gray; width: 200pt; background-color: white; }
-.hacl_tt { padding: 3px; }
-.hacl_ti { color: black; cursor: pointer; padding: 1px 3px; }
-.hacl_ti_a { color: white; background-color: #008; cursor: pointer; padding: 1px 3px; }
-.act_disabled { color: gray; }
-</style>
-
 <form action="<?= $wgScript ?>?action=submit" method="POST">
 <input type="hidden" name="wpEditToken" value="<?= htmlspecialchars($wgUser->editToken()) ?>" />
-<input type="hidden" name="wpEdittime" value="<?= $aclArticle ? $aclArticle->getTimestamp() : '' ?>" />
+<input type="hidden" name="wpEdittime" value="<?= $aclTitle ? $aclArticle->getTimestamp() : '' ?>" />
 <input type="hidden" name="wpStarttime" value="<?= wfTimestampNow() ?>" />
-<input type="hidden" id="wpTitle" name="title" value="<?= $aclArticle ? htmlspecialchars($aclArticle->getTitle()->getPrefixedText()) : '' ?>" />
+<input type="hidden" id="wpTitle" name="title" value="<?= $aclTitle ? htmlspecialchars($aclTitle()->getPrefixedText()) : '' ?>" />
 <table class="acle">
 <tr>
  <td style="vertical-align: top; width: 500px">
@@ -67,11 +55,13 @@ p.inactive, p.inactive input, p.inactive select { color: gray; }
 </table>
 <p id="acl_pns">
  <span><a id="acl_pn" href="#"></a></span>
- <input type="submit" name="wpSave" value="<?= wfMsg($aclSD ? 'hacl_edit_save' : 'hacl_edit_create') ?>" id="wpSave" />
- <a id="acl_delete_link" href="<?= $aclSD ? Title::newFromText($aclSD->getSDName(), HACL_NS_ACL)->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_edit_delete') ?></a>
+ <input type="submit" name="wpSave" value="<?= wfMsg($aclArticle ? 'hacl_edit_save' : 'hacl_edit_create') ?>" id="wpSave" />
+ <a id="acl_delete_link" href="<?= $aclArticle ? $aclTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_edit_delete') ?></a>
 </p>
-<p id="acl_pnhint" style="display: none; color: red; font-style: italic"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
-<p id="acl_exists_hint"><?= wfMsg('hacl_edit_sd_exists') ?></p>
+<p id="acl_pnhint" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
+<p id="acl_exists_hint" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
+<p id="acl_define_rights"><?= wfMsg('hacl_edit_define_rights') ?></p>
+<p id="acl_define_manager"><?= wfMsg('hacl_edit_define_manager') ?></p>
 </form>
 
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/exAttach.js"></script>
@@ -89,8 +79,10 @@ var msgStartTyping = {
 var msgEditSave = '<?= wfMsg('hacl_edit_save') ?>';
 var msgEditCreate = '<?= wfMsg('hacl_edit_create') ?>';
 var msgAffected = {
-    'user'  : '<?= wfMsg('hacl_edit_users_affected') ?>',
-    'group' : '<?= wfMsg('hacl_edit_groups_affected') ?>'
+    'user'      : '<?= wfMsg('hacl_edit_users_affected') ?>',
+    'group'     : '<?= wfMsg('hacl_edit_groups_affected') ?>',
+    'nouser'    : '<?= wfMsg('hacl_edit_no_users_affected') ?>',
+    'nogroup'   : '<?= wfMsg('hacl_edit_no_groups_affected') ?>'
 };
 var userNsRegexp = '(^|,\s*)Участник:';
 var groupPrefixRegexp = '(^|,\s*)Group:';
@@ -107,18 +99,16 @@ foreach($haclgContLang->mPetPrefixes as $k => $v)
 };
 
 exAttach(window, 'load', function() {
-<?php if ($aclSD) {
-list($t, $n) = explode('/', $aclSD->getSDName(), 2);
-$title = Title::newFromId($aclSD->getSDID());
-$aclType = $aclSD->getPEType();
+<?php if ($aclArticle) {
+list($t, $n) = explode('/', $aclTitle->getText(), 2);
 ?>
 document.getElementById('acl_name').value = "<?= addslashes($n) ?>";
-petPrefix['<?= $aclType ?>'] = "<?= addslashes($t) ?>";
-document.getElementById('acl_what_<?= $aclType ?>').selected = true;
+petPrefix['<?= $aclPEType ?>'] = "<?= addslashes($t) ?>";
+document.getElementById('acl_what_<?= $aclPEType ?>').selected = true;
 parse_make_closure();
 <? } ?>
 acl_init_editor();
-<?php if ($aclSD) { ?>
+<?php if ($aclArticle) { ?>
 document.getElementById('acl_exists_hint').style.display = '';
 <? } ?>
 });

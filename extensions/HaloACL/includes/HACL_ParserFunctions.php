@@ -748,8 +748,23 @@ class HACLParserFunctions
         {
             switch (HACLEvaluator::hacl_type($title))
             {
-                case 'defaultsd':
-                case 'sd':
+                case 'group':
+                    $group = HACLGroup::newFromID($id);
+                    // It is a group
+                    // => remove all current members, however the group remains in the
+                    //    hierarchy of groups, as it might be "revived"
+                    $group->removeAllMembers();
+                    // The empty group article can now be changed by everyone
+                    $group->setManageGroups(NULL);
+                    $group->setManageUsers('*,#');
+                    $group->save();
+                    break;
+                case 'whitelist':
+                    // Create an empty whitelist and save it.
+                    $wl = new HACLWhitelist();
+                    $wl->save();
+                    break;
+                default:
                     $sd = HACLSecurityDescriptor::newFromID($id);
                     // It is a right or security descriptor
                     if ($for_update)
@@ -767,22 +782,6 @@ class HACLParserFunctions
                         // delete SD permanently
                         $sd->delete();
                     }
-                    break;
-                case 'group':
-                    $group = HACLGroup::newFromID($id);
-                    // It is a group
-                    // => remove all current members, however the group remains in the
-                    //    hierarchy of groups, as it might be "revived"
-                    $group->removeAllMembers();
-                    // The empty group article can now be changed by everyone
-                    $group->setManageGroups(NULL);
-                    $group->setManageUsers('*,#');
-                    $group->save();
-                    break;
-                case 'whitelist':
-                    // Create an empty whitelist and save it.
-                    $wl = new HACLWhitelist();
-                    $wl->save();
                     break;
             }
         }
@@ -973,6 +972,7 @@ class HACLParserFunctions
         }
         catch (HACLSDException $e)
         {
+            wfDebug("[HaloACL] Error saving $t: $e");
             return false;
         }
 

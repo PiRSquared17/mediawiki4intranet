@@ -23,11 +23,8 @@
  * Date: 03.04.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
-global $haclgIP;
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class describes a group in HaloACL.

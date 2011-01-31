@@ -215,10 +215,10 @@ function haclfSetupExtension()
 function haclfAddPageHeader(&$out)
 {
     global $wgTitle;
-    if ($wgTitle->getNamespace() == NS_SPECIAL && $wgTitle->getText() == 'HaloACL')
-        return haclAddHTMLHeader($out);
-    else
-        return addNonSpecialPageHeader($out);
+    haclCheckScriptPath();
+    if ($wgTitle->getNamespace() != NS_SPECIAL)
+        addNonSpecialPageHeader($out);
+    return true;
 }
 
 /**
@@ -244,60 +244,13 @@ function haclCheckScriptPath()
 function addNonSpecialPageHeader(&$out)
 {
     global $haclgHaloScriptPath, $smwgDeployVersion;
-    haclCheckScriptPath();
-
     $out->addScript('<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/toolbar.js"></script>');
-
-    /*$out->addLink(array(
-        'rel'   => 'stylesheet',
-        'type'  => 'text/css',
-        'media' => 'screen, projection',
-        'href'  => $haclgHaloScriptPath . '/skins/haloacl.css'
-    ));*/
-
     $out->addLink(array(
         'rel'   => 'stylesheet',
         'type'  => 'text/css',
         'media' => 'screen, projection',
         'href'  => $haclgHaloScriptPath.'/skins/haloacl_toolbar.css'
     ));
-
-    return true;
-}
-
-/**
- * Adds headers for HaloACL special page
- *
- * @param OutputPage $out
- * @return true
- */
-function haclAddHTMLHeader(&$out)
-{
-    global $wgTitle, $wgUser;
-    global $haclgHaloScriptPath, $smwgDeployVersion;
-
-    haclCheckScriptPath();
-    if ($wgTitle->getNamespace() != NS_SPECIAL)
-        return true;
-    else
-    {
-        $out->addLink(array(
-            'rel'   => 'stylesheet',
-            'type'  => 'text/css',
-            'media' => 'screen, projection',
-            'href'  => $haclgHaloScriptPath . '/skins/haloacl.css'
-        ));
-        if (get_class($wgUser->getSkin()) == "SkinMonoBook")
-        {
-            $out->addLink(array(
-                'rel'   => 'stylesheet',
-                'type'  => 'text/css',
-                'media' => 'screen, projection',
-                'href'  => $haclgHaloScriptPath . '/skins/mono-fix.css'
-            ));
-        }
-        return true;
-    }
 }
 
 /**********************************************/
