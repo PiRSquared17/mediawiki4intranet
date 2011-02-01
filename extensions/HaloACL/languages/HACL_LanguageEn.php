@@ -89,6 +89,7 @@ class HACLLanguageEn extends HACLLanguage
     public $mGroupPrefix = 'Group';
 
     public $mWhitelist = 'Whitelist';
+    public $mDefault = 'HaloACL Default';
 
     public $mPrefixes = array(
         'group'     => 'group',

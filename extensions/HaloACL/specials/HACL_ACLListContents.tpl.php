@@ -1,7 +1,7 @@
 <?php if (!$lists) { ?>
 <?= wfMsg('hacl_acllist_empty') ?>
 <?php }
-foreach (array('namespace', 'category', 'right', 'template', 'page', 'property') as $k) {
+foreach (array('default', 'namespace', 'category', 'right', 'template', 'page', 'property') as $k) {
  if ($lists[$k]) { ?>
  <?= wfMsg('hacl_acllist_'.$k) ?>
  <ul>

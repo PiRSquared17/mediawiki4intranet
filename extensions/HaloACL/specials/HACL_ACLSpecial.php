@@ -122,12 +122,25 @@ class HaloACLSpecial extends SpecialPage
         {
             $aclTitle = NULL;
             $aclArticle = NULL;
+            $aclDefault = Title::newFromText($haclgContLang->mDefault);
+            if (!$aclDefault->userCanRead())
+                $aclDefault = NULL;
+            elseif ($aclDefault->getArticleId())
+            {
+                $aclContent = new Article($aclDefault);
+                $aclContent = $aclContent->getContent();
+                $aclDefaultExists = true;
+            }
+            else
+                $aclContent = '';
         }
         else
         {
+            $aclContent = $aclArticle->getContent();
             $aclSDName = $aclTitle->getText();
             list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($aclSDName);
         }
+        /* Run template */
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');
         $html = ob_get_contents();
@@ -320,32 +333,49 @@ class HaloACLSpecial extends SpecialPage
     /* "Real" ACL list, loaded using AJAX */
     static function haclAcllist($t, $n, $limit = 101)
     {
-        global $wgScript, $wgTitle, $haclgHaloScriptPath, $wgUser;
+        global $wgScript, $wgTitle, $haclgHaloScriptPath, $haclgContLang, $wgUser;
         haclCheckScriptPath();
         /* Load data */
-        $t = $t ? explode(',', $t) : NULL;
-        $sds = HACLStorage::getDatabase()->getSDs2($t, $n, $limit);
+        $dbr = wfGetDB(DB_SLAVE);
+        $t = $t ? array_flip(explode(',', $t)) : NULL;
+        $n = str_replace(' ', '_', $n);
+        $where = array();
+        foreach ($haclgContLang->mPetAliases as $k => $v)
+            if (!$t || array_key_exists($v, $t))
+                $where[] = 'page_title COLLATE utf8_unicode_ci LIKE '.$dbr->addQuotes($k.'/'.$n.'%');
+        $where = 'page_namespace='.HACL_NS_ACL.' AND ('.implode(' OR ', $where).')';
+        /* Run select */
+        $res = $dbr->select('page', '*', $where, __METHOD__);
+        $sds = array();
+        foreach ($res as $r)
+            $sds[] = Title::newFromRow($r);
+        $res = NULL;
         if (count($sds) == $limit)
         {
+            /* Maximum SDs found */
             array_pop($sds);
             $max = true;
         }
+        /* Build array for template */
         $lists = array();
         foreach ($sds as $sd)
         {
             $d = array(
-                'name' => $sd->getSDName(),
-                'real' => $sd->getSDName(),
-                'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.urlencode($sd->getSDName()),
-                'viewlink' => Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl(),
+                'name' => $sd->getText(),
+                'real' => $sd->getText(),
+                'editlink' => $wgScript.'?title=Special:HaloACL&action=acl&sd='.urlencode($sd->getText()),
+                'viewlink' => $sd->getLocalUrl(),
             );
-            if ($p = strpos($d['real'], '/'))
+            list($d['type'], $d['real']) = explode('/', $d['real'], 2);
+            if ($d['real'])
             {
-                $d['real'] = substr($d['real'], $p+1);
-                if ($sd->getPEType() == 'template' && $d['real'] == $wgUser->getName())
+                $d['type'] = $haclgContLang->mPetAliases[mb_strtolower($d['type'])];
+                if ($d['type'] == 'template' && $d['real'] == $wgUser->getName())
                     $d['real'] = wfMsg('hacl_acllist_own_template', $d['real']);
             }
-            $lists[$sd->getPEType()][] = $d;
+            else
+                $d['real'] = $d['type'];
+            $lists[$d['type']][] = $d;
         }
         /* Run template */
         ob_start();
