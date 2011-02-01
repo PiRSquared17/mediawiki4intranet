@@ -20,8 +20,6 @@
      <optgroup label="<?= wfMsg('hacl_edit_'.$t) ?>">
      <?php foreach($l as $k => $true) { ?>
       <option id="acl_what_<?= $k ?>" value="<?= $k ?>"><?= wfMsg("hacl_define_$k") ?></option>
-     <?php } if ($t == 'define') { ?>
-      <option id="acl_what_default" value="default"><?= wfMsg('hacl_define_default') ?></option>
      <?php } ?>
      </optgroup>
     <?php } ?>
