@@ -255,7 +255,7 @@ function haclAutocomplete($t, $n, $limit = 11, $checkbox_prefix = false)
             $i++;
             $html .= '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
                 htmlspecialchars($item[1]).'"><input style="cursor: pointer" type="checkbox" id="c'.$ip.$i.
-                '" /> '.htmlspecialchars($item[0]).'</div>';
+                '" /> '.htmlspecialchars($item[0]).' <span id="t'.$ip.$i.'"></span></div>';
         }
     }
     else
