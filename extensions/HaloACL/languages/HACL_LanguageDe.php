@@ -83,8 +83,6 @@ class HACLLanguageDe extends HACLLanguage
         HACLLanguage::CAT_SECURITY_DESCRIPTOR => 'Kategorie:Rechte/Sicherheitsbeschreibung',
     );
 
-    public $mWhitelist = 'Positivliste';
-
     public $mPetPrefixes = array(
         HACLSecurityDescriptor::PET_PAGE      => 'Seite',
         HACLSecurityDescriptor::PET_CATEGORY  => 'Kategorie',
@@ -96,6 +94,9 @@ class HACLLanguageDe extends HACLLanguage
     public $mSDTemplateName = 'Vorlage';
     public $mPredefinedRightName = 'Recht';
     public $mGroupPrefix = 'Group';
+
+    public $mWhitelist = 'Positivliste';
+    public $mDefault = 'HaloACL Default';
 
     public $mPrefixes = array(
         'group'     => 'group',
