@@ -103,6 +103,7 @@ list($t, $n) = explode('/', $aclTitle->getText(), 2);
 document.getElementById('acl_name').value = "<?= addslashes($n) ?>";
 petPrefix['<?= $aclPEType ?>'] = "<?= addslashes($t) ?>";
 document.getElementById('acl_what_<?= $aclPEType ?>').selected = true;
+<? } if ($aclContent) { ?>
 parse_make_closure();
 <? } ?>
 acl_init_editor();
