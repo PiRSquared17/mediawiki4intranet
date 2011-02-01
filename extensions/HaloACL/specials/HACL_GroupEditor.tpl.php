@@ -66,7 +66,8 @@ exAttach(window, 'load', function()
     <?php foreach (explode(' ',
         'grp_save grp_create no_member_user no_member_group no_manager_user no_manager_group'.
         ' current_member_user current_member_group current_manager_user current_manager_group'.
-        ' regexp_user regexp_group start_typing_user start_typing_group'
+        ' regexp_user regexp_group start_typing_user start_typing_group indirect_through'.
+        ' edit_all edit_reg'
     ) as $msg)
         print "'$msg': '".addslashes(wfMsgNoTrans("hacl_$msg"))."',\n"; ?>
 'group_prefix' : '<?= $grpTitle ? $grpPrefix : $haclgContLang->mGroupPrefix ?>',
