@@ -103,9 +103,11 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_edit_delete'                  => 'Delete ACL',
     'hacl_edit_protect'                 => 'Protect:',
     'hacl_edit_define'                  => 'Define:',
+
     'hacl_indirect_grant'               => 'This right is granted through $1, cannot revoke.',
     'hacl_indirect_grant_all'           => 'all users right',
     'hacl_indirect_grant_reg'           => 'all registered users right',
+    'hacl_indirect_through'             => '(through $1)',
 
     'hacl_edit_sd_exists'               => 'This definition already exists.',
     'hacl_edit_enter_name_first'        => 'Error: Enter name to save ACL!',
