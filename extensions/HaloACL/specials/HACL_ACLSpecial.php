@@ -115,7 +115,8 @@ class HaloACLSpecial extends SpecialPage
         $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
         if (!($q['sd'] &&
             ($aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
-            HACLEvaluator::hacl_type($aclTitle) == 'sd' &&
+            ($t = HACLEvaluator::hacl_type($aclTitle)) &&
+            ($t == 'sd' || $t == 'right') &&
             ($aclArticle = new Article($aclTitle)) &&
             $aclArticle->exists()))
         {
@@ -125,7 +126,7 @@ class HaloACLSpecial extends SpecialPage
         else
         {
             $aclSDName = $aclTitle->getText();
-            list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($sdName);
+            list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($aclSDName);
         }
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');

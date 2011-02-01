@@ -1,14 +1,8 @@
-// FIXME HACL_GroupEditor.js uses a JS class, but this does not :(
-
-/* This script requires global variables:
-   aclNsText: HACL_NS_ACL namespace name
-   msgStartTyping: { page =>, user =>, group =>, category => }
-   msgEditSave
-   msgEditCreate
-   msgAffected: { user =>, group => }
-   userNsRegexp: regexp matching (,|^)+localised user namespace name
-   groupPrefixRegexp: same for group prefix
+/* This script requires the following global variables:
+   msg: localisation messages
    petPrefix: { PET_XX => prefix } from haclgContLang */
+
+// FIXME move all this into a class, like in HACL_GroupEditor.js
 
 var allActions = [ 'create', 'delete', 'edit', 'move', 'read' ];
 var groupClosureCache = {};
@@ -19,8 +13,12 @@ var aclPredefined = {};
 var aclLastTarget = {};
 var user_hint, target_hint, inc_hint, last_target = '', last_target_name = '';
 
-userNsRegexp = userNsRegexp ? new RegExp(userNsRegexp, 'gi') : '';
-groupPrefixRegexp = groupPrefixRegexp ? new RegExp(groupPrefixRegexp, 'gi') : '';
+var actionsHash = {};
+for (var a in allActions)
+    actionsHash[allActions[a]] = true;
+
+userNsRegexp = msg.regexp_user ? new RegExp(msg.regexp_user, 'gi') : '';
+groupPrefixRegexp = msg.regexp_group ? new RegExp(msg.regexp_group, 'gi') : '';
 
 if (!String.prototype.trim)
     String.prototype.trim = function() { return this.replace(/^\s*/, '').replace(/\s*$/, ''); }
@@ -56,7 +54,7 @@ function target_change(total_change)
     if (name.length)
     {
         var pn = document.getElementById('acl_pn');
-        var t = aclNsText+':'+petPrefix[what]+'/'+name;
+        var t = msg.NS_ACL+':'+petPrefix[what]+'/'+name;
         pn.innerHTML = t;
         pn.href = wgScript+'/'+t;
         document.getElementById('wpTitle').value = t;
@@ -81,7 +79,7 @@ function pe_exists_ajax(request)
         document.getElementById('acl_exists_hint').style.display = '';
     else
         document.getElementById('acl_delete_link').style.display = 'none';
-    document.getElementById('wpSave').value = exists ? msgEditSave : msgEditCreate;
+    document.getElementById('wpSave').value = exists ? msg.edit_save : msg.edit_create;
 }
 
 // add predefined ACL inclusion
@@ -127,6 +125,11 @@ function parse_sd()
         }
         for (j in act)
         {
+            if (!actionsHash[act[j]])
+            {
+                // remove invalid actions
+                continue;
+            }
             for (k in ass)
             {
                 r[ass[k]] = r[ass[k]] || {};
@@ -222,7 +225,7 @@ function closure_groups_sd(d, sd)
                 m = groupClosureCache[g][m];
                 aclClosure[m] = aclClosure[m] || {};
                 for (var a in aclRights[g])
-                    aclClosure[m][a] = true;
+                    aclClosure[m][a] = g;
             }
         }
     }
@@ -237,7 +240,7 @@ function closure_groups_sd(d, sd)
             {
                 aclClosure[m] = aclClosure[m] || {};
                 for (var a in predefCache[r][m])
-                    aclClosure[m][a] = true;
+                    aclClosure[m][a] = m;
             }
         }
     }
@@ -294,7 +297,7 @@ function save_sd()
     var r, i, j, k, m, h, man;
     // remove old definitions
     var t = document.getElementById('acl_def').value;
-    t = t.replace(/\{\{\s*\#(access|manage\s+rights|predefined\s*right):\s*[^\}]*?\}\}\s*/ig, '');
+    t = t.replace(/\{\{\s*\#(access|manage\s+rights|predefined\s*right):\s*[^\}]*?\}\}\s*/ig, '').trim();
     // build {{#manage rights: }}
     m = [];
     r = aclRights;
@@ -328,6 +331,8 @@ function save_sd()
     for (var i in aclPredefined)
         predef.push(i);
     // add definitions
+    if (t.length)
+        t = t + "\n";
     t = t + r + man;
     t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
     document.getElementById('acl_def').value = t;
@@ -371,6 +376,8 @@ function act_change(e)
 // onchange for to_type
 function to_type_change()
 {
+    var t = document.getElementById('to_type').value;
+    document.getElementById('to_name').style.display = t == '*' || t == '#' ? 'none' : '';
     document.getElementById('to_name').value = '';
     to_name_change();
     // force refresh hint (for the case when value didn't change)
@@ -390,8 +397,19 @@ function to_name_change()
         a = act[a];
         c = document.getElementById('act_'+a);
         l = document.getElementById('act_label_'+a);
-        direct = g_to && aclRights[g_to] && aclRights[g_to][a];
-        grp = g_to && (aclClosure[g_to] && aclClosure[g_to][a] || aclRights['#'] && aclRights['#'][a]);
+        // determine direct and indirect grant
+        if (g_to)
+        {
+            direct = aclRights[g_to] && aclRights[g_to][a];
+            grp = aclClosure[g_to] && aclClosure[g_to][a];
+            if (!grp && g_to.substr(0, 5) == 'User:')
+            {
+                if (aclRights['#'] && aclRights['#'][a])
+                    grp = msg.indirect_grant_reg;
+                else if (!grp && aclRights['*'] && aclRights['*'][a])
+                    grp = msg.indirect_grant_all;
+            }
+        }
         // all = all except manage
         if (a == 'all')
         {
@@ -406,7 +424,8 @@ function to_name_change()
         c.checked = direct || grp;
         // disable checkbox if right is granted through some group
         c.disabled = !g_to || grp;
-        l.className = !g_to || grp ? 'act_disabled' : '';
+        l.className = c.disabled ? 'act_disabled' : '';
+        c.title = l.title = grp ? msg.indirect_grant.replace('$1', grp) : '';
     }
 }
 
@@ -496,7 +515,7 @@ function get_empty_hint()
         j = 0;
         for (var n in x)
         {
-            if ((tt == 'group') == (n.substr(0, 6) == 'Group/'))
+            if (n != '*' && n != '#' && (tt == 'group') == (n.substr(0, 6) == 'Group/'))
             {
                 n = htmlspecialchars(n.replace(/^User:|^Group\//, ''));
                 involved.push('<div id="hi_'+(++j)+'" class="hacl_ti" title="'+n+'">'+n+'</div>');
@@ -504,8 +523,8 @@ function get_empty_hint()
         }
     }
     if (!involved.length)
-        return '<div class="hacl_tt">'+msgAffected['no'+tt]+' '+msgStartTyping[tt]+'</div>';
-    return '<div class="hacl_tt">'+msgAffected[tt]+'</div>'+involved.join('');
+        return '<div class="hacl_tt">'+msg['edit_no_'+tt+'s_affected']+' '+msg['start_typing_'+tt]+'</div>';
+    return '<div class="hacl_tt">'+msg['edit_'+tt+'s_affected']+'</div>'+involved.join('');
 }
 
 // initialize ACL editor
@@ -549,7 +568,7 @@ function acl_init_editor()
             if (wv == 'right' || wv == 'template')
                 return;
             if (wv != 'namespace' && !v.length)
-                h.tip_div.innerHTML = '<div class="hacl_tt">'+msgStartTyping[wv]+'</div>';
+                h.tip_div.innerHTML = '<div class="hacl_tt">'+msg['start_typing_'+wv]+'</div>';
             else
                 sajax_do_call('haclAutocomplete', [ wv, v ],
                     function (request) { if (request.status == 200) h.change_ajax(request.responseText) })

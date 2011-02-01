@@ -69,23 +69,16 @@
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/SHint.js"></script>
 
 <script language="JavaScript">
-var aclNsText = '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>';
-var msgStartTyping = {
-    'page' : '<?= wfMsg('hacl_edit_prompt_page') ?>',
-    'user' : '<?= wfMsg('hacl_start_typing_user') ?>',
-    'group' : '<?= wfMsg('hacl_start_typing_group') ?>',
-    'category' : '<?= wfMsg('hacl_edit_prompt_category') ?>'
+var msg = {
+<?php foreach (explode(' ',
+    'edit_save edit_create regexp_user regexp_group'.
+    ' start_typing_user start_typing_group start_typing_page start_typing_category'.
+    ' edit_users_affected edit_groups_affected edit_no_users_affected edit_no_groups_affected'.
+    ' indirect_grant indirect_grant_all indirect_grant_reg'
+) as $msg)
+    print "'$msg': '".addslashes(wfMsgNoTrans("hacl_$msg"))."',\n"; ?>
+    NS_ACL: '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>'
 };
-var msgEditSave = '<?= wfMsg('hacl_edit_save') ?>';
-var msgEditCreate = '<?= wfMsg('hacl_edit_create') ?>';
-var msgAffected = {
-    'user'      : '<?= wfMsg('hacl_edit_users_affected') ?>',
-    'group'     : '<?= wfMsg('hacl_edit_groups_affected') ?>',
-    'nouser'    : '<?= wfMsg('hacl_edit_no_users_affected') ?>',
-    'nogroup'   : '<?= wfMsg('hacl_edit_no_groups_affected') ?>'
-};
-var userNsRegexp = '(^|,\s*)Участник:';
-var groupPrefixRegexp = '(^|,\s*)Group:';
 var petPrefix = {
 <?php
 $i = 0;
