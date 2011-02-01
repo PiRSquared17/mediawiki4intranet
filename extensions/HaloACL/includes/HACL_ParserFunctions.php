@@ -580,7 +580,9 @@ class HACLParserFunctions
      */
     public static function articleViewHeader(&$article, &$outputDone, &$pcache)
     {
-        if ($article->getTitle()->getNamespace() == HACL_NS_ACL)
+        global $haclgContLang;
+        if ($article->getTitle()->getNamespace() == HACL_NS_ACL ||
+            $article->getTitle()->getPrefixedText() == $haclgContLang->mDefault)
         {
             self::$mInstance = new self($article->getTitle());
             $pcache = false;
