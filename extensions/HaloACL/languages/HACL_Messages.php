@@ -135,7 +135,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_define_property'              => 'Protect property:',
     'hacl_define_right'                 => 'Define right:',
     'hacl_define_template'              => 'Define user template:',
-    'hacl_define_default'               => 'Default for new ACLs:',
 
     'hacl_action_acllist'               => 'Manage ACL',
     'hacl_action_acl'                   => 'Create new ACL definition',
