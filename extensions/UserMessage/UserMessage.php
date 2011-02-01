@@ -55,6 +55,7 @@ $wgExtensionCredits['other'][] = array(
 );
 $wgHooks['NormalizeMessageKey'][] = 'efUserMessageNormalizeMessageKey';
 $wgHooks['userCan'][] = 'efUserMessageAllowEditPersonalMessages';
+$wgExtensionMessagesFiles['UserMessage'] = dirname(__FILE__) . '/UserMessage.i18n.php';
 if (is_null($wgUserMessageAllowCustomization))
     $wgUserMessageAllowCustomization = array('edittools' => true);
 
@@ -62,6 +63,8 @@ function efUserMessageIsPersonalMessage($title)
 {
     global $wgContLang, $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
     /* Match keys like MediaWiki:Something_Customisable@UserName */
+    if (!$wgUserMessageDelimiter)
+        $wgUserMessageDelimiter = '@';
     return $title->getNamespace() == NS_MEDIAWIKI &&
         ($newkey = $wgContLang->lcfirst($title->getText())) &&
         ($p = mb_strrpos($newkey, $wgUserMessageDelimiter)) !== false &&
@@ -95,6 +98,7 @@ function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transfor
     elseif ($key == 'editinginterface' &&
         efUserMessageIsPersonalMessage($wgTitle))
     {
+        wfLoadExtensionMessages('UserMessage');
         /* We are editing a personal message */
         $key = 'editingpersonalinterface';
         $useDB = true;
