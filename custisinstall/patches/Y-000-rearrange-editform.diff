@@ -1,9 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1292339419 -10800
+# Date 1296577505 -10800
 Bug 73311 - Rearrange edit form contents, remove copyright warnings
+Bug 75186 - Move subpages by default
 
-diff -r 2951a613ce57 -r 7919920078ee includes/EditPage.php
+diff -r 98a60024775f -r d23ea13452dc includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
 @@ -1268,14 +1268,16 @@
@@ -77,3 +78,15 @@ diff -r 2951a613ce57 -r 7919920078ee includes/EditPage.php
  		if ( !$wgUser->getOption( 'previewontop' ) ) {
  			$this->displayPreviewArea( $previewOutput, false );
  		}
+diff -r 98a60024775f -r d23ea13452dc includes/specials/SpecialMovepage.php
+--- includes/specials/SpecialMovepage.php
++++ includes/specials/SpecialMovepage.php
+@@ -75,7 +75,7 @@
+ 			$this->fixRedirects = $wgRequest->getBool( 'wpFixRedirects', true );
+ 			$this->leaveRedirect = $wgRequest->getBool( 'wpLeaveRedirect', true );
+ 		}
+-		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', false );
++		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', true );
+ 		$this->deleteAndMove = $wgRequest->getBool( 'wpDeleteAndMove' ) && $wgRequest->getBool( 'wpConfirm' );
+ 		$this->watch = $wgRequest->getCheck( 'wpWatch' );
+ 	}
