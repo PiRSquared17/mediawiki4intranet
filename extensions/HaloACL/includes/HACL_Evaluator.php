@@ -83,12 +83,13 @@ class HACLEvaluator
      * @return boolean
      *         true
      */
-    public static function userCan($title, $user, $action, &$result) {
+    public static function userCan($title, $user, $action, &$result)
+    {
         global $wgRequest, $wgTitle;
 
         self::startLog($title, $user, $action);
 
-        if ($title == null) {
+        if ($title == NULL) {
             $result = true;
             self::finishLog("Title is <null>.", $result, true);
             return true;
@@ -105,16 +106,6 @@ class HACLEvaluator
                 $result = $r;
                 self::finishLog("Right for property evaluated.", $result, true);
                 return $r;
-            }
-        }
-
-        // FIXME remove wysiwyg action rights
-        // Special handling of action "wysiwyg". This is passed as
-        // "action=edit&mode=wysiwyg"
-        if ($action == 'edit') {
-            $action = $wgRequest->getVal('mode', 'edit');
-            if ($action != 'edit') {
-                self::log("Action updated to: $action");
             }
         }
 

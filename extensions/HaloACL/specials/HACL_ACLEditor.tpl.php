@@ -7,7 +7,12 @@
 <tr>
  <td style="vertical-align: top; width: 500px">
   <p><b><?= wfMsg('hacl_edit_definition_text') ?></b></p>
-  <p><textarea id="acl_def" name="wpTextbox1" rows="6" style="width: 500px" onchange="parse_make_closure()"><?= $aclArticle ? htmlspecialchars($aclArticle->getContent()) : '' ?></textarea></p>
+  <p><textarea id="acl_def" name="wpTextbox1" rows="6" style="width: 500px" onchange="parse_make_closure()"><?= htmlspecialchars($aclContent) ?></textarea></p>
+  <?php if ($aclDefaultExists) { ?>
+   <?= wfMsgExt('hacl_edit_default_taken', array('parse'), $aclDefault) ?>
+  <?php } elseif ($aclDefault) { ?>
+   <?= wfMsgExt('hacl_edit_default_is_here', array('parse'), $aclDefault) ?>
+  <?php } ?>
   <p><b><?= wfMsg('hacl_edit_definition_target') ?></b></p>
   <p>
    <select id="acl_what" onchange="target_change(true)">
@@ -15,6 +20,8 @@
      <optgroup label="<?= wfMsg('hacl_edit_'.$t) ?>">
      <?php foreach($l as $k => $true) { ?>
       <option id="acl_what_<?= $k ?>" value="<?= $k ?>"><?= wfMsg("hacl_define_$k") ?></option>
+     <?php } if ($t == 'define') { ?>
+      <option id="acl_what_default" value="default"><?= wfMsg('hacl_define_default') ?></option>
      <?php } ?>
      </optgroup>
     <?php } ?>
