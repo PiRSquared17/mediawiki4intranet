@@ -334,7 +334,8 @@ function save_sd()
     if (t.length)
         t = t + "\n";
     t = t + r + man;
-    t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
+    if (predef.length)
+        t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
     document.getElementById('acl_def').value = t;
     check_errors();
 }
