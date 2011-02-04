@@ -116,9 +116,14 @@ $messages = array(
 'edithelp'             => 'संपादन सहयोग',
 'edithelppage'         => 'Help:संपादन',
 'mainpage'             => 'सम्मुख पन्ना',
-'mainpage-description' => 'सम्मुख पन्ना',
+'mainpage-description' => 'सम्मुख पृष्ठ',
+'policy-url'           => 'कार्य-भार :निअम',
+'portal'               => 'सामाजिक कोण',
+'portal-url'           => 'कार्य-भार : समूह कोण',
 'privacy'              => 'गोपनीयताक नियम',
 'privacypage'          => 'Project:गोपनीयता नियम',
+
+'badaccess' => 'आज्ञा गल्ती',
 
 'retrievedfrom'   => 'प्राप्ति स्थल "$1"',
 'editsection'     => 'संपादन करू',
@@ -128,6 +133,11 @@ $messages = array(
 'hidetoc'         => 'नुकाऊ',
 'site-rss-feed'   => '$1 आरएसएस फीड',
 'site-atom-feed'  => '$1 अणु फीड',
+'red-link-title'  => 'पृष्ठ उपलब्ध नहि अछि',
+
+# Short words for each namespace, by default used in the namespace tab in monobook
+'nstab-main' => 'पृष्ठ',
+'nstab-user' => 'उपयोगकर्ताक पृष्ठ',
 
 # Login and logout pages
 'nav-login-createaccount' => 'सदस्य लॉग इन',
@@ -162,7 +172,7 @@ $messages = array(
 'showpreview'          => 'पूर्वप्रदर्शन',
 'showdiff'             => 'परिवर्त्तन देखाऊ',
 'copyrightwarning'     => 'कृपा कय बुझू जे सभटा योगदान {{SITENAME}} ई बुझि कय देल जा रहल अछि जे ई निम्नांकितक अंतर्गत अछि $2 (देखू $1 जनकारीक हेतु). जौँ अहाँ चाहैत छी जी अहाँक रचना बिना रोकटोकक संपादित नहि हो किंवा बाँटल नहि जाय, तँ एकर योगदान एतय नहि करू। <br />
-एतय अहाँ ईहो सप्पत खाइत छी जी ई अहाँक अपन रचना छी आकि अहाँ एकरा कोनो सार्वजनिक डोमेन किंवा ओह्ने कोनो मँगनीक संदर्भ-स्थलसँ कॉपी कएने छी। 
+एतय अहाँ ईहो सप्पत खाइत छी जी ई अहाँक अपन रचना छी आकि अहाँ एकरा कोनो सार्वजनिक डोमेन किंवा ओह्ने कोनो मँगनीक संदर्भ-स्थलसँ कॉपी कएने छी।
 < दृढ़> सर्वाधिकार सुरक्षित कार्य एतय नहि दी।!</दृढ़>',
 'templatesusedpreview' => 'एहि पूर्वप्रदर्शनमे प्रयुक्त मास्टरफाइल:',
 'template-protected'   => '(सुरक्षित)',
@@ -178,8 +188,7 @@ $messages = array(
 'editundo' => 'असंपादन',
 
 # Search results
-'noexactmatch' => "'''\"\$1\" नामसँ कोनो लेख नहि अछि।''' अहाँ ई लेख [[:\$1|बना सकैत छी]]।",
-'powersearch'  => 'त्वरित खोज',
+'powersearch' => 'त्वरित खोज',
 
 # Preferences page
 'preferences'   => 'विकल्प',
@@ -198,8 +207,10 @@ $messages = array(
 'boteditletter'   => 'ब',
 
 # Recent changes linked
-'recentchangeslinked'       => 'संबंधित परिवर्त्तन',
-'recentchangeslinked-title' => '"$1" मे भेल परिवर्तन',
+'recentchangeslinked'         => 'संबंधित परिवर्त्तन',
+'recentchangeslinked-feed'    => 'संबंधित परिवर्त्तन',
+'recentchangeslinked-toolbox' => 'संबंधित परिवर्त्तन',
+'recentchangeslinked-title'   => '"$1" मे भेल परिवर्तन',
 
 # Upload
 'upload'        => 'फाइल अपलोड करू',
@@ -241,6 +252,8 @@ $messages = array(
 
 # Contributions
 'mycontris' => 'हमर योगदान',
+
+'sp-contributions-talk' => 'कहू',
 
 # What links here
 'whatlinkshere'       => 'एतय कोन लिंक अछि',
@@ -286,7 +299,7 @@ $messages = array(
 # Bad image list
 'bad_image_list' => 'फॉर्मेट निम्न प्रकारेँ अछि:
 
-मात्र सूचीबद्ध सामग्री (* सँ प्रारम्भ होय बला पंक्त्ति) विचारनीय अछि। पंक्त्तिक प्रथम लिंक आवश्यक रूपसँ खराब चित्रक लिंक होयबाक चाही। 
+मात्र सूचीबद्ध सामग्री (* सँ प्रारम्भ होय बला पंक्त्ति) विचारनीय अछि। पंक्त्तिक प्रथम लिंक आवश्यक रूपसँ खराब चित्रक लिंक होयबाक चाही।
 
 ओही पंक्त्तिक कोनो आर लिंक अपवाद स्वरूप अछि, उदाहरणस्वरूप पन्ना जतय चित्र पंक्त्तिअहि पर होय।',
 

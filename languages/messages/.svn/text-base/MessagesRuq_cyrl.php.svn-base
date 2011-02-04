@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Andrijko Z.
  * @author Кумулај Маркус
  * @author Макѕе
  * @author Приетен тев
@@ -192,8 +193,7 @@ $messages = array(
 'editundo'                => 'анулизаје',
 
 # Search results
-'noexactmatch'   => "'''Нпажу вец лном \"\$1\" н-ќсистст.''' Путе [[:\$1|креаре це пажу]].",
-'viewprevnext'   => 'Ву ($1) ($2) ($3)',
+'viewprevnext'   => 'Ву ($1 {{int:pipe-separator}} $2) ($3)',
 'searchhelp-url' => 'Help:Ајутор',
 'powersearch'    => 'каутај авансата',
 
@@ -202,7 +202,7 @@ $messages = array(
 
 # Recent changes
 'recentchanges'   => 'шумбајрае рецентае',
-'rcnote'          => "Маи хос се флај {{PLURAL:$|ултима модификаре|ултимеле '''$1''' модификајри}} дин {{PLURAL:$2|ултима зи|ултимеле '''$2''' зиле}}, енцепонд цу $3.",
+'rcnote'          => "Маи хос се флај {{PLURAL:$|ултима модификаре|ултимеле '''$1''' модификајри}} дин {{PLURAL:$2|ултима зи|ултимеле '''$2''' зиле}}, енцепонд цу $5, $4.",
 'rcshowhideminor' => '$1 модификајриле миноре',
 'rcshowhidebots'  => '$1 роботи',
 'rcshowhideliu'   => '$1 утилизатори приласнаери',
@@ -219,20 +219,23 @@ $3',
 'boteditletter'   => 'б',
 
 # Recent changes linked
-'recentchangeslinked' => 'Модификајри корелате',
+'recentchangeslinked'         => 'Модификајри корелате',
+'recentchangeslinked-feed'    => 'Модификајри корелате',
+'recentchangeslinked-toolbox' => 'Модификајри корелате',
 
 # Upload
 'upload' => 'тримиће фиширул',
 
 # File description page
+'file-anchor-link'    => 'фиширул',
 'filehist'            => 'Хисториа фиширулу',
 'filehist-current'    => 'куренту',
 'filehist-datetime'   => 'Дата/Темп',
 'filehist-user'       => 'Утилизатору',
 'filehist-dimensions' => 'Дименционс',
 'filehist-comment'    => 'коментарул',
-'imagelinks'          => 'легајтул',
-'linkstoimage'        => 'Цес пажи легајтент а це фиширул:',
+'imagelinks'          => 'Легајтул фиширул де медиа',
+'linkstoimage'        => 'Цес {{PLURAL:$1|page links||пажи легајтент}} а це фиширул:',
 
 # Random page
 'randompage' => 'алаећу',
@@ -278,6 +281,8 @@ $3',
 'mycontris'     => 'Мес контрибући',
 'contribsub2'   => 'пентру $1 ($2)',
 'uctop'         => '(сусверф)',
+
+'sp-contributions-talk' => 'дискућу',
 
 # What links here
 'whatlinkshere'       => 'Легајтул а це пажу',
