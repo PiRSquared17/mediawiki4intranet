@@ -195,7 +195,7 @@ $messages['arz'] = array(
 	'right-usermerge' => 'دمج اليوزرز',
 );
 
-/** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
+/** Belarusian (Taraškievica orthography) (‪Беларуская (тарашкевіца)‬)
  * @author EugeneZelenko
  * @author Jim-by
  * @author Red Winged Duck
@@ -430,7 +430,7 @@ Klicke auf „{{int:usermerge-submit}}“ zum Ausführen.',
 	'right-usermerge' => 'Benutzerkonten vereinen',
 );
 
-/** German (formal address) (Deutsch (Sie-Form))
+/** German (formal address) (‪Deutsch (Sie-Form)‬)
  * @author Imre
  */
 $messages['de-formal'] = array(
@@ -592,6 +592,7 @@ $messages['eu'] = array(
  * @author BlueDevil
  * @author Huji
  * @author Meisam
+ * @author ZxxZxxZ
  */
 $messages['fa'] = array(
 	'usermerge' => 'یکی کردن و حذف کردن کاربران',
@@ -603,6 +604,8 @@ $messages['fa'] = array(
 	'usermerge-deleteolduser' => 'کاربر قدیمی حذف شود؟',
 	'usermerge-submit' => 'یکی کردن کاربر',
 	'usermerge-userdeleted' => '$1 ($2) پاک شد.',
+	'usermerge-logpage' => 'سیاههٔ ادغام کاربر',
+	'right-usermerge' => 'ادغام حساب‌های کاربری',
 );
 
 /** Finnish (Suomi)
@@ -859,29 +862,30 @@ Klikń na "{{int:usermerge-submit}}", zo by akceptował.',
 );
 
 /** Haitian (Kreyòl ayisyen)
+ * @author Boukman
  * @author Masterches
  */
 $messages['ht'] = array(
-	'usermerge' => 'Mèt ansanm kont itilizatè yo ak efase tou',
-	'usermerge-desc' => '[[Special:UserMerge|Mèt ansanm referans yo depi yon itilizatè nan referans yon lòt itilizatè]] nan baz done wiki a - l ap efase tou vye non itilizatè yo apre fizyon, reyinyon sa. Ou dwèt genyen dwa pou fè fizyon sa.',
-	'usermerge-badolduser' => 'Lòt vyen non itilizatè ou an pa bon, li pa korèk, genyen yon erè anndan l.',
-	'usermerge-badnewuser' => 'Nouvo non itilizatè ou chwazi an pa bon, li pa korèk, genyen yon erè anndan l',
-	'usermerge-nonewuser' => 'Efase nouvo non itilizatè - depi ou vle mèt ansanm kont ou an ak $1.<br />
-Klike (prese) <u>Mèt ansanm kont Itilizatè</u> pou aksepte operasyon an.',
-	'usermerge-noolduser' => 'Efase vye non itilizatè an',
-	'usermerge-olduser' => 'Ansyen non itilizatè (mèt ansanm)',
-	'usermerge-newuser' => 'Nouvo non itilizatè (mèt ansanm)',
-	'usermerge-deleteolduser' => 'Efase ansyen, vye non itilizatè a ?',
+	'usermerge' => 'Mete ansanm ak efase kont itilizatè yo',
+	'usermerge-desc' => "[[Special:UserMerge|Mèt ansanm referans yo depi yon itilizatè nan referans yon lòt itilizatè]] nan baz done wiki a - l ap efase tou vye non itilizatè yo apre fizyon fin fèt. Ou bezwen genyen dwa ''usermerge'' pou fè fizyon sa.",
+	'usermerge-badolduser' => 'Ansyen non itilizatè a pa bon.',
+	'usermerge-badnewuser' => 'Nouvo non itilizatè a pa bon.',
+	'usermerge-nonewuser' => 'Nouvo non itilizatè ki vid - nou kwè ou vle mete l ansanm ak $1.<br />
+Klike "{{int:usermerge-submit}}" pou aksepte operasyon an.',
+	'usermerge-noolduser' => 'Ansyen non itilizatè a vid',
+	'usermerge-olduser' => 'Ansyen non itilizatè (mete ansanm depi)',
+	'usermerge-newuser' => 'Nouvo non itilizatè (mete ansanm ak)',
+	'usermerge-deleteolduser' => 'Efase ansyen non itilizatè a',
 	'usermerge-submit' => 'Mèt ansanm kont itilizatè yo',
-	'usermerge-badtoken' => 'Edisyon ou fè an pa bon, li pa korèk, genyen yon erè nan operasyon an',
+	'usermerge-badtoken' => 'Tikè pou modifikasyon pa bon',
 	'usermerge-userdeleted' => '$1 ($2) efase.',
 	'usermerge-userdeleted-log' => 'Non itilizatè ki efase a: $2 ($3)',
-	'usermerge-updating' => 'Mèt a jou, modifye tab $1 (depi $2 jouk $3)',
+	'usermerge-updating' => 'Mete ajou tablo $1 (depi $2 jouk $3)',
 	'usermerge-success' => 'Nou rive mèt ansanm $1 ($2) ak $3 ($4), depi premye kont an.',
 	'usermerge-success-log' => 'Itilizatè $2 ($3) fizyone ak $4 ($5)',
-	'usermerge-logpage' => 'Jounal itilizatè pou referans fizyon, "mèt ansanm kont itilizatè yo"',
-	'usermerge-logpagetext' => "Men jounal ki ap reprann tout aksyon ki fèt nan seksyon 'Mete ansanm kont itilizatè yo, fizyone yo'.",
-	'usermerge-noselfdelete' => 'Ou pa kapab efase tèt ou oubyen mèt yon lòt kont sou tèt ou, depi kont ou an menm.',
+	'usermerge-logpage' => 'Jounal pou fizyon kont itilizatè',
+	'usermerge-logpagetext' => 'Men jounal ki dekri tout aksyon ki te fèt pou fizyon kont itilizatè yo.',
+	'usermerge-noselfdelete' => 'Ou pa kapab efase tèt ou oubyen fizyone tèt ou.',
 	'usermerge-unmergable' => 'Nou pa kapab mèt ansanm kont sa yo - ID an oubyen non an pa kapab mete ansanm, li sanble l make nan definisyon yo.',
 	'usermerge-protectedgroup' => 'Nou pa kapab mèt ansanm kont itilizatè yo - itilizatè sa a nan yon gwoup ki pwoteje.',
 );
@@ -1211,15 +1215,16 @@ $messages['mk'] = array(
 );
 
 /** Malayalam (മലയാളം)
+ * @author Praveenp
  * @author Shijualex
  */
 $messages['ml'] = array(
 	'usermerge-badolduser' => 'അസാധുവായ പഴയ ഉപയോക്തൃനാമം',
 	'usermerge-badnewuser' => 'അസാധുവായ പുതിയ ഉപയോക്തൃനാമം',
 	'usermerge-noolduser' => 'പഴയ ഉപയോക്തൃനാമം ശൂന്യമാക്കുക',
-	'usermerge-olduser' => 'പഴയ ഉപയോക്തൃനാമം (ലയിപ്പിക്കാനുള്ളത്)',
-	'usermerge-newuser' => 'പുതിയ ഉപയോക്തൃനാമം (ഇതിലേക്കു സം‌യോജിപ്പിക്കണം)',
-	'usermerge-deleteolduser' => 'പഴയ ഉപയോക്താവിനെ മായ്ക്കട്ടെ?',
+	'usermerge-olduser' => 'പഴയ ഉപയോക്താവ് (ലയിപ്പിക്കാനുള്ളത്):',
+	'usermerge-newuser' => 'പുതിയ ഉപയോക്താവ് (ഇതിലേക്കു സം‌യോജിപ്പിക്കണം):',
+	'usermerge-deleteolduser' => 'പഴയ ഉപയോക്താവിനെ മായ്ക്കുക',
 	'usermerge-submit' => 'ഉപയോക്താവിനെ സം‌യോജിപ്പിക്കുക',
 	'usermerge-userdeleted' => '$1 ($2) മായ്ച്ചു.',
 	'usermerge-userdeleted-log' => 'ഉപയോക്താവിനെ മായ്ച്ചു: $2 ($3)',
@@ -1706,23 +1711,33 @@ Kliknutím na „{{int:usermerge-submit}}“ prijmete.',
  */
 $messages['sl'] = array(
 	'usermerge' => 'Spoji in izbriši uporabnike',
+	'usermerge-desc' => "[[Special:UserMerge|Združi sklice iz enega uporabnika na drugega]] v zbirki podatkov wikija – prav tako po združitvi izbriše stare uporabnika. Potrebuje pravico ''usermerge''",
 	'usermerge-badolduser' => 'Neveljavno staro uporabniško ime',
 	'usermerge-badnewuser' => 'Neveljavno novo uporabniško ime',
+	'usermerge-nonewuser' => 'Prazno novo uporabniško ime – predpostavljam združitev z »$1«.<br />
+Kliknite »{{int:usermerge-submit}}« za sprejetje.',
 	'usermerge-noolduser' => 'Prazno staro uporabniško ime',
 	'usermerge-fieldset' => 'Uporabniška imena za spajanje',
 	'usermerge-olduser' => 'Stari uporabnik (spoji od):',
 	'usermerge-newuser' => 'Novi uporabnik (spoji do):',
 	'usermerge-deleteolduser' => 'Izbriši starega uporabnika',
 	'usermerge-submit' => 'Spoji uporabnika',
+	'usermerge-badtoken' => 'Neveljavni žeton urejanja',
 	'usermerge-userdeleted' => '$1 ($2) je bil izbrisan.',
 	'usermerge-userdeleted-log' => 'Izbrisal(-a) uporabnika: $2 ($3)',
+	'usermerge-updating' => 'Posodabljanje tabele $1 ($2 v $3)',
+	'usermerge-success' => 'Združitev iz $1 ($2) v $3 ($4) je končana.',
 	'usermerge-success-log' => 'Uporabnik $2 ($3) je spojen z $4 ($5)',
 	'usermerge-logpage' => 'Dnevnik spajanja uporabnikov',
 	'usermerge-logpagetext' => 'To je dnevnik dejanj spajanja uporabnikov.',
+	'usermerge-noselfdelete' => 'Ne morete izbrisati ali združevati sebe!',
+	'usermerge-unmergable' => 'Ne morem združiti uporabnika – ID ali ime je opredeljeno kot nezdružljivo.',
+	'usermerge-protectedgroup' => 'Ne morem združiti uporabnika – uporabnik je v zaščiteni skupini.',
 	'right-usermerge' => 'Spajanje uporabnikov',
 );
 
-/** Serbian Cyrillic ekavian (Српски (ћирилица))
+/** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
+ * @author Rancher
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
@@ -1741,13 +1756,13 @@ $messages['sr-ec'] = array(
 	'usermerge-success' => 'Спајање $1 ($2) са $3 ($4) је завршено.',
 	'usermerge-success-log' => 'Корисник $2 ($3) је спојен са $4 ($5)',
 	'usermerge-logpage' => 'Историја спајања корисника',
-	'usermerge-logpagetext' => 'Ово је историја спајања корисника.',
+	'usermerge-logpagetext' => 'Ово је историјат спајања корисника.',
 	'usermerge-noselfdelete' => 'Не можете да се обришете или спојите са другим налогом!',
 	'usermerge-protectedgroup' => 'Није могуђе спојити овог корисника са другим — налази се у заштићеној групи.',
 	'right-usermerge' => 'Споји кориснике',
 );
 
-/** Serbian Latin ekavian (Srpski (latinica))
+/** Serbian Latin ekavian (‪Srpski (latinica)‬)
  * @author Michaello
  */
 $messages['sr-el'] = array(
@@ -2062,13 +2077,14 @@ Nhấn “{{int:usermerge-submit}}” để chấp nhận.',
 );
 
 /** Volapük (Volapük)
+ * @author Malafaya
  * @author Smeira
  */
 $messages['vo'] = array(
 	'usermerge-badolduser' => 'Gebananem büik no lonöfon',
 	'usermerge-badnewuser' => 'Gebananem nulik no lonöfon',
 	'usermerge-noolduser' => 'Vagükön gebananemi büik',
-	'usermerge-deleteolduser' => 'Moükön gebani büik?',
+	'usermerge-deleteolduser' => 'Moükön gebani vönedik',
 	'usermerge-userdeleted' => '$1 ($2) pemoükon.',
 	'usermerge-userdeleted-log' => 'Moükön gebani: $2 ($3)',
 );
@@ -2121,6 +2137,7 @@ $messages['zh-hans'] = array(
 
 /** Traditional Chinese (‪中文(繁體)‬)
  * @author Liangent
+ * @author Mark85296341
  * @author Wrightbus
  */
 $messages['zh-hant'] = array(
@@ -2129,6 +2146,7 @@ $messages['zh-hant'] = array(
 	'usermerge-badnewuser' => '無效的新用戶名',
 	'usermerge-nonewuser' => '清除新用戶名 - 假設合併到$1。<br />點擊<u>合併用戶</u>以接受。',
 	'usermerge-noolduser' => '清除舊用戶名',
+	'usermerge-fieldset' => '使用者名稱合併',
 	'usermerge-olduser' => '舊用戶（合併自）：',
 	'usermerge-newuser' => '新用戶（合併到）：',
 	'usermerge-deleteolduser' => '刪除舊用戶',
@@ -2142,8 +2160,8 @@ $messages['zh-hant'] = array(
 	'usermerge-logpage' => '使用者合併記錄',
 	'usermerge-logpagetext' => '這是一份用戶合併動作的記錄。',
 	'usermerge-noselfdelete' => '您不能將自己刪除或者合併！',
-	'usermerge-unmergable' => '無法完成用戶合併 - ID或者名稱被標記為不可合併。',
-	'usermerge-protectedgroup' => '無法完成用戶合併 - 用戶位於受保護組中。',
+	'usermerge-unmergable' => '無法完成用戶合併 - ID 或者名稱被標記為不可合併。',
+	'usermerge-protectedgroup' => '無法完成用戶合併 - 用戶位於受保護群組中。',
 	'right-usermerge' => '合併使用者',
 );
 

@@ -1,29 +1,35 @@
 K 25
 svn:wc:ra_dav:version-url
 V 61
-/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/PdfHandler
+/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler
+END
+CreatePdfThumbnailsJob.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/76943/trunk/extensions/PdfHandler/CreatePdfThumbnailsJob.class.php
 END
 PdfHandler_body.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/56413/trunk/extensions/PdfHandler/PdfHandler_body.php
+/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler/PdfHandler_body.php
 END
 PdfHandler.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/60246/trunk/extensions/PdfHandler/PdfHandler.i18n.php
+/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/PdfHandler/PdfHandler.i18n.php
 END
 PdfHandler.php
 K 25
 svn:wc:ra_dav:version-url
 V 76
-/svnroot/mediawiki/!svn/ver/57808/trunk/extensions/PdfHandler/PdfHandler.php
+/svnroot/mediawiki/!svn/ver/76941/trunk/extensions/PdfHandler/PdfHandler.php
 END
 PdfHandler.image.php
 K 25
 svn:wc:ra_dav:version-url
 V 82
-/svnroot/mediawiki/!svn/ver/57266/trunk/extensions/PdfHandler/PdfHandler.image.php
+/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler/PdfHandler.image.php
 END

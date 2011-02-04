@@ -18,11 +18,12 @@ Please use the page [[MediaWiki:Number_of_watching_users_pageview]] to define an
 );
 
 /** Message documentation (Message documentation)
+ * @author Fryed-peach
  * @author Purodha
  * @author Siebrand
  */
 $messages['qqq'] = array(
-	'whoiswatching-desc' => 'Short description of the Whoiswatching extension, shown in [[Special:Version]].{{doc-important|Do not translate or change links.}}',
+	'whoiswatching-desc' => '{{desc}}',
 );
 
 /** Arabic (العربية)
@@ -77,11 +78,13 @@ $messages['avk'] = array(
 /** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
  * @author EugeneZelenko
  * @author Jim-by
+ * @author Red Winged Duck
  */
 $messages['be-tarask'] = array(
 	'whoiswatching' => 'Хто назірае за старонкай',
+	'whoiswatching-desc' => 'Паказвае сьпіс удзельнікаў, якія назіраюць за вікі-старонкай',
 	'specialwhoiswatchingthepage' => 'Хто назірае за %s',
-	'specialwhoiswatchingusage' => 'Гэтая спэцыяльная старонка не можа выкарыстоўвацца самастойна.
+	'specialwhoiswatchingusage' => 'Гэтая спэцыяльная старонка ня можа выкарыстоўвацца самастойна.
 Калі ласка, карыстайцеся старонкай [[MediaWiki:Number_of_watching_users_pageview]] для вызначэньня ўваходнага пункту на гэту спэцыяльную старонку.',
 	'specialwhoiswatchingaddusers' => 'Дадаць удзельнікаў, якія будуць назіраюць за старонкай',
 	'specialwhoiswatchingaddbtn' => 'Дадаць выбраных удзельнікаў',
@@ -116,6 +119,7 @@ $messages['bn'] = array(
  */
 $messages['br'] = array(
 	'whoiswatching' => 'Implijerien o sellet ouzh ur bajenn eus ar wiki',
+	'whoiswatching-desc' => 'Pourchas a ra ur roll eus an implijerien a heuilh ur bajenn wiki',
 	'specialwhoiswatchingthepage' => 'Implijerien o sellet %s',
 	'specialwhoiswatchingusage' => "N'hall ket ar bajenn dibar-mañ bezañ implijet en hec'h-unan. Kit dre [[MediaWiki:Number_of_watching_users_pageview]] evit termeniñ ul lec'h mont davet ar bajenn-mañ.",
 	'specialwhoiswatchingaddusers' => 'Ouzhpennit an implijerien evit gwelet ar bajenn',
@@ -133,6 +137,16 @@ $messages['bs'] = array(
 Molimo koristite stranicu [[MediaWiki:Number_of_watching_users_pageview]] za određivanje ulazne tačke na ovu posebnu stranicu.',
 	'specialwhoiswatchingaddusers' => 'Dodaj korisnike da prate ovu stranicu',
 	'specialwhoiswatchingaddbtn' => 'Dodaj odabrane korisnike',
+);
+
+/** Catalan (Català)
+ * @author SMP
+ * @author Solde
+ */
+$messages['ca'] = array(
+	'whoiswatching' => 'Qui està una pàgina wiki',
+	'whoiswatching-desc' => 'Proporciona una llista dels usuaris que estan mirant una pàgina wiki',
+	'specialwhoiswatchingthepage' => 'Qui està mirant %s',
 );
 
 /** Czech (Česky)
@@ -162,6 +176,14 @@ Bitte definiere über die Seite [[MediaWiki:Number_of_watching_users_pageview]] 
 	'specialwhoiswatchingaddbtn' => 'Füge Benutzer hinzu',
 );
 
+/** German (formal address) (Deutsch (Sie-Form))
+ * @author Imre
+ */
+$messages['de-formal'] = array(
+	'specialwhoiswatchingusage' => 'Diese Spezialseite ist nicht auf sich allein gestellt einsetzbar.
+Bitte definieren Sie über die Seite [[MediaWiki:Number_of_watching_users_pageview]] eine Einstiegsseite für diese Spezialseite.',
+);
+
 /** Lower Sorbian (Dolnoserbski)
  * @author Michawiki
  */
@@ -173,6 +195,16 @@ $messages['dsb'] = array(
 Pšosym wužyj bok [[MediaWiki:Number_of_watching_users_pageview]], aby zastupny dypk k toś tomu specialnemu bokoju definěrował.',
 	'specialwhoiswatchingaddusers' => 'Wužywarjow k wobglědowanjeju boka pśidaś',
 	'specialwhoiswatchingaddbtn' => 'Wubranych wužywarjow pśidaś',
+);
+
+/** Greek (Ελληνικά)
+ * @author ZaDiak
+ */
+$messages['el'] = array(
+	'whoiswatching' => 'Ποιος βλέπει μια σελίδα βίκι',
+	'specialwhoiswatchingthepage' => 'Ποιος βλέπει %s',
+	'specialwhoiswatchingaddusers' => 'Προσθήκη χρηστών για παρακολούθηση της σελίδας',
+	'specialwhoiswatchingaddbtn' => 'Προσθήκη επιλεγμένων χρηστών',
 );
 
 /** Esperanto (Esperanto)
@@ -214,36 +246,48 @@ $messages['et'] = array(
  * @author Theklan
  */
 $messages['eu'] = array(
-	'whoiswatching' => 'Nor dago ikusten wiki orrialde bat',
-	'whoiswatching-desc' => 'Wiki orrialde bat begiratzen ari diren erabiltzaileen zerrenda ematen du.',
+	'whoiswatching' => 'Nor ari da wiki orrialde bat zaintzen',
+	'whoiswatching-desc' => 'Wiki orrialde bat zaintzen ari diren erabiltzaileen zerrenda ematen du.',
+	'specialwhoiswatchingthepage' => 'Nor ari da %s zaintzen',
+	'specialwhoiswatchingusage' => 'Orri berezi hau ezin da bere kabuz erabili.
+Mesedez [[MediaWiki:Number_of_watching_users_pageview]] orria erabili sarrerako puntu bat definitzeko orri berezi honi.',
+	'specialwhoiswatchingaddusers' => 'Lankideak gehitu orrialdea zaintzeko',
 	'specialwhoiswatchingaddbtn' => 'Gehitu aukeratutako lankideak',
 );
 
 /** Finnish (Suomi)
+ * @author Cimon Avaro
  * @author Crt
  * @author Nike
  * @author Silvonen
  * @author Str4nd
  * @author Vililikku
+ * @author ZeiP
  */
 $messages['fi'] = array(
 	'whoiswatching' => 'Kuka on tarkkailemassa wikisivua',
-	'whoiswatching-desc' => 'Mahdollistaa wikisivun tarkkailijoidan listauksen.',
+	'whoiswatching-desc' => 'Mahdollistaa wikisivun tarkkailijoiden listauksen.',
 	'specialwhoiswatchingthepage' => 'Kuka tarkkailee sivua %s',
+	'specialwhoiswatchingusage' => 'Tätä toimintosivua ei voi käyttää sellaisenaan.
+Käytä sivua [[MediaWiki:Number_of_watching_users_pageview]] määritelläksesi liityntäkohdan tähän toimintosivuun.',
+	'specialwhoiswatchingaddusers' => 'Lisää käyttäjiä tarkkailemaan sivua',
 	'specialwhoiswatchingaddbtn' => 'Lisää valitut käyttäjät',
 );
 
 /** French (Français)
+ * @author Crochet.david
  * @author Dereckson
  * @author Grondin
  * @author McDutchie
+ * @author PieRRoMaN
  * @author Sherbrooke
  */
 $messages['fr'] = array(
-	'whoiswatching' => 'Utilisateurs regardant une page du wiki',
+	'whoiswatching' => 'Qui suit une page wiki',
 	'whoiswatching-desc' => 'Fournit une liste des utilisateurs qui suivent une page wiki',
-	'specialwhoiswatchingthepage' => 'Utilisateurs regardant %s',
-	'specialwhoiswatchingusage' => "Cette page spéciale ne peut être utilisée seule. Passez par [[MediaWiki:Number_of_watching_users_pageview]] pour définir un point d'entrée vers cette page spéciale.",
+	'specialwhoiswatchingthepage' => 'Qui suit %s',
+	'specialwhoiswatchingusage' => 'Cette page spéciale ne peut être utilisée seule.
+Veuillez utiliser la page [[MediaWiki:Number_of_watching_users_pageview]] pour définir un point d’entrée vers cette page spéciale.',
 	'specialwhoiswatchingaddusers' => 'Ajouter les utilisateurs pour suivre la page',
 	'specialwhoiswatchingaddbtn' => 'Ajouter les utilisateurs sélectionnés',
 );
@@ -262,6 +306,19 @@ $messages['gl'] = array(
 	'specialwhoiswatchingaddbtn' => 'Engadir os usuarios seleccionados',
 );
 
+/** Swiss German (Alemannisch)
+ * @author Als-Holder
+ */
+$messages['gsw'] = array(
+	'whoiswatching' => 'Wär beobachtet e Syte',
+	'whoiswatching-desc' => 'Zeigt e Lischt vu Benutzer, wu ne Syte beobachte',
+	'specialwhoiswatchingthepage' => 'Wär beobachtet %s',
+	'specialwhoiswatchingusage' => 'Die Spezialsyte cha nit elai bruucht wäre.
+Bitte definier iber d Syte [[MediaWiki:Number_of_watching_users_pageview]] e Aafangssyte fir die Spezialsyte.',
+	'specialwhoiswatchingaddusers' => 'Fieg Benutzer zum Beobachte vu dr Syte dezue',
+	'specialwhoiswatchingaddbtn' => 'Fieg Benutzer dezue',
+);
+
 /** Hebrew (עברית)
  * @author Agbad
  * @author Rotemliss
@@ -278,7 +335,7 @@ $messages['he'] = array(
 
 /** Croatian (Hrvatski)
  * @author Dalibor Bosits
- * @author Suradnik13
+ * @author Ex13
  */
 $messages['hr'] = array(
 	'whoiswatching' => 'Tko prati wiki stranicu',
@@ -327,11 +384,26 @@ Per favor usa le pagina [[MediaWiki:Number_of_watching_users_pageview]] pro defi
 	'specialwhoiswatchingaddbtn' => 'Adder le usatores seligite',
 );
 
+/** Indonesian (Bahasa Indonesia)
+ * @author Bennylin
+ */
+$messages['id'] = array(
+	'whoiswatching' => 'Siapa yang memantau sebuah halaman wiki',
+	'whoiswatching-desc' => 'Menampilkan daftar pengguna yang memantau sebuah halaman wiki',
+	'specialwhoiswatchingthepage' => 'Siapa yang memantau %s',
+	'specialwhoiswatchingusage' => 'Ini adalah sebuah halaman istimewa yang tidak dapat digunakan sendirian.
+Gunakan halaman [[MediaWiki:Number_of_watching_users_pageview]] untuk menetapkan titik masuk ke halaman istimewa ini.',
+	'specialwhoiswatchingaddusers' => 'Tambahkan pengguna untuk memantau halaman',
+	'specialwhoiswatchingaddbtn' => 'Tambah pengguna yang dipilih',
+);
+
 /** Italian (Italiano)
+ * @author BrokenArrow
  * @author Pietrodn
  */
 $messages['it'] = array(
 	'whoiswatching' => 'Chi sta osservando una pagina wiki',
+	'whoiswatching-desc' => 'Elenca i nomi degli utenti che tengono sotto osservazione una pagina wiki',
 	'specialwhoiswatchingthepage' => 'Chi sta osservando %s',
 	'specialwhoiswatchingusage' => 'Questa pagina speciale non può essere usata da sola. Per favore usa la pagina [[MediaWiki:Number_of_watching_users_pageview]] per definire un punto di entrata per questa pagina speciale.',
 	'specialwhoiswatchingaddusers' => 'Aggiungi utenti ad osservare la pagina',
@@ -343,9 +415,9 @@ $messages['it'] = array(
  * @author Fryed-peach
  */
 $messages['ja'] = array(
-	'whoiswatching' => '誰がページをウォッチしているのか',
+	'whoiswatching' => 'ページをウォッチしている利用者',
 	'whoiswatching-desc' => 'ページをウォッチしている利用者の一覧を提供する',
-	'specialwhoiswatchingthepage' => '誰が%sをウォッチしているのか',
+	'specialwhoiswatchingthepage' => '%s をウォッチしている利用者',
 	'specialwhoiswatchingusage' => 'この特別ページは単独では利用できません。この特別ページへのエントリーポイントを定義するためには [[MediaWiki:Number_of_watching_users_pageview]] を使用してください。',
 	'specialwhoiswatchingaddusers' => '利用者のウォッチリストにページを追加',
 	'specialwhoiswatchingaddbtn' => '選択した利用者を追加',
@@ -401,7 +473,7 @@ $messages['lb'] = array(
 	'whoiswatching' => 'Wien iwwerwaacht eng Säit',
 	'whoiswatching-desc' => 'Liwwert eng Säit mat de Benotzer déi eng Wiki-Säit iwwerwaachen',
 	'specialwhoiswatchingthepage' => 'Wien iwwerwaacht %s',
-	'specialwhoiswatchingusage' => 'Dës Spezialsäit kann net eleng benotzt ginn. Benotz w.e.g. [[MediaWiki:Number_of_watching_users_pageview|Zuel vun de Benotzer déi eng Sàit iwwerwaachen]] fir eng Ufankssäit fir dës Spezialsäit ze definéieren.',
+	'specialwhoiswatchingusage' => 'Dës Spezialsäit kann net eleng benotzt ginn. Benotz w.e.g. [[MediaWiki:Number_of_watching_users_pageview|Zuel vun de Benotzer déi eng Säit iwwerwaachen]] fir eng Ufankssäit fir dës Spezialsäit ze definéieren.',
 	'specialwhoiswatchingaddusers' => "Setzt Benotzer derbäi déi d'Säit iwwerwaachen",
 	'specialwhoiswatchingaddbtn' => 'Setzt déi ausgewielte Benotzer derbäi',
 );
@@ -416,6 +488,7 @@ $messages['lt'] = array(
 );
 
 /** Macedonian (Македонски)
+ * @author Bjankuloski06
  * @author Brest
  */
 $messages['mk'] = array(
@@ -424,8 +497,8 @@ $messages['mk'] = array(
 	'specialwhoiswatchingthepage' => 'Кој набљудува %s',
 	'specialwhoiswatchingusage' => 'Оваа специјална страница не може да се користи самостојно.
 За дефинирање на влезна точка кон оваа специјална страница, Ве молиме користете се со оваа страница [[MediaWiki:Number_of_watching_users_pageview|тука]].',
-	'specialwhoiswatchingaddusers' => 'Додади корисници за набљудување на страницата',
-	'specialwhoiswatchingaddbtn' => 'Додади избрани корисници',
+	'specialwhoiswatchingaddusers' => 'Додај корисници за набљудување на страницата',
+	'specialwhoiswatchingaddbtn' => 'Додај избрани корисници',
 );
 
 /** Malayalam (മലയാളം)
@@ -447,6 +520,19 @@ $messages['mr'] = array(
 	'specialwhoiswatchingusage' => 'हे विशेषपान स्वावलंबीपणे वापरता येत नाही. कृपया, या विशेष पानाचे एक प्रवेशस्थळ नक्की करण्याकरिता [[MediaWiki:Number_of_watching_users_pageview]] हे पान वापरा.',
 	'specialwhoiswatchingaddusers' => 'पानावर पहारा ठेवण्याकरिता सदस्य वाढवा',
 	'specialwhoiswatchingaddbtn' => 'निवडलेले सदस्य वाढवा',
+);
+
+/** Malay (Bahasa Melayu)
+ * @author Aurora
+ */
+$messages['ms'] = array(
+	'whoiswatching' => 'Siapa memantau laman wiki',
+	'whoiswatching-desc' => 'Menyediakan senarai nama pengguna memantau laman wiki',
+	'specialwhoiswatchingthepage' => 'Siapa memantau %',
+	'specialwhoiswatchingusage' => 'Laman khas ini tidak boleh digunakan sendirian.
+Sila gunakan laman [[MediaWiki:Number_of_watching_users_pageview]] untuk menakrifkan titik masuk ke laman khas ini.',
+	'specialwhoiswatchingaddusers' => 'Tambah pengguna untuk memantau laman',
+	'specialwhoiswatchingaddbtn' => 'Tambah pengguna terpilih',
 );
 
 /** Nahuatl (Nāhuatl)
@@ -486,9 +572,11 @@ Ver venleg og bruk sida [[MediaWiki:Number_of_watching_users_pageview]] for å l
 
 /** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
  * @author Jon Harald Søby
+ * @author Nghtwlkr
  */
 $messages['no'] = array(
 	'whoiswatching' => 'Hvem overvåker en wikiside',
+	'whoiswatching-desc' => 'Viser en liste over brukere som overvåker en side',
 	'specialwhoiswatchingthepage' => 'Hvem overvåker %s',
 	'specialwhoiswatchingusage' => 'Denne spesialsiden kan ikke brukes selvstendig. Bruk siden [[MediaWiki:Number_of_watching_users_pageview]] for å definere et inngangspunkt for denne spesialsiden.',
 	'specialwhoiswatchingaddusers' => 'Legg til siden i brukeres overvåkningsliste',
@@ -507,6 +595,13 @@ $messages['oc'] = array(
 	'specialwhoiswatchingaddbtn' => 'Apondre los utilizaires seleccionats',
 );
 
+/** Ossetic (Иронау)
+ * @author Amikeco
+ */
+$messages['os'] = array(
+	'whoiswatching' => 'Чи йæ цæст дары фарсмæ',
+);
+
 /** Polish (Polski)
  * @author Derbeth
  * @author Maikking
@@ -519,6 +614,19 @@ $messages['pl'] = array(
 	'specialwhoiswatchingusage' => 'Ta strona nie może być użyta samoistnie. Skorzystaj ze strony [[MediaWiki:Number_of_watching_users_pageview]], aby zdefiniować punkt startowy dla tej strony',
 	'specialwhoiswatchingaddusers' => 'Dodaj użytkowników obserwujących stronę',
 	'specialwhoiswatchingaddbtn' => 'Dodaj wybranych użytkowników',
+);
+
+/** Piedmontese (Piemontèis)
+ * @author Dragonòt
+ */
+$messages['pms'] = array(
+	'whoiswatching' => 'Chi a sta vardand na pàgina wiki',
+	'whoiswatching-desc' => "A dà na lista d'utent che a stan vardand na pàgina wiki",
+	'specialwhoiswatchingthepage' => "Chi a l'é an mente ch'a varda %s",
+	'specialwhoiswatchingusage' => "Sta pàgina special-sì a peul pa esse dovrà da sola.
+Për piasì dovra la pàgina [[MediaWiki:Number_of_watching_users_pageview]] për defin^ un pont d'intrada a sta pàgina special-sì.",
+	'specialwhoiswatchingaddusers' => 'Gionta utent për vardé la pàgina',
+	'specialwhoiswatchingaddbtn' => "Gionta j'utent selessionà",
 );
 
 /** Pashto (پښتو)
@@ -569,6 +677,13 @@ Te rugăm să foloseşti pagina [[MediaWiki:Number_of_watching_users_pageview]] 
 	'specialwhoiswatchingaddbtn' => 'Adaugă utilizatorii selectaţi',
 );
 
+/** Tarandíne (Tarandíne)
+ * @author Joetaras
+ */
+$messages['roa-tara'] = array(
+	'specialwhoiswatchingaddbtn' => "Aggiunge l'utinde selezionate",
+);
+
 /** Russian (Русский)
  * @author Aleksandrit
  * @author Ferrer
@@ -583,6 +698,19 @@ $messages['ru'] = array(
 	'specialwhoiswatchingaddbtn' => 'Добавить выбранных участников',
 );
 
+/** Sinhala (සිංහල)
+ * @author Calcey
+ */
+$messages['si'] = array(
+	'whoiswatching' => 'විකි පිටුවක් නරඹමින් සිටින්නේ කවුරුද',
+	'whoiswatching-desc' => 'විකි පිටුවක් නරඹන පරිශීලකයන්ගේ නම් ලැයිස්තුවක් සපයයි',
+	'specialwhoiswatchingthepage' => '% නරඹන්නේ කවුද',
+	'specialwhoiswatchingusage' => 'මෙම විශේෂ පිටුව එය මතදීම භාවිතා කළ නොහැක.
+කරුණාකර මෙම විශේෂ පිටුවට පිවිසුම් ලක්ෂ්‍යයක් නිර්වචනය කිරීමට [[MediaWiki:Number_of_watching_users_pageview]]  පිටුව භාවිතා කරන්න.',
+	'specialwhoiswatchingaddusers' => 'පිටුව බැලීමට පරිශීලකයන් එකතු කරන්න',
+	'specialwhoiswatchingaddbtn' => 'තෝරාගත් පරිශීලකයන් ඇතුල් කරන්න',
+);
+
 /** Slovak (Slovenčina)
  * @author Helix84
  */
@@ -595,11 +723,38 @@ $messages['sk'] = array(
 	'specialwhoiswatchingaddbtn' => 'Pridať zvolených používateľov',
 );
 
+/** Serbian Cyrillic ekavian (Српски (ћирилица))
+ * @author Михајло Анђелковић
+ */
+$messages['sr-ec'] = array(
+	'whoiswatching' => 'Ко прати вики страну',
+	'whoiswatching-desc' => 'Приказује списак корисничких имена која прате одрећену страницу',
+	'specialwhoiswatchingthepage' => 'Ко прати %s',
+	'specialwhoiswatchingusage' => 'Ова специјална страна не може бити коришћена сама за себе, већ јој треба улазна тачка.
+Молимо Вас, користите страну [[MediaWiki:Number_of_watching_users_pageview]] да бисте дефинисали ову улазну тачку.',
+	'specialwhoiswatchingaddusers' => 'Додај кориснике који ће пратити ову страну',
+	'specialwhoiswatchingaddbtn' => 'Додај означене кориснике',
+);
+
+/** Serbian Latin ekavian (Srpski (latinica))
+ * @author Michaello
+ */
+$messages['sr-el'] = array(
+	'whoiswatching' => 'Ko prati viki stranu',
+	'whoiswatching-desc' => 'Prikazuje spisak korisničkih imena koja prate odrećenu stranicu',
+	'specialwhoiswatchingthepage' => 'Ko prati %s',
+	'specialwhoiswatchingusage' => 'Ova specijalna strana ne može biti korišćena sama za sebe, već joj treba ulazna tačka.
+Molimo Vas, koristite stranu [[MediaWiki:Number_of_watching_users_pageview]] da biste definisali ovu ulaznu tačku.',
+	'specialwhoiswatchingaddusers' => 'Dodaj korisnike koji će pratiti ovu stranu',
+	'specialwhoiswatchingaddbtn' => 'Dodaj označene korisnike',
+);
+
 /** Seeltersk (Seeltersk)
  * @author Pyt
  */
 $messages['stq'] = array(
 	'whoiswatching' => 'Wäl beooboachtet ne Siede',
+	'whoiswatching-desc' => 'Wiest ne Lieste fon Benutsere an, do ne Siede beooboachtje',
 	'specialwhoiswatchingthepage' => 'Wäl beooboachtet %s',
 	'specialwhoiswatchingusage' => 'Disse Spezioalsiede kon nit ap sik sälwen anwoand wäide. Definier uur ju Siede [[MediaWiki:Number_of_watching_users_pageview]] ne Ienstiegssiede foar disse Spezioalsiede.',
 	'specialwhoiswatchingaddusers' => 'Föich Benutser tou dät Bekiekjen fon ju Siede bietou.',
@@ -653,6 +808,22 @@ $messages['tg-cyrl'] = array(
 	'specialwhoiswatchingaddbtn' => 'Илова кардани Корбарони интихобшуда',
 );
 
+/** Tajik (Latin) (Тоҷикӣ (Latin))
+ * @author Liangent
+ */
+$messages['tg-latn'] = array(
+	'specialwhoiswatchingaddbtn' => 'Ilova kardani Korbaroni intixobşuda',
+);
+
+/** Thai (ไทย)
+ * @author Passawuth
+ */
+$messages['th'] = array(
+	'whoiswatching' => 'ผู้ที่กำลังเฝ้าดูหน้าวิกิอยู่',
+	'specialwhoiswatchingaddusers' => 'เพิ่มผู้ใช้เพื่อเฝ้าดูหน้า',
+	'specialwhoiswatchingaddbtn' => 'เพิ่มผู้ใช้ที่เลือก',
+);
+
 /** Tagalog (Tagalog)
  * @author AnakngAraw
  */
@@ -666,6 +837,39 @@ Pakigamit ang pahinang [[MediaWiki:Number_of_watching_users_pageview|Mediawiki:B
 	'specialwhoiswatchingaddbtn' => 'Idagdag ang napiling mga tagagamit',
 );
 
+/** Turkish (Türkçe)
+ * @author Joseph
+ */
+$messages['tr'] = array(
+	'whoiswatching' => 'Bir wiki sayfasını kim izliyor',
+	'whoiswatching-desc' => 'Bir viki sayfasını izleyen kullanıcı adlarının bir listesini sağlar',
+	'specialwhoiswatchingthepage' => '%s sayfasını kim izliyor',
+	'specialwhoiswatchingusage' => 'Bu özel sayfa kendi başına kullanılamaz.
+Lütfen, bu özel sayfaya bir giriş noktası tanımlamak için [[MediaWiki:Number_of_watching_users_pageview]] sayfasını kullanın.',
+	'specialwhoiswatchingaddusers' => 'Sayfayı izlemek için kullanıcıları ekleyin',
+	'specialwhoiswatchingaddbtn' => 'Seçili kullanıcıları ekleyin',
+);
+
+/** Veps (Vepsan kel')
+ * @author Игорь Бродский
+ */
+$messages['vep'] = array(
+	'specialwhoiswatchingaddbtn' => 'Ližata valitud kävutajid',
+);
+
+/** Vietnamese (Tiếng Việt)
+ * @author Vinhtantran
+ */
+$messages['vi'] = array(
+	'whoiswatching' => 'Ai đang theo dõi một trang wiki',
+	'whoiswatching-desc' => 'Cung cấp danh sách các người dùng đang theo dõi một trang wiki',
+	'specialwhoiswatchingthepage' => 'Ai đang theo dõi %s',
+	'specialwhoiswatchingusage' => 'Trang đặc biệt này không thể hoạt động một mình được.
+Xin dùng trang [[MediaWiki:Number_of_watching_users_pageview]] để định nghĩa một điểm nhập cho trang đặc biệt này.',
+	'specialwhoiswatchingaddusers' => 'Thêm thành viên theo dõi trang',
+	'specialwhoiswatchingaddbtn' => 'Thêm các thành viên đã chọn',
+);
+
 /** Volapük (Volapük)
  * @author Smeira
  */
@@ -676,6 +880,20 @@ $messages['vo'] = array(
 	'specialwhoiswatchingusage' => 'Pad patik at no dalon pagebön ito. Gebolös padi: [[MediaWiki:Number_of_watching_users_pageview]] ad miedetön nükömapüni lü pad patik at.',
 	'specialwhoiswatchingaddusers' => 'Läükön gebanis ad galädön padi at',
 	'specialwhoiswatchingaddbtn' => 'Läükön gebanis pevälöl',
+);
+
+/** Simplified Chinese (‪中文(简体)‬)
+ * @author Liangent
+ */
+$messages['zh-hans'] = array(
+	'specialwhoiswatchingthepage' => '谁正观看%s',
+);
+
+/** Traditional Chinese (‪中文(繁體)‬)
+ * @author Wrightbus
+ */
+$messages['zh-hant'] = array(
+	'specialwhoiswatchingthepage' => '誰正觀看%s',
 );
 
 /** Chinese (Taiwan) (‪中文(台灣)‬)

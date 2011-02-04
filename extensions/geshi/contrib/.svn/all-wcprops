@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 58
-/svnroot/geshi/!svn/ver/2218/trunk/geshi-1.0.X/src/contrib
+/svnroot/geshi/!svn/ver/2345/trunk/geshi-1.0.X/src/contrib
 END
 example.php
 K 25
@@ -13,13 +13,13 @@ langwiz.php
 K 25
 svn:wc:ra_dav:version-url
 V 70
-/svnroot/geshi/!svn/ver/2218/trunk/geshi-1.0.X/src/contrib/langwiz.php
+/svnroot/geshi/!svn/ver/2285/trunk/geshi-1.0.X/src/contrib/langwiz.php
 END
 langcheck.php
 K 25
 svn:wc:ra_dav:version-url
 V 72
-/svnroot/geshi/!svn/ver/2173/trunk/geshi-1.0.X/src/contrib/langcheck.php
+/svnroot/geshi/!svn/ver/2345/trunk/geshi-1.0.X/src/contrib/langcheck.php
 END
 aliased.php
 K 25
@@ -31,7 +31,7 @@ cssgen.php
 K 25
 svn:wc:ra_dav:version-url
 V 69
-/svnroot/geshi/!svn/ver/2173/trunk/geshi-1.0.X/src/contrib/cssgen.php
+/svnroot/geshi/!svn/ver/2226/trunk/geshi-1.0.X/src/contrib/cssgen.php
 END
 cssgen2.php
 K 25

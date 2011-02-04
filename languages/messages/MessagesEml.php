@@ -36,8 +36,10 @@ $messages = array(
 'december'  => 'Dzèmber',
 'may'       => 'Mâz',
 
+'mytalk' => 'I mê discussiòun',
+
+# Cologne Blue skin
 'qbspecialpages' => 'Pagini specièli',
-'mytalk'         => 'I mê discussiòun',
 
 'returnto'         => 'Tórna a $1.',
 'help'             => 'Per quî rivê da pôch',
@@ -63,15 +65,15 @@ $messages = array(
 'nstab-template' => 'Modèl',
 
 # Login and logout pages
-'logouttext'           => "'''Adèsa s'et discunnês.'''<br />
-Putiv cuntinuèr ad usèr {{SITENAME}} anonimamèint, o putiv cunnètterv dòp cun al stèss nàmm o cun un èter. Nutêv ca alcuni pàgini i putrèbber cuntinuèr a cràdder ca vueter a-sîv discunnès, finchè non purghê la cache dal vòster browser.",
+'logouttext'           => "'''Adèsa s'et discunnês.'''
+
+Putiv cuntinuèr ad usèr {{SITENAME}} anonimamèint, o putiv cunnètterv dòp cun al stèss nàmm o cun un èter.
+Nutêv ca alcuni pàgini i putrèbber cuntinuèr a cràdder ca vueter a-sîv discunnès, finchè non purghê la cache dal vòster browser.",
 'userlogin'            => 'Entrèr / Argistrères',
 'logout'               => 'va fôra',
 'userlogout'           => 'Va fôra',
 'userexists'           => "Al nòmm ch'èt scélt l'è stê bèle usê: càten un èter, per piasêr.",
-'yourrealname'         => 'Al tô vér nàmm:',
-'yourlanguage'         => 'Léngua:',
-'loginsuccess'         => "'''Adèsa sèt cunês in d'la Wikipedia {{SITENAME}} cun al nàmm d'utèint \"\$1\".'''",
+'loginsuccess'         => "'''Adèsa sèt cunês in {{SITENAME}} cun al nàmm d'utèint \"\$1\".'''",
 'wrongpassword'        => "La password ch'et méss l'è sbajèda. Pròva ancàrra.",
 'blocked-mailpassword' => "Al tô indirézz IP l'an pôl più feèr di cambiamèint, e l'en brisa abilitê par user la funziòun ed recópper ed password par evitèr di abûs.",
 'accountcreated'       => 'Et criê un nôv account',
@@ -87,13 +89,15 @@ Putiv cuntinuèr ad usèr {{SITENAME}} anonimamèint, o putiv cunnètterv dòp c
 'anontalkpagetext' => "----''Sta chè l'éla pàgina ed discussiòun d'un utèint anònim c'al n'à brisa criê un sô account o c'an l'usa ménga. Bsògna quindi usêr al sô indirézz IP par identifichèrel. L'istèss indirézz IP al pôl èsser usê da di mòndi utèint. Se sèt un utèint anònim e pèinset c'a-t in sun stèdi fâti di cummèint irrilevànt, per piasér [[Special:UserLogin|criêt un account o fê al log-in]] par evitèr confusiòuni futuri cun di èter utèint anònim.''",
 'editing'          => 'Cambiamèint ed $1',
 'yourdiff'         => 'Differèinzi',
-'templatesused'    => 'Modêl usèdi in sta pàgina:',
+'templatesused'    => '{{PLURAL:$1|Modêl|Modêl}} usèdi in sta pàgina:',
 
 # Search results
 'searchhelp-url' => 'Help:Introduzione',
 
 # Preferences page
 'mypreferences' => 'AL mê preferèinzi',
+'yourrealname'  => 'Al tô vér nàmm:',
+'yourlanguage'  => 'Léngua:',
 
 # Recent changes
 'recentchanges' => 'Ûltem cambiamèint',
@@ -101,7 +105,9 @@ Putiv cuntinuèr ad usèr {{SITENAME}} anonimamèint, o putiv cunnètterv dòp c
 'hist'          => 'stôria',
 
 # Recent changes linked
-'recentchangeslinked' => 'Mudéffic curelèdi',
+'recentchangeslinked'         => 'Mudéffic curelèdi',
+'recentchangeslinked-feed'    => 'Mudéffic curelèdi',
+'recentchangeslinked-toolbox' => 'Mudéffic curelèdi',
 
 # Upload
 'upload'            => 'Carghèr un file',

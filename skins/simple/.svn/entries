@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/skins/simple
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/simple
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-10-23T14:15:17.085748Z
-42377
-simetrical
+2010-01-15T23:35:50.681554Z
+61112
+platonides
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-0b4572a0dd20ec2422b77ddbca3c3295
-2006-04-03T10:07:32.999978Z
-13447
-brion
+2011-02-04T18:15:07.872114Z
+a6c8b274ce50cf975b8b7a0bcdb4c79f
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-918
+321
 
 external.png
 file
@@ -66,7 +66,7 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.872114Z
 8ea7563eac773be6a466fd8a9866a411
 2006-04-03T10:07:32.999978Z
 13447
@@ -100,11 +100,11 @@ file
 
 
 
-2009-11-10T13:28:35.000000Z
-822b0556515d79caf3a32509e5e3c471
-2008-09-22T16:16:37.683558Z
-41160
-raymond
+2011-02-04T18:15:07.872114Z
+f3124c89eef935ce1297ef2ebebb1f0f
+2009-06-25T21:10:10.774551Z
+52414
+catrope
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-3023
+3229
 
 link_icon.gif
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-b6a7a24983a73f036bab46091219978d
-2006-04-03T10:07:32.999978Z
-13447
-brion
+2011-02-04T18:15:07.872114Z
+33d08fd0a040afeaaf13bb6b89d43556
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-942
+342
 
 file_icon.gif
 file
@@ -168,11 +168,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-44582b491ee0abf23e250aa68ddec8e7
-2006-04-03T10:07:32.999978Z
-13447
-brion
+2011-02-04T18:15:07.872114Z
+0d916914a51b6e5d3afb4bd9448cf705
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -194,7 +194,7 @@ has-props
 
 
 
-921
+323
 
 main.css
 file
@@ -202,11 +202,11 @@ file
 
 
 
-2009-11-10T13:28:35.000000Z
-846eec3b6696476a79548b82bf48e492
-2008-10-23T14:15:17.085748Z
-42377
-simetrical
+2011-02-04T18:15:07.872114Z
+6130191124ca39fb9be11be0ba57f453
+2010-01-15T23:35:50.681554Z
+61112
+platonides
 has-props
 
 
@@ -228,7 +228,7 @@ has-props
 
 
 
-6543
+6586
 
 discussionitem_icon.gif
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-98d5aa20079adc097eb8b9ba27df3f8a
-2006-04-03T10:07:32.999978Z
-13447
-brion
+2011-02-04T18:15:07.872114Z
+46fbcf215fc5897e840b498507bac8a1
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -262,7 +262,7 @@ has-props
 
 
 
-949
+549
 
 mail_icon.gif
 file
@@ -270,11 +270,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-265e5d8bb700c8c344312a98e7850d60
-2006-04-03T10:07:32.999978Z
-13447
-brion
+2011-02-04T18:15:07.872114Z
+67f2ef1863c048fcb436ee44c7bf96cb
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -296,5 +296,5 @@ has-props
 
 
 
-918
+321
 

@@ -8,6 +8,7 @@
  * @file
  *
  * @author Amikeco
+ * @author Andrijko Z.
  */
 
 $messages = array(
@@ -57,7 +58,9 @@ $messages = array(
 'nov'           => 'ЦӀе',
 'dec'           => 'Фaн',
 
-'about'  => 'Хакъиндай',
+'about' => 'Хакъиндай',
+
+# Cologne Blue skin
 'qbfind' => 'Жугъун',
 'qbedit' => 'Дегишарун',
 
@@ -102,15 +105,12 @@ $messages = array(
 
 # Short words for each namespace, by default used in the namespace tab in monobook
 'nstab-main'      => 'Хъувун',
-'nstab-special'   => 'КьетIен',
+'nstab-special'   => 'КьетIен хъувун',
 'nstab-image'     => 'Шикил',
 'nstab-mediawiki' => 'Меслят',
 
 # General errors
 'viewsource' => 'Къаларун булах',
-
-# Login and logout pages
-'yourrealname' => 'Xалис тIвар:',
 
 # Edit pages
 'minoredit'      => 'И гъвечIи дегишарун',
@@ -129,8 +129,11 @@ $messages = array(
 'lineno' => 'ЦIар $1:',
 
 # Search results
-'viewprevnext' => 'Къаларун ($1) ($2) ($3)',
+'viewprevnext' => 'Къаларун ($1 {{int:pipe-separator}} $2) ($3)',
 'powersearch'  => 'Ахтармишун',
+
+# Preferences page
+'yourrealname' => 'Xалис тIвар:',
 
 # Recent changes
 'diff'            => 'тафават',
@@ -144,6 +147,7 @@ $messages = array(
 'upload' => 'Парвиниз шикил',
 
 # File description page
+'file-anchor-link'  => 'Шикил',
 'filehist'          => 'Шикил тарих',
 'filehist-datetime' => 'Югъ/Заман',
 
@@ -185,6 +189,8 @@ $messages = array(
 
 # Contributions
 'uctop' => '(кIукI)',
+
+'sp-contributions-talk' => 'Рахун',
 
 # Block/unblock
 'blocklink' => 'тIаб',
