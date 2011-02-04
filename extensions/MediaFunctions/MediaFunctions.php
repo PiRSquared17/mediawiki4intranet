@@ -30,7 +30,6 @@ $wgExtensionFunctions[] = 'efMediaFunctionsSetup';
  */
 function efMediaFunctionsSetup() {
 	global $wgParser;
-	wfLoadExtensionMessages('MediaFunctions');
 	$wgParser->setFunctionHook( 'mediamime', array( 'MediaFunctions', 'mediamime' ) );
 	$wgParser->setFunctionHook( 'mediasize', array( 'MediaFunctions', 'mediasize' ) );
 	$wgParser->setFunctionHook( 'mediaheight', array( 'MediaFunctions', 'mediaheight' ) );
