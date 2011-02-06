@@ -23,6 +23,13 @@ $messages['qqq'] = array(
 	'stringfunctions-desc' => 'Short description of the extension. Shown in [[Special:Version]].',
 );
 
+/** Afrikaans (Afrikaans)
+ * @author Naudefj
+ */
+$messages['af'] = array(
+	'stringfunctions-desc' => 'Brei die ontleder uit deur string-funksies by te voeg',
+);
+
 /** Arabic (العربية)
  * @author Meno25
  */
@@ -37,6 +44,13 @@ $messages['arz'] = array(
 	'stringfunctions-desc' => 'يعزز المحلل بدوال سلسلة',
 );
 
+/** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
+ * @author EugeneZelenko
+ */
+$messages['be-tarask'] = array(
+	'stringfunctions-desc' => 'Пашырае магчымасьці парсэра функцыямі працы з радкамі',
+);
+
 /** Bulgarian (Български)
  * @author DCLXVI
  */
@@ -44,11 +58,25 @@ $messages['bg'] = array(
 	'stringfunctions-desc' => 'Подобрява парсера с низови функции',
 );
 
+/** Breton (Brezhoneg)
+ * @author Fulup
+ */
+$messages['br'] = array(
+	'stringfunctions-desc' => "Gwellaat a ra ar parser gant arc'hwelioù neudennadoù",
+);
+
 /** Bosnian (Bosanski)
  * @author CERminator
  */
 $messages['bs'] = array(
 	'stringfunctions-desc' => 'Proširuje parser sa string funkcijama',
+);
+
+/** Catalan (Català)
+ * @author SMP
+ */
+$messages['ca'] = array(
+	'stringfunctions-desc' => 'Millora el parser amb funcions de cadenes de text',
 );
 
 /** Czech (Česky)
@@ -72,6 +100,13 @@ $messages['dsb'] = array(
 	'stringfunctions-desc' => 'Rozšyrja parser wó funkcije za znamuškowe rědy',
 );
 
+/** Greek (Ελληνικά)
+ * @author Omnipaedista
+ */
+$messages['el'] = array(
+	'stringfunctions-desc' => 'Ενισχύει τον λεξιαναλυτή με συναρτήσεις συμβολοσειρών',
+);
+
 /** Esperanto (Esperanto)
  * @author Yekrats
  */
@@ -84,6 +119,13 @@ $messages['eo'] = array(
  */
 $messages['es'] = array(
 	'stringfunctions-desc' => 'Amplía el analizador sintáctico con funciones de cadena',
+);
+
+/** Basque (Euskara)
+ * @author Kobazulo
+ */
+$messages['eu'] = array(
+	'stringfunctions-desc' => 'Sintaxi-analizatzailea hobetzen du kate-funtzioekin',
 );
 
 /** Persian (فارسی)
@@ -122,11 +164,39 @@ $messages['gl'] = array(
 	'stringfunctions-desc' => 'Realza a análise con funcións de cordas',
 );
 
+/** Ancient Greek (Ἀρχαία ἑλληνικὴ)
+ * @author Omnipaedista
+ */
+$messages['grc'] = array(
+	'stringfunctions-desc' => 'Ἐνισχύει τὸν λεξιαναλυτὴν μετὰ συναρτήσεων ὀρμαθῶν',
+);
+
+/** Swiss German (Alemannisch)
+ * @author Als-Holder
+ */
+$messages['gsw'] = array(
+	'stringfunctions-desc' => 'Erwyteret dr Parser mit Zeichechettefunktione (string functions)',
+);
+
 /** Hebrew (עברית)
  * @author Rotemliss
  */
 $messages['he'] = array(
 	'stringfunctions-desc' => 'הוספת הוראות מחרוזת למפענח',
+);
+
+/** Hiligaynon (Ilonggo)
+ * @author Tagimata
+ */
+$messages['hil'] = array(
+	'stringfunctions-desc' => 'Ginapanami ang parser upod sang string panksiyones',
+);
+
+/** Croatian (Hrvatski)
+ * @author Ex13
+ */
+$messages['hr'] = array(
+	'stringfunctions-desc' => 'Proširuje parser sa string funkcijama',
 );
 
 /** Upper Sorbian (Hornjoserbsce)
@@ -150,6 +220,20 @@ $messages['ia'] = array(
 	'stringfunctions-desc' => 'Extende le analysator syntactic con functiones de texto',
 );
 
+/** Indonesian (Bahasa Indonesia)
+ * @author Bennylin
+ */
+$messages['id'] = array(
+	'stringfunctions-desc' => 'Meningkatkan fungsi parser dengan fungsi-fungsi string',
+);
+
+/** Italian (Italiano)
+ * @author Pietrodn
+ */
+$messages['it'] = array(
+	'stringfunctions-desc' => 'Migliora il parser con le funzioni per le stringhe',
+);
+
 /** Japanese (日本語)
  * @author Fryed-peach
  */
@@ -169,6 +253,21 @@ $messages['ksh'] = array(
  */
 $messages['lb'] = array(
 	'stringfunctions-desc' => 'Verbessert de parser mat String-Funktiounen',
+);
+
+/** Macedonian (Македонски)
+ * @author Bjankuloski06
+ * @author Brest
+ */
+$messages['mk'] = array(
+	'stringfunctions-desc' => 'Проширување на парсерот со функции за работа со низи',
+);
+
+/** Low German (Plattdüütsch)
+ * @author Slomox
+ */
+$messages['nds'] = array(
+	'stringfunctions-desc' => 'Föögt Textfunktionen to’n Parser to',
 );
 
 /** Dutch (Nederlands)
@@ -206,10 +305,24 @@ $messages['pl'] = array(
 	'stringfunctions-desc' => 'Rozszerza analizator składni o funkcje operujące na łańcuchach znaków',
 );
 
+/** Piedmontese (Piemontèis)
+ * @author Dragonòt
+ */
+$messages['pms'] = array(
+	'stringfunctions-desc' => 'Mijora ël parser con le fonsion "string"',
+);
+
 /** Portuguese (Português)
  * @author Waldir
  */
 $messages['pt'] = array(
+	'stringfunctions-desc' => 'Acrescenta funções de strings ao analisador (parser)',
+);
+
+/** Brazilian Portuguese (Português do Brasil)
+ * @author Eduardo.mps
+ */
+$messages['pt-br'] = array(
 	'stringfunctions-desc' => 'Acrescenta funções de strings ao analisador (parser)',
 );
 
@@ -218,6 +331,13 @@ $messages['pt'] = array(
  */
 $messages['ro'] = array(
 	'stringfunctions-desc' => 'Îmbunătăţeşte parserul cu funcţii pe şiruri',
+);
+
+/** Tarandíne (Tarandíne)
+ * @author Joetaras
+ */
+$messages['roa-tara'] = array(
+	'stringfunctions-desc' => "Migliore 'u ''parser'' cu le funzione pe le stringhe",
 );
 
 /** Russian (Русский)
@@ -241,6 +361,27 @@ $messages['sk'] = array(
 	'stringfunctions-desc' => 'Rozširuje syntaktický analyzátor o funkcie na prácu s reťazcami',
 );
 
+/** Serbian Cyrillic ekavian (Српски (ћирилица))
+ * @author Михајло Анђелковић
+ */
+$messages['sr-ec'] = array(
+	'stringfunctions-desc' => 'Обогаћује парсер функцијама за стрингове',
+);
+
+/** Serbian Latin ekavian (Srpski (latinica))
+ * @author Michaello
+ */
+$messages['sr-el'] = array(
+	'stringfunctions-desc' => 'Obogaćuje parser funkcijama za stringove',
+);
+
+/** Seeltersk (Seeltersk)
+ * @author Pyt
+ */
+$messages['stq'] = array(
+	'stringfunctions-desc' => 'Fegrattert dän Parser mäd Teekenkättenfunktione (String Functions)',
+);
+
 /** Sundanese (Basa Sunda)
  * @author Kandar
  */
@@ -255,11 +396,25 @@ $messages['sv'] = array(
 	'stringfunctions-desc' => 'Utökar parsern med strängfunktioner',
 );
 
+/** Thai (ไทย)
+ * @author Harley Hartwell
+ */
+$messages['th'] = array(
+	'stringfunctions-desc' => 'เพิ่มประสิทธิภาพของฟังก์ชันพาร์เซอร์โดยใช้ฟังก์ชันสตริง',
+);
+
 /** Tagalog (Tagalog)
  * @author AnakngAraw
  */
 $messages['tl'] = array(
 	'stringfunctions-desc' => "Nagpapainam sa banghay na may mga tungkuling pambagting (''string'')",
+);
+
+/** Turkish (Türkçe)
+ * @author Joseph
+ */
+$messages['tr'] = array(
+	'stringfunctions-desc' => 'Dizi fonksiyonlarıyla derleyici geliştirir',
 );
 
 /** Ukrainian (Українська)
@@ -281,5 +436,19 @@ $messages['vec'] = array(
  */
 $messages['vi'] = array(
 	'stringfunctions-desc' => 'Bổ sung các hàm chuỗi trong bộ phân tích',
+);
+
+/** Simplified Chinese (‪中文(简体)‬)
+ * @author Liangent
+ */
+$messages['zh-hans'] = array(
+	'stringfunctions-desc' => '使用字符串函数来增强解析器',
+);
+
+/** Traditional Chinese (‪中文(繁體)‬)
+ * @author Tomchiukc
+ */
+$messages['zh-hant'] = array(
+	'stringfunctions-desc' => '利用字串函數來增強parser',
 );
 

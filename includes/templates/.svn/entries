@@ -1,15 +1,15 @@
 10
 
 dir
-60293
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/includes/templates
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/templates
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-02-20T13:58:49.907233Z
-47552
-tstarling
+2010-05-12T02:12:12.083270Z
+66255
+simetrical
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-10T13:27:41.000000Z
-d196b294a35bb7b85cf20d2a2c801cd5
-2008-10-07T01:10:32.692358Z
-41791
-brion
+2011-02-04T18:14:25.855992Z
+5d00754ba084bcd948637b7fbb46fb83
+2010-02-11T17:25:10.126623Z
+62312
+simetrical
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-2711
+2685
 
 Userlogin.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:27:41.000000Z
-d57767398eede01796246a0d816c0b7c
-2008-11-17T22:09:29.518092Z
-43645
-brion
+2011-02-04T18:14:25.855992Z
+8349610b5edcce2f20fc35618743e984
+2010-05-12T02:12:12.083270Z
+66255
+simetrical
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-8871
+10070
 
 NoLocalSettings.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2009-11-10T13:27:41.000000Z
-cbb7d45b05c72adcaea28dee42c7b7bb
-2009-02-20T13:58:49.907233Z
-47552
-tstarling
+2011-02-04T18:14:25.855992Z
+401da5ea4318e09f0fcdd0466179ae5e
+2010-02-11T17:25:10.126623Z
+62312
+simetrical
 has-props
 
 
@@ -126,5 +126,5 @@ has-props
 
 
 
-2446
+2464
 

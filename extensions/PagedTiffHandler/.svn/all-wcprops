@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 67
-/svnroot/mediawiki/!svn/ver/80191/trunk/extensions/PagedTiffHandler
+/svnroot/mediawiki/!svn/ver/80807/trunk/extensions/PagedTiffHandler
 END
 TiffReader.php
 K 25
@@ -19,7 +19,7 @@ PagedTiffHandler.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 93
-/svnroot/mediawiki/!svn/ver/80191/trunk/extensions/PagedTiffHandler/PagedTiffHandler.i18n.php
+/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/PagedTiffHandler/PagedTiffHandler.i18n.php
 END
 PagedTiffHandler.php
 K 25
@@ -31,5 +31,5 @@ PagedTiffHandler.image.php
 K 25
 svn:wc:ra_dav:version-url
 V 94
-/svnroot/mediawiki/!svn/ver/79025/trunk/extensions/PagedTiffHandler/PagedTiffHandler.image.php
+/svnroot/mediawiki/!svn/ver/80807/trunk/extensions/PagedTiffHandler/PagedTiffHandler.image.php
 END
