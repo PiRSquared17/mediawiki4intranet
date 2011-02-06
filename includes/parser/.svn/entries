@@ -1,15 +1,15 @@
 10
 
 dir
-60293
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/includes/parser
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/parser
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-03-11T15:49:28.615545Z
-48315
-demon
+2010-05-12T02:12:12.083270Z
+66255
+simetrical
 
 
 
@@ -32,10 +32,44 @@ file
 
 
 
-2009-11-10T13:26:26.000000Z
-006cbd2b34411c69b0b10113078dd355
-2008-11-03T00:04:33.927801Z
-43105
+2011-02-04T18:14:23.451985Z
+a6ea9a92b7d322bce411377d8f105f00
+2009-09-04T00:43:51.419362Z
+55795
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+47377
+
+LinkHolderArray.php
+file
+
+
+
+
+2011-02-04T18:14:23.455985Z
+477beacac824215bb9cf84298442be77
+2009-06-13T12:39:00.253655Z
+51820
 siebrand
 has-props
 
@@ -58,41 +92,7 @@ has-props
 
 
 
-46092
-
-LinkHolderArray.php
-file
-
-
-
-
-2009-11-10T13:26:26.000000Z
-448f63d797fca2eeea0b51bdd4ae0f97
-2008-12-13T04:14:40.076477Z
-44524
-vyznev
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-12915
+13107
 
 Parser.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2009-12-22T14:48:57.992400Z
-cf2dbc32799907173852d5806e815af5
-2009-03-11T15:49:28.615545Z
-48315
-demon
+2011-02-04T18:14:23.455985Z
+4c2df825968dccf5de5494b24271a042
+2010-05-12T02:12:12.083270Z
+66255
+simetrical
 has-props
 
 
@@ -126,75 +126,7 @@ has-props
 
 
 
-157114
-
-ParserOutput.php
-file
-
-
-
-
-2009-11-10T13:27:36.000000Z
-73e41af918e2a05cd4c91fa556724db9
-2009-03-03T17:44:17.899478Z
-47983
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-7638
-
-Parser_LinkHooks.php
-file
-
-
-
-
-2009-11-10T13:27:36.000000Z
-1363072f555f8f19921f8bfd19160c1d
-2008-08-19T04:44:34.850884Z
-39635
-dantman
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-10448
+166597
 
 CoreParserFunctions.php
 file
@@ -202,11 +134,11 @@ file
 
 
 
-2009-11-10T13:27:36.000000Z
-607f09140a81a5fa654adbcb3427e6b4
-2008-12-31T16:49:38.656056Z
-45226
-brion
+2011-02-04T18:14:23.459985Z
+91c1683adbb04a9cee1288986c8f5243
+2010-02-19T05:19:32.022150Z
+62689
+tstarling
 has-props
 
 
@@ -228,7 +160,7 @@ has-props
 
 
 
-14830
+24246
 
 CoreLinkFunctions.php
 file
@@ -236,7 +168,7 @@ file
 
 
 
-2009-11-10T13:27:36.000000Z
+2011-02-04T18:14:23.459985Z
 223e1027347a0f70866ec1d8100c9f2c
 2008-08-19T04:44:34.850884Z
 39635
@@ -264,17 +196,17 @@ has-props
 
 1798
 
-ParserCache.php
+DateFormatter.php
 file
 
 
 
 
-2009-11-10T13:27:36.000000Z
-128cad5d5f031110e3fb96fc6c7d3bbe
-2008-12-10T05:33:57.866027Z
-44385
-aaron
+2011-02-04T18:14:23.459985Z
+4e8f5427c0eae3470489367435b867f1
+2009-08-21T20:39:35.551692Z
+55433
+simetrical
 has-props
 
 
@@ -296,18 +228,18 @@ has-props
 
 
 
-3183
+8889
 
-DateFormatter.php
+ParserOptions.php
 file
 
 
 
 
-2009-03-02T15:51:23.000000Z
-9aa89596700b98fe600c568ae4971b55
-2008-06-16T20:21:26.732294Z
-36353
+2011-02-04T18:14:23.463985Z
+50334838afa270ed0653b769383494cb
+2010-02-03T07:10:58.123968Z
+61913
 tstarling
 has-props
 
@@ -330,7 +262,143 @@ has-props
 
 
 
-7450
+8814
+
+Tidy.php
+file
+
+
+
+
+2011-02-04T18:14:23.451985Z
+b75bed7a6cfbce86779393778364d762
+2009-01-27T15:20:31.531021Z
+46348
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5058
+
+Parser_LinkHooks.php
+file
+
+
+
+
+2011-02-04T18:14:23.459985Z
+1363072f555f8f19921f8bfd19160c1d
+2008-08-19T04:44:34.850884Z
+39635
+dantman
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10448
+
+ParserOutput.php
+file
+
+
+
+
+2011-02-04T18:14:23.455985Z
+656b90c32deb505b62cbba1b10c611da
+2010-02-16T03:37:19.595658Z
+62577
+mah
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8391
+
+ParserCache.php
+file
+
+
+
+
+2011-02-04T18:14:23.459985Z
+e4612ce62f851bfc380872cfbc32c095
+2009-07-08T08:12:35.028193Z
+52888
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3505
 
 Parser_DiffTest.php
 file
@@ -338,7 +406,7 @@ file
 
 
 
-2009-11-10T13:27:36.000000Z
+2011-02-04T18:14:23.459985Z
 23b4d6ab78eb71ae6edb025c6615e289
 2008-08-26T14:37:15.731097Z
 40020
@@ -372,78 +440,10 @@ file
 
 
 
-2009-12-22T14:48:57.992400Z
-46fcf83e2761c90da212f25a842f5a4a
-2008-11-03T00:04:33.927801Z
-43105
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-43389
-
-Preprocessor.php
-file
-
-
-
-
-2009-03-02T15:51:23.000000Z
-f6c58c00229f1c094de2ff77c3eaad58
-2008-06-26T13:05:40.126396Z
-36668
-daniel
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4085
-
-ParserOptions.php
-file
-
-
-
-
-2009-11-10T13:27:36.000000Z
-b8372ed48a17b5fb558ce841c7450491
-2008-09-30T01:00:40.269549Z
-41409
+2011-02-04T18:14:23.459985Z
+baedc37f93f94397ac333930641c2b51
+2009-09-04T00:43:51.419362Z
+55795
 tstarling
 has-props
 
@@ -466,5 +466,73 @@ has-props
 
 
 
-8282
+44822
+
+Preprocessor.php
+file
+
+
+
+
+2011-02-04T18:14:23.459985Z
+6f06f84ee14ef84c07e47d148b4e53a8
+2009-07-02T16:21:30.799027Z
+52700
+vasilievvv
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4344
+
+CoreTagHooks.php
+file
+
+
+
+
+2011-02-04T18:14:23.459985Z
+57bd2ccca044943bd8d4f3d10b1ed414
+2010-02-19T23:21:58.296387Z
+62726
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1567
 

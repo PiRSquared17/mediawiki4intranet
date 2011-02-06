@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/skins/common/images/de
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/common/images/de
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-09-10T06:50:01.957934Z
-40694
-raymond
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-10T13:28:35.000000Z
-62bb35210c66f7e4bc4f6c4635f8d463
-2008-09-10T06:50:01.957934Z
-40694
-raymond
+2011-02-04T18:15:07.328113Z
+47b03ecd95929790af31e3a16a149a27
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-1021
+351
 
 button_bold.png
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:28:35.000000Z
-7ed63b0699f97ab67395672e934bf12e
-2008-09-10T06:50:01.957934Z
-40694
-raymond
+2011-02-04T18:15:07.328113Z
+c75b5473c7d34589d84a8d3bd4610c4e
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -92,5 +92,5 @@ has-props
 
 
 
-1013
+328
 

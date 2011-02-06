@@ -27,8 +27,7 @@
  * page list.
  * @ingroup SpecialPage
  */
-class SpecialPage
-{
+class SpecialPage {
 	/**#@+
 	 * @access private
 	 */
@@ -80,92 +79,113 @@ class SpecialPage
 	 ** array( 'SpecialRedirectToSpecial', name, page to redirect to, special page param, ... )
 	 */
 	static public $mList = array(
-		'DoubleRedirects'           => array( 'SpecialPage', 'DoubleRedirects' ),
+		# Maintenance Reports
 		'BrokenRedirects'           => array( 'SpecialPage', 'BrokenRedirects' ),
-		'Disambiguations'           => array( 'SpecialPage', 'Disambiguations' ),
-
-		'Userlogin'                 => array( 'SpecialPage', 'Userlogin' ),
-		'Userlogout'                => array( 'UnlistedSpecialPage', 'Userlogout' ),
-		'CreateAccount'             => array( 'SpecialRedirectToSpecial', 'CreateAccount', 'Userlogin', 'signup', array( 'uselang' ) ),
-		'Preferences'               => array( 'SpecialPage', 'Preferences' ),
-		'Watchlist'                 => array( 'SpecialPage', 'Watchlist' ),
-		'Resetpass'                 => 'SpecialResetpass',
-
-
-		'Recentchanges'             => 'SpecialRecentchanges',
-		'Upload'                    => array( 'SpecialPage', 'Upload' ),
-		'Listfiles'                 => array( 'SpecialPage', 'Listfiles' ),
-		'Newimages'                 => array( 'IncludableSpecialPage', 'Newimages' ),
-		'Listusers'                 => array( 'SpecialPage', 'Listusers' ),
-		'Listgrouprights'           => 'SpecialListGroupRights',
-		'DeletedContributions'      => 'DeletedContributionsPage',
-		'Statistics'				=> 'SpecialStatistics',
-		'Randompage'                => 'Randompage',
+		'Deadendpages'              => array( 'SpecialPage', 'Deadendpages' ),
+		'DoubleRedirects'           => array( 'SpecialPage', 'DoubleRedirects' ),
+		'Longpages'                 => array( 'SpecialPage', 'Longpages' ),
+		'Ancientpages'              => array( 'SpecialPage', 'Ancientpages' ),
 		'Lonelypages'               => array( 'SpecialPage', 'Lonelypages' ),
-		'Uncategorizedpages'        => array( 'SpecialPage', 'Uncategorizedpages' ),
+		'Fewestrevisions'           => array( 'SpecialPage', 'Fewestrevisions' ),
+		'Withoutinterwiki'          => array( 'SpecialPage', 'Withoutinterwiki' ),
+		'Protectedpages'            => array( 'SpecialPage', 'Protectedpages' ),
+		'Protectedtitles'           => array( 'SpecialPage', 'Protectedtitles' ),
+		'Shortpages'                => array( 'SpecialPage', 'Shortpages' ),
 		'Uncategorizedcategories'   => array( 'SpecialPage', 'Uncategorizedcategories' ),
 		'Uncategorizedimages'       => array( 'SpecialPage', 'Uncategorizedimages' ),
+		'Uncategorizedpages'        => array( 'SpecialPage', 'Uncategorizedpages' ),
 		'Uncategorizedtemplates'    => array( 'SpecialPage', 'Uncategorizedtemplates' ),
 		'Unusedcategories'          => array( 'SpecialPage', 'Unusedcategories' ),
 		'Unusedimages'              => array( 'SpecialPage', 'Unusedimages' ),
-		'Wantedpages'               => array( 'IncludableSpecialPage', 'Wantedpages' ),
+		'Unusedtemplates'           => array( 'SpecialPage', 'Unusedtemplates' ),
+		'Unwatchedpages'            => array( 'SpecialPage', 'Unwatchedpages', 'unwatchedpages' ),
 		'Wantedcategories'          => array( 'SpecialPage', 'Wantedcategories' ),
 		'Wantedfiles'               => array( 'SpecialPage', 'Wantedfiles' ),
+		'Wantedpages'               => array( 'IncludableSpecialPage', 'Wantedpages' ),
 		'Wantedtemplates'           => array( 'SpecialPage', 'Wantedtemplates' ),
-		'Mostlinked'                => array( 'SpecialPage', 'Mostlinked' ),
-		'Mostlinkedcategories'      => array( 'SpecialPage', 'Mostlinkedcategories' ),
-		'Mostlinkedtemplates'       => array( 'SpecialPage', 'Mostlinkedtemplates' ),
-		'Mostcategories'            => array( 'SpecialPage', 'Mostcategories' ),
-		'Mostimages'                => array( 'SpecialPage', 'Mostimages' ),
-		'Mostrevisions'             => array( 'SpecialPage', 'Mostrevisions' ),
-		'Fewestrevisions'           => array( 'SpecialPage', 'Fewestrevisions' ),
-		'Shortpages'                => array( 'SpecialPage', 'Shortpages' ),
-		'Longpages'                 => array( 'SpecialPage', 'Longpages' ),
-		'Newpages'                  => 'SpecialNewpages',
-		'Ancientpages'              => array( 'SpecialPage', 'Ancientpages' ),
-		'Deadendpages'              => array( 'SpecialPage', 'Deadendpages' ),
-		'Protectedpages'            => array( 'SpecialPage', 'Protectedpages' ),
-		'Protectedtitles'           => array( 'SpecialPage', 'Protectedtitles' ),
+
+		# List of pages
 		'Allpages'                  => 'SpecialAllpages',
 		'Prefixindex'               => 'SpecialPrefixindex',
-		'Ipblocklist'               => array( 'SpecialPage', 'Ipblocklist' ),
-		'Specialpages'              => array( 'UnlistedSpecialPage', 'Specialpages' ),
-		'Contributions'             => 'SpecialContributions',
-		'Emailuser'                 => array( 'UnlistedSpecialPage', 'Emailuser' ),
-		'Whatlinkshere'             => array( 'SpecialPage', 'Whatlinkshere' ),
-		'LinkSearch'                => array( 'SpecialPage', 'LinkSearch' ),
-		'Recentchangeslinked'       => 'SpecialRecentchangeslinked',
-		'Movepage'                  => array( 'UnlistedSpecialPage', 'Movepage' ),
-		'Blockme'                   => array( 'UnlistedSpecialPage', 'Blockme' ),
-		'Booksources'               => 'SpecialBookSources',
 		'Categories'                => array( 'SpecialPage', 'Categories' ),
-		'Export'                    => array( 'SpecialPage', 'Export' ),
-		'Version'                   => 'SpecialVersion',
-		'Blankpage'                 => array( 'UnlistedSpecialPage', 'Blankpage' ),
-		'Allmessages'               => array( 'SpecialPage', 'Allmessages' ),
-		'Log'                       => array( 'SpecialPage', 'Log' ),
+		'Disambiguations'           => array( 'SpecialPage', 'Disambiguations' ),
+		'Listredirects'             => array( 'SpecialPage', 'Listredirects' ),
+
+		# Login/create account
+		'Userlogin'                 => array( 'SpecialPage', 'Userlogin' ),
+		'CreateAccount'             => array( 'SpecialRedirectToSpecial', 'CreateAccount', 'Userlogin', 'signup', array( 'uselang' ) ),
+
+		# Users and rights
 		'Blockip'                   => array( 'SpecialPage', 'Blockip', 'block' ),
-		'Undelete'                  => array( 'SpecialPage', 'Undelete', 'deletedhistory' ),
-		'Import'                    => 'SpecialImport',
-		'Lockdb'                    => array( 'SpecialPage', 'Lockdb', 'siteadmin' ),
-		'Unlockdb'                  => array( 'SpecialPage', 'Unlockdb', 'siteadmin' ),
+		'Ipblocklist'               => array( 'SpecialPage', 'Ipblocklist' ),
+		'Resetpass'                 => 'SpecialResetpass',
+		'DeletedContributions'      => 'DeletedContributionsPage',
+		'Preferences'               => 'SpecialPreferences',
+		'Contributions'             => 'SpecialContributions',
+		'Listgrouprights'           => 'SpecialListGroupRights',
+		'Listusers'                 => array( 'SpecialPage', 'Listusers' ),
+		'Activeusers'               => 'SpecialActiveUsers',
 		'Userrights'                => 'UserrightsPage',
+
+		# Recent changes and logs
+		'Newimages'                 => array( 'IncludableSpecialPage', 'Newimages' ),
+		'Log'                       => array( 'SpecialPage', 'Log' ),
+		'Watchlist'                 => array( 'SpecialPage', 'Watchlist' ),
+		'Newpages'                  => 'SpecialNewpages',
+		'Recentchanges'             => 'SpecialRecentchanges',
+		'Recentchangeslinked'       => 'SpecialRecentchangeslinked',
+		'Tags'                      => 'SpecialTags',
+
+		# Media reports and uploads
+		'Listfiles'                 => array( 'SpecialPage', 'Listfiles' ),
+		'Filepath'                  => array( 'SpecialPage', 'Filepath' ),
 		'MIMEsearch'                => array( 'SpecialPage', 'MIMEsearch' ),
 		'FileDuplicateSearch'       => array( 'SpecialPage', 'FileDuplicateSearch' ),
-		'Unwatchedpages'            => array( 'SpecialPage', 'Unwatchedpages', 'unwatchedpages' ),
-		'Listredirects'             => array( 'SpecialPage', 'Listredirects' ),
-		'Revisiondelete'            => array( 'UnlistedSpecialPage', 'Revisiondelete', 'deleterevision' ),
-		'Unusedtemplates'           => array( 'SpecialPage', 'Unusedtemplates' ),
-		'Randomredirect'            => 'SpecialRandomredirect',
-		'Withoutinterwiki'          => array( 'SpecialPage', 'Withoutinterwiki' ),
-		'Filepath'                  => array( 'SpecialPage', 'Filepath' ),
+		'Upload'                    => 'SpecialUpload',
 
+		# Wiki data and tools
+		'Statistics'                => 'SpecialStatistics',
+		'Allmessages'               => 'SpecialAllmessages',
+		'Version'                   => 'SpecialVersion',
+		'Lockdb'                    => array( 'SpecialPage', 'Lockdb', 'siteadmin' ),
+		'Unlockdb'                  => array( 'SpecialPage', 'Unlockdb', 'siteadmin' ),
+
+		# Redirecting special pages
+		'LinkSearch'                => array( 'SpecialPage', 'LinkSearch' ),
+		'Randompage'                => 'Randompage',
+		'Randomredirect'            => 'SpecialRandomredirect',
+
+		# High use pages
+		'Mostlinkedcategories'      => array( 'SpecialPage', 'Mostlinkedcategories' ),
+		'Mostimages'                => array( 'SpecialPage', 'Mostimages' ),
+		'Mostlinked'                => array( 'SpecialPage', 'Mostlinked' ),
+		'Mostlinkedtemplates'       => array( 'SpecialPage', 'Mostlinkedtemplates' ),
+		'Mostcategories'            => array( 'SpecialPage', 'Mostcategories' ),
+		'Mostrevisions'             => array( 'SpecialPage', 'Mostrevisions' ),
+
+		# Page tools
+		'Export'                    => 'SpecialExport',
+		'Import'                    => 'SpecialImport',
+		'Undelete'                  => array( 'SpecialPage', 'Undelete', 'deletedhistory' ),
+		'Whatlinkshere'             => 'SpecialWhatlinkshere',
+		'MergeHistory'              => array( 'SpecialPage', 'MergeHistory', 'mergehistory' ),
+
+		# Other
+		'Booksources'               => 'SpecialBookSources',
+
+		# Unlisted / redirects
+		'Blankpage'                 => 'SpecialBlankpage',
+		'Blockme'                   => array( 'UnlistedSpecialPage', 'Blockme' ),
+		'Emailuser'                 => array( 'UnlistedSpecialPage', 'Emailuser' ),
+		'Listadmins'                => array( 'SpecialRedirectToSpecial', 'Listadmins', 'Listusers', 'sysop' ),
+		'Listbots'                  => array( 'SpecialRedirectToSpecial', 'Listbots', 'Listusers', 'bot' ),
+		'Movepage'                  => array( 'UnlistedSpecialPage', 'Movepage' ),
+		'Mycontributions'           => array( 'SpecialMycontributions' ),
 		'Mypage'                    => array( 'SpecialMypage' ),
 		'Mytalk'                    => array( 'SpecialMytalk' ),
-		'Mycontributions'           => array( 'SpecialMycontributions' ),
-		'Listadmins'                => array( 'SpecialRedirectToSpecial', 'Listadmins', 'Listusers', 'sysop' ),
-		'MergeHistory'              => array( 'SpecialPage', 'MergeHistory', 'mergehistory' ),
-		'Listbots'                  => array( 'SpecialRedirectToSpecial', 'Listbots', 'Listusers', 'bot' ),
+		'Revisiondelete'            => 'SpecialRevisionDelete',
+		'Specialpages'              => array( 'UnlistedSpecialPage', 'Specialpages' ),
+		'Userlogout'                => array( 'UnlistedSpecialPage', 'Userlogout' ),
 	);
 
 	static public $mAliases;
@@ -257,7 +277,7 @@ class SpecialPage
 		$bits = explode( '/', $alias, 2 );
 		$name = self::resolveAlias( $bits[0] );
 		if( !isset( $bits[1] ) ) { // bug 2087
-			$par = NULL;
+			$par = null;
 		} else {
 			$par = $bits[1];
 		}
@@ -374,7 +394,7 @@ class SpecialPage
 			}
 			return self::$mList[$name];
 		} else {
-			return NULL;
+			return null;
 		}
 	}
 
@@ -387,7 +407,7 @@ class SpecialPage
 		if ( $realName ) {
 			return self::getPage( $realName );
 		} else {
-			return NULL;
+			return null;
 		}
 	}
 
@@ -480,7 +500,7 @@ class SpecialPage
 		$bits = explode( '/', $title->getDBkey(), 2 );
 		$name = $bits[0];
 		if( !isset( $bits[1] ) ) { // bug 2087
-			$par = NULL;
+			$par = null;
 		} else {
 			$par = $bits[1];
 		}
@@ -554,6 +574,7 @@ class SpecialPage
 		$oldTitle = $wgTitle;
 		$oldOut = $wgOut;
 		$wgOut = new OutputPage;
+		$wgOut->setTitle( $title );
 
 		$ret = SpecialPage::executePath( $title, true );
 		if ( $ret === true ) {
@@ -577,11 +598,25 @@ class SpecialPage
 		$aliases = $wgContLang->getSpecialPageAliases();
 		if ( isset( $aliases[$name][0] ) ) {
 			$name = $aliases[$name][0];
+		} else {
+			// Try harder in case someone misspelled the correct casing
+			$found = false;
+			foreach ( $aliases as $n => $values ) {
+				if ( strcasecmp( $name, $n ) === 0 ) {
+					wfWarn( "Found alias defined for $n when searching for special page aliases
+for $name. Case mismatch?" );
+					$name = $values[0];
+					$found = true;
+					break;
+				}
+			}
+			if ( !$found ) wfWarn( "Did not find alias for special page '$name'.
+Perhaps no page aliases are defined for it?" );
 		}
 		if ( $subpage !== false && !is_null( $subpage ) ) {
 			$name = "$name/$subpage";
 		}
-		return ucfirst( $name );
+		return $wgContLang->ucfirst( $name );
 	}
 
 	/**
@@ -668,13 +703,18 @@ class SpecialPage
 	/**#@+
 	  * Accessor and mutator
 	  */
-	function name( $x = NULL ) { return wfSetVar( $this->mName, $x ); }
-	function restrictions( $x = NULL) { return wfSetVar( $this->mRestrictions, $x ); }
-	function listed( $x = NULL) { return wfSetVar( $this->mListed, $x ); }
-	function func( $x = NULL) { return wfSetVar( $this->mFunction, $x ); }
-	function file( $x = NULL) { return wfSetVar( $this->mFile, $x ); }
-	function includable( $x = NULL ) { return wfSetVar( $this->mIncludable, $x ); }
-	function including( $x = NULL ) { return wfSetVar( $this->mIncluding, $x ); }
+	function name( $x = null ) { return wfSetVar( $this->mName, $x ); }
+	function restrictions( $x = null) {
+		# Use the one below this
+		wfDeprecated( __METHOD__ );
+		return wfSetVar( $this->mRestriction, $x );
+	}
+	function restriction( $x = null) { return wfSetVar( $this->mRestriction, $x ); }
+	function listed( $x = null) { return wfSetVar( $this->mListed, $x ); }
+	function func( $x = null) { return wfSetVar( $this->mFunction, $x ); }
+	function file( $x = null) { return wfSetVar( $this->mFile, $x ); }
+	function includable( $x = null ) { return wfSetVar( $this->mIncludable, $x ); }
+	function including( $x = null ) { return wfSetVar( $this->mIncluding, $x ); }
 	/**#@-*/
 
 	/**
@@ -695,7 +735,9 @@ class SpecialPage
 	 *   pages?
 	 */
 	public function isRestricted() {
-		return $this->mRestriction != '';
+		global $wgGroupPermissions;
+		// DWIM: If all anons can do something, then it is not restricted
+		return $this->mRestriction != '' && empty($wgGroupPermissions['*'][$this->mRestriction]);
 	}
 
 	/**
@@ -752,13 +794,25 @@ class SpecialPage
 		}
 	}
 
-	function outputHeader() {
+	/**
+	 * Outputs a summary message on top of special pages
+	 * Per default the message key is the canonical name of the special page
+	 * May be overriden, i.e. by extensions to stick with the naming conventions
+	 * for message keys: 'extensionname-xxx'
+	 *
+	 * @param string message key of the summary
+	 */
+	function outputHeader( $summaryMessageKey = '' ) {
 		global $wgOut, $wgContLang;
 
-		$msg = $wgContLang->lc( $this->name() ) . '-summary';
+		if( $summaryMessageKey == '' ) {
+			$msg = $wgContLang->lc( $this->name() ) . '-summary';
+		} else {
+			$msg = $summaryMessageKey;
+		}
 		$out = wfMsgNoTrans( $msg );
 		if ( ! wfEmptyMsg( $msg, $out ) and  $out !== '' and ! $this->including() ) {
-			$wgOut->addWikiMsg( $msg );
+			$wgOut->wrapWikiMsg( "<div class='mw-specialpage-summary'>\n$1</div>", $msg );
 		}
 
 	}
@@ -775,7 +829,7 @@ class SpecialPage
 	/**
 	 * Get a self-referential title object
 	 */
-	function getTitle( $subpage = false) {
+	function getTitle( $subpage = false ) {
 		return self::getTitleFor( $this->mName, $subpage );
 	}
 
@@ -804,7 +858,7 @@ class SpecialPage
 		global $wgRequest;
 		$params = array();
 		foreach( $this->mAllowedRedirectParams as $arg ) {
-			if( $val = $wgRequest->getVal( $arg, false ) )
+			if( ( $val = $wgRequest->getVal( $arg, null ) ) !== null )
 				$params[] = $arg . '=' . $val;
 		}
 
@@ -911,6 +965,8 @@ class SpecialMytalk extends UnlistedSpecialPage {
 class SpecialMycontributions extends UnlistedSpecialPage {
 	function __construct() {
 		parent::__construct(  'Mycontributions' );
+		$this->mAllowedRedirectParams = array( 'limit', 'namespace', 'tagfilter',
+			'offset', 'dir', 'year', 'month', 'feed' );
 	}
 
 	function getRedirect( $subpage ) {

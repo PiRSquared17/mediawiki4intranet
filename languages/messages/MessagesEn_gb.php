@@ -8,6 +8,8 @@
  * @file
  *
  * @author Jon Harald Søby
+ * @author Reedy
+ * @author The Evil IP address
  */
 
 $specialPageAliases = array(
@@ -30,7 +32,7 @@ $messages = array(
 # Rollback
 'sessionfailure' => 'There seems to be a problem with your login session;
 this action has been cancelled as a precaution against session hijacking.
-Please hit "back" and reload the page you came from, then try again.',
+Go back to the previous page, reload that page and then try again.',
 
 # Block/unblock
 'blockiptext' => 'Use the form below to block write access from a specific IP address or username.
@@ -44,6 +46,7 @@ If the file has been modified from its original state, some details may not full
 # EXIF tags
 'exif-ycbcrcoefficients'   => 'Colour space transformation matrix coefficients',
 'exif-colorspace'          => 'Colour space',
+'exif-datetimedigitized'   => 'Date and time of digitising',
 'exif-subsectimedigitized' => 'DateTimeDigitised subseconds',
 'exif-exposureprogram'     => 'Exposure programme',
 
@@ -59,7 +62,7 @@ If the file has been modified from its original state, some details may not full
 'exif-sensingmethod-5' => 'Colour sequential area sensor',
 'exif-sensingmethod-8' => 'Colour sequential linear sensor',
 
-# Pseudotags used for GPSSpeedRef and GPSDestDistanceRef
+# Pseudotags used for GPSSpeedRef
 'exif-gpsspeed-k' => 'Kilometres per hour',
 
 # E-mail address confirmation
