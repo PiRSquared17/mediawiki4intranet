@@ -630,7 +630,7 @@ $messages['ru'] = array(
 	'tiff-file-info-size' => 'страница $5, $1 × $2 пикселов, размер файла: $3, MIME-тип: $4',
 );
 
-/** Serbian Cyrillic ekavian (Српски (ћирилица))
+/** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
@@ -646,7 +646,7 @@ $messages['sr-ec'] = array(
 	'tiff_bad_file' => 'Послати фајл садржи грешке: $1',
 );
 
-/** Serbian Latin ekavian (Srpski (latinica)) */
+/** Serbian Latin ekavian (‪Srpski (latinica)‬) */
 $messages['sr-el'] = array(
 	'tiff_no_metadata' => 'Ne mogu se preuzeti metapodaci iz TIFF-a',
 	'tiff_page_error' => 'Broj strane nije u opsegu',
@@ -699,5 +699,16 @@ $messages['vi'] = array(
 $messages['yi'] = array(
 	'tiff_too_much_meta' => 'מעטאַדאַטן באַניצן צו פֿיל פלאַץ.',
 	'tiff-file-info-size' => 'בלטַט $5, $1 × $2 פיקסעל, טעקע גרייס: $3, טיפ MIME: $4',
+);
+
+/** Traditional Chinese (‪中文(繁體)‬)
+ * @author Mark85296341
+ */
+$messages['zh-hant'] = array(
+	'tiff_too_many_embed_files' => '該圖像包含太多嵌入檔案。',
+	'tiff_file_too_large' => '上傳的檔案過大而被拒絕。',
+	'tiff_too_much_meta' => '元數據佔用太多的空間。',
+	'tiff_bad_file' => '上傳的檔案有錯誤：$1',
+	'tiff-file-info-size' => '$5 頁面，$1 × $2 像素，檔案大小：$3，MIME類型：$4',
 );
 

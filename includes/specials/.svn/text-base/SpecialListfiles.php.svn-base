@@ -34,13 +34,11 @@ class ImageListPager extends TablePager {
 		}
 		$search = $wgRequest->getText( 'ilsearch' );
 		if ( $search != '' && !$wgMiserMode ) {
-			$nt = Title::newFromUrl( $search );
+			$nt = Title::newFromURL( $search );
 			if( $nt ) {
 				$dbr = wfGetDB( DB_SLAVE );
-				$m = $dbr->strencode( strtolower( $nt->getDBkey() ) );
-				$m = str_replace( "%", "\\%", $m );
-				$m = str_replace( "_", "\\_", $m );
-				$this->mQueryConds = array( "LOWER(img_name) LIKE '%{$m}%'" );
+				$this->mQueryConds = array( 'LOWER(img_name)' . $dbr->buildLike( $dbr->anyString(), 
+					strtolower( $nt->getDBkey() ), $dbr->anyString() ) );
 			}
 		}
 
@@ -58,7 +56,7 @@ class ImageListPager extends TablePager {
 				'img_description' => wfMsg( 'listfiles_description' ),
 			);
 			if( !$wgMiserMode ) {
-				$this->mFieldNames['COUNT(oi_archive_name)'] = wfMsg( 'listfiles_count' );
+				$this->mFieldNames['count'] = wfMsg( 'listfiles_count' );
 			}
 		}
 		return $this->mFieldNames;
@@ -74,11 +72,25 @@ class ImageListPager extends TablePager {
 		$fields = array_keys( $this->getFieldNames() );
 		$fields[] = 'img_user';
 		$options = $join_conds = array();
+
 		# Depends on $wgMiserMode
-		if( isset($this->mFieldNames['COUNT(oi_archive_name)']) ) {
+		if( isset( $this->mFieldNames['count'] ) ) {
 			$tables[] = 'oldimage';
-			$options = array('GROUP BY' => 'img_name');
-			$join_conds = array('oldimage' => array('LEFT JOIN','oi_name = img_name') );
+
+			# Need to rewrite this one
+			foreach ( $fields as &$field )
+				if ( $field == 'count' )
+					$field = 'COUNT(oi_archive_name) as count';
+			unset( $field );
+
+			$dbr = wfGetDB( DB_SLAVE );
+			if( $dbr->implicitGroupby() ) {
+				$options = array( 'GROUP BY' => 'img_name' );
+			} else {
+				$columnlist = implode( ',', preg_grep( '/^img/', array_keys( $this->getFieldNames() ) ) );
+				$options = array( 'GROUP BY' => "img_user, $columnlist" );
+			}
+			$join_conds = array( 'oldimage' => array( 'LEFT JOIN', 'oi_name = img_name' ) );
 		}
 		return array(
 			'tables'     => $tables,
@@ -113,21 +125,23 @@ class ImageListPager extends TablePager {
 		global $wgLang;
 		switch ( $field ) {
 			case 'img_timestamp':
-				return $wgLang->timeanddate( $value, true );
+				return htmlspecialchars( $wgLang->timeanddate( $value, true ) );
 			case 'img_name':
 				static $imgfile = null;
 				if ( $imgfile === null ) $imgfile = wfMsg( 'imgfile' );
 
 				$name = $this->mCurrentRow->img_name;
-				$link = $this->getSkin()->makeKnownLinkObj( Title::makeTitle( NS_FILE, $name ), $value );
+				$link = $this->getSkin()->linkKnown( Title::makeTitle( NS_FILE, $name ), $value );
 				$image = wfLocalFile( $value );
 				$url = $image->getURL();
 				$download = Xml::element('a', array( 'href' => $url ), $imgfile );
 				return "$link ($download)";
 			case 'img_user_text':
 				if ( $this->mCurrentRow->img_user ) {
-					$link = $this->getSkin()->makeLinkObj( Title::makeTitle( NS_USER, $value ),
-						htmlspecialchars( $value ) );
+					$link = $this->getSkin()->link(
+						Title::makeTitle( NS_USER, $value ),
+						htmlspecialchars( $value )
+					);
 				} else {
 					$link = htmlspecialchars( $value );
 				}
@@ -136,16 +150,16 @@ class ImageListPager extends TablePager {
 				return $this->getSkin()->formatSize( $value );
 			case 'img_description':
 				return $this->getSkin()->commentBlock( $value );
-			case 'COUNT(oi_archive_name)':
+			case 'count':
 				return intval($value)+1;
 		}
 	}
 
 	function getForm() {
-		global $wgRequest, $wgMiserMode;
+		global $wgRequest, $wgScript, $wgMiserMode;
 		$search = $wgRequest->getText( 'ilsearch' );
 
-		$s = Xml::openElement( 'form', array( 'method' => 'get', 'action' => $this->getTitle()->getLocalURL(), 'id' => 'mw-listfiles-form' ) ) .
+		$s = Xml::openElement( 'form', array( 'method' => 'get', 'action' => $wgScript, 'id' => 'mw-listfiles-form' ) ) .
 			Xml::openElement( 'fieldset' ) .
 			Xml::element( 'legend', null, wfMsg( 'listfiles' ) ) .
 			Xml::tags( 'label', null, wfMsgHtml( 'table_pager_limit', $this->getLimitSelect() ) );
