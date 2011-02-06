@@ -114,12 +114,12 @@ class Cite {
 	 */
 	function ref( $str, $argv, $parser ) {
 		wfLoadExtensionMessages( 'Cite' );
-		if ( $parser->egCiteInCite ) {
+		if ( $this->mInCite ) {
 			return htmlspecialchars( "<ref>$str</ref>" );
 		} else {
-			$parser->egCiteInCite = true;
+			$this->mInCite = true;
 			$ret = $this->guardedRef( $str, $argv, $parser );
-			$parser->egCiteInCite = false;
+			$this->mInCite = false;
 			return $ret;
 		}
 	}
@@ -186,7 +186,7 @@ class Cite {
 			# fers to an existing one.  If it refers to a nonexistent ref,
 			# we'll figure that out later.  Likewise it's definitely valid
 			# if there's any content, regardless of key.
-			return $this->stack( $parser, $str, $key, $group );
+			return $this->stack( $str, $key, $group );
 		}
 
 		# Not clear how we could get here, but something is probably
@@ -239,58 +239,56 @@ class Cite {
 	}
 
 	/**
-	 * Populate $parser->egCiteRefs based on input and arguments to <ref>
+	 * Populate $this->mRefs based on input and arguments to <ref>
 	 *
 	 * @param string $str Input from the <ref> tag
 	 * @param mixed $key Argument to the <ref> tag as returned by $this->refArg()
 	 * @return string 
 	 */
-	function stack( $parser, $str, $key = null, $group ) {
-		if (! isset($parser->egCiteRefs[$group])) 
-			$parser->egCiteRefs[$group]=array();
-		if (! isset($parser->egCiteGroupCnt[$group]))
-			$parser->egCiteGroupCnt[$group]=0;
+	function stack( $str, $key = null, $group ) {
+		if (! isset($this->mRefs[$group])) 
+			$this->mRefs[$group]=array();
+		if (! isset($this->mGroupCnt[$group]))
+			$this->mGroupCnt[$group]=0;
 
 		if ( $key === null ) {
 			// No key
-			//$parser->egCiteRefs[$group][] = $str;
-			$parser->egCiteRefs[$group][] = array('count'=>-1, 'text'=>$str, 'key'=>++$parser->egCiteOutCnt);
+			//$this->mRefs[$group][] = $str;
+			$this->mRefs[$group][] = array('count'=>-1, 'text'=>$str, 'key'=>++$this->mOutCnt);
 
-			return $this->linkRef( $parser, $group, $parser->egCiteInCnt++ );
+			return $this->linkRef( $group, $this->mInCnt++ );
 		} else if ( is_string( $key ) ) {
 			// Valid key
-			if ( ! isset( $parser->egCiteRefs[$group][$key] ) || ! is_array( $parser->egCiteRefs[$group][$key] ) ) {
+			if ( ! isset( $this->mRefs[$group][$key] ) || ! is_array( $this->mRefs[$group][$key] ) ) {
 				// First occurance
-				$parser->egCiteRefs[$group][$key] = array(
+				$this->mRefs[$group][$key] = array(
 					'text' => $str,
 					'count' => 0,
-					'key' => ++$parser->egCiteOutCnt,
-					'number' => ++$parser->egCiteGroupCnt[$group]
+					'key' => ++$this->mOutCnt,
+					'number' => ++$this->mGroupCnt[$group]
 				);
-				$parser->egCiteInCnt++;
+				$this->mInCnt++;
 				return
 					$this->linkRef(
-						$parser,
 						$group,
 						$key,
-						$parser->egCiteRefs[$group][$key]['key']."-".$parser->egCiteRefs[$group][$key]['count'],
-						$parser->egCiteRefs[$group][$key]['number'],
-						"-".$parser->egCiteRefs[$group][$key]['key']
+						$this->mRefs[$group][$key]['key']."-".$this->mRefs[$group][$key]['count'],
+						$this->mRefs[$group][$key]['number'],
+						"-".$this->mRefs[$group][$key]['key']
 					);
 			} else {
 				// We've been here before
-				if ( $parser->egCiteRefs[$group][$key]['text'] === null && $str !== '' ) {
+				if ( $this->mRefs[$group][$key]['text'] === null && $str !== '' ) {
 					// If no text found before, use this text
-					$parser->egCiteRefs[$group][$key]['text'] = $str;
+					$this->mRefs[$group][$key]['text'] = $str;
 				};
 				return 
 					$this->linkRef(
-						$parser,
 						$group,
 						$key,
-						$parser->egCiteRefs[$group][$key]['key']."-".++$parser->egCiteRefs[$group][$key]['count'],
-						$parser->egCiteRefs[$group][$key]['number'],
-						"-".$parser->egCiteRefs[$group][$key]['key']
+						$this->mRefs[$group][$key]['key']."-".++$this->mRefs[$group][$key]['count'],
+						$this->mRefs[$group][$key]['number'],
+						"-".$this->mRefs[$group][$key]['key']
 					); }
 		}
 
@@ -307,16 +305,16 @@ class Cite {
 	 */
 	function references( $str, $argv, $parser ) {
 		wfLoadExtensionMessages( 'Cite' );
-		if ( $parser->egCiteInCite ) {
+		if ( $this->mInCite ) {
 			if ( is_null( $str ) ) {
 				return htmlspecialchars( "<references/>" );
 			} else {
 				return htmlspecialchars( "<references>$str</references>" );
 			}
 		} else {
-			$parser->egCiteInCite = true;
+			$this->mInCite = true;
 			$ret = $this->guardedReferences( $str, $argv, $parser );
-			$parser->egCiteInCite = false;
+			$this->mInCite = false;
 			return $ret;
 		}
 	}
@@ -341,7 +339,7 @@ class Cite {
 		elseif ( count( $argv ) )
 			return $this->error( 'cite_error_references_invalid_parameters' );
 		else
-			return $this->referencesFormat($parser, $group);
+			return $this->referencesFormat($group);
 	}
 
 	/**
@@ -349,14 +347,14 @@ class Cite {
 	 *
 	 * @return string XHTML ready for output
 	 */
-	function referencesFormat($parser, $group) {
-		if (( count( $parser->egCiteRefs ) == 0 ) or (empty( $parser->egCiteRefs[$group] ) ))
+	function referencesFormat($group) {
+		if (( count( $this->mRefs ) == 0 ) or (empty( $this->mRefs[$group] ) ))
 			return '';
 		
 		wfProfileIn( __METHOD__ );
 		wfProfileIn( __METHOD__ .'-entries' );
 		$ent = array();
-		foreach ( $parser->egCiteRefs[$group] as $k => $v )
+		foreach ( $this->mRefs[$group] as $k => $v )
 			$ent[] = $this->referencesFormatEntry( $k, $v );
 		
 		$prefix = wfMsgForContentNoTrans( 'cite_references_prefix' );
@@ -371,8 +369,8 @@ class Cite {
 		wfProfileOut( __METHOD__ );
 		
 		//done, clean up so we can reuse the group
-		unset ($parser->egCiteRefs[$group]);
-		unset($parser->egCiteGroupCnt[$group]);
+		unset ($this->mRefs[$group]);
+		unset($this->mGroupCnt[$group]);
 			
 		return $ret;
 	}
@@ -544,7 +542,7 @@ class Cite {
 	 *                   the same named reference.
 	 * @return string
 	 */
-	function linkRef( $parser, $group, $key, $count = null, $label = null, $subkey = '' ) {
+	function linkRef( $group, $key, $count = null, $label = null, $subkey = '' ) {
 		global $wgContLang;
 		return
 			$this->parse(
@@ -552,7 +550,7 @@ class Cite {
 					'cite_reference_link',
 					$this->refKey( $key, $count ),
 					$this->referencesKey( $key . $subkey ),
-					(($group == CITE_DEFAULT_GROUP)?'':"$group ").$wgContLang->formatNum( is_null( $label ) ? ++$parser->egCiteGroupCnt[$group] : $label )
+					(($group == CITE_DEFAULT_GROUP)?'':"$group ").$wgContLang->formatNum( is_null( $label ) ? ++$this->mGroupCnt[$group] : $label )
 				)
 			);
 	}
@@ -654,16 +652,16 @@ class Cite {
 	 * Gets run when Parser::clearState() gets run, since we don't
 	 * want the counts to transcend pages and other instances
 	 */
-	function clearState($parser) {
+	function clearState() {
 		# Don't clear state when we're in the middle of parsing
 		# a <ref> tag
-		if($parser->egCiteInCite)
+		if($this->mInCite)
 			return true;
  
-		$parser->egCiteGroupCnt = array();
-		$parser->egCiteOutCnt = -1;
-		$parser->egCiteInCnt = 0;
-		$parser->egCiteRefs = array();
+		$this->mGroupCnt = array();
+		$this->mOutCnt = -1;
+		$this->mInCnt = 0;
+		$this->mRefs = array();
 
 		return true;
 	}
