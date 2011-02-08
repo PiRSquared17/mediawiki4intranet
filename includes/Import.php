@@ -241,7 +241,7 @@ class WikiRevision {
 
 		} elseif( $changed ) {
 			wfDebug( __METHOD__ . ": running onArticleEdit\n" );
-			Article::onArticleEdit( $this->title, 'skiptransclusions' ); // leave templatelinks for editUpdates()
+			Article::onArticleEdit( $this->title );
 
 			wfDebug( __METHOD__ . ": running edit updates\n" );
 			$article->editUpdates(
@@ -292,7 +292,7 @@ class WikiRevision {
 				$this->timestamp . "\n" );
 			return false;
 		}
-		$log_id = $dbw->nextSequenceValue( 'log_log_id_seq' );
+		$log_id = $dbw->nextSequenceValue( 'logging_log_id_seq' );
 		$data = array(
 			'log_id' => $log_id,
 			'log_type' => $this->type,
@@ -318,7 +318,7 @@ class WikiRevision {
 			return false;
 		}
 
-		// @fixme upload() uses $wgUser, which is wrong here
+		// @todo Fixme: upload() uses $wgUser, which is wrong here
 		// it may also create a page without our desire, also wrong potentially.
 		// and, it will record a *current* upload, but we might want an archive version here
 
@@ -415,7 +415,7 @@ class WikiRevision {
 			return false;
 		}
 
-		// @fixme!
+		// @todo Fixme!
 		$data = Http::get( $src );
 		if( !$data ) {
 			wfDebug( "IMPORT: couldn't fetch source $src\n" );
@@ -468,8 +468,8 @@ class WikiImporter {
 	}
 
 	function handleXmlNamespace ( $parser, $data, $prefix=false, $uri=false ) {
-    		 if( preg_match( '/www.mediawiki.org/',$prefix ) ) {
-	                $prefix = str_replace( '/','\/',$prefix );
+		if( preg_match( '/www.mediawiki.org/',$prefix ) ) {
+			$prefix = str_replace( '/','\/',$prefix );
 			$this->mXmlNamespace='/^'.$prefix.':/';
 		 }
 	}
@@ -482,7 +482,7 @@ class WikiImporter {
 			return($name);
 		}
 	}
-   
+
 	# --------------
 
 	function doImport() {
@@ -622,7 +622,7 @@ class WikiImporter {
 	
 	/**
 	 * Default per-revision callback, performs the import.
-	 * @param $revision WikiRevision
+	 * @param $rev WikiRevision
 	 * @private
 	 */
 	function importLogItem( $rev ) {
@@ -787,6 +787,7 @@ class WikiImporter {
 		switch( $name ) {
 		case "id":
 		case "title":
+		case "redirect":
 		case "restrictions":
 			$this->appendfield = $name;
 			$this->appenddata = "";
@@ -1003,7 +1004,7 @@ class WikiImporter {
 				$this->lastExistingRevision = $ok;
 		}
 	}
-	
+
 	function in_logitem( $parser, $name, $attribs ) {
 		$name = $this->stripXmlNamespace($name);
 		$this->debug( "in_logitem $name" );
@@ -1313,9 +1314,9 @@ class ImportStreamSource {
 					return new WikiErrorMsg( 'importuploaderrorsize' );
 				case 3: # The uploaded file was only partially uploaded
 					return new WikiErrorMsg( 'importuploaderrorpartial' );
-			    case 6: #Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3.
-			    	return new WikiErrorMsg( 'importuploaderrortemp' );
-			    # case else: # Currently impossible
+				case 6: #Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3.
+					return new WikiErrorMsg( 'importuploaderrortemp' );
+				# case else: # Currently impossible
 			}
 
 		}
@@ -1345,7 +1346,7 @@ class ImportStreamSource {
 		}
 	}
 
-	public static function newFromInterwiki( $interwiki, $page, $history=false ) {
+	public static function newFromInterwiki( $interwiki, $page, $history = false, $templates = false, $pageLinkDepth = 0 ) {
 		if( $page == '' ) {
 			return new WikiErrorMsg( 'import-noarticle' );
 		}
@@ -1353,7 +1354,10 @@ class ImportStreamSource {
 		if( is_null( $link ) || $link->getInterwiki() == '' ) {
 			return new WikiErrorMsg( 'importbadinterwiki' );
 		} else {
-			$params = $history ? 'history=1' : '';
+			$params = array();
+			if ( $history ) $params['history'] = 1;
+			if ( $templates ) $params['templates'] = 1;
+			if ( $pageLinkDepth ) $params['pagelink-depth'] = $pageLinkDepth;
 			$url = $link->getFullUrl( $params );
 			# For interwikis, use POST to avoid redirects.
 			return ImportStreamSource::newFromURL( $url, "POST" );

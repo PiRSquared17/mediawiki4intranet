@@ -1,30 +1,28 @@
 <?php
+/**
+ *
+ * Copyright © 2007 Xarax <jodeldi@gmx.de>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ */
 
- /**
-  *
-  * Copyright (C) 2007 Xarax <jodeldi@gmx.de>
-  *
-  * This program is free software; you can redistribute it and/or modify
-  * it under the terms of the GNU General Public License as published by
-  * the Free Software Foundation; either version 2 of the License, or
-  * (at your option) any later version.
-  *
-  * This program is distributed in the hope that it will be useful,
-  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-  * GNU General Public License for more details.
-  *
-  * You should have received a copy of the GNU General Public License along
-  * with this program; if not, write to the Free Software Foundation, Inc.,
-  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-  * http://www.gnu.org/copyleft/gpl.html
-  *
-  */
-
- /** 
-  * inspired by djvuimage from brion vibber 
-  * modified and written by xarax 
-  */
+/**
+ * inspired by djvuimage from Brion Vibber
+ * modified and written by xarax
+ */
 
 class PdfImage {
 
@@ -39,7 +37,7 @@ class PdfImage {
 	public function getImageSize() {
 		$data = $this->retrieveMetadata();
 		$size = self::getPageSize( $data, 1 );
-		
+
 		if( $size ) {
 			$width = $size['width'];
 			$height = $size['height'];
@@ -48,7 +46,7 @@ class PdfImage {
 		}
 		return false;
 	}
-	
+
 	public static function getPageSize( $data, $page ) {
 		global $wgPdfHandlerDpi;
 
@@ -61,11 +59,11 @@ class PdfImage {
 		}
 
 		if ( $o ) {
-			$size = explode( "x", $o, 2 );
+			$size = explode( 'x', $o, 2 );
 
 			if ( $size ) {
 				$width  = intval( trim( $size[0] ) / 72 * $wgPdfHandlerDpi );
-				$height = explode( " ", trim( $size[1] ), 2 );
+				$height = explode( ' ', trim( $size[1] ), 2 );
 				$height = intval( trim( $height[0] ) / 72 * $wgPdfHandlerDpi );
 
 				return array(
@@ -74,7 +72,7 @@ class PdfImage {
 				);
 			}
 		}
-		
+
 		return false;
 	}
 
@@ -87,6 +85,7 @@ class PdfImage {
 				" -enc UTF-8 " . # Report metadata as UTF-8 text...
 				" -l 9999999 " . # Report page sizes for all pages
 				wfEscapeShellArg( $this->mFilename );
+			$retval = '';
 			$dump = wfShellExec( $cmd, $retval );
 			$data = $this->convertDumpToArray( $dump );
 			wfProfileOut( 'pdfinfo' );
@@ -95,10 +94,11 @@ class PdfImage {
 		}
 
 		# Read text layer
-		if ( isset( $wgPdftoText ) ) { 
+		if ( isset( $wgPdftoText ) ) {
 			wfProfileIn( 'pdftotext' );
 			$cmd = wfEscapeShellArg( $wgPdftoText ) . ' '. wfEscapeShellArg( $this->mFilename ) . ' - ';
 			wfDebug( __METHOD__.": $cmd\n" );
+			$retval = '';
 			$txt = wfShellExec( $cmd, $retval );
 			wfProfileOut( 'pdftotext' );
 			if( $retval == 0 ) {
@@ -116,9 +116,11 @@ class PdfImage {
 	}
 
 	protected function convertDumpToArray( $dump ) {
-		if ( strval( $dump ) == '' ) return false;
+		if ( strval( $dump ) == '' ) {
+			return false;
+		}
 
-		$lines = explode("\n", $dump);
+		$lines = explode( "\n", $dump );
 		$data = array();
 
 		foreach( $lines as $line ) {
@@ -126,6 +128,7 @@ class PdfImage {
 			if( count( $bits ) > 1 ) {
 				$key = trim( $bits[0] );
 				$value = trim( $bits[1] );
+				$matches = array();
 				if( preg_match( '/^Page +(\d+) size$/', $key, $matches ) ) {
 					$data['pages'][$matches[1]]['Page size'] = $value;
 				} else {

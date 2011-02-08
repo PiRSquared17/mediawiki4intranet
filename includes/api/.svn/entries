@@ -1,16 +1,16 @@
 10
 
 dir
-60293
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/includes/api
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/api
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-03-07T13:13:45.399255Z
-48126
-catrope
-
+2011-01-04T06:15:54.403142Z
+79562
+tstarling
+has-props
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-7142e5e7386f1d0cbd1257562bc05a9e
-2008-12-17T16:34:01.327923Z
-44719
-catrope
+2011-02-04T18:14:24.139987Z
+ada49d359e735a34b9ed765bb6a9fa3b
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-15173
+18424
 
 ApiQueryAllLinks.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-5c0310665e1c83b9153b70fa2e09e8ee
-2009-01-17T20:03:25.265872Z
-45850
-catrope
+2011-02-04T18:14:24.139987Z
+ac88fbbb0a34294ec6e50bf7f9dd5a60
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-5968
+6991
 
 ApiQueryAllCategories.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-44df7db8b2662ae9c57fca498a420371
-2008-12-14T20:24:23.807193Z
-44590
-catrope
+2011-02-04T18:14:24.143987Z
+e6485a05875ca384f162d12c7da98487
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -126,41 +126,7 @@ has-props
 
 
 
-5363
-
-ApiWatch.php
-file
-
-
-
-
-2009-11-10T13:27:37.000000Z
-b404c22eabd52947c821cbd8cff77295
-2008-09-04T22:20:32.478605Z
-40460
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2702
+5723
 
 ApiQuerySiteinfo.php
 file
@@ -168,11 +134,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-8af23c823525d94aba68a4a409f7c4d5
-2008-12-20T23:49:16.712831Z
-44862
-catrope
+2011-02-04T18:14:24.143987Z
+e7895aa3a873493e5de1087ab6ba175c
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -194,7 +160,7 @@ has-props
 
 
 
-11886
+15896
 
 ApiQueryRandom.php
 file
@@ -202,11 +168,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-ce29c74282c926278c9aa6ecd5dfb5b5
-2008-09-10T13:30:42.395442Z
-40699
-catrope
+2011-02-04T18:14:24.143987Z
+ba692c474848afe28eeb15e6456f89fb
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -228,7 +194,7 @@ has-props
 
 
 
-4925
+5251
 
 ApiQueryLinks.php
 file
@@ -236,11 +202,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-a13b0180060fba4dce6562b3d4f38a93
-2008-11-06T22:38:42.593042Z
-43271
-siebrand
+2011-02-04T18:14:24.143987Z
+3416b41c546edfc7439af1516b55e4e6
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -262,7 +228,7 @@ has-props
 
 
 
-6757
+6859
 
 ApiMove.php
 file
@@ -270,11 +236,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-b49be78e3d5d5e530c63479f99ce9ef2
-2009-02-09T14:39:41.740125Z
-47041
-catrope
+2011-02-04T18:14:24.143987Z
+2e708dc1ce17eefa49b2d04b3d9bd843
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -296,7 +262,41 @@ has-props
 
 
 
-5040
+7059
+
+ApiWatch.php
+file
+
+
+
+
+2011-02-04T18:14:24.143987Z
+b3b24232ca886f2fa12d7477c0ab5b0a
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2978
 
 ApiLogout.php
 file
@@ -304,11 +304,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-f773d454b68a72909005cf35b3719397
-2008-11-15T01:23:39.156466Z
-43522
-brion
+2011-02-04T18:14:24.143987Z
+ff99e77546927883cc4ca6c3006967e0
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
 has-props
 
 
@@ -330,7 +330,7 @@ has-props
 
 
 
-1979
+2047
 
 ApiParse.php
 file
@@ -338,11 +338,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-867792d54260c15baaa9f80d596e0207
-2008-12-20T20:00:07.241290Z
-44858
-catrope
+2011-02-04T18:14:24.147987Z
+cc74bfeb8de4906796b93fb2bf423953
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -364,7 +364,7 @@ has-props
 
 
 
-8464
+10575
 
 ApiQueryExtLinksUsage.php
 file
@@ -372,11 +372,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-f4e416d1eefea7ee534c4e5a9ef490f2
-2008-11-06T22:38:42.593042Z
-43271
-siebrand
+2011-02-04T18:14:24.147987Z
+fdcdd6980bfa689096c1d47197490991
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -398,7 +398,7 @@ has-props
 
 
 
-5940
+6413
 
 ApiQueryAllpages.php
 file
@@ -406,11 +406,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-b60b45268103a6d1937290c07c2a62ca
-2008-12-20T23:54:04.433917Z
-44863
-catrope
+2011-02-04T18:14:24.147987Z
+33bf2417baddce38acfd88cc6e57e429
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -432,7 +432,7 @@ has-props
 
 
 
-8523
+9361
 
 ApiFormatWddx.php
 file
@@ -440,11 +440,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-dd11096898a150f1783401bfd2b1c7fd
-2008-12-14T19:14:21.949546Z
-44588
-demon
+2011-02-04T18:14:24.147987Z
+1d93cc0b6c6bab7c545b07d7fbb4626c
+2010-01-23T22:26:40.235699Z
+61437
+reedy
 has-props
 
 
@@ -466,7 +466,7 @@ has-props
 
 
 
-3744
+4151
 
 ApiProtect.php
 file
@@ -474,11 +474,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-f8a28f48ddb95b8440c31d60dca7f56e
-2009-03-07T13:02:30.355972Z
-48123
-catrope
+2011-02-04T18:14:24.147987Z
+fe026460372b1f6b164349aedf833971
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -500,7 +500,7 @@ has-props
 
 
 
-6235
+7069
 
 ApiPurge.php
 file
@@ -508,11 +508,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-8957b65c0ded28aff5354036eb245e3a
-2008-09-19T00:21:03.677040Z
-41020
-demon
+2011-02-04T18:14:24.147987Z
+84bbcd742e11abfb5423c4c6fb5c124a
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
 has-props
 
 
@@ -534,7 +534,7 @@ has-props
 
 
 
-2625
+3009
 
 ApiQueryBacklinks.php
 file
@@ -542,11 +542,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-d74c21e11c63488a280fd5d81f15dfa0
-2009-01-24T13:03:40.081438Z
-46135
-catrope
+2011-02-04T18:14:24.147987Z
+5725b4a380b0ad2cf9a6fb9921b8a591
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -568,7 +568,7 @@ has-props
 
 
 
-14639
+17275
 
 ApiRollback.php
 file
@@ -576,11 +576,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-02d0fd46fcfdcd06d74f1c7117fa4cef
-2009-03-07T13:02:30.355972Z
-48123
-catrope
+2011-02-04T18:14:24.147987Z
+c124eba2cd518fad50ab020f0e164dfd
+2010-04-21T10:41:25.910431Z
+65371
+tstarling
 has-props
 
 
@@ -602,7 +602,7 @@ has-props
 
 
 
-4005
+4319
 
 ApiQueryDeletedrevs.php
 file
@@ -610,11 +610,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-44f8d3237d29a0555f757ed50a6bc0b4
-2008-09-13T20:41:58.313123Z
-40798
-aaron
+2011-02-04T18:14:24.147987Z
+65e02bacc8dc605cac4edbbd346f3add
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
 has-props
 
 
@@ -636,7 +636,7 @@ has-props
 
 
 
-6941
+12366
 
 ApiExpandTemplates.php
 file
@@ -644,11 +644,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-84abd530401fb1d03c0b8a1b48aa28f2
-2008-12-17T16:34:01.327923Z
-44719
-catrope
+2011-02-04T18:14:24.151987Z
+7438955342bed7e806949635c7e81b98
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -670,7 +670,41 @@ has-props
 
 
 
-3083
+3239
+
+ApiUserrights.php
+file
+
+
+
+
+2011-02-04T18:14:24.151987Z
+3609e738d8209a456f58c7afcef45785
+2010-10-03T15:53:07.770593Z
+74217
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3577
 
 ApiQueryBase.php
 file
@@ -678,11 +712,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-56cc4e768c4fffa8bf585df7fc8e135e
-2008-12-11T19:11:11.628259Z
-44461
-ialex
+2011-02-04T18:14:24.151987Z
+7afa82f4f7288358b3f098b6ab64498f
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -704,7 +738,7 @@ has-props
 
 
 
-12626
+14452
 
 ApiFormatPhp.php
 file
@@ -712,11 +746,11 @@ file
 
 
 
-2009-03-02T15:51:25.000000Z
-eb0745c8e7b9829df50a768a97c559d9
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2011-02-04T18:14:24.151987Z
+c4984c2a394251eb660d73ead353808b
+2010-01-11T15:55:52.812261Z
+60930
+simetrical
 has-props
 
 
@@ -738,7 +772,7 @@ has-props
 
 
 
-1585
+1604
 
 ApiDelete.php
 file
@@ -746,11 +780,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-62ab7ff37a2db44f13227d35e0c4eef7
-2009-03-07T13:02:30.355972Z
-48123
-catrope
+2011-02-04T18:14:24.151987Z
+f4f98130a46c833fe96418d5dafd1b53
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -772,7 +806,7 @@ has-props
 
 
 
-7161
+7820
 
 ApiQueryBlocks.php
 file
@@ -780,11 +814,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-ebf3e1299429126f5dc07f741f737127
-2008-11-18T15:11:11.354620Z
-43676
-catrope
+2011-02-04T18:14:24.151987Z
+8dff063de9cfd39c2b75cb70ff93f41e
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
 has-props
 
 
@@ -806,7 +840,7 @@ has-props
 
 
 
-7786
+8814
 
 ApiDisabled.php
 file
@@ -814,11 +848,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-07e91c149ec7451ea07f83b210a26ee1
-2008-09-25T20:50:50.769273Z
-41268
-catrope
+2011-02-04T18:14:24.151987Z
+2e638be5d6e7c58791f60f095c1a4a5d
+2010-02-21T18:09:00.325865Z
+62783
+ashley
 has-props
 
 
@@ -840,7 +874,41 @@ has-props
 
 
 
-1915
+1971
+
+ApiImport.php
+file
+
+
+
+
+2011-02-04T18:14:24.151987Z
+9a587b0d3524d3a04fdbf47843ebf1c3
+2010-10-03T15:53:07.770593Z
+74217
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5667
 
 ApiFormatYaml.php
 file
@@ -848,11 +916,11 @@ file
 
 
 
-2009-03-02T15:51:25.000000Z
-7c058404cdad34ab403538ca76da3e81
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2011-02-04T18:14:24.151987Z
+8d30d69286dc73f9881cb1d21092e934
+2010-01-11T15:55:52.812261Z
+60930
+simetrical
 has-props
 
 
@@ -874,41 +942,7 @@ has-props
 
 
 
-1570
-
-ApiResult.php
-file
-
-
-
-
-2009-11-10T13:27:37.000000Z
-96e9a9671c3959b8f9cf30ac1b026999
-2009-01-14T21:36:57.127401Z
-45752
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6868
+1589
 
 ApiQueryCategoryMembers.php
 file
@@ -916,11 +950,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-46bf9e0c2078bbd8cd259abb023c617c
-2008-10-18T10:09:19.795063Z
-42197
-ialex
+2011-02-04T18:14:24.151987Z
+42b714c155bf082b4a658f6d43e2a267
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -942,7 +976,41 @@ has-props
 
 
 
-8571
+10438
+
+ApiResult.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+9368b78e51a9a196e8277dac53b2e3b4
+2010-02-12T06:44:16.252589Z
+62354
+mah
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9334
 
 ApiQueryCategoryInfo.php
 file
@@ -950,11 +1018,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-b0bce51e740c859f1f2e1e0a34053697
-2008-12-14T20:24:23.807193Z
-44590
-catrope
+2011-02-04T18:14:24.155987Z
+3789904e2ed6572fc311e6551ec47f05
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -976,7 +1044,7 @@ has-props
 
 
 
-3060
+3766
 
 ApiEditPage.php
 file
@@ -984,11 +1052,11 @@ file
 
 
 
-2009-11-10T13:27:37.000000Z
-4dfb5333d3e282c76adb0d9e42094751
-2008-12-10T14:12:54.893772Z
-44394
-catrope
+2011-02-04T18:14:24.155987Z
+65d7efb31e07c019574879c398733b91
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -1010,7 +1078,7 @@ has-props
 
 
 
-11329
+16455
 
 ApiFormatBase.php
 file
@@ -1018,11 +1086,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-927aa6d8caff074f0aab79f3e7508d9f
-2008-11-14T00:30:34.793766Z
-43470
-tstarling
+2011-02-04T18:14:24.155987Z
+de2020fd67901187cdfea197d7285a34
+2010-02-12T14:09:42.246208Z
+62367
+siebrand
 has-props
 
 
@@ -1044,7 +1112,7 @@ has-props
 
 
 
-8515
+9617
 
 ApiQueryAllimages.php
 file
@@ -1052,282 +1120,10 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-d528bace436e0df2d5947da0477e2942
-2008-12-01T17:14:30.460111Z
-44121
-vyznev
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6169
-
-ApiQueryAllmessages.php
-file
-
-
-
-
-2009-03-02T15:51:25.000000Z
-d064a456ef1e02884ed3270a738f2670
-2008-07-10T14:28:09.655706Z
-37504
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3710
-
-ApiFormatTxt.php
-file
-
-
-
-
-2009-03-02T15:51:25.000000Z
-3e6be4e4acdda41bb6e9366062a1290e
-2008-05-20T17:13:28.824583Z
-35098
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1754
-
-ApiQuerySearch.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-e9d72f3ab6f0490edf3b642728043a61
-2008-12-03T19:33:57.580137Z
-44186
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5216
-
-ApiQueryLogEvents.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-28561982255d2c6344ec527911d8783c
-2008-12-04T15:59:26.509694Z
-44234
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8408
-
-ApiUnblock.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-e79f81ed2368d0ee2b6ba4ff39ab4ecf
-2008-10-27T12:06:49.139904Z
-42651
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3594
-
-ApiQueryWatchlistRaw.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-d4fc1635a1a127a08c15a5c7423f49c2
-2008-10-04T14:30:33.964807Z
-41651
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5706
-
-ApiFormatDbg.php
-file
-
-
-
-
-2009-03-02T15:51:24.000000Z
-1f50e8846aecc7a014a4d8697dae93b2
-2008-05-20T17:13:28.824583Z
-35098
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1760
-
-ApiQuery.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-811967c941bba617f5673641ad3e1b5e
-2008-10-25T14:04:43.543040Z
-42548
+2011-02-04T18:14:24.155987Z
+ea87036523b9cda5b411687eabca21e3
+2010-07-26T08:03:21.981246Z
+69932
 tstarling
 has-props
 
@@ -1350,7 +1146,347 @@ has-props
 
 
 
-16311
+7030
+
+ApiQueryAllmessages.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+0b1381e06d0e3d78552a3d4fb5584fc1
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5502
+
+ApiFormatTxt.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+33613c6139dad1535265268f4352af39
+2010-01-23T22:52:40.751008Z
+61444
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1771
+
+ApiQuerySearch.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+faae442f571b89b1b3c443d23d60e9e9
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7618
+
+ApiQueryLogEvents.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+83efa0b5497806043c8e722578e32a81
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11411
+
+ApiUnblock.php
+file
+
+
+
+
+2011-02-04T18:14:24.155987Z
+e7d0ae3a8c81501f366ca19a15ffb297
+2010-10-03T15:53:07.770593Z
+74217
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3806
+
+ApiFormatRaw.php
+file
+
+
+
+
+2011-02-04T18:14:24.159987Z
+ecac99f3897b2ba1eb65f0279751c13a
+2010-01-23T22:26:40.235699Z
+61437
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2140
+
+ApiQueryWatchlistRaw.php
+file
+
+
+
+
+2011-02-04T18:14:24.159987Z
+65ac881deb77657819605788901af91c
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6158
+
+ApiQueryProtectedTitles.php
+file
+
+
+
+
+2011-02-04T18:14:24.159987Z
+6ea0e362de9d4da1d78d12b8320be10c
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6347
+
+ApiFormatDbg.php
+file
+
+
+
+
+2011-02-04T18:14:24.159987Z
+7e7ef5f18e1682f5ef3c9638f0d86c54
+2010-01-23T22:52:40.751008Z
+61444
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1777
+
+ApiQuery.php
+file
+
+
+
+
+2011-02-04T18:14:24.159987Z
+d4f53d5d485a0db8cd31e15a41f61944
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+20644
 
 ApiQueryLangLinks.php
 file
@@ -1358,11 +1494,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-d15e322fd6a39eb7ba62f8907f827eea
-2008-11-06T22:38:42.593042Z
-43271
-siebrand
+2011-02-04T18:14:24.159987Z
+76fcc6bf56ce8585578aa2234ca0277a
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -1384,7 +1520,7 @@ has-props
 
 
 
-4084
+4336
 
 ApiLogin.php
 file
@@ -1392,11 +1528,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-440510fa14fe9e1b579bbd2827df31f0
-2009-01-01T02:02:03.393914Z
-45275
-simetrical
+2011-02-04T18:14:24.159987Z
+77958a086593ccb36e2932fc85f38eab
+2010-04-07T09:05:05.572075Z
+64697
+catrope
 has-props
 
 
@@ -1418,7 +1554,7 @@ has-props
 
 
 
-4830
+6885
 
 ApiFormatXml.php
 file
@@ -1426,11 +1562,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-809f3fd74b01db121545f601ed201608
-2008-12-14T19:14:21.949546Z
-44588
-demon
+2011-02-04T18:14:24.159987Z
+4110688505b7b1187228c00da6d40b00
+2010-02-13T00:09:05.452605Z
+62402
+reedy
 has-props
 
 
@@ -1452,7 +1588,7 @@ has-props
 
 
 
-5789
+6601
 
 ApiFormatYaml_spyc.php
 file
@@ -1460,11 +1596,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-d456cb84966dd58d838816e01327ea0d
-2008-12-08T17:29:24.265025Z
-44313
-ialex
+2011-02-04T18:14:24.159987Z
+68e5600c1be84b032bfba996b99163b6
+2010-01-31T21:54:29.549316Z
+61757
+catrope
 has-props
 
 
@@ -1486,7 +1622,7 @@ has-props
 
 
 
-6618
+6851
 
 ApiQueryUserInfo.php
 file
@@ -1494,11 +1630,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-254796040ca4e76bb3e333af87b61008
-2008-11-20T15:15:00.990510Z
-43764
-catrope
+2011-02-04T18:14:24.163987Z
+99a6d0be68a4560adcd46074cf38db23
+2010-07-20T02:46:20.931614Z
+69578
+tstarling
 has-props
 
 
@@ -1520,7 +1656,7 @@ has-props
 
 
 
-5276
+6157
 
 ApiFormatJson.php
 file
@@ -1528,11 +1664,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-260c0eeade7edd31a049f04c67f2828f
-2009-01-12T19:06:33.421906Z
-45682
-raymond
+2011-02-04T18:14:24.163987Z
+69353a0c58d0e5878a2c60094b509307
+2010-02-12T06:44:16.252589Z
+62354
+mah
 has-props
 
 
@@ -1554,41 +1690,7 @@ has-props
 
 
 
-2779
-
-ApiMain.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-2faf87de7c79d0fbe47e8d67adb0987f
-2009-01-14T21:36:57.127401Z
-45752
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-22257
+2624
 
 ApiQueryImageInfo.php
 file
@@ -1596,11 +1698,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-26cdb3b795d91df0b8672e4cf01e452c
-2008-12-01T17:14:30.460111Z
-44121
-vyznev
+2011-02-04T18:14:24.163987Z
+e6946dcaaef27c50090869ccc28fcd4c
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -1622,7 +1724,41 @@ has-props
 
 
 
-7265
+10706
+
+ApiMain.php
+file
+
+
+
+
+2011-02-04T18:14:24.163987Z
+f7124df96588561454a0f6c061aba821
+2010-07-28T05:52:32.712581Z
+70066
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+29498
 
 ApiEmailUser.php
 file
@@ -1630,11 +1766,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-17ca7f034856a3302be1766c50be2d4c
-2008-09-25T21:39:36.690005Z
-41269
-catrope
+2011-02-04T18:14:24.163987Z
+0b6ae9a57c677fd48914093edbd82329
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -1656,7 +1792,7 @@ has-props
 
 
 
-3296
+3534
 
 ApiOpenSearch.php
 file
@@ -1664,11 +1800,11 @@ file
 
 
 
-2009-03-02T15:51:25.000000Z
-c82eae7951fd95088ec7b346d971c2ed
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2011-02-04T18:14:24.163987Z
+019789113c96a0e8483929e94fd0896d
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -1690,18 +1826,18 @@ has-props
 
 
 
-2700
+3107
 
-ApiPageSet.php
+ApiHelp.php
 file
 
 
 
 
-2009-11-10T13:27:38.000000Z
-7167a7830273e4fdb7f2034535184a22
-2009-01-01T02:02:03.393914Z
-45275
+2011-02-04T18:14:24.163987Z
+121a1f7aa165fbec1f03478bb989cf59
+2010-01-11T15:55:52.812261Z
+60930
 simetrical
 has-props
 
@@ -1724,19 +1860,19 @@ has-props
 
 
 
-18383
+1687
 
-ApiHelp.php
+ApiPageSet.php
 file
 
 
 
 
-2009-03-02T15:51:25.000000Z
-a0e509c27c1fcc7e0d75848dcbe7bfe2
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2011-02-04T18:14:24.163987Z
+01ff75a7cb87b968c0dbe724462ba9a4
+2010-02-13T01:21:52.446971Z
+62410
+reedy
 has-props
 
 
@@ -1758,7 +1894,7 @@ has-props
 
 
 
-1618
+20626
 
 ApiQueryWatchlist.php
 file
@@ -1766,11 +1902,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-eb3e538dd7f086260ad6b5e0eb9ecfd2
-2008-12-17T16:34:01.327923Z
-44719
-catrope
+2011-02-04T18:14:24.163987Z
+315d4c2d7c398bcc5bd8dd5fc3128371
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -1792,7 +1928,7 @@ has-props
 
 
 
-10119
+13436
 
 ApiBlock.php
 file
@@ -1800,11 +1936,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-4e59ea30d4c5cb86cb57ec9ee364f54d
-2008-11-18T15:21:04.396792Z
-43677
-catrope
+2011-02-04T18:14:24.167987Z
+9e14fa4375bc0999a79833c5b78eb13d
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -1826,7 +1962,7 @@ has-props
 
 
 
-5925
+6245
 
 ApiQueryDisabled.php
 file
@@ -1834,11 +1970,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-77bd84a4b64a16b58f2b6b808a883a15
-2008-09-25T20:50:50.769273Z
-41268
-catrope
+2011-02-04T18:14:24.167987Z
+d32d689f09599dec82c000a54d1d4937
+2010-01-11T15:55:52.812261Z
+60930
+simetrical
 has-props
 
 
@@ -1860,7 +1996,7 @@ has-props
 
 
 
-1896
+1911
 
 ApiPatrol.php
 file
@@ -1868,11 +2004,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-bcb6d600131a2fa4ebaa1de53f5dc9ef
-2009-03-07T13:02:30.355972Z
-48123
-catrope
+2011-02-04T18:14:24.167987Z
+859049bdf5a8dadea11ebf22537b53f3
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -1894,7 +2030,7 @@ has-props
 
 
 
-2739
+2861
 
 ApiUndelete.php
 file
@@ -1902,11 +2038,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-f346f608f016d468bffb4c32ad64fc39
-2008-11-06T22:30:55.712830Z
-43270
-siebrand
+2011-02-04T18:14:24.167987Z
+86cda7117f0695ca3fddd8e4bd651954
+2010-10-03T15:53:07.770593Z
+74217
+reedy
 has-props
 
 
@@ -1928,7 +2064,7 @@ has-props
 
 
 
-3974
+4298
 
 ApiQueryRevisions.php
 file
@@ -1936,11 +2072,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-379892331e20a2ae38a0f53af7c9c13d
-2009-03-07T13:13:45.399255Z
-48126
-catrope
+2011-02-04T18:14:24.167987Z
+9f08d97b6fb3c290d13dc74e6f9b3e89
+2010-09-01T16:50:07.810948Z
+72117
+reedy
 has-props
 
 
@@ -1962,7 +2098,7 @@ has-props
 
 
 
-15885
+22953
 
 ApiQueryExternalLinks.php
 file
@@ -1970,11 +2106,11 @@ file
 
 
 
-2009-03-02T15:51:25.000000Z
-b9b11867d79265c7e7ee8ee76eb3131f
-2008-07-07T17:32:22.830443Z
-37270
-catrope
+2011-02-04T18:14:24.167987Z
+8a504e70ef5b23a3145d3c00ecc88712
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -1996,7 +2132,7 @@ has-props
 
 
 
-3620
+3601
 
 ApiBase.php
 file
@@ -2004,11 +2140,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-5a2e6e0518663da03b792cc840170bfc
-2009-02-27T14:29:51.393611Z
-47862
-catrope
+2011-02-04T18:14:24.167987Z
+b611c4c5452724f700785b65465e42a9
+2011-01-04T06:15:54.403142Z
+79562
+tstarling
 has-props
 
 
@@ -2030,7 +2166,7 @@ has-props
 
 
 
-37168
+48775
 
 ApiQueryCategories.php
 file
@@ -2038,11 +2174,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-cacbee50b2a8347c1c80fe3bf1bbd6c4
-2008-12-14T17:39:50.180084Z
-44585
-catrope
+2011-02-04T18:14:24.167987Z
+e0082206b35837cde450de0e7012afb8
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -2064,41 +2200,7 @@ has-props
 
 
 
-6670
-
-ApiFormatJson_json.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-8c6cee7bea2a3de1ba38ba724866c14d
-2009-01-12T19:06:33.421906Z
-45682
-raymond
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-35967
+7491
 
 ApiParamInfo.php
 file
@@ -2106,11 +2208,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-dd47a83bef55485b8e84f8e9a9fba0fd
-2008-10-04T15:03:03.263082Z
-41653
-catrope
+2011-02-04T18:14:24.167987Z
+dc601ccaec15a79e85045d1545f27157
+2010-02-11T22:22:20.550310Z
+62336
+reedy
 has-props
 
 
@@ -2132,7 +2234,7 @@ has-props
 
 
 
-4963
+6375
 
 ApiQueryAllUsers.php
 file
@@ -2140,11 +2242,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-73b4bc7fe074ad088edcb25893ee81e3
-2008-12-11T21:51:01.808679Z
-44472
-catrope
+2011-02-04T18:14:24.171987Z
+eb62c1fd3bfca513e4736a4171558e9f
+2011-01-04T06:15:54.403142Z
+79562
+tstarling
 has-props
 
 
@@ -2166,7 +2268,7 @@ has-props
 
 
 
-6986
+8209
 
 ApiQueryInfo.php
 file
@@ -2174,11 +2276,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-d26dd28936994c4e18cb31fa65c5e1fe
-2009-01-12T19:10:42.358812Z
-45683
-raymond
+2011-02-04T18:14:24.171987Z
+44b38a10d5bdab657a8cfcbe68d70f39
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -2200,7 +2302,7 @@ has-props
 
 
 
-18136
+19994
 
 ApiQueryDuplicateFiles.php
 file
@@ -2208,11 +2310,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-7f843808b673fee056dd1e8323c0d4d4
-2008-12-01T17:14:30.460111Z
-44121
-vyznev
+2011-02-04T18:14:24.171987Z
+cf0ee1137bc1c706f9e9d06a9451cd0c
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -2234,7 +2336,75 @@ has-props
 
 
 
-4734
+5068
+
+ApiQueryTags.php
+file
+
+
+
+
+2011-02-04T18:14:24.171987Z
+75381ad729c042d03ccc2794a5fc5ab7
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4638
+
+ApiUpload.php
+file
+
+
+
+
+2011-02-04T18:14:24.171987Z
+175caf6216bca6db35dcd51041aeba70
+2010-10-03T15:53:07.770593Z
+74217
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11104
 
 ApiFeedWatchlist.php
 file
@@ -2242,11 +2412,11 @@ file
 
 
 
-2009-03-02T15:51:25.000000Z
-571f9851c7e7e55d9847e4b9785c424a
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2011-02-04T18:14:24.171987Z
+12515033d42632ea32f1954d7f99462d
+2010-07-14T22:39:23.129283Z
+69357
+mah
 has-props
 
 
@@ -2268,41 +2438,7 @@ has-props
 
 
 
-5551
-
-ApiQueryUsers.php
-file
-
-
-
-
-2009-11-10T13:27:38.000000Z
-a5a9121b99407ae12dfb46d78912d388
-2008-12-04T14:42:30.271419Z
-44231
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5361
+6144
 
 ApiQueryUserContributions.php
 file
@@ -2310,11 +2446,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-e0e10e70efb8734a09c5f4120ab10489
-2008-11-06T22:38:42.593042Z
-43271
-siebrand
+2011-02-04T18:14:24.171987Z
+c850205d2d60ea1157ecb33c31f36a3d
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -2336,7 +2472,41 @@ has-props
 
 
 
-10185
+15069
+
+ApiQueryUsers.php
+file
+
+
+
+
+2011-02-04T18:14:24.171987Z
+0293f2330ae9b67a282b5a179b04017c
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8439
 
 ApiQueryImages.php
 file
@@ -2344,11 +2514,11 @@ file
 
 
 
-2009-11-10T13:27:38.000000Z
-cd2646ff1ab7163ce991d94142561fd7
-2008-12-01T17:14:30.460111Z
-44121
-vyznev
+2011-02-04T18:14:24.175987Z
+88e3e46552fa3d250c105b477c6248c5
+2010-07-26T08:03:21.981246Z
+69932
+tstarling
 has-props
 
 
@@ -2370,5 +2540,5 @@ has-props
 
 
 
-4963
+5267
 
