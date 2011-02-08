@@ -55,7 +55,9 @@ $messages = array(
 'searchresultshead' => 'ସନ୍ଧାନ',
 
 # Recent changes linked
-'recentchangeslinked' => 'ସମ୍ବଧ୍ହିତ ପରିବର୍ତନ',
+'recentchangeslinked'         => 'ସମ୍ବଧ୍ହିତ ପରିବର୍ତନ',
+'recentchangeslinked-feed'    => 'ସମ୍ବଧ୍ହିତ ପରିବର୍ତନ',
+'recentchangeslinked-toolbox' => 'ସମ୍ବଧ୍ହିତ ପରିବର୍ତନ',
 
 # Upload
 'filedesc'          => 'ସାରକଥା',
@@ -79,7 +81,9 @@ $messages = array(
 'ipblocklist-submit' => 'ସନ୍ଧାନ',
 
 # Tooltip help for the actions
-'tooltip-p-logo' => 'ପ୍ରଧାନ ପ୍ରୁଷ୍ଟ୍ଆ',
+'tooltip-p-logo'                 => 'ପ୍ରଧାନ ପ୍ରୁଷ୍ଟ୍ଆ',
+'tooltip-n-mainpage'             => 'ପ୍ରଧାନ ପ୍ରୁଷ୍ଟ୍ଆ',
+'tooltip-n-mainpage-description' => 'ପ୍ରଧାନ ପ୍ରୁଷ୍ଟ୍ଆ',
 
 # Special:NewFiles
 'ilsubmit' => 'ସନ୍ଧାନ',
