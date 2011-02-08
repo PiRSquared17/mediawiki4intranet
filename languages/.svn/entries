@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/languages
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/languages
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-05-16T13:58:19.680781Z
-50661
-siebrand
+2011-02-01T23:00:31.586049Z
+81344
+tstarling
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-10T13:28:26.000000Z
-9178ad50f683a9104c32e6576c269886
-2008-09-13T08:07:55.305508Z
-40776
-shinjiman
+2011-02-04T18:14:51.544067Z
+24ba8613ac9609c2042d301d8ade7639
+2011-01-10T02:43:24.186585Z
+79923
+philip
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-31769
+39082
 
 messages
 dir
@@ -69,11 +69,11 @@ file
 
 
 
-2009-12-22T14:49:42.744400Z
-15e65ec336f9dfdc9e6284be56a173b7
-2008-12-30T22:51:05.350898Z
-45208
-danny_b
+2011-02-04T18:14:51.544067Z
+3651c59d9b381223e3b30435bcd19c85
+2011-02-01T23:00:31.586049Z
+81344
+tstarling
 has-props
 
 
@@ -95,7 +95,7 @@ has-props
 
 
 
-76966
+77140
 
 Names.php
 file
@@ -103,10 +103,10 @@ file
 
 
 
-2009-11-10T13:28:27.000000Z
-54692e2335952473f56adc314d65e94c
-2009-02-21T18:24:13.750103Z
-47628
+2011-02-04T18:14:51.544067Z
+e36635bee93862c1b0522d2b67011db9
+2010-06-08T08:09:25.454178Z
+67597
 siebrand
 has-props
 
@@ -129,7 +129,7 @@ has-props
 
 
 
-16349
+17602
 
 .htaccess
 file
@@ -137,7 +137,7 @@ file
 
 
 
-2009-03-02T15:52:05.000000Z
+2011-02-04T18:14:51.544067Z
 a1751e1f10a3b96b05d0401c97e72008
 2004-04-21T23:17:36.000000Z
 3253

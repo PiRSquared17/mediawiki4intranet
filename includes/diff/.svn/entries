@@ -1,16 +1,16 @@
 10
 
 dir
-60293
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/includes/diff
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/diff
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-01-02T15:56:33.588958Z
-45320
-aaron
-
+2011-01-04T06:15:54.403142Z
+79562
+tstarling
+has-props
 
 
 
@@ -26,17 +26,17 @@ aaron
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
-HTMLDiff.php
+DifferenceInterface.php
 file
 
 
 
 
-2009-11-10T13:26:20.000000Z
-9733150732db43e9dd3dfcf1f2131434
-2008-11-06T22:43:19.755363Z
-43272
-siebrand
+2011-02-04T18:14:23.083984Z
+446b3f007d28b679e153e81c6e86f9bb
+2011-01-04T06:15:54.403142Z
+79562
+tstarling
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-28864
+31658
 
 DifferenceEngine.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:26:20.000000Z
-426d10b6eb12904845c12fa632ef62f1
-2009-01-02T15:56:33.588958Z
-45320
-aaron
+2011-02-04T18:14:23.087984Z
+f50a7a1b149d853d60f25dbe831cef3d
+2010-05-12T02:12:12.083270Z
+66255
+simetrical
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-59992
+31417
 
 Diff.php
 file
@@ -100,7 +100,7 @@ file
 
 
 
-2009-11-10T13:26:20.000000Z
+2011-02-04T18:14:23.087984Z
 7eb5b2f22ebb3e1d98e3a44af26e45df
 2008-08-25T20:19:00.835480Z
 39969
@@ -127,38 +127,4 @@ has-props
 
 
 16153
-
-Nodes.php
-file
-
-
-
-
-2009-11-10T13:26:20.000000Z
-84fcc584183603ee0f0726b3ead77375
-2008-08-26T15:23:53.165071Z
-40025
-demon
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-10951
 

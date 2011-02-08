@@ -98,6 +98,8 @@ $messages = array(
 # User preference toggles
 'tog-underline'               => 'ຂີດເສັ້ນກ້ອງລິງກ໌:',
 'tog-hideminor'               => 'ເຊື່ອງການດັດແກ້ເລັກນ້ອຍ ໃນ ການປ່ຽນແປງຫຼ້າສຸດ',
+'tog-hidepatrolled'           => 'ເຊື່ອງ ການລາດຕະເວນດັດແກ້ ໃນ ການດັດແກ້ຫຼ້າສຸດ',
+'tog-newpageshidepatrolled'   => 'ເຊື່ອງ ການລາດຕະເວນດັດແກ້ ໃນ ລາຍການໜ້າໃໝ່',
 'tog-extendwatchlist'         => 'ຂະຫຍາຍ ລາຍການຕິດຕາມ ເພື່ອ ສະແດງທຸກໆການປ່ຽນແປງ',
 'tog-usenewrc'                => 'ສະແດງ ການປ່ຽນແປງຫຼ້າສຸດ ເປັນສີເຂັ້ມ (JavaScript)',
 'tog-numberheadings'          => 'ໜາຍເລກຫົວຂໍ້ແບບອັດຕະໂນມັດ',
@@ -129,6 +131,7 @@ $messages = array(
 'tog-watchlisthideminor'      => 'ເຊື່ອງ ການດັດແກ້ເລັກນ້ອຍ ໃນ ລາຍການຕິດຕາມຂອງຂ້ອຍ',
 'tog-watchlisthideliu'        => 'ເຊື່ອງການດັດແກ້ ໂດຍ ຜູ້ໃຊ້ໄດ້ເຊັນເຂົາ ໃນ ລາຍການຕິດຕາມ',
 'tog-watchlisthideanons'      => 'ເຊື່ອງ ການດັດແກ້ໂດຍຜູ້ໃຊ້ ບໍ່ສະແດງຊື່ ຈາກ ລາຍການຕິດຕາມ',
+'tog-watchlisthidepatrolled'  => 'ເຊື່ອງ ການລາດຕະເວນດັດແກ້ ໃນ ລາຍການຕິດຕາມ',
 'tog-ccmeonemails'            => 'ສົ່ງສຳເນົາ ອີເມລ ທີ່ ຂ້ອຍສົ່ງຫາຜູ້ອື່ນ ໃຫ້ ຂ້ອຍ',
 'tog-diffonly'                => 'ບໍ່ສະແດງເນື້ອໃນຂອງບົດຄວາມ ຢູ່ທາງລຸ່ມ ສ່ວນຕ່າງ',
 'tog-showhiddencats'          => 'ສະແດງໝວດເຊື່ອງ',
@@ -196,28 +199,30 @@ $messages = array(
 'category-media-header'         => 'ໜ້າຕ່າງ າ ໃນ "$1"',
 'category-empty'                => "''ບໍ່ມີໜ້າໃດຢູ່ໃນໝວດນີ້''",
 'hidden-categories'             => '{{PLURAL:$1|ໜວດເຊື່ອງ|ໜວດເຊື່ອງ}}',
-'hidden-category-category'      => 'ບັນດາໜວດເຊື່ອງ', # Name of the category where hidden categories will be listed
+'hidden-category-category'      => 'ບັນດາໜວດເຊື່ອງ',
 'category-subcat-count-limited' => 'ໜວດນີ້ ມີ ໜວດຍ່ອຍ ດັ່ງຕໍ່ໄປນີ້ {{PLURAL:$1|ໜວດຍ່ອຍ|$1 ໜວດຍ່ອຍ}}.',
 'category-article-count'        => '{{PLURAL:$2|ໝວດນີ້ມີໜ້າຢູ່ພຽງໜ້າດຽວ|ມີ {{PLURAL:$1|ໜ້າດຽວ|$1 ໜ້າ}} ໃນໝວດນີ້ ເຕັມ $2}}',
 'listingcontinuesabbrev'        => 'ຕໍ່.',
 
-'mainpagetext' => "<big>'''ຕິດຕັ້ງມີເດຍວິກິນີ້ສຳເລັດແລ້ວ.'''</big>",
+'mainpagetext' => "'''ຕິດຕັ້ງມີເດຍວິກິນີ້ສຳເລັດແລ້ວ.'''",
 
-'about'          => 'ກ່ຽວກັບ',
-'article'        => 'ບົດຄວາມ',
-'newwindow'      => '(ເປີດເປັນ ປ່ອງຢ້ຽມ(ວິນໂດ)ໃໝ່ )',
-'cancel'         => 'ລົບລ້າງ',
+'about'         => 'ກ່ຽວກັບ',
+'article'       => 'ບົດຄວາມ',
+'newwindow'     => '(ເປີດເປັນ ປ່ອງຢ້ຽມ(ວິນໂດ)ໃໝ່ )',
+'cancel'        => 'ລົບລ້າງ',
+'moredotdotdot' => 'ຕື່ມ...',
+'mypage'        => 'ໜ້າຂ້ອຍ',
+'mytalk'        => 'ສົນທະນາ',
+'anontalk'      => 'ສົນທະນາ ສຳຫຼັບ IP ນີ້',
+'navigation'    => 'ນຳທິດ',
+'and'           => '&#32;ແລະ',
+
+# Cologne Blue skin
 'qbfind'         => 'ຊອກຫາ',
 'qbedit'         => 'ດັດແກ້',
 'qbpageoptions'  => 'ໜ້ານີ້',
 'qbmyoptions'    => 'ໝ້າຂ້ອຍ',
 'qbspecialpages' => 'ໜ້າພິເສດ',
-'moredotdotdot'  => 'ຕື່ມ...',
-'mypage'         => 'ໜ້າຂ້ອຍ',
-'mytalk'         => 'ສົນທະນາ',
-'anontalk'       => 'ສົນທະນາ ສຳຫຼັບ IP ນີ້',
-'navigation'     => 'ນຳທິດ',
-'and'            => '&#32;ແລະ',
 
 'errorpagetitle'   => 'ຜິດພາດ',
 'returnto'         => 'ກັບໄປ  $1.',
@@ -261,7 +266,7 @@ $messages = array(
 'otherlanguages'   => 'ເປັນພາສາອື່ນໆ',
 'redirectedfrom'   => '(ໂອນມາຈາກ $1)',
 'redirectpagesub'  => 'ໜ້າໂອນ',
-'lastmodifiedat'   => 'ໜ້ານີ້ຖຶກດັດແກ້ຫຼ້າສຸດ $2, $1.', # $1 date, $2 time
+'lastmodifiedat'   => 'ໜ້ານີ້ຖຶກດັດແກ້ຫຼ້າສຸດ $2, $1.',
 'viewcount'        => 'ໜ້ານີ້ຖືກເຂົ້າເບິ່ງ {{PLURAL:$1|ເທື່ອໜຶ່ງ|$1 ເທື່ອ}}.',
 'protectedpage'    => 'ໜ້າຖືກປົກປ້ອງ',
 'jumpto'           => 'ໄປຫາ:',
@@ -294,7 +299,6 @@ $messages = array(
 'versionrequired' => 'ຕ້ອງການເວີຣ໌ຊັ່ນ $1 ຂອງມີເດຍວິກິ',
 
 'ok'                      => 'ຕົກລົງ',
-'pagetitle'               => '$1 - ວິກິພີເດຍ',
 'retrievedfrom'           => 'ຖອນມາຈາກ "$1"',
 'youhavenewmessages'      => 'ທ່ານ ມີ $1 ($2).',
 'newmessageslink'         => 'ຂໍ້ຄວາມໃໝ່',
@@ -330,9 +334,6 @@ $messages = array(
 
 # General errors
 'databaseerror'       => 'ມີຄວາມຜິດພາດ ດ້ານ ຖານຂໍ້ມູນ',
-'noconnect'           => 'ຂໍອະໄພ! ວິກີ ພວມປະສົບບັນຫາ ທາງດ້ານເຕັກນິກ ແລະ ບໍ່ສາມາດເຂົ້າຫາ ຖານຂໍ້ມູນ.<br />$1',
-'nodb'                => 'ບໍ່ສາມາດເລືອກຖານຂໍ້ມູນ $1',
-'cachederror'         => 'ທາງລຸ່ມນີ້ ແມ່ນ ບັນທຶກຂໍ້ມູນ ຂອງ ໜ້າທີ່ທ່ານຊອກຫາ ເຊິ່ງອາດຈະບໍ່ແມ່ນສະບັບຫຼ້າສຸດ.',
 'readonly'            => 'ຖານຂໍ້ມູນຖືກລອັກ',
 'enterlockreason'     => 'ກະລຸນາຂຽນເຫດຜົນໃນການລອັກ, ລວມທັງ ປະມານເວລາທີ່ຈະປົດລອັກ',
 'missingarticle-diff' => '(ສ່ວນຕ່າງ: $1, $2)',
@@ -345,16 +346,13 @@ $messages = array(
 'namespaceprotected'  => "ທ່ານບໍ່ໄດ້ຮັບອະນຸຍາດ ໃຫ້ ດັດແກ້ ໜ້າ ໃນ  '''$1'''.",
 
 # Login and logout pages
-'logouttitle'                => 'ຜູ້ໃຊ້ ເຊັນອອກ',
-'logouttext'                 => "'''ທ່່ານ ໄດ້ ເຊັນອອກແລ້ວ.'''<br />
-ທ່ານ ສາມາດສືບຕໍ່ໃຊ້ {{SITENAME}} ແບບບໍ່ສະແດງຊື່, ຫຼື ທ່ານ ສາມາດ ເຊັນເຂົ້າ
-ອີກ ໂດຍ ຊື່ຜູ້ໃຊ້ ເກົ່າ ຫຼື ໃໝ່ ກໍ່ໄດ້. ກະລຸນາ ຮັບຊາບວ່າ ບາງໜ້າ ອາດຈະສືບຕໍ່ ສະແດງ
-ຄືວ່າ ທ່ານ ຍັງເຊັນເຂົ້າຢູ່ ຈົນກວ່າ ທ່ານ ຂໍ້ມູນບັນທຶກຊົ່ວຄາວ ໃນ ໂປຣແກຣມທ່ອງເວັບ
-ຂອງ ທ່ານ ຈະຖືກລຶບ.",
+'logouttext'                 => "'''ທ່່ານ ໄດ້ ເຊັນອອກແລ້ວ.'''
+
+ທ່ານ ສາມາດສືບຕໍ່ໃຊ້ {{SITENAME}} ແບບບໍ່ສະແດງຊື່, ຫຼື ທ່ານ ສາມາດ ເຊັນເຂົ້າ ອີກ ໂດຍ ຊື່ຜູ້ໃຊ້ ເກົ່າ ຫຼື ໃໝ່ ກໍ່ໄດ້.
+ກະລຸນາ ຮັບຊາບວ່າ ບາງໜ້າ ອາດຈະສືບຕໍ່ ສະແດງ ຄືວ່າ ທ່ານ ຍັງເຊັນເຂົ້າຢູ່ ຈົນກວ່າ ທ່ານ ຂໍ້ມູນບັນທຶກຊົ່ວຄາວ ໃນ ໂປຣແກຣມທ່ອງເວັບ ຂອງ ທ່ານ ຈະຖືກລຶບ.",
 'welcomecreation'            => '== ຍິນດີຕ້ອນຮັບ, $1! ==
 
 ບັນຊີ ຂອງທ່ານ ຖືກສ້າງຂຶ້ນແລ້ວ. ຢ່າລືມ ຕັ້ງຄ່າ ທ່ານ ຢູ່ {{SITENAME}}.',
-'loginpagetitle'             => 'ຜູ້ໃຊ້ ເຊັນເຂົ້າ',
 'yourname'                   => 'ຊື່ຜູ້ໃຊ້',
 'yourpassword'               => 'ລະຫັດຜ່ານ',
 'yourpasswordagain'          => 'ພິມລະຫັດຜ່ານອີກ',
@@ -366,22 +364,14 @@ $messages = array(
 'userlogin'                  => 'ເຊັນເຂົ້າ / ສ້າງບັນຊີ',
 'logout'                     => 'ເຊັນອອກ',
 'userlogout'                 => 'ເຊັນອອກ',
-'nologin'                    => 'ບໍ່ມີບັນຊີເທື່ອບໍ? $1.',
+'nologin'                    => "ບໍ່ມີບັນຊີເທື່ອບໍ? '''$1'''.",
 'nologinlink'                => 'ສ້າງບັນຊີໃໝ່',
 'createaccount'              => 'ສ້າງບັນຊີ',
-'gotaccount'                 => 'ມີ ບັນຊີແລ້ວບໍ? $1.',
+'gotaccount'                 => "ມີ ບັນຊີແລ້ວບໍ? '''$1'''.",
 'gotaccountlink'             => 'ເຊັນເຂົ້າ',
 'createaccountmail'          => 'ໂດຍ ອີເມລ',
 'badretype'                  => 'ລະຫັດຜ່ານ ທີ່ ທ່ານພິມຄືນ ບໍ່ຖືກກັບ ທີ່ພິມກ່ອນ.',
-'youremail'                  => 'ອີເມລ *:',
-'username'                   => 'ຊື່ຜູ້ໃຊ້:',
-'uid'                        => 'ເລກປະຈຳໂຕຜູ້ໃຊ້:',
-'yourrealname'               => 'ຊື່ແທ້ *:',
-'yourlanguage'               => 'ພາສາ:',
-'yournick'                   => 'ຊື່ຫຼິ້ນ:',
-'email'                      => 'ອີເມລ',
 'loginerror'                 => 'ມີບັນຫາໃນການເຊັນເຂົ້າ',
-'prefs-help-email'           => '* ອີເມລ (ເລືອກໄດ້): ໃຫ້ຜູ້ອື່ນ ສາມາດຕິດຕໍ່ຫາ ທ່ານ ຜ່ານ ໜ້າຜູ້ໃຊ້ ຫຼື ໜ້າສົນທະນາຜູ້ໃຊ້ ຂອງ ທ່ານ ໂດຍ ບໍ່ຈຳເປັນຕ້ອງ ເປີດເຜີຍ ອີເມລຂອງທ່ານ.',
 'loginsuccesstitle'          => 'ເຊັນເຂົ້າສຳເລັດ',
 'loginsuccess'               => "'''ທ່ານ ເຊັນເຂົ້າ  {{SITENAME}} ໃນນາມ \"\$1\".'''",
 'wrongpassword'              => 'ລະຫັດຜ່ານບໍ່ຖືກ. ກະລຸນາເຮັດຄືນໃໝ່.',
@@ -429,7 +419,6 @@ $messages = array(
 'blockededitsource'        => "ເນື້ອໃນ ຂອງ '''ການດັດແປງໂດຍທ່ານ '''ຕໍ່ກັບ '''$1''' ມີດັ່ງລຸ່ມນີ້:",
 'whitelistedittitle'       => 'ຕ້ອງເຊັນເຂົ້າ ຈຶ່ງຈະສາມາດດັດແກ້ໄດ້',
 'whitelistedittext'        => 'ທ່ານ ຈະຕ້ອງ  $1 ເພື່ອ ຈະດັດແກ້.',
-'confirmedittitle'         => 'ຕ້ອງຢືນຢັນ ທີ່ຢູ່ ອີເມລ ຈຶ່ງຈະສາມາດ ດັດແກ້',
 'loginreqtitle'            => 'ຈຳເປັນຕ້ອງ ເຊັນເຂົ້າ',
 'loginreqlink'             => 'ເຊັນເຂົ້າ',
 'accmailtitle'             => 'ໄດ້ສົ່ງ ລະຫັດຜ່ານ ໄປແລ້ວ.',
@@ -497,10 +486,9 @@ $messages = array(
 # Search results
 'searchresulttext'          => 'ສຳຫຼັບ ຂໍ້ມູນເພີ່ມເຕີມ ກ່ຽວກັບ ການຊອກຫາ ຢູ່ {{SITENAME}}, ກະລຸນາເບິ່ງ [[{{MediaWiki:Helppage}}|{{int:help}}]].',
 'searchsubtitle'            => "ທ່ານ ຊອກຫາ '''[[:$1]]'''",
-'noexactmatch'              => "'''ຍັງບໍ່ມີໜ້າ ຊື່ວ່າ  \"\$1\".''' ທ່ານ ສາມາດ [[:\$1|ສ້າງໜ້ານີ້ໄດ້]].",
-'prevn'                     => '$1 ກ່ອນໜ້າ',
-'nextn'                     => '$1 ຕໍ່ໄປ',
-'viewprevnext'              => 'ເບິ່ງ ($1) ($2) ($3).',
+'prevn'                     => '{{PLURAL:$1|$1}} ກ່ອນໜ້າ',
+'nextn'                     => '{{PLURAL:$1|$1}} ຕໍ່ໄປ',
+'viewprevnext'              => 'ເບິ່ງ ($1 {{int:pipe-separator}} $2) ($3).',
 'searchhelp-url'            => 'Help:ເນື້ອໃນ',
 'search-result-size'        => '$1 ({{PLURAL:$2|1 ຄຳ|$2 ຄຳ}})',
 'search-result-score'       => 'ຄວາມກ່ຽວຂ້ອງ: $1%',
@@ -513,7 +501,6 @@ $messages = array(
 'searchall'                 => 'ທັງໜົດ',
 'showingresults'            => "ສະແດງທາງລຸ່ມ ຮອດ {{PLURAL:$1|'''1''' ຜົນ|'''$1''' ຜົນ}} ເລີ່ມຈາກ  #'''$2'''.",
 'showingresultsnum'         => "ສະແດງທາງລຸ່ມ  {{PLURAL:$3|'''1''' ຜົນ|'''$3''' ຜົນ}} ເລີ່ມຈາກ #'''$2'''.",
-'showingresultstotal'       => "ສະແດງທາງລຸ່ມ {{PLURAL:$4|ຜົນ '''$1''' of '''$3'''|ຜົນ '''$1 - $2''' of '''$3'''}}",
 'nonefound'                 => "'''ໜາຍເຫດ''': ຈະຄົ້ນຫາແຕ່ໃນ ບາງຂອບເຂດຊື່ ຖ້າບໍ່ມີການຕັ້ງຄ່າ.
 ທົດລອງ ໃຊ້ຄຳນຳໝ້າ ''all:'' ໃນຂໍ້ຄວາມຊອກຫາ ຂອງ ທ່ານ ເພື່ອ ຄົ້ນຫາ ທຸກໆເນື້ອໃນ (ລວມທັງໝ້າສົນທະນາ, ແມ່ແບບ ແລະອື່ນໆ), ຫຼື ໃຊ້ ຂອບເຂດຊື່ໃດໝຶ່ງເປັນ ຄຳນຳໝ້າເລີຍ.",
 'powersearch'               => 'ຊອກຫາ',
@@ -523,13 +510,11 @@ $messages = array(
 'mypreferences'         => 'ຕັ້ງຄ່າ',
 'prefs-edits'           => 'ຈຳນວນການດັດແກ້:',
 'changepassword'        => 'ປ່ຽນລະຫັດຜ່ານ',
-'skin'                  => 'ລວດລາຍ',
+'prefs-skin'            => 'ລວດລາຍ',
 'skin-preview'          => 'ລອງເບິ່ງ',
-'math'                  => 'ຄະນິດສາດ',
-'dateformat'            => 'ແບບວັນເດືອນປີ',
+'prefs-math'            => 'ຄະນິດສາດ',
 'datedefault'           => 'ແນວໃດກໍ່ໄດ້',
-'datetime'              => 'ວັນ ແລະ ເວລາ',
-'math_syntax_error'     => 'ຜິດຫຼັກໄວຍະກອນ',
+'prefs-datetime'        => 'ວັນ ແລະ ເວລາ',
 'prefs-personal'        => 'ຂໍ້ມູນຫຼັກຜູ້ໃຊ້',
 'prefs-rc'              => 'ການດັດແກ້ຫຼ້າສຸດ',
 'prefs-watchlist'       => 'ລາຍການຕິດຕາມ',
@@ -538,7 +523,7 @@ $messages = array(
 'prefs-misc'            => 'ແລະອື່ນໆ',
 'saveprefs'             => 'ບັນທຶກ',
 'resetprefs'            => 'ເລີ່ມຄືນໃໝ່',
-'textboxsize'           => 'ການດັດແກ້',
+'prefs-editing'         => 'ການດັດແກ້',
 'rows'                  => 'ແຖວ:',
 'columns'               => 'ຖັນ:',
 'searchresultshead'     => 'ຊອກຫາ',
@@ -548,14 +533,21 @@ $messages = array(
 'recentchangescount'    => 'ຈຳນວນການດັດແກ້ສະແດງໃນການປ່ຽນແປງຫຼ້າສຸດ:',
 'savedprefs'            => 'ການຕັ້ງຄ່າຂອງທ່ານໄດ້ຖືກບັນທຶກແລ້ວ.',
 'timezonelegend'        => 'ເຂດເວລາ',
-'timezonetext'          => 'ຈຳນວນຊົ່ວໂມງແຕກຕ່າງ ລະຫວ່າງເວລາທ້ອງຖິ່ນ ແລະ ເວລາ ຂອງ ເຊີບເວີ (UTC).',
 'localtime'             => 'ເວລາທ້ອງຖິ່ນ',
 'timezoneoffset'        => 'ຫ່າງກັນ¹',
 'servertime'            => 'ເວລາເຊີເວີ',
 'guesstimezone'         => 'ເອົາເວລາຈາກໂປຣແກຣມທ່ອງເວັບ',
 'allowemail'            => 'ອະນຸຍາດ ໃຫ້ຜູ້ໃຊ້ອື່ນ ສົ່ງອີເມລຫາຂ້ອຍ',
 'defaultns'             => 'ຄົ້ນຫາ ໃນ ຂອບເຂດຊື່ ນີ້ ເວລາບໍ່ມີການລະບຸ:',
-'files'                 => 'ໄຟລ໌',
+'prefs-files'           => 'ໄຟລ໌',
+'youremail'             => 'ອີເມລ *:',
+'username'              => 'ຊື່ຜູ້ໃຊ້:',
+'uid'                   => 'ເລກປະຈຳໂຕຜູ້ໃຊ້:',
+'yourrealname'          => 'ຊື່ແທ້ *:',
+'yourlanguage'          => 'ພາສາ:',
+'yournick'              => 'ຊື່ຫຼິ້ນ:',
+'email'                 => 'ອີເມລ',
+'prefs-help-email'      => '* ອີເມລ (ເລືອກໄດ້): ໃຫ້ຜູ້ອື່ນ ສາມາດຕິດຕໍ່ຫາ ທ່ານ ຜ່ານ ໜ້າຜູ້ໃຊ້ ຫຼື ໜ້າສົນທະນາຜູ້ໃຊ້ ຂອງ ທ່ານ ໂດຍ ບໍ່ຈຳເປັນຕ້ອງ ເປີດເຜີຍ ອີເມລຂອງທ່ານ.',
 
 # User rights
 'editinguser' => 'ຜູ້ໃຊ້ <b>$1</b> ພວມດັດແກ້ ([[User talk:$1|{{int:talkpagelinktext}}]] | [[Special:Contributions/$1|{{int:contribslink}}]])',
@@ -582,6 +574,8 @@ $messages = array(
 
 # Recent changes linked
 'recentchangeslinked'          => 'ການດັດແກ້ທີ່ກ່ຽວຂ້ອງ',
+'recentchangeslinked-feed'     => 'ການດັດແກ້ທີ່ກ່ຽວຂ້ອງ',
+'recentchangeslinked-toolbox'  => 'ການດັດແກ້ທີ່ກ່ຽວຂ້ອງ',
 'recentchangeslinked-title'    => 'ການປ່ຽນແປງກ່ຽວຂ້ອງກັບ "$1"',
 'recentchangeslinked-noresult' => 'ບໍ່ມີການປ່ຽນແປງຢູ່ໜ້າລິ້ງຄ໌ໃນໄລຍະດັ່ງກ່າວ.',
 
@@ -592,7 +586,7 @@ $messages = array(
 'badfilename'       => 'ຊື່ໄຟລ໌ ໄດ້ຖືກປ່ຽນເປັນ  "$1".',
 'large-file'        => 'ໄຟລ໌ບໍ່ຄວນມີຂະໜາດໃຫຍ່ກວ່າ $1 ແຕ່ໄຟລ໌ນີ້ມີຂະໜາດ  $2',
 'largefileserver'   => 'ໄຟລ໌ມີຂະໜາດໃຫຍ່ກວ່າຄ່າທີ່ໃຊ້ໄດ້',
-'filepageexists'    => "ມີໜ້າສຳຫຼັບຫັວເຮື່ອງນີ້ອຍູ່ແລ້ວ (ບໍ່ໃຊ່ໄຟລ໌) ກະລຸນາຕວດສອບ '''$1''' ຫາກຄຸນບໍ່ແນ່ໃຈວ່າຕ້ອງການຈະປ່ຽນໜ້ານີ້",
+'filepageexists'    => "ມີໜ້າສຳຫຼັບຫັວເຮື່ອງນີ້ອຍູ່ແລ້ວ (ບໍ່ໃຊ່ໄຟລ໌) ກະລຸນາຕວດສອບ '''[[:$1]]''' ຫາກຄຸນບໍ່ແນ່ໃຈວ່າຕ້ອງການຈະປ່ຽນໜ້ານີ້",
 'savefile'          => 'ບັນທຶກໄຟລ໌',
 'watchthisupload'   => 'ຕິດຕາມໜ້ານີ້',
 
@@ -600,6 +594,7 @@ $messages = array(
 'listfiles' => 'ລາຍຊື່ໄຟລ໌',
 
 # File description page
+'file-anchor-link'    => 'ໄຟລ໌',
 'filehist'            => 'ປະຫວັດໄຟລ໌',
 'filehist-current'    => 'ປະຈຸບັນ',
 'filehist-datetime'   => 'ວັນເວລາ',
@@ -611,8 +606,6 @@ $messages = array(
 'linkstoimage'        => 'ລິ້ງຄ໌ຕໍ່ໄປນີ້ເຊື່ອມຕໍ່ຫາໄຟລ໌:',
 'nolinkstoimage'      => 'ບໍ່ມີໜ້າໃດ ລິ້ງຄ໌ ຫາ ໄຟລ໌ນີ້.',
 'sharedupload'        => 'ໄຟລ໌ນີ້ແມ່ນການອັບໂຫຼດຣ່ວມ ແລະ ອາດຖືກໃຊ້ໂດຍໂຄງການອື່ນໆ.',
-'noimage'             => 'ຍັງບໍ່ມີ ໄຟລ໌ຊື່ນີ້ ເທື່ອ, ທ່ານ ສາມາດ  $1.',
-'noimage-linktext'    => 'ອັບໂຫຼດມັນ',
 
 # List redirects
 'listredirects' => 'ລາຍການການໂອນໜ້າ',
@@ -638,8 +631,8 @@ $messages = array(
 
 'brokenredirects'        => 'ການໂອນບໍ່ມີໜ້າປາຍທາງ',
 'brokenredirectstext'    => 'ການໂອນໜ້ານີ້ ເຊື່ອມຕໍ່ໄປຫາໜ້າ ທີ່ ຍັງບໍ່ມີເທື່ອ:',
-'brokenredirects-edit'   => '(ດັດແກ້)',
-'brokenredirects-delete' => '(ລຶບ)',
+'brokenredirects-edit'   => 'ດັດແກ້',
+'brokenredirects-delete' => 'ລຶບ',
 
 'withoutinterwiki'         => 'ບັນດາໜ້າ ທີ່ບໍ່ມີລິ້ງຄ໌ ຫາ ສະບັບພາສາອື່ນ',
 'withoutinterwiki-summary' => 'ໜ້າ ຕໍ່ໄປນີ້ ບໍ່ມີ ລິ້ງຄ໌ ຫາ ບົດຄວາມສະບັບພາສາອື່ນໆ:',
@@ -697,7 +690,9 @@ $messages = array(
 
 # Special:Categories
 'categories'         => 'ໝວດ',
-'categoriespagetext' => 'ມີ ບັນດາ ໝວດ ຕໍ່ໄປນີ້ ຢູ່ ວິກີ.',
+'categoriespagetext' => 'ມີ ບັນດາ ໝວດ ຕໍ່ໄປນີ້ ຢູ່ ວິກີ.
+[[Special:UnusedCategories|Unused categories]] are not shown here.
+Also see [[Special:WantedCategories|wanted categories]].',
 
 # Special:LinkSearch
 'linksearch' => 'ຄົ້ນຫາການເຊື່ອມຕໍ່ຫາເວັບ',
@@ -760,7 +755,7 @@ $messages = array(
 'dellogpage'     => 'ບັນທຶກ ການລຶບ',
 'dellogpagetext' => 'ຂ້າງລຸ່ມ ແມ່ນ ລາຍການ ການລຶບຫຼ້າສຸດ.',
 'deletionlog'    => 'ບັນທຶກ ການລຶບ',
-'deletecomment'  => 'ເຫດຜົນໃນການລຶບ',
+'deletecomment'  => 'ເຫດຜົນ:',
 
 # Rollback
 'rollbacklink' => 'ກັບຄືນ',
@@ -808,6 +803,7 @@ $messages = array(
 
 'sp-contributions-newbies'  => 'ສະແດງສະເພາະ ການປະກອບສ່ວນ ໂດຍ ບັນຊີໃໝ່',
 'sp-contributions-blocklog' => 'ບັນທຶກການຫ້າມ',
+'sp-contributions-talk'     => 'ສົນທະນາ',
 'sp-contributions-search'   => 'ຊອກຫາ ການປະກອບສ່ວນ',
 'sp-contributions-username' => 'ທີ່ຢູ່ IP ຫຼື ຊື່ຜູ້ໃຊ້:',
 'sp-contributions-submit'   => 'ຊອກຫາ',
@@ -846,7 +842,7 @@ $messages = array(
 'newtitle'                => 'ຫາ ຫົວຂໍ້ໃໝ່',
 'move-watch'              => 'ຕິດຕາມໜ້ານີ້',
 'movepagebtn'             => 'ຍ້າຍໜ້າ',
-'articleexists'           => 'ມີໜ້າຊື່ນີ້ແລ້ວ ຫຼື ຊື່ບໍ່ຖືກ. 
+'articleexists'           => 'ມີໜ້າຊື່ນີ້ແລ້ວ ຫຼື ຊື່ບໍ່ຖືກ.
 ກະລຸນາເລືອກຊື່ອື່ນ.',
 'movedto'                 => 'ໄດ້ຖືກຍ້າຍໄປ',
 'movetalk'                => 'ຍ້າຍທັງ ໜ້າສົນທະນາ ທີ່ ກ່ຽວພັນ.',
@@ -859,11 +855,10 @@ $messages = array(
 'delete_and_move_reason'  => 'ລຶບແລ້ວ ເພື່ອ ຍ້າຍໜ້າອື່ນ ມານີ້',
 
 # Namespace 8 related
-'allmessages'         => 'ຂໍ້ຄວາມ ຂອງ ລະບົບ',
-'allmessagesname'     => 'ຊື່',
-'allmessagesdefault'  => 'ຂໍ້ຄວາມເດີມ',
-'allmessagescurrent'  => 'ຂໍ້ຄວາມປະຈຸບັນ',
-'allmessagesmodified' => 'ສະແດງແຕ່ອັນທີ່ຖືກດັດແປງ',
+'allmessages'        => 'ຂໍ້ຄວາມ ຂອງ ລະບົບ',
+'allmessagesname'    => 'ຊື່',
+'allmessagesdefault' => 'ຂໍ້ຄວາມເດີມ',
+'allmessagescurrent' => 'ຂໍ້ຄວາມປະຈຸບັນ',
 
 # Thumbnails
 'thumbnail-more' => 'ໃຫ້ໃຫຍ່ຂຶ້ນ',
@@ -915,6 +910,9 @@ $messages = array(
 # Info page
 'numedits' => 'ຈຳນວນດັດແກ້ (ໜ້າ): $1',
 
+# Math errors
+'math_syntax_error' => 'ຜິດຫຼັກໄວຍະກອນ',
+
 # Browsing diffs
 'previousdiff' => 'ສ່ວນຕ່າງກ່ອນ',
 'nextdiff'     => 'ສ່ວນຕ່າງຕໍ່ໄປ →',
@@ -957,11 +955,9 @@ $messages = array(
 
 # E-mail address confirmation
 'confirmemail'            => 'ຢືນຢັນ ທີ່ຢູ່ ອີເມລ',
-'confirmemail_pending'    => '<div class="error">
-ລະຫັດຢືນຢັນ ໄດ້ຖືກສົ່ງໄປ ທີ່ຢູ່ ອີເມລ ຂອງ ທ່ານ; ຖ້າ ທ່ານ ຫາກໍ່ສ້າງບັນຊີ
+'confirmemail_pending'    => 'ລະຫັດຢືນຢັນ ໄດ້ຖືກສົ່ງໄປ ທີ່ຢູ່ ອີເມລ ຂອງ ທ່ານ; ຖ້າ ທ່ານ ຫາກໍ່ສ້າງບັນຊີ
 , ທ່ານ ຄວນຈະລໍຖ້າໜ້ອຍໜຶ່ງ ກ່ອນຈະ ພະຍາຍາມ
-ຂໍລະຫັດຢືນຢັນໃໝ່.
-</div>',
+ຂໍລະຫັດຢືນຢັນໃໝ່.',
 'confirmemail_send'       => 'ສົ່ງ ລະຫັດ ຢືນຢັນ',
 'confirmemail_sent'       => 'ອີເມລຢືນຢັນ ໄດ້ຖືກສົ່ງໄປແລ້ວ.',
 'confirmemail_oncreate'   => 'ລະຫັດ ຢືນຢັນ ໄດ້ຖືກສົງໄປ ຫາ ທີ່ຢູ່ ອີເມລ ຂອງ ທ່ານແລ້ວ.
@@ -1000,7 +996,7 @@ $messages = array(
 'watchlisttools-edit' => 'ເບິ່ງ ແລະ ດັດແກ້ ລາຍການຕິດຕາມ',
 
 # Special:Version
-'version' => 'ສະບັບ', # Not used as normal message but as header for the special page itself
+'version' => 'ສະບັບ',
 
 # Special:FilePath
 'filepath' => 'ທາງໄປຫາໄຟລ໌',
