@@ -9,7 +9,9 @@
  *
  * @author Jmb
  * @author Malafaya
+ * @author Reedy
  * @author Remember the dot
+ * @author Renan
  * @author Valodnieks
  * @author לערי ריינהארט
  */
@@ -73,68 +75,82 @@ $messages = array(
 # Categories related messages
 'pagecategories'         => '{{PLURAL:$1|Categorie|Categories}}',
 'category_header'        => 'Articules in categorie "$1"',
+'category-media-header'  => 'Multimedia in categorie "$1"',
 'listingcontinuesabbrev' => 'cont.',
 
-'mainpagetext' => "<big>'''Software del wiki installat con successe.'''</big>",
+'mainpagetext' => "'''Software del wiki installat con successe.'''",
 
-'about'          => 'Apropó',
-'article'        => 'Articul',
-'newwindow'      => '(aperte un nov fenestre)',
-'cancel'         => 'Anullar',
-'qbfind'         => 'Serchar',
-'qbedit'         => 'Modificar',
+'about'         => 'Concernent',
+'article'       => 'Articul',
+'newwindow'     => '(inaugurar in nov planca de fenestre)',
+'cancel'        => 'Anullar',
+'moredotdotdot' => 'Plu...',
+'mypage'        => 'Mi págine',
+'mytalk'        => 'Mi discussion',
+'anontalk'      => 'Discussion por ti ci IP',
+'and'           => '&#32;e',
+
+# Cologne Blue skin
+'qbfind'         => 'Constatar',
+'qbedit'         => 'Redacter',
 'qbpageoptions'  => 'Págine de optiones',
 'qbpageinfo'     => 'Págine de information',
-'qbspecialpages' => 'Special págines',
-'moredotdotdot'  => 'Plu mult...',
-'mytalk'         => 'Mi discussion',
-'anontalk'       => 'Discussion por ti ci IP',
-'and'            => '&#32;e',
+'qbmyoptions'    => 'Mi optiones',
+'qbspecialpages' => 'Págines special',
 
-'errorpagetitle'   => 'Errore',
-'returnto'         => 'Retornar a $1.',
-'tagline'          => 'Ex {{SITENAME}}',
-'help'             => 'Auxilie',
-'search'           => 'Serchar',
-'searchbutton'     => 'Sercha',
-'go'               => 'Ear',
-'searcharticle'    => 'Vade',
-'history'          => 'Historie',
-'history_short'    => 'Historie',
-'printableversion' => 'Printabil version',
-'edit'             => 'Modificar',
-'editthispage'     => 'Modificar ti págine',
-'delete'           => 'Deleter',
-'deletethispage'   => 'Deleter ti págine',
-'undelete_short'   => 'Restaurar {{PLURAL:$1|1 modification|$1 modificationes}}',
-'protect'          => 'Protecter',
-'unprotect'        => 'Deprotecter',
-'newpage'          => 'Nov págine',
-'talkpage'         => 'Discusser ti págine',
-'talkpagelinktext' => 'Discussion',
-'specialpage'      => 'Special Págine',
-'personaltools'    => 'Utensiles personal',
-'postcomment'      => 'Impostar un comenta',
-'articlepage'      => 'Vider li articul',
-'talk'             => 'Discussion',
-'toolbox'          => 'Buxe de utensiles',
-'userpage'         => 'Vider págine del usator',
-'imagepage'        => 'Vider págine del image',
-'viewtalkpage'     => 'Vider li discussion',
-'redirectedfrom'   => '(Redirectet de $1)',
-'viewcount'        => 'Ti págine ha esset consultat {{PLURAL:$1|un vez|$1 vezes}}.',
-'protectedpage'    => 'Un protectet págine',
-'jumptonavigation' => 'navigation',
+'errorpagetitle'    => 'Errore',
+'returnto'          => 'Retornar a $1.',
+'tagline'           => 'De {{SITENAME}}',
+'help'              => 'Auxilie',
+'search'            => 'Serchar',
+'searchbutton'      => 'Serchar',
+'go'                => 'Ear',
+'searcharticle'     => 'Ear',
+'history'           => 'Historie',
+'history_short'     => 'Historie',
+'printableversion'  => 'Version por impression',
+'permalink'         => 'Catenun permanent',
+'edit'              => 'Redacter',
+'editthispage'      => 'Redacter',
+'delete'            => 'Deleter',
+'deletethispage'    => 'Deleter ti págine',
+'undelete_short'    => 'Restaurar {{PLURAL:$1|1 modification|$1 modificationes}}',
+'protect'           => 'Gardar',
+'protectthispage'   => 'Gardar ti págine',
+'unprotect'         => 'Desgardar',
+'unprotectthispage' => 'Desgardar ti págine',
+'newpage'           => 'Nov págine',
+'talkpage'          => 'Parlar ti págine',
+'talkpagelinktext'  => 'Discurse',
+'specialpage'       => 'Págine special',
+'personaltools'     => 'Utensiles personal',
+'postcomment'       => 'Impostar un comenta',
+'articlepage'       => 'Vider li articul',
+'talk'              => 'Discurse',
+'views'             => 'Vistas',
+'toolbox'           => 'Buxe de utensiles',
+'userpage'          => 'Vider págine del usator',
+'imagepage'         => 'Vider págine del image',
+'viewtalkpage'      => 'Vider li discussion',
+'otherlanguages'    => 'Altri lingues',
+'redirectedfrom'    => '(Redirectet de $1)',
+'redirectpagesub'   => 'Págine de redirecterion',
+'viewcount'         => 'Ti págine ha esset consultat {{PLURAL:$1|un vez|$1 vezes}}.',
+'protectedpage'     => 'Un protectet págine',
+'jumpto'            => 'Saltar a:',
+'jumptonavigation'  => 'navigation',
+'jumptosearch'      => 'serchar',
 
 # All link text and link target definitions of links into project namespace that get used by other message strings, with the exception of user group pages (see grouppage) and the disambiguation template definition (see disambiguations).
-'aboutsite'            => 'Apropó de {{SITENAME}}',
-'aboutpage'            => 'Project:Apropó',
+'aboutsite'            => 'Concernent {{SITENAME}}',
+'aboutpage'            => 'Project:Concernent',
 'copyright'            => 'Contenete disponibil sub $1.',
+'copyrightpage'        => '{{ns:project}}:Jure de copie',
 'disclaimers'          => 'Advertimentes',
 'edithelp'             => 'Auxilie',
 'edithelppage'         => 'Help:Qualmen modificar un págine',
 'helppage'             => 'Help:Auxilie',
-'mainpage'             => 'Principal págine',
+'mainpage'             => 'Págine principal',
 'mainpage-description' => 'Principal págine',
 'portal'               => 'Págine del comunité',
 'portal-url'           => 'Project:Págine del comunité',
@@ -163,10 +179,9 @@ $messages = array(
 'viewsource' => 'Vider fonte',
 
 # Login and logout pages
-'logouttitle'                => 'Fine de session',
-'logouttext'                 => 'Vu ha terminat vor session.
-Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session denov quam li sam usator o quam un diferent usator.',
-'loginpagetitle'             => 'Registrar se/Intrar',
+'logouttext'                 => "'''Vu ha terminat vor session.'''
+
+Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session denov quam li sam usator o quam un diferent usator.",
 'yourname'                   => 'Vor nómine usatori:',
 'yourpassword'               => 'Vor passa-parol:',
 'yourpasswordagain'          => 'Tippa denov vor passa-parol',
@@ -181,7 +196,6 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 'createaccount'              => 'Crear un nov conto',
 'gotaccountlink'             => 'Intrar',
 'badretype'                  => 'Li passa-paroles queles vu tippat ne es identic.',
-'youremail'                  => 'Vor ret-adresse:',
 'loginerror'                 => 'Erra in initiation del session',
 'nocookieslogin'             => '{{SITENAME}} utilisa cookies por far intrar usatores. Vu nu ne permisse cookies. Ples permisser les e provar denov.',
 'loginsuccesstitle'          => 'Apertion de session successosi',
@@ -216,23 +230,28 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 'lineno' => 'Linea $1:',
 
 # Search results
-'viewprevnext'   => 'Vider ($1) ($2) ($3)',
+'viewprevnext'   => 'Vider ($1 {{int:pipe-separator}} $2) ($3)',
 'searchhelp-url' => 'Help:Auxilie',
+
+# Quickbar
+'qbsettings' => 'Personalisation del barre de utensiles',
 
 # Preferences page
 'preferences'    => 'Preferenties',
 'mypreferences'  => 'Mi preferenties',
 'prefsnologin'   => 'Vu ne ha intrat',
-'qbsettings'     => 'Personalisation del barre de utensiles',
 'changepassword' => 'Modificar passa-parol',
 'saveprefs'      => 'Conservar preferenties',
+'youremail'      => 'Vor ret-adresse:',
 
 # Groups
-'group-user' => 'Usatores',
+'group-user'  => 'Usatores',
+'group-sysop' => 'Administratores',
 
 'group-user-member' => 'Usator',
 
-'grouppage-user' => '{{ns:project}}:Usatores',
+'grouppage-user'  => '{{ns:project}}:Usatores',
+'grouppage-sysop' => '{{ns:project}}:Administratores',
 
 # Recent changes
 'nchanges'          => '$1 {{PLURAL:$1|change|changes}}',
@@ -241,15 +260,18 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 'rclistfrom'        => 'Monstrar li nov modificationes desde $1.',
 'rcshowhideminor'   => '$1 modificationes minori',
 'rcshowhidemine'    => '$1 mi redactiones',
-'rclinks'           => 'Monstrar li $1 ultim modificationes fat durante li $2 ultim dies<br/ >$3.',
+'rclinks'           => 'Monstrar li $1 ultim modificationes fat durante li $2 ultim dies<br />$3.',
 'diff'              => 'dif',
 'hist'              => 'hist',
 'hide'              => 'Celar',
 'show'              => 'Monstrar',
 'minoreditletter'   => 'm',
+'newpageletter'     => 'N',
 
 # Recent changes linked
-'recentchangeslinked' => 'Relatet modificationes',
+'recentchangeslinked'         => 'Relatet modificationes',
+'recentchangeslinked-feed'    => 'Relatet modificationes',
+'recentchangeslinked-toolbox' => 'Relatet modificationes',
 
 # Upload
 'upload'    => 'Cargar file',
@@ -261,6 +283,7 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 'listfiles' => 'Liste de images',
 
 # File description page
+'filehist-user'    => 'Usator',
 'filehist-comment' => 'Comenta',
 
 # Random page
@@ -310,13 +333,13 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 # Delete
 'deletepage'            => 'Deleter págine',
 'actioncomplete'        => 'Supression efectuat',
-'deletecomment'         => 'Motive de deletion:',
+'deletecomment'         => 'Motive:',
 'deleteotherreason'     => 'Altri/suplementari motive:',
 'deletereasonotherlist' => 'Altri motive',
 
 # Protect
 'prot_1movedto2'   => '[[$1]] moet a [[$2]]',
-'protectcomment'   => 'Comenta:',
+'protectcomment'   => 'Motive:',
 'restriction-type' => 'Permission:',
 
 # Namespace form on various pages
@@ -324,6 +347,8 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 
 # Contributions
 'mycontris' => 'Mi contributiones',
+
+'sp-contributions-talk' => 'Discussion',
 
 # What links here
 'whatlinkshere'      => 'Ligat págines',
@@ -364,7 +389,7 @@ Vu posse continuar usar {{SITENAME}} anonimimen, o vu posse aperter un session d
 'monthsall'     => 'omni',
 
 # Special:Version
-'version' => 'Version', # Not used as normal message but as header for the special page itself
+'version' => 'Version',
 
 # Special:SpecialPages
 'specialpages' => 'Special págines',

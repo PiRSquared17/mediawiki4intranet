@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/skins/myskin
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/myskin
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-02-08T17:55:33.742593Z
-30721
-huji
+2009-05-07T07:40:57.398886Z
+50301
+werdna
 
 
 
@@ -32,7 +32,7 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.940114Z
 be802ad80b8fe31221cf2ee176d14ecf
 2004-09-05T03:33:26.000000Z
 5091

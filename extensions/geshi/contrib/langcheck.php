@@ -8,7 +8,7 @@
  * CLI mode is supported
  *
  * @author  Benny Baumann
- * @version $Id: langcheck.php 2173 2009-09-09 20:15:21Z benbe $
+ * @version $Id: langcheck.php 2345 2010-08-29 11:12:44Z benbe $
  */
 header('Content-Type: text/html; charset=utf-8');
 
@@ -246,10 +246,13 @@ if(!$error_abort) {
 
     if(!$error_abort) {
         while ($file = readdir($dir)) {
-            if (!$file || $file[0] == '.' || strpos($file, '.') === false) {
+            if (!$file || $file[0] == '.' || strpos($file, '.php') === false) {
                 continue;
             }
             $lang = substr($file, 0,  strpos($file, '.'));
+            if(4 != strlen($file) - strlen($lang)) {
+                continue;
+            }
             $languages[] = $lang;
         }
         closedir($dir);

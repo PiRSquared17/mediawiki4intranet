@@ -44,6 +44,13 @@ $messages['ast'] = array(
 	'charinsert-desc' => "Permite la creación d'una caxa JavaScript pa [[MediaWiki:Edittools|enxertar carauteres non estándar]]",
 );
 
+/** Bavarian (Boarisch)
+ * @author Man77
+ */
+$messages['bar'] = array(
+	'charinsert-desc' => 'Erlaubt, dass a JavaScript-gsteiate Leistn zum [[MediaWiki:Edittools|Eifüng vu Sondazeichn]] eastöid wiad',
+);
+
 /** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
  * @author EugeneZelenko
  * @author Jim-by
@@ -60,10 +67,18 @@ $messages['bg'] = array(
 );
 
 /** Bengali (বাংলা)
+ * @author Bellayet
  * @author Zaheen
  */
 $messages['bn'] = array(
-	'charinsert-desc' => 'আদর্শ নয় এমন ক্যারেক্টার অনুপ্রবেশ করানোর জন্য জাভাস্ক্রিপ্ট বাক্স সৃষ্টি অনুমোদন করে',
+	'charinsert-desc' => '[[MediaWiki:Edittools|আদর্শ নয় এমন অক্ষর যোগের]] জন্য জাভাস্ক্রিপ্ট বাক্স সৃষ্টি অনুমোদন করে',
+);
+
+/** Breton (Brezhoneg)
+ * @author Fulup
+ */
+$messages['br'] = array(
+	'charinsert-desc' => "Aotren a ra krouiñ ur voest JavaScript evit [[MediaWiki:Edittools|ensoc'hañ arouezennoù na gaver ket war ar c'hlavierioù boas]]",
 );
 
 /** Bosnian (Bosanski)
@@ -87,6 +102,13 @@ $messages['cs'] = array(
 	'charinsert-desc' => 'Umožňuje vytvoření JavaScriptového políčka, které zjednodušuje [[MediaWiki:Edittools|vkládání neobvyklých znaků]]',
 );
 
+/** Welsh (Cymraeg)
+ * @author Lloffiwr
+ */
+$messages['cy'] = array(
+	'charinsert-desc' => 'Yn caniatau llunio blwch Javascript ar gyfer [[MediaWiki:Edittools|gosod nodau ansafonol]]',
+);
+
 /** German (Deutsch)
  * @author Raimond Spekking
  */
@@ -94,11 +116,25 @@ $messages['de'] = array(
 	'charinsert-desc' => 'Erlaubt die Erstellung einer JavaScript gesteuerten Leiste zum [[MediaWiki:Edittools|Einfügen von Sonderzeichen]]',
 );
 
+/** Zazaki (Zazaki)
+ * @author Xoser
+ */
+$messages['diq'] = array(
+	'charinsert-desc' => 'Qe [[MediaWiki:Edittools|de kerdişê karektaranê ne-standardî]] viraziyayîşê quti yê JavaScriptî ra destur dano',
+);
+
 /** Lower Sorbian (Dolnoserbski)
  * @author Michawiki
  */
 $messages['dsb'] = array(
 	'charinsert-desc' => 'Dowólujo napóranje JavaScriptowego kašćika za [[MediaWiki:Edittools|zasajźenje specielnych znamješkow]]',
+);
+
+/** Greek (Ελληνικά)
+ * @author Geraki
+ */
+$messages['el'] = array(
+	'charinsert-desc' => 'Επιτρέπει την δημιουργία κουτιού JavaScript για την [[MediaWiki:Edittools|εισαγωγή μη-κανονικών χαρακτήρων]]',
 );
 
 /** Esperanto (Esperanto)
@@ -113,6 +149,21 @@ $messages['eo'] = array(
  */
 $messages['es'] = array(
 	'charinsert-desc' => 'Permite la creación de una caja JavaScript para [[MediaWiki:Edittools|insertar caracteres inusuales]]',
+);
+
+/** Estonian (Eesti)
+ * @author Pikne
+ * @author Silvar
+ */
+$messages['et'] = array(
+	'charinsert-desc' => 'Lubab JavaScripti abil teha raami [[MediaWiki:Edittools|erimärkide lisamiseks]].',
+);
+
+/** Basque (Euskara)
+ * @author An13sa
+ */
+$messages['eu'] = array(
+	'charinsert-desc' => '[[MediaWiki:Edittools|Estandarizatu gabeko karaktereak sartzeko]] JavaScript taula sortzea baimentzen du',
 );
 
 /** Persian (فارسی)
@@ -133,9 +184,10 @@ $messages['fi'] = array(
 /** French (Français)
  * @author Meithal
  * @author Urhixidur
+ * @author Verdy p
  */
 $messages['fr'] = array(
-	'charinsert-desc' => 'Permet la création d’une boîte JavaScript pour l’[[MediaWiki:Edittools|insertion de caractères non-standards]]',
+	'charinsert-desc' => 'Permet la création d’une boîte JavaScript pour l’[[MediaWiki:Edittools|insertion de caractères absents des claviers usuels]]',
 );
 
 /** Galician (Galego)
@@ -143,6 +195,13 @@ $messages['fr'] = array(
  */
 $messages['gl'] = array(
 	'charinsert-desc' => 'Permite a creación dunha caixa de JavaScript para [[MediaWiki:Edittools|inserir caracteres que non son estándar]]',
+);
+
+/** Swiss German (Alemannisch)
+ * @author Als-Holder
+ */
+$messages['gsw'] = array(
+	'charinsert-desc' => 'Erlaubt s Aalege vun ere JavaScript gstyyrte Leischte zum [[MediaWiki:Edittools|Yyfiege vu Sonderzeiche]]',
 );
 
 /** Hebrew (עברית)
@@ -157,6 +216,13 @@ $messages['he'] = array(
  */
 $messages['hi'] = array(
 	'charinsert-desc' => '[[MediaWiki:Edittools|नॉन-स्टैडेर्ड चिन्ह]] के इस्तेमाल के लिये एक जावास्क्रीप्ट कुंजीफलक बनाता हैं',
+);
+
+/** Hiligaynon (Ilonggo)
+ * @author Tagimata
+ */
+$messages['hil'] = array(
+	'charinsert-desc' => 'Nagapasugot sa paghimu sang JavaScript kahon para sa [[MediaWiki:Edittools|inserting non-standard characters]]',
 );
 
 /** Croatian (Hrvatski)
@@ -225,6 +291,13 @@ $messages['km'] = array(
 	'charinsert-desc' => 'អនុញ្ញាតឱ្យមានការបង្កើតប្រអ​ប់ JavaScript សម្រាប់[[MediaWiki:Edittools|ការដាក់បញ្ចូលតួរអក្សរមិនមានលក្ខណៈស្តង់ដារ]]',
 );
 
+/** Korean (한국어)
+ * @author Kwj2772
+ */
+$messages['ko'] = array(
+	'charinsert-desc' => '[[MediaWiki:Edittools|특수 문자]] 삽입을 위한 자바스크립트 상자를 생성',
+);
+
 /** Ripoarisch (Ripoarisch)
  * @author Purodha
  */
@@ -239,11 +312,33 @@ $messages['lb'] = array(
 	'charinsert-desc' => 'Erlaabt et eng JavaScript-gesteiert Këscht ze maache fir [[MediaWiki:Edittools|Sonnerzeechen anzesetzen]]',
 );
 
+/** Limburgish (Limburgs)
+ * @author Ooswesthoesbes
+ */
+$messages['li'] = array(
+	'charinsert-desc' => "Maak 't meugelik [[MediaWiki:Edittools|neet-standaard karakters]] in te veure venoet e deilvènster via JavaScript",
+);
+
+/** Malagasy (Malagasy)
+ * @author Jagwar
+ */
+$messages['mg'] = array(
+	'charinsert-desc' => "Mamela ny manao boaty JavaScript hoan'y [[MediaWiki:Edittools|fampidirana soratra tsy afaka soratana amin'izao]]",
+);
+
 /** Macedonian (Македонски)
+ * @author Bjankuloski06
  * @author Brest
  */
 $messages['mk'] = array(
-	'charinsert-desc' => 'Дава можност за креирање на JavaScript кутија за [[MediaWiki:Edittools|вметнување на нестандардни знаци]]',
+	'charinsert-desc' => 'Дава можност за создавање на JavaScript кутија за [[MediaWiki:Edittools|вметнување на нестандардни знаци]]',
+);
+
+/** Malayalam (മലയാളം)
+ * @author Praveenp
+ */
+$messages['ml'] = array(
+	'charinsert-desc' => 'ജാവസ്ക്രിപ്റ്റ് പെട്ടിയിൽ [[MediaWiki:Edittools|സാധാരണമല്ലാത്ത ലിപികൾ ഉൾപ്പെടുത്താൻ]] ഉള്ള സൗകര്യം സൃഷ്ടിക്കാൻ അനുവദിക്കുന്നു.',
 );
 
 /** Marathi (मराठी)
@@ -274,6 +369,27 @@ $messages['nah'] = array(
 	'charinsert-desc' => 'Tihuelītīz ticchīhuāz JavaScript caxitl ic [[MediaWiki:Edittools|tlahcuiloa nōncuahquīzqui tlahtōl]]',
 );
 
+/** Low German (Plattdüütsch)
+ * @author Slomox
+ */
+$messages['nds'] = array(
+	'charinsert-desc' => 'Verlöövt dat Opstellen vun en mit JavaScript stüürt Liest för dat [[MediaWiki:Edittools|Infögen vun Sünnerteken]]',
+);
+
+/** Nedersaksisch (Nedersaksisch)
+ * @author Servien
+ */
+$messages['nds-nl'] = array(
+	'charinsert-desc' => 'Hiermee ku-j [[MediaWiki:Edittools|neet-standardkarakters]] invoeren vanuut een deelvienster via JavaScript',
+);
+
+/** Nepali (नेपाली)
+ * @author सरोज कुमार ढकाल
+ */
+$messages['ne'] = array(
+	'charinsert-desc' => 'JavaScript बाकस बनाउन [[MediaWiki:Edittools| स्तरहिन वर्णहरु राख्न ]] सहयोग गर्छ',
+);
+
 /** Dutch (Nederlands)
  * @author Siebrand
  */
@@ -302,6 +418,13 @@ $messages['oc'] = array(
 	'charinsert-desc' => 'Permet la creacion d’una bóstia JavaScript per [[MediaWiki:Edittools|l’insercion de caractèrs pas estandards]]',
 );
 
+/** Picard (Picard)
+ * @author Geoleplubo
+ */
+$messages['pcd'] = array(
+	'charinsert-desc' => "Pèrmet l'créhachon d’eune boéte JavaScript pou l’[[MediaWiki:Edittools|insérchon des caractéres absints d'chés cleftieus éd qhère]]",
+);
+
 /** Polish (Polski)
  * @author Derbeth
  * @author Sp5uhe
@@ -310,11 +433,25 @@ $messages['pl'] = array(
 	'charinsert-desc' => 'Umożliwia stworzenie z użyciem JavaScriptu ramki z linkami [[MediaWiki:Edittools|wstawiającymi niestandardowe znaki]]',
 );
 
+/** Piedmontese (Piemontèis)
+ * @author Dragonòt
+ */
+$messages['pms'] = array(
+	'charinsert-desc' => 'A përmëtt la creassion dë fneste JavaScripts për [[MediaWiki:Edittools|anserì caràter pa standard]]',
+);
+
 /** Portuguese (Português)
  * @author Malafaya
  */
 $messages['pt'] = array(
 	'charinsert-desc' => 'Permite a criação de uma caixa JavaScript para [[MediaWiki:Edittools|inserção de caracteres não "standard"]]',
+);
+
+/** Brazilian Portuguese (Português do Brasil)
+ * @author Eduardo.mps
+ */
+$messages['pt-br'] = array(
+	'charinsert-desc' => 'Permite a criação de uma caixa JavaScript para [[MediaWiki:Edittools|inserção de caracteres "não-padrão"]]',
 );
 
 /** Romanian (Română)
@@ -332,10 +469,11 @@ $messages['roa-tara'] = array(
 );
 
 /** Russian (Русский)
+ * @author Lockal
  * @author Александр Сигачёв
  */
 $messages['ru'] = array(
-	'charinsert-desc' => 'Позволяет создать JavaScript-поле для [[MediaWiki:Edittools|вставки необычных символов]]',
+	'charinsert-desc' => 'Позволяет создать JavaScript-поле для [[MediaWiki:Edittools|вставки нестандартных символов]]',
 );
 
 /** Yakut (Саха тыла)
@@ -359,6 +497,27 @@ $messages['sk'] = array(
 	'charinsert-desc' => 'Umožňuje vytvoriť JavaScriptové pole na [[MediaWiki:Edittools|vkladanie neštandardných znakov]]',
 );
 
+/** Albanian (Shqip)
+ * @author Puntori
+ */
+$messages['sq'] = array(
+	'charinsert-desc' => 'Lejon krijimin e kutive JavaScript për [[MediaWiki:Edittools|inserting karaktere jo standarde]]',
+);
+
+/** Serbian Cyrillic ekavian (Српски (ћирилица))
+ * @author Михајло Анђелковић
+ */
+$messages['sr-ec'] = array(
+	'charinsert-desc' => 'Омогућава прављење јаваскрипт кутијице за [[MediaWiki:Edittools|inserting non-standard characters]]',
+);
+
+/** Serbian Latin ekavian (Srpski (latinica))
+ * @author Michaello
+ */
+$messages['sr-el'] = array(
+	'charinsert-desc' => 'Omogućava pravljenje javaskript kutijice za [[MediaWiki:Edittools|inserting non-standard characters]]',
+);
+
 /** Seeltersk (Seeltersk)
  * @author Pyt
  */
@@ -380,6 +539,13 @@ $messages['sv'] = array(
 	'charinsert-desc' => 'Gör det möjligt att infoga [[MediaWiki:Edittools|specialtecken]] i redigeringsrutan med hjälp av JavaScript',
 );
 
+/** Telugu (తెలుగు)
+ * @author Veeven
+ */
+$messages['te'] = array(
+	'charinsert-desc' => '[[MediaWiki:Edittools|ప్రత్యేక అక్షరాలను చేర్చడానికి]] ఉద్దేశించిన జావాస్క్రిప్టు పెట్టెని తయారుచేయడానికి పనికివస్తుంది',
+);
+
 /** Tajik (Cyrillic) (Тоҷикӣ (Cyrillic))
  * @author Ibrahim
  */
@@ -387,11 +553,32 @@ $messages['tg-cyrl'] = array(
 	'charinsert-desc' => 'Имкони эҷоди қуттиҳои ҶаваСкриптро барои [[MediaWiki:Edittools|дохил кардани аломатҳои ғайристандарӣ]] пешниҳод мекунад',
 );
 
+/** Tajik (Latin) (Тоҷикӣ (Latin))
+ * @author Liangent
+ */
+$messages['tg-latn'] = array(
+	'charinsert-desc' => 'Imkoni eçodi quttihoi ÇavaSkriptro baroi [[MediaWiki:Edittools|doxil kardani alomathoi ƣajristandarī]] peşnihod mekunad',
+);
+
+/** Thai (ไทย)
+ * @author Passawuth
+ */
+$messages['th'] = array(
+	'charinsert-desc' => 'อนุญาตการสร้างกล่องจาวาสคริปต์สำหรับ[[MediaWiki:Edittools|การใส่อักขระพิเศษ]]',
+);
+
 /** Tagalog (Tagalog)
  * @author AnakngAraw
  */
 $messages['tl'] = array(
 	'charinsert-desc' => 'Nagpapahintulot sa paglikha ng kahon ng JavaScript na para sa [[MediaWiki:Edittools|pagsisingit ng wala sa pamantayang mga panitik]]',
+);
+
+/** Turkish (Türkçe)
+ * @author Joseph
+ */
+$messages['tr'] = array(
+	'charinsert-desc' => '[[MediaWiki:Edittools|Standart olmayan karakter eklemek]] için JavaScript kutusu oluşturulmasına izin verir',
 );
 
 /** Ukrainian (Українська)
