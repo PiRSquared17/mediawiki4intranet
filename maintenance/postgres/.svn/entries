@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/maintenance/postgres
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/maintenance/postgres
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-11-22T06:44:45.762774Z
-43845
-greg
+2009-12-21T16:09:47.790705Z
+60262
+overlordq
 
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2009-11-10T13:28:31.000000Z
-0ba0721cff01f0ef78933447dfa7b2e0
-2008-09-22T20:57:36.559625Z
-41168
+2011-02-04T18:14:59.372090Z
+92b13609da79fc4eb29c2a17328bcc75
+2009-11-15T18:57:48.754126Z
+59115
 greg
 has-props
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-13234
+14361
 
 archives
 dir
@@ -69,11 +69,11 @@ file
 
 
 
-2009-11-30T14:30:27.000000Z
-5e122aaa73a208d9f156c60d316223eb
-2008-10-11T12:08:10.845921Z
-41967
-greg
+2011-02-04T18:14:59.372090Z
+32bb4b0df23743fbf11134273a3278c0
+2009-12-08T19:32:17.950213Z
+59842
+simetrical
 has-props
 
 
@@ -95,7 +95,7 @@ has-props
 
 
 
-22702
+24985
 
 mediawiki_mysql2postgres.pl
 file
@@ -103,10 +103,10 @@ file
 
 
 
-2009-11-10T13:28:31.000000Z
-46ef1be719181462a016d124f2654b6e
-2008-11-22T06:44:45.762774Z
-43845
+2011-02-04T18:14:59.372090Z
+ffc815b0aff1c34f6d5b862d651084c4
+2009-11-27T15:34:54.680246Z
+59489
 greg
 has-props
 

@@ -12,7 +12,7 @@ $wgProfiling = true;
 
 /**
  * Begin profiling of a function
- * @param $functioname name of the function we will profile
+ * @param $functionname name of the function we will profile
  */
 function wfProfileIn( $functionname ) {
 	global $wgProfiler;
@@ -21,7 +21,7 @@ function wfProfileIn( $functionname ) {
 
 /**
  * Stop profiling of a function
- * @param $functioname name of the function we have profiled
+ * @param $functionname name of the function we have profiled
  */
 function wfProfileOut( $functionname = 'missing' ) {
 	global $wgProfiler;
@@ -31,8 +31,8 @@ function wfProfileOut( $functionname = 'missing' ) {
 /**
  * Returns a profiling output to be stored in debug file
  *
- * @param float $start
- * @param float $elapsed time elapsed since the beginning of the request
+ * @param $start Float
+ * @param $elapsed Float: time elapsed since the beginning of the request
  */
 function wfGetProfilingOutput( $start, $elapsed ) {
 	global $wgProfiler;
@@ -78,8 +78,8 @@ class Profiler {
 	 * @param $functionname string
 	 */
 	function profileIn( $functionname ) {
-		global $wgDebugFunctionEntry;
-
+		global $wgDebugFunctionEntry, $wgProfiling;
+		if( !$wgProfiling ) return;
 		if( $wgDebugFunctionEntry ){
 			$this->debug( str_repeat( ' ', count( $this->mWorkStack ) ) . 'Entering ' . $functionname . "\n" );
 		}
@@ -92,8 +92,8 @@ class Profiler {
 	 * @param $functionname string
 	 */
 	function profileOut($functionname) {
-		global $wgDebugFunctionEntry;
-
+		global $wgDebugFunctionEntry, $wgProfiling;
+		if( !$wgProfiling ) return;
 		$memory = memory_get_usage();
 		$time = $this->getTime();
 
@@ -128,6 +128,12 @@ class Profiler {
 	 * called by wfProfileClose()
 	 */
 	function close() {
+		global $wgProfiling;
+
+		# Avoid infinite loop
+		if( !$wgProfiling )
+			return;
+
 		while( count( $this->mWorkStack ) ){
 			$this->profileOut( 'close' );
 		}
@@ -145,7 +151,12 @@ class Profiler {
 		}
 		$this->close();
 
-		if( $wgProfileCallTree ){
+		if( $wgProfileCallTree ) {
+			global $wgProfileToDatabase;
+			# XXX: We must call $this->getFunctionReport() to log to the DB
+			if( $wgProfileToDatabase ) {
+				$this->getFunctionReport();
+			}
 			return $this->getCallTree();
 		} else {
 			return $this->getFunctionReport();
@@ -202,16 +213,13 @@ class Profiler {
 	/**
 	 * Callback to get a formatted line for the call tree
 	 */
-	function getCallTreeLine($entry) {
+	function getCallTreeLine( $entry ) {
 		list( $fname, $level, $start, /* $x */, $end)  = $entry;
 		$delta = $end - $start;
 		$space = str_repeat(' ', $level);
-
 		# The ugly double sprintf is to work around a PHP bug,
 		# which has been fixed in recent releases.
-		return sprintf( "%10s %s %s\n",
-			trim( sprintf( "%7.3f", $delta * 1000.0 ) ),
-			$space, $fname );
+		return sprintf( "%10s %s %s\n", trim( sprintf( "%7.3f", $delta * 1000.0 ) ), $space, $fname );
 	}
 
 	function getTime() {
@@ -251,6 +259,7 @@ class Profiler {
 		wfProfileOut( '-overhead-total' );
 
 		# First, subtract the overhead!
+		$overheadTotal = $overheadMemory = $overheadInternal = array();
 		foreach( $this->mStack as $entry ){
 			$fname = $entry[0];
 			$start = $entry[2];
@@ -316,8 +325,8 @@ class Profiler {
 			$percent = $total ? 100. * $elapsed / $total : 0;
 			$memory = $this->mMemory[$fname];
 			$prof .= sprintf($format, substr($fname, 0, $nameWidth), $calls, (float) ($elapsed * 1000), (float) ($elapsed * 1000) / $calls, $percent, $memory, ($this->mMin[$fname] * 1000.0), ($this->mMax[$fname] * 1000.0), $this->mOverhead[$fname]);
-
-			if( $wgProfileToDatabase ){
+			# Log to the DB
+			if( $wgProfileToDatabase ) {
 				self::logToDB($fname, (float) ($elapsed * 1000), $calls, (float) ($memory) );
 			}
 		}

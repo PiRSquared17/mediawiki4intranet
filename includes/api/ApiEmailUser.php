@@ -22,38 +22,32 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-if (!defined('MEDIAWIKI')) {
+if ( !defined( 'MEDIAWIKI' ) ) {
 	// Eclipse helper - will be ignored in production
-	require_once ("ApiBase.php");
+	require_once ( "ApiBase.php" );
 }
-
 
 /**
  * @ingroup API
  */
 class ApiEmailUser extends ApiBase {
 
-	public function __construct($main, $action) {
-		parent :: __construct($main, $action);
+	public function __construct( $main, $action ) {
+		parent :: __construct( $main, $action );
 	}
 
 	public function execute() {
 		global $wgUser;
-		
 		// Check whether email is enabled
 		if ( !EmailUserForm::userEmailEnabled() )
 			$this->dieUsageMsg( array( 'usermaildisabled' ) );
-		
-		$this->getMain()->requestWriteMode();
+
 		$params = $this->extractRequestParams();
-		
 		// Check required parameters
 		if ( !isset( $params['target'] ) )
 			$this->dieUsageMsg( array( 'missingparam', 'target' ) );
 		if ( !isset( $params['text'] ) )
 			$this->dieUsageMsg( array( 'missingparam', 'text' ) );
-		if ( !isset( $params['token'] ) )
-			$this->dieUsageMsg( array( 'missingparam', 'token' ) );	
 		
 		// Validate target 
 		$targetUser = EmailUserForm::validateEmailTarget( $params['target'] );
@@ -64,8 +58,7 @@ class ApiEmailUser extends ApiBase {
 		$error = EmailUserForm::getPermissionsError( $wgUser, $params['token'] );
 		if ( $error )
 			$this->dieUsageMsg( array( $error ) );
-		
-			
+
 		$form = new EmailUserForm( $targetUser, $params['text'], $params['subject'], $params['ccme'] );
 		$retval = $form->doSubmit();
 		if ( is_null( $retval ) )
@@ -77,7 +70,13 @@ class ApiEmailUser extends ApiBase {
 		$this->getResult()->addValue( null, $this->getModuleName(), $result );
 	}
 	
-	public function mustBePosted() { return true; }
+	public function mustBePosted() {
+		return true;
+	}
+
+	public function isWriteMode() {
+		return true;
+	}
 
 	public function getAllowedParams() {
 		return array (
@@ -104,6 +103,22 @@ class ApiEmailUser extends ApiBase {
 			'Email a user.'
 		);
 	}
+	
+    public function getPossibleErrors() {
+		return array_merge( parent::getPossibleErrors(), array(
+			array( 'usermaildisabled' ),
+			array( 'missingparam', 'target' ),
+			array( 'missingparam', 'text' ),
+        ) );
+	}
+	
+	public function needsToken() {
+		return true;
+	}
+
+	public function getTokenSalt() {
+		return '';
+	}
 
 	protected function getExamples() {
 		return array (
@@ -112,7 +127,7 @@ class ApiEmailUser extends ApiBase {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiEmailUser.php 41269 2008-09-25 21:39:36Z catrope $';
+		return __CLASS__ . ': $Id: ApiEmailUser.php 74217 2010-10-03 15:53:07Z reedy $';
 	}
-}	
+}
 	

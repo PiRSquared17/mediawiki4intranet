@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Andrijko Z.
  * @author Кумулај Маркус
  * @author Макѕе
  * @author Приетен тев
@@ -192,8 +193,7 @@ Te rog notari la din kontribuţi al {{SITENAME}} sunt konsideraere relesavat sup
 'editundo'                => 'anulizăe',
 
 # Search results
-'noexactmatch'   => "'''N'pažu vec l'nom \"\$1\" n'ķsistst.''' Pute [[:\$1|kreare ce pažu]].",
-'viewprevnext'   => 'Vu ($1) ($2) ($3)',
+'viewprevnext'   => 'Vu ($1 {{int:pipe-separator}} $2) ($3)',
 'searchhelp-url' => 'Help:Ajutor',
 'powersearch'    => 'kaută avansata',
 
@@ -202,7 +202,7 @@ Te rog notari la din kontribuţi al {{SITENAME}} sunt konsideraere relesavat sup
 
 # Recent changes
 'recentchanges'   => 'şumbărae recentae',
-'rcnote'          => "Mai hos se flă {{PLURAL:$|ultima modifikare|ultimele '''$1''' modifikări}} din {{PLURAL:$2|ultima zi|ultimele '''$2''' zile}}, encepând cu $3.",
+'rcnote'          => "Mai hos se flă {{PLURAL:$|ultima modifikare|ultimele '''$1''' modifikări}} din {{PLURAL:$2|ultima zi|ultimele '''$2''' zile}}, encepând cu $5, $4.",
 'rcshowhideminor' => '$1 modifikările minore',
 'rcshowhidebots'  => '$1 roboti',
 'rcshowhideliu'   => '$1 utilizatori prilasnaeri',
@@ -219,20 +219,23 @@ $3',
 'boteditletter'   => 'b',
 
 # Recent changes linked
-'recentchangeslinked' => 'Modifikări korelate',
+'recentchangeslinked'         => 'Modifikări korelate',
+'recentchangeslinked-feed'    => 'Modifikări korelate',
+'recentchangeslinked-toolbox' => 'Modifikări korelate',
 
 # Upload
 'upload' => 'trimiţe fişirul',
 
 # File description page
+'file-anchor-link'    => 'Fişirul',
 'filehist'            => 'Historia fişirulu',
 'filehist-current'    => 'kurentu',
 'filehist-datetime'   => 'Data/Temp',
 'filehist-user'       => 'Utilizatoru',
 'filehist-dimensions' => 'Dimencions',
 'filehist-comment'    => 'komentarul',
-'imagelinks'          => 'legătul',
-'linkstoimage'        => 'Ces paži legǎtent a ce fişirul:',
+'imagelinks'          => 'Legătul fişirul de media',
+'linkstoimage'        => 'Ces {{PLURAL:$1|paži legǎt|paži legǎtent}} a ce fişirul:',
 
 # Random page
 'randompage' => 'alaeţu',
@@ -278,6 +281,8 @@ $3',
 'mycontris'     => 'Mes kontribuţi',
 'contribsub2'   => 'Pentru $1 ($2)',
 'uctop'         => '(susverf)',
+
+'sp-contributions-talk' => 'Diskuţu',
 
 # What links here
 'whatlinkshere'       => 'Legǎtul a ce pažu',
