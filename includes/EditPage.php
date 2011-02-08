@@ -321,8 +321,13 @@ class EditPage {
 
 		$permErrors = $this->getEditPermissionErrors();
 		if ( $permErrors ) {
-			wfDebug( __METHOD__ . ": User can't edit\n" );
-			$this->readOnlyPage( $this->getContent( false ), true, $permErrors, 'edit' );
+			wfDebug( __METHOD__.": User can't edit\n" );
+			$this->readOnlyPage(
+			    $this->textbox2 ? $this->textbox2 :
+			    $this->textbox1 ? $this->textbox1 :
+			                      $this->getContent( false ),
+			    true, $permErrors, 'edit'
+			);
 			wfProfileOut( __METHOD__ );
 			return;
 		} else {
@@ -758,6 +763,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 
 		wfProfileIn( __METHOD__  );
 		wfProfileIn( __METHOD__ . '-checks' );
@@ -929,7 +935,7 @@ class EditPage {
 		$userid = $wgUser->getId();
 
 		# Suppress edit conflict with self, except for section edits where merging is required.
-		if ( $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
+		if ( $wgSuppressSameUserConflicts && $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
 			wfDebug( __METHOD__ . ": Suppressing edit conflict, same user.\n" );
 			$this->isConflict = false;
 		}
