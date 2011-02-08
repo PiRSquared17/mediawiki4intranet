@@ -88,6 +88,19 @@ function _enotifdiff_personalize_mailtext(&$mailer, &$user, &$body)
 
 function _enotifdiff_user_condition(&$mailer, &$condition)
 {
-    $condition = str_ireplace('wl_notificationtimestamp IS NULL', '(wl_notificationtimestamp IS NULL OR user_options LIKE \'%enotifsendmultiple=1%\' OR user_options LIKE \'%enotifsenddiffs=1%\')', $condition);
+    $search = 'wl_notificationtimestamp is null';
+    $replace = '(wl_notificationtimestamp IS NULL OR user_options LIKE \'%enotifsendmultiple=1%\' OR user_options LIKE \'%enotifsenddiffs=1%\')';
+    if (is_string($condition))
+    {
+        // Mediawiki4Intranet 1.14
+        $condition = str_ireplace($search, $replace, $condition);
+    }
+    elseif (is_array($condition))
+    {
+        // Mediawiki4Intranet 1.16+
+        foreach ($condition as &$c)
+            if (strtolower($c) == $search)
+                $c = $replace;
+    }
     return true;
 }
