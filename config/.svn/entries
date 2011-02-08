@@ -1,14 +1,14 @@
 10
 
 dir
-60293
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/config
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/config
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-02-20T14:17:47.599712Z
-47555
+2011-01-04T06:15:54.403142Z
+79562
 tstarling
 has-props
 
@@ -32,11 +32,11 @@ file
 
 
 
-2009-11-10T13:26:18.780703Z
-706b4d9e3d174b794e2fc86b7c2dde57
-2007-07-11T07:55:24.172768Z
-23989
-nickj
+2011-02-04T18:14:15.507962Z
+f82d648bd2e08b933c82cb3c3c8b7996
+2009-11-14T08:12:51.207128Z
+59053
+maxsem
 has-props
 
 
@@ -58,18 +58,18 @@ has-props
 
 
 
-68
+64
 
-index.php
+Installer.php
 file
 
 
 
 
-2009-11-10T13:26:18.780703Z
-085e76f06816bc3ec5a8fd8a394deac3
-2009-02-20T14:17:47.599712Z
-47555
+2011-02-04T18:14:15.511962Z
+705ae137ad1053eeb4561a641443f094
+2011-01-04T06:15:54.403142Z
+79562
 tstarling
 has-props
 
@@ -92,5 +92,39 @@ has-props
 
 
 
-72195
+80901
+
+index.php
+file
+
+
+
+
+2011-02-04T18:14:15.511962Z
+d45b821403bb4afa679ee964322dee95
+2009-08-19T17:03:00.777954Z
+55330
+brion
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1637
 

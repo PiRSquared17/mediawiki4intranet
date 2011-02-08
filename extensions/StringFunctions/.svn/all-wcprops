@@ -1,17 +1,17 @@
 K 25
 svn:wc:ra_dav:version-url
 V 75
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/StringFunctions
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/StringFunctions
 END
 StringFunctions.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 100
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/StringFunctions/StringFunctions.i18n.php
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/StringFunctions/StringFunctions.i18n.php
 END
 StringFunctions.php
 K 25
 svn:wc:ra_dav:version-url
 V 95
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/StringFunctions/StringFunctions.php
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/StringFunctions/StringFunctions.php
 END
