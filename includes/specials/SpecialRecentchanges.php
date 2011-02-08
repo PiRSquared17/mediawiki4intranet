@@ -5,6 +5,8 @@
  * @ingroup SpecialPage
  */
 class SpecialRecentChanges extends SpecialPage {
+	var $rcOptions, $rcSubpage;
+
 	public function __construct() {
   		parent::__construct( 'Recentchanges' );
 		$this->includable( true );
@@ -23,11 +25,11 @@ class SpecialRecentChanges extends SpecialPage {
 		$opts->add( 'limit', (int)$wgUser->getOption( 'rclimit' ) );
 		$opts->add( 'from', '' );
 
-		$opts->add( 'hideminor',     (bool)$wgUser->getOption( 'hideminor' ) );
+		$opts->add( 'hideminor',     $wgUser->getBoolOption( 'hideminor' ) );
 		$opts->add( 'hidebots',      true  );
 		$opts->add( 'hideanons',     false );
 		$opts->add( 'hideliu',       false );
-		$opts->add( 'hidepatrolled', false );
+		$opts->add( 'hidepatrolled', $wgUser->getBoolOption( 'hidepatrolled' ) );
 		$opts->add( 'hidemyself',    false );
 
 		$opts->add( 'namespace', '', FormOptions::INTNULL );
@@ -35,11 +37,12 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$opts->add( 'categories', '' );
 		$opts->add( 'categories_any', false );
+		$opts->add( 'tagfilter', '' );
 		return $opts;
 	}
 
 	/**
-	 * Get a FormOptions object with options as specified by the user
+	 * Create a FormOptions object with options as specified by the user
 	 *
 	 * @return FormOptions
 	 */
@@ -59,25 +62,40 @@ class SpecialRecentChanges extends SpecialPage {
 	}
 
 	/**
-	 * Get a FormOptions object sepcific for feed requests
+	 * Create a FormOptions object specific for feed requests and return it
 	 *
 	 * @return FormOptions
 	 */
 	public function feedSetup() {
 		global $wgFeedLimit, $wgRequest;
 		$opts = $this->getDefaultOptions();
-		$opts->fetchValuesFromRequest( $wgRequest, array( 'days', 'limit', 'hideminor' ) );
+		# Feed is cached on limit,hideminor,namespace; other params would randomly not work
+		$opts->fetchValuesFromRequest( $wgRequest, array( 'limit', 'hideminor', 'namespace' ) );
 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
 
 	/**
+	 * Get the current FormOptions for this request
+	 */
+	public function getOptions() {
+		if ( $this->rcOptions === null ) {
+			global $wgRequest;
+			$feedFormat = $wgRequest->getVal( 'feed' );
+			$this->rcOptions = $feedFormat ? $this->feedSetup() : $this->setup( $this->rcSubpage );
+		}
+		return $this->rcOptions;
+	}
+
+
+	/**
 	 * Main execution point
 	 *
-	 * @param $parameters string
+	 * @param $subpage string
 	 */
-	public function execute( $parameters ) {
+	public function execute( $subpage ) {
 		global $wgRequest, $wgOut;
+		$this->rcSubpage = $subpage;
 		$feedFormat = $wgRequest->getVal( 'feed' );
 
 		# 10 seconds server-side caching max
@@ -88,12 +106,11 @@ class SpecialRecentChanges extends SpecialPage {
 			return;
 		}
 
-		$opts = $feedFormat ? $this->feedSetup() : $this->setup( $parameters );
+		$opts = $this->getOptions();
 		$this->setHeaders();
 		$this->outputHeader();
 
 		// Fetch results, prepare a batch link existence check query
-		$rows = array();
 		$conds = $this->buildMainQueryConds( $opts );
 		$rows = $this->doMainQuery( $conds, $opts );
 		if( $rows === false ){
@@ -108,13 +125,13 @@ class SpecialRecentChanges extends SpecialPage {
 			foreach( $rows as $row ) {
 				$batch->add( NS_USER, $row->rc_user_text  );
 				$batch->add( NS_USER_TALK, $row->rc_user_text  );
+				$batch->add( $row->rc_namespace, $row->rc_title );
 			}
 			$batch->execute();
 		}
-
 		if( $feedFormat ) {
-			list( $feed, $feedObj ) = $this->getFeedObject( $feedFormat );
-			$feed->execute( $feedObj, $rows, $opts['limit'], $opts['hideminor'], $lastmod );
+			list( $changesFeed, $formatter ) = $this->getFeedObject( $feedFormat );
+			$changesFeed->execute( $formatter, $rows, $lastmod, $opts );
 		} else {
 			$this->webOutput( $rows, $opts );
 		}
@@ -128,12 +145,12 @@ class SpecialRecentChanges extends SpecialPage {
 	 * @return array
 	 */
 	public function getFeedObject( $feedFormat ){
-		$feed = new ChangesFeed( $feedFormat, 'rcfeed' );
-		$feedObj = $feed->getFeedObject(
+		$changesFeed = new ChangesFeed( $feedFormat, 'rcfeed' );
+		$formatter = $changesFeed->getFeedObject(
 			wfMsgForContent( 'recentchanges' ),
 			wfMsgForContent( 'recentchanges-feed-description' )
 		);
-		return array( $feed, $feedObj );
+		return array( $changesFeed, $formatter );
 	}
 
 	/**
@@ -174,7 +191,7 @@ class SpecialRecentChanges extends SpecialPage {
 	public function checkLastModified( $feedFormat ) {
 		global $wgUseRCPatrol, $wgOut;
 		$dbr = wfGetDB( DB_SLAVE );
-		$lastmod = $dbr->selectField( 'recentchanges', 'MAX(rc_timestamp)', false, __FUNCTION__ );
+		$lastmod = $dbr->selectField( 'recentchanges', 'MAX(rc_timestamp)', false, __METHOD__ );
 		if( $feedFormat || !$wgUseRCPatrol ) {
 			if( $lastmod && $wgOut->checkLastModified( $lastmod ) ) {
 				# Client cache fresh and headers sent, nothing more to do.
@@ -267,6 +284,7 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$tables = array( 'recentchanges' );
 		$join_conds = array();
+		$query_options = array( 'USE INDEX' => array('recentchanges' => 'rc_timestamp') );
 
 		$uid = $wgUser->getId();
 		$dbr = wfGetDB( DB_SLAVE );
@@ -277,18 +295,36 @@ class SpecialRecentChanges extends SpecialPage {
 		// JOIN on watchlist for users
 		if( $uid ) {
 			$tables[] = 'watchlist';
-			$join_conds = array( 'watchlist' => array('LEFT JOIN',
-				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace") );
+			$join_conds['watchlist'] = array('LEFT JOIN',
+				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace");
 		}
+		if ($wgUser->isAllowed("rollback")) {
+			$tables[] = 'page';
+			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
+		}
+		// Tag stuff.
+		$fields = array();
+		// Fields are * in this case, so let the function modify an empty array to keep it happy.
+		ChangeTags::modifyDisplayQuery(
+			$tables, $fields, $conds, $join_conds, $query_options, $opts['tagfilter']
+		);
 
-		wfRunHooks('SpecialRecentChangesQuery', array( &$conds, &$tables, &$join_conds, $opts ) );
+		if ( !wfRunHooks( 'SpecialRecentChangesQuery', array( &$conds, &$tables, &$join_conds, $opts, &$query_options ) ) )
+			return false;
 
-		// Is there either one namespace selected or excluded?
-		// Also, if this is "all" or main namespace, just use timestamp index.
-		if( is_null($namespace) || $invert || $namespace == NS_MAIN ) {
+		// Don't use the new_namespace_time timestamp index if:
+		// (a) "All namespaces" selected
+		// (b) We want all pages NOT in a certain namespaces (inverted)
+		// (c) There is a tag to filter on (use tag index instead)
+		// (d) UNION + sort/limit is not an option for the DBMS
+		if( is_null($namespace)
+			|| $invert
+			|| $opts['tagfilter'] != ''
+			|| !$dbr->unionSupportsOrderAndLimit() )
+		{
 			$res = $dbr->select( $tables, '*', $conds, __METHOD__,
-				array( 'ORDER BY' => 'rc_timestamp DESC', 'LIMIT' => $limit,
-					'USE INDEX' => array('recentchanges' => 'rc_timestamp') ),
+				array( 'ORDER BY' => 'rc_timestamp DESC', 'LIMIT' => $limit ) +
+				$query_options,
 				$join_conds );
 		// We have a new_namespace_time index! UNION over new=(0,1) and sort result set!
 		} else {
@@ -297,17 +333,18 @@ class SpecialRecentChanges extends SpecialPage {
 				array( 'rc_new' => 1 ) + $conds,
 				__METHOD__,
 				array( 'ORDER BY' => 'rc_timestamp DESC', 'LIMIT' => $limit,
-					'USE INDEX' =>  array('recentchanges' => 'new_name_timestamp') ),
+					'USE INDEX' =>  array('recentchanges' => 'rc_timestamp') ),
 				$join_conds );
 			// Old pages
 			$sqlOld = $dbr->selectSQLText( $tables, '*',
 				array( 'rc_new' => 0 ) + $conds,
 				__METHOD__,
 				array( 'ORDER BY' => 'rc_timestamp DESC', 'LIMIT' => $limit,
-					'USE INDEX' =>  array('recentchanges' => 'new_name_timestamp') ),
+					'USE INDEX' =>  array('recentchanges' => 'rc_timestamp') ),
 				$join_conds );
 			# Join the two fast queries, and sort the result set
-			$sql = "($sqlNew) UNION ($sqlOld) ORDER BY rc_timestamp DESC LIMIT $limit";
+			$sql = $dbr->unionQueries(array($sqlNew, $sqlOld), false).' ORDER BY rc_timestamp DESC';
+			$sql = $dbr->limitResult($sql, $limit, false);
 			$res = $dbr->query( $sql, __METHOD__ );
 		}
 
@@ -332,7 +369,7 @@ class SpecialRecentChanges extends SpecialPage {
 		}
 
 		// And now for the content
-		$wgOut->setSyndicated( true );
+		$wgOut->setFeedAppendQuery( $this->getFeedQuery() );
 
 		if( $wgAllowCategorizedRecentChanges ) {
 			$this->filterByCategories( $rows, $opts );
@@ -379,11 +416,19 @@ class SpecialRecentChanges extends SpecialPage {
 				}
 				$rc->numberofWatchingusers = $watcherCache[$obj->rc_namespace][$obj->rc_title];
 			}
-			$s .= $list->recentChangesLine( $rc, !empty( $obj->wl_user ) );
+			$s .= $list->recentChangesLine( $rc, !empty( $obj->wl_user ), $counter );
 			--$limit;
 		}
 		$s .= $list->endRecentChangesList();
 		$wgOut->addHTML( $s );
+	}
+
+	/**
+	 * Get the query string to append to feed link URLs.
+	 * This is overridden by RCL to add the target parameter
+	 */
+	public function getFeedQuery() {
+		return false;
 	}
 
 	/**
@@ -399,7 +444,7 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$defaults = $opts->getAllValues();
 		$nondefaults = $opts->getChangedValues();
-		$opts->consumeValues( array( 'namespace', 'invert' ) );
+		$opts->consumeValues( array( 'namespace', 'invert', 'tagfilter' ) );
 
 		$panel = array();
 		$panel[] = $this->optionsPanel( $defaults, $nondefaults );
@@ -442,6 +487,8 @@ class SpecialRecentChanges extends SpecialPage {
 			Xml::fieldset( wfMsg( 'recentchanges-legend' ), $panelString, array( 'class' => 'rcoptions' ) )
 		);
 
+		$wgOut->addHTML( ChangesList::flagLegend() );
+
 		$this->setBottomText( $wgOut, $opts );
 	}
 
@@ -459,6 +506,10 @@ class SpecialRecentChanges extends SpecialPage {
 		if( $wgAllowCategorizedRecentChanges ) {
 			$extraOpts['category'] = $this->categoryFilterForm( $opts );
 		}
+
+		$tagFilter = ChangeTags::buildTagFilterSelector( $opts['tagfilter'] );
+		if ( count($tagFilter) )
+			$extraOpts['tagfilter'] = $tagFilter;
 
 		wfRunHooks( 'SpecialRecentChangesPanel', array( &$extraOpts, $opts ) );
 		return $extraOpts;
@@ -579,8 +630,12 @@ class SpecialRecentChanges extends SpecialPage {
 		global $wgUser;
 		$sk = $wgUser->getSkin();
 		$params = $override + $options;
-		return $sk->link( $this->getTitle(), htmlspecialchars( $title ),
-			( $active ? array( 'style'=>'font-weight: bold;' ) : array() ), $params, array( 'known' ) );
+		if ( $active ) {
+			return $sk->link( $this->getTitle(), '<strong>' . htmlspecialchars( $title ) . '</strong>',
+							  array(), $params, array( 'known' ) );
+		} else {
+			return $sk->link( $this->getTitle(), htmlspecialchars( $title ), array() , $params, array( 'known' ) );
+		}
 	}
 
 	/**
@@ -594,13 +649,15 @@ class SpecialRecentChanges extends SpecialPage {
 		$options = $nondefaults + $defaults;
 
 		$note = '';
+		if( !wfEmptyMsg( 'rclegend', wfMsg('rclegend') ) ) {
+			$note .= '<div class="mw-rclegend">' . wfMsgExt( 'rclegend', array('parseinline') ) . "</div>\n";
+		}
 		if( $options['from'] ) {
 			$note .= wfMsgExt( 'rcnotefrom', array( 'parseinline' ),
 				$wgLang->formatNum( $options['limit'] ),
-				$wgLang->timeanddate( $options['from'], true ) ) . '<br />';
-		}
-		if( !wfEmptyMsg( 'rclegend', wfMsg('rclegend') ) ) {
-			$note .= wfMsgExt( 'rclegend', array('parseinline') ) . '<br />';
+				$wgLang->timeanddate( $options['from'], true ),
+				$wgLang->date( $options['from'], true ),
+				$wgLang->time( $options['from'], true ) ) . '<br />';
 		}
 
 		# Sort data for display and make sure it's unique after we've added user data.
@@ -616,14 +673,14 @@ class SpecialRecentChanges extends SpecialPage {
 			$cl[] = $this->makeOptionsLink( $wgLang->formatNum( $value ),
 				array( 'limit' => $value ), $nondefaults, $value == $options['limit'] ) ;
 		}
-		$cl = implode( ' | ', $cl );
+		$cl = $wgLang->pipeList( $cl );
 
 		// day links, reset 'from' to none
 		foreach( $wgRCLinkDays as $value ) {
 			$dl[] = $this->makeOptionsLink( $wgLang->formatNum( $value ),
 				array( 'days' => $value, 'from' => '' ), $nondefaults, $value == $options['days'] ) ;
 		}
-		$dl = implode( ' | ', $dl );
+		$dl = $wgLang->pipeList( $dl );
 
 
 		// show/hide links
@@ -648,7 +705,7 @@ class SpecialRecentChanges extends SpecialPage {
 		if( $wgUser->useRCPatrol() )
 			$links[] = wfMsgHtml( 'rcshowhidepatr', $patrLink );
 		$links[] = wfMsgHtml( 'rcshowhidemine', $myselfLink );
-		$hl = implode( ' | ', $links );
+		$hl = $wgLang->pipeList( $links );
 
 		// show from this onward link
 		$now = $wgLang->timeanddate( wfTimestampNow(), true );

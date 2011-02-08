@@ -23,9 +23,9 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-if (!defined('MEDIAWIKI')) {
+if ( !defined( 'MEDIAWIKI' ) ) {
 	// Eclipse helper - will be ignored in production
-	require_once ("ApiQueryBase.php");
+	require_once ( "ApiQueryBase.php" );
 }
 
 /**
@@ -35,8 +35,8 @@ if (!defined('MEDIAWIKI')) {
  */
 class ApiQueryExternalLinks extends ApiQueryBase {
 
-	public function __construct($query, $moduleName) {
-		parent :: __construct($query, $moduleName, 'el');
+	public function __construct( $query, $moduleName ) {
+		parent :: __construct( $query, $moduleName, 'el' );
 	}
 
 	public function execute() {
@@ -44,51 +44,47 @@ class ApiQueryExternalLinks extends ApiQueryBase {
 			return;
 
 		$params = $this->extractRequestParams();
-		$this->addFields(array (
+		$this->addFields( array (
 			'el_from',
 			'el_to'
-		));
+		) );
 
-		$this->addTables('externallinks');
-		$this->addWhereFld('el_from', array_keys($this->getPageSet()->getGoodTitles()));
-		# Don't order by el_from if it's constant in the WHERE clause
-		if(count($this->getPageSet()->getGoodTitles()) != 1)
-			$this->addOption('ORDER BY', 'el_from');
-		$this->addOption('LIMIT', $params['limit'] + 1);
-		if(!is_null($params['offset']))
-			$this->addOption('OFFSET', $params['offset']);
+		$this->addTables( 'externallinks' );
+		$this->addWhereFld( 'el_from', array_keys( $this->getPageSet()->getGoodTitles() ) );
+
+		// Don't order by el_from if it's constant in the WHERE clause
+		if ( count( $this->getPageSet()->getGoodTitles() ) != 1 )
+			$this->addOption( 'ORDER BY', 'el_from' );
+
+		$this->addOption( 'LIMIT', $params['limit'] + 1 );
+		if ( !is_null( $params['offset'] ) )
+			$this->addOption( 'OFFSET', $params['offset'] );
 
 		$db = $this->getDB();
-		$res = $this->select(__METHOD__);
+		$res = $this->select( __METHOD__ );
 
-		$data = array();
-		$lastId = 0;	// database has no ID 0
 		$count = 0;
-		while ($row = $db->fetchObject($res)) {
-			if (++$count > $params['limit']) {
+		while ( $row = $db->fetchObject( $res ) ) {
+			if ( ++$count > $params['limit'] ) {
 				// We've reached the one extra which shows that
 				// there are additional pages to be had. Stop here...
-				$this->setContinueEnumParameter('offset', @$params['offset'] + $params['limit']);
+				$this->setContinueEnumParameter( 'offset', @$params['offset'] + $params['limit'] );
 				break;
 			}
-			if ($lastId != $row->el_from) {
-				if($lastId != 0) {
-					$this->addPageSubItems($lastId, $data);
-					$data = array();
-				}
-				$lastId = $row->el_from;
-			}
-
 			$entry = array();
-			ApiResult :: setContent($entry, $row->el_to);
-			$data[] = $entry;
+			ApiResult :: setContent( $entry, $row->el_to );
+			$fit = $this->addPageSubItem( $row->el_from, $entry );
+			if ( !$fit )
+			{
+				$this->setContinueEnumParameter( 'offset', @$params['offset'] + $count - 1 );
+				break;
+			}
 		}
+		$db->freeResult( $res );
+	}
 
-		if($lastId != 0) {
-			$this->addPageSubItems($lastId, $data);
-		}
-
-		$db->freeResult($res);
+	public function getCacheMode( $params ) {
+		return 'public';
 	}
 
 	public function getAllowedParams() {
@@ -123,6 +119,6 @@ class ApiQueryExternalLinks extends ApiQueryBase {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiQueryExternalLinks.php 37270 2008-07-07 17:32:22Z catrope $';
+		return __CLASS__ . ': $Id: ApiQueryExternalLinks.php 69932 2010-07-26 08:03:21Z tstarling $';
 	}
 }

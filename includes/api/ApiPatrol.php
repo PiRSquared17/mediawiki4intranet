@@ -23,8 +23,8 @@
  * http://www.gnu.org/copyleft/gpl.html
  */
 
-if (!defined('MEDIAWIKI')) {
-	require_once ('ApiBase.php');
+if ( !defined( 'MEDIAWIKI' ) ) {
+	require_once ( 'ApiBase.php' );
 }
 
 /**
@@ -33,36 +33,34 @@ if (!defined('MEDIAWIKI')) {
  */
 class ApiPatrol extends ApiBase {
 
-	public function __construct($main, $action) {
-		parent :: __construct($main, $action);
+	public function __construct( $main, $action ) {
+		parent :: __construct( $main, $action );
 	}
 
 	/**
 	 * Patrols the article or provides the reason the patrol failed.
 	 */
 	public function execute() {
-		global $wgUser, $wgUseRCPatrol, $wgUseNPPatrol;
-		$this->getMain()->requestWriteMode();
 		$params = $this->extractRequestParams();
 		
-		if(!isset($params['token']))
-			$this->dieUsageMsg(array('missingparam', 'token'));
-		if(!isset($params['rcid']))
-			$this->dieUsageMsg(array('missingparam', 'rcid'));
-		if(!$wgUser->matchEditToken($params['token']))
-			$this->dieUsageMsg(array('sessionfailure'));
+		if ( !isset( $params['rcid'] ) )
+			$this->dieUsageMsg( array( 'missingparam', 'rcid' ) );
 
-		$rc = RecentChange::newFromID($params['rcid']);
-		if(!$rc instanceof RecentChange)
-			$this->dieUsageMsg(array('nosuchrcid', $params['rcid']));
-		$retval = RecentChange::markPatrolled($params['rcid']);
+		$rc = RecentChange::newFromID( $params['rcid'] );
+		if ( !$rc instanceof RecentChange )
+			$this->dieUsageMsg( array( 'nosuchrcid', $params['rcid'] ) );
+		$retval = RecentChange::markPatrolled( $params['rcid'] );
 			
-		if($retval)
-			$this->dieUsageMsg(reset($retval));
+		if ( $retval )
+			$this->dieUsageMsg( reset( $retval ) );
 		
-		$result = array('rcid' => $rc->getAttribute('rc_id'));
-		ApiQueryBase::addTitleInfo($result, $rc->getTitle());
-		$this->getResult()->addValue(null, $this->getModuleName(), $result);
+		$result = array( 'rcid' => intval( $rc->getAttribute( 'rc_id' ) ) );
+		ApiQueryBase::addTitleInfo( $result, $rc->getTitle() );
+		$this->getResult()->addValue( null, $this->getModuleName(), $result );
+	}
+
+	public function isWriteMode() {
+		return true;
 	}
 
 	public function getAllowedParams() {
@@ -86,6 +84,21 @@ class ApiPatrol extends ApiBase {
 			'Patrol a page or revision. '
 		);
 	}
+	
+    public function getPossibleErrors() {
+		return array_merge( parent::getPossibleErrors(), array(
+			array( 'missingparam', 'rcid' ),
+			array( 'nosuchrcid', 'rcid' ),
+        ) );
+	}
+	
+	public function needsToken() {
+		return true;
+	}
+
+	public function getTokenSalt() {
+		return '';
+	}
 
 	protected function getExamples() {
 		return array(
@@ -94,6 +107,6 @@ class ApiPatrol extends ApiBase {
 	}
 
 	public function getVersion() {
-		return __CLASS__ . ': $Id: ApiPatrol.php 48123 2009-03-07 13:02:30Z catrope $';
+		return __CLASS__ . ': $Id: ApiPatrol.php 74217 2010-10-03 15:53:07Z reedy $';
 	}
 }
