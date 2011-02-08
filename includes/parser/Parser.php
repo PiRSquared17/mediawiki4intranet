@@ -3590,7 +3590,7 @@ class Parser
 	 * @private
 	 */
 	function formatHeadings( $text, $origText, $isMain=true ) {
-		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds;
+		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
 
 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
 		$showEditLink = $this->mOptions->getEditSection();
@@ -3738,6 +3738,8 @@ class Parser
 					$numbering .= $wgContLang->formatNum( $sublevelCount[$i] );
 					$dot = 1;
 				}
+				if ($wgDotAfterTocnumber)
+					$numbering .= '.';
 			}
 
 			# The safe header is a version of the header text safe to use for links
