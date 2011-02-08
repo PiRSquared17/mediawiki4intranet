@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 55
-/svnroot/geshi/!svn/ver/2128/trunk/geshi-1.0.X/src/docs
+/svnroot/geshi/!svn/ver/2423/trunk/geshi-1.0.X/src/docs
 END
 BUGS
 K 25
@@ -25,25 +25,19 @@ geshi-doc.html
 K 25
 svn:wc:ra_dav:version-url
 V 70
-/svnroot/geshi/!svn/ver/2089/trunk/geshi-1.0.X/src/docs/geshi-doc.html
+/svnroot/geshi/!svn/ver/2229/trunk/geshi-1.0.X/src/docs/geshi-doc.html
 END
 CHANGES
 K 25
 svn:wc:ra_dav:version-url
 V 63
-/svnroot/geshi/!svn/ver/2128/trunk/geshi-1.0.X/src/docs/CHANGES
-END
-COPYING
-K 25
-svn:wc:ra_dav:version-url
-V 62
-/svnroot/geshi/!svn/ver/706/trunk/geshi-1.0.X/src/docs/COPYING
+/svnroot/geshi/!svn/ver/2423/trunk/geshi-1.0.X/src/docs/CHANGES
 END
 THANKS
 K 25
 svn:wc:ra_dav:version-url
 V 62
-/svnroot/geshi/!svn/ver/2128/trunk/geshi-1.0.X/src/docs/THANKS
+/svnroot/geshi/!svn/ver/2411/trunk/geshi-1.0.X/src/docs/THANKS
 END
 phpdoc.ini
 K 25
@@ -55,5 +49,5 @@ README
 K 25
 svn:wc:ra_dav:version-url
 V 62
-/svnroot/geshi/!svn/ver/1739/trunk/geshi-1.0.X/src/docs/README
+/svnroot/geshi/!svn/ver/2322/trunk/geshi-1.0.X/src/docs/README
 END

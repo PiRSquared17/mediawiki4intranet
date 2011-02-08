@@ -27,8 +27,8 @@ $wgExtensionCredits['parserhook'][] = array (
 	'name' => 'Wiki Category Tag Cloud',
 	'url' => 'http://wiki-tools.com/wiki/Wiki_Category_Tag_Cloud',
 	'version' => '1.0.1',
-	'svn-revision' => '$LastChangedRevision: 188 $',
-	'author' => "[http://wiki-tools.com/wiki/User:Dantman Daniel Friesen] [mailto:Daniel%20Friesen%20%3Cdan_the_man@telus.net%3E <dan_the_man@telus.net>]",
+	'svn-revision' => '$LastChangedRevision: 227 $',
+	'author' => "[http://mediawiki.org/wiki/User:Dantman Daniel Friesen] [mailto:Daniel%20Friesen%20%3Cwiki@danielfriesen.name%3E <dan_the_man@telus.net>]",
 	'description' => "A Category Tag Cloud derived, improved, and fixed from the YetAnotherTagCloud Extension",
 );
 

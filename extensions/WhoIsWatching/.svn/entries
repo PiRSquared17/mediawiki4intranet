@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/extensions/WhoIsWatching
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/WhoIsWatching
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-01-06T21:40:11.283910Z
-45462
-siebrand
+2010-02-18T20:13:15.018905Z
+62678
+raymond
 
 
 
@@ -32,7 +32,7 @@ file
 
 
 
-2009-11-10T13:30:31.000000Z
+2011-02-04T18:16:00.132266Z
 62b1f471f65328e5d93b6b3c698ac1dc
 2008-10-13T20:32:09.863857Z
 42055
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:30:31.000000Z
-6da192f8a82a25434990ab2ddd1d8eea
-2009-01-06T21:40:11.283910Z
-45462
-siebrand
+2011-02-04T18:16:00.132266Z
+82bc2510d4562ec53bb0371a9e9ceaca
+2010-01-24T19:16:37.446515Z
+61471
+raymond
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-37182
+47418
 
 SpecialWhoIsWatching.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2009-11-10T13:30:31.000000Z
-fedbc0518ce23f036f21fc19ecaf6d05
-2008-10-06T13:23:58.096162Z
-41748
-gri6507
+2011-02-04T18:16:00.132266Z
+92c6e46f13310f0e589357c2333691f5
+2009-04-27T04:45:10.789582Z
+49927
+shinjiman
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-1732
+1766
 
 SpecialWhoIsWatching.alias.php
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2009-11-10T13:30:31.000000Z
-28002e3b0a98721ce586807fddc4a659
-2008-12-10T14:27:36.418827Z
-44396
-siebrand
+2011-02-04T18:16:00.136266Z
+b1907b5460e82fdeaa47f0080cadd6e0
+2010-02-18T20:13:15.018905Z
+62678
+raymond
 has-props
 
 
@@ -160,5 +160,5 @@ has-props
 
 
 
-2050
+4675
 

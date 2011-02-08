@@ -1,15 +1,15 @@
 10
 
 dir
-59430
+81532
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/MediaFunctions
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-11-11T19:05:20.397090Z
-58921
-raymond
+2011-01-22T20:08:34.818499Z
+80761
+siebrand
 
 
 
@@ -32,7 +32,7 @@ file
 
 
 
-2009-11-25T18:52:58.000000Z
+2011-02-04T18:17:26.228515Z
 12a2852e9cdfddc28906f12738b7d62c
 2009-08-11T22:17:30.646585Z
 54818
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-25T18:52:58.000000Z
-4db5008b43d2e1afeec9b44e0e11515d
-2009-08-11T22:17:30.646585Z
-54818
-siebrand
+2011-02-04T18:17:26.228515Z
+e48e77e03a26a3c4b4c508d4a12097b5
+2010-11-05T16:30:21.791886Z
+76112
+simetrical
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-4059
+4562
 
 MediaFunctions.i18n.magic.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2009-11-25T18:52:58.000000Z
-34c133c5b97d21723556b12771e634b1
-2009-10-04T22:45:32.260889Z
-57369
+2011-02-04T18:17:26.228515Z
+53260e823cb16015f2816ee80cee4235
+2010-10-31T17:55:47.642542Z
+75726
 siebrand
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-2503
+4731
 
 MediaFunctions.i18n.php
 file
@@ -134,44 +134,10 @@ file
 
 
 
-2009-11-25T18:52:58.000000Z
-6061eef695edfd760372c65e5e0aa317
-2009-11-11T19:05:20.397090Z
-58921
-raymond
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-19657
-
-MediaFunctions.php
-file
-
-
-
-
-2009-11-30T14:01:05.142916Z
-94b588e13e3b473107be64dd30bfaab0
-2009-08-11T22:17:30.646585Z
-54818
+2011-02-04T18:17:26.228515Z
+f2e871a41d64c4699ff0363f7b93efc8
+2011-01-22T20:08:34.818499Z
+80761
 siebrand
 has-props
 
@@ -194,5 +160,39 @@ has-props
 
 
 
-1470
+20873
+
+MediaFunctions.php
+file
+
+
+
+
+2011-02-04T18:17:26.232515Z
+6fdd438c508b7a0d6bce51f1e5fa4536
+2010-06-06T15:12:22.807498Z
+67467
+ialex
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1483
 

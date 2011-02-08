@@ -1,14 +1,14 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/extensions/StringFunctions
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/StringFunctions
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-01-01T23:45:29.564737Z
-45302
+2010-01-22T20:33:04.646846Z
+61389
 siebrand
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2009-11-10T13:30:36.000000Z
-a6fea9dec19ffd8167e85605fdb5b65c
-2009-01-01T23:45:29.564737Z
-45302
+2011-02-04T18:16:14.532307Z
+492e2237cfe21ab94c7d1aecb5d7b59c
+2010-01-22T20:33:04.646846Z
+61389
 siebrand
 has-props
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-6768
+11241
 
 StringFunctions.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2009-11-10T13:30:36.000000Z
-93ed04c2e3914d87d3daa0973646db58
-2008-12-01T03:19:21.620130Z
-44097
-yaron
+2011-02-04T18:16:14.532307Z
+e06252be866b4486619b4efc11bd4e5e
+2009-04-27T04:45:10.789582Z
+49927
+shinjiman
 has-props
 
 
@@ -92,5 +92,5 @@ has-props
 
 
 
-14396
+14428
 

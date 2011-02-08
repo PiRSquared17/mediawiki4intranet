@@ -1,23 +1,35 @@
 K 25
 svn:wc:ra_dav:version-url
-V 69
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Interwiki
+V 60
+/svnroot/mediawiki/!svn/ver/81107/trunk/extensions/Interwiki
 END
-SpecialInterwiki.alias.php
+Interwiki.alias.php
 K 25
 svn:wc:ra_dav:version-url
-V 96
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Interwiki/SpecialInterwiki.alias.php
+V 80
+/svnroot/mediawiki/!svn/ver/73309/trunk/extensions/Interwiki/Interwiki.alias.php
 END
-SpecialInterwiki_body.php
+Interwiki_body.php
 K 25
 svn:wc:ra_dav:version-url
-V 95
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Interwiki/SpecialInterwiki_body.php
+V 79
+/svnroot/mediawiki/!svn/ver/78123/trunk/extensions/Interwiki/Interwiki_body.php
 END
-SpecialInterwiki.i18n.php
+Interwiki.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 95
-/svnroot/mediawiki/!svn/ver/53182/tags/REL1_14_1/extensions/Interwiki/SpecialInterwiki.i18n.php
+V 79
+/svnroot/mediawiki/!svn/ver/81107/trunk/extensions/Interwiki/Interwiki.i18n.php
+END
+Interwiki.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/mediawiki/!svn/ver/65202/trunk/extensions/Interwiki/Interwiki.php
+END
+Interwiki.css
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/mediawiki/!svn/ver/65202/trunk/extensions/Interwiki/Interwiki.css
 END
