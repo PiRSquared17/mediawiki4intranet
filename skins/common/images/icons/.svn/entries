@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/skins/common/images/icons
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/common/images/icons
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-02-08T17:55:33.742593Z
-30721
-huji
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 
 
 
@@ -26,13 +26,47 @@ huji
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
+fileicon-djvu.png
+file
+
+
+
+
+2011-02-04T18:15:07.700114Z
+11569c440a8621bc01323a0e66f4a1b5
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10752
+
 fileicon-ogg.xcf
 file
 
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.696114Z
 76e6e46399ac4626b7a6adca1e345d31
 2006-06-24T05:51:11.044615Z
 14991
@@ -60,17 +94,17 @@ has-props
 
 40236
 
-fileicon-djvu.png
+fileicon-mid.png
 file
 
 
 
 
-2009-03-02T15:52:26.000000Z
-6e569863cbf01fac9f50a557b61d2dba
-2006-06-25T07:00:01.646997Z
-15030
-brion
+2011-02-04T18:15:07.700114Z
+e71e20e8fb81a0c5b2d09cbf9f94a646
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -92,7 +126,7 @@ has-props
 
 
 
-11137
+6657
 
 fileicon-pdf.png
 file
@@ -100,11 +134,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-32adacaa12d31c6ba497ccf432e26fe2
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+2df3f041618ec05fdb82ac844f82d3ff
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -126,41 +160,7 @@ has-props
 
 
 
-5138
-
-fileicon-mid.png
-file
-
-
-
-
-2009-03-02T15:52:26.000000Z
-59b88688b90de25a3a3ef07be086694d
-2006-04-03T09:05:10.741197Z
-13445
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-7191
+4976
 
 fileicon-ogg.png
 file
@@ -168,11 +168,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-658d92ad240be27e71733ff23eeedead
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+5773e4b784567c6d73010a9a318fa9d7
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -194,7 +194,7 @@ has-props
 
 
 
-6143
+3750
 
 fileicon-rm.png
 file
@@ -202,11 +202,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-c480e6dbce7750164ef59926c4df676c
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+e369d93c8a19f473ab025321006e9968
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -228,7 +228,7 @@ has-props
 
 
 
-4977
+2851
 
 fileicon-txt.png
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-fca3020aa37e998d31342b5047338594
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+b348146acdf553e50dfdd1cf9af9c414
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -262,41 +262,7 @@ has-props
 
 
 
-6801
-
-fileicon-exe.png
-file
-
-
-
-
-2009-03-02T15:52:26.000000Z
-c062eff06ab8792311dd401000ca2ea7
-2006-04-03T09:05:10.741197Z
-13445
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-5864
+3638
 
 fileicon-java.png
 file
@@ -304,11 +270,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-e923757eee12a6195919189e432f04da
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+7875a84a24d6b5f2df9bdd2b99b02e7d
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -330,19 +296,19 @@ has-props
 
 
 
-6825
+5989
 
-fileicon-ps.png
+fileicon-exe.png
 file
 
 
 
 
-2009-03-02T15:52:26.000000Z
-36e55c207a02d5246dd4896433c3e460
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.700114Z
+d6c3e8de138034b8487b99b56b9c2556
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -364,75 +330,7 @@ has-props
 
 
 
-3293
-
-fileicon-c.png
-file
-
-
-
-
-2009-03-02T15:52:26.000000Z
-9557cc8d577a75d0de696204930ee308
-2006-04-03T09:05:10.741197Z
-13445
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2995
-
-fileicon-cpp.png
-file
-
-
-
-
-2009-03-02T15:52:26.000000Z
-961fc40562a97bc0c8f6e77bf406c525
-2006-04-03T09:05:10.741197Z
-13445
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2250
+5680
 
 fileicon-dvi.png
 file
@@ -440,11 +338,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-83c36cca68eb5f3c2f11b4b00a3e94e3
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.704114Z
+1404650702263541f59ac140e1baf71a
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -466,7 +364,109 @@ has-props
 
 
 
-13042
+12778
+
+fileicon-cpp.png
+file
+
+
+
+
+2011-02-04T18:15:07.704114Z
+cbfde727f5bc918e344b2914d332e21e
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1882
+
+fileicon-c.png
+file
+
+
+
+
+2011-02-04T18:15:07.704114Z
+6543f781d67d983451b5238f0d2b286c
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2211
+
+fileicon-ps.png
+file
+
+
+
+
+2011-02-04T18:15:07.704114Z
+3a73aa61fbec4d66948658c130a38533
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3012
 
 fileicon-tar.png
 file
@@ -474,11 +474,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-676e46b8ee5c99b80eb40af9d90f6d68
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.704114Z
+05a9c152ee253a75ccc94576771cec84
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -500,7 +500,7 @@ has-props
 
 
 
-6544
+6347
 
 fileicon-h.png
 file
@@ -508,11 +508,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-ef092fd3368c56eba7abdd5ca54a4acb
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.704114Z
+1fef50208ab717dccf4b7778b052f88f
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -534,7 +534,7 @@ has-props
 
 
 
-1195
+1191
 
 fileicon-iso.png
 file
@@ -542,11 +542,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-5190c21ae7042da45ea97b3e3b1d0ece
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.704114Z
+12292250a34b342a4a290fe213e5e6b5
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -568,7 +568,7 @@ has-props
 
 
 
-6673
+6450
 
 fileicon-deb.png
 file
@@ -576,11 +576,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-3f09f3c16c826f85d54726240ce962d7
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+cfd007355ed1935e254a477a3632d9d7
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -602,7 +602,7 @@ has-props
 
 
 
-5528
+4801
 
 fileicon-ttf.png
 file
@@ -610,11 +610,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-f9301269ced40d4a07770f4579d5676c
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+891ab612dc95e3cf6f14c98026e74d9f
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -636,7 +636,7 @@ has-props
 
 
 
-3625
+3469
 
 fileicon-o.png
 file
@@ -644,11 +644,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-5941fd18dee589b583c865bdf9a1d6d6
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+41625d5e567b73657bb0be9b1c2c1cc1
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -670,7 +670,7 @@ has-props
 
 
 
-2893
+2204
 
 fileicon-rpm.png
 file
@@ -678,11 +678,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-2fd06271efea5f0c10097a148a15f7e9
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+2e35e2520bce0544986ca002e23c5096
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -704,7 +704,7 @@ has-props
 
 
 
-4753
+4103
 
 COPYING
 file
@@ -712,7 +712,7 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.708114Z
 31b8cc7292ca764d775edf4ee219c5fd
 2008-01-30T12:06:27.157775Z
 30295
@@ -746,11 +746,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-ee3e7c94d6ed7843d091c0cb0bba11be
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+7eedcae49532b8e7d6fc7968a416b74f
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -772,7 +772,7 @@ has-props
 
 
 
-5193
+5094
 
 fileicon-tex.png
 file
@@ -780,11 +780,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-82d2af66a0f59d82c06d56d215dc94dd
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+d5721228159eab41ec54000bf24dd4b3
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -806,7 +806,7 @@ has-props
 
 
 
-4203
+3997
 
 fileicon-mov.png
 file
@@ -814,11 +814,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-4e2d7bc49a0ba34146cadfff5e4fc04d
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+995bcdcc08e13405c1e89aa8555bafd1
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -840,7 +840,7 @@ has-props
 
 
 
-7946
+7716
 
 fileicon.png
 file
@@ -848,7 +848,7 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.708114Z
 08cd2db5216df156c4432828bba5c56c
 2006-04-03T09:05:10.741197Z
 13445
@@ -882,11 +882,11 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
-f745b653f617cb1fa3cbc39d6500669e
-2006-04-03T09:05:10.741197Z
-13445
-brion
+2011-02-04T18:15:07.708114Z
+dbfc0bffbf35bb242c0c242734d12a73
+2009-08-09T19:11:53.168946Z
+54679
+greenreaper
 has-props
 
 
@@ -908,7 +908,7 @@ has-props
 
 
 
-7601
+7422
 
 fileicon-djvu.xcf
 file
@@ -916,7 +916,7 @@ file
 
 
 
-2009-03-02T15:52:26.000000Z
+2011-02-04T18:15:07.708114Z
 c095943d9424f9633bb42ba8913a8046
 2006-06-25T07:00:01.646997Z
 15030

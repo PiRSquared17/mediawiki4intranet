@@ -1,15 +1,15 @@
 10
 
 dir
-58865
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1/phase3/maintenance/mssql
+81532
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/maintenance/mssql
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2008-06-03T09:05:07.806490Z
-35779
-ialex
+2009-05-07T07:40:57.398886Z
+50301
+werdna
 
 
 
@@ -32,7 +32,7 @@ file
 
 
 
-2009-03-02T15:52:15.000000Z
+2011-02-04T18:14:59.516090Z
 9f0f6cdc24bdcaeecccb4aa9da1ee65c
 2008-05-10T12:17:45.128051Z
 34571
@@ -66,7 +66,7 @@ file
 
 
 
-2009-03-02T15:52:15.000000Z
+2011-02-04T18:14:59.516090Z
 12f63450adf8ca5624ce9a6eab6f98ce
 2008-06-03T09:05:07.806490Z
 35779

@@ -11,7 +11,8 @@ if ( count( $args ) < 1 ) {
 	exit( 1 );
 }
 $tracker = new TrackBlobs( $args );
-$tracker->trackBlobs();
+$tracker->run();
+echo "All done.\n";
 
 class TrackBlobs {
 	var $clusters, $textClause;
@@ -33,7 +34,7 @@ class TrackBlobs {
 		}
 	}
 
-	function trackBlobs() {
+	function run() {
 		$this->initTrackingTable();
 		$this->trackRevisions();
 		$this->trackOrphanText();
@@ -59,7 +60,7 @@ class TrackBlobs {
 				if ( $this->textClause != '' ) {
 					$this->textClause .= ' OR ';
 				}
-				$this->textClause .= 'old_text LIKE ' . $dbr->addQuotes( $dbr->escapeLike( "DB://$cluster/" ) . '%' );
+				$this->textClause .= 'old_text' . $dbr->buildLike( "DB://$cluster/", $dbr->anyString() );
 			}
 		}
 		return $this->textClause;
@@ -72,7 +73,7 @@ class TrackBlobs {
 		return array(
 			'cluster' => $m[1],
 			'id' => intval( $m[2] ),
-			'hash' => isset( $m[3] ) ? $m[2] : null
+			'hash' => isset( $m[3] ) ? $m[3] : null
 		);
 	}
 
@@ -98,7 +99,7 @@ class TrackBlobs {
 					'rev_id > ' . $dbr->addQuotes( $startId ),
 					'rev_text_id=old_id',
 					$textClause,
-					"old_flags LIKE '%external%'",
+					'old_flags ' . $dbr->buildLike( $dbr->anyString(), 'external', $dbr->anyString() ),
 				),
 				__METHOD__,
 				array(
@@ -174,7 +175,7 @@ class TrackBlobs {
 				array( 
 					'old_id>' . $dbr->addQuotes( $startId ),
 					$textClause,
-					"old_flags LIKE '%external%'",
+					'old_flags ' . $dbr->buildLike( $dbr->anyString(), 'external', $dbr->anyString() ),
 					'bt_text_id IS NULL'
 				),
 				__METHOD__,
@@ -259,14 +260,22 @@ class TrackBlobs {
 				}
 				continue;
 			}
+			$table = $extDB->getLBInfo( 'blobs table' );
+			if ( is_null( $table ) ) {
+				$table = 'blobs';
+			}
+			if ( !$extDB->tableExists( $table ) ) {
+				echo "No blobs table on cluster $cluster\n";
+				continue;
+			}
 			$startId = 0;
 			$batchesDone = 0;
 			$actualBlobs = gmp_init( 0 );
-			$endId = $extDB->selectField( 'blobs', 'MAX(blob_id)', false, __METHOD__ );
+			$endId = $extDB->selectField( $table, 'MAX(blob_id)', false, __METHOD__ );
 
 			// Build a bitmap of actual blob rows
 			while ( true ) {
-				$res = $extDB->select( 'blobs', 
+				$res = $extDB->select( $table, 
 					array( 'blob_id' ), 
 					array( 'blob_id > ' . $extDB->addQuotes( $startId ) ),
 					__METHOD__,
@@ -296,6 +305,7 @@ class TrackBlobs {
 			// Traverse the orphan list
 			$insertBatch = array();
 			$id = 0;
+			$numOrphans = 0;
 			while ( true ) {
 				$id = gmp_scan1( $orphans, $id );
 				if ( $id == -1 ) {
@@ -305,12 +315,18 @@ class TrackBlobs {
 					'bo_cluster' => $cluster,
 					'bo_blob_id' => $id
 				);
-				++$id;
-			}
+				if ( count( $insertBatch ) > $this->batchSize ) {
+					$dbw->insert( 'blob_orphans', $insertBatch, __METHOD__ );
+					$insertBatch = array();
+				}
 
-			// Insert the batch
-			echo "Found " . count( $insertBatch ) . " orphan(s) in $cluster\n";
-			$dbw->insert( 'blob_orphans', $insertBatch, __METHOD__ );
+				++$id;
+				++$numOrphans;
+			}
+			if ( $insertBatch ) {
+				$dbw->insert( 'blob_orphans', $insertBatch, __METHOD__ );
+			}
+			echo "Found $numOrphans orphan(s) in $cluster\n";
 		}
 	}
 }
