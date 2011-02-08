@@ -239,37 +239,10 @@ function fillDestFilename(id) {
 		fname = path.substring(backslash+1, 10000);
 	}
 
-	// Clear the filename if it does not have a valid extension.
-	// URLs are less likely to have a useful extension, so don't include them in the 
-	// extension check.
-	if( wgFileExtensions && id != 'wpUploadFileURL' ) {
-		var found = false;
-		if( fname.lastIndexOf( '.' ) != -1 ) {
-			var ext = fname.substr( fname.lastIndexOf( '.' ) + 1 );
-			for( var i = 0; i < wgFileExtensions.length; i++ ) {
-				if( wgFileExtensions[i].toLowerCase() == ext.toLowerCase() ) {
-					found = true;
-					break;
-				}
-			}
-		}
-		if( !found ) {
-			// Not a valid extension
-			// Clear the upload and set mw-upload-permitted to error
-			document.getElementById(id).value = '';
-			var e = document.getElementById( 'mw-upload-permitted' );
-			if( e ) e.className = 'error';
-
-			var e = document.getElementById( 'mw-upload-prohibited' );
-			if( e ) e.className = 'error';
-
-			// Clear wpDestFile as well
-			var e = document.getElementById( 'wpDestFile' )
-			if( e ) e.value = '';
-
-			return false;
-		}
-	}
+	// Find and make extension lower-case
+	var dot = fname.lastIndexOf('.');
+	if (dot >= 0)
+		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
 
 	// Capitalise first letter and replace spaces by underscores
 	// FIXME: $wgCapitalizedNamespaces
