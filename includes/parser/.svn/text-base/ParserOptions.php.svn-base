@@ -5,10 +5,8 @@
  * @todo document
  * @ingroup Parser
  */
-class ParserOptions
-{
+class ParserOptions {
 	# All variables are supposed to be private in theory, although in practise this is not the case.
-	var $mUseTeX;                    # Use texvc to expand <math> tags
 	var $mUseDynamicDates;           # Use DateFormatter to format dates
 	var $mInterwikiMagic;            # Interlanguage links are removed and returned in an array
 	var $mAllowExternalImages;       # Allow external images inline
@@ -33,8 +31,10 @@ class ParserOptions
 	var $mExternalLinkTarget;        # Target attribute for external links
 
 	var $mUser;                      # Stored user object, just used to initialise the skin
-
-	function getUseTeX()                        { return $this->mUseTeX; }
+	var $mIsPreview;                 # Parsing the page for a "preview" operation
+	var $mIsSectionPreview;          # Parsing the page for a "preview" operation on a single section
+	var $mIsPrintable;               # Parsing the printable version of the page
+	
 	function getUseDynamicDates()               { return $this->mUseDynamicDates; }
 	function getInterwikiMagic()                { return $this->mInterwikiMagic; }
 	function getAllowExternalImages()           { return $this->mAllowExternalImages; }
@@ -54,6 +54,9 @@ class ParserOptions
 	function getEnableLimitReport()             { return $this->mEnableLimitReport; }
 	function getCleanSignatures()               { return $this->mCleanSignatures; }
 	function getExternalLinkTarget()            { return $this->mExternalLinkTarget; }
+	function getIsPreview()                     { return $this->mIsPreview; }
+	function getIsSectionPreview()              { return $this->mIsSectionPreview; }
+	function getIsPrintable()                   { return $this->mIsPrintable; }
 
 	function getSkin() {
 		if ( !isset( $this->mSkin ) ) {
@@ -76,7 +79,6 @@ class ParserOptions
 		return $this->mTimestamp;
 	}
 
-	function setUseTeX( $x )                    { return wfSetVar( $this->mUseTeX, $x ); }
 	function setUseDynamicDates( $x )           { return wfSetVar( $this->mUseDynamicDates, $x ); }
 	function setInterwikiMagic( $x )            { return wfSetVar( $this->mInterwikiMagic, $x ); }
 	function setAllowExternalImages( $x )       { return wfSetVar( $this->mAllowExternalImages, $x ); }
@@ -99,6 +101,9 @@ class ParserOptions
 	function setTimestamp( $x )                 { return wfSetVar( $this->mTimestamp, $x ); }
 	function setCleanSignatures( $x )           { return wfSetVar( $this->mCleanSignatures, $x ); }
 	function setExternalLinkTarget( $x )        { return wfSetVar( $this->mExternalLinkTarget, $x ); }
+	function setIsPreview( $x )                 { return wfSetVar( $this->mIsPreview, $x ); }
+	function setIsSectionPreview( $x )          { return wfSetVar( $this->mIsSectionPreview, $x ); }
+	function setIsPrintable( $x )               { return wfSetVar( $this->mIsPrintable, $x ); }
 
 	function __construct( $user = null ) {
 		$this->initialiseFromUser( $user );
@@ -114,12 +119,13 @@ class ParserOptions
 
 	/** Get user options */
 	function initialiseFromUser( $userInput ) {
-		global $wgUseTeX, $wgUseDynamicDates, $wgInterwikiMagic, $wgAllowExternalImages;
+		global $wgUseDynamicDates, $wgInterwikiMagic, $wgAllowExternalImages;
 		global $wgAllowExternalImagesFrom, $wgEnableImageWhitelist, $wgAllowSpecialInclusion, $wgMaxArticleSize;
 		global $wgMaxPPNodeCount, $wgMaxTemplateDepth, $wgMaxPPExpandDepth, $wgCleanSignatures;
 		global $wgExternalLinkTarget;
-		$fname = 'ParserOptions::initialiseFromUser';
-		wfProfileIn( $fname );
+
+		wfProfileIn( __METHOD__ );
+
 		if ( !$userInput ) {
 			global $wgUser;
 			if ( isset( $wgUser ) ) {
@@ -133,7 +139,6 @@ class ParserOptions
 
 		$this->mUser = $user;
 
-		$this->mUseTeX = $wgUseTeX;
 		$this->mUseDynamicDates = $wgUseDynamicDates;
 		$this->mInterwikiMagic = $wgInterwikiMagic;
 		$this->mAllowExternalImages = $wgAllowExternalImages;
@@ -156,6 +161,9 @@ class ParserOptions
 		$this->mEnableLimitReport = false;
 		$this->mCleanSignatures = $wgCleanSignatures;
 		$this->mExternalLinkTarget = $wgExternalLinkTarget;
-		wfProfileOut( $fname );
+		$this->mIsPreview = false;
+		$this->mIsSectionPreview = false;
+
+		wfProfileOut( __METHOD__ );
 	}
 }

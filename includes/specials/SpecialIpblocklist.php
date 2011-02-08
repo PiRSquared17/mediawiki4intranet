@@ -5,12 +5,13 @@
  */
 
 /**
+ * @param $ip part of title: Special:Ipblocklist/<ip>.
  * @todo document
  */
-function wfSpecialIpblocklist() {
+function wfSpecialIpblocklist( $ip = '' ) {
 	global $wgUser, $wgOut, $wgRequest;
-
-	$ip = trim( $wgRequest->getVal( 'wpUnblockAddress', $wgRequest->getVal( 'ip' ) ) );
+	$ip = $wgRequest->getVal( 'ip', $ip );
+	$ip = trim( $wgRequest->getVal( 'wpUnblockAddress', $ip ) );
 	$id = $wgRequest->getVal( 'id' );
 	$reason = $wgRequest->getText( 'wpUnblockReason' );
 	$action = $wgRequest->getText( 'action' );
@@ -94,7 +95,7 @@ class IPUnblockForm {
 		$titleObj = SpecialPage::getTitleFor( "Ipblocklist" );
 		$action = $titleObj->getLocalURL( "action=submit" );
 
-		if ( "" != $err ) {
+		if ( $err != "" ) {
 			$wgOut->setSubtitle( wfMsg( "formerror" ) );
 			$wgOut->addWikiText( Xml::tags( 'span', array( 'class' => 'error' ), $err ) . "\n" );
 		}
@@ -162,7 +163,7 @@ class IPUnblockForm {
 	 * @return array array(message key, parameters) on failure, empty array on success
 	 */
 
-	static function doUnblock(&$id, &$ip, &$reason, &$range = null) {
+	static function doUnblock(&$id, &$ip, &$reason, &$range = null, $blocker=null) {
 		if ( $id ) {
 			$block = Block::newFromID( $id );
 			if ( !$block ) {
@@ -184,8 +185,7 @@ class IPUnblockForm {
 				if ( !$block ) {
 					return array('ipb_cant_unblock', htmlspecialchars($id));
 				}
-				if( $block->mRangeStart != $block->mRangeEnd
-						&& !strstr( $ip, "/" ) ) {
+				if( $block->mRangeStart != $block->mRangeEnd && !strstr( $ip, "/" ) ) {
 					/* If the specified IP is a single address, and the block is
 					 * a range block, don't unblock the range. */
 					 $range = $block->mAddress;
@@ -195,10 +195,21 @@ class IPUnblockForm {
 		}
 		// Yes, this is really necessary
 		$id = $block->mId;
+		
+		# If the name was hidden and the blocking user cannot hide
+		# names, then don't allow any block removals...
+		if( $blocker && $block->mHideName && !$blocker->isAllowed('hideuser') ) {
+			return array('ipb_cant_unblock', htmlspecialchars($id));
+		}
 
 		# Delete block
 		if ( !$block->delete() ) {
 			return array('ipb_cant_unblock', htmlspecialchars($id));
+		}
+		
+		# Unset _deleted fields as needed
+		if( $block->mHideName ) {
+			IPBlockForm::unsuppressUserName( $block->mAddress, $block->mUser );
 		}
 
 		# Make log entry
@@ -208,10 +219,9 @@ class IPUnblockForm {
 	}
 
 	function doSubmit() {
-		global $wgOut;
-		$retval = self::doUnblock($this->id, $this->ip, $this->reason, $range);
-		if(!empty($retval))
-		{
+		global $wgOut, $wgUser;
+		$retval = self::doUnblock($this->id, $this->ip, $this->reason, $range, $wgUser);
+		if( !empty($retval) ) {
 			$key = array_shift($retval);
 			$this->showForm(wfMsgReal($key, $retval));
 			return;
@@ -226,7 +236,7 @@ class IPUnblockForm {
 		global $wgOut, $wgUser;
 
 		$wgOut->setPagetitle( wfMsg( "ipblocklist" ) );
-		if ( "" != $msg ) {
+		if ( $msg != "" ) {
 			$wgOut->setSubtitle( $msg );
 		}
 
@@ -238,7 +248,7 @@ class IPUnblockForm {
 		$conds = array();
 		$matches = array();
 		// Is user allowed to see all the blocks?
-		if ( !$wgUser->isAllowed( 'suppress' ) )
+		if ( !$wgUser->isAllowed( 'hideuser' ) )
 			$conds['ipb_deleted'] = 0;
 		if ( $this->ip == '' ) {
 			// No extra conditions
@@ -253,10 +263,9 @@ class IPUnblockForm {
 				// Fixme -- encapsulate this sort of query-building.
 				$dbr = wfGetDB( DB_SLAVE );
 				$encIp = $dbr->addQuotes( IP::sanitizeIP($this->ip) );
-				$encRange = $dbr->addQuotes( "$range%" );
 				$encAddr = $dbr->addQuotes( $iaddr );
 				$conds[] = "(ipb_address = $encIp) OR 
-					(ipb_range_start LIKE $encRange AND
+					(ipb_range_start" . $dbr->buildLike( $range, $dbr->anyString() ) . " AND
 					ipb_range_start <= $encAddr
 					AND ipb_range_end >= $encAddr)";
 			} else {
@@ -288,25 +297,48 @@ class IPUnblockForm {
 			$conds[] = "ipb_user != 0 OR ipb_range_end > ipb_range_start";
 		}
 
+		// Search form
+		$wgOut->addHTML( $this->searchForm() );
+
+		// Check for other blocks, i.e. global/tor blocks
+		$otherBlockLink = array();
+		wfRunHooks( 'OtherBlockLogLink', array( &$otherBlockLink, $this->ip ) );
+
+		// Show additional header for the local block only when other blocks exists.
+		// Not necessary in a standard installation without such extensions enabled
+		if( count( $otherBlockLink ) ) {
+			$wgOut->addHTML(
+				Html::rawElement( 'h2', array(), wfMsg( 'ipblocklist-localblock' ) ) . "\n"
+			);
+		}
 		$pager = new IPBlocklistPager( $this, $conds );
 		if ( $pager->getNumRows() ) {
 			$wgOut->addHTML(
-				$this->searchForm() .
 				$pager->getNavigationBar() .
 				Xml::tags( 'ul', null, $pager->getBody() ) .
 				$pager->getNavigationBar()
 			);
 		} elseif ( $this->ip != '') {
-			$wgOut->addHTML( $this->searchForm() );
 			$wgOut->addWikiMsg( 'ipblocklist-no-results' );
 		} else {
-			$wgOut->addHTML( $this->searchForm() );
 			$wgOut->addWikiMsg( 'ipblocklist-empty' );
 		}
+
+		if( count( $otherBlockLink ) ) {
+			$wgOut->addHTML(
+				Html::rawElement( 'h2', array(), wfMsgExt( 'ipblocklist-otherblocks', 'parseinline', count( $otherBlockLink ) ) ) . "\n"
+			);
+			$list = '';
+			foreach( $otherBlockLink as $link ) {
+				$list .= Html::rawElement( 'li', array(), $link ) . "\n";
+			}
+			$wgOut->addHTML( Html::rawElement( 'ul', array( 'class' => 'mw-ipblocklist-otherblocks' ), $list ) . "\n" );
+		}
+
 	}
 
 	function searchForm() {
-		global $wgTitle, $wgScript, $wgRequest;
+		global $wgScript, $wgRequest, $wgLang;
 
 		$showhide = array( wfMsg( 'show' ), wfMsg( 'hide' ) );
 		$nondefaults = array();
@@ -330,11 +362,11 @@ class IPUnblockForm {
 		$links[] = wfMsgHtml( 'ipblocklist-sh-userblocks', $ubLink );
 		$links[] = wfMsgHtml( 'ipblocklist-sh-tempblocks', $tbLink );
 		$links[] = wfMsgHtml( 'ipblocklist-sh-addressblocks', $sipbLink );
-		$hl = implode( ' ' . wfMsg( 'pipe-separator' ) . ' ', $links );
+		$hl = $wgLang->pipeList( $links );
 
 		return
 			Xml::tags( 'form', array( 'action' => $wgScript ),
-				Xml::hidden( 'title', $wgTitle->getPrefixedDbKey() ) .
+				Xml::hidden( 'title', SpecialPage::getTitleFor( 'Ipblocklist' )->getPrefixedDbKey() ) .
 				Xml::openElement( 'fieldset' ) .
 				Xml::element( 'legend', null, wfMsg( 'ipblocklist-legend' ) ) .
 				Xml::inputLabel( wfMsg( 'ipblocklist-username' ), 'ip', 'ip', /* size */ false, $this->ip ) .
@@ -355,7 +387,7 @@ class IPUnblockForm {
 		global $wgUser;
 		$sk = $wgUser->getSkin();
 		$params = $override + $options;
-		$ipblocklist = SpecialPage::getTitleFor( 'IPBlockList' );
+		$ipblocklist = SpecialPage::getTitleFor( 'Ipblocklist' );
 		return $sk->link( $ipblocklist, htmlspecialchars( $title ),
 			( $active ? array( 'style'=>'font-weight: bold;' ) : array() ), $params, array( 'known' ) );
 	}
@@ -375,11 +407,10 @@ class IPUnblockForm {
 		if( is_null( $msg ) ) {
 			$msg = array();
 			$keys = array( 'infiniteblock', 'expiringblock', 'unblocklink', 'change-blocklink',
-				'anononlyblock', 'createaccountblock', 'noautoblockblock', 'emailblock', 'blocklist-nousertalk' );
+				'anononlyblock', 'createaccountblock', 'noautoblockblock', 'emailblock', 'blocklist-nousertalk', 'blocklistline' );
 			foreach( $keys as $key ) {
 				$msg[$key] = wfMsgHtml( $key );
 			}
-			$msg['blocklistline'] = wfMsg( 'blocklistline' );
 		}
 
 		# Prepare links to the blocker's user and talk pages
@@ -396,7 +427,7 @@ class IPUnblockForm {
 				. $sk->userToolLinks( $block->mUser, $block->mAddress, false, Linker::TOOL_LINKS_NOBLOCK );
 		}
 
-		$formattedTime = $wgLang->timeanddate( $block->mTimestamp, true );
+		$formattedTime = htmlspecialchars( $wgLang->timeanddate( $block->mTimestamp, true ) );
 
 		$properties = array();
 		$properties[] = Block::formatExpiry( $block->mExpiry );
@@ -418,7 +449,7 @@ class IPUnblockForm {
 			$properties[] = $msg['blocklist-nousertalk'];
 		}
 
-		$properties = implode( ', ', $properties );
+		$properties = $wgLang->commaList( $properties );
 
 		$line = wfMsgReplaceArgs( $msg['blocklistline'], array( $formattedTime, $blocker, $target, $properties ) );
 
@@ -434,7 +465,7 @@ class IPUnblockForm {
 
 			# Create changeblocklink for all blocks with exception of autoblocks
 			if( !$block->mAuto ) {
-				$changeblocklink = ' ' . wfMsg( 'pipe-separator' ) . ' ' .
+				$changeblocklink = wfMsgExt( 'pipe-separator', 'escapenoentities' ) .
 					$sk->link( SpecialPage::getTitleFor( 'Blockip', $block->mAddress ), 
 						$msg['change-blocklink'],
 						array(), array(), 'known' );
@@ -442,7 +473,7 @@ class IPUnblockForm {
 			$toolLinks = "($unblocklink$changeblocklink)";
 		}
 
-		$comment = $sk->commentBlock( $block->mReason );
+		$comment = $sk->commentBlock( htmlspecialchars($block->mReason) );
 
 		$s = "{$line} $comment";
 		if ( $block->mHideName )

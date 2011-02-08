@@ -21,10 +21,9 @@ class KkConverter extends LanguageConverter {
 	function __construct($langobj, $maincode,
 								$variants=array(),
 								$variantfallbacks=array(),
-								$markup=array(),
 								$flags = array()) {
 		parent::__construct( $langobj, $maincode,
-			$variants, $variantfallbacks, $markup, $flags );
+			$variants, $variantfallbacks, $flags );
 
 		// No point delaying this since they're in code.
 		// Waiting until loadDefaultTables() means they never get loaded
@@ -209,23 +208,13 @@ class KkConverter extends LanguageConverter {
 		return $carray;
 	}
 
-	// Do not convert content on talk pages
-	function parserConvert( $text, &$parser ){
-		if(is_object($parser->getTitle() ) && $parser->getTitle()->isTalkPage())
-			$this->mDoContentConvert=false;
-		else
-			$this->mDoContentConvert=true;
-
-		return parent::parserConvert($text, $parser );
-	}
-
 	/*
 	 * A function wrapper:
 	 *  - if there is no selected variant, leave the link
 	 *    names as they were
 	 *  - do not try to find variants for usernames
 	 */
-	function findVariantLink( &$link, &$nt, $forTemplate = false ) {
+	function findVariantLink( &$link, &$nt, $ignoreOtherCond = false ) {
 		// check for user namespace
 		if(is_object($nt)){
 			$ns = $nt->getNamespace();
@@ -234,7 +223,7 @@ class KkConverter extends LanguageConverter {
 		}
 
 		$oldlink=$link;
-		parent::findVariantLink( $link, $nt, $forTemplate );
+		parent::findVariantLink( $link, $nt, $ignoreOtherCond );
 		if( $this->getPreferredVariant()==$this->mMainLanguageCode )
 			$link=$oldlink;
 	}

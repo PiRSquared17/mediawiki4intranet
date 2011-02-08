@@ -7,6 +7,7 @@
  * @ingroup Language
  * @file
  *
+ * @author Diego Grez
  * @author Erebedhel
  * @author Kanon6917
  */
@@ -19,6 +20,8 @@ $messages = array(
 'tog-highlightbroken'         => 'P\'akita sipita utt\'ayaña <a href="" class="new">ukhama</a> (maykipa: ukhama<a href="" class="internal">?</a>).',
 'tog-justify'                 => "Tanta amuyanak purapt'ayaña",
 'tog-hideminor'               => 'Jichha jaqukipawina sullka askiptawix imantaña',
+'tog-hidepatrolled'           => "Jichhnaki jaqukipawina askiptawix unch'ukita imantaña",
+'tog-newpageshidepatrolled'   => "Machaqa uñstawix waruchatat uñstawix unch'ukita imantaña",
 'tog-extendwatchlist'         => "Sarayawi jaqukipaw uñachayasuñatakiw unch'ukit waruch aqatatayaña",
 'tog-usenewrc'                => 'Jichhnaki jaqukipawi waliptäta (JavaScript munawiwa)',
 'tog-numberheadings'          => 'Titulun chinu achuraña',
@@ -53,6 +56,7 @@ $messages = array(
 'tog-watchlisthideminor'      => "Unch'ukit waruchatana sullka askiptawix imantaña",
 'tog-watchlisthideliu'        => "Unch'ukit waruchatana qillqt'ayasita apnaqirina askiptawipax imantaña",
 'tog-watchlisthideanons'      => "Unch'ukit waruchatana sutiwisa apnaqirina askiptawipax imantaña",
+'tog-watchlisthidepatrolled'  => "Unch'ukit waruchatana unch'ukit askiptawix imantaña",
 'tog-nolangconversion'        => "Yaqha aruptaxa jark'aña",
 'tog-ccmeonemails'            => 'Chaski jalayirija nayax yaqhar apayayäta qillqaqawix nayaru apayaña',
 'tog-diffonly'                => 'Manqha diff-nakax uñstawit yati utjawi janiw uñachayaña',
@@ -115,16 +119,18 @@ $messages = array(
 
 'article'       => 'Amtachinu',
 'cancel'        => 'Jan saña',
+'moredotdotdot' => 'Yapa...',
+'mypage'        => 'Uñstawija',
+'navigation'    => 'Wampuña',
+'and'           => '&#32;-mpi',
+
+# Cologne Blue skin
 'qbfind'        => 'Thaqaña',
 'qbbrowse'      => 'Wampuña',
 'qbedit'        => 'Turkaña',
 'qbpageoptions' => 'Uñstawitaki ajllita',
 'qbpageinfo'    => "Uñstawxat uñt'ayawi",
 'qbmyoptions'   => 'Ajllitanakaja',
-'moredotdotdot' => 'Yapa...',
-'mypage'        => 'Uñstawija',
-'navigation'    => 'Wampuña',
-'and'           => '&#32;-mpi',
 
 'errorpagetitle'    => 'Pantja',
 'help'              => 'Yanapaña',
@@ -185,23 +191,24 @@ $messages = array(
 'error' => 'Pantja',
 
 # Login and logout pages
-'loginpagetitle'     => "Qillqt'ayasiña",
 'login'              => "Qillqt'ayasiña",
 'userlogin'          => "Qillqt'ayasiña",
 'logout'             => 'Mistuña',
 'userlogout'         => 'Mistuña',
-'yourlanguage'       => 'Aru:',
-'email'              => 'Chaski jalayiri',
 'loginlanguagelabel' => 'Aru: $1',
 
 # Edit pages
-'summary'  => 'Juk’aptayawi:',
-'subject'  => 'Yatsuwi/titulu:',
-'yourdiff' => 'Jalaqtatanaka',
+'summary'   => 'Juk’aptayäwi:',
+'subject'   => 'Yatsuwi/titulu:',
+'minoredit' => 'Akax janiw taqpachäkiti',
+'yourdiff'  => 'Jalaqtatanaka',
 
 # Preferences page
+'preferences'    => 'Amtajarjama',
 'prefs-rc'       => 'Jichha kutikiptatanaka',
 'timezoneoffset' => 'Jalaqtata',
+'yourlanguage'   => 'Aru:',
+'email'          => 'Chaski jalayiri',
 
 # Recent changes
 'recentchanges' => 'Jichha kutikiptatanaka',
@@ -210,7 +217,8 @@ $messages = array(
 # Upload
 'fileuploadsummary' => 'Uñt’ayawi:',
 
-'license' => 'Iyawsawi:',
+'license'        => 'Iyawsawi:',
+'license-header' => 'Iyawsawi:',
 
 # Special:ListFiles
 'listfiles_date'        => 'Uru jakhu',
@@ -218,10 +226,14 @@ $messages = array(
 'listfiles_description' => 'Uñt’ayawi',
 
 # File description page
-'filehist-user' => 'Apnaqiri',
+'file-anchor-link' => "Q'ipi",
+'filehist-user'    => 'Apnaqiri',
 
 # Miscellaneous special pages
 'move' => 'Qillqaraña',
+
+# Book sources
+'booksources-go' => 'Saraña',
 
 # Special:Log
 'specialloguserlabel'  => 'Apnaqiri:',
@@ -239,6 +251,7 @@ $messages = array(
 # Undelete
 'undelete-search-submit' => 'Thaqaña',
 
+'sp-contributions-talk'   => 'Kutkatasiña',
 'sp-contributions-submit' => 'Thaqaña',
 
 # Block/unblock
