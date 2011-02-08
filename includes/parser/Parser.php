@@ -154,7 +154,7 @@ class Parser
 	 */
 	function __destruct() {
 		if ( isset( $this->mLinkHolders ) ) {
-			$this->mLinkHolders->__destruct();
+			unset( $this->mLinkHolders );
 		}
 		foreach ( $this as $name => $value ) {
 			unset( $this->$name );
@@ -2780,6 +2780,7 @@ class Parser
 	 *  $piece['title']: the title, i.e. the part before the |
 	 *  $piece['parts']: the parameter array
 	 *  $piece['lineStart']: whether the brace was at the start of a line
+	 *  $piece['headLevel']: the shift value for all heading levels
 	 * @param PPFrame The current frame, contains template arguments
 	 * @return string the text of the template
 	 * @private
@@ -2796,6 +2797,9 @@ class Parser
 		$forceRawInterwiki = false; # Force interwiki transclusion to be done in raw mode not rendered
 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
+
+		if (!$piece['headLevel'])
+			$piece['headLevel'] = 0;
 
 		# Title object, where $text came from
 		$title = null;
@@ -3034,22 +3038,22 @@ class Parser
 			$newFrame = $frame->newChild( $args, $title );
 
 			if ( $nowiki ) {
-				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
+				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
 				# Expansion is eligible for the empty-frame cache
 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
 					$text = $this->mTplExpandCache[$titleText];
 				} else {
-					$text = $newFrame->expand( $text );
+					$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 					$this->mTplExpandCache[$titleText] = $text;
 				}
 			} else {
 				# Uncached expansion
-				$text = $newFrame->expand( $text );
+				$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 			}
 		}
 		if ( $isLocalObj && $nowiki ) {
-			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG );
+			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			$isLocalObj = false;
 		}
 
