@@ -3,7 +3,8 @@
 /**
  * Parser function callbacks for the MediaFunctions extension
  *
- * @addtogroup Extensions
+ * @file
+ * @ingroup Extensions
  * @author Rob Church <robchur@gmail.com>
  * @version 1.1
  */
@@ -108,6 +109,24 @@ class MediaFunctions {
 					return htmlspecialchars( $data[$meta] );
 			}
 			return '';
+		}
+		return self::error( $file, $name );
+	}
+	
+ 	/**
+	 * Get the number of pages of a file
+	 *
+	 * @param Parser $parser Calling parser
+	 * @param string $name File name
+	 * @return string
+	 */
+	public static function mediapages( $parser, $name = '' ) {
+		if( ( $file = self::resolve( $name ) ) instanceof File ) {
+			$parser->mOutput->addImage( $file->getTitle()->getDBkey() );
+			$nrpages = $file->getHandler()->pageCount( $file );
+			if ( $nrpages == false )
+				return '';
+			return $nrpages;
 		}
 		return self::error( $file, $name );
 	}

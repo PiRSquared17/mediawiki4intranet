@@ -17,7 +17,7 @@ if( !defined( 'MEDIAWIKI' ) ) {
 class CategoryTreePage extends SpecialPage {
 
 	var $target = '';
-	var $tree = NULL;
+	var $tree = null;
 
 	/**
 	 * Constructor
@@ -50,7 +50,7 @@ class CategoryTreePage extends SpecialPage {
 		$this->target = trim( $this->target );
 
 		#HACK for undefined root category
-		if ( $this->target == '<rootcategory>' || $this->target == '&lt;rootcategory&gt;' ) $this->target = NULL;
+		if ( $this->target == '<rootcategory>' || $this->target == '&lt;rootcategory&gt;' ) $this->target = null;
 
 		$options = array();
 
@@ -68,7 +68,7 @@ class CategoryTreePage extends SpecialPage {
 
 		$this->executeInputForm();
 
-		if( $this->target !== '' && $this->target !== NULL ) {
+		if( $this->target !== '' && $this->target !== null ) {
 			if ( !$wgCategoryTreeForceHeaders ) CategoryTree::setHeaders( $wgOut );
 
 			$title = CategoryTree::makeTitle( $this->target );
@@ -76,7 +76,7 @@ class CategoryTreePage extends SpecialPage {
 			if ( $title && $title->getArticleID() ) {
 				$wgOut->addHTML( Xml::openElement( 'div', array( 'class' => 'CategoryTreeParents' ) ) );
 				$wgOut->addHTML( wfMsgExt( 'categorytree-parents', 'parseinline' ) );
-				$wgOut->addHTML( ': ' );
+				$wgOut->addHTML( wfMsg( 'colon-separator' ) );
 
 				$parents = $this->tree->renderParents( $title );
 
