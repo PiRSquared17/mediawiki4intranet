@@ -110,12 +110,6 @@ else
     cmd("hg clone http://hg.code.sf.net/p/mwslideology/mercurial $DIR/extensions/S5SlideShow");
 }
 
-if (!$WINDOWS)
-{
-    cmd("sudo chown -R www-data:www-data $DIR");
-    cmd("sudo chmod 000 $DIR/config");
-}
-
 cmd(($WINDOWS ? "del" : "rm")." $DIR/extensions/CategoryTree/SubcatCat.i18n.php");
 
 foreach (glob("$SELFDIR/patches/Y-*") as $p)
@@ -129,6 +123,12 @@ if ($UPGRADE)
         cmd("php extensions/HaloACL/maintenance/HACL_Setup.php");
         cmd("php maintenance/update.php");
     }
+}
+
+if (!$WINDOWS)
+{
+    cmd("sudo chown -R www-data:www-data $DIR");
+    cmd("sudo chmod 000 $DIR/config");
 }
 
 run_commands();

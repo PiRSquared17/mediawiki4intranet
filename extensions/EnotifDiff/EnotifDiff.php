@@ -7,8 +7,7 @@
  * (at your option) any later version.
  *
  * ATTENTION: This extension requires a patched includes/UserMailer.php
- *            See ../../custisinstall/includes.diff
- *            PreferencesExtension <http://www.mediawiki.org/wiki/Extension:PreferencesExtension> is also needed
+ *            (see MediaWiki4Intranet patch 000-html-emails)
  *
  * @author Vitaliy Filippov <vitalif@mail.ru>
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
@@ -17,38 +16,42 @@
 if (!defined('MEDIAWIKI'))
     die();
 
-$wgExtensionFunctions[] = "wfEnotifDiff";
+$wgExtensionFunctions[] = 'wfEnotifDiff';
+$wgHooks['GetPreferences'][] = '_enotifdiff_GetPreferences';
+$wgHooks['EnotifComposeCommonMailtext'][] = '_enotifdiff_compose_common_mailtext';
+$wgHooks['EnotifPersonalizeMailtext'][] = '_enotifdiff_personalize_mailtext';
+$wgHooks['EnotifUserCondition'][] = '_enotifdiff_user_condition';
 $wgExtensionMessagesFiles['EnotifDiff'] = dirname(__FILE__) . '/EnotifDiff.i18n.php';
 $wgExtensionCredits['other'][] = array (
     'name'        => 'Differences in Enotify mail',
     'description' => 'Your MediaWiki will get an ability to send page diffs in enotify mail messages',
     'author'      => 'Vitaliy Filippov',
     'url'         => 'http://lib.custis.ru/EnotifDiff',
-    'version'     => '1.0.1 (2010-04-21)',
+    'version'     => '1.0.2 (2011-02-04), for MediaWiki 1.16',
 );
 
 function wfEnotifDiff()
 {
-    global $wgHooks, $wgEmailContentType;
+    global $wgEmailContentType;
     wfLoadExtensionMessages('EnotifDiff');
-    wfAddPreferences(array(
-        array(
-            'name'    => 'enotifsenddiffs',
-            'section' => 'prefs-personal',
-            'type'    => PREF_TOGGLE_T,
-            'default' => 0,
-        ),
-        array(
-            'name'    => 'enotifsendmultiple',
-            'section' => 'prefs-personal',
-            'type'    => PREF_TOGGLE_T,
-            'default' => 0,
-        )
-    ));
-    $wgHooks['EnotifComposeCommonMailtext'][] = '_enotifdiff_compose_common_mailtext';
-    $wgHooks['EnotifPersonalizeMailtext'][] = '_enotifdiff_personalize_mailtext';
-    $wgHooks['EnotifUserCondition'][] = '_enotifdiff_user_condition';
     $wgEmailContentType = 'text/html';
+}
+
+function _enotifdiff_GetPreferences( $user, &$defaultPreferences )
+{
+    $defaultPreferences['enotifsenddiffs'] =
+        array(
+            'type' => 'toggle',
+            'label-message' => 'tog-enotifsenddiffs',
+            'section' => 'personal/email',
+        );
+    $defaultPreferences['enotifsendmultiple'] =
+        array(
+            'type' => 'toggle',
+            'label-message' => 'tog-enotifsendmultiple',
+            'section' => 'personal/email',
+        );
+    return true;
 }
 
 function _enotifdiff_compose_common_mailtext(&$mailer, &$keys)
@@ -88,19 +91,6 @@ function _enotifdiff_personalize_mailtext(&$mailer, &$user, &$body)
 
 function _enotifdiff_user_condition(&$mailer, &$condition)
 {
-    $search = 'wl_notificationtimestamp is null';
-    $replace = '(wl_notificationtimestamp IS NULL OR user_options LIKE \'%enotifsendmultiple=1%\' OR user_options LIKE \'%enotifsenddiffs=1%\')';
-    if (is_string($condition))
-    {
-        // Mediawiki4Intranet 1.14
-        $condition = str_ireplace($search, $replace, $condition);
-    }
-    elseif (is_array($condition))
-    {
-        // Mediawiki4Intranet 1.16+
-        foreach ($condition as &$c)
-            if (strtolower($c) == $search)
-                $c = $replace;
-    }
+    $condition = str_ireplace('wl_notificationtimestamp IS NULL', '(wl_notificationtimestamp IS NULL OR user_options LIKE \'%enotifsendmultiple=1%\' OR user_options LIKE \'%enotifsenddiffs=1%\')', $condition);
     return true;
 }
