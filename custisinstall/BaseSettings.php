@@ -1,5 +1,8 @@
 <?php
 
+// MediaWiki4Intranet configuration base for all MW installations (UNIX, Windows)
+// (c) Stas Fomin, Vitaliy Filippov 2008-2011
+
 setlocale(LC_ALL, 'ru_RU.UTF-8');
 setlocale(LC_NUMERIC, 'C');
 
