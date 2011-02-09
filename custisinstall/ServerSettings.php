@@ -5,7 +5,6 @@ require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 
 $wgPageShowWatchingUsers = true;
 
-require_once($IP.'/extensions/PreferencesExtension/PreferencesExtension.php');
 require_once($IP.'/extensions/EnotifDiff/EnotifDiff.php');
 require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/Polls/poll.php');
