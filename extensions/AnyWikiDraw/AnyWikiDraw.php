@@ -54,25 +54,25 @@ $wgSpecialPages['AnyWikiDraw'] = 'AnyWikiDraw';
 
 # Setup the AnyWikDraw parser function
 function efAnyWikiDrawParserFunction_Setup() {
-    # Setup AnyWikiDraw Version
-    global $wgAnywikidrawVersion;
-    $wgAnyWikiDrawVersion = '0.11';
+	# Setup AnyWikiDraw Version
+	global $wgAnywikidrawVersion;
+	$wgAnyWikiDrawVersion = '0.11';
 
-    # Setup messages
-    global $wgMessageCache;
-    require( dirname( __FILE__ ) . '/AnyWikiDraw.i18n.php' );
-    foreach ( $messages as $lang => $langMessages ) {
-        $wgMessageCache->addMessages( $langMessages, $lang );
-    }
+	# Setup messages
+	global $wgMessageCache;
+	require( dirname( __FILE__ ) . '/AnyWikiDraw.i18n.php' );
+	foreach ( $messages as $lang => $langMessages ) {
+		$wgMessageCache->addMessages( $langMessages, $lang );
+	}
 
-    # Setup extension credits
-    $wgExtensionCredits['parserhook'][] = array(
-       'name' => 'AnyWikiDraw',
-       'version' => $wgAnyWikiDrawVersion,
-       'author' =>'Werner Randelshofer', 
-       'url' => 'http://sourceforge.net/projects/anywikidraw', 
-       'description' => 'The AnyWikiDraw extensions adds a <nowiki>{{#drawing:}}</nowiki> tag to the MediaWiki parser which allows to edit SVG, PNG and JPEG images directly in a page using a Java applet.'
-       );
+	# Setup extension credits
+	$wgExtensionCredits['parserhook'][] = array(
+	   'name' => 'AnyWikiDraw',
+	   'version' => $wgAnyWikiDrawVersion,
+	   'author' =>'Werner Randelshofer', 
+	   'url' => 'http://sourceforge.net/projects/anywikidraw', 
+	   'description' => 'The AnyWikiDraw extensions adds a <nowiki>{{#drawing:}}</nowiki> tag to the MediaWiki parser which allows to edit SVG, PNG and JPEG images directly in a page using a Java applet.'
+	   );
 
 	# Setup function hook associating the "drawing" magic word with our function
 	global $wgParser;
@@ -133,7 +133,7 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 	if ($height == null && $image->getHeight() != -1) {
 		$height = $image->getHeight();
 	}
-		
+	
 	// render a header
 	$output = '<table><tr><td>';
 	if ($wgEnableUploads && ! $isProtected && 
@@ -141,15 +141,15 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 			$_POST['drawingtitle'] == $name) {
 		
 		// edit the drawing using the applet
-        $uploadURL = str_replace('$1', 'Special:AnyWikiDraw', $wgArticlePath);
+		$uploadURL = str_replace('$1', 'Special:AnyWikiDraw', $wgArticlePath);
 		$output .= 
 				'<a name="anywikidraw" id="anywikidraw">'.
 				'<applet archive="'.$wgScriptPath.'/extensions/AnyWikiDraw/AnyWikiDrawForMediaWiki.jar"'. 
 				' code="org.anywikidraw.mediawiki.MediaWikiDrawingApplet.class"'.
 				' width="'.htmlspecialchars(min(max($width+4, 600), 800)).'" '.
-                ' height="'.htmlspecialchars(min(max($height+140, 480), 600)).'">'.
+				' height="'.htmlspecialchars(min(max($height+140, 480), 600)).'">'.
 
-           // The following parameters are used to tell AnyWikiDraw how to communicate with MediaWiki:
+		   // The following parameters are used to tell AnyWikiDraw how to communicate with MediaWiki:
 
 				'<param name="DrawingName" value="'.htmlspecialchars($name).'">'.
 				'<param name="DrawingWidth" value="'.htmlspecialchars($width).'">'.
@@ -158,18 +158,18 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 				'<param name="PageURL" value="'.htmlspecialchars($wgTitle->getLocalURL()).'">'.
 				'<param name="UploadURL" value="'.$uploadURL.'">'.
 
-           // The following parameters are used to configure the drawing applet: 
+		   // The following parameters are used to configure the drawing applet: 
 
-                '<param name="Locale" value="'.$wgUser->getOption('language','en').'"/>'.
-           
-           // The following parameters are used to configure Sun's Java Plug-In: 
+				'<param name="Locale" value="'.$wgUser->getOption('language','en').'"/>'.
+		   
+		   // The following parameters are used to configure Sun's Java Plug-In: 
 
-                '<param name="codebase_lookup" value="false"/>'.
-                '<param name="classloader_cache" value="false"/>'.
-                '<param name="java_arguments" value="-Djnlp.packEnabled=true"/>'.
-                '<param name="image" value="lib/Splash.gif"/>'.
-                '<param name="boxborder" value="false"/>'.
-                '<param name="centerimage" value="true"/>'.
+				'<param name="codebase_lookup" value="false"/>'.
+				'<param name="classloader_cache" value="false"/>'.
+				'<param name="java_arguments" value="-Djnlp.packEnabled=true"/>'.
+				'<param name="image" value="lib/Splash.gif"/>'.
+				'<param name="boxborder" value="false"/>'.
+				'<param name="centerimage" value="true"/>'.
 
 				'</applet>'.
 				'</a>';
@@ -186,42 +186,41 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 		$filtered = preg_replace ( "/[^".Title::legalChars()."]|:/", '-', $name );
 		$nt = Title::newFromText( $filtered );
 		if(! is_null( $nt ) ) {
-			$nt =& Title::makeTitle( NS_IMAGE, $nt->getDBkey() );
+			$nt = Title::makeTitle( NS_IMAGE, $nt->getDBkey() );
 		}
 
-        // Determine if the user has permission to edit the image
-		$userCanEdit = $wgEnableUploads && 
-                    !$isProtected && 
-                    (is_null($nt) || $nt->userCanEdit()) &&
-                    (is_null($image) || $wgUser->isAllowed( 'reupload' ));
-        /*$output .= 'enableUploads='.$wgEnableUploads.','.
-                'isProtected='.$isProtected.','.
-                'page.userCanEdit='.(is_null($nt) ? 'null' : $nt->userCanEdit()).','.
-                'image.exists='.$image->exists().','.
-                'user.reupload allowed='.$wgUser->isAllowed( 'reupload' );
-        */
+		// Determine if the user has permission to edit the image
+		$userCanEdit = $wgEnableUploads &&
+					!$isProtected &&
+					(is_null($nt) || $nt->userCan('edit')) &&
+					(is_null($image) || $wgUser->isAllowed( 'reupload' ));
+		/*$output .= 'enableUploads='.$wgEnableUploads.','.
+				'isProtected='.$isProtected.','.
+				'page.userCanEdit='.(is_null($nt) ? 'null' : $nt->userCanEdit()).','.
+				'image.exists='.$image->exists().','.
+				'user.reupload allowed='.$wgUser->isAllowed( 'reupload' );
+		*/
 
-        // Determine if the user may edit images using the specified 
-        // filename extension.
-        if ($userCanEdit) {
-            $extension = array_pop(explode( '.', $filtered ));
-            global $wgFileExtensions;
-            $userCanEdit = in_array($extension, $wgFileExtensions);
-        }
-		
+		// Determine if the user may edit images using the specified 
+		// filename extension.
+		if ($userCanEdit) {
+			$extension = array_pop(explode( '.', $filtered ));
+			global $wgFileExtensions;
+			$userCanEdit = in_array($extension, $wgFileExtensions);
+		}
 		
 		// If the user can edit the image, display an edit link.
-        // We do not display the edit link, if the user is already
-        // editing a drawing.
+		// We do not display the edit link, if the user is already
+		// editing a drawing.
 		if ($userCanEdit && ! key_exists('drawingtitle', $_POST)) {
 			$formId = 'Form'.rand();
-            global $wgUsePathInfo;
-            if ($wgUsePathInfo) {
-                $action = $wgTitle->getLocalURL().'#anywikidraw';
-            } else {
-                //$action = str_replace('?','#anywikidraw?',$wgTitle->getLocalURL());
-                $action = $wgTitle->getLocalURL();
-            }
+			global $wgUsePathInfo;
+			if ($wgUsePathInfo) {
+				$action = $wgTitle->getLocalURL().'#anywikidraw';
+			} else {
+				//$action = str_replace('?','#anywikidraw?',$wgTitle->getLocalURL());
+				$action = $wgTitle->getLocalURL();
+			}
 			$output .= '<form name="'.$formId.'" method="post" action="'.$action.'">'.
 					'<input type="hidden" name="drawingtitle" value="'.htmlspecialchars($name).'">'.
 					'<p align="right">'.
@@ -252,35 +251,35 @@ function efAnyWikiDrawParserFunction_Render( &$parser, $name = null, $width = nu
 			if (! $isImageMap) {
 				$output .= '<a href="./Image:'.$name.'">';
 			}
-            // Note: We append the timestamp of the image to the
-            //       view URL as a query string. This way, we ensure,
-            //       that the browser always displays the last edited version
-            //       of the image
+			// Note: We append the timestamp of the image to the
+			// view URL as a query string. This way, we ensure,
+			// that the browser always displays the last edited version
+			// of the image
 			$imageblock = '<img '.
 				'src="'.$image->getViewUrl().
-                    '?version='.$image->nextHistoryLine()->img_timestamp.'" '.
+					'?version='.$image->nextHistoryLine()->img_timestamp.'" '.
 				(($width != null) ? 'width="'.$width.'" ' : '').
 				(($height != null) ? 'height="'.$height.'" ' : '').
 				'alt="Image:'.$name.'" '.
 				'title="Image:'.$name.'" '.
 				(($isImageMap) ? 'usemap="#'.$mapId.'" ' : '').
 				'></img>';
-      if ($image->getMimeType()=="image/svg+xml"){  
-        $fullpath=$image->getURL();
-        $imageblock =<<<EOT
-<object type="image/svg+xml" width="{$width}" height="{$height}" data="$fullpath">        
-        {$imageblock }
-</object>      
+		if ($image->getMimeType()=="image/svg+xml"){  
+			$fullpath=$image->getURL();
+			$imageblock =<<<EOT
+<object type="image/svg+xml" width="{$width}" height="{$height}" data="$fullpath">
+	{$imageblock}
+</object>
 EOT;
-      }  
- 			$output .= $imageblock;
+		}  
+			$output .= $imageblock;
 			if (! $isImageMap) {
 				$output .= '</a>';
 			}
 		}
 		// If the user can edit the image, display an edit link.
-        // We do not display the edit link, if the user is already
-        // editing a drawing.
+		// We do not display the edit link, if the user is already
+		// editing a drawing.
 		if ($userCanEdit && ! key_exists('drawingtitle', $_POST)) {
 			$output .= '</form>';
 		}
@@ -291,4 +290,3 @@ EOT;
 	
 	return array($output, 'isHTML'=>true, 'noparse'=>true);
 }
-?>

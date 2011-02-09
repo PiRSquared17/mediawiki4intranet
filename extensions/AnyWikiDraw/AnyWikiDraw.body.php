@@ -59,37 +59,37 @@ class AnyWikiDraw extends SpecialPage {
 			# $param = $wgRequest->getText('param');
 				
 			# Show information about AnyWikiDraw
-            global $wgAnyWikiDrawVersion;
+			global $wgAnyWikiDrawVersion;
 			$wgOut->addWikiText(
 				wfMsg('anywikidraw_about', $wgAnyWikiDrawVersion)
 			);
 
-            # Check uploading enabled
-            global $wgEnableUploads, $wgSitename;
-        	if( !$wgEnableUploads ) {
-    			$wgOut->addWikiText(
-        			wfMsg('anywikidraw_upload_disabled', $wgSitename)
-                );
-            } 
+			# Check uploading enabled
+			global $wgEnableUploads, $wgSitename;
+			if( !$wgEnableUploads ) {
+				$wgOut->addWikiText(
+					wfMsg('anywikidraw_upload_disabled', $wgSitename)
+				);
+			} 
 
-            # Check file extensions enabled
-            global $wgFileExtensions;
-            $requiredExtensions = array("svg","svgz","png","jpg");
-            $missingExtensions = array();
-            foreach ($requiredExtensions as $ext) {
-                if (! in_array($ext, $wgFileExtensions)) {
-                    $missingExtensions[] = $ext;
-                }
-            }
-            if (count($missingExtensions) == 1) {
-    			$wgOut->addWikiText(
-        			wfMsg('anywikidraw_extension_disabled', $wgSitename, ".".implode(", .", $missingExtensions) )
-                );
-            } else if (count($missingExtensions) > 1) {
-    			$wgOut->addWikiText(
-        			wfMsg('anywikidraw_extensions_disabled', $wgSitename, ".".implode(", .", $missingExtensions) )
-                );
-            }
+			# Check file extensions enabled
+			global $wgFileExtensions;
+			$requiredExtensions = array("svg","svgz","png","jpg");
+			$missingExtensions = array();
+			foreach ($requiredExtensions as $ext) {
+				if (! in_array($ext, $wgFileExtensions)) {
+					$missingExtensions[] = $ext;
+				}
+			}
+			if (count($missingExtensions) == 1) {
+				$wgOut->addWikiText(
+					wfMsg('anywikidraw_extension_disabled', $wgSitename, ".".implode(", .", $missingExtensions) )
+				);
+			} else if (count($missingExtensions) > 1) {
+				$wgOut->addWikiText(
+					wfMsg('anywikidraw_extensions_disabled', $wgSitename, ".".implode(", .", $missingExtensions) )
+				);
+			}
 		
 			// Output
 			// $wgOut->addHTML( $output );
@@ -106,8 +106,8 @@ class AnyWikiDraw extends SpecialPage {
 		$fname= "AnyWikiDraw_body::internalProcessUpload";
 
 		// Retrieve form fields
-        // FIXME - We currently do not support rendered images and image maps
-        //         we handle the fields here anyway, for future extensions.
+		// FIXME - We currently do not support rendered images and image maps
+		//		 we handle the fields here anyway, for future extensions.
 		$drawingName = $wgRequest->getText('DrawingName');
 		$drawingWidth = $wgRequest->getText('DrawingWidth');
 		$drawingHeight = $wgRequest->getText('DrawingHeight');
@@ -138,7 +138,7 @@ class AnyWikiDraw extends SpecialPage {
 					'[user '.$wgUser->getName().'] '.
 					$fname.' received bad request [DrawingName='.$drawingName.']'.
 					'[fileSize(DrawingData)='.$drawingFileSize.']',
-               true
+			   true
 			);
 			unlink($drawingTempPath);
 			header('HTTP/1.0 400 Bad Request');
@@ -177,13 +177,13 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' Received bad image extension [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 400 Bad Request');
-    		global $wgFileExtensions;
+			global $wgFileExtensions;
 			exit("\n\n"+'<html><body>DrawingName must have one of the following extensions: '.
 					implode(',', $wgFileExtensions).
 				'.</body></html>');
@@ -199,15 +199,15 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' Received bad image name [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 400 Bad Request');
 			exit("\n\n"+'<html><body>DrawingName must contain legible characters only.</body></html>');
 		}
-        $localFile = wfLocalFile( $nt );
+		$localFile = wfLocalFile( $nt );
 		$destName = $localFile->getName();
 		
 		
@@ -219,11 +219,11 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' image is protected [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 403 Forbidden');
 			exit("\n\n"+'<html><body>You are not allowed to edit this image.</body></html>');
 		}
@@ -236,11 +236,11 @@ class AnyWikiDraw extends SpecialPage {
 //			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 //					'[user '.$wgUser->getName().'] '.
 //					$fname.' image may not be overwritten [DrawingName='.$drawingName.']',
-//                true
-//            );
-//            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-//            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-//            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+//				true
+//			);
+//			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+//			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+//			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 //			header('HTTP/1.0 403 Forbidden');
 //			exit("\n\n"+'<html><body>You are not allowed to overwrite this image.</body></html>');
 //		}
@@ -252,11 +252,11 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' filename extension missing [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 415 Unsupported Media Type');
 			exit("\n\n"+'<html><body>The drawing must have a filename extension.</body></html>');
 		} elseif ( $this->checkFileExtensionList( $ext, $wgFileBlacklist ) ||
@@ -264,11 +264,11 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' bad filename extension [DrawingName='.$drawingName.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 415 Unsupported Media Type');
 			exit("\n\n"+'<html><body>The drawing has a forbidden filename extension.</body></html>');
 		}
@@ -284,35 +284,35 @@ class AnyWikiDraw extends SpecialPage {
 		//$this->checkMacBinary(); // XXX
 		$veri = $this->verify( $drawingTempPath, $finalExt );
 
-        if( $veri !== true ) { //it's a wiki error...
+		if( $veri !== true ) { //it's a wiki error...
 				$resultDetails = array( 'veri' => $veri );
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' image failed verification [DrawingName='.$drawingName.'][DrawingTempFile='.$drawingTempPath.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 400 Bad Request');
 			exit("\n\n"+'<html><body>The image data is corrupt.</body></html>');
-        }
+		}
 
-        /**
-         * Provide an opportunity for extensions to add further checks
-         */
-        $error = '';
-        if( !wfRunHooks( 'UploadVerification',
-                    array( $destName, $drawingTempPath, &$error ) ) ) {
+		/**
+		 * Provide an opportunity for extensions to add further checks
+		 */
+		$error = '';
+		if( !wfRunHooks( 'UploadVerification',
+					array( $destName, $drawingTempPath, &$error ) ) ) {
 			$resultDetails = array( 'error' => $error );
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' image failed extended verification [DrawingName='.$drawingName.'][DrawingTempFile='.$drawingTempPath.']',
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 400 Bad Request');
 			exit("\n\n"+'<html><body>The image data is corrupt.</body></html>');
 		}
@@ -331,24 +331,24 @@ class AnyWikiDraw extends SpecialPage {
 			wfDebug('[client '.$_SERVER["REMOTE_ADDR"].']'.
 					'[user '.$wgUser->getName().'] '.
 					$fname.' image upload failed '.
-                    '[DrawingName='.$drawingName.']'.
-                    '[DrawingTempFile='.$drawingTempPath.']'.
-                    '[Status='.$status->getWikiText().']'
-                    ,
-                true
-            );
-            if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-            if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-            if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+					'[DrawingName='.$drawingName.']'.
+					'[DrawingTempFile='.$drawingTempPath.']'.
+					'[Status='.$status->getWikiText().']'
+					,
+				true
+			);
+			if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+			if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+			if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 			header('HTTP/1.0 500 Internal Server Error');
 			exit("\n\n"+'<html><body>Uploading the image failed.</body></html>');
 		}
-			                                
-        if ($drawingTempPath!= null) { unlink($drawingTempPath); }
-        if ($renderedTempPath!= null) { unlink($renderedTempPath); }
-        if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
+											
+		if ($drawingTempPath!= null) { unlink($drawingTempPath); }
+		if ($renderedTempPath!= null) { unlink($renderedTempPath); }
+		if ($imageMapTempPath!= null) { unlink($imageMapTempPath); }
 
-    	 // Show success, and exit
+		 // Show success, and exit
 		header('HTTP/1.0 200 OK');
 		exit;
 	}
@@ -374,7 +374,7 @@ class AnyWikiDraw extends SpecialPage {
 				}
 			} else {
 				if( !$wgUser->isAllowed( 'reupload' ) ||
-				    !$wgUser->isAllowed( 'reupload-shared' ) ) {
+					!$wgUser->isAllowed( 'reupload-shared' ) ) {
 					$error = "fileexists-shared-forbidden";
 				}
 			}
@@ -633,8 +633,8 @@ class AnyWikiDraw extends SpecialPage {
 	 *
 	 * @param string $file Pathname to the temporary upload file
 	 * @return mixed false if not virus is found, NULL if the scan fails or is disabled,
-	 *         or a string containing feedback from the virus scanner if a virus was found.
-	 *         If textual feedback is missing but a virus was found, this function returns true.
+	 *		 or a string containing feedback from the virus scanner if a virus was found.
+	 *		 If textual feedback is missing but a virus was found, this function returns true.
 	 */
 	function detectVirus($file) {
 		global $wgAntivirus, $wgAntivirusSetup, $wgAntivirusRequired, $wgOut;
@@ -671,8 +671,8 @@ class AnyWikiDraw extends SpecialPage {
 		$exitCode = false;
 
 		#NOTE: there's a 50 line workaround to make stderr redirection work on windows, too.
-		#      that does not seem to be worth the pain.
-		#      Ask me (Duesentrieb) about it if it's ever needed.
+		#	  that does not seem to be worth the pain.
+		#	  Ask me (Duesentrieb) about it if it's ever needed.
 		$output = array();
 		if ( wfIsWindows() ) {
 			exec( "$command", $output, $exitCode );
