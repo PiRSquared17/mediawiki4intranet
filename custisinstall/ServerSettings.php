@@ -1,5 +1,8 @@
 <?php
 
+// MediaWiki4Intranet configuration base for internal UNIX installations
+// (c) Stas Fomin, Vitaliy Filippov 2008-2011
+
 require_once('BaseSettings.php');
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 
