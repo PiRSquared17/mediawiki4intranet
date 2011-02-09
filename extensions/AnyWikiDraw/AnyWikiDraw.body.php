@@ -27,8 +27,6 @@
  * @author Werner Randelshofer
  */
 
-include 'SpecialUpload.php';
-
 class AnyWikiDraw extends SpecialPage {
 	/**#@+
 	 * @access private
