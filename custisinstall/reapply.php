@@ -1,9 +1,9 @@
 #!/usr/bin/php
 <?php
 
-# Revert all CustIS Wiki patches and reapply them again
+# Revert all MediaWiki4Intranet patches and reapply them again
 # Useful for manually updating Wiki installations
-# (c) Vitaliy Filippov, 2010
+# (c) Vitaliy Filippov, 2011
 
 $PATCHED_DIRS = explode(' ', 'includes languages skins/common');
 $PATCHED_EXTENSIONS = explode(' ', 'CategoryTree AnyWikiDraw MediaFunctions Cite DeleteBatch Interwiki PdfHandler');
