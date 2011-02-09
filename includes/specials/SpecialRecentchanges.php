@@ -242,7 +242,6 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$conds[] = 'rc_timestamp >= ' . $dbr->addQuotes( $cutoff );
 
-
 		$hidePatrol = $wgUser->useRCPatrol() && $opts['hidepatrolled'];
 		$hideLoggedInUsers = $opts['hideliu'] && !$forcebot;
 		$hideAnonymousUsers = $opts['hideanons'] && !$forcebot;
@@ -322,7 +321,7 @@ class SpecialRecentChanges extends SpecialPage {
 			$join_conds['watchlist'] = array('LEFT JOIN',
 				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
 		}
-		if ($wgUser->isAllowed("rollback")) {
+		if ( $wgUser->isAllowed("rollback") && !$join_conds['page'] ) {
 			$tables[] = 'page';
 			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
 		}
