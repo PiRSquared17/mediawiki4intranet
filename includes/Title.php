@@ -3844,49 +3844,50 @@ class Title {
 		return $types;
 	}
 
-/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+/*op-patch|TS|2011-02-09|HaloACL|SafeTitle|start*/
 	
 	/**
-	 * This function is called from the patches for HaloACL for secure listings 
-	 * (e.g. Spcecial:AllPages). It checks, whether the current user is allowed
-	 * to read the article for this title object. For normal pages this is 
-	 * evaluate in the method <userCanRead>. 
-	 * However, the special pages that generate listings, often create title 
+	 * This function is called from the patches for HaloACL for secure listings
+	 * (e.g. Special:AllPages). It checks, whether the current user is allowed
+	 * to read the article for this title object. For normal pages this is
+	 * evaluate in the method <userCanRead>.
+	 * However, the special pages that generate listings, often create title
 	 * objects before the can check their accessibility. The fallback mechanism
-	 * of HaloACL creates the title "Permission denied" for the article that 
+	 * of HaloACL creates the title "Permission denied" for the article that
 	 * must not be accessed. The listings would then show a link to "Permission
 	 * denied". So this function returns "false" for the title "Permission denied"
-	 * as well. 
+	 * as well.
 	 *
-	 * @return 
+	 * @return
 	 * 		true, if this title can be read
 	 * 		false, if the title is protected or "Permission denied".
 	 */
-	public function userCanReadEx() {
+	public function userCanReadEx()
+	{
 		if (!defined('HACL_HALOACL_VERSION')) {
 			//HaloACL is disabled
 			return true;
 		}
 		global $haclgContLang;
-		return $this->mTextform !== $haclgContLang->getPermissionDeniedPage() 
+		return $this->mTextform !== $haclgContLang->getPermissionDeniedPage()
 		       && $this->userCanRead();
 	}
-	
+
 	/**
 	 * This function checks, if this title is accessible for the action of the
 	 * current request. If the action is unknown it is assumed to be "read".
-	 * If the title is not accessible, the new title "Permission denied" is 
-	 * returned. This is a fallback to protect titles if all other security 
+	 * If the title is not accessible, the new title "Permission denied" is
+	 * returned. This is a fallback to protect titles if all other security
 	 * patches fail.
-	 * 
-	 * While a page is rendered, the same title is often checked several times. 
+	 *
+	 * While a page is rendered, the same title is often checked several times.
 	 * To speed things up, the results of an accessibility check are internally
-	 * cached.  
-	 * 
+	 * cached.
+	 *
 	 * This function can be disabled in HACL_Initialize.php or LocalSettings.php
 	 * by setting the variable $haclgEnableTitleCheck = false.
 	 *
-	 * @return 
+	 * @return
 	 * 		$this, if access is granted on this title or
 	 * 		the title for "Permission denied" if not.
 	 */
@@ -3913,15 +3914,9 @@ class Title {
 		if (!isset($allowed)) {
 			switch ($action) {
 				case 'create':
-					$allowed = $this->userCanCreate();
-					break;
 				case 'edit':
-					$allowed = $this->userCanEdit();
-					break;
 				case 'move':
-					$allowed = $this->userCanMove();
-					break;
-				case 'annotate':
+				case 'delete':
 					$allowed = $this->userCan($action);
 					break;
 				default:
@@ -3930,7 +3925,6 @@ class Title {
 			$permissionCache[$index] = $allowed;
 		}
 		if ($allowed === false) {
-//			echo "no\n";
 			global $haclgContLang;
 			$etc = $haclgEnableTitleCheck;
 			$haclgEnableTitleCheck = false;
@@ -3938,9 +3932,8 @@ class Title {
 			$haclgEnableTitleCheck = $etc;
 			return $t;
 		}
-//		echo "yes\n";
 		return $this;
 	}
-/*op-patch|TS|2009-06-19|end*/  
+/*op-patch|TS|2011-02-09|end*/
 
 }
