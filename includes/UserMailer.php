@@ -302,7 +302,7 @@ class EmailNotification {
 			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
 			$res = $dbw->select( array( 'watchlist' ),
 				array( 'wl_user' ),
-				$where, __METHOD__
+				$userCondition, __METHOD__
 			);
 			while ($row = $dbw->fetchObject( $res ) ) {
 				$watchers[] = intval( $row->wl_user );
