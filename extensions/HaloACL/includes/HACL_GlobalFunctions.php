@@ -85,17 +85,6 @@ function enableHaloACL()
         'HACLWhitelistException'    => "$haclgIP/exceptions/HACL_WhitelistException.php",
     );
 
-    // HACLParserFunctions hooks
-    global $wgHooks;
-    $wgHooks['ArticleViewHeader'][]     = 'HACLParserFunctions::articleViewHeader';
-    $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
-    $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
-    $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
-    $wgHooks['ArticleUndelete'][]       = 'HACLParserFunctions::articleUndelete';
-    $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
-    $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
-    $wgHooks['LoadExtensionSchemaUpdates'][] = 'haclfLoadExtensionSchemaUpdates';
-
     return true;
 }
 
@@ -135,18 +124,30 @@ function haclfSetupExtension()
         define('HACL_HALOACL_VERSION', '1.0');
     else
     {
-        // Also disable security checks in console mode
+        // Disable security checks in console mode
         // Also issue a warning as an insurance to not run Wiki in some bad setup
         print '** WARNING: HaloACL security checks are disabled because
 ** $_SERVER[SERVER_NAME] is empty, which probably means we are in console
 ';
+        return true;
     }
+
+    wfLoadExtensionMessages('HaloACL');
 
     //--- Register hooks ---
     global $wgHooks;
-    $wgHooks['userCan'][] = 'HACLEvaluator::userCan';
 
-    wfLoadExtensionMessages('HaloACL');
+    // HACLParserFunctions hooks
+    $wgHooks['ArticleViewHeader'][]     = 'HACLParserFunctions::articleViewHeader';
+    $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
+    $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
+    $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
+    $wgHooks['ArticleUndelete'][]       = 'HACLParserFunctions::articleUndelete';
+    $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
+    $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
+    $wgHooks['LoadExtensionSchemaUpdates'][] = 'haclfLoadExtensionSchemaUpdates';
+
+    $wgHooks['userCan'][] = 'HACLEvaluator::userCan';
 
     $wgHooks['ArticleSaveComplete'][]  = 'HACLDefaultSD::articleSaveComplete';
     $wgHooks['IsFileCacheable'][]      = 'haclfIsFileCacheable';
