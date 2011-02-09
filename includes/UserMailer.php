@@ -294,13 +294,14 @@ class EmailNotification {
 		if ($wgEnotifWatchlist || $wgShowUpdatedMarker) {
 			$dbw = wfGetDB( DB_MASTER );
 			$userCondition = array(
+				'user_id=wl_user',
 				'wl_title' => $title->getDBkey(),
 				'wl_namespace' => $title->getNamespace(),
 				'wl_user != ' . intval( $editor->getID() ),
 				'wl_notificationtimestamp IS NULL',
 			);
 			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
-			$res = $dbw->select( array( 'watchlist' ),
+			$res = $dbw->select( array( 'watchlist', 'user' ),
 				array( 'wl_user' ),
 				$userCondition, __METHOD__
 			);
