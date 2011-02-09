@@ -3,15 +3,15 @@
 
 /* Help text */
 
-$HELP = 'CustIS-Wiki install script
-(c) 2010, Vitaliy Filippov, Stas Fomin
+$HELP = 'MediaWiki4Intranet installation script
+(c) 2010-2011, Vitaliy Filippov, Stas Fomin
 
 Instructions:
 - create a directory for MediaWiki
 - copy "custisinstall" directory inside there
 - run "php WHATEVER/custisinstall/install.php"
 
-To upgrade an existing CustIS-Wiki installation:
+To upgrade an existing MediaWiki4Intranet installation:
 - run "php WHATEVER/custisinstall/install.php"
 
 To look at the commands which would be run, but do not run them:
@@ -20,7 +20,7 @@ To look at the commands which would be run, but do not run them:
 
 /* URL config */
 
-$SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_14_1';
+$SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2';
 $SVN_WIKIMEDIA_TRUNK = 'http://svn.wikimedia.org/svnroot/mediawiki/trunk';
 $SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 
@@ -29,8 +29,8 @@ $SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 $DIRS_WIKIMEDIA = explode(' ',
     'config includes languages maintenance skins');
 $FILES_WIKIMEDIA = explode(' ',
-    'api.php index.php COPYING StartProfiler.php thumb.php trackback.php'.
-    ' install-utils.inc opensearch_desc.php img_auth.php redirect.php');
+    'api.php index.php COPYING thumb.php trackback.php'.
+    ' opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
     ' StringFunctions DeleteBatch');
@@ -38,7 +38,7 @@ $EXT_WIKIMEDIA_TRUNK = explode(' ',
     'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions');
 $EXT_OUR = explode(' ',
     'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
-    ' SphinxSearch SimpleTable CategoryTemplate PreferencesExtension EnotifDiff Drafts'.
+    ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
     ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
     ' HaloACL OpenID Calendar Wikilog GlobalAuth HaloACL PlantUML SubPageList2 HttpAuth'.
