@@ -166,7 +166,7 @@ class WikiRevision {
 
 	function importOldRevision() {
 		# Check edit permission
-		if( !$this->getTitle()->userCanEdit() )
+		if( !$this->getTitle()->userCan('edit') )
 		{
 			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
@@ -267,7 +267,7 @@ class WikiRevision {
 			return;
 		}
 		# Check edit permission
-		if( !$this->getTitle()->userCanEdit() )
+		if( !$this->getTitle()->userCan('edit') )
 		{
 			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
@@ -311,7 +311,7 @@ class WikiRevision {
 	function importUpload()
 	{
 		# Check edit permission
-		if( !$this->getTitle()->userCanEdit() )
+		if( !$this->getTitle()->userCan('edit') )
 		{
 			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
