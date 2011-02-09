@@ -282,7 +282,7 @@ function SVNIntegrationLinkToFile($url)
  * @param Parser $parser The MediaWiki parser.
  * @return string The formatted content of the given file or a marker that will be replaced with the raw file contents after parsing is complete.
  */
-function SVNIntegrationPrintFile($text, $params, &$parser)
+function SVNIntegrationPrintFile($text, $params, $parser)
 {
 	global $SVNIntegrationSettings;
 	SVNIntegrationHandleParams($params);
@@ -369,7 +369,7 @@ function SVNIntegrationPrintFile($text, $params, &$parser)
  * @param Parser $parser The MediaWiki parser.
  * @return string The formatted HTML information about the given file.
  */
-function SVNIntegrationFileInfo($text, $params, &$parser)
+function SVNIntegrationFileInfo($text, $params, $parser)
 {
 	global $SVNIntegrationSettings;
 	
@@ -470,7 +470,7 @@ function SVNIntegrationFileInfo($text, $params, &$parser)
  * @param Parser The MediaWiki parser.
  * @return string The formatted HTML history of the given file.
  */
-function SVNIntegrationFileHistory($text, $params, &$parser)
+function SVNIntegrationFileHistory($text, $params, $parser)
 {
 	global $SVNIntegrationSettings;
 	
@@ -529,7 +529,7 @@ function SVNIntegrationFileHistory($text, $params, &$parser)
  * @param Parser The MediaWiki parser.
  * @return string A list of all found TODO-Tags.
  */
-function SVNIntegrationTodo($text, $params, &$parser)
+function SVNIntegrationTodo($text, $params, $parser)
 {
 	global $SVNIntegrationSettings;
 	SVNIntegrationHandleParams($params);
@@ -588,5 +588,3 @@ function SVNIntegrationTodo($text, $params, &$parser)
 		return SVNIntegrationHandleErrors($svnStack->getErrors());
 	}
 }
-
-?>
