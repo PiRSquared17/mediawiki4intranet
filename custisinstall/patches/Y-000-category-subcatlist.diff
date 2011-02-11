@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1269972336 -14400
+# Date 1297181625 -10800
 Bug 62054 - Remove alpha-bars in categories
 
-diff -r 2f012c39365a -r cf9b43270db7 extensions/CategoryTree/CategoryPageSubclass.php
+diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
-@@ -141,4 +141,157 @@
+@@ -61,4 +61,157 @@
  		}
  		parent::finaliseCategoryState();
  	}
@@ -164,16 +164,13 @@ diff -r 2f012c39365a -r cf9b43270db7 extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r 2f012c39365a -r cf9b43270db7 extensions/CategoryTree/CategoryTree.php
+diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
-@@ -393,4 +393,32 @@
- 	$result = $embed . implode ( "{$pop} {$sep} {$embed}" , $links ) . $pop;
+@@ -377,3 +377,31 @@
  
  	return false;
--}
-\ No newline at end of file
-+}
+ }
 +
 +$wgExtensionMessagesFiles['SubcategorizedCategoryPage'] = dirname(__FILE__)."/SubcatCat.i18n.php";
 +$wgHooks['MagicWordwgVariableIDs'][] = 'efSubcatCatMagicWordwgVariableIDs';
@@ -202,7 +199,7 @@ diff -r 2f012c39365a -r cf9b43270db7 extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->useSubcategorizedList = TRUE;
 +    return true;
 +}
-diff -r 2f012c39365a -r cf9b43270db7 extensions/CategoryTree/SubcatCat.i18n.php
+diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,8 @@

@@ -1,21 +1,33 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1270052406 -14400
-Create branch for patch 000-debug-categorized-specialrecentchanges
+# Date 1297452439 -10800
+Bug 18103 - Allow to view categorized Recent Changes, SQL category filtering
 
-diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
+diff -r b11befdd7427 -r 55975ffd5236 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
-@@ -66,7 +66,7 @@
+@@ -69,8 +69,10 @@
  	public function feedSetup() {
  		global $wgFeedLimit, $wgRequest;
  		$opts = $this->getDefaultOptions();
--		$opts->fetchValuesFromRequest( $wgRequest, array( 'days', 'limit', 'hideminor' ) );
-+		$opts->fetchValuesFromRequest( $wgRequest );
+-		# Feed is cached on limit,hideminor,namespace; other params would randomly not work
+-		$opts->fetchValuesFromRequest( $wgRequest, array( 'limit', 'hideminor', 'namespace' ) );
++		$opts->fetchValuesFromRequest( $wgRequest, array(
++			'days', 'limit', 'from', 'hideminor', 'hidebots', 'hideanons', 'hideliu',
++			'hidepatrolled', 'hidemyself', 'namespace', 'invert', 'categories',
++			'categories_any', 'tagfilter' ) );
  		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
  		return $opts;
  	}
-@@ -264,6 +264,7 @@
+@@ -240,7 +242,6 @@
+ 
+ 		$conds[] = 'rc_timestamp >= ' . $dbr->addQuotes( $cutoff );
+ 
+-
+ 		$hidePatrol = $wgUser->useRCPatrol() && $opts['hidepatrolled'];
+ 		$hideLoggedInUsers = $opts['hideliu'] && !$forcebot;
+ 		$hideAnonymousUsers = $opts['hideanons'] && !$forcebot;
+@@ -281,6 +282,7 @@
  	 */
  	public function doMainQuery( $conds, $opts ) {
  		global $wgUser;
@@ -23,7 +35,7 @@ diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
  
  		$tables = array( 'recentchanges' );
  		$join_conds = array();
-@@ -274,11 +275,31 @@
+@@ -292,13 +294,34 @@
  		$namespace = $opts['namespace'];
  		$invert = $opts['invert'];
  
@@ -51,13 +63,16 @@ diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
  		// JOIN on watchlist for users
  		if( $uid ) {
  			$tables[] = 'watchlist';
--			$join_conds = array( 'watchlist' => array('LEFT JOIN',
--				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace") );
-+			$join_conds['watchlist'] = array('LEFT JOIN', array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
+ 			$join_conds['watchlist'] = array('LEFT JOIN',
+-				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace");
++				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
  		}
- 
- 		wfRunHooks('SpecialRecentChangesQuery', array( &$conds, &$tables, &$join_conds, $opts ) );
-@@ -322,7 +343,6 @@
+-		if ($wgUser->isAllowed("rollback")) {
++		if ( $wgUser->isAllowed("rollback") && !$join_conds['page'] ) {
+ 			$tables[] = 'page';
+ 			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
+ 		}
+@@ -359,7 +382,6 @@
  	 */
  	public function webOutput( $rows, $opts ) {
  		global $wgOut, $wgUser, $wgRCShowWatchingUsers, $wgShowUpdatedMarker;
@@ -65,28 +80,16 @@ diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
  
  		$limit = $opts['limit'];
  
-@@ -333,10 +353,7 @@
- 
- 		// And now for the content
- 		$wgOut->setSyndicated( true );
--
--		if( $wgAllowCategorizedRecentChanges ) {
--			$this->filterByCategories( $rows, $opts );
--		}
-+		$wgOut->setFeedAppendQuery( http_build_query( $opts->getAllValues() ) );
- 
- 		$showWatcherCount = $wgRCShowWatchingUsers && $wgUser->getOption( 'shownumberswatching' );
- 		$watcherCache = array();
-@@ -392,7 +409,7 @@
+@@ -437,7 +459,7 @@
  
  		$defaults = $opts->getAllValues();
  		$nondefaults = $opts->getChangedValues();
--		$opts->consumeValues( array( 'namespace', 'invert' ) );
-+		$opts->consumeValues( array( 'namespace', 'invert', 'categories', 'categories_any' ) );
+-		$opts->consumeValues( array( 'namespace', 'invert', 'tagfilter' ) );
++		$opts->consumeValues( array( 'namespace', 'invert', 'tagfilter', 'categories', 'categories_any' ) );
  
  		$panel = array();
  		$panel[] = $this->optionsPanel( $defaults, $nondefaults );
-@@ -529,6 +546,7 @@
+@@ -580,6 +602,7 @@
  		# Filter articles
  		$articles = array();
  		$a2r = array();
@@ -94,7 +97,7 @@ diff -r 2f012c39365a -r 017ab49f652c includes/specials/SpecialRecentchanges.php
  		foreach( $rows AS $k => $r ) {
  			$nt = Title::makeTitle( $r->rc_namespace, $r->rc_title );
  			$id = $nt->getArticleID();
-@@ -539,8 +557,10 @@
+@@ -590,8 +613,10 @@
  			if( !isset($a2r[$id]) ) {
  				$a2r[$id] = array();
  			}

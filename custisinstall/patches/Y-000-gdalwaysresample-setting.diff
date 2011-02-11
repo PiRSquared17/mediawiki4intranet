@@ -1,12 +1,13 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1282043365 -14400
-Create branch for patch 000-gdalwaysresample-setting
+# Date 1297453105 -10800
+Bug 41449 - Optional setting to always use resample instead of resize
+Bug 67935 - Initialize вот именно что to transparent, а не default solid black
 
-diff -r 6b77a2bb86d2 -r 51bb13b95034 includes/media/Bitmap.php
+diff -r b11befdd7427 -r 373c9665b938 includes/media/Bitmap.php
 --- includes/media/Bitmap.php
 +++ includes/media/Bitmap.php
-@@ -168,6 +168,7 @@
+@@ -180,6 +180,7 @@
  			#
  			# First find out what kind of file this is, and select the correct
  			# input routine for this.
@@ -14,7 +15,7 @@ diff -r 6b77a2bb86d2 -r 51bb13b95034 includes/media/Bitmap.php
  
  			$typemap = array(
  				'image/gif'          => array( 'imagecreatefromgif',  'palette',   'imagegif'  ),
-@@ -194,11 +195,11 @@
+@@ -215,11 +216,11 @@
  
  			// Initialise the destination image to transparent instead of
  			// the default solid black, to support PNG and GIF transparency nicely
