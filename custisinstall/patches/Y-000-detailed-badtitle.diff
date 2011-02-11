@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1274457741 -14400
+# Date 1297182204 -10800
 Bug 64385 - Detailed "invalid title" diagnostics for MediaWiki
 
-diff -r 9626c7a0e12e -r 5498d1e88697 includes/Exception.php
+diff -r b11befdd7427 -r b22355bba132 includes/Exception.php
 --- includes/Exception.php
 +++ includes/Exception.php
-@@ -243,7 +243,10 @@
+@@ -262,7 +262,10 @@
  	function __construct( $title, $msg ) {
  		$this->title = $title;
  		$this->msg = $msg;
@@ -18,19 +18,19 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Exception.php
  	}
  
  	function report() {
-diff -r 9626c7a0e12e -r 5498d1e88697 includes/OutputPage.php
+diff -r b11befdd7427 -r b22355bba132 includes/OutputPage.php
 --- includes/OutputPage.php
 +++ includes/OutputPage.php
-@@ -1067,7 +1067,7 @@
- 		if ( isset($wgTitle) ) {
- 			$this->mDebugtext .= 'Original title: ' . $wgTitle->getPrefixedText() . "\n";
+@@ -1738,7 +1738,7 @@
+ 		if ( $this->getTitle() ) {
+ 			$this->mDebugtext .= 'Original title: ' . $this->getTitle()->getPrefixedText() . "\n";
  		}
 -		$this->setPageTitle( wfMsg( $title ) );
 +		$this->setPageTitle( is_array( $title ) ? strip_tags( call_user_func_array( 'wfMsgExt', $title ) ) : wfMsg( $title ) );
  		$this->setHTMLTitle( wfMsg( 'errorpagetitle' ) );
  		$this->setRobotPolicy( 'noindex,nofollow' );
  		$this->setArticleRelated( false );
-@@ -1075,8 +1075,12 @@
+@@ -1746,8 +1746,12 @@
  		$this->mRedirect = '';
  		$this->mBodytext = '';
  
@@ -45,10 +45,10 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/OutputPage.php
  		$this->addHTML( call_user_func_array( 'wfMsgExt', $params ) );
  
  		$this->returnToMain();
-diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
+diff -r b11befdd7427 -r b22355bba132 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
-@@ -27,6 +27,7 @@
+@@ -21,6 +21,7 @@
  	//@{
  	static private $titleCache=array();
  	static private $interwikiCache=array();
@@ -56,18 +56,18 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  	//@}
  
  	/**
-@@ -2029,6 +2030,7 @@
- 		global $wgContLang, $wgLocalInterwiki, $wgCapitalLinks;
+@@ -2263,6 +2264,7 @@
+ 	 */
+ 	private function secureAndSplit() {
+ 		global $wgContLang, $wgLocalInterwiki;
++		self::$lastError = NULL;
  
  		# Initialisation
-+		self::$lastError = NULL;
- 		static $rxTc = false;
- 		if( !$rxTc ) {
- 			# Matching titles will be held as illegal.
-@@ -2061,11 +2063,13 @@
+ 		$rxTc = self::getTitleInvalidRegex();
+@@ -2286,11 +2288,13 @@
  		$dbkey = trim( $dbkey, '_' );
  
- 		if ( '' == $dbkey ) {
+ 		if ( $dbkey == '' ) {
 +			self::$lastError = 'title-invalid-empty';
  			return false;
  		}
@@ -78,7 +78,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  
-@@ -2093,6 +2097,7 @@
+@@ -2326,6 +2330,7 @@
  					if( !$firstPass ) {
  						# Can't make a local interwiki link to an interwiki link.
  						# That's just crazy!
@@ -86,7 +86,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  						return false;
  					}
  
-@@ -2104,6 +2109,7 @@
+@@ -2337,6 +2342,7 @@
  					if ( 0 == strcasecmp( $this->mInterwiki, $wgLocalInterwiki ) ) {
  						if( $dbkey == '' ) {
  							# Can't have an empty self-link
@@ -94,7 +94,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  							return false;
  						}
  						$this->mInterwiki = '';
-@@ -2141,7 +2147,13 @@
+@@ -2374,7 +2380,13 @@
  
  		# Reject illegal characters.
  		#
@@ -109,7 +109,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  
-@@ -2159,13 +2171,15 @@
+@@ -2392,13 +2404,15 @@
  		       substr( $dbkey, -2 ) == '/.' ||
  		       substr( $dbkey, -3 ) == '/..' ) )
  		{
@@ -126,7 +126,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  
-@@ -2176,9 +2190,12 @@
+@@ -2409,9 +2423,12 @@
  		 * in the database, and may edge over 255 bytes due to subpage syntax
  		 * for long titles, e.g. [[Special:Block/Long name]]
  		 */
@@ -141,7 +141,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  
-@@ -2203,6 +2220,7 @@
+@@ -2436,6 +2453,7 @@
  		if( $dbkey == '' &&
  			$this->mInterwiki == '' &&
  			$this->mNamespace != NS_MAIN ) {
@@ -149,7 +149,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  		// Allow IPv6 usernames to start with '::' by canonicalizing IPv6 titles.
-@@ -2215,6 +2233,7 @@
+@@ -2448,6 +2466,7 @@
  			IP::sanitizeIP( $dbkey ) : $dbkey;
  		// Any remaining initial :s are illegal.
  		if ( $dbkey !== '' && ':' == $dbkey{0} ) {
@@ -157,7 +157,7 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
  			return false;
  		}
  
-@@ -2228,6 +2247,13 @@
+@@ -2461,6 +2480,13 @@
  	}
  
  	/**
@@ -169,15 +169,15 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
 +
 +	/**
  	 * Set the fragment for this title. Removes the first character from the
- 	 * specified fragment before setting, so it assumes you're passing it with 
+ 	 * specified fragment before setting, so it assumes you're passing it with
  	 * an initial "#".
-diff -r 9626c7a0e12e -r 5498d1e88697 includes/Wiki.php
+diff -r b11befdd7427 -r b22355bba132 includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
-@@ -173,9 +173,17 @@
+@@ -185,9 +185,17 @@
  
- 		$action = $this->getVal( 'Action' );
- 		if( is_null($title) || $title->getDBkey() == '' ) {
+ 		// Invalid titles. Bug 21776: The interwikis must redirect even if the page name is empty.
+ 		if( is_null($title) || ( ($title->getDBkey() == '') && ($title->getInterwiki() == '') ) ) {
 +			$error = Title::getLastError();
  			$title = SpecialPage::getTitleFor( 'Badtitle' );
  			# Die now before we mess up $wgArticle and the skin stops working
@@ -190,15 +190,15 @@ diff -r 9626c7a0e12e -r 5498d1e88697 includes/Wiki.php
 +			else
 +				$errortext .= 'text';
 +			throw new ErrorPageError( $error, $errortext );
+ 
+ 		// Interwiki redirects
  		} else if( $title->getInterwiki() != '' ) {
- 			if( $rdfrom = $request->getVal( 'rdfrom' ) ) {
- 				$url = $title->getFullURL( 'rdfrom=' . urlencode( $rdfrom ) );
-diff -r 9626c7a0e12e -r 5498d1e88697 languages/messages/MessagesEn.php
+diff -r b11befdd7427 -r b22355bba132 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -780,6 +780,24 @@
+@@ -948,6 +948,24 @@
  
- A list of valid special pages can be found at [[Special:SpecialPages|{{int:specialpages}}]].",
+ A list of valid special pages can be found at [[Special:SpecialPages|{{int:specialpages}}]].',
  
 +# Title errors
 +'title-invalid-empty'            => 'Empty page title',
@@ -221,12 +221,12 @@ diff -r 9626c7a0e12e -r 5498d1e88697 languages/messages/MessagesEn.php
  # General errors
  'error'                => 'Error',
  'databaseerror'        => 'Database error',
-diff -r 9626c7a0e12e -r 5498d1e88697 languages/messages/MessagesRu.php
+diff -r b11befdd7427 -r b22355bba132 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -524,6 +524,24 @@
+@@ -588,6 +588,24 @@
  
- См. [[Special:SpecialPages|список служебных страниц]].",
+ Список существующих служебных страниц: [[Special:SpecialPages|{{int:specialpages}}]].',
  
 +# Title errors
 +'title-invalid-empty'            => 'Пустое имя страницы',

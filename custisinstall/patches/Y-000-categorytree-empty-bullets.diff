@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1265212231 -10800
+# Date 1297035745 -10800
 Bug 59835 - Remove unwanted clickable [+] bullets near non-expandable categories
 
-diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.css
+diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.css
 --- extensions/CategoryTree/CategoryTree.css
 +++ extensions/CategoryTree/CategoryTree.css
 @@ -16,8 +16,7 @@
@@ -16,7 +16,7 @@ diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.css
  	cursor: pointer;
  	cursor: hand; /* hack for MSIE 5.0 and 5.5 */
  }
-diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.i18n.php
+diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.i18n.php
 --- extensions/CategoryTree/CategoryTree.i18n.php
 +++ extensions/CategoryTree/CategoryTree.i18n.php
 @@ -34,7 +34,7 @@
@@ -28,7 +28,7 @@ diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.i18n.p
  	'categorytree-page-bullet'      => '&nbsp;', # do not translate or duplicate this message to other languages
  
  	'categorytree-member-counts'    => 'contains {{PLURAL:$1|1 subcategory|$1 subcategories}}, {{PLURAL:$2|1 page|$2 pages}}, and {{PLURAL:$3|1 file|$3 files}}', # $1=subcategories, $2=subpages, $3=files, $4=total, $5=shown-in-tree
-diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.js
+diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.js
 --- extensions/CategoryTree/CategoryTree.js
 +++ extensions/CategoryTree/CategoryTree.js
 @@ -50,7 +50,7 @@
@@ -40,12 +40,12 @@ diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTree.js
        lnk.innerHTML= categoryTreeCollapseBulletMsg;
        lnk.title= categoryTreeCollapseMsg;
        lnk.onclick= function() { categoryTreeCollapseNode(cat, options, lnk) }
-diff -r ecc1d86fc6cf -r 65eda8fb2edc extensions/CategoryTree/CategoryTreeFunctions.php
+diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTreeFunctions.php
 --- extensions/CategoryTree/CategoryTreeFunctions.php
 +++ extensions/CategoryTree/CategoryTreeFunctions.php
-@@ -659,25 +659,25 @@
- 
+@@ -664,25 +664,25 @@
  			$linkattr[ 'class' ] = "CategoryTreeToggle";
+ 			$linkattr['style'] = 'display: none;'; // Unhidden by JS
  
 -			/*if ( $count === 0 ) {
 +			if ( !$count ) {

@@ -1,25 +1,25 @@
 # HG changeset patch
-# User root@yourcmc.ru
-# Date 1269560994 -10800
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297181810 -10800
 Bug 61871 - Allow (optional) article merging for SAME user
 
-diff -r 2f012c39365a -r 46bd18b9b11f includes/EditPage.php
+diff -r b11befdd7427 -r 57e54df0229b includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
-@@ -730,6 +730,7 @@
+@@ -758,6 +758,7 @@
  	function internalAttemptSave( &$result, $bot = false ) {
  		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
  		global $wgMaxArticleSize;
 +		global $wgSuppressSameUserConflicts;
  
- 		$fname = 'EditPage::attemptSave';
- 		wfProfileIn( $fname );
-@@ -910,7 +911,7 @@
- 		}
+ 		wfProfileIn( __METHOD__  );
+ 		wfProfileIn( __METHOD__ . '-checks' );
+@@ -929,7 +930,7 @@
+ 		$userid = $wgUser->getId();
  
  		# Suppress edit conflict with self, except for section edits where merging is required.
--		if ( $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
-+		if ( $wgSuppressSameUserConflicts && $this->section == '' && $userid && $this->userWasLastToEdit($userid,$this->edittime) ) {
- 			wfDebug( "EditPage::editForm Suppressing edit conflict, same user.\n" );
+-		if ( $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
++		if ( $wgSuppressSameUserConflicts && $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
+ 			wfDebug( __METHOD__ . ": Suppressing edit conflict, same user.\n" );
  			$this->isConflict = false;
- 		} else {
+ 		}

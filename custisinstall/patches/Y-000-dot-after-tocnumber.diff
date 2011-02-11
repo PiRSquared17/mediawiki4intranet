@@ -1,19 +1,23 @@
-Index: includes/parser/Parser.php
-===================================================================
---- includes/parser/Parser.php	(revision 53578)
-+++ includes/parser/Parser.php	(working copy)
-@@ -3448,7 +3454,7 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297452760 -10800
+Bug 52772 - Optional dots (.) after TOC item numbers
+
+diff -r b11befdd7427 -r 31f24eacdc5d includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -3499,7 +3499,7 @@
  	 * @private
  	 */
- 	function formatHeadings( $text, $isMain=true ) {
--		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds;
-+		global $wgMaxTocLevel, $wgContLang, $wgEnforceHtmlIds, $wgDotAfterTocnumber;
+ 	function formatHeadings( $text, $origText, $isMain=true ) {
+-		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds;
++		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
  
  		$doNumberHeadings = $this->mOptions->getNumberHeadings();
  		$showEditLink = $this->mOptions->getEditSection();
-@@ -3591,6 +3597,8 @@
- 						$dot = 1;
- 					}
+@@ -3647,6 +3647,8 @@
+ 					$numbering .= $wgContLang->formatNum( $sublevelCount[$i] );
+ 					$dot = 1;
  				}
 +				if ($wgDotAfterTocnumber)
 +					$numbering .= '.';

@@ -1,22 +1,18 @@
-From: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-Subject: [PATCH] t/001-bug53818-empty-heading-crutch
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297453397 -10800
 Depends on: Y-000-shift-included-templates-heading-levels.diff
 
-A logical patch which removes empty headings from parser output
-instead of taking '==' as their text and all the remaining ='s
+Bug 53818 - A logical patch which removes empty headings from parser
+output instead of taking '==' as their text and all the remaining ='s
 as heading marker.
 
-Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
----
- includes/parser/Preprocessor_DOM.php |   27 +++++++++++++++------------
- 1 files changed, 15 insertions(+), 12 deletions(-)
-
-Index: includes/parser/Preprocessor_DOM.php
-===================================================================
---- includes/parser/Preprocessor_DOM.php	(revision 54846)
-+++ includes/parser/Preprocessor_DOM.php	(working copy)
-@@ -986,20 +1018,23 @@
+diff -r 04b0595bb022 -r 7f19b549cb30 includes/parser/Preprocessor_DOM.php
+--- includes/parser/Preprocessor_DOM.php
++++ includes/parser/Preprocessor_DOM.php
+@@ -1071,20 +1071,23 @@
  
                      # Insert a heading marker only for <h> children of <root>
                      # This is to stop extractSections from going over multiple tree levels
