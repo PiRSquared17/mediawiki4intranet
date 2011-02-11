@@ -91,10 +91,9 @@ foreach ($SKINS_OUR as $s)
     cmd("svn export $SVN_OUR/skins/$s.php $DIR/skins/$s.php");
 
 cmd("svn export $SVN_OUR/extensions/FullLocalImage.php $DIR/extensions/FullLocalImage.php");
-cmd("svn export $SVN_WIKIMEDIA/extensions/ExtensionFunctions.php $DIR/extensions/ExtensionFunctions.php");
 cmd("svn co --force svn://svn.nadir-point.com/mediawiki-extensions/branches/stable/WikiCategoryTagCloud/ $DIR/extensions/WikiCategoryTagCloud/");
 cmd("svn revert -R $DIR/extensions/WikiCategoryTagCloud");
-cmd("svn co --force http://geshi.svn.sourceforge.net/svnroot/geshi/tags/RELEASE_1_0_8_3/geshi-1.0.X/src/ $DIR/extensions/geshi/");
+cmd("svn co --force http://geshi.svn.sourceforge.net/svnroot/geshi/trunk/geshi-1.0.X/src/ $DIR/extensions/geshi/");
 cmd("svn revert -R $DIR/extensions/geshi");
 
 /* Switch S5SlideShow from CustIS SVN to SF.net HG */
