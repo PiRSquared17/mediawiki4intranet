@@ -1,1 +1,1 @@
-Create branch for patch 000-dont-call-linkholders-__destruct
+Do not explicitly call destructor of mLinkHolders as it causes errors in some cases
