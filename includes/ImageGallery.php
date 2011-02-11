@@ -232,7 +232,7 @@ class ImageGallery
 		if( $this->mCaption )
 			$s .= "\n\t<caption>{$this->mCaption}</caption>";
 
-		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights, 'imagegallery' => true );
+		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights );
 		$i = 0;
 		foreach ( $this->mImages as $pair ) {
 			$nt = $pair[0];
