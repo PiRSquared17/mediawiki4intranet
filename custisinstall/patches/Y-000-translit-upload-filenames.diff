@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1268753658 -10800
-Create branch for patch 000-translit-upload-filenames
+# Date 1297451064 -10800
+Bug 48216 - Transliterate uploaded file names from Cyrillic to Latin
 
-diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/File.php
+diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/File.php
 --- includes/filerepo/File.php
 +++ includes/filerepo/File.php
 @@ -19,6 +19,81 @@
@@ -97,7 +97,7 @@ diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/File.php
  		if ( $thumbExt != $extension ) {
  			$thumbName .= ".$thumbExt";
  		}
-@@ -722,17 +797,33 @@
+@@ -733,17 +808,33 @@
  	}
  
  	/**
@@ -133,10 +133,10 @@ diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/File.php
  	}
  
  	/** Get the relative path for an archive file */
-diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/LocalFile.php
+diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
-@@ -956,7 +956,7 @@
+@@ -963,7 +963,7 @@
  	function publish( $srcPath, $flags = 0 ) {
  		$this->lock();
  		$dstRel = $this->getRel();
@@ -145,11 +145,13 @@ diff -r 2f012c39365a -r a6918fe00216 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-@@ -1729,7 +1729,8 @@
+@@ -1792,8 +1792,9 @@
+ 		$this->file = $file;
  		$this->target = $target;
  		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );
- 		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
+-		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBkey() );
 -		$this->oldName = $this->file->getName();
++		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
 +		$this->oldName = $this->file->getPhys();
 +		/* FIXME getPhysFromTitle is needed */
  		$this->newName = $this->file->repo->getNameFromTitle( $this->target );
