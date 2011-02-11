@@ -16,27 +16,49 @@ class SVGEditHooks {
 	 * @param $skin Skin current skin
 	 */
 	public static function beforePageDisplay( $out, $skin ) {
-		global $wgTitle, $wgScriptPath, $wgScriptExtension;
-		if( $wgTitle && $wgTitle->getNamespace() == NS_FILE && ( $file = wfFindFile( $wgTitle ) ) &&
-			(!$_REQUEST['action'] || $_REQUEST['action'] == 'view' || $_REQUEST['action'] == 'purge') &&
-			preg_match( '/\.svg$/is', $wgTitle->getText() ) )
-		{
-			$out->addHTML(
-'<iframe id="svg-edit" style="display: none; position: fixed; left: 2.5%; top: 2.5%; width: 95%; height: 95%; z-index: 99999"></iframe>
-<input type="button" value="Edit drawing with SVGEdit" onclick="triggerSVGEdit()" style="font-weight: bold" />
-<script language="JavaScript">
-if (!window.wgScriptExtension)
-    window.wgScriptExtension = "'.addslashes($wgScriptExtension).'";
-window.wgFileFullUrl = "'.addslashes($file->getFullUrl()).'";
-function triggerSVGEdit()
-{
-  var i = document.getElementById("svg-edit");
-  i.style.display = "";
-  i.src = wgScriptPath + "/extensions/SVGEdit/svg-edit/svg-editor.html";
-}
-</script>'
-			);
+		global $wgUser, $wgSVGEditInline;
+		$title = $out->getTitle();
+		$modules = array();
+		if( self::trigger( $title ) ) {
+			$modules[] = 'ext.svgedit.editButton';
+		}
+		if ($wgSVGEditInline) {
+			// Experimental inline edit trigger.
+			// Potentially expensive and tricky as far as UI on article pages!
+			if( $wgUser->isAllowed( 'upload' ) ) {
+				$modules[] = 'ext.svgedit.inline';
+			}
+		}
+		if ($modules) {
+			$out->addModules($modules);
 		}
 		return true;
 	}
+
+	/**
+	 * MakeGlobalVariablesScript hook
+	 *
+	 * Exports a setting if necessary.
+	 *
+	 * @param $vars array of vars
+	 */
+	public static function makeGlobalVariablesScript( &$vars ) {
+		global $wgTitle, $wgSVGEditEditor;
+		#if( self::trigger( $wgTitle ) ) {
+			$vars['wgSVGEditEditor'] = $wgSVGEditEditor;
+		#}
+		return true;
+	}
+
+	/**
+	 * Should the editor links trigger on this page?
+	 *
+	 * @param Title $title
+	 * @return boolean
+	 */
+	private static function trigger( $title ) {
+		return $title && $title->getNamespace() == NS_FILE &&
+			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
+	}
+
 }
