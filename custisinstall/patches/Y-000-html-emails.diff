@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1289238583 -10800
+# Date 1297262226 -10800
 HTML email support, needed for Bug 25475 (diffs in enotify emails)
 
-diff -r 2951a613ce57 -r 306baffa1404 includes/UserMailer.php
+diff -r b11befdd7427 -r 0f2a4d0811de includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
 @@ -106,8 +106,10 @@
@@ -36,26 +36,32 @@ diff -r 2951a613ce57 -r 306baffa1404 includes/UserMailer.php
  			$headers =
  				"MIME-Version: 1.0$endl" .
  				"Content-type: $ctype$endl" .
-@@ -369,6 +371,10 @@
- 					// Already sent an email to this person
- 					$userCondition .= ' AND wl_user != ' . intval( $userTalkId );
- 				}
-+
-+				$userCondition .= ' AND wl_notificationtimestamp IS NULL';
-+				wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
-+
- 				$dbr = wfGetDB( DB_SLAVE );
- 
- 				list( $user ) = $dbr->tableNamesN( 'user' );
-@@ -380,7 +386,6 @@
- 						'wl_title' => $title->getDBkey(),
- 						'wl_namespace' => $title->getNamespace(),
- 						$userCondition,
--						'wl_notificationtimestamp IS NULL',
- 					), __METHOD__ );
- 				$userArray = UserArray::newFromResult( $res );
- 
-@@ -472,10 +477,12 @@
+@@ -291,14 +293,17 @@
+ 		$watchers = array();
+ 		if ($wgEnotifWatchlist || $wgShowUpdatedMarker) {
+ 			$dbw = wfGetDB( DB_MASTER );
+-			$res = $dbw->select( array( 'watchlist' ),
++			$userCondition = array(
++				'user_id=wl_user',
++				'wl_title' => $title->getDBkey(),
++				'wl_namespace' => $title->getNamespace(),
++				'wl_user != ' . intval( $editor->getID() ),
++				'wl_notificationtimestamp IS NULL',
++			);
++			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
++			$res = $dbw->select( array( 'watchlist', 'user' ),
+ 				array( 'wl_user' ),
+-				array(
+-					'wl_title' => $title->getDBkey(),
+-					'wl_namespace' => $title->getNamespace(),
+-					'wl_user != ' . intval( $editor->getID() ),
+-					'wl_notificationtimestamp IS NULL',
+-				), __METHOD__
++				$userCondition, __METHOD__
+ 			);
+ 			while ($row = $dbw->fetchObject( $res ) ) {
+ 				$watchers[] = intval( $row->wl_user );
+@@ -469,11 +474,13 @@
  		$pagetitle = $this->title->getPrefixedText();
  		$keys['$PAGETITLE']          = $pagetitle;
  		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
@@ -63,13 +69,14 @@ diff -r 2951a613ce57 -r 306baffa1404 includes/UserMailer.php
  
  		$keys['$PAGEMINOREDIT']      = $medit;
  		$keys['$PAGESUMMARY']        = $summary;
+ 		$keys['$UNWATCHURL']         = $this->title->getFullUrl( 'action=unwatch' );
  
 +		wfRunHooks('EnotifComposeCommonMailtext', array(&$this, &$keys));
  		$subject = strtr( $subject, $keys );
  
  		# Reveal the page editor's address as REPLY-TO address only if
-@@ -580,6 +587,8 @@
- 			$wgLang->timeanddate( $this->timestamp, true, false, $timecorrection ),
+@@ -583,6 +590,8 @@
+ 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
  			$body);
  
 +		wfRunHooks('EnotifPersonalizeMailtext', array(&$this, &$watchingUser, &$body));
