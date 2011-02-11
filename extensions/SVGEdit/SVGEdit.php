@@ -25,62 +25,6 @@ $wgHooks['MakeGlobalVariablesScript'][] = 'SVGEditHooks::makeGlobalVariablesScri
 
 $wgAutoloadClasses['SVGEditHooks'] = dirname( __FILE__ ) . '/SVGEdit.hooks.php';
 
-$myResourceTemplate = array(
-	'localBasePath' => dirname( __FILE__ ) . '/modules',
-	'remoteExtPath' => 'SVGEdit/modules',
-	'group' => 'ext.svgedit',
-);
-$wgResourceModules += array(
-	'ext.svgedit.editor' => $myResourceTemplate + array(
-		'scripts' => array(
-			'ext.svgedit.embedapi.js',
-			'ext.svgedit.formmultipart.js',
-			'ext.svgedit.io.js',
-			'ext.svgedit.editor.js',
-		),
-		'styles' => array(
-			'ext.svgedit.editButton.css',
-		),
-		'messages' => array(
-			'svgedit-summary-label',
-			'svgedit-summary-default',
-			'svgedit-editor-save-close',
-			'svgedit-editor-close',
-		),
-		'dependencies' => array(
-			'jquery.ui.resizable'
-		)
-	),
-);
-$wgResourceModules += array(
-	'ext.svgedit.editButton' => $myResourceTemplate + array(
-		'scripts' => array(
-			'ext.svgedit.editButton.js',
-		),
-		'messages' => array(
-			'svgedit-editbutton-edit',
-			'svgedit-edit-tab',
-			'svgedit-edit-tab-tooltip'
-		),
-		'dependencies' => array(
-			'ext.svgedit.editor'
-		)
-	),
-);
-$wgResourceModules += array(
-	'ext.svgedit.inline' => $myResourceTemplate + array(
-		'scripts' => array(
-			'ext.svgedit.inline.js',
-		),
-		'messages' => array(
-			'svgedit-editbutton-edit',
-		),
-		'dependencies' => array(
-			'ext.svgedit.editor'
-		)
-	),
-);
-
 // Can set to alternate SVGEdit URL to pull the editor's HTML/CSS/JS/SVG
 // resources from another domain; will still need to have the MediaWiki
 // extension in it, so use a checkout of this extension rather than a
