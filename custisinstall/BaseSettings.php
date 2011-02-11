@@ -114,6 +114,8 @@ require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
 require_once($IP.'/extensions/FullLocalImage.php');
 
+require_once($IP.'/extensions/SVGEdit/SVGEdit.php');
+
 $wgGroupPermissions['bureaucrat']['usermerge'] = true;
 require_once($IP.'/extensions/UserMerge/UserMerge.php');
 require_once($IP.'/extensions/Renameuser/Renameuser.php');
