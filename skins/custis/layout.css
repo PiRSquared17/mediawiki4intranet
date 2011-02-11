@@ -32,7 +32,9 @@ Author:		stas-fomin@yandex.ru
 a {color: #2153B0;} /* blue */
 a:hover {color: #173A7B;} /* dark blue */
 
-p a:visited {color: #FD9A26;} /* orange */
+p a:visited {color: #FD9A26;}
+
+div.paragraph a:visited {color: #FD9A26;} /* orange */
 #content a.new {color: green;} /* green */
 
 #column-one a:hover {color: #173A7B;} /* dark blue */
@@ -43,7 +45,9 @@ p a:visited {color: #FD9A26;} /* orange */
 
 #toc a {color: #808080;} /* blue */
 #toc a:hover {color: #173A7B;} /* dark blue */
-#toc p a:visited {color: #2153B0;} /* blue */
+#toc p a:visited {color: #2153B0;}
+
+#toc div.paragraph a:visited {color: #2153B0;} /* blue */
 
 #footer a {color: #999999;}
 #footer a:hover {color: #173A7B;} /* dark blue */
