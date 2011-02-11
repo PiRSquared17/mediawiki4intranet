@@ -1,1 +1,1 @@
-Create branch for patch 000-unauth-save-display-modified-source
+Bug 50009 - Show their modified text instead of latest saved on Save click to users who can't modify the page
