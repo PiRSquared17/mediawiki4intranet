@@ -97,5 +97,3 @@ $wgExtensionFunctions[] = "SVNIntegrationRegisterHooks";
 $wgHooks['ParserAfterTidy'][] = 'SVNIntegrationParserAfterTidy';
 $wgHooks['ArticleSave'][] = 'SVNIntegrationArticleSave';
 $wgHooks['EditPage::showEditForm:initial'][] = 'SVNIntegrationEditFormInitial';
-
-?>

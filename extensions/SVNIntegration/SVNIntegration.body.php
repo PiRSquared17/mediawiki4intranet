@@ -28,7 +28,7 @@ EOT;
 
 // names of SVN tags
 $SVNIntegrationSettings['tags'] = array(
-	"SVNPrintFile", 
+	"SVNPrintFile",
 	"SVNFileInfo",
 	"SVNFileHistory",
 	"SVNTodo"
@@ -59,17 +59,16 @@ function SVNIntegrationParserAfterTidy(&$parser, &$text)
 	// find markers in $text and replace them with actual output
 	global $SVNIntegrationSettings;
 	for ($i = 0; $i < count($SVNIntegrationSettings['markerList']); $i++)
-    {
-    	$pattern = str_replace('XXX', $i, $SVNIntegrationSettings['markerPattern']);
-    	$text = str_replace($pattern, SVNIntegrationGetOutput($SVNIntegrationSettings['markerList'][$i]), $text);
-    }
-    return true;
+	{
+		$pattern = str_replace('XXX', $i, $SVNIntegrationSettings['markerPattern']);
+		$text = str_replace($pattern, SVNIntegrationGetOutput($SVNIntegrationSettings['markerList'][$i]), $text);
+	}
+	return true;
 }
-
 
 /**
  * Hook function used to add content from SVN to the article's text so that it becomes searchable.
- * 
+ *
  * @param Article $article The article (Article object) being saved.
  * @param User $user The user (User object) saving the article.
  * @param string $text The new article text.
@@ -284,11 +283,15 @@ function SVNIntegrationLinkToFile($url)
  */
 function SVNIntegrationPrintFile($text, $params, $parser)
 {
-	global $SVNIntegrationSettings;
+	global $SVNIntegrationSettings, $wgScriptPath;
 	SVNIntegrationHandleParams($params);
 	
 	wfLoadExtensionMessages('SVNIntegration');
 	$parser->disableCache();
+	$parser->mOutput->addHeadItem(
+		'svnintegration-style',
+		"<link rel='stylesheet' type='text/css' href='$wgScriptPath/extensions/SVNIntegration/SVNIntegration.css' />"
+	);
 	
 	if (!eregi($SVNIntegrationSettings['urlRegex'], $text))
 	{
@@ -377,7 +380,11 @@ function SVNIntegrationFileInfo($text, $params, $parser)
 	
 	wfLoadExtensionMessages('SVNIntegration');
 	$parser->disableCache();
-
+	$parser->mOutput->addHeadItem(
+		'svnintegration-style',
+		"<link rel='stylesheet' type='text/css' href='$wgScriptPath/extensions/SVNIntegration/SVNIntegration.css' />"
+	);
+	
 	if (!eregi($SVNIntegrationSettings['urlRegex'], $text))
 	{
 		return SVNIntegrationGetError(wfMsg('svnintegration-invalidurl') . $text);
@@ -478,7 +485,11 @@ function SVNIntegrationFileHistory($text, $params, $parser)
 	
 	wfLoadExtensionMessages('SVNIntegration');
 	$parser->disableCache();
-
+	$parser->mOutput->addHeadItem(
+		'svnintegration-style',
+		"<link rel='stylesheet' type='text/css' href='$wgScriptPath/extensions/SVNIntegration/SVNIntegration.css' />"
+	);
+	
 	if (!eregi($SVNIntegrationSettings['urlRegex'], $text))
 	{
 		return SVNIntegrationGetError(wfMsg('svnintegration-invalidurl') . $text);
@@ -536,6 +547,10 @@ function SVNIntegrationTodo($text, $params, $parser)
 
 	wfLoadExtensionMessages('SVNIntegration');
 	$parser->disableCache();
+	$parser->mOutput->addHeadItem(
+		'svnintegration-style',
+		"<link rel='stylesheet' type='text/css' href='$wgScriptPath/extensions/SVNIntegration/SVNIntegration.css' />"
+	);
 	
 	if (!eregi($SVNIntegrationSettings['urlRegex'], $text))
 	{
