@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297035744 -10800
-Create branch for patch 000-shift-included-templates-heading-levels
+# Date 1297453283 -10800
+Bug 53818 - Allow optional shifting of included template/article heading levels
 
-diff -r b11befdd7427 -r 04b0595bb022 includes/parser/Parser.php
+diff -r b11befdd7427 -r 758eba8799a5 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -2780,6 +2780,7 @@
@@ -51,7 +51,7 @@ diff -r b11befdd7427 -r 04b0595bb022 includes/parser/Parser.php
  			$isLocalObj = false;
  		}
  
-diff -r b11befdd7427 -r 04b0595bb022 includes/parser/Preprocessor_DOM.php
+diff -r b11befdd7427 -r 758eba8799a5 includes/parser/Preprocessor_DOM.php
 --- includes/parser/Preprocessor_DOM.php
 +++ includes/parser/Preprocessor_DOM.php
 @@ -263,6 +263,13 @@

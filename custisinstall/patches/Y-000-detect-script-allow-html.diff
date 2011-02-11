@@ -1,24 +1,46 @@
-Index: includes/specials/SpecialUpload.php
-===================================================================
---- includes/specials/SpecialUpload.php	(revision 54846)
-+++ includes/specials/SpecialUpload.php	(working copy)
-@@ -1413,7 +1416,7 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297452568 -10800
+Bug 55101 - Allow some html in uploads (for SVG)
+
+diff -r b11befdd7427 -r fa145a9478e6 includes/upload/UploadBase.php
+--- includes/upload/UploadBase.php
++++ includes/upload/UploadBase.php
+@@ -646,7 +646,7 @@
  	 * @return bool true if the file contains something looking like embedded scripts
  	 */
- 	function detectScript($file, $mime, $extension) {
+ 	public static function detectScript( $file, $mime, $extension ) {
 -		global $wgAllowTitlesInSVG;
 +		global $wgAllowTitlesInSVG, $wgForbiddenTagsInUploads;
  
- 		#ugly hack: for text files, always look at the entire file.
- 		#For binarie field, just check the first K.
-@@ -1478,7 +1481,9 @@
- 		* when served with a generic content-type.
- 		*/
- 
+ 		# ugly hack: for text files, always look at the entire file.
+ 		# For binary field, just check the first K.
+@@ -703,16 +703,18 @@
+ 		 * Also returns true if Safari would mistake the given file for HTML
+ 		 * when served with a generic content-type.
+ 		 */
 -		$tags = array(
+-			'<a href',
+-			'<body',
+-			'<head',
+-			'<html',   #also in safari
+-			'<img',
+-			'<pre',
+-			'<script', #also in safari
+-			'<table'
+-		);
 +		$tags = $wgForbiddenTagsInUploads;
-+		if (!$tags)
++		if ( !$tags )
 +			$tags = array(
- 			'<a href',
- 			'<body',
- 			'<head',
++				'<a href',
++				'<body',
++				'<head',
++				'<html',   #also in safari
++				'<img',
++				'<pre',
++				'<script', #also in safari
++				'<table'
++			);
+ 
+ 		if( !$wgAllowTitlesInSVG && $extension !== 'svg' && $mime !== 'image/svg' ) {
+ 			$tags[] = '<title';

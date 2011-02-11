@@ -1,13 +1,13 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1292340698 -10800
+# Date 1296845262 -10800
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 
-diff -r 2951a613ce57 -r 14272e9f0cf1 includes/ChangesList.php
+diff -r b11befdd7427 -r 2069ec23303d includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
-@@ -552,6 +552,7 @@
+@@ -751,6 +751,7 @@
  			if( $rc_type == RC_LOG ){
  				$secureName = SpecialPage::getTitleFor( 'Log', $rc_log_type )->getPrefixedDBkey();
  			}
@@ -15,10 +15,10 @@ diff -r 2951a613ce57 -r 14272e9f0cf1 includes/ChangesList.php
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 2951a613ce57 -r 14272e9f0cf1 includes/Wiki.php
+diff -r b11befdd7427 -r 2069ec23303d includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
-@@ -142,6 +142,8 @@
+@@ -152,6 +152,8 @@
  			// Do this above the read whitelist check for security...
  			$title = SpecialPage::getTitleFor( 'Search' );
  		}
