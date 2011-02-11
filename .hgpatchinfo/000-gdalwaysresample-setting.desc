@@ -1,1 +1,2 @@
-Create branch for patch 000-gdalwaysresample-setting
+Bug 41449 - Optional setting to always use resample instead of resize
+Bug 67935 - Initialize вот именно что to transparent, а не default solid black
