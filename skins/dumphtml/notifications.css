@@ -25,5 +25,7 @@ Author:		stas-fomin@yandex.ru
 
 #siteNotice p {margin: 0; padding: 0;}
 
+#siteNotice div.paragraph {margin: 0; padding: 0;}
+
 .error {color: red; font-size: larger;}
 /* END user notifications */
