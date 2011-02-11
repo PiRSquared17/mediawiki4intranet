@@ -1,13 +1,13 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1263569767 -10800
+# Date 1297036212 -10800
 Bug 56653
 Debug wfMsgExt to remove UNIQ____QINU
 
-diff -r ecc1d86fc6cf -r 2923928c3ff2 includes/parser/Parser.php
+diff -r b11befdd7427 -r a05a7243fe3c includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -194,7 +194,8 @@
+@@ -195,7 +195,8 @@
  		$this->mLastSection = '';
  		$this->mDTopen = false;
  		$this->mIncludeCount = array();
@@ -17,4 +17,3 @@ diff -r ecc1d86fc6cf -r 2923928c3ff2 includes/parser/Parser.php
  		$this->mArgStack = false;
  		$this->mInPre = false;
  		$this->mLinkHolders = new LinkHolderArray( $this );
-
