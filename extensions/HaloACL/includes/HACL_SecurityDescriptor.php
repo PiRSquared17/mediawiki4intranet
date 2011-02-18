@@ -52,21 +52,6 @@ if (!defined('MEDIAWIKI'))
  */
 class HACLSecurityDescriptor 
 {
-    //--- Constants ---
-
-    //---- Types of protected elements ----
-    const PET_PAGE      = 'page';       // Protect pages
-    const PET_CATEGORY  = 'category';   // Protect instances of a category
-    const PET_NAMESPACE = 'namespace';  // Protect instances of a namespace
-    const PET_PROPERTY  = 'property';   // Protect values of a property
-
-    //---- Types of predefined rights ----
-    // This is not an actual security descriptor
-    // but a predefined right that is equivalent to
-    // an SD by its structure.
-    const PET_TEMPLATE  = 'template';   // default user template
-    const PET_RIGHT     = 'right';      // general right template
-
     //--- Private fields ---
     private $mSDID;            // int: Page ID of the article that defines this SD
     private $mPEID;            // int: Page ID of the protected element
@@ -122,7 +107,7 @@ class HACLSecurityDescriptor
         }
         $this->mPEID = $peID;
         $this->mPEType = $peType;
-        if ($peType == self::PET_RIGHT)
+        if ($peType == HACLLanguage::PET_RIGHT)
             $this->mPEID = 0;
 
         $this->setManageGroups($manageGroups);
@@ -160,7 +145,7 @@ class HACLSecurityDescriptor
      */
     public static function peIDforName($peName, $peType)
     {
-        if ($peType === self::PET_NAMESPACE)
+        if ($peType === HACLLanguage::PET_NAMESPACE)
         {
             // $peName is a namespace => get its ID
             global $wgContLang;
@@ -170,9 +155,9 @@ class HACLSecurityDescriptor
                 return (strtolower($peName) == 'main') ? 0 : false;
             return $idx;
         }
-        elseif ($peType === self::PET_RIGHT)
+        elseif ($peType === HACLLanguage::PET_RIGHT)
             return 0;
-        elseif ($peType === self::PET_TEMPLATE)
+        elseif ($peType === HACLLanguage::PET_TEMPLATE)
         {
             $u = User::newFromName($peName);
             return $u ? $u->getId() : false;
@@ -251,11 +236,12 @@ class HACLSecurityDescriptor
      *         Name of the SD with the given ID or <null> if there is no article
      *         that defines this SD
      */
-    public static function nameForID($SDID) {
+    public static function nameForID($SDID)
+    {
         $etc = haclfDisableTitlePatch();
         $nt = Title::newFromID($SDID);
         haclfRestoreTitlePatch($etc);
-        return ($nt) ? $nt->getText() : null;
+        return $nt ? $nt->getText() : NULL;
     }
 
     /**
@@ -268,7 +254,8 @@ class HACLSecurityDescriptor
      *         <true> if the SD exists
      *         <false> otherwise
      */
-    public static function exists($sdID) {
+    public static function exists($sdID)
+    {
         return HACLStorage::getDatabase()->sdExists($sdID);
     }
 
@@ -286,7 +273,8 @@ class HACLSecurityDescriptor
      *         int: ID of the security descriptor
      *         <false>, if there is no SD for the protected element
      */
-    public static function getSDForPE($peID, $peType) {
+    public static function getSDForPE($peID, $peType)
+    {
         return HACLStorage::getDatabase()->getSDForPE($peID, $peType);
     }
 
@@ -377,8 +365,8 @@ class HACLSecurityDescriptor
      *         without namespace).
      *
      * @return array(string, string)
-     *         Name of the protected element and its type (one of self::PET_CATEGORY
-     *         etc). It the type is self::PET_RIGHT, the name is <null>.
+     *         Name of the protected element and its type (one of HACLLanguage::PET_CATEGORY
+     *         etc). It the type is HACLLanguage::PET_RIGHT, the name is <null>.
      */
     public static function nameOfPE($nameOfSD)
     {
@@ -393,8 +381,8 @@ class HACLSecurityDescriptor
         if (!$p)
             return array(NULL, 'right');
 
-        $prefix = mb_strtolower(substr($nameOfSD, 0, $p));
-        if ($type = $haclgContLang->mPetAliases[$prefix])
+        $prefix = substr($nameOfSD, 0, $p);
+        if ($type = $haclgContLang->getPetAlias($prefix))
         {
             $peName = substr($nameOfSD, $p+1);
             if ($type == 'category')
@@ -419,15 +407,11 @@ class HACLSecurityDescriptor
      * @param string $nameOfPE
      *         The full name of the protected element
      * @param string $peType
-     *         The type of the protected element which is one of
-     *         - HACLSecurityDescriptor::PET_CATEGORY
-     *        - HACLSecurityDescriptor::PET_NAMESPACE
-     *        - HACLSecurityDescriptor::PET_PAGE
-     *        - HACLSecurityDescriptor::PET_PROPERTY
+     *         The type of the protected element which is one of HACLLanguage::PET_*
      *
      * @return array(string, string)
-     *         Name of the protected element and its type (one of self::PET_CATEGORY
-     *      etc). It the type is self::PET_RIGHT, the name is <null>.
+     *         Name of the protected element and its type (one of HACLLanguage::PET_*
+     *         etc). It the type is HACLLanguage::PET_RIGHT, the name is <null>.
      */
     public static function nameOfSD($nameOfPE, $peType) {
 
@@ -480,7 +464,7 @@ class HACLSecurityDescriptor
 
         // Check if all rights are predefined rights
         foreach ($rights as $r) {
-            if ($r->getPEType() !== self::PET_RIGHT) {
+            if ($r->getPEType() !== HACLLanguage::PET_RIGHT) {
                 throw new HACLSDException(HACLSDException::CANNOT_ADD_SD,
                                           $this->getSDName(), $r->getSDName());
             }
@@ -599,7 +583,7 @@ class HACLSecurityDescriptor
      *      of PRs.
      */
     public function getSDsIncludingPR() {
-        if ($this->mPEType === self::PET_RIGHT) {
+        if ($this->mPEType === HACLLanguage::PET_RIGHT) {
             return HACLStorage::getDatabase()->getSDsIncludingPR($this->mSDID);
         } else {
             // $this is an SD

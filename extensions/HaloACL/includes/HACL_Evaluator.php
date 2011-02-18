@@ -218,13 +218,13 @@ class HACLEvaluator
         }
 
         // Check if there is a security descriptor for the article.
-        $hasSD = HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false;
+        $hasSD = HACLSecurityDescriptor::getSDForPE($articleID, HACLLanguage::PET_PAGE) !== false;
 
         // first check page rights
         if ($hasSD) {
             self::log("The article is protected with a security descriptor.");
 
-            $r = self::hasRight($articleID, HACLSecurityDescriptor::PET_PAGE,
+            $r = self::hasRight($articleID, HACLLanguage::PET_PAGE,
                                 $userID, $actionID);
             if ($r) {
                 haclfRestoreTitlePatch($etc);
@@ -237,12 +237,12 @@ class HACLEvaluator
         // if the page is a category page, check the category right
         if ($title->getNamespace() == NS_CATEGORY)
         {
-            $hasSD = HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_CATEGORY) !== false;
+            $hasSD = HACLSecurityDescriptor::getSDForPE($articleID, HACLLanguage::PET_CATEGORY) !== false;
             if ($hasSD)
             {
                 self::log("The article is a category page and this category is protected with a security descriptor.");
 
-                $r = self::hasRight($articleID, HACLSecurityDescriptor::PET_CATEGORY,
+                $r = self::hasRight($articleID, HACLLanguage::PET_CATEGORY,
                                     $userID, $actionID);
                 if ($r)
                 {
@@ -315,10 +315,10 @@ class HACLEvaluator
      *         is PET_NAMESPACE)
      * @param string $peType
      *         The type of the protection to check for the title. One of
-     *         HACLSecurityDescriptor::PET_PAGE
-     *         HACLSecurityDescriptor::PET_CATEGORY
-     *         HACLSecurityDescriptor::PET_NAMESPACE
-     *         HACLSecurityDescriptor::PET_PROPERTY
+     *         HACLLanguage::PET_PAGE
+     *         HACLLanguage::PET_CATEGORY
+     *         HACLLanguage::PET_NAMESPACE
+     *         HACLLanguage::PET_PROPERTY
      * @param int $userID
      *         ID of the user who wants to perform an action
      * @param int $actionID
@@ -371,7 +371,7 @@ class HACLEvaluator
             $propertyTitle = $propertyTitle->getArticleID();
         }
 
-        $hasSD = HACLSecurityDescriptor::getSDForPE($propertyTitle, HACLSecurityDescriptor::PET_PROPERTY) !== false;
+        $hasSD = HACLSecurityDescriptor::getSDForPE($propertyTitle, HACLLanguage::PET_PROPERTY) !== false;
 
         if (!$hasSD) {
             global $haclgOpenWikiAccess;
@@ -380,7 +380,7 @@ class HACLEvaluator
             return $haclgOpenWikiAccess;
         }
         return self::hasRight($propertyTitle,
-                              HACLSecurityDescriptor::PET_PROPERTY,
+                              HACLLanguage::PET_PROPERTY,
                               $userID, $actionID);
 
     }
@@ -535,8 +535,8 @@ class HACLEvaluator
         // Only the users who can modify the SD of the protecting category can
         // create a new SD for the protected page.
 
-        if ($peType == HACLSecurityDescriptor::PET_PAGE ||
-            $peType == HACLSecurityDescriptor::PET_CATEGORY) {
+        if ($peType == HACLLanguage::PET_PAGE ||
+            $peType == HACLLanguage::PET_CATEGORY) {
             list ($r, $hasSD) = self::hasCategorySDCreationRight($peName, $user->getId());
             if ($r === false && $hasSD === true) {
                 return false;
@@ -545,7 +545,7 @@ class HACLEvaluator
         $t = Title::newFromText($peName);
 
         // Check if article belongs to a protected namespace
-        if ($peType == HACLSecurityDescriptor::PET_PAGE) {
+        if ($peType == HACLLanguage::PET_PAGE) {
             list ($r, $hasSD) = self::checkNamespaceSDCreationRight($t, $user->getId());
             if ($r === false && $hasSD === true) {
                 return false;
@@ -557,8 +557,8 @@ class HACLEvaluator
             // the wiki is open => not applicable
             return "n/a";
         }
-        if ($peType != HACLSecurityDescriptor::PET_PAGE &&
-            $peType != HACLSecurityDescriptor::PET_PROPERTY) {
+        if ($peType != HACLLanguage::PET_PAGE &&
+            $peType != HACLLanguage::PET_PROPERTY) {
             // only applicable to pages and properties
             return "n/a";
         }
@@ -625,9 +625,9 @@ class HACLEvaluator
             $parentTitles[] = $t = Title::newFromText($p);
 
             if (!$hasSD) {
-                $hasSD = (HACLSecurityDescriptor::getSDForPE($t->getArticleID(), HACLSecurityDescriptor::PET_CATEGORY) !== false);
+                $hasSD = (HACLSecurityDescriptor::getSDForPE($t->getArticleID(), HACLLanguage::PET_CATEGORY) !== false);
             }
-            $r = self::hasRight($t->getArticleID(), HACLSecurityDescriptor::PET_CATEGORY,
+            $r = self::hasRight($t->getArticleID(), HACLLanguage::PET_CATEGORY,
                                 $userID, $actionID);
             if ($r) {
                 return array(true, $hasSD);
@@ -708,7 +708,7 @@ class HACLEvaluator
             $parentTitles[] = $t = Title::newFromText($p);
 
             $sd = HACLSecurityDescriptor::getSDForPE($t->getArticleID(),
-                                                     HACLSecurityDescriptor::PET_CATEGORY);
+                                                     HACLLanguage::PET_CATEGORY);
             if ($sd !== false) {
                 $sd = HACLSecurityDescriptor::newFromID($sd);
                 if ($sd->userCanModify($userID)) {
@@ -763,7 +763,7 @@ class HACLEvaluator
      */
     private static function checkNamespaceRight(Title $t, $userID, $actionID) {
         $nsID = $t->getNamespace();
-        $hasSD = HACLSecurityDescriptor::getSDForPE($nsID, HACLSecurityDescriptor::PET_NAMESPACE) !== false;
+        $hasSD = HACLSecurityDescriptor::getSDForPE($nsID, HACLLanguage::PET_NAMESPACE) !== false;
 
         if (!$hasSD) {
             global $haclgOpenWikiAccess;
@@ -772,7 +772,7 @@ class HACLEvaluator
             return array($haclgOpenWikiAccess, false);
         }
 
-        return array(self::hasRight($nsID, HACLSecurityDescriptor::PET_NAMESPACE,
+        return array(self::hasRight($nsID, HACLLanguage::PET_NAMESPACE,
                                     $userID, $actionID), $hasSD);
 
     }
@@ -800,7 +800,7 @@ class HACLEvaluator
      */
     private static function checkNamespaceSDCreationRight(Title $t, $userID) {
         $nsID = $t->getNamespace();
-        $sd = HACLSecurityDescriptor::getSDForPE($nsID, HACLSecurityDescriptor::PET_NAMESPACE);
+        $sd = HACLSecurityDescriptor::getSDForPE($nsID, HACLLanguage::PET_NAMESPACE);
         if ($sd !== false) {
             $sd = HACLSecurityDescriptor::newFromID($sd);
             return array($sd->userCanModify($userID), true);
@@ -891,12 +891,12 @@ class HACLEvaluator
     {
         global $haclgContLang;
         $text = is_object($title) ? $title->getText() : $title;
-        if ($text == $haclgContLang->mWhitelist)
+        if ($text == $haclgContLang->getWhitelist())
             return 'whitelist';
         elseif (($p = strpos($text, '/')) === false)
             return false;
-        $prefix = mb_strtolower(substr($text, 0, $p));
-        if ($t = $haclgContLang->mPrefixes[$prefix])
+        $prefix = substr($text, 0, $p);
+        if ($t = $haclgContLang->getPrefix($prefix))
             return $t;
         return false;
     }
