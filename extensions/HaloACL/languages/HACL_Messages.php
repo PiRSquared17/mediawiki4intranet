@@ -229,6 +229,16 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_current_manager_group'        => 'Manager groups:',
     'hacl_regexp_user'                  => '(^|,\s*)Участник:',
     'hacl_regexp_group'                 => '(^|,\s*)Group:',
+
+    'hacl_toolbar_page_prot'            => 'Page protection:',
+    'hacl_toolbar_advanced'             => 'Advanced rights definition',
+    'hacl_toolbar_goto'                 => 'Go to $1.',
+    'hacl_toolbar_global_acl'           => 'Note $1 also have effect.',
+    'hacl_toolbar_cannot_modify'        => 'You can not modify page protection.',
+    'hacl_toolbar_no_right_templates'   => 'No custom page rights. Select some <a href="$1">Quick ACL</a> templates.',
+    'hacl_toolbar_unprotected'          => 'No custom rights',
+    'hacl_comment_protect_with'         => 'Page protected with $1.',
+    'hacl_comment_unprotect'            => 'Custom page rights removed.',
     /* /NEW */
 
     /* Messages for semantic protection (properties etc.) */

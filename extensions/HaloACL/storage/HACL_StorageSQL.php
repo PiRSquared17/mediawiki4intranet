@@ -39,14 +39,13 @@ class HACLStorageSQL {
      * - halo_acl_rights:
      *         description of each inline right
      * - halo_acl_rights_hierarchy:
-     *         hierarchy of predefined rights
+     *         holds predefined rights inclusions
      * - halo_acl_security_descriptors:
      *         table for security descriptors and predefined rights
      * - halo_acl_groups:
      *         stores the ACL groups
      * - halo_acl_group_members:
      *         stores the hierarchy of groups and their users
-     *
      */
     public function initDatabaseTables() {
 
@@ -973,6 +972,8 @@ class HACLStorageSQL {
      */
     public function getSDByID($SDID)
     {
+        if (is_array($SDID) && !$SDID)
+            return array();
         $dbr = wfGetDB(DB_SLAVE);
         $res = $dbr->select(
             array('halo_acl_security_descriptors', 'page'),
