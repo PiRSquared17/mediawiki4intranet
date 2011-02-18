@@ -38,8 +38,8 @@ if (!defined('MEDIAWIKI'))
  * @author Thomas Schweitzer
  *
  */
-class HACLGroup {
-
+class HACLGroup
+{
     //--- Constants ---
     const NAME   = 0;       // Mode parameter for getUsers/getGroups
     const ID     = 1;       // Mode parameter for getUsers/getGroups
@@ -492,7 +492,7 @@ class HACLGroup {
      *
      */
     public function removeAllMembers($mgUser=null) {
-    // Check if $mgUser can modifiy this group.
+        // Check if $mgUser can modify this group.
         $this->userCanModify($mgUser, true);
         HACLStorage::getDatabase()->removeAllMembersFromGroup($this->mGroupID);
     }
@@ -537,7 +537,7 @@ class HACLGroup {
      *
      */
     public function removeGroup($group, $mgUser=null) {
-    // Check if $mgUser can modifiy this group.
+        // Check if $mgUser can modify this group.
         $this->userCanModify($mgUser, true);
 
         $groupID = self::idForGroup($group);

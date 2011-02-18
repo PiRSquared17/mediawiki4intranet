@@ -80,18 +80,22 @@ HACLGroupEditor.prototype.exists_ajax = function(request)
     document.getElementById('wpSave').value = exists ? this.msg.grp_save : this.msg.grp_create;
 };
 
-// parse assigned to = ... text into user/group array
-HACLGroupEditor.prototype.assigned_to = function(name, value)
+// parse PF parameter text into array of comma separated values
+// is_assigned_to=true means it is the list of users/groups
+HACLGroupEditor.prototype.pf_param = function(name, value, is_assigned_to)
 {
-    var re = new RegExp('[:\\|]\\s*' + name + '\\s*=\\s*([^\\|\\}]*)', 'i');
+    var re = new RegExp('[:\\|]\\s*' + name.replace(' ', '\\s+') + '\\s*=\\s*([^\\|\\}]*)', 'i');
     var ass = re.exec(value);
     if (!ass)
         return [];
     ass = (ass[1] || '');
-    if (this.regexp_user)
-        ass = ass.replace(this.regexp_user, '$1User:');
-    if (this.regexp_group)
-        ass = ass.replace(this.regexp_group, '$1Group/');
+    if (is_assigned_to)
+    {
+        if (this.regexp_user)
+            ass = ass.replace(this.regexp_user, '$1User:');
+        if (this.regexp_group)
+            ass = ass.replace(this.regexp_group, '$1Group/');
+    }
     return ass.trim().split(/[,\s*]*,[,\s]*/);
 };
 
@@ -106,7 +110,7 @@ HACLGroupEditor.prototype.parse = function()
     m = t.match(/\{\{\s*\#member\s*:\s*[^\}]*?\}\}/ig) || [];
     while (m[i])
     {
-        ass = this.assigned_to('members', m[i]);
+        ass = this.pf_param('members', m[i], true);
         for (k in ass)
             this.members[ass[k]] = true;
         i++;
@@ -117,7 +121,7 @@ HACLGroupEditor.prototype.parse = function()
     m = t.match(/\{\{\s*\#manage\s+group\s*:\s*[^\}]*?\}\}/ig) || [];
     while (m[i])
     {
-        ass = this.assigned_to('assigned\\s+to', m[i]);
+        ass = this.pf_param('assigned to', m[i], true);
         for (k in ass)
             this.managers[ass[k]] = true;
         i++;

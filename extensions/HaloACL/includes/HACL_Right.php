@@ -58,28 +58,27 @@ if (!defined('MEDIAWIKI'))
  * @author Thomas Schweitzer
  *
  */
-class  HACLRight  {
-
-    //--- Constants ---
+class HACLRight
+{
+    /*//--- Constants ---
 
     //---- Mode parameter for getUsersEx/getGroupsEx ----
     const NAME   = 0;
     const ID     = 1;
-    const OBJECT = 2;
+    const OBJECT = 2;*/
 
-
-    //--- Private fields ---
-    private $mRightID = -1;        // int: ID of this right. This value is valid after
+    //--- protected fields ---
+    protected $mRightID = -1;   // int: ID of this right. This value is valid after
                                 //      the right has been saved in the database.
-    private $mActions;            // int: A bit-field for the allowed actions.
-    private $mGroups;            // array(int): IDs of the groups for which this
+    protected $mActions;        // int: A bit-field for the allowed actions.
+    protected $mGroups;         // array(int): IDs of the groups for which this
                                 //             right applies
-    private $mUsers;            // array(int): IDs of the users for which this
+    protected $mUsers;          // array(int): IDs of the users for which this
                                 //             right applies
-    private $mDescription;        // string: A decription of this right
-    private $mOriginID;            // int: ID of the security descriptor or
+    protected $mDescription;    // string: A decription of this right
+    protected $mOriginID;       // int: ID of the security descriptor or
                                 //      predefined right that defines this right
-    private $mName;                // string: the name of the right
+    protected $mName;           // string: the name of the right
 
     /**
      * Constructor for HACLRight.
@@ -384,7 +383,7 @@ class  HACLRight  {
     }
 
     /**
-     * Don't call this method!!
+     * Don't call this method!! (FIXME WTF??)
      *
      * Saves this right in the database.
      *
@@ -400,7 +399,6 @@ class  HACLRight  {
         $this->mRightID = HACLStorage::getDatabase()->saveRight($this);
     }
 
-
     /**
      * Returns all users who own this right. This does not include the users that
      * are collected in groups.
@@ -413,7 +411,7 @@ class  HACLRight  {
      * @return array(string/int/User)
      *         List of all direct users in this group.
      *
-     */
+     *
     public function getUsersEx($mode)
     {
         if ($mode === self::ID)
@@ -429,7 +427,7 @@ class  HACLRight  {
                 $users[] = User::newFromId($u);
         }
         return $users;
-    }
+    }*/
 
     /**
      * Returns all groups who who own this right. These are only the groups that
@@ -444,7 +442,7 @@ class  HACLRight  {
      * @return array(string/int/HACLGroup)
      *         List of all direct groups in this group.
      *
-     */
+     *
     public function getGroupsEx($mode)
     {
         // retrieve the IDs of all groups in this group
@@ -459,7 +457,7 @@ class  HACLRight  {
                 $groups[] = HACLGroup::newFromID($g);
         }
         return $groups;
-    }
+    }*/
 
     /**
      * Deletes this right from the database. All references to this right are
@@ -479,7 +477,7 @@ class  HACLRight  {
         return HACLStorage::getDatabase()->deleteRight($this->mRightID);
     }
 
-    //--- Private methods ---
+    //--- protected methods ---
 
     /**
      * Completes a given set of actions according to the hierarchy of actions.
@@ -489,7 +487,7 @@ class  HACLRight  {
      * @return int
      *         Bitfield of all derived actions
      */
-    private function completeActions($actions)
+    protected function completeActions($actions)
     {
         // Complete the hierarchy of rights
         if ($actions & (HACLLanguage::RIGHT_CREATE | HACLLanguage::RIGHT_DELETE))

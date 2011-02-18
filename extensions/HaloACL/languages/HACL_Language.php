@@ -1,30 +1,51 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-*  This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of heavily modified "Web 1.0" HaloACL-extension.
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * $Id: $
+ *
+ * Copyright 2009, ontoprise GmbH
+ *
+ * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
- * Base class for all HaloACL language classes.
- * @author Thomas Schweitzer
+ * HACLLanguage is the class where all shared constants and important
+ * language-specific names live.
+ * All properties are public, but you getters instead to get a runtime error
+ * when trying to access non-existing property.
  */
-abstract class HACLLanguage {
 
-    //-- Constants --
+/**
+ * Security descriptors protect different types of elements i.e. pages,
+ * instances of categories and namespaces and properties. The name of a
+ * security descriptor has a prefix that matches this type. The prefix
+ * depends on the language.
+ *
+ * Example: ACL:Page/X is the security descriptor for page X. The prefix is
+ *          "Page".
+ */
 
-    //---IDs of parser functions ---
+abstract class HACLLanguage
+{
+    ///////////////
+    // CONSTANTS //
+    ///////////////
+
+    //--- IDs of parser functions ---
     const PF_ACCESS             = 1;
     const PF_MANAGE_RIGHTS      = 2;
     const PF_MANAGE_GROUP       = 3;
@@ -33,7 +54,7 @@ abstract class HACLLanguage {
     const PF_WHITELIST          = 6;
     const PF_MEMBER             = 7;
 
-    //---IDs of parser function parameters ---
+    //--- IDs of parser function parameters ---
     const PFP_ASSIGNED_TO       = 8;
     const PFP_ACTIONS           = 9;
     const PFP_DESCRIPTION       = 10;
@@ -42,90 +63,143 @@ abstract class HACLLanguage {
     const PFP_MEMBERS           = 13;
     const PFP_NAME              = 14;
 
-    //--- IDs of categories ---
-    const CAT_GROUP                 = 14;
-    const CAT_RIGHT                 = 15;
-    const CAT_SECURITY_DESCRIPTOR   = 16;
+    //---- Actions ----
+    // RIGHT_FORMEDIT, RIGHT_WYSIWYG and RIGHT_ANNOTATE are considered useless and removed
+    // RIGHT_MANAGE is the right to edit the security descriptor.
+    // RIGHT_MANAGE must not be confused with {{#manage rights: }} ^-)
+    // RIGHT_MANAGE is inherited through predefined right inclusion, while {{#manage rights: }} is not.
+    // RIGHT_MANAGE does not have the effect on predefined rights itself, while {{#manage rights: }} has.
+    const RIGHT_MANAGE      = 0x80;
+    const RIGHT_ALL_ACTIONS = 0x1F; // all = read + edit + create + move + delete
+    const RIGHT_READ        = 0x10; // read page
+    const RIGHT_EDIT        = 0x08; // edit page
+    const RIGHT_CREATE      = 0x04; // create new page
+    const RIGHT_MOVE        = 0x02; // move(rename) page
+    const RIGHT_DELETE      = 0x01; // delete page
 
-    //---- Operations ----
-    const RIGHT_ALL_ACTIONS = 255;
-    const RIGHT_READ        = 128;
-#    const RIGHT_FORMEDIT    = 64; # removed, formedit = edit
-#    const RIGHT_WYSIWYG     = 32; # removed, wysiwyg = edit
-#    const RIGHT_ANNOTATE    = 16; # removed, annotate = edit
-    const RIGHT_EDIT        = 8;
-    const RIGHT_CREATE      = 4;
-    const RIGHT_MOVE        = 2;
-    const RIGHT_DELETE      = 1;
+    //---- Types of protected elements ----
+    const PET_PAGE      = 'page';       // Protect pages
+    const PET_CATEGORY  = 'category';   // Protect instances of a category
+    const PET_NAMESPACE = 'namespace';  // Protect instances of a namespace
+    const PET_PROPERTY  = 'property';   // Protect values of a property
+    const PET_RIGHT     = 'right';      // Not an actual SD but a right template equal to SD by structure
 
-    // the special message arrays ...
-    protected $mNamespaces;
-    protected $mNamespaceAliases = array();
-    protected $mPermissionDeniedPage;
-    protected $mPermissionDeniedPageContent = "{{:MediaWiki:hacl_permission_denied}}";
-    protected $mParserFunctions = array();
-    protected $mParserFunctionsParameters = array();
-    protected $mActionNames = array();
-    protected $mCategories = array();
-    protected $mWhitelist = "";
-    protected $mPetPrefixes = array();
-    protected $mSDTemplateName;            // Part of the name of default SDs for users
-    protected $mPredefinedRightName;            // Part of the name of default SDs for users
+    //////////////////////////////////
+    // LANGUAGE-INDEPENDENT ALIASES //
+    //////////////////////////////////
 
-    public function getPredefinedRightName() {
-        return $this->mPredefinedRightName;
+    // THESE ARE NOT CONSTANTS, BUT WE STRONGLY RECOMMEND
+    // NOT TO OVERRIDE THESE VALUES (it is logically to have
+    // language-independent parser function names and parameters and etc):
+
+    // Default content for "Permission denied" page, is filled during installation
+    public $mPermissionDeniedPageContent = "{{:MediaWiki:hacl_permission_denied}}";
+
+    // Parser function names
+    public $mParserFunctions = array(
+        self::PF_ACCESS             => 'access',
+        self::PF_MANAGE_RIGHTS      => 'manage rights',
+        self::PF_MANAGE_GROUP       => 'manage group',
+        self::PF_PREDEFINED_RIGHT   => 'predefined right',
+        self::PF_PROPERTY_ACCESS    => 'property access',
+        self::PF_WHITELIST          => 'whitelist',
+        self::PF_MEMBER             => 'member'
+    );
+
+    // Parser function parameter names
+    public $mParserFunctionsParameters = array(
+        self::PFP_ASSIGNED_TO   => 'assigned to',
+        self::PFP_ACTIONS       => 'actions',
+        self::PFP_DESCRIPTION   => 'description',
+        self::PFP_RIGHTS        => 'rights',
+        self::PFP_PAGES         => 'pages',
+        self::PFP_MEMBERS       => 'members',
+        self::PFP_NAME          => 'name'
+    );
+
+    // Action names
+    public $mActionNames = array(
+        self::RIGHT_READ        => 'read',
+        self::RIGHT_EDIT        => 'edit',
+        self::RIGHT_CREATE      => 'create',
+        self::RIGHT_MOVE        => 'move',
+        self::RIGHT_DELETE      => 'delete',
+        self::RIGHT_ALL_ACTIONS => '*',
+        self::RIGHT_MANAGE      => 'manage',
+    );
+
+    // Lookup array: ACL:Prefix/Name --> lowercased prefix --> type (sd, group, right)
+    public $mPrefixes = array();
+
+    // Lookup array: lowercased action name --> action ID
+    public $mActionAliases = array();
+
+    ////////////////////////////////
+    // LANGUAGE-DEPENDENT ALIASES //
+    ////////////////////////////////
+
+    // THESE ARE RECOMMENDED TO BE OVERRIDDEN IN SUBCLASSES
+
+    // HaloACL namespaces and aliases
+    public $mNamespaces = array(
+        HACL_NS_ACL       => 'ACL',
+        HACL_NS_ACL_TALK  => 'ACL_talk'
+    );
+
+    // HaloACL namespace aliases, is appended to $wgNamespaceAliases
+    public $mNamespaceAliases = array();
+
+    // "Permission denied" page, inaccessible Title's are replaced with it
+    public $mPermissionDeniedPage = 'Permission denied';
+
+    // SD page prefixes (ACL:Prefix/Name) for different protected element types
+    public $mPetPrefixes = array(
+        self::PET_PAGE      => 'Page',
+        self::PET_CATEGORY  => 'Category',
+        self::PET_NAMESPACE => 'Namespace',
+        self::PET_PROPERTY  => 'Property',
+        self::PET_RIGHT     => 'Right',
+    );
+
+    // Group page prefix (ACL:Group/Name)
+    public $mGroupPrefix = 'Group';
+
+    // Whitelist page title (ACL:Whitelist)
+    public $mWhitelist = 'Whitelist';
+
+    // Lookup array: ACL:Prefix/Name --> lowercased prefix --> protected element type constant
+    // Add language-dependent protected element type names here
+    public $mPetAliases = array();
+
+    //////////////////////////////////////
+    // CONSTRUCTOR, fills lookup arrays //
+    //////////////////////////////////////
+
+    public function __construct()
+    {
+        foreach ($this->mPetPrefixes as $id => $prefix)
+            $this->mPetAliases[mb_strtolower($prefix)] = $id;
+        foreach ($this->mPetAliases as $prefix => $id)
+            $this->mPrefixes[$prefix] = $id == self::PET_RIGHT ? 'right' : 'sd';
+        $this->mPrefixes[mb_strtolower($this->mGroupPrefix)] = 'group';
+        foreach ($this->mActionNames as $id => $name)
+            $this->mActionAliases[mb_strtolower($name)] = $id;
     }
 
-    /**
-     * Function that returns an array of namespace identifiers.
-     */
+    /////////////
+    // GETTERS //
+    /////////////
 
-    public function getNamespaces() {
-        return $this->mNamespaces;
-    }
-
-    /**
-     * Function that returns an array of namespace aliases, if any.
-     */
-    public function getNamespaceAliases() {
-        return $this->mNamespaceAliases;
-    }
-
-    /**
-     * Returns the name of the page that informs the user, that access to
-     * a requested page is denied. A page with this name must be created in the
-     * wiki.
-     */
-    public function getPermissionDeniedPage() {
-        return $this->mPermissionDeniedPage;
-    }
-
-    /**
-     * Returns the content of the page that informs the user, that access to
-     * a requested page is denied. The page is created during setup of the
-     * extension.
-     */
-    public function getPermissionDeniedPageContent() {
-        return $this->mPermissionDeniedPageContent;
-    }
-
-    /**
-     * Users can define a default security descriptor in an article with a
-     * certain naming convention like "ACL:Template/<username>".
-     * This method returns the part after the namespace e.g. "Template" in english
-     *
-     */
-    public function getSDTemplateName() {
-        return $this->mSDTemplateName;
-    }
+    public function getNamespaces() { return $this->mNamespaces; }
+    public function getNamespaceAliases() { return $this->mNamespaceAliases; }
+    public function getPermissionDeniedPage() { return $this->mPermissionDeniedPage; }
+    public function getPermissionDeniedPageContent() { return $this->mPermissionDeniedPageContent; }
 
     /**
      * This method returns the language dependent name of a parser function.
      *
-     * @param int $parserFunctionID
-     *         ID of the parser function i.e. one of PF_ACCESS,
-     *      PF_MANAGE_RIGHTS, PF_MANAGE_GROUP, PF_PREDEFINED_RIGHT,
-     *         PF_PROPERTY_ACCESS, PF_WHITELIST, PF_MEMBER
+     * @param  int $parserFunctionID
+     *         ID of the parser function i.e. one of self::PF_*
      *
      * @return string
      *         The language dependent name of the parser function.
@@ -139,9 +213,7 @@ abstract class HACLLanguage {
      * parameter.
      *
      * @param int $parserFunctionParameterID
-     *         ID of the parser function parameter i.e. one of PF_ACCESS,
-     *      PF_MANAGE_RIGHTS, PF_MANAGE_GROUP, PF_PREDEFINED_RIGHT,
-     *         PF_PROPERTY_ACCESS, PF_WHITELIST, PF_MEMBER
+     *         ID of the parser function parameter i.e. one of self::PFP_*
      *
      * @return string
      *         The language dependent name of the parser function.
@@ -155,68 +227,20 @@ abstract class HACLLanguage {
      * are used in rights.
      *
      * @return array(int => string)
-     *         A mapping from action IDs to action names. The possible IDs are
-     *         HACLLanguage::RIGHT_READ, HACLLanguage::RIGHT_FORMEDIT, HACLLanguage::RIGHT_WYSIWYG,
-     *      HACLLanguage::RIGHT_EDIT, HACLLanguage::RIGHT_CREATE, HACLLanguage::RIGHT_MOVE,
-     *        HACLLanguage::RIGHT_ANNOTATE and    HACLLanguage::RIGHT_DELETE.
-     *
+     *         A mapping from action IDs to action names.
+     *         The possible IDs are HACLLanguage::RIGHT_*
      */
-    public function getActionNames() {
-        return $this->mActionNames;
-    }
+    public function getActionNames()    { return $this->mActionNames; }
 
-    /**
-     * Returns the name of the category which certain elements of an ACL must
-     * belong to.
-     *
-     * @param int $cattype
-     *         Type of the category: CAT_GROUP, CAT_RIGHT or CAT_SECURITY_DESCRIPTOR
-     * @return string
-     *         Name of the category
-     */
-    public function getCategory($cattype) {
-        return $this->mCategories[$cattype];
-    }
+    // Get self::RIGHT_* action ID by action name $name
+    public function getActionId($name)  { return $this->mActionAliases[mb_strtolower($name)]; }
 
-    /**
-     * Returns the name of the article (with or without namespace) that contains
-     * the whitelist.
-     *
-     * @param bool $withNS
-     *         true => Name with namespace (default)
-     *         false => Name without namespace
-     *
-     * @return string
-     *         Complete name of the whitelist.
-     */
-    public function getWhitelist($withNS = true) {
-        return (($withNS) ? $this->mNamespaces[HACL_NS_ACL].':'
-                          : '').$this->mWhitelist;
-    }
-
-    /**
-     * Security descriptors protect different types of elements i.e. pages,
-     * instances of categories and namespaces and properties. The name of a
-     * security descriptor has a prefix that matches this type. The prefix
-     * depends on the language. This method return the name of the prefix for given
-     * type.
-     * Example: ACL:Page/X is the security descriptor for page X. The prefix is
-     *          "Page".
-     *
-     * @param int $peType
-     *         Type of the protected element which is one of:
-     *         HACLSecurityDesriptor::PET_PAGE
-     *         HACLSecurityDesriptor::PET_CATEGORY
-     *         HACLSecurityDesriptor::PET_NAMESPACE
-     *         HACLSecurityDesriptor::PET_PROPERTY
-     *         HACLSecurityDesriptor::PET_RIGHT
-     *
-     * @return string
-     *         Prefix for the given type
-     */
-    public function getPetPrefix($peType) {
-        return $this->mPetPrefixes[$peType];
-    }
+    public function getWhitelist()      { return $this->mWhitelist; }
+    public function getPetPrefix($type) { return $this->mPetPrefixes[$type]; }
+    public function getPetPrefixes()    { return $this->mPetPrefixes; }
+    public function getPrefix($prefix)  { return $this->mPrefixes[mb_strtolower($prefix)]; }
+    public function getPrefixes()       { return $this->mPrefixes; }
+    public function getPetAlias($alias) { return $this->mPetAliases[mb_strtolower($alias)]; }
+    public function getPetAliases()     { return $this->mPetAliases; }
+    public function getGroupPrefix()    { return $this->mGroupPrefix; }
 }
-
-

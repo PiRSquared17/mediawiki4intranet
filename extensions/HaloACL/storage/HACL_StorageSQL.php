@@ -906,8 +906,9 @@ class HACLStorageSQL {
      *         An array of IDs of all SD that include the PR via the hierarchy
      *      of PRs.
      */
-    public function getSDsIncludingPR($prID) {
-        $dbr =& wfGetDB( DB_SLAVE );
+    public function getSDsIncludingPR($prID)
+    {
+        $dbr = wfGetDB( DB_SLAVE );
 
         $parentIDs = array();
         $childIDs = array($prID);
@@ -955,40 +956,62 @@ class HACLStorageSQL {
         $dbr->freeResult($res);
 
         return $sdIDs;
-
     }
 
     /**
-     * Retrieves the description of the SD with the ID $SDID from
-     * the database.
+     * Retrieves the SD object(s) with the ID(s) $SDID from the database.
      *
-     * @param int $SDID
+     * @param  int $SDID
      *         ID of the requested SD.
+     *         Optionally an array of SD ids.
      *
      * @return HACLSecurityDescriptor
      *         A new SD object or <NULL> if there is no such SD in the
      *         database.
-     *
+     *         If $SDID is an array, then return value will also be an array
+     *         with SD objects in the preserved order.
      */
-    public function getSDByID($SDID) {
-        $dbr =& wfGetDB( DB_SLAVE );
-        $sd = NULL;
-
-        $res = $dbr->select('halo_acl_security_descriptors', '*', array('sd_id' => $SDID), __METHOD__);
-        if ($dbr->numRows($res) == 1) {
-            $row = $dbr->fetchObject($res);
-            $sdID = (int)$row->sd_id;
-            $peID = (int)$row->pe_id;
-            $type   = $row->type;
-            $mgGroups = self::strToIntArray($row->mr_groups);
-            $mgUsers  = self::strToIntArray($row->mr_users);
-
-            $name = HACLSecurityDescriptor::nameForID($sdID);
-            $sd = new HACLSecurityDescriptor($sdID, $name, $peID, $type, $mgGroups, $mgUsers);
+    public function getSDByID($SDID)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        $res = $dbr->select(
+            array('halo_acl_security_descriptors', 'page'),
+            'halo_acl_security_descriptors.*, page_title',
+            array('sd_id' => $SDID, 'page_id=sd_id'),
+            __METHOD__
+        );
+        if ($dbr->numRows($res) == 1)
+            return self::rowToSD($dbr->fetchObject($res));
+        elseif (is_array($SDID))
+        {
+            $byid = array();
+            foreach ($res as $row)
+            {
+                $sd = self::rowToSD($row);
+                $byid[$sd->getSDId()] = $sd;
+            }
+            $r = array();
+            foreach ($SDID as $id)
+                if ($byid[$id])
+                    $r[] = $byid[$id];
+            return $r;
         }
-        $dbr->freeResult($res);
+        return NULL;
+    }
 
-        return $sd;
+    /* Create HACLSecurityDescriptor from DB row object */
+    static function rowToSD($row)
+    {
+        if (!$row->page_title)
+            $row->page_title = HACLSecurityDescriptor::nameForID($sdID);
+        return new HACLSecurityDescriptor(
+            (int)$row->sd_id,
+            str_replace('_', ' ', $row->page_title),
+            (int)$row->pe_id,
+            $row->type,
+            self::strToIntArray($row->mr_groups),
+            self::strToIntArray($row->mr_users)
+        );
     }
 
     /**
@@ -1159,7 +1182,7 @@ class HACLStorageSQL {
      *         ID of the protected element
      * @param string $type
      *         Type of the protected element: One of
-     *         HACLSecurityDescriptor::PET_*
+     *         HACLLanguage::PET_*
      *
      * @param int $actionID
      *         ID of the action. One of
@@ -1464,27 +1487,25 @@ class HACLStorageSQL {
         $dbw->insert('halo_acl_quickacl', $rows, __METHOD__);
     }
 
-
-    public function getQuickacl($user_id) {
-        $dbr =& wfGetDB( DB_SLAVE );
+    public function getQuickacl($user_id)
+    {
+        $dbr = wfGetDB( DB_SLAVE );
 
         $res = $dbr->select('halo_acl_quickacl', 'sd_id', array('user_id' => $user_id), __METHOD__);
-
         $sd_ids = array();
-        while ($row = $dbr->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res))
             $sd_ids[] = (int)$row->sd_id;
-        }
         $dbr->freeResult($res);
 
-        $quickacl = new HACLQuickacl($user_id,$sd_ids);
+        $quickacl = new HACLQuickacl($user_id, $sd_ids);
         return $quickacl;
     }
 
-    public function deleteQuickaclForSD($sdid){
-        $dbw =& wfGetDB( DB_MASTER );
+    public function deleteQuickaclForSD($sdid)
+    {
+        $dbw = wfGetDB( DB_MASTER );
         // delete old quickacl entries
         $dbw->delete('halo_acl_quickacl', array('sd_id' => $sdid), __METHOD__);
         return true;
     }
-
 }
