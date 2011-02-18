@@ -1,76 +1,105 @@
-/* This script requires the following global variables:
-   msg: localisation messages
-   petPrefix: { PET_XX => prefix } from haclgContLang */
-
-// FIXME move all this into a class, like in HACL_GroupEditor.js
-
-var allActions = [ 'create', 'delete', 'edit', 'move', 'read' ];
-var groupClosureCache = {};
-var predefCache = {};
-var aclRights = {};
-var aclClosure = {};
-var aclPredefined = {};
-var aclLastTarget = {};
-var user_hint, target_hint, inc_hint, last_target = '', last_target_name = '';
-
-var actionsHash = {};
-for (var a in allActions)
-    actionsHash[allActions[a]] = true;
-
-userNsRegexp = msg.regexp_user ? new RegExp(msg.regexp_user, 'gi') : '';
-groupPrefixRegexp = msg.regexp_group ? new RegExp(msg.regexp_group, 'gi') : '';
-
 if (!String.prototype.trim)
-    String.prototype.trim = function() { return this.replace(/^\s*/, '').replace(/\s*$/, ''); }
+    String.prototype.trim = function() { return this.replace(/^\s*/, '').replace(/\s*$/, ''); };
+
+// escape &<>"'
+var htmlspecialchars = function(s)
+{
+    var r = { '&' : '&amp;', '<' : '&lt;', '>' : '&gt;', '"' : '&quot;', '\'' : '&apos;' };
+    for (var i in r)
+        s = s.replace(i, r[i]);
+    return s;
+};
+
+/* msg: localisation messages
+   petPrefixes: PET_XX => prefix from haclgContLang
+   initialTitle: SD Title -> getText()
+   initialType: SD -> getPEType()
+*/
+var HACLACLEditor = function(msg, petPrefixes, initialTitle, initialType)
+{
+    this.msg = msg;
+    this.pet_prefixes = petPrefixes;
+    this.is_template = { 'right': true };
+
+    this.group_cache = {};
+    this.predef_cache = {};
+    this.rights_direct = {};
+    this.rights_indirect = {};
+    this.predef_included = {};
+    this.last_target_names = {};
+    this.last_target_type = '';
+
+    // Autocompleters (SHint's)
+    this.user_hint = null;
+    this.target_hint = null;
+    this.inc_hint = null;
+
+    this.regexp_user = msg.regexp_user ? new RegExp(msg.regexp_user, 'gi') : '';
+    this.regexp_group = msg.regexp_group ? new RegExp(msg.regexp_group, 'gi') : '';
+    this.action_alias = {};
+    this.all_actions = [];
+
+    var an = ['manage', 'create', 'delete', 'edit', 'move', 'read'];
+    for (var a in an)
+    {
+        a = an[a];
+        this.action_alias[a] = a;
+        if (a != 'manage')
+            this.all_actions.push(a);
+    }
+
+    this.init(initialTitle, initialType);
+};
 
 // target ACL page name/type change
 // total_change==true only when onchange is fired (element loses focus)
-function target_change(total_change)
+HACLACLEditor.prototype.target_change = function(total_change)
 {
+    // check if target really changed
     var what = document.getElementById('acl_what').value;
     var an = document.getElementById('acl_name');
-    // check if target type changed
-    if (last_target != what)
+    if (this.last_target_type != what)
     {
-        if (last_target)
+        if (this.last_target_type)
         {
             // remember name for each type separately
-            aclLastTarget[last_target] = an.value;
-            if (aclLastTarget[what])
-                an.value = aclLastTarget[what];
+            this.last_target_names[this.last_target_type] = an.value;
+            if (this.last_target_names[what])
+                an.value = this.last_target_names[what];
             else if (what == 'template')
                 an.value = wgUserName;
             else
                 an.value = '';
-            last_target_name = an.value;
-            target_hint.change();
+            this.target_hint.change();
         }
-        last_target = what;
+        this.last_target_type = what;
     }
     var name = an.value.trim();
-    if (last_target_name.length && last_target_name == name && !total_change)
+    if (this.last_target_names[this.last_target_type] && this.last_target_names[this.last_target_type] == name && !total_change)
         return;
-    last_target_name = name;
+    this.last_target_names[this.last_target_type] = name;
+    // yes, target really changed, hide/show elements
+    var t;
     if (name.length)
     {
         var pn = document.getElementById('acl_pn');
-        var t = msg.NS_ACL+':'+petPrefix[what]+'/'+name;
+        t = this.msg.NS_ACL+':'+this.pet_prefixes[what];
         pn.innerHTML = t;
         pn.href = wgScript+'/'+t;
         document.getElementById('wpTitle').value = t;
         document.getElementById('acl_delete_link').href = wgScript + '?title=' + encodeURI(t) + '&action=delete';
         if (total_change)
-            sajax_do_call('haclSDExists', [ what, name ], pe_exists_ajax);
+            sajax_do_call('haclSDExists', [ what, name ], this.pe_exists_ajax);
     }
-    if (!name.length || !total_change)
+    if (!t || !total_change)
         document.getElementById('acl_exists_hint').style.display = 'none';
-    document.getElementById('acl_delete_link').style.display = name.length ? '' : 'none';
-    document.getElementById('acl_pns').style.display = name.length ? '' : 'none';
-    document.getElementById('acl_pnhint').style.display = name.length ? 'none' : '';
-}
+    document.getElementById('acl_delete_link').style.display = t ? '' : 'none';
+    document.getElementById('acl_pns').style.display = t ? '' : 'none';
+    document.getElementById('acl_pnhint').style.display = t ? 'none' : '';
+};
 
 // react to item existence check
-function pe_exists_ajax(request)
+HACLACLEditor.prototype.pe_exists_ajax = function(request)
 {
     if (request.status != 200)
         return;
@@ -79,40 +108,52 @@ function pe_exists_ajax(request)
         document.getElementById('acl_exists_hint').style.display = '';
     else
         document.getElementById('acl_delete_link').style.display = 'none';
-    document.getElementById('wpSave').value = exists ? msg.edit_save : msg.edit_create;
-}
+    document.getElementById('wpSave').value = exists ? this.msg.edit_save : this.msg.edit_create;
+};
 
 // add predefined ACL inclusion
-function include_acl()
+HACLACLEditor.prototype.include_acl = function()
 {
     var inc = document.getElementById('inc_acl').value;
-    aclPredefined[inc] = true;
-    save_sd();
-}
+    this.predef_included[inc] = true;
+    this.save_sd();
+};
+
+// parse PF parameter text into array of comma separated values
+// is_assigned_to=true means it is the list of users/groups
+HACLACLEditor.prototype.pf_param = function(name, value, is_assigned_to)
+{
+    var re = new RegExp('[:\\|]\\s*' + name.replace(' ', '\\s+') + '\\s*=\\s*([^\\|\\}]*)', 'i');
+    var ass = re.exec(value);
+    if (!ass)
+        return [];
+    ass = (ass[1] || '');
+    if (is_assigned_to)
+    {
+        if (this.regexp_user)
+            ass = ass.replace(this.regexp_user, '$1User:');
+        if (this.regexp_group)
+            ass = ass.replace(this.regexp_group, '$1Group/');
+    }
+    return ass.trim().split(/[,\s*]*,[,\s]*/);
+};
 
 // parse definition text from textbox
-function parse_sd()
+HACLACLEditor.prototype.parse_sd = function()
 {
     var t = document.getElementById('acl_def').value;
     var m = t.match(/\{\{\s*\#access\s*:\s*[^\}]*?\}\}/ig) || [];
     var r = {}, i = 0, j, k, h, act, ass;
     while (m[i])
     {
-        ass = /[:\|]\s*assigned\s+to\s*=\s*([^\|\}]*)/i.exec(m[i]);
-        ass = (ass[1] || '');
-        if (userNsRegexp)
-            ass = ass.replace(userNsRegexp, '$1User:');
-        if (groupPrefixRegexp)
-            ass = ass.replace(groupPrefixRegexp, '$1Group/');
-        ass = ass.trim().split(/[,\s*]*,[,\s]*/);
-        act = /[:\|]\s*actions\s*=\s*([^\|\}]*)/i.exec(m[i]);
-        act = (act[1] || '').trim().toLowerCase().split(/[,\s*]*,[,\s]*/);
+        ass = this.pf_param('assigned to', m[i], true);
+        act = this.pf_param('actions', m[i].toLowerCase(), false);
         h = {};
         for (j = act.length-1; j >= 0; j--)
         {
             if (act[j] == '*')
             {
-                act = allActions;
+                act = this.all_actions;
                 break;
             }
             else if (h[act[j]])
@@ -125,92 +166,94 @@ function parse_sd()
         }
         for (j in act)
         {
-            if (!actionsHash[act[j]])
+            j = this.action_alias[act[j]];
+            if (!j)
             {
-                // remove invalid actions
+                // skip invalid actions
                 continue;
             }
             for (k in ass)
             {
                 r[ass[k]] = r[ass[k]] || {};
-                r[ass[k]][act[j]] = true;
+                r[ass[k]][j] = true;
             }
         }
         i++;
     }
-    // assigned to manage rights
+    // template manage rights
     var m1 = t.match(/\{\{\s*\#manage\s+rights\s*:\s*[^\}]*?\}\}/ig) || [];
     i = 0;
     while (m1[i])
     {
-        ass = /[:\|]\s*assigned\s+to\s*=\s*([^\|\}]*)/i.exec(m1[i]);
-        ass = (ass[1] || '').trim().split(/[,\s*]*,[,\s]*/);
+        ass = this.pf_param('assigned to', m1[i], true);
         for (k in ass)
         {
             r[ass[k]] = r[ass[k]] || {};
-            r[ass[k]]['manage'] = true;
+            r[ass[k]]['template'] = true;
         }
         i++;
     }
     // ACL inclusions
     var m2 = t.match(/\{\{\s*\#predefined\s+right\s*:\s*[^\}]*?\}\}/ig) || [];
     i = 0;
-    aclPredefined = {};
+    this.predef_included = {};
     while (m2[i])
     {
-        ass = /[:\|]\s*rights\s*=\s*([^\|\}]*)/i.exec(m2[i]);
-        ass = (ass[1] || '').trim().split(/[,\s*]*,[,\s]*/);
+        ass = this.pf_param('rights', m2[i], false);
         for (k in ass)
-            aclPredefined[ass[k]] = true;
+            this.predef_included[ass[k]] = true;
         i++;
     }
-    // Save aclRights
-    aclRights = r;
-    check_errors();
+    // Save this.rights_direct
+    this.rights_direct = r;
 }
 
 // Check for errors (now: at least 1 manager defined, at least 1 action defined)
-function check_errors()
+HACLACLEditor.prototype.check_errors = function()
 {
     var has_managers = false, has_rights = false;
-    for (var m in aclRights)
+    var is_template = this.is_template[this.last_target_type];
+    var merge = [ this.rights_direct, this.rights_indirect ];
+    for (var h in merge)
     {
-        for (var a in aclRights[m])
+        h = merge[h];
+        for (var m in h)
         {
-            if (a == 'manage')
-                has_managers = true;
-            else
-                has_rights = true;
+            for (var a in h[m])
+            {
+                if (a == 'manage' && !is_template ||
+                    a == 'template')
+                    has_managers = true;
+                else
+                    has_rights = true;
+            }
+            if (has_rights && has_managers)
+                break;
         }
-        if (has_rights && has_managers)
-            break;
-    }
-    for (var m in aclPredefined)
-    {
-        has_rights = true;
-        break;
     }
     document.getElementById('acl_define_rights').style.display = has_rights ? 'none' : '';
-    document.getElementById('acl_define_manager').style.display = has_managers ? 'none' : '';
-}
+    var m = document.getElementById('acl_define_manager');
+    m.style.display = has_managers ? 'none' : '';
+    m.innerHTML = this.msg[is_template ? 'edit_define_tmanager' : 'edit_define_manager'];
+};
 
-// fill in aclRights with closure data
-function closure_ajax(request)
+// fill in this.rights_direct with closure data
+HACLACLEditor.prototype.closure_ajax = function(request)
 {
     if (request.status != 200)
         return;
     var d = eval('('+request.responseText+')'); // JSON parse
     if (d && d['groups'])
         for (var g in d['groups'])
-            groupClosureCache[g] = d['groups'][g];
+            this.group_cache[g] = d['groups'][g];
     if (d && d['rights'])
         for (var g in d['rights'])
-            predefCache[g] = d['rights'][g];
-}
+            this.predef_cache[g] = d['rights'][g];
+};
 
 // modify closure, append d = [ group1, group2, ... ],
 // append predefined rights sd = [ right1, ... ]
-function closure_groups_sd(d, sd)
+HACLACLEditor.prototype.closure_groups_sd = function(d, sd)
 {
     var c = false;
     // Groups
@@ -218,14 +261,14 @@ function closure_groups_sd(d, sd)
     {
         c = true;
         g = d[g];
-        if (groupClosureCache[g])
+        if (this.group_cache[g])
         {
-            for (var m in groupClosureCache[g])
+            for (var m in this.group_cache[g])
             {
-                m = groupClosureCache[g][m];
-                aclClosure[m] = aclClosure[m] || {};
-                for (var a in aclRights[g])
-                    aclClosure[m][a] = g;
+                m = this.group_cache[g][m];
+                this.rights_indirect[m] = this.rights_indirect[m] || {};
+                for (var a in this.rights_direct[g])
+                    this.rights_indirect[m][a] = g;
             }
         }
     }
@@ -234,49 +277,50 @@ function closure_groups_sd(d, sd)
     {
         c = true;
         r = sd[r];
-        if (predefCache[r])
+        if (this.predef_cache[r])
         {
-            for (var m in predefCache[r])
+            for (var m in this.predef_cache[r])
             {
-                aclClosure[m] = aclClosure[m] || {};
-                for (var a in predefCache[r][m])
-                    aclClosure[m][a] = m;
+                this.rights_indirect[m] = this.rights_indirect[m] || {};
+                for (var a in this.predef_cache[r][m])
+                    this.rights_indirect[m][a] = m;
             }
         }
     }
     // refresh hint
-    if (c && !user_hint.element.value.trim().length)
-        user_hint.change_ajax(get_empty_hint());
-}
+    if (c && !this.user_hint.element.value.trim().length)
+        this.user_hint.change_ajax(this.get_empty_hint());
+};
 
 // parse ACL and re-fill closure
-function parse_make_closure()
+HACLACLEditor.prototype.parse_make_closure = function()
 {
-    parse_sd();
-    fill_closure();
-}
+    this.parse_sd();
+    this.fill_closure();
+};
 
-// re-fill aclClosure
-function fill_closure()
+// re-fill this.rights_indirect
+HACLACLEditor.prototype.fill_closure = function()
 {
+    var ge = this;
     var g = [];
     var fetch = [];
-    aclClosure = {};
-    for (var k in aclRights)
+    this.rights_indirect = {};
+    for (var k in this.rights_direct)
     {
         if (k.substr(0, 6) == 'Group/')
         {
             g.push(k);
-            if (!groupClosureCache[k])
+            if (!this.group_cache[k])
                 fetch.push(k);
         }
     }
     var sd = [];
     var fetch_sd = [];
-    for (var k in aclPredefined)
+    for (var k in this.predef_included)
     {
         sd.push(k);
-        if (!predefCache[k])
+        if (!this.predef_cache[k])
             fetch_sd.push(k);
     }
     if (fetch.length || fetch_sd.length)
@@ -284,27 +328,25 @@ function fill_closure()
         sajax_do_call(
             'haclGroupClosure',
             [ fetch.join(','), fetch_sd.join('[') ],
-            function(request) { closure_ajax(request); closure_groups_sd(g, sd); }
+            function(request) { ge.closure_ajax(request); ge.closure_groups_sd(g, sd); ge.check_errors(); }
         );
     }
     else if (g.length || sd.length)
-        closure_groups_sd(g, sd);
-}
+    {
+        ge.closure_groups_sd(g, sd);
+        ge.check_errors();
+    }
+};
 
 // save definition text into textbox
-function save_sd()
+HACLACLEditor.prototype.save_sd = function()
 {
-    var r, i, j, k, m, h, man;
+    var r = this.rights_direct, i, j, k, m, h, man;
     // remove old definitions
     var t = document.getElementById('acl_def').value;
     t = t.replace(/\{\{\s*\#(access|manage\s+rights|predefined\s*right):\s*[^\}]*?\}\}\s*/ig, '').trim();
-    // build {{#manage rights: }}
-    m = [];
-    r = aclRights;
-    for (j in r)
-        if (r[j]['manage'])
-            m.push(j);
-    man = m.length ? '{{#manage rights: assigned to = '+m.join(", ")+"}}\n" : '';
+    if (t.length)
+        t = t + "\n";
     // build {{#access: }} rights
     m = {};
     for (j in r)
@@ -312,85 +354,93 @@ function save_sd()
         h = r[j];
         i = [];
         for (var k in h)
-            if (k != 'manage')
-                i.push(k);
+            if (k != 'template' &&
+                k != 'manage')
+                i.push(this.action_names[k]);
         if (i.length)
         {
-            i = i.sort().join(', ');
-            if (i == allActions.join(', '))
-                i = '*';
+            i = i.sort();
+            if (i.join(',') == this.all_actions.join(','))
+                i = ['*'];
+        }
+        if (h['manage'])
+            i.push(this.action_names.manage);
+        if (i.length)
+        {
+            i = i.join(', ');
             m[i] = m[i] || [];
             m[i].push(j);
         }
     }
-    r = '';
     for (j in m)
-        r += '{{#access: assigned to = '+m[j].join(", ")+' | actions = '+j+"}}\n";
+        t += '{{#access: assigned to = '+m[j].join(", ")+' | actions = '+j+"}}\n";
+    // include {{#manage rights: }}
+    m = [];
+    for (j in r)
+        if (r[j]['template'])
+            m.push(j);
+    if (m.length)
+        t = t + '{{#manage rights: assigned to = '+m.join(", ")+"}}\n";
     // include predefined rights
     var predef = [];
-    for (var i in aclPredefined)
+    for (var i in this.predef_included)
         predef.push(i);
-    // add definitions
-    if (t.length)
-        t = t + "\n";
-    t = t + r + man;
     if (predef.length)
         t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
     document.getElementById('acl_def').value = t;
-    check_errors();
-}
+};
 
 // onchange for action checkboxes
-function act_change(e)
+HACLACLEditor.prototype.act_change = function(e)
 {
     if (e.disabled)
         return;
-    var g_to = get_grant_to();
+    var g_to = this.get_grant_to();
     var a = e.id.substr(4), direct, grp;
     if (a == 'all')
     {
-        var act = allActions;
+        var act = this.all_actions;
         direct = grp = true;
         for (var i in act)
         {
             i = act[i];
-            direct = direct && aclRights[g_to] && aclRights[g_to][i];
+            direct = direct && this.rights_direct[g_to] && this.rights_direct[g_to][i];
             grp = grp &&
-                (aclClosure[g_to] && aclClosure[g_to][i] ||
-                aclRights['#'] && aclRights['#'][i]);
+                (this.rights_indirect[g_to] && this.rights_indirect[g_to][i] ||
+                this.rights_direct['#'] && this.rights_direct['#'][i]);
         }
     }
     else
     {
-        direct = aclRights[g_to] && aclRights[g_to][a];
-        grp = aclClosure[g_to] && aclClosure[g_to][a] ||
-            aclRights['#'] && aclRights['#'][a];
+        direct = this.rights_direct[g_to] && this.rights_direct[g_to][a];
+        grp = this.rights_indirect[g_to] && this.rights_indirect[g_to][a] ||
+            this.rights_direct['#'] && this.rights_direct['#'][a];
     }
-    // grant if not yet
+    // this.grant if not yet
     if (e.checked && !direct && !grp)
-        grant(g_to, a, true);
-    // if right is granted through some group, we can't revoke
+        this.grant(g_to, a, true);
+    // if right is this.granted through some group, we can't revoke
     else if (!e.checked && direct && !grp)
-        grant(g_to, a, false);
-}
+        this.grant(g_to, a, false);
+};
 
 // onchange for to_type
-function to_type_change()
+HACLACLEditor.prototype.to_type_change = function()
 {
     var t = document.getElementById('to_type').value;
     document.getElementById('to_name').style.display = t == '*' || t == '#' ? 'none' : '';
     document.getElementById('to_name').value = '';
-    to_name_change();
+    this.to_name_change();
     // force refresh hint (for the case when value didn't change)
-    user_hint.fill_handler(user_hint, '');
-}
+    this.user_hint.fill_handler(this.user_hint, '');
+};
 
-// additional onchange for to_name - load to_name's rights from aclClosure
-function to_name_change()
+// additional onchange for to_name - load to_name's rights from this.rights_indirect
+HACLACLEditor.prototype.to_name_change = function()
 {
-    var g_to = get_grant_to();
-    var act = allActions.slice(0);
-    act.push('manage', 'all');
+    var g_to = this.get_grant_to();
+    var act = this.all_actions.slice(0); // copy array
+    act.push('manage', 'template', 'all');
     var all_direct = true, all_grp = true;
     var c, l, direct, grp;
     for (var a in act)
@@ -398,40 +448,44 @@ function to_name_change()
         a = act[a];
         c = document.getElementById('act_'+a);
         l = document.getElementById('act_label_'+a);
-        // determine direct and indirect grant
+        // determine direct and indirect rights
         if (g_to)
         {
-            direct = aclRights[g_to] && aclRights[g_to][a];
-            grp = aclClosure[g_to] && aclClosure[g_to][a];
+            direct = this.rights_direct[g_to] && this.rights_direct[g_to][a];
+            grp = this.rights_indirect[g_to] && this.rights_indirect[g_to][a];
             if (!grp && g_to.substr(0, 5) == 'User:')
             {
-                if (aclRights['#'] && aclRights['#'][a])
-                    grp = msg.indirect_grant_reg;
-                else if (!grp && aclRights['*'] && aclRights['*'][a])
-                    grp = msg.indirect_grant_all;
+                if (this.rights_direct['#'] && this.rights_direct['#'][a])
+                    grp = this.msg.indirect_grant_reg;
+                else if (!grp && this.rights_direct['*'] && this.rights_direct['*'][a])
+                    grp = this.msg.indirect_grant_all;
             }
         }
-        // all = all except manage
         if (a == 'all')
         {
+            // load saved all_direct and all_grp
             direct = all_direct;
             grp = all_grp;
         }
-        else if (a != 'manage')
+        else if (a != 'manage' && a != 'template')
         {
+            // make all_direct and all_grp
             all_direct = all_direct && direct;
             all_grp = all_grp && grp;
         }
         c.checked = direct || grp;
-        // disable checkbox if right is granted through some group
-        c.disabled = !g_to || grp;
+        // disable checkbox:
+        // - if right is granted through some group
+        // - or if no grant target selected
+        // - or if a=='template' and we are not template
+        c.disabled = !g_to || grp || a == 'template' && !this.is_template[this.last_target_type];
         l.className = c.disabled ? 'act_disabled' : '';
-        c.title = l.title = grp ? msg.indirect_grant.replace('$1', grp) : '';
+        c.title = l.title = grp ? this.msg.indirect_grant.replace('$1', grp) : '';
     }
-}
+};
 
 // get grant subject (*, #, User:X, Group/X)
-function get_grant_to()
+HACLACLEditor.prototype.get_grant_to = function()
 {
     var g_to = document.getElementById('to_type').value;
     if (g_to == '*' || g_to == '#')
@@ -444,71 +498,62 @@ function get_grant_to()
     else if (g_to == 'user')
         g_to = 'User:' + n;
     return g_to;
-}
+};
 
-// grant/revoke g_act to/from g_to and update textbox with definition
-// g_act is: one of allActions, or 'manage', or 'all'
-function grant(g_to, g_act, g_yes)
+// this.grant/revoke g_act to/from g_to and update textbox with definition
+// g_act is: one of this.all_actions, or 'manage', or 'all'
+HACLACLEditor.prototype.grant = function(g_to, g_act, g_yes)
 {
     if (g_act == 'all')
-        act = allActions;
+        act = this.all_actions;
     else
         act = [ g_act ];
     if (g_yes)
     {
         for (var a in act)
         {
-            aclRights[g_to] = aclRights[g_to] || {};
-            aclRights[g_to][act[a]] = true;
+            this.rights_direct[g_to] = this.rights_direct[g_to] || {};
+            this.rights_direct[g_to][act[a]] = true;
         }
     }
     else
     {
         for (var a in act)
-            if (aclRights[g_to])
-                delete aclRights[g_to][act[a]];
+            if (this.rights_direct[g_to])
+                delete this.rights_direct[g_to][act[a]];
     }
     if (g_act == 'all')
-        for (var a in allActions)
-            document.getElementById('act_'+allActions[a]).checked = g_yes;
+        for (var a in this.all_actions)
+            document.getElementById('act_'+this.all_actions[a]).checked = g_yes;
     else
     {
-        var c = aclRights[g_to];
+        var c = this.rights_direct[g_to];
         if (c)
-            for (var a in allActions)
-                c = c && aclRights[g_to][allActions[a]];
+            for (var a in this.all_actions)
+                c = c && this.rights_direct[g_to][this.all_actions[a]];
         document.getElementById('act_all').checked = c;
     }
-    save_sd();
+    this.save_sd();
     if (g_to.substr(0, 6) == 'Group/')
-        fill_closure();
-}
-
-// escape &<>"'
-function htmlspecialchars(s)
-{
-    var r = { '&' : '&amp;', '<' : '&lt;', '>' : '&gt;', '"' : '&quot;', '\'' : '&apos;' };
-    for (var i in r)
-        s = s.replace(i, r[i]);
-    return s;
-}
+        this.fill_closure();
+};
 
 // get autocomplete html code for the case when to_name is empty
-function get_empty_hint()
+HACLACLEditor.prototype.get_empty_hint = function()
 {
     var tt = document.getElementById('to_type').value;
     var involved = [], n, j = 0;
     if (tt == 'group' || tt == 'user')
     {
         var x = {};
-        for (n in aclRights)
-            for (j in aclRights[n])
+        for (n in this.rights_direct)
+            for (j in this.rights_direct[n])
             {
                 x[n] = true;
                 break;
             }
-        for (n in aclClosure)
-            for (j in aclClosure[n])
+        for (n in this.rights_indirect)
+            for (j in this.rights_indirect[n])
             {
                 x[n] = true;
                 break;
@@ -524,70 +569,93 @@ function get_empty_hint()
         }
     }
     if (!involved.length)
-        return '<div class="hacl_tt">'+msg['edit_no_'+tt+'s_affected']+' '+msg['start_typing_'+tt]+'</div>';
-    return '<div class="hacl_tt">'+msg['edit_'+tt+'s_affected']+'</div>'+involved.join('');
-}
+        return '<div class="hacl_tt">'+this.msg['edit_no_'+tt+'s_affected']+' '+this.msg['start_typing_'+tt]+'</div>';
+    return '<div class="hacl_tt">'+this.msg['edit_'+tt+'s_affected']+'</div>'+involved.join('');
+};
 
-// initialize ACL editor
-function acl_init_editor()
+HACLACLEditor.prototype.user_hint_fill = function(h, v)
 {
-    // create autocompleter for user/group name
-    var w = document.getElementById('to_type');
-    user_hint = new SHint('to_name', 'hacl',
-        function (h, v)
-        {
-            if (!v.length)
-                h.change_ajax(get_empty_hint());
-            else
-                sajax_do_call('haclAutocomplete', [ w.value, v ],
-                    function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
-        });
-    user_hint.change_old = user_hint.change;
-    user_hint.change = function(ev)
+    if (!v.length)
+        h.change_ajax(this.get_empty_hint());
+    else
+        sajax_do_call('haclAutocomplete', [ document.getElementById('to_type').value, v ],
+            function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+};
+
+HACLACLEditor.prototype.user_hint_change = function(h)
+{
+    // onchange for to_name
+    if (!this.user_hint.element.value.trim())
+        this.user_hint.msg_hint = this.get_empty_hint();
+    var wv = document.getElementById('to_type').value;
+    this.user_hint.element.style.display = wv == '*' || wv == '#' ? 'none' : '';
+    if (wv == '*' || wv == '#')
+        this.user_hint.focus(false);
+    else
+        this.user_hint.change_old();
+};
+
+HACLACLEditor.prototype.target_hint_fill = function (h, v)
+{
+    var wv = document.getElementById('acl_what').value;
+    if (this.is_template[wv])
+        return;
+    if (wv != 'namespace' && !v.length)
+        h.tip_div.innerHTML = '<div class="hacl_tt">'+this.msg['start_typing_'+wv]+'</div>';
+    else
+        sajax_do_call('haclAutocomplete', [ wv, v ],
+            function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+};
+
+HACLACLEditor.prototype.target_hint_focus = function(f)
+{
+    this.target_hint.tip_div.style.display = !this.is_template[document.getElementById('acl_what').value] && (f || this.target_hint.nodefocus) ? '' : 'none';
+    this.target_hint.nodefocus = undefined;
+};
+
+HACLACLEditor.prototype.inc_hint_fill = function(h, v)
+{
+    sajax_do_call('haclAutocomplete', [ 'sd/right', v ],
+        function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
+};
+
+// Initialize ACL editor
+HACLACLEditor.prototype.init = function(aclTitle, aclType)
+{
+    if (aclTitle)
     {
-        // onchange for to_name
-        if (!user_hint.element.value.trim())
-            user_hint.msg_hint = get_empty_hint();
-        user_hint.element.style.display = w.value == '*' || w.value == '#' ? 'none' : '';
-        if (w.value == '*' || w.value == '#')
-            user_hint.focus(false);
+        aclTitle = aclTitle.split('/', 2);
+        document.getElementById('acl_name').value = aclTitle[1];
+        this.pet_prefixes[aclType] = aclTitle[0];
+        var what_item = document.getElementById('acl_what_'+aclType);
+        if (what_item)
+            what_item.selected = true;
         else
-            user_hint.change_old();
-    };
-    user_hint.onset = to_name_change;
-    user_hint.init();
-    exAttach('to_name', 'change', to_name_change);
-    to_name_change();
+            document.getElementById('acl_what_right').selected = true;
+    }
+    this.parse_make_closure();
+    // use ge.XX instead of this.XX because methods are often called in element or SHint context
+    var ge = this;
+    // create autocompleter for user/group name
+    this.user_hint = new SHint('to_name', 'hacl', function(h, v) { ge.user_hint_fill(h, v) });
+    this.user_hint.change_old = this.user_hint.change;
+    this.user_hint.change = function(ev) { ge.user_hint_change() };
+    this.user_hint.onset = function(ev, e) { ge.to_name_change() };
+    this.user_hint.init();
+    exAttach('to_name', 'change', function(ev, e) { ge.to_name_change() });
     // init protection target
-    target_change();
+    this.target_change();
+    this.to_name_change();
     // create autocompleter for protection target
-    var w1 = document.getElementById('acl_what');
-    target_hint = new SHint('acl_name', 'hacl',
-        function (h, v)
-        {
-            var wv = w1.value;
-            if (wv == 'right' || wv == 'template')
-                return;
-            if (wv != 'namespace' && !v.length)
-                h.tip_div.innerHTML = '<div class="hacl_tt">'+msg['start_typing_'+wv]+'</div>';
-            else
-                sajax_do_call('haclAutocomplete', [ wv, v ],
-                    function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
-        });
-    // do not hint template and right targets
-    target_hint.focus = function(f)
-    {
-        target_hint.tip_div.style.display = w1.value != 'template' && w1.value != 'right' && (f || target_hint.nodefocus) ? '' : 'none';
-        target_hint.nodefocus = undefined;
-    };
-    target_hint.onset = target_change;
-    target_hint.max_height = 400;
-    target_hint.init();
+    this.target_hint = new SHint('acl_name', 'hacl', function(h, v) { ge.target_hint_fill(h, v) });
+    // do not hint template targets
+    this.target_hint.focus = function(f) { ge.target_hint_focus(f) };
+    this.target_hint.onset = function(ev, e) { ge.target_change(ev, e) };
+    this.target_hint.max_height = 400;
+    this.target_hint.init();
     // create autocompleter for ACL inclusion
-    inc_hint = new SHint('inc_acl', 'hacl',
-        function (h, v) {
-            sajax_do_call('haclAutocomplete', [ 'sd/right', v ],
-                function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
-        });
-    inc_hint.init();
+    this.inc_hint = new SHint('inc_acl', 'hacl', function(h, v) { ge.inc_hint_fill(h, v) });
+    this.inc_hint.init();
+    if (aclTitle)
+        document.getElementById('acl_exists_hint').style.display = '';
 }

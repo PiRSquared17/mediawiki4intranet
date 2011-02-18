@@ -44,7 +44,7 @@ class HaloACLSpecial extends SpecialPage
 
     var $aclTargetTypes = array(
         'protect' => array('page' => 1, 'namespace' => 1, 'category' => 1, 'property' => 1),
-        'define' => array('right' => 1, 'template' => 1),
+        'define' => array('right' => 1),
     );
 
     /* Identical to Xml::element, but does no htmlspecialchars() on $contents */
@@ -60,6 +60,7 @@ class HaloACLSpecial extends SpecialPage
     /* Constructor of HaloACL special page class */
     public function __construct()
     {
+        $this->mRestriction = 'user';
         if (!defined('SMW_NS_PROPERTY'))
         {
             $this->hasProp = false;
@@ -71,7 +72,7 @@ class HaloACLSpecial extends SpecialPage
     /* Entry point */
     public function execute()
     {
-        global $wgOut, $wgRequest, $wgUser, $haclgHaloScriptPath;
+        global $wgOut, $wgRequest, $wgUser, $wgTitle, $haclgHaloScriptPath;
         haclCheckScriptPath();
         $q = $wgRequest->getValues();
         if ($wgUser->isLoggedIn())
@@ -93,7 +94,17 @@ class HaloACLSpecial extends SpecialPage
             $this->$f($q);
         }
         else
-            $wgOut->showErrorPage('hacl_login_first_title', 'hacl_login_first_text');
+        {
+            $q = $_GET;
+            unset($q['title']);
+            $wgOut->redirect(
+                Title::newFromText('Special:UserLogin')
+                ->getFullUrl(array(
+                    'returnto' => 'Special:HaloACL',
+                    'returntoquery' => http_build_query($q)
+                ))
+            );
+        }
     }
 
     /* View list of all ACL definitions, filtered and loaded using AJAX */
@@ -113,17 +124,17 @@ class HaloACLSpecial extends SpecialPage
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang, $wgContLang;
         $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
-        if (!($q['sd'] &&
-            ($aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL)) &&
-            ($t = HACLEvaluator::hacl_type($aclTitle)) &&
-            ($t == 'sd' || $t == 'right') &&
+        $aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL);
+        $t = HACLEvaluator::hacl_type($aclTitle);
+        if (!($q['sd'] && $aclTitle &&
+            ($t != 'whitelist' && $t != 'group') &&
             ($aclArticle = new Article($aclTitle)) &&
             $aclArticle->exists()))
         {
             $aclTitle = NULL;
             $aclArticle = NULL;
-            $aclDefault = Title::newFromText($haclgContLang->mDefault);
-            if (!$aclDefault->userCanRead())
+            $aclDefault = HACLQuickacl::getGlobalDefault();
+            if (!$aclDefault || !$aclDefault->userCanRead())
                 $aclDefault = NULL;
             elseif ($aclDefault->getArticleId())
             {
@@ -195,33 +206,18 @@ class HaloACLSpecial extends SpecialPage
     public function _actions(&$q)
     {
         global $wgScript, $wgOut, $wgUser;
-        $ownt = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template');
-        if ($ownt)
-            $ownt = Title::newFromId($ownt);
         $act = $q['action'];
         if ($act == 'acl' && $q['sd'])
-        {
-            if ($ownt && Title::newFromText($q['sd'], HACL_NS_ACL)->getArticleId() == $ownt->getArticleId())
-                $act = 'owntemplate';
-            else
-                $act = 'acledit';
-        }
+            $act = 'acledit';
         elseif ($act == 'group' && $q['group'])
             $act = 'groupedit';
         $html = array();
-        foreach (array('acllist', 'acl', 'owntemplate', 'quickaccess', 'grouplist', 'group', 'whitelist') as $action)
+        foreach (array('acllist', 'acl', 'quickaccess', 'grouplist', 'group', 'whitelist') as $action)
         {
             $a = '<b>'.wfMsg("hacl_action_$action").'</b>';
             if ($act != $action)
             {
                 $url = "$wgScript?title=Special:HaloACL&action=$action";
-                if ($action == 'owntemplate')
-                {
-                    if ($ownt)
-                        $url = "$wgScript?title=Special:HaloACL&action=acl&sd=".$ownt->getText();
-                    else
-                        continue;
-                }
                 $a = '<a href="'.htmlspecialchars($url).'">'.$a.'</a>';
             }
             $html[] = $a;
@@ -298,6 +294,8 @@ class HaloACLSpecial extends SpecialPage
             $actions = array();
             if ($actmask & HACLLanguage::RIGHT_READ)
                 $actions[] = 'read';
+            if ($actmask & HACLLanguage::RIGHT_MANAGE)
+                $actions[] = 'manage';
             if ($actmask & HACLLanguage::RIGHT_EDIT)
                 $actions[] = 'edit';
             if ($actmask & HACLLanguage::RIGHT_CREATE)
@@ -340,7 +338,7 @@ class HaloACLSpecial extends SpecialPage
         $t = $t ? array_flip(explode(',', $t)) : NULL;
         $n = str_replace(' ', '_', $n);
         $where = array();
-        foreach ($haclgContLang->mPetAliases as $k => $v)
+        foreach ($haclgContLang->getPetAliases() as $k => $v)
             if (!$t || array_key_exists($v, $t))
                 $where[] = 'page_title COLLATE utf8_unicode_ci LIKE '.$dbr->addQuotes($k.'/'.$n.'%');
         $where = 'page_namespace='.HACL_NS_ACL.' AND ('.implode(' OR ', $where).')';
@@ -369,7 +367,7 @@ class HaloACLSpecial extends SpecialPage
             list($d['type'], $d['real']) = explode('/', $d['real'], 2);
             if ($d['real'])
             {
-                $d['type'] = $haclgContLang->mPetAliases[mb_strtolower($d['type'])];
+                $d['type'] = $haclgContLang->getPetAlias($d['type']);
                 if ($d['type'] == 'template' && $d['real'] == $wgUser->getName())
                     $d['real'] = wfMsg('hacl_acllist_own_template', $d['real']);
             }

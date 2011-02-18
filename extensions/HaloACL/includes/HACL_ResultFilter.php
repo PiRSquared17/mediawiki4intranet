@@ -24,13 +24,8 @@
  * Date: 16.06.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class filters protected pages from a query result.
@@ -38,33 +33,8 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  * @author Thomas Schweitzer
  *
  */
-class  HACLResultFilter  {
-
-    //--- Constants ---
-//    const XY= 0;        // the result has been added since the last time
-
-    //--- Private fields ---
-    private $mXY;            //string: comment
-
-    /**
-     * Constructor for  HACLResultFilter
-     *
-     * @param type $param
-     *         Name of the notification
-     */
-    function __construct() {
-//        $this->mXY = $xy;
-    }
-
-
-    //--- getter/setter ---
-//    public function getXY()           {return $this->mXY;}
-
-//    public function setXY($xy)               {$this->mXY = $xy;}
-
-    //--- Public methods ---
-
-
+class HACLResultFilter
+{
     /**
      * This callback function for the parser hook "FilterQueryResults" removes
      * all protected pages from a query result.
@@ -117,5 +87,4 @@ class  HACLResultFilter  {
 
         return true;
     }
-    //--- Private methods ---
 }
