@@ -1,0 +1,21 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1298036608 -10800
+Bug 60996 - Support environment proxy settings for cURL downloads
+
+diff -r b11befdd7427 -r f1eb3bc6b2a1 includes/upload/UploadFromUrl.php
+--- includes/upload/UploadFromUrl.php
++++ includes/upload/UploadFromUrl.php
+@@ -105,6 +105,12 @@
+ 		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
+ 		curl_setopt( $ch, CURLOPT_URL, $this->mUrl);
+ 		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
++		if ( class_exists( 'CurlEnvProxy' ) )
++		{
++			// Set the cURL proxy from system environment variables
++			// $ENV['http_proxy'], $ENV['no_proxy']
++			CurlEnvProxy::set( $ch, $url );
++		}
+ 		curl_exec( $ch );
+ 		$error =  curl_errno( $ch );
+ 		curl_close( $ch );
