@@ -8,7 +8,6 @@
  * @author Bryan Tong Minh
  * @author Michael Dale
  */
-
 class UploadFromUrl extends UploadBase {
 	protected $mTempDownloadPath;
 
