@@ -24,52 +24,63 @@
  * Date: 07.10.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
-//--- Includes ---
-global $haclgIP;
-class HACLQuickacl {
-
+class HACLQuickacl
+{
     private $userid = 0;
     private $sd_ids = array();
 
-
-    public function getUserid() {
+    public function getUserid()
+    {
         return $this->userid;
     }
 
-    public function setUserid($userid) {
+    public function setUserid($userid)
+    {
         $this->userid = $userid;
     }
 
-
-    function __construct($userid,$sd_ids) {
+    function __construct($userid, $sd_ids)
+    {
         $this->userid = $userid;
-        $this->sd_ids = $sd_ids;
+        $this->sd_ids = array_flip($sd_ids);
     }
 
-
-    public function getSD_IDs() {
-        return $this->sd_ids;
+    public function getSD_IDs()
+    {
+        return array_keys($this->sd_ids);
     }
 
-    public function addSD_ID($sdID) {
-        if (!in_array($sdID, $this->sd_ids)) {
-            $this->sd_ids[] = $sdID;
-        }
+    public function getSDs()
+    {
+        return HACLStorage::getDatabase()->getSDById(array_keys($this->sd_ids));
     }
 
-    public static function newForUserId($user_id){
+    public function addSD_ID($sdID)
+    {
+        $this->sd_ids[$sdID] = true;
+    }
+
+    public static function newForUserId($user_id)
+    {
         return HACLStorage::getDatabase()->getQuickacl($user_id);
-
     }
 
-    public function save(){
-        return HACLStorage::getDatabase()->saveQuickacl($this->userid, $this->sd_ids);
+    public function save()
+    {
+        return HACLStorage::getDatabase()->saveQuickacl($this->userid, array_keys($this->sd_ids));
     }
-    public static function removeQuickAclsForSD($sdid){
+
+    public static function removeQuickAclsForSD($sdid)
+    {
         return HACLStorage::getDatabase()->deleteQuickaclForSD($sdid);
+    }
+
+    public static function getGlobalDefault()
+    {
+        // FIXME
+        return NULL;
     }
 }

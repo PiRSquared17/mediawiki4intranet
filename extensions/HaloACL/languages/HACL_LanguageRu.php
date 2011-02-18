@@ -24,86 +24,10 @@
 
 if (!defined('MEDIAWIKI')) die();
 
-/* Russian language labels for important HaloACL labels (namespaces, ,...) */
+// Russian language labels for important HaloACL labels (namespaces, ,...)
+
 class HACLLanguageRu extends HACLLanguage
 {
-    public $mNamespaces = array(
-        HACL_NS_ACL       => 'ACL',
-        HACL_NS_ACL_TALK  => 'ACL_talk',
-    );
-
     public $mPermissionDeniedPage = 'Доступ запрещён';
-
-    public $mParserFunctions = array(
-        HACLLanguage::PF_ACCESS             => 'access',
-        HACLLanguage::PF_MANAGE_RIGHTS      => 'manage rights',
-        HACLLanguage::PF_MANAGE_GROUP       => 'manage group',
-        HACLLanguage::PF_PREDEFINED_RIGHT   => 'predefined right',
-        HACLLanguage::PF_PROPERTY_ACCESS    => 'property access',
-        HACLLanguage::PF_WHITELIST          => 'whitelist',
-        HACLLanguage::PF_MEMBER             => 'member'
-    );
-
-    public $mParserFunctionsParameters = array(
-        HACLLanguage::PFP_ASSIGNED_TO   => 'assigned to',
-        HACLLanguage::PFP_ACTIONS       => 'actions',
-        HACLLanguage::PFP_DESCRIPTION   => 'description',
-        HACLLanguage::PFP_RIGHTS        => 'rights',
-        HACLLanguage::PFP_PAGES         => 'pages',
-        HACLLanguage::PFP_MEMBERS       => 'members',
-        HACLLanguage::PFP_NAME          => 'name',
-    );
-
-    public $mActionNames = array(
-        HACLLanguage::RIGHT_READ         => 'read',
-        HACLLanguage::RIGHT_EDIT         => 'edit',
-        HACLLanguage::RIGHT_CREATE       => 'create',
-        HACLLanguage::RIGHT_DELETE       => 'delete',
-        HACLLanguage::RIGHT_MOVE         => 'move',
-        HACLLanguage::RIGHT_ALL_ACTIONS  => '*',
-        'read'      => 'Read',
-        'edit'      => 'Edit',
-        'create'    => 'Create',
-        'delete'    => 'Delete',
-        'move'      => 'Move',
-        'manage'    => 'Manage',
-        'all'       => 'Full Access',
-    );
-
-    public $mPetPrefixes = array(
-        'page'      => 'Page',
-        'category'  => 'Category',
-        'namespace' => 'Namespace',
-        'property'  => 'Property',
-        'right'     => 'Right',
-        'template'  => 'Template',
-    );
-
-    public $mPredefinedRightName = 'Right';
-    public $mSDTemplateName = 'Template';
-    public $mGroupPrefix = 'Group';
-
-    public $mWhitelist = 'Whitelist';
-    public $mDefault = 'HaloACL Default';
-
-    public $mPrefixes = array(
-        'group'     => 'group',
-        'template'  => 'right',
-        'page'      => 'sd',
-        'category'  => 'sd',
-        'namespace' => 'sd',
-        'property'  => 'sd',
-        'right'     => 'right',
-        'категория' => 'sd',
-    );
-
-    public $mPetAliases = array(
-        'page'      => 'page',
-        'category'  => 'category',
-        'namespace' => 'namespace',
-        'property'  => 'property',
-        'right'     => 'right',
-        'template'  => 'template',
-        'категория' => 'category',
-    );
+    public $mPetAliases = array('категория' => self::PET_CATEGORY);
 }

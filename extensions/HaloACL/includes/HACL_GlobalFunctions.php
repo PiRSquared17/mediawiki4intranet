@@ -74,7 +74,6 @@ function enableHaloACL()
 
         // UI
         'HaloACLSpecial'            => "$haclgIP/specials/HACL_ACLSpecial.php",
-        'HACL_GenericPanel'         => "$haclgIP/includes/HACL_GenericPanel.php",
 
         // Exception classes
         'HACLException'             => "$haclgIP/exceptions/HACL_Exception.php",
@@ -84,6 +83,17 @@ function enableHaloACL()
         'HACLRightException'        => "$haclgIP/exceptions/HACL_RightException.php",
         'HACLWhitelistException'    => "$haclgIP/exceptions/HACL_WhitelistException.php",
     );
+
+    // HACLParserFunctions hooks
+    global $wgHooks;
+    $wgHooks['ArticleViewHeader'][]     = 'HACLParserFunctions::articleViewHeader';
+    $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
+    $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
+    $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
+    $wgHooks['ArticleUndelete'][]       = 'HACLParserFunctions::articleUndelete';
+    $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
+    $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
+    $wgHooks['LoadExtensionSchemaUpdates'][] = 'haclfLoadExtensionSchemaUpdates';
 
     return true;
 }
@@ -124,30 +134,18 @@ function haclfSetupExtension()
         define('HACL_HALOACL_VERSION', '1.0');
     else
     {
-        // Disable security checks in console mode
+        // Also disable security checks in console mode
         // Also issue a warning as an insurance to not run Wiki in some bad setup
         print '** WARNING: HaloACL security checks are disabled because
 ** $_SERVER[SERVER_NAME] is empty, which probably means we are in console
 ';
-        return true;
     }
-
-    wfLoadExtensionMessages('HaloACL');
 
     //--- Register hooks ---
     global $wgHooks;
-
-    // HACLParserFunctions hooks
-    $wgHooks['ArticleViewHeader'][]     = 'HACLParserFunctions::articleViewHeader';
-    $wgHooks['OutputPageBeforeHTML'][]  = 'HACLParserFunctions::outputPageBeforeHTML';
-    $wgHooks['ArticleSaveComplete'][]   = 'HACLParserFunctions::articleSaveComplete';
-    $wgHooks['ArticleDelete'][]         = 'HACLParserFunctions::articleDelete';
-    $wgHooks['ArticleUndelete'][]       = 'HACLParserFunctions::articleUndelete';
-    $wgHooks['ArticleMove'][]           = 'HACLParserFunctions::articleMove';
-    $wgHooks['LanguageGetMagic'][]      = 'haclfLanguageGetMagic';
-    $wgHooks['LoadExtensionSchemaUpdates'][] = 'haclfLoadExtensionSchemaUpdates';
-
     $wgHooks['userCan'][] = 'HACLEvaluator::userCan';
+
+    wfLoadExtensionMessages('HaloACL');
 
     $wgHooks['ArticleSaveComplete'][]  = 'HACLDefaultSD::articleSaveComplete';
     $wgHooks['IsFileCacheable'][]      = 'haclfIsFileCacheable';
@@ -266,7 +264,7 @@ function addNonSpecialPageHeader(&$out)
 function haclfInitNamespaces()
 {
     global $haclgNamespaceIndex, $wgExtraNamespaces, $wgNamespaceAliases,
-    $wgNamespacesWithSubpages, $wgLanguageCode, $haclgContLang;
+        $wgNamespacesWithSubpages, $wgLanguageCode, $haclgContLang;
 
     if (!isset($haclgNamespaceIndex))
         $haclgNamespaceIndex = 300;
@@ -430,8 +428,6 @@ function haclfIsFileCacheable($article)
  * @param string $hash
  *         A reference to the hash. This the ID of the current user is appended
  *         to this hash.
- *
- *
  */
 function haclfPageRenderingHash($hash)
 {

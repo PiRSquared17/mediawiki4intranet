@@ -582,7 +582,7 @@ class HACLParserFunctions
     {
         global $haclgContLang;
         if ($article->getTitle()->getNamespace() == HACL_NS_ACL ||
-            $article->getTitle()->getPrefixedText() == $haclgContLang->mDefault)
+            $article->getTitle()->getPrefixedText() == $haclgContLang->getGlobalDefault())
         {
             self::$mInstance = new self($article->getTitle());
             $pcache = false;
@@ -686,7 +686,7 @@ class HACLParserFunctions
             // If a protected article is deleted, its SD will be deleted as well
             $sd = HACLSecurityDescriptor::getSDForPE(
                 $article->getTitle()->getArticleID(),
-                HACLSecurityDescriptor::PET_PAGE);
+                HACLLanguage::PET_PAGE);
             if ($sd)
             {
                 $t = Title::newFromID($sd);
@@ -712,28 +712,28 @@ class HACLParserFunctions
         // Check if the old title has an SD
         $sd = HACLSecurityDescriptor::getSDForPE(
             $newTitle->getArticleID(),
-            HACLSecurityDescriptor::PET_PAGE);
+            HACLLanguage::PET_PAGE);
         if ($sd !== false)
         {
             // move SD for page
             $oldSD = Title::newFromID($sd);
             $oldSD = $oldSD->getFullText();
             $newSD = HACLSecurityDescriptor::nameOfSD($newName,
-                HACLSecurityDescriptor::PET_PAGE);
+                HACLLanguage::PET_PAGE);
 
             self::move($oldSD, $newSD);
         }
 
         $sd = HACLSecurityDescriptor::getSDForPE(
             $newTitle->getArticleID(),
-            HACLSecurityDescriptor::PET_PROPERTY);
+            HACLLanguage::PET_PROPERTY);
         if ($sd !== false)
         {
             // move SD for property
             $oldSD = Title::newFromID($sd);
             $oldSD = $oldSD->getFullText();
             $newSD = HACLSecurityDescriptor::nameOfSD($newName,
-                HACLSecurityDescriptor::PET_PROPERTY);
+                HACLLanguage::PET_PROPERTY);
             self::move($oldSD, $newSD);
         }
 
@@ -1089,7 +1089,7 @@ class HACLParserFunctions
             // a namespace can only be protected if it is not member of
             // $haclgUnprotectableNamespaces
             if ($haclgUnprotectableNamespaces &&
-                $peType == HACLSecurityDescriptor::PET_NAMESPACE &&
+                $peType == HACLLanguage::PET_NAMESPACE &&
                 in_array($pe, $haclgUnprotectableNamespaces))
             {
                 // This namespace can not be protected
@@ -1306,14 +1306,11 @@ class HACLParserFunctions
 
         $actions = $params[$actionsPN];
         $actions = explode(',', $actions);
-        // trim actions
-        $possibleActions = $haclgContLang->getActionNames();
         for ($i = 0; $i < count($actions); ++$i) {
             $actions[$i] = trim($actions[$i]);
             // Check if the action is valid
-            if (array_search($actions[$i], $possibleActions) === false) {
+            if (!$haclgContLang->getActionId($actions[$i]))
                 $errMsgs[] = wfMsgForContent('hacl_invalid_action', $actions[$i]);
-            }
         }
         if (count($actions) == 0) {
             $errMsgs[] = wfMsgForContent('hacl_missing_parameter_values', $actionsPN);
@@ -1370,7 +1367,7 @@ class HACLParserFunctions
 
     /**
      * Converts an array of language dependent action names as they are used in
-     * rights to a combined (ORed) action ID.
+     * rights to a combined (ORed) action ID bit-field.
      *
      * @param array(string) $actionNames
      *         Language dependent action names like 'read' or 'lesen'.
@@ -1379,15 +1376,13 @@ class HACLParserFunctions
      *         An action ID that is the ORed combination of action IDs they are
      *     defined as constants in the class HACLRight.
      */
-    private function actionNamesToIDs($actionNames) {
+    private function actionNamesToIDs($actionNames)
+    {
         global $haclgContLang;
-        $actions = $haclgContLang->getActionNames();
-
         $actionID = 0;
-        foreach ($actionNames as $an) {
-            $id = array_search($an, $actions);
-            $actionID |= ($id === false) ? 0 : $id;
-        }
+        foreach ($actionNames as $an)
+            if ($id = $haclgContLang->getActionId($an))
+                $actionID |= $id;
         return $actionID;
     }
 

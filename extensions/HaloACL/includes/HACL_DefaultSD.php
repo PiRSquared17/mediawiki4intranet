@@ -104,7 +104,7 @@ class HACLDefaultSD
 
         $sdAlreadyDefined = false;
         $createCustomSD = false;
-        if (HACLSecurityDescriptor::getSDForPE($articleID, HACLSecurityDescriptor::PET_PAGE) !== false)
+        if (HACLSecurityDescriptor::getSDForPE($articleID, HACLLanguage::PET_PAGE) !== false)
         {
             // There is already an SD for the article
             $sdAlreadyDefined = true;
@@ -145,7 +145,7 @@ class HACLDefaultSD
             $content = $defaultSDArticle->getContent();
 
             // Create the new SD
-            $newSDName = HACLSecurityDescriptor::nameOfSD($article->getTitle()->getFullText(), HACLSecurityDescriptor::PET_PAGE);
+            $newSDName = HACLSecurityDescriptor::nameOfSD($article->getTitle()->getFullText(), HACLLanguage::PET_PAGE);
 
             $etc = haclfDisableTitlePatch();
             $newSD = Title::newFromText($newSDName);
@@ -177,7 +177,7 @@ class HACLDefaultSD
 
                 // Create the new SD
                 $newSDName = HACLSecurityDescriptor::nameOfSD($article->getTitle()->getFullText(),
-                HACLSecurityDescriptor::PET_PAGE);
+                HACLLanguage::PET_PAGE);
 
                 $newSD = Title::newFromText($newSDName);
                 $content = "
@@ -196,7 +196,7 @@ class HACLDefaultSD
             else
             {
                 $newSDName = HACLSecurityDescriptor::nameOfSD($article->getTitle()->getFullText(),
-                HACLSecurityDescriptor::PET_PAGE);
+                HACLLanguage::PET_PAGE);
 
                 $etc = haclfDisableTitlePatch();
                 $newSD = Title::newFromText($newSDName);
