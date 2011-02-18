@@ -1684,7 +1684,7 @@ PICT # различные
  #</pre> <!-- оставьте эту строчку как есть -->',
 
 'upload-proto-error'        => 'Неправильный протокол',
-'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code> или <code>ftp://</code>.',
+'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code>, <code>https://</code> или <code>ftp://</code>.',
 'upload-file-error'         => 'Внутренняя ошибка',
 'upload-file-error-text'    => 'Внутренняя ошибка при попытке создать временный файл на сервере.
 Пожалуйста, обратитесь к [[Special:ListUsers/sysop|администратору]].',

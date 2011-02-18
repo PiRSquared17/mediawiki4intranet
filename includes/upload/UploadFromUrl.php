@@ -68,7 +68,7 @@ class UploadFromUrl extends UploadBase {
 
 	public static function isValidUrl( $url ) {
 		// Only allow HTTP or FTP for now
-		return (bool)preg_match( '!^(http://|ftp://)!', $url );
+		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
 	}
 
 	/**
