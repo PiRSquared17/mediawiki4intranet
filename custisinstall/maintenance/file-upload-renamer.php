@@ -1,7 +1,22 @@
 <?php
+
 /**
- * @file
- * @ingroup Maintenance
+ * This tool is a part of MediaWiki4Intranet Import-Export patch.
+ * http://wiki.4intra.net/MW_Import&Export
+ * http://wiki.4intra.net/Mediawiki4Intranet
+ * Copyright (c) 2010, Vitaliy Filippov
+ *
+ * Maintenance tool updating archived image revision filenames to:
+ * 1) match the revision date, not the NEXT revision date as in the
+ *    original MediaWiki.
+ * 2) if $wgTransliterateUploadFilenames is true and the
+ *    'translit-upload-filenames' patch is active, then change
+ *    cyrillic uploaded file names into transliterated ones.
+ *
+ * USAGE: copy this file into maintenance/ subdirectory of MediaWiki
+ * installation and run with command "php file-upload-renamer.php"
+ *
+ * DO NOT run this if you don't plan to use MW4Intranet Import-Export patch.
  */
 
 $dir = dirname($_SERVER['PHP_SELF']);
