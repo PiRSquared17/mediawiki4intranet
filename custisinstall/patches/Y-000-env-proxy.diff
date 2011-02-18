@@ -1,11 +1,21 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1298036608 -10800
+# Date 1298050253 -10800
 Bug 60996 - Support environment proxy settings for cURL downloads
+Upload-proto-error-text message is fixed only in English and Russian languages.
 
-diff -r b11befdd7427 -r f1eb3bc6b2a1 includes/upload/UploadFromUrl.php
+diff -r b11befdd7427 -r 7808fdfb7e60 includes/upload/UploadFromUrl.php
 --- includes/upload/UploadFromUrl.php
 +++ includes/upload/UploadFromUrl.php
+@@ -68,7 +68,7 @@
+ 
+ 	public static function isValidUrl( $url ) {
+ 		// Only allow HTTP or FTP for now
+-		return (bool)preg_match( '!^(http://|ftp://)!', $url );
++		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
+ 	}
+ 
+ 	/**
 @@ -105,6 +105,12 @@
  		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
  		curl_setopt( $ch, CURLOPT_URL, $this->mUrl);
@@ -19,3 +29,39 @@ diff -r b11befdd7427 -r f1eb3bc6b2a1 includes/upload/UploadFromUrl.php
  		curl_exec( $ch );
  		$error =  curl_errno( $ch );
  		curl_close( $ch );
+diff -r b11befdd7427 -r 7808fdfb7e60 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -2126,7 +2126,7 @@
+  #</pre> <!-- leave this line exactly as it is -->', # only translate this message to other languages if you have to change it
+ 
+ 'upload-proto-error'        => 'Incorrect protocol',
+-'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code>, <code>https://</code> or <code>ftp://</code>.',
+ 'upload-file-error'         => 'Internal error',
+ 'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
+ Please contact an [[Special:ListUsers/sysop|administrator]].',
+diff -r b11befdd7427 -r 7808fdfb7e60 languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -1666,7 +1666,7 @@
+  #</pre> <!-- оставьте эту строчку как есть -->',
+ 
+ 'upload-proto-error'        => 'Неправильный протокол',
+-'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code> или <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code>, <code>https://</code> или <code>ftp://</code>.',
+ 'upload-file-error'         => 'Внутренняя ошибка',
+ 'upload-file-error-text'    => 'Внутренняя ошибка при попытке создать временный файл на сервере.
+ Пожалуйста, обратитесь к [[Special:ListUsers/sysop|администратору]].',
+diff -r b11befdd7427 -r 7808fdfb7e60 languages/messages/MessagesRue.php
+--- languages/messages/MessagesRue.php
++++ languages/messages/MessagesRue.php
+@@ -1375,7 +1375,7 @@
+ 'filename-bad-prefix'         => "Назва файлу, котрый начітавате ся зачінать на '''„$1“''', што не є назва звычайно приряджована діґіталным фотоапаратом. Звольте іншу назву, котра ваш файл попише лїпше.",
+ 
+ 'upload-proto-error'        => 'Неплатный протокол',
+-'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code> або <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code>, <code>https://</code> або <code>ftp://</code>.',
+ 'upload-file-error'         => 'Інтерна хыба',
+ 'upload-file-error-text'    => 'Почас спробы створїня дочасного файлу настала внутрїшня хыба на сервері.
+ Просиме контактуйте  [[Special:ListUsers/sysop|адміністратора]].',
