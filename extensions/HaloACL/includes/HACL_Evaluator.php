@@ -146,7 +146,7 @@ class HACLEvaluator
                 // Check right for creation of default SD template. Users
                 // can only create their own template. Sysops and bureaucrats
                 // can create them for everyone.
-                list ($r, $sd) = HACLDefaultSD::userCanModify($title, $user);
+                list ($r, $sd) = HACLDefaultSD::userCanModify($title, $user);//INCORRECT
                 if ($sd)
                 {
                     haclfRestoreTitlePatch($etc);
@@ -830,7 +830,7 @@ class HACLEvaluator
      *             <true>, if there is an SD for the article
      *             <false>, if not
      */
-    private static function checkACLManager(Title $t, $user, $actionID)
+    static function checkACLManager(Title $t, $user, $actionID)
     {
         // Require ACL namespace
         if ($t->getNamespace() != HACL_NS_ACL)

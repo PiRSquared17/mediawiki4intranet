@@ -24,13 +24,8 @@
  * Date: 11.05.2009
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
-
- //--- Includes ---
- global $haclgIP;
-//require_once("$haclgIP/...");
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * The class HACLWhitelist manages the whitelist in the database. The whitelist
@@ -41,7 +36,6 @@ if ( !defined( 'MEDIAWIKI' ) ) {
  */
 class HACLWhitelist
 {
-
     //--- Private fields ---
 
     // array(string): The names of all pages (with namespace) that define the whitelist

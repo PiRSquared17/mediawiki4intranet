@@ -70,6 +70,7 @@ HACLACLEditor.prototype.target_change = function(total_change)
                 an.value = wgUserName;
             else
                 an.value = '';
+            this.target_hint.curValue = null; // force SHint refill
             this.target_hint.change();
         }
         this.last_target_type = what;
@@ -83,9 +84,9 @@ HACLACLEditor.prototype.target_change = function(total_change)
     if (name.length)
     {
         var pn = document.getElementById('acl_pn');
-        t = this.msg.NS_ACL+':'+this.pet_prefixes[what];
+        t = this.msg.NS_ACL+':'+this.pet_prefixes[what]+'/'+name;
         pn.innerHTML = t;
-        pn.href = wgScript+'/'+t;
+        pn.href = wgScript+'/'+encodeURI(t);
         document.getElementById('wpTitle').value = t;
         document.getElementById('acl_delete_link').href = wgScript + '?title=' + encodeURI(t) + '&action=delete';
         if (total_change)
@@ -600,6 +601,7 @@ HACLACLEditor.prototype.target_hint_fill = function (h, v)
     var wv = document.getElementById('acl_what').value;
     if (this.is_template[wv])
         return;
+    // Always show autocomplete for namespaces
     if (wv != 'namespace' && !v.length)
         h.tip_div.innerHTML = '<div class="hacl_tt">'+this.msg['start_typing_'+wv]+'</div>';
     else

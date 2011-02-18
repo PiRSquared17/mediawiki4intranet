@@ -120,6 +120,7 @@ class HACLSecurityDescriptor
     public function getPEID()           { return $this->mPEID; }
     public function getSDName()         { return $this->mSDName; }
     public function getPEType()         { return $this->mPEType; }
+    public function getPEName()         { $exploded = explode('/', $this->mSDName, 2); return $exploded[1]; }
     public function getManageGroups()   { return $this->mManageGroups; }
     public function getManageUsers()    { return $this->mManageUsers; }
 
@@ -128,18 +129,17 @@ class HACLSecurityDescriptor
     /**
      * Returns the ID of a protected element that is given by its name. The ID
      * depends on the type of the protected element:
-     * -PET_PAGE: ID of the article that is protected
-     * -PET_NAMESPACE: ID of the namespace that is protected
-     * -PET_CATEGORY: ID of the category article whose instances are protected
-     * -PET_PROPERTY: ID of the property article whose values are protected
-     * -PET_RIGHT: not applicable
+     * - PET_PAGE: ID of the article that is protected
+     * - PET_NAMESPACE: ID of the namespace that is protected
+     * - PET_CATEGORY: ID of the category article whose instances are protected
+     * - PET_PROPERTY: ID of the property article whose values are protected
+     * - PET_RIGHT: not applicable
      *
-     * @param string $peName
+     * @param  string $peName
      *         Name of the protected object. For categories and properties, the
      *         namespace must be given
-     * @param int $peType
-     *         Type of the protected element. See PET-... constants of this class.
-     *
+     * @param  int $peType
+     *         Type of the protected element. See HACLLanguage::PET_*
      * @return int/bool
      *         ID of the protected element or <false>, if it does not exist.
      */
@@ -157,11 +157,6 @@ class HACLSecurityDescriptor
         }
         elseif ($peType === HACLLanguage::PET_RIGHT)
             return 0;
-        elseif ($peType === HACLLanguage::PET_TEMPLATE)
-        {
-            $u = User::newFromName($peName);
-            return $u ? $u->getId() : false;
-        }
         // return the page id
         $id = haclfArticleID($peName);
         return $id == 0 ? false : $id;
@@ -413,16 +408,13 @@ class HACLSecurityDescriptor
      *         Name of the protected element and its type (one of HACLLanguage::PET_*
      *         etc). It the type is HACLLanguage::PET_RIGHT, the name is <null>.
      */
-    public static function nameOfSD($nameOfPE, $peType) {
-
-        global $haclgContLang;
-        $ns = $haclgContLang->getNamespaces();
-        $ns = $ns[HACL_NS_ACL].':';
+    public static function nameOfSD($nameOfPE, $peType)
+    {
+        global $wgContLang, $haclgContLang;
+        $ns = $wgContLang->getNsText(HACL_NS_ACL).':';
         $prefix = $haclgContLang->getPetPrefix($peType).'/';
-
         $sdName = $ns.$prefix.$nameOfPE;
         return $sdName;
-
     }
 
     /**
@@ -539,6 +531,7 @@ class HACLSecurityDescriptor
      *         An array of inline right IDs. There are no duplicate IDs.
      *
      */
+    // FIXME add caching
     public function getInlineRights($recursively = true) {
         if ($recursively) {
             // find all derived inline rights as well
@@ -564,12 +557,25 @@ class HACLSecurityDescriptor
      * @return array<int>
      *         Array of unique IDs of rights of this SD.
      */
-    public function getPredefinedRights($recursively = true) {
-
+    public function getPredefinedRights($recursively = true)
+    {
         $pr = HACLStorage::getDatabase()->getPredefinedRightsOfSD($this->getSDID(), $recursively);
-
         return $pr;
+    }
 
+    /**
+     * Checks whether this SD only includes SINGLE predefined right and
+     * does not include any inline rights or manage template rights.
+     * If so, the ID of this single predefined right is returned.
+     * If not, NULL is returned.
+     */
+    public function isSinglePredefinedRightInclusion()
+    {
+        $pr = $this->getPredefinedRights(false);
+        if (count($pr) == 1 && !$this->mManageUsers && !$this->mManageGroups &&
+            !$this->getInlineRights())
+            return $pr[0];
+        return NULL;
     }
 
     /**
@@ -580,7 +586,7 @@ class HACLSecurityDescriptor
      *
      * @return array<int>
      *         An array of IDs of all SD that include $this SD or PR via the hierarchy
-     *      of PRs.
+     *         of PRs.
      */
     public function getSDsIncludingPR() {
         if ($this->mPEType === HACLLanguage::PET_RIGHT) {

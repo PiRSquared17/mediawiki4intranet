@@ -65,7 +65,6 @@ function enableHaloACL()
         'HACLSecurityDescriptor'    => "$haclgIP/includes/HACL_SecurityDescriptor.php",
         'HACLRight'                 => "$haclgIP/includes/HACL_Right.php",
         'HACLWhitelist'             => "$haclgIP/includes/HACL_Whitelist.php",
-        'HACLDefaultSD'             => "$haclgIP/includes/HACL_DefaultSD.php",
         'HACLResultFilter'          => "$haclgIP/includes/HACL_ResultFilter.php",
         'HACLQueryRewriter'         => "$haclgIP/includes/HACL_QueryRewriter.php",
         'HACLQuickacl'              => "$haclgIP/includes/HACL_Quickacl.php",
@@ -147,7 +146,7 @@ function haclfSetupExtension()
 
     wfLoadExtensionMessages('HaloACL');
 
-    $wgHooks['ArticleSaveComplete'][]  = 'HACLDefaultSD::articleSaveComplete';
+    $wgHooks['ArticleSaveComplete'][]  = 'HACLToolbar::articleSaveComplete';
     $wgHooks['IsFileCacheable'][]      = 'haclfIsFileCacheable';
     $wgHooks['PageRenderingHash'][]    = 'haclfPageRenderingHash';
 
@@ -160,11 +159,6 @@ function haclfSetupExtension()
         $wgHooks['DiffViewHeader'][]     = 'HACLEvaluator::onDiffViewHeader';
         $wgHooks['EditFilter'][]         = 'HACLEvaluator::onEditFilter';
     }
-
-    global $haclgNewUserTemplate, $haclgDefaultQuickAccessRights;
-    if (isset($haclgNewUserTemplate) ||
-        isset($haclgDefaultQuickAccessRightMasterTemplates))
-        $wgHooks['UserLoginComplete'][] = 'HACLDefaultSD::newUser';
 
     $wgHooks['BeforePageDisplay'][] = 'haclfAddPageHeader';
 
@@ -215,8 +209,6 @@ function haclfAddPageHeader(&$out)
 {
     global $wgTitle;
     haclCheckScriptPath();
-    if ($wgTitle->getNamespace() != NS_SPECIAL)
-        addNonSpecialPageHeader($out);
     return true;
 }
 
@@ -232,25 +224,6 @@ function haclCheckScriptPath()
     return $haclgHaloScriptPath;
 }
 
-/**
- * Add headers for non-special-pages
- * only used for toolbar-realted stuff
- *
- * @global <type> $haclgHaloScriptPath
- * @param <type> $out
- * @return <type>
- */
-function addNonSpecialPageHeader(&$out)
-{
-    global $haclgHaloScriptPath, $smwgDeployVersion;
-    $out->addScript('<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/toolbar.js"></script>');
-    $out->addLink(array(
-        'rel'   => 'stylesheet',
-        'type'  => 'text/css',
-        'media' => 'screen, projection',
-        'href'  => $haclgHaloScriptPath.'/skins/haloacl_toolbar.css'
-    ));
-}
 
 /**********************************************/
 /***** namespace settings                 *****/
@@ -516,7 +489,7 @@ function haclfAddToolbarForEditPage($content_actions)
     if ($content_actions->mArticle->mTitle->mNamespace == HACL_NS_ACL)
         return $content_actions;
     global $wgOut;
-    $wgOut->addHTML(HACLToolbar::haclGetHACLToolbar($content_actions->mTitle));
+    $wgOut->addHTML(HACLToolbar::get($content_actions->mTitle));
     return true;
 }
 
@@ -526,7 +499,7 @@ function haclfAddToolbarForEditPage($content_actions)
  */
 function haclfAddToolbarForSemanticForms($pageTitle, &$html)
 {
-    $html = HACLToolbar::haclGetHACLToolbar($pageTitle);
+    $html = HACLToolbar::get($pageTitle);
     return true;
 }
 

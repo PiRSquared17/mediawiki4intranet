@@ -122,46 +122,6 @@ if ($haclgBaseStore === NULL)
 if ($haclgUnprotectableNamespaces === NULL)
     $haclgUnprotectableNamespaces = array();
 
-###
-# This is the name of the master template that is used as default rights template
-# for new users.
-# Every user can define his own default rights for new pages. He does this in a
-# security descriptor with the naming convention "ACL:Template/<username>". The
-# content of this article is assigned to security descriptors that are automatically
-# generated for new pages.
-# However, for new users there is no default template. With this setting you can
-# specify a master template (a name of an article) that is used to create a
-# default template for new users.
-# The master template is a normal security descriptor that can contain the
-# variable "{{{user}}}" that will be replaced by the user's name.
-#$haclgNewUserTemplate = "ACL:Template/NewUserTemplate";
-
-###
-# These are the names of the master templates that are installed as quick access
-# rights templates for new users.
-# Every user can add right templates to his own quick access list. In addition
-# the system adds the rights that are specified in this array to every user's
-# quick access list when he logs in for the first time.
-# The given master templates are copied to the user's own right space defined
-# by the naming convention "ACL:Right/<username>/<Right name>".
-# The master templates must follow the naming convention "ACL:Template/QARMT/<Right name>".
-# (Please note the "ACL:Template" depends on the content language, i.e. in german
-# it will be "Rechte:Vorlage/QARMT/<Right name>".)
-# Example for user "Thomas":
-# The template "ACL:Template/QARMT/Private use" will be copied to
-# "ACL:Right/Thomas/Private use".
-# The master templates is are normal security descriptors that can contain the
-# variable "{{{user}}}" that will be replaced by the user's name.
-/*
-$haclgDefaultQuickAccessRightMasterTemplates = array(
-    "ACL:Template/QARMT/Private use",
-    "ACL:Template/QARMT/Public read",
-    "ACL:Template/QARMT/Public form edit",
-    "ACL:Template/QARMT/Public edit",
-    "ACL:Template/QARMT/Public full access",
-);
-*/
-
 ##
 # If $haclgEvaluatorLog is <true>, you can specify the URL-parameter "hacllog=true".
 # In this case HaloACL echos the reason why actions are permitted or prohibited.
