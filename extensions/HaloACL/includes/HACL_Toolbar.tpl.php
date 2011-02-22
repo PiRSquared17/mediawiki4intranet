@@ -20,7 +20,8 @@
 <?php } else { ?>
  <?= wfMsg('hacl_toolbar_no_right_templates') ?>
 <?php } if ($globalACL) { ?>
- <?= wfMsg('hacl_toolbar_global_acl', $globalACL) ?>
+ <div id="hacl_toolbar_global_acl"><div style="position: absolute"><?= $globalACL ?></div></div>
+ <span><?= wfMsg('hacl_toolbar_global_acl') ?></span>
 <?php } if ($title->exists()) { ?>
  &nbsp; <a target="_blank" href="index.php?title=Special:HaloACL&action=acl&sd=<?= urlencode($haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).'/'.$title) ?>"><?= wfMsg('hacl_toolbar_advanced') ?></a>
 <?php } ?>

@@ -52,7 +52,6 @@ class HACLLanguageDe extends HACLLanguage
     );
 
     public $mGroupPrefix = 'Group';
-    public $mWhitelist = 'Positivliste';
 
     public $mPetAliases = array(
         'page'      => self::PET_PAGE,
