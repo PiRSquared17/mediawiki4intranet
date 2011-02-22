@@ -1,18 +1,13 @@
 <form action="<?= $wgScript ?>?action=submit" method="POST">
 <input type="hidden" name="wpEditToken" value="<?= htmlspecialchars($wgUser->editToken()) ?>" />
-<input type="hidden" name="wpEdittime" value="<?= $aclTitle ? $aclArticle->getTimestamp() : '' ?>" />
+<input type="hidden" name="wpEdittime" value="<?= $aclArticle ? $aclArticle->getTimestamp() : '' ?>" />
 <input type="hidden" name="wpStarttime" value="<?= wfTimestampNow() ?>" />
-<input type="hidden" id="wpTitle" name="title" value="<?= $aclTitle ? htmlspecialchars($aclTitle->getPrefixedText()) : '' ?>" />
+<input type="hidden" id="wpTitle" name="title" value="<?= $aclArticle ? htmlspecialchars($aclTitle->getPrefixedText()) : '' ?>" />
 <table class="acle">
 <tr>
  <td style="vertical-align: top; width: 500px">
   <p><b><?= wfMsg('hacl_edit_definition_text') ?></b></p>
   <p><textarea id="acl_def" name="wpTextbox1" rows="6" style="width: 500px" onchange="AE.parse_make_closure()"><?= htmlspecialchars($aclContent) ?></textarea></p>
-  <?php if ($aclDefaultExists) { ?>
-   <?= wfMsgExt('hacl_edit_default_taken', array('parse'), $aclDefault) ?>
-  <?php } elseif ($aclDefault) { ?>
-   <?= wfMsgExt('hacl_edit_default_is_here', array('parse'), $aclDefault) ?>
-  <?php } ?>
   <p><b><?= wfMsg('hacl_edit_definition_target') ?></b></p>
   <p>
    <select id="acl_what" onchange="AE.target_change(true)">
@@ -86,7 +81,9 @@ exAttach(window, 'load', function()
         ' start_typing_user start_typing_group start_typing_page start_typing_category'.
         ' edit_users_affected edit_groups_affected edit_no_users_affected edit_no_groups_affected'.
         ' indirect_grant indirect_grant_all indirect_grant_reg edit_sd_exists edit_define_rights'.
-        ' edit_define_manager edit_define_tmanager'
+        ' edit_define_manager edit_define_tmanager edit_ahint_all edit_ahint_manage'.
+        ' edit_ahint_template edit_ahint_read edit_ahint_edit edit_ahint_create edit_ahint_delete'.
+        ' edit_ahint_move'
     ) as $msg)
         print "        '$msg': '".addslashes(wfMsgNoTrans("hacl_$msg"))."',\n"; ?>
         'NS_ACL': '<?= $wgContLang->getNsText(HACL_NS_ACL) ?>'
@@ -102,6 +99,6 @@ exAttach(window, 'load', function()
     }
     ?>
     };
-    AE = new HACLACLEditor(msg, petPrefixes, "<?= $aclTitle ? addslashes($aclTitle->getText()) : '' ?>", '<?= $aclPEType ?>');
+    AE = new HACLACLEditor(msg, petPrefixes, "<?= $aclTitle ? addslashes($aclTitle->getText()) : '' ?>", '<?= $aclPEType ?>', <?= $aclArticle ? 1 : 0 ?>);
 });
 </script>

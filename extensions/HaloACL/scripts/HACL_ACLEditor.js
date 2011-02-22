@@ -15,7 +15,7 @@ var htmlspecialchars = function(s)
    initialTitle: SD Title -> getText()
    initialType: SD -> getPEType()
 */
-var HACLACLEditor = function(msg, petPrefixes, initialTitle, initialType)
+var HACLACLEditor = function(msg, petPrefixes, initialTitle, initialType, initialExists)
 {
     this.msg = msg;
     this.pet_prefixes = petPrefixes;
@@ -48,7 +48,7 @@ var HACLACLEditor = function(msg, petPrefixes, initialTitle, initialType)
             this.all_actions.push(a);
     }
 
-    this.init(initialTitle, initialType);
+    this.init(initialTitle, initialType, initialExists);
 };
 
 // target ACL page name/type change
@@ -137,7 +137,7 @@ HACLACLEditor.prototype.pf_param = function(name, value, is_assigned_to)
         if (this.regexp_group)
             ass = ass.replace(this.regexp_group, '$1Group/');
     }
-    return ass.trim().split(/[,\s*]*,[,\s]*/);
+    return ass.trim().split(/[,\s]*,[,\s]*/);
 };
 
 // parse definition text from textbox
@@ -155,20 +155,15 @@ HACLACLEditor.prototype.parse_sd = function()
         {
             if (act[j] == '*')
             {
-                act = this.all_actions;
-                break;
-            }
-            else if (h[act[j]])
-            {
-                act.splice(j, 1);
-                j++;
+                for (var x in this.all_actions)
+                    h[this.all_actions[x]] = true;
             }
             else
                 h[act[j]] = true;
         }
-        for (j in act)
+        for (j in h)
         {
-            j = this.action_alias[act[j]];
+            j = this.action_alias[j];
             if (!j)
             {
                 // skip invalid actions
@@ -333,9 +328,10 @@ HACLACLEditor.prototype.fill_closure = function()
             function(request) { ge.closure_ajax(request); ge.closure_groups_sd(g, sd); ge.check_errors(); }
         );
     }
-    else if (g.length || sd.length)
+    else
     {
-        ge.closure_groups_sd(g, sd);
+        if (g.length || sd.length)
+            ge.closure_groups_sd(g, sd);
         ge.check_errors();
     }
 };
@@ -366,7 +362,7 @@ HACLACLEditor.prototype.save_sd = function()
                 i = ['*'];
         }
         if (h['manage'])
-            i.push('manage');
+            i.push(this.action_alias['manage']);
         if (i.length)
         {
             i = i.join(', ');
@@ -480,10 +476,10 @@ HACLACLEditor.prototype.to_name_change = function()
         // disable checkbox:
         // - if right is granted through some group
         // - or if no grant target selected
-        // - or if a=='template' and we are not template
-        c.disabled = !g_to || grp || a == 'template' && !this.is_template[this.last_target_type];
+        // - or if a=='template' and we are page right
+        c.disabled = !g_to || grp || a == 'template' && !this.last_target_type == 'page';
         l.className = c.disabled ? 'act_disabled' : '';
-        c.title = l.title = grp ? this.msg.indirect_grant.replace('$1', grp) : '';
+        c.title = l.title = (grp ? this.msg.indirect_grant.replace('$1', grp) : this.msg['edit_ahint_'+a]);
     }
 };
 
@@ -624,7 +620,7 @@ HACLACLEditor.prototype.inc_hint_fill = function(h, v)
 };
 
 // Initialize ACL editor
-HACLACLEditor.prototype.init = function(aclTitle, aclType)
+HACLACLEditor.prototype.init = function(aclTitle, aclType, aclExists)
 {
     if (aclTitle)
     {
@@ -660,6 +656,6 @@ HACLACLEditor.prototype.init = function(aclTitle, aclType)
     // create autocompleter for ACL inclusion
     this.inc_hint = new SHint('inc_acl', 'hacl', function(h, v) { ge.inc_hint_fill(h, v) });
     this.inc_hint.init();
-    if (aclTitle)
-        document.getElementById('acl_exists_hint').style.display = '';
+    document.getElementById('acl_exists_hint').style.display = aclExists ? '' : 'none';
+    document.getElementById('acl_delete_link').style.display = aclExists ? '' : 'none';
 }
