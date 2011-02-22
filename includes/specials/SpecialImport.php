@@ -368,16 +368,9 @@ class ImportReporter {
 				}
 				$log->addEntry( 'interwiki', $title, $detail );
 			}
-
-			$comment = $detail; // quick
-			$dbw = wfGetDB( DB_MASTER );
-			$latest = $title->getLatestRevID();
-			$nullRevision = Revision::newNullRevision( $dbw, $title->getArticleId(), $comment, true );
-			$nullRevision->insertOn( $dbw );
-			$article = new Article( $title );
-			# Update page record
-			$article->updateRevisionOn( $dbw, $nullRevision );
-			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
+			// [MediaWiki4Intranet] do not insert any empty revisions because it leads
+			// to fancy bugs (infinitely multiplicated revisions) in the case of cross
+			// (2-way) import-export.
 		}
 	}
 
