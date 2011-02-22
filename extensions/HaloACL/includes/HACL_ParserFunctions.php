@@ -733,7 +733,7 @@ class HACLParserFunctions
         if ($this->mTitle->getNamespace() != HACL_NS_ACL || !$id)
             return '';
 
-        global $haclgContLang;
+        global $haclgContLang, $haclgHaloScriptPath;
         $msg = $this->checkConsistency();
 
         // Article does not correspond to any ACL definition
@@ -757,18 +757,25 @@ class HACLParserFunctions
                 $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
         }
 
+        $html = '';
         if ($msg !== true)
         {
-            $html = wfMsgForContent('hacl_consistency_errors');
+            $html .= wfMsgForContent('hacl_consistency_errors');
             $html .= wfMsgForContent('hacl_definitions_will_not_be_saved');
             $html .= "<ul>";
             foreach ($msg as $m)
                 $html .= "<li>$m</li>";
             $html .= "</ul>";
-            return $html;
         }
 
-        return '';
+        $html .= wfMsgForContent('hacl_edit_with_special',
+            Title::newFromText('Special:HaloACL')->getLocalUrl(array(
+                'action' => 'acl',
+                'sd' => $this->mTitle->getPrefixedText(),
+            )),
+            $haclgHaloScriptPath . '/skins/images/edit.png');
+
+        return $html;
     }
 
     /**

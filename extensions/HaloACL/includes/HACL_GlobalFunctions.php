@@ -157,8 +157,6 @@ function haclfSetupExtension()
         $wgHooks['EditFilter'][]         = 'HACLEvaluator::onEditFilter';
     }
 
-    $wgHooks['BeforePageDisplay'][] = 'haclfAddPageHeader';
-
     //-- Hooks for ACL toolbar--
     $wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
     $wgHooks['sfEditPageBeforeForm'][] = 'haclfAddToolbarForSemanticForms';
@@ -197,14 +195,9 @@ function haclfSetupExtension()
     $wgParser->setFunctionHook('haclmember',            'HACLParserFunctions::addMember');
     $wgParser->setFunctionHook('haclmanagegroup',       'HACLParserFunctions::manageGroup');
 
-    wfProfileOut(__FUNCTION__);
-    return true;
-}
-
-function haclfAddPageHeader(&$out)
-{
-    global $wgTitle;
     haclCheckScriptPath();
+
+    wfProfileOut(__FUNCTION__);
     return true;
 }
 
@@ -219,7 +212,6 @@ function haclCheckScriptPath()
         $haclgHaloScriptPath = $wgScriptPath.'/'.$haclgHaloScriptPath;
     return $haclgHaloScriptPath;
 }
-
 
 /**********************************************/
 /***** namespace settings                 *****/
@@ -568,8 +560,11 @@ function haclfHandleFormField($form_field, $cur_value, $form_submitted)
 // Hook into maintenance/update.php
 function haclfLoadExtensionSchemaUpdates()
 {
-    global $wgMysqlUpdates;
-    $wgMysqlUpdates[] = array('haclfInitDatabase');
+    global $wgMysqlUpdates, $wgUpdates;
+    if ($wgMysqlUpdates)
+        $wgMysqlUpdates[] = array('haclfInitDatabase');
+    elseif ($wgUpdates)
+        $wgUpdates['mysql'][] = array('haclfInitDatabase');
     return true;
 }
 
