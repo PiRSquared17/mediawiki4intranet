@@ -64,7 +64,6 @@ function enableHaloACL()
         'HACLGroup'                 => "$haclgIP/includes/HACL_Group.php",
         'HACLSecurityDescriptor'    => "$haclgIP/includes/HACL_SecurityDescriptor.php",
         'HACLRight'                 => "$haclgIP/includes/HACL_Right.php",
-        'HACLWhitelist'             => "$haclgIP/includes/HACL_Whitelist.php",
         'HACLResultFilter'          => "$haclgIP/includes/HACL_ResultFilter.php",
         'HACLQueryRewriter'         => "$haclgIP/includes/HACL_QueryRewriter.php",
         'HACLQuickacl'              => "$haclgIP/includes/HACL_Quickacl.php",
@@ -80,7 +79,6 @@ function enableHaloACL()
         'HACLGroupException'        => "$haclgIP/exceptions/HACL_GroupException.php",
         'HACLSDException'           => "$haclgIP/exceptions/HACL_SDException.php",
         'HACLRightException'        => "$haclgIP/exceptions/HACL_RightException.php",
-        'HACLWhitelistException'    => "$haclgIP/exceptions/HACL_WhitelistException.php",
     );
 
     // HACLParserFunctions hooks
@@ -103,7 +101,6 @@ function haclfLanguageGetMagic(&$magicWords, $langCode)
     $magicWords['haclaccess']           = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_ACCESS));
     $magicWords['haclpropertyaccess']   = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_PROPERTY_ACCESS));
     $magicWords['haclpredefinedright']  = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_PREDEFINED_RIGHT));
-    $magicWords['haclwhitelist']        = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_WHITELIST));
     $magicWords['haclmanagerights']     = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_RIGHTS));
     $magicWords['haclmember']           = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_MEMBER));
     $magicWords['haclmanagegroup']      = array(0, $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_GROUP));
@@ -196,7 +193,6 @@ function haclfSetupExtension()
     $wgParser->setFunctionHook('haclaccess',            'HACLParserFunctions::access');
     $wgParser->setFunctionHook('haclpropertyaccess',    'HACLParserFunctions::propertyAccess');
     $wgParser->setFunctionHook('haclpredefinedright',   'HACLParserFunctions::predefinedRight');
-    $wgParser->setFunctionHook('haclwhitelist',         'HACLParserFunctions::whitelist');
     $wgParser->setFunctionHook('haclmanagerights',      'HACLParserFunctions::manageRights');
     $wgParser->setFunctionHook('haclmember',            'HACLParserFunctions::addMember');
     $wgParser->setFunctionHook('haclmanagegroup',       'HACLParserFunctions::manageGroup');
@@ -467,10 +463,14 @@ function haclfRestoreTitlePatch($etc)
  */
 function haclfArticleID($articleName, $defaultNS = NS_MAIN)
 {
-    $etc = haclfDisableTitlePatch();
-    $t = Title::newFromText($articleName, $defaultNS);
-    haclfRestoreTitlePatch($etc);
-    if (is_null($t))
+    $t = $articleName;
+    if (!is_object($t))
+    {
+        $etc = haclfDisableTitlePatch();
+        $t = Title::newFromText($articleName, $defaultNS);
+        haclfRestoreTitlePatch($etc);
+    }
+    if (!$t)
         return 0;
     $id = $t->getArticleID();
     if ($id === 0)

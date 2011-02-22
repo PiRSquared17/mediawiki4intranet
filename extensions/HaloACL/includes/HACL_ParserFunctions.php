@@ -38,7 +38,6 @@ if (!defined('MEDIAWIKI'))
  * - access
  * - property access
  * - predefined right
- * - whitelist
  * - manage rights
  * - member
  * - manage group
@@ -59,9 +58,6 @@ class HACLParserFunctions
 
     // array(string): All predefined rights that are referenced
     private $mPredefinedRights = array();
-
-    // array(string): All pages that are added to the whitelist
-    private $mWhitelist = array();
 
     // array(string): Users who can change a right
     private $mRightManagerUsers = array();
@@ -84,7 +80,7 @@ class HACLParserFunctions
     // bool: true if all parser functions of an article are valid
     private $mDefinitionValid = true;
 
-    // string: Type of the definition: group, right, sd, whitelist, invalid
+    // string: Type of the definition: group, right, sd, invalid
     private $mType = false;
 
     // HACLParserFunctions: Currently used instance of this class
@@ -125,13 +121,6 @@ class HACLParserFunctions
     {
         if (self::$mInstance)
             return self::$mInstance->_predefinedRight($parser, func_get_args());
-        return '';
-    }
-
-    public static function whitelist(&$parser)
-    {
-        if (self::$mInstance)
-            return self::$mInstance->_whitelist($parser, func_get_args());
         return '';
     }
 
@@ -208,10 +197,12 @@ class HACLParserFunctions
 
         $errMsgs = $em1 + $em2;
 
-        if (count($errMsgs) == 0) {
+        if (count($errMsgs) == 0)
+        {
             // no errors
             // => create and store the new right for later use.
-            if (!in_array($fingerprint, $this->mFingerprints)) {
+            if (!in_array($fingerprint, $this->mFingerprints))
+            {
                 $ir = new HACLRight($this->actionNamesToIDs($actions), $groups, $users, $description, $name);
                 $this->mInlineRights[] = $ir;
                 $this->mFingerprints[] = $fingerprint;
@@ -369,68 +360,6 @@ class HACLParserFunctions
 
         return $text;
 
-    }
-
-    /**
-     * Callback for parser function "#whitelist:".
-     * This parser function can only appear in the article ACL:Whitelist,
-     * however several times. It has only one parameter:
-     * pages: This is a comma separated list of full article names that can be
-     *        read by everyone.
-     *
-     * @param Parser $parser
-     *         The parser object
-     *
-     * @return string
-     *         Wikitext
-     *
-     * @throws
-     *         HACLException(HACLException::INTERNAL_ERROR)
-     *             ... if the parser function is called for different articles
-     */
-    public function _whitelist(&$parser, $args)
-    {
-        $params = $this->getParameters($args);
-
-        global $wgContLang, $haclgContLang;
-        $errMsgs = array();
-        $pages = array();
-
-        $pagesPN = $haclgContLang->getParserFunctionParameter(HACLLanguage::PFP_PAGES);
-        if (!array_key_exists($pagesPN, $params)) {
-            // The parameter "pages" is missing.
-            $errMsgs[] = wfMsgForContent('hacl_missing_parameter', $pagesPN);
-        } else {
-            $pages = $params[$pagesPN];
-            $pages = explode(',', $pages);
-            // trim pages
-            for ($i = 0; $i < count($pages); ++$i) {
-                $pn = trim($pages[$i]);
-                $etc = haclfDisableTitlePatch();
-                $t = Title::newFromText($pn);
-                haclfRestoreTitlePatch($etc);
-                // Create page names with correct upper/lower cases
-                $pages[$i] = $t->getFullText();
-            }
-            if (count($pages) == 0) {
-                $errMsgs[] = wfMsgForContent('hacl_missing_parameter_values', $pagesPN);
-            } else {
-                $this->mWhitelist = array_merge($this->mWhitelist, $pages);
-            }
-        }
-        // Remove duplicate pages from the whitelist
-        $this->mWhitelist = array_unique($this->mWhitelist);
-
-        if (count($errMsgs) > 0) {
-            $this->mDefinitionValid = false;
-        }
-
-        // Format the whitelist in Wikitext
-        $text = wfMsgForContent('hacl_pf_whitelist_title');
-        // Show the whitelist pages in the same format as predefined rights
-        $text .= $this->showRights($pages, false);
-        $text .= $this->showErrors($errMsgs);
-        return $text;
     }
 
     /**
@@ -611,7 +540,7 @@ class HACLParserFunctions
 
     /**
      * This method is called, after an article has been saved. If the article
-     * belongs to the namespace ACL (i.e. a right, SD, group or whitelist)
+     * belongs to the namespace ACL (i.e. a right, SD, group)
      * its content is transferred to the database.
      *
      * @param Article $article
@@ -664,7 +593,7 @@ class HACLParserFunctions
 
     /**
      * This method is called, when an article is deleted. If the article
-     * belongs to the namespace ACL (i.e. a right, SD, group or whitelist)
+     * belongs to the namespace ACL (i.e. a right, SD, group)
      * its removal is reflected in the database.
      *
      * @param unknown_type $article
@@ -760,11 +689,6 @@ class HACLParserFunctions
                     $group->setManageUsers('*,#');
                     $group->save();
                     break;
-                case 'whitelist':
-                    // Create an empty whitelist and save it.
-                    $wl = new HACLWhitelist();
-                    $wl->save();
-                    break;
                 default:
                     $sd = HACLSecurityDescriptor::newFromID($id);
                     // It is a right or security descriptor
@@ -825,37 +749,12 @@ class HACLParserFunctions
                 case 'group':
                     $exists = HACLGroup::exists($id);
                     break;
-                case 'whitelist':
-                    $exists = $id == HACLWhitelist::exists();
-                    break;
                 default:
                     $exists = HACLSecurityDescriptor::exists($id);
                     break;
             }
             if (!$exists)
                 $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
-        }
-
-        if ($this->mType == 'whitelist')
-        {
-            // Check if the whitelist defined in the article matches the
-            // whitelist in the database. Articles that did no exist when the
-            // whitelist was saved were not added to the database.
-            $wl = HACLWhitelist::newFromDB();
-            $wl = $wl->getPages();
-            $inArticle = array_diff($this->mWhitelist, $wl);
-            if (!empty($inArticle))
-            {
-                // There are more pages in the article than in the database
-                $m = wfMsgForContent('hacl_whitelist_mismatch');
-                $m .= '<ul>';
-                foreach ($inArticle as $ia)
-                    $m .= '<li>'.$ia.'</li>';
-                $m .= '</ul>';
-                if (!is_array($msg))
-                    $msg = array();
-                $msg[] = $m;
-            }
         }
 
         if ($msg !== true)
@@ -898,9 +797,6 @@ class HACLParserFunctions
                 break;
             case 'sd':
                 return $this->saveSecurityDescriptor(false);
-                break;
-            case 'whitelist':
-                return $this->saveWhitelist();
                 break;
             default:
                 return NULL;
@@ -981,27 +877,6 @@ class HACLParserFunctions
     }
 
     /**
-     * Saves the whitelist based on the definitions given in the current article.
-     *
-     * @return bool
-     *         true, if saving was successful
-     *         false, if not
-     */
-    private function saveWhitelist()
-    {
-        try
-        {
-            $wl = new HACLWhitelist($this->mWhitelist);
-            $wl->save();
-        }
-        catch (HACLWhitelistException $e)
-        {
-            // Non-existing articles could not be added to the whitelist
-        }
-        return true;
-    }
-
-    /**
      * Checks the consistency of all used parser functions in the current article.
      * The following conditions must be met:
      *
@@ -1017,9 +892,6 @@ class HACLParserFunctions
      *  - must have managers (users or groups)
      *  - must have inline or predefined rights
      *  - a namespace can only be protected if it is not member of $haclgUnprotectableNamespaces
-     *
-     * Whitelist:
-     *  - must have a list of pages
      *
      * @return array(string)|bool
      *         An array of error messages of <true>, if the parser functions are
@@ -1052,19 +924,11 @@ class HACLParserFunctions
         if ($this->mType == 'right' || $this->mType == 'sd')
         {
             // check for inline or predefined rights
-            if (count($this->mInlineRights) == 0 &&
-                count($this->mPredefinedRights) == 0 &&
-                count($this->mPropertyRights) == 0)
+            if (!$this->mInlineRights &&
+                !$this->mPredefinedRights &&
+                !$this->mPropertyRights)
                 $msg[] = wfMsgForContent('hacl_right_must_have_rights');
-            // check for managers
-            if (count($this->mRightManagerGroups) == 0 &&
-                count($this->mRightManagerUsers) == 0)
-                $msg[] = wfMsgForContent('hacl_right_must_have_managers');
         }
-
-        // Check if the definition of a whitelist is complete and valid
-        if ($isWhitelist && count($this->mWhitelist) == 0)
-            $msg[] = wfMsgForContent('hacl_whitelist_must_have_pages');
 
         // Check for invalid parser functions
         $ivpf = $this->findInvalidParserFunctions($this->mType);
@@ -1103,11 +967,10 @@ class HACLParserFunctions
     }
 
     /**
-     * Checks if invalid parser functions were used in groups, rights, security
-     * descriptors or whitelists.
+     * Checks if invalid parser functions were used in definition.
      *
      * @param string $type
-     *         One of 'group', 'right', 'sd' or 'whitelist'
+     *         One of 'group', 'right', 'sd'
      *
      * @return array(string)
      *         An array of error messages. (May be empty.)
@@ -1118,46 +981,40 @@ class HACLParserFunctions
         global $haclgContLang;
 
         if (count($this->mInlineRights) > 0) {
-            if ($type == 'group' || $type == 'whitelist') {
+            if ($type == 'group') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_ACCESS));
             }
         }
         if (count($this->mPropertyRights) > 0) {
-            if ($type == 'group' || $type == 'whitelist') {
+            if ($type == 'group') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_PROPERTY_ACCESS));
             }
         }
         if (count($this->mPredefinedRights) > 0) {
-            if ($type == 'group' || $type == 'whitelist') {
+            if ($type == 'group') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_PREDEFINED_RIGHT));
             }
         }
-        if (count($this->mWhitelist) > 0) {
-            if ($type == 'group' || $type == 'sd' || $type == 'right') {
-                $msg[] = wfMsgForContent("hacl_invalid_parser_function",
-                    $haclgContLang->getParserFunction(HACLLanguage::PF_WHITELIST));
-            }
-        }
         if (count($this->mRightManagerGroups) > 0 ||
             count($this->mRightManagerUsers) > 0) {
-            if ($type == 'group' || $type == 'whitelist') {
+            if ($type == 'group') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_RIGHTS));
             }
         }
         if (count($this->mGroupManagerGroups) > 0 ||
             count($this->mGroupManagerUsers) > 0) {
-            if ($type == 'right' || $type == 'sd' || $type == 'whitelist') {
+            if ($type == 'right' || $type == 'sd') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_MANAGE_GROUP));
             }
         }
         if (count($this->mUserMembers) > 0 ||
             count($this->mGroupMembers) > 0) {
-            if ($type == 'right' || $type == 'sd' || $type == 'whitelist') {
+            if ($type == 'right' || $type == 'sd') {
                 $msg[] = wfMsgForContent("hacl_invalid_parser_function",
                     $haclgContLang->getParserFunction(HACLLanguage::PF_MEMBER));
             }

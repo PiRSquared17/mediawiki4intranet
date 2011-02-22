@@ -89,8 +89,9 @@ HACLACLEditor.prototype.target_change = function(total_change)
         pn.href = wgScript+'/'+encodeURI(t);
         document.getElementById('wpTitle').value = t;
         document.getElementById('acl_delete_link').href = wgScript + '?title=' + encodeURI(t) + '&action=delete';
+        var ae = this;
         if (total_change)
-            sajax_do_call('haclSDExists', [ what, name ], this.pe_exists_ajax);
+            sajax_do_call('haclSDExists', [ what, name ], function(request) { ae.pe_exists_ajax(request) });
     }
     if (!t || !total_change)
         document.getElementById('acl_exists_hint').style.display = 'none';
@@ -357,7 +358,7 @@ HACLACLEditor.prototype.save_sd = function()
         for (var k in h)
             if (k != 'template' &&
                 k != 'manage')
-                i.push(this.action_names[k]);
+                i.push(k);
         if (i.length)
         {
             i = i.sort();
@@ -365,7 +366,7 @@ HACLACLEditor.prototype.save_sd = function()
                 i = ['*'];
         }
         if (h['manage'])
-            i.push(this.action_names.manage);
+            i.push('manage');
         if (i.length)
         {
             i = i.join(', ');
@@ -389,6 +390,7 @@ HACLACLEditor.prototype.save_sd = function()
     if (predef.length)
         t = t + "{{#predefined right: rights="+predef.join(", ")+"}}\n";
     document.getElementById('acl_def').value = t;
+    this.check_errors();
 };
 
 // onchange for action checkboxes

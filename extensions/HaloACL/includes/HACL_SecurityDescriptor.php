@@ -30,7 +30,7 @@
  *
  */
 if (!defined('MEDIAWIKI'))
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * This class describes security descriptors or predefined rights in HaloACL.
@@ -374,17 +374,17 @@ class HACLSecurityDescriptor
 
         $p = strpos($nameOfSD, '/');
         if (!$p)
-            return array(NULL, 'right');
+            return array(NULL, HACLLanguage::PET_RIGHT);
 
         $prefix = substr($nameOfSD, 0, $p);
         if ($type = $haclgContLang->getPetAlias($prefix))
         {
             $peName = substr($nameOfSD, $p+1);
-            if ($type == 'category')
+            if ($type == HACLLanguage::PET_CATEGORY)
                 $peName = $wgContLang->getNsText(NS_CATEGORY).':'.$peName;
-            elseif ($type == 'property' && defined('SMW_NS_PROPERTY'))
+            elseif ($type == HACLLanguage::PET_PROPERTY && defined('SMW_NS_PROPERTY'))
                 $peName = $wgContLang->getNsText(SMW_NS_PROPERTY).':'.$peName;
-            elseif ($type == 'right')
+            elseif ($type == HACLLanguage::PET_RIGHT)
                 $peName = NULL;
             return array($peName, $type);
         }
@@ -673,6 +673,15 @@ class HACLSecurityDescriptor
                      'rights' => $missingPR);
     }
 
+    protected function checkIndirectManageRight($userID)
+    {
+        $title = Title::newFromId($this->mPEID);
+        if (HACLEvaluator::hasRight($title->getNamespace(), HACLLanguage::PET_NAMESPACE, $userID, HACLLanguage::RIGHT_MANAGE))
+            return true;
+        list($r) = HACLEvaluator::hasCategoryRight($title, $userID, HACLLanguage::RIGHT_MANAGE);
+        return $r;
+    }
+
     /**
      * Checks if the given user can modify this SD.
      *
@@ -699,6 +708,7 @@ class HACLSecurityDescriptor
     {
         // Get the ID of the user who wants to add/modify the SD
         list($userID, $userName) = haclfGetUserID($user);
+
         // Check if the user can modify the SD
         if (in_array($userID, $this->mManageUsers))
             return true;
@@ -719,6 +729,21 @@ class HACLSecurityDescriptor
         $groups = $user->getGroups();
         if (in_array('sysop', $groups) || in_array('bureaucrat', $groups))
             return true;
+
+        // Check for direct RIGHT_MANAGE, for all except right templates
+        if ($this->mPEType != HACLLanguage::PET_RIGHT &&
+            HACLEvaluator::hasRight($this->mPEID, $this->mPEType, $userID, HACLLanguage::RIGHT_MANAGE))
+            return true;
+
+        // Check for inherited RIGHT_MANAGE, only for page SDs!
+        if ($this->mPEType == HACLLanguage::PET_PAGE)
+        {
+            $etc = haclfDisableTitlePatch();
+            $r = $this->checkIndirectManageRight($userID);
+            haclfRestoreTitlePatch($etc);
+            if ($r)
+                return true;
+        }
 
         if ($throwException)
         {

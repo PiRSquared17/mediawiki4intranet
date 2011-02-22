@@ -47,16 +47,13 @@ $messages['en'] = array(
     'hacl_invalid_parser_function'      => 'The use of the "#$1" function in this article is not allowed.',
     'hacl_right_must_have_rights'       => 'A right or security descriptor must contain rights or reference other rights.',
     'hacl_right_must_have_managers'     => 'A right or security descriptor must have at least one manager (group or user).',
-    'hacl_whitelist_must_have_pages'    => 'The whitelist is empty. Please add pages .',
     'hacl_add_to_group_cat'             => 'This article contains functions that define a group. They will not be taken into effect until you add the category "[[Category:ACL/Group]]".',
     'hacl_add_to_right_cat'             => 'This article contains the functions that define a security descriptor or a right template. They will not be taken to effect until you add the category "[[Category:ACL/ACL]]" or "[[Category:ACL/Right]]".',
-    'hacl_add_to_whitelist'             => 'The article contains functions that define a whitelist. This function may only be used in the "ACL:Whitelist" article.',
     'hacl_pf_rightname_title'           => "===$1===\n",
     'hacl_pf_rights_title'              => "===Right(s): $1===\n",
     'hacl_pf_rights'                    => ":;Right(s):\n:: $1\n",
     'hacl_pf_right_managers_title'      => "===Right managers===\n",
     'hacl_pf_predefined_rights_title'   => "===Right templates===\n",
-    'hacl_pf_whitelist_title'           => "===Whitelist===\n",
     'hacl_pf_group_managers_title'      => "===Group managers===\n",
     'hacl_pf_group_members_title'       => "===Group members===\n",
     'hacl_assigned_user'                => 'Assigned users: ',
@@ -73,7 +70,6 @@ $messages['en'] = array(
     'hacl_anonymous_users'              => 'anonymous users',
     'hacl_registered_users'             => 'registered users',
     'hacl_acl_element_not_in_db'        => 'No entry has been made in the ACL database about this article. Please re-save it again with all the articles that use it.',
-    'hacl_whitelist_mismatch'           => 'The whitelist in this article contains nonexistent articles. Please remove them and save the whitelist again.',
     'hacl_unprotectable_namespace'      => 'This namespace cannot be protected. Please contact the wiki administrator.',
 
     /* NEW */
@@ -155,7 +151,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_action_quickaccess'           => 'Manage Quick ACL',
     'hacl_action_grouplist'             => 'Manage groups',
     'hacl_action_group'                 => 'Create a group',
-    'hacl_action_whitelist'             => 'Manage whitelist',
 
     'hacl_acllist'                      => 'Halo Access Control Lists',
     'hacl_acllist_hello'                => 'Hi, this is \'\'\'HaloACL[http://4intra.net/ <sup>4</sup>IN]\'\'\', the best MediaWiki rights extension. You can get help [http://wiki.4intra.net/HaloACL here]. Select function below to start working:',
@@ -251,7 +246,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_tab_create_acl'               => 'Create ACL',
     'hacl_tab_manage_acls'              => 'Manage ACLs',
     'hacl_tab_manage_user'              => 'Manage Groups',
-    'hacl_tab_manage_whitelist'         => 'Manage Whitelist',
 
     /* Messages for 'Create ACL' tab */
     'hacl_create_acl_subtab1'           => 'Create standard ACL',
@@ -314,14 +308,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     /* Messages for 'Manage ACLs' tab */
     'hacl_manage_acls_subtab1'                  => 'Manage all ACLs',
     'hacl_manage_acls_subtab2'                  => 'Manage own default user template',
-    /* Messages for 'Manage User' tab */
-    /* Messages for 'Manage Whitelist' tab */
-    'hacl_whitelist_headline'                   => 'Manage Whitelist',
-    'hacl_whitelist_info'                       => 'You may edit and create the Whitelist in this tab',
-    'hacl_whitelist_filter'                     => 'Filter:',
-    'hacl_whitelist_pageset_header'             => 'Page',
-    'hacl_whitelist_pagename'                   => 'Page-Name:',
-    'hacl_whitelist_addbutton'                  => 'Add Page',
 
     'hacl_createRightContent_help'              => 'Click on <strong>&quot;Create right&quot;</strong> if you want to create a new right.<br /><br />Note: <br />You may create multiple rights e.g.:<br /> Right1 = Read only for User1 + Right 2 = Full access for User2 etc.<br /><br /> Choose <strong>&quot;Add right template&quot;</strong> if you wish to select a predefined ACL.',
 
@@ -441,11 +427,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_manageUser_9' => 'Editing',
     'hacl_manageUser_10' => 'Save group',
 
-    'hacl_whitelist_1' => 'Manage whitelisted pages',
-    'hacl_whitelist_2' => 'This tab lets you create and delete whitelist entries.',
-    'hacl_whitelist_3' => 'Whitelisted Pages',
-    'hacl_whitelist_4' => 'Add page to whitelist:',
-
     'hacl_deleteGroup_1' => 'The marked items have been deleted successfully.',
 
     'hacl_quickACL_1' => 'Manage quick access ACLs',
@@ -532,16 +513,13 @@ $messages['de'] = array(
     'hacl_invalid_parser_function'    => 'Sie dürfen die Funktion "#$1" in diesem Artikel nicht verwenden.',
     'hacl_right_must_have_rights'   => 'Ein Recht oder eine Sicherheitsbeschreibung müssen Rechte oder Verweise auf Rechte enthalten.',
     'hacl_right_must_have_managers' => 'Ein Recht oder eine Sicherheitsbeschreibung müssen mindestens einen Verwalter haben (Gruppe oder Benutzer).',
-    'hacl_whitelist_must_have_pages' => 'Die Positivliste ist leer. Bitte fügen Sie Seiten hinzu.',
     'hacl_add_to_group_cat'            => 'Der Artikel enthält Funktionen zur Definition von Gruppen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Gruppe]]" hinzufügen.',
     'hacl_add_to_right_cat'            => 'Der Artikel enthält Funktionen zur Definition von Rechten oder Sicherheitsbeschreibungen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Recht]]" oder "[[Kategorie:Rechte/Sicherheitsbeschreibung]]" hinzufügen.',
-    'hacl_add_to_whitelist'            => 'Der Artikel enthält Funktionen zur Definition einer "Positivliste". Diese Funktion darf nur im Artikel "Rechte:Positivliste" benutzt werden.',
     'hacl_pf_rightname_title'        => "===$1===\n",
     'hacl_pf_rights_title'            => "===Recht(e): $1===\n",
     'hacl_pf_rights'                => ":;Recht(e):\n:: $1\n",
     'hacl_pf_right_managers_title'    => "===Rechteverwalter===\n",
     'hacl_pf_predefined_rights_title' => "===Rechtevorlagen===\n",
-    'hacl_pf_whitelist_title'         => "===Positivliste===\n",
     'hacl_pf_group_managers_title'    => "===Gruppenverwalter===\n",
     'hacl_pf_group_members_title'    => "===Gruppenmitglieder===\n",
     'hacl_assigned_user'            => 'Zugewiesene Benutzer: ',
@@ -558,7 +536,6 @@ $messages['de'] = array(
     'hacl_anonymous_users'            => 'anonyme Benutzer',
     'hacl_registered_users'            => 'registrierte Benutzer',
     'hacl_acl_element_not_in_db'    => 'Zu diesem Artikel gibt es keinen Eintrag in der Rechtedatenbank. Vermutlich wurde er gelöscht und wiederhergestellt. Bitte speichern Sie ihn und alle Artikel die ihn verwenden neu.',
-    'hacl_whitelist_mismatch'        => 'Die "Positivliste" in diesem Artikel enthält Artikel, die nicht existieren. Bitte entfernen Sie diese und speichern Sie die "Positivliste" erneut.' ,
     'hacl_unprotectable_namespace'  => 'Dieser Namensraum kann nicht geschützt werden. Bitte fragen Sie Ihren Wikiadministrator.',
 
     /* Messages for semantic protection (properties etc.) */
@@ -571,7 +548,6 @@ $messages['de'] = array(
     'hacl_tab_create_acl' => 'Recht erzeugen',
     'hacl_tab_manage_acls' => 'Rechte verwalten',
     'hacl_tab_manage_user' => 'Gruppen verwalten',
-    'hacl_tab_manage_whitelist' => 'Positivliste verwalten',
 
     /* Messages for 'Create ACL' tab */
     'hacl_create_acl_subtab1' => 'Standardrecht erzeugen',
@@ -633,13 +609,6 @@ $messages['de'] = array(
 
     /* Messages for 'Manage ACLs' tab */
     /* Messages for 'Manage User' tab */
-    /* Messages for 'Manage Whitelists' tab */
-    'hacl_whitelists_headline' => 'Positivliste verwalten',
-    'hacl_whitelists_info' => 'Auf dieser Seite können Sie die Positivliste erzeugen und bearbeiten.',
-    'hacl_whitelists_filter' => 'Filter:',
-    'hacl_whitelists_addlink' => 'Seite:',
-    'hacl_whitelists_pagename' => 'Seitenname',
-    'hacl_whitelists_addbutton' => 'Seite hinzufügen',
 
     'hacl_createRightContent_help' => 'Klicken Sie auf <strong>Recht erstellen</strong> um ein neues Recht zu erstellen. Sie können beliebige viele Rechte erstellen (bspw.: ein Recht welches Vollzugriff für bestimmte Nutzer erlaubt sowie ein Recht welches lediglich Lesezugriff für alle Nutzer realisiert).<br /><br />Wählen Sie <strong>Template hinzufügen</strong> wenn Sie vordefinierte ACL templates in in Ihre Rechtedefinition einbinden möchten.',
     'hacl_haloacl_tab_section_header_title' =>  'Rechte',
@@ -757,11 +726,6 @@ $messages['de'] = array(
     'hacl_manageUser_8' => 'ACL Gruppen Explorer',
     'hacl_manageUser_9' => 'Editieren',
     'hacl_manageUser_10' => 'Gruppe speichern',
-
-    'hacl_whitelist_1' => 'Whitelist Einträge verwalten',
-    'hacl_whitelist_2' => 'Hier können Whitelist Einträge angelegt und gelöscht werden.',
-    'hacl_whitelist_3' => 'Whitelisted Einträge',
-    'hacl_whitelist_4' => 'Eintrag zu Whitelist hinzufügen:',
 
     'hacl_deleteGroup_1' => 'Die markierten Einträge wurden erfolgreich gelöscht',
 
