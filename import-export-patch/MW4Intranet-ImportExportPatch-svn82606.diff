@@ -1,21 +1,8 @@
-# HG changeset patch
-# User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1290777240 -10800
-
-Totally improved MediaWiki Import and Export engine with conflict detection,
-advanced export page list building options and support for exporting file data
-over HTTP or inside the export file.
-
-Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
-installation.
-
-Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
-
 Index: skins/common/shared.css
 ===================================================================
---- skins/common/shared.css	(revision 77332)
+--- skins/common/shared.css	(revision 82604)
 +++ skins/common/shared.css	(working copy)
-@@ -560,6 +560,8 @@
+@@ -519,6 +519,8 @@
  	font-size: 90%;
  }
  
@@ -26,9 +13,9 @@ Index: skins/common/shared.css
  strong.mw-revdelundel-link {
 Index: includes/filerepo/LocalFile.php
 ===================================================================
---- includes/filerepo/LocalFile.php	(revision 77332)
+--- includes/filerepo/LocalFile.php	(revision 82604)
 +++ includes/filerepo/LocalFile.php	(working copy)
-@@ -848,6 +848,66 @@
+@@ -851,6 +851,66 @@
  	}
  
  	/**
@@ -95,7 +82,7 @@ Index: includes/filerepo/LocalFile.php
  	 * Record a file upload in the upload log and the image table
  	 */
  	function recordUpload2( $oldver, $comment, $pageText, $props = false, $timestamp = false, $user = null )
-@@ -1035,16 +1095,22 @@
+@@ -1038,16 +1098,22 @@
  	 *
  	 * @param $srcPath String: local filesystem path to the source image
  	 * @param $flags Integer: a bitwise combination of:
@@ -125,7 +112,7 @@ Index: includes/filerepo/LocalFile.php
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 Index: includes/Export.php
 ===================================================================
---- includes/Export.php	(revision 77332)
+--- includes/Export.php	(revision 82604)
 +++ includes/Export.php	(working copy)
 @@ -3,6 +3,7 @@
   * Base classes for dumps and export
@@ -252,15 +239,6 @@ Index: includes/Export.php
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -510,7 +564,7 @@
- 		} elseif( isset( $row->old_text ) ) {
- 			// Raw text from the database may have invalid chars
- 			$text = strval( Revision::getRevisionText( $row ) );
--			$out .= "      " . Xml::elementClean( 'text',
-+			$out .= "      " . Xml::ElementClean( 'text',
- 				array( 'xml:space' => 'preserve' ),
- 				strval( $text ) ) . "\n";
- 		} else {
 @@ -595,12 +649,12 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
@@ -314,153 +292,9 @@ Index: includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-Index: includes/ImportXMLReader.php
-===================================================================
---- includes/ImportXMLReader.php	(revision 77332)
-+++ includes/ImportXMLReader.php	(working copy)
-@@ -11,6 +11,7 @@
-  */
- class WikiImporter {
- 	private $reader = null;
-+	private $importSource;
- 	private $mLogItemCallback, $mUploadCallback, $mRevisionCallback, $mPageCallback;
- 	private $mSiteInfoCallback, $mTargetNamespace, $mPageOutCallback;
- 	private $mDebug;
-@@ -22,6 +23,7 @@
- 		$this->reader = new XMLReader2();
- 
- 		stream_wrapper_register( 'uploadsource', 'UploadSourceAdapter' );
-+		$this->importSource = $source;
- 		$id = UploadSourceAdapter::registerSource( $source );
- 		$this->reader->open( "uploadsource://$id" );
- 
-@@ -168,12 +170,13 @@
- 	}
- 
- 	/**
--	 * Dummy for now...
-+	 * Per-revision file import callback, performs the upload.
-+	 * @param $revision WikiRevision
-+	 * @private
- 	 */
- 	public function importUpload( $revision ) {
--		//$dbw = wfGetDB( DB_MASTER );
--		//return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
--		return false;
-+		$dbw = wfGetDB( DB_MASTER );
-+		return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
- 	}
- 
- 	/**
-@@ -227,6 +230,16 @@
- 	}
- 
- 	/**
-+	 * Notify the callback function when a </upload> is closed.
-+	 */
-+	private function uploadCallback( $revision ) {
-+		if( isset( $this->mUploadCallback ) ) {
-+			$args = func_get_args();
-+			call_user_func_array( $this->mUploadCallback, $args );
-+		}
-+	}
-+
-+	/**
- 	 * Notify the callback function of a revision
- 	 * @param $revision A WikiRevision object
- 	 */
-@@ -416,10 +429,36 @@
- 		return $this->logItemCallback( $revision );
- 	}
- 
-+	static function getLastLocalRevision( $title )
-+	{
-+		/* We need to skip import-info Null Revisions.
-+		   They have rev_text_id equal to previous revision. */
-+		$dbr = wfGetDB( DB_MASTER );
-+		$res = $dbr->select( 'revision', 'rev_id, rev_text_id',
-+			array( 'rev_page' => $title->getArticleId(), 'rev_len IS NOT NULL' ),
-+			__METHOD__,
-+			array( 'ORDER BY' => 'rev_timestamp DESC' ) );
-+		$row = $res->fetchRow();
-+		$rev_id = $row['rev_id'];
-+		$text_id = $row['rev_text_id'];
-+		while (($row = $res->fetchRow()) && $text_id == $row['rev_text_id'])
-+			$rev_id = $row['rev_id'];
-+		$res->free();
-+		if ($rev_id)
-+			return Revision::newFromId( $rev_id );
-+		return NULL;
-+	}
-+
- 	private function handlePage() {
- 		// Handle page data.
- 		$this->debug( "Enter page handler." );
--		$pageInfo = array( 'revisionCount' => 0, 'successfulRevisionCount' => 0 );
-+		$pageInfo = array(
-+			'revisionCount' => 0,
-+			'successfulRevisionCount' => 0,
-+			'lastRevision' => NULL,
-+			'lastLocalRevision' => NULL,
-+			'lastExistingRevision' => NULL,
-+		);
- 
- 		// Fields that can just be stuffed in the pageInfo object
- 		$normalFields = array( 'title', 'id', 'redirect', 'restrictions' );
-@@ -453,6 +492,7 @@
- 
- 					$this->pageCallback( $title );
- 					list( $pageInfo['_title'], $origTitle ) = $title;
-+					$pageInfo['lastLocalRevision'] = self::getLastLocalRevision( $pageInfo['_title'] );
- 				}
- 			} elseif ( $tag == 'revision' ) {
- 				$this->handleRevision( $pageInfo );
-@@ -500,8 +540,15 @@
- 		}
- 
- 		$pageInfo['revisionCount']++;
--		if ( $this->processRevision( $pageInfo, $revisionInfo ) ) {
--			$pageInfo['successfulRevisionCount']++;
-+		if ( $r = $this->processRevision( $pageInfo, $revisionInfo ) ) {
-+			if ( is_object($r) && $r->_imported )
-+			{
-+				$pageInfo['successfulRevisionCount']++;
-+				$pageInfo['lastRevision'] = $r;
-+			}
-+			elseif ( is_object($r) && ( !$pageInfo['lastExistingRevision'] ||
-+				$r->getTimestamp() > $pageInfo['lastExistingRevision']->getTimestamp() ) )
-+				$pageInfo['lastExistingRevision'] = $r;
- 		}
- 	}
- 
-@@ -552,6 +599,8 @@
- 				// Do nothing
- 			} elseif ( in_array( $tag, $normalFields ) ) {
- 				$uploadInfo[$tag] = $this->nodeContents();
-+				if ( $tag == 'src' && $this->workRevision && ( $sha1 = $this->reader->getAttribute('sha1') ) )
-+					$uploadInfo['sha1'] = $sha1;
- 			} elseif ( $tag == 'contributor' ) {
- 				$uploadInfo['contributor'] = $this->handleContributor();
- 			} elseif ( $tag != '#text' ) {
-@@ -571,7 +620,14 @@
- 		$revision->setTimestamp( $uploadInfo['timestamp'] );
- 		$revision->setText( $uploadInfo['text'] );
- 		$revision->setFilename( $uploadInfo['filename'] );
--		$revision->setSrc( $uploadInfo['src'] );
-+		/* Pass temp file path for multipart parts */
-+		if( substr( $uploadInfo['src'], 0, 12 ) == 'multipart://' )
-+		{
-+			if ( $p = $this->importSource->parts[ substr( $uploadInfo['src'], 12 ) ] )
-+				$revision->setSrc( $p['tempfile'] );
-+		}
-+		else
-+			$revision->setSrc( $uploadInfo['src'] );
- 		$revision->setSize( intval( $uploadInfo['size'] ) );
- 		$revision->setComment( $uploadInfo['comment'] );
- 
 Index: includes/specials/SpecialImport.php
 ===================================================================
---- includes/specials/SpecialImport.php	(revision 77332)
+--- includes/specials/SpecialImport.php	(revision 82604)
 +++ includes/specials/SpecialImport.php	(working copy)
 @@ -3,6 +3,7 @@
   * Implements Special:Import
@@ -470,7 +304,7 @@ Index: includes/specials/SpecialImport.php
   * http://www.mediawiki.org/
   *
   * This program is free software; you can redistribute it and/or modify
-@@ -320,12 +321,56 @@
+@@ -325,12 +326,56 @@
  		$localCount = $wgLang->formatNum( $successCount );
  		$contentCount = $wgContLang->formatNum( $successCount );
  
@@ -532,7 +366,7 @@ Index: includes/specials/SpecialImport.php
  			$log = new LogPage( 'import' );
  			if( $this->mIsUpload ) {
  				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
-@@ -344,19 +389,9 @@
+@@ -349,19 +394,9 @@
  				}
  				$log->addEntry( 'interwiki', $title, $detail );
  			}
@@ -557,7 +391,7 @@ Index: includes/specials/SpecialImport.php
  
 Index: includes/specials/SpecialExport.php
 ===================================================================
---- includes/specials/SpecialExport.php	(revision 77332)
+--- includes/specials/SpecialExport.php	(revision 82604)
 +++ includes/specials/SpecialExport.php	(working copy)
 @@ -3,6 +3,7 @@
   * Implements Special:Export
@@ -579,7 +413,7 @@ Index: includes/specials/SpecialExport.php
  	private $images;
  
  	public function __construct() {
-@@ -50,51 +52,28 @@
+@@ -50,44 +52,17 @@
  		$this->doExport = false;
  		$this->templates = $wgRequest->getCheck( 'templates' );
  		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
@@ -603,7 +437,9 @@ Index: includes/specials/SpecialExport.php
 -					 * during the export in a single query.
 -					 */
 -					$catpages = $this->getPagesFromCategory( $t );
--					if ( $catpages ) $page .= "\n" . implode( "\n", $catpages );
+-					if ( $catpages ) {
+-						$page .= "\n" . implode( "\n", $catpages );
+-					}
 -				}
 -			}
 +		$state = $wgRequest->getValues();
@@ -622,26 +458,15 @@ Index: includes/specials/SpecialExport.php
 -				 * Same implementation as above, so same @todo
 -				 */
 -				$nspages = $this->getPagesFromNamespace( $nsindex );
--				if ( $nspages ) $page .= "\n" . implode( "\n", $nspages );
+-				if ( $nspages ) {
+-					$page .= "\n" . implode( "\n", $nspages );
+-				}
 -			}
 -		}
  		else if( $wgRequest->wasPosted() && $par == '' ) {
  			$page = $wgRequest->getText( 'pages' );
  			$this->curonly = $wgRequest->getCheck( 'curonly' );
- 			$rawOffset = $wgRequest->getVal( 'offset' );
--			
-+
- 			if( $rawOffset ) {
- 				$offset = wfTimestamp( TS_MW, $rawOffset );
- 			} else {
- 				$offset = null;
- 			}
--			
-+
- 			$limit = $wgRequest->getInt( 'limit' );
- 			$dir = $wgRequest->getVal( 'dir' );
- 			$history = array(
-@@ -103,7 +82,7 @@
+@@ -107,7 +82,7 @@
  				'limit' => $wgExportMaxHistory,
  			);
  			$historyCheck = $wgRequest->getCheck( 'history' );
@@ -650,7 +475,7 @@ Index: includes/specials/SpecialExport.php
  			if ( $this->curonly ) {
  				$history = WikiExporter::CURRENT;
  			} elseif ( !$historyCheck ) {
-@@ -123,7 +102,7 @@
+@@ -129,7 +104,7 @@
  			// Default to current-only for GET requests.
  			$page = $wgRequest->getText( 'pages', $par );
  			$historyCheck = $wgRequest->getCheck( 'history' );
@@ -659,7 +484,7 @@ Index: includes/specials/SpecialExport.php
  			if( $historyCheck ) {
  				$history = WikiExporter::FULL;
  			} else {
-@@ -143,20 +122,20 @@
+@@ -153,20 +128,20 @@
  
  		if ( $this->doExport ) {
  			$wgOut->disable();
@@ -684,7 +509,7 @@ Index: includes/specials/SpecialExport.php
  			return;
  		}
  
-@@ -164,40 +143,39 @@
+@@ -174,40 +149,39 @@
  
  		$form = Xml::openElement( 'form', array( 'method' => 'post',
  			'action' => $this->getTitle()->getLocalUrl( 'action=submit' ) ) );
@@ -739,7 +564,7 @@ Index: includes/specials/SpecialExport.php
  		return $wgUser->isAllowed( 'override-export-depth' );
  	}
  
-@@ -210,6 +188,9 @@
+@@ -220,6 +194,9 @@
  	 *                      not returning full history)
  	 */
  	private function doExport( $page, $history, $list_authors ) {
@@ -749,7 +574,7 @@ Index: includes/specials/SpecialExport.php
  		$pageSet = array(); // Inverted index of all pages to look up
  
  		// Split up and normalize input
-@@ -218,38 +199,33 @@
+@@ -228,38 +205,33 @@
  			$title = Title::newFromText( $pageName );
  			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
  				// Only record each page once!
@@ -808,18 +633,14 @@ Index: includes/specials/SpecialExport.php
  		/* Ok, let's get to it... */
  		if( $history == WikiExporter::CURRENT ) {
  			$lb = false;
-@@ -266,91 +242,114 @@
- 			set_time_limit(0);
- 			wfRestoreWarnings();
- 		}
--		
-+
+@@ -279,30 +251,11 @@
+ 		
  		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors;
 +		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
 +		$exporter->selfContained = $wgRequest->getCheck('selfcontained') ? true : false;
  		$exporter->openStream();
--		
+ 		
 -		foreach( $pages as $page ) {
 -			/*
 -			 if( $wgExportMaxHistory && !$this->curonly ) {
@@ -835,18 +656,18 @@ Index: includes/specials/SpecialExport.php
 -			 }*/
 -			#Bug 8824: Only export pages the user can read
 -			$title = Title::newFromText( $page );
--			if( is_null( $title ) ) continue; #TODO: perhaps output an <error> tag or something.
--			if( !$title->userCanRead() ) continue; #TODO: perhaps output an <error> tag or something.
+-			if( is_null( $title ) ) {
+-				continue; #TODO: perhaps output an <error> tag or something.
+-			}
+-			if( !$title->userCanRead() ) {
+-				continue; #TODO: perhaps output an <error> tag or something.
+-			}
 -
 +		foreach( $pages as $title ) {
  			$exporter->pageByTitle( $title );
  		}
  
- 		$exporter->closeStream();
--		
-+
- 		if( $lb ) {
- 			$lb->closeAll();
+@@ -313,58 +266,97 @@
  		}
  	}
  
@@ -986,7 +807,7 @@ Index: includes/specials/SpecialExport.php
  		return $pages;
  	}
  
-@@ -360,8 +359,10 @@
+@@ -374,8 +366,10 @@
  	 * @param $pageSet array, associative array indexed by titles for output
  	 * @return array associative array index by titles
  	 */
@@ -999,24 +820,21 @@ Index: includes/specials/SpecialExport.php
  			'templatelinks',
  			array( 'tl_namespace AS namespace', 'tl_title AS title' ),
  			array( 'page_id=tl_from' )
-@@ -373,48 +374,36 @@
- 	 */
+@@ -388,9 +382,8 @@
  	private function validateLinkDepth( $depth ) {
  		global $wgExportMaxLinkDepth;
--		
+ 		
 -		if( $depth < 0 ) {
-+
 +		if( $depth <= 0 )
  			return 0;
 -		}
--		
-+
+ 		
  		if ( !$this->userCanOverrideExportDepth() ) {
  			if( $depth > $wgExportMaxLinkDepth ) {
- 				return $wgExportMaxLinkDepth;
+@@ -398,26 +391,18 @@
  			}
  		}
--		
+ 		
 -		/*
 -		 * There's a HARD CODED limit of 5 levels of recursion here to prevent a
 -		 * crazy-big export from being done by someone setting the depth
@@ -1028,7 +846,7 @@ Index: includes/specials/SpecialExport.php
  
  	/** Expand a list of pages to include pages linked to from that page. */
 -	private function getPageLinks( $inputPages, $pageSet, $depth ) {
--		for(; $depth > 0; --$depth ) {
+-		for( ; $depth > 0; --$depth ) {
 -			$pageSet = $this->getLinks(
 -				$inputPages, $pageSet, 'pagelinks',
 -			  	array( 'pl_namespace AS namespace', 'pl_title AS title' ),
@@ -1049,11 +867,8 @@ Index: includes/specials/SpecialExport.php
  	}
  
  	/**
- 	 * Expand a list of pages to include images used in those pages.
--	 * 
- 	 * @param $inputPages array, list of titles to look up
- 	 * @param $pageSet array, associative array indexed by titles for output
--	 * 
+@@ -428,7 +413,7 @@
+ 	 * 
  	 * @return array associative array index by titles
  	 */
 -	private function getImages( $inputPages, $pageSet ) {
@@ -1061,7 +876,7 @@ Index: includes/specials/SpecialExport.php
  		return $this->getLinks(
  			$inputPages,
  			$pageSet,
-@@ -426,38 +415,34 @@
+@@ -440,38 +425,34 @@
  
  	/**
  	 * Expand a list of pages to include items used in those pages.
@@ -1128,7 +943,7 @@ Index: includes/specials/SpecialExport.php
 +}
 Index: includes/Import.php
 ===================================================================
---- includes/Import.php	(revision 77332)
+--- includes/Import.php	(revision 82604)
 +++ includes/Import.php	(working copy)
 @@ -3,6 +3,7 @@
   * MediaWiki page data importer
@@ -1138,7 +953,147 @@ Index: includes/Import.php
   * http://www.mediawiki.org/
   *
   * This program is free software; you can redistribute it and/or modify
-@@ -40,6 +41,7 @@
+@@ -32,6 +33,7 @@
+  */
+ class WikiImporter {
+ 	private $reader = null;
++	private $importSource;
+ 	private $mLogItemCallback, $mUploadCallback, $mRevisionCallback, $mPageCallback;
+ 	private $mSiteInfoCallback, $mTargetNamespace, $mPageOutCallback;
+ 	private $mDebug;
+@@ -43,6 +45,7 @@
+ 		$this->reader = new XMLReader();
+ 
+ 		stream_wrapper_register( 'uploadsource', 'UploadSourceAdapter' );
++		$this->importSource = $source;
+ 		$id = UploadSourceAdapter::registerSource( $source );
+ 		$this->reader->open( "uploadsource://$id" );
+ 
+@@ -189,12 +192,13 @@
+ 	}
+ 
+ 	/**
+-	 * Dummy for now...
++	 * Per-revision file import callback, performs the upload.
++	 * @param $revision WikiRevision
++	 * @private
+ 	 */
+ 	public function importUpload( $revision ) {
+-		//$dbw = wfGetDB( DB_MASTER );
+-		//return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
+-		return false;
++		$dbw = wfGetDB( DB_MASTER );
++		return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
+ 	}
+ 
+ 	/**
+@@ -248,6 +252,16 @@
+ 	}
+ 
+ 	/**
++	 * Notify the callback function when a </upload> is closed.
++	 */
++	private function uploadCallback( $revision ) {
++		if( isset( $this->mUploadCallback ) ) {
++			$args = func_get_args();
++			call_user_func_array( $this->mUploadCallback, $args );
++		}
++	}
++
++	/**
+ 	 * Notify the callback function of a revision
+ 	 * @param $revision A WikiRevision object
+ 	 */
+@@ -453,10 +467,36 @@
+ 		return $this->logItemCallback( $revision );
+ 	}
+ 
++	static function getLastLocalRevision( $title )
++	{
++		/* We need to skip import-info Null Revisions.
++		   They have rev_text_id equal to previous revision. */
++		$dbr = wfGetDB( DB_MASTER );
++		$res = $dbr->select( 'revision', 'rev_id, rev_text_id',
++			array( 'rev_page' => $title->getArticleId(), 'rev_len IS NOT NULL' ),
++			__METHOD__,
++			array( 'ORDER BY' => 'rev_timestamp DESC' ) );
++		$row = $res->fetchRow();
++		$rev_id = $row['rev_id'];
++		$text_id = $row['rev_text_id'];
++		while (($row = $res->fetchRow()) && $text_id == $row['rev_text_id'])
++			$rev_id = $row['rev_id'];
++		$res->free();
++		if ($rev_id)
++			return Revision::newFromId( $rev_id );
++		return NULL;
++	}
++
+ 	private function handlePage() {
+ 		// Handle page data.
+ 		$this->debug( "Enter page handler." );
+-		$pageInfo = array( 'revisionCount' => 0, 'successfulRevisionCount' => 0 );
++		$pageInfo = array(
++			'revisionCount' => 0,
++			'successfulRevisionCount' => 0,
++			'lastRevision' => NULL,
++			'lastLocalRevision' => NULL,
++			'lastExistingRevision' => NULL,
++		);
+ 
+ 		// Fields that can just be stuffed in the pageInfo object
+ 		$normalFields = array( 'title', 'id', 'redirect', 'restrictions' );
+@@ -490,6 +530,7 @@
+ 
+ 					$this->pageCallback( $title );
+ 					list( $pageInfo['_title'], $origTitle ) = $title;
++					$pageInfo['lastLocalRevision'] = self::getLastLocalRevision( $pageInfo['_title'] );
+ 				}
+ 			} elseif ( $tag == 'revision' ) {
+ 				$this->handleRevision( $pageInfo );
+@@ -537,8 +578,15 @@
+ 		}
+ 
+ 		$pageInfo['revisionCount']++;
+-		if ( $this->processRevision( $pageInfo, $revisionInfo ) ) {
+-			$pageInfo['successfulRevisionCount']++;
++		if ( $r = $this->processRevision( $pageInfo, $revisionInfo ) ) {
++			if ( is_object($r) && $r->_imported )
++			{
++				$pageInfo['successfulRevisionCount']++;
++				$pageInfo['lastRevision'] = $r;
++			}
++			elseif ( is_object($r) && ( !$pageInfo['lastExistingRevision'] ||
++				$r->getTimestamp() > $pageInfo['lastExistingRevision']->getTimestamp() ) )
++				$pageInfo['lastExistingRevision'] = $r;
+ 		}
+ 	}
+ 
+@@ -589,6 +637,8 @@
+ 				// Do nothing
+ 			} elseif ( in_array( $tag, $normalFields ) ) {
+ 				$uploadInfo[$tag] = $this->nodeContents();
++				if ( $tag == 'src' && $this->workRevision && ( $sha1 = $this->reader->getAttribute('sha1') ) )
++					$uploadInfo['sha1'] = $sha1;
+ 			} elseif ( $tag == 'contributor' ) {
+ 				$uploadInfo['contributor'] = $this->handleContributor();
+ 			} elseif ( $tag != '#text' ) {
+@@ -608,7 +658,14 @@
+ 		$revision->setTimestamp( $uploadInfo['timestamp'] );
+ 		$revision->setText( $uploadInfo['text'] );
+ 		$revision->setFilename( $uploadInfo['filename'] );
+-		$revision->setSrc( $uploadInfo['src'] );
++		/* Pass temp file path for multipart parts */
++		if( substr( $uploadInfo['src'], 0, 12 ) == 'multipart://' )
++		{
++			if ( $p = $this->importSource->parts[ substr( $uploadInfo['src'], 12 ) ] )
++				$revision->setSrc( $p['tempfile'] );
++		}
++		else
++			$revision->setSrc( $uploadInfo['src'] );
+ 		$revision->setSize( intval( $uploadInfo['size'] ) );
+ 		$revision->setComment( $uploadInfo['comment'] );
+ 
+@@ -789,6 +846,7 @@
  	var $type = "";
  	var $action = "";
  	var $params = "";
@@ -1146,7 +1101,7 @@ Index: includes/Import.php
  
  	function setTitle( $title ) {
  		if( is_object( $title ) ) {
-@@ -88,6 +90,10 @@
+@@ -837,6 +895,10 @@
  		$this->filename = $filename;
  	}
  
@@ -1157,7 +1112,7 @@ Index: includes/Import.php
  	function setSize( $size ) {
  		$this->size = intval( $size );
  	}
-@@ -140,6 +146,10 @@
+@@ -889,6 +951,10 @@
  		return $this->filename;
  	}
  
@@ -1168,7 +1123,7 @@ Index: includes/Import.php
  	function getSize() {
  		return $this->size;
  	}
-@@ -157,6 +167,14 @@
+@@ -906,6 +972,14 @@
  	}
  
  	function importOldRevision() {
@@ -1183,7 +1138,7 @@ Index: includes/Import.php
  		$dbw = wfGetDB( DB_MASTER );
  
  		# Sneak a single revision into place
-@@ -182,7 +200,7 @@
+@@ -931,7 +1005,7 @@
  		} else {
  			$created = false;
  
@@ -1192,7 +1147,7 @@ Index: includes/Import.php
  				array( 'rev_page' => $pageId,
  					'rev_timestamp' => $dbw->timestamp( $this->timestamp ),
  					'rev_user_text' => $userText,
-@@ -190,10 +208,11 @@
+@@ -939,10 +1013,11 @@
  				__METHOD__
  			);
  			if( $prior ) {
@@ -1205,7 +1160,7 @@ Index: includes/Import.php
  			}
  		}
  
-@@ -236,7 +255,9 @@
+@@ -985,7 +1060,9 @@
  		}
  		$GLOBALS['wgTitle'] = $tempTitle;
  
@@ -1216,7 +1171,7 @@ Index: includes/Import.php
  	}
  	
  	function importLogItem() {
-@@ -247,6 +268,13 @@
+@@ -996,6 +1073,13 @@
  				$this->timestamp . "\n" );
  			return;
  		}
@@ -1230,7 +1185,7 @@ Index: includes/Import.php
  		# Check if it exists already
  		// FIXME: use original log ID (better for backups)
  		$prior = $dbw->selectField( 'logging', '1',
-@@ -282,29 +310,16 @@
+@@ -1031,29 +1115,16 @@
  		$dbw->insert( 'logging', $data, __METHOD__ );
  	}
  
@@ -1269,7 +1224,7 @@ Index: includes/Import.php
  		// @todo Fixme: upload() uses $wgUser, which is wrong here
  		// it may also create a page without our desire, also wrong potentially.
  		// and, it will record a *current* upload, but we might want an archive version here
-@@ -315,26 +330,67 @@
+@@ -1064,26 +1135,67 @@
  			return false;
  		}
  
@@ -1345,7 +1300,7 @@ Index: includes/Import.php
  		return false;
  
  	}
-@@ -345,29 +401,41 @@
+@@ -1094,29 +1206,41 @@
  			return false;
  		}
  
@@ -1394,7 +1349,7 @@ Index: includes/Import.php
  }
  
  /**
-@@ -392,6 +460,10 @@
+@@ -1141,6 +1265,10 @@
  			return $this->mString;
  		}
  	}
@@ -1405,7 +1360,7 @@ Index: includes/Import.php
  }
  
  /**
-@@ -399,20 +471,131 @@
+@@ -1148,20 +1276,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -1538,13 +1493,13 @@ Index: includes/Import.php
 -		$file = @fopen( $filename, 'rt' );
 +		$file = @fopen( $filename, 'rb' );
  		if( !$file ) {
- 			return new WikiErrorMsg( "importcantopen" );
+ 			return Status::newFatal( "importcantopen" );
  		}
 Index: languages/messages/MessagesRu.php
 ===================================================================
---- languages/messages/MessagesRu.php	(revision 77332)
+--- languages/messages/MessagesRu.php	(revision 82604)
 +++ languages/messages/MessagesRu.php	(working copy)
-@@ -2663,13 +2663,21 @@
+@@ -2696,13 +2696,21 @@
  'exportnohistory'   => "----
  '''Замечание:''' экспорт полной истории изменений страниц отключён из-за проблем с производительностью.",
  'export-submit'     => 'Экспортировать',
@@ -1570,7 +1525,7 @@ Index: languages/messages/MessagesRu.php
  
  # Namespace 8 related
  'allmessages'                   => 'Системные сообщения',
-@@ -2715,7 +2723,6 @@
+@@ -2748,7 +2756,6 @@
  'import-comment'             => 'Примечание:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
@@ -1578,7 +1533,7 @@ Index: languages/messages/MessagesRu.php
  'importnopages'              => 'Нет страниц для импортирования.',
  'imported-log-entries'       => '{{PLURAL:$1|Импортирована $1 запись журнала|Импортировано $1 записи журнала|Импортировано $1 записей журнала}}.',
  'importfailed'               => 'Не удалось импортировать: $1',
-@@ -2732,9 +2739,15 @@
+@@ -2765,9 +2772,15 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -1597,9 +1552,9 @@ Index: languages/messages/MessagesRu.php
  
 Index: languages/messages/MessagesEn.php
 ===================================================================
---- languages/messages/MessagesEn.php	(revision 77332)
+--- languages/messages/MessagesEn.php	(revision 82604)
 +++ languages/messages/MessagesEn.php	(working copy)
-@@ -3213,13 +3213,21 @@
+@@ -3260,13 +3260,21 @@
  'exportnohistory'   => "----
  '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
  'export-submit'     => 'Export',
@@ -1625,7 +1580,7 @@ Index: languages/messages/MessagesEn.php
  
  # Namespace 8 related
  'allmessages'                   => 'System messages',
-@@ -3266,7 +3274,6 @@
+@@ -3313,7 +3321,6 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -1633,7 +1588,7 @@ Index: languages/messages/MessagesEn.php
  'importnopages'              => 'No pages to import.',
  'imported-log-entries'       => 'Imported $1 {{PLURAL:$1|log entry|log entries}}.',
  'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
-@@ -3286,9 +3293,15 @@
+@@ -3333,9 +3340,15 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',

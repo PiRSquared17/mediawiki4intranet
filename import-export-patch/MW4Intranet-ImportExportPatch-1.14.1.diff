@@ -1,6 +1,7 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1290710896 -10800
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1298387322 -10800
+Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
 advanced export page list building options and support for exporting file data
@@ -9,9 +10,9 @@ over HTTP or inside the export file.
 Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
 installation.
 
-Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
+Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 86e89552dd12 -r 86f957756e18 includes/Export.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -193,7 +194,7 @@ diff -r 86e89552dd12 -r 86f957756e18 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 86e89552dd12 -r 86f957756e18 includes/Import.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -892,7 +893,7 @@ diff -r 86e89552dd12 -r 86f957756e18 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 86e89552dd12 -r 86f957756e18 includes/filerepo/LocalFile.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -776,6 +776,66 @@
@@ -988,7 +989,7 @@ diff -r 86e89552dd12 -r 86f957756e18 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 86e89552dd12 -r 86f957756e18 includes/specials/SpecialExport.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -21,28 +21,54 @@
@@ -1327,7 +1328,7 @@ diff -r 86e89552dd12 -r 86f957756e18 includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r 86e89552dd12 -r 86f957756e18 includes/specials/SpecialImport.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -264,7 +264,9 @@
@@ -1403,16 +1404,29 @@ diff -r 86e89552dd12 -r 86f957756e18 includes/specials/SpecialImport.php
  			$log = new LogPage( 'import' );
  			if( $this->mIsUpload ) {
  				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
-@@ -308,8 +354,6 @@
- 			# Update page record
- 			$article->updateRevisionOn( $dbw, $nullRevision );
- 			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
+@@ -298,18 +344,9 @@
+ 				}
+ 				$log->addEntry( 'interwiki', $title, $detail );
+ 			}
+-
+-			$comment = $detail; // quick
+-			$dbw = wfGetDB( DB_MASTER );
+-			$latest = $title->getLatestRevID();
+-			$nullRevision = Revision::newNullRevision( $dbw, $title->getArticleId(), $comment, true );
+-			$nullRevision->insertOn( $dbw );
+-			$article = new Article( $title );
+-			# Update page record
+-			$article->updateRevisionOn( $dbw, $nullRevision );
+-			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
 -		} else {
 -			$wgOut->addHTML( '<li>' . wfMsgHtml( 'import-nonewrevisions' ) . '</li>' );
++			// [MediaWiki4Intranet] do not insert any empty revisions because it leads
++			// to fancy bugs (infinitely multiplicated revisions) in the case of cross
++			// (2-way) import-export.
  		}
  	}
  
-diff -r 86e89552dd12 -r 86f957756e18 languages/messages/MessagesEn.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2763,10 +2763,20 @@
@@ -1462,7 +1476,7 @@ diff -r 86e89552dd12 -r 86f957756e18 languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r 86e89552dd12 -r 86f957756e18 languages/messages/MessagesRu.php
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2321,10 +2321,20 @@
@@ -1512,7 +1526,7 @@ diff -r 86e89552dd12 -r 86f957756e18 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 86e89552dd12 -r 86f957756e18 skins/common/shared.css
+diff -r 1f23ac6aaec1 -r dc2d53c26dc1 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -311,3 +311,5 @@
