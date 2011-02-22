@@ -96,7 +96,7 @@ HACLGroupEditor.prototype.pf_param = function(name, value, is_assigned_to)
         if (this.regexp_group)
             ass = ass.replace(this.regexp_group, '$1Group/');
     }
-    return ass.trim().split(/[,\s*]*,[,\s]*/);
+    return ass.trim().split(/[,\s]*,[,\s]*/);
 };
 
 // parse group definition text from textbox

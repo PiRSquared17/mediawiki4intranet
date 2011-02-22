@@ -6,3 +6,8 @@ var hacl_change_toolbar_goto = function(e, msg)
   l.href = t ? wgScript+'?title='+encodeURI(t) : '';
   l.title = msg.replace('$1', t);
 };
+var hacl_show_gacl = function(s)
+{
+  var t = document.getElementById('hacl_toolbar_global_acl_tip');
+  t.style.display = s ? '' : 'none';
+};

@@ -130,32 +130,28 @@ class HaloACLSpecial extends SpecialPage
             ($aclArticle = new Article($aclTitle)) &&
             $aclArticle->exists()))
         {
-            $aclTitle = NULL;
             $aclArticle = NULL;
-            $aclDefault = HACLQuickacl::getGlobalDefault();
-            if (!$aclDefault || !$aclDefault->userCanRead())
-                $aclDefault = NULL;
-            elseif ($aclDefault->getArticleId())
-            {
-                $aclContent = new Article($aclDefault);
-                $aclContent = $aclContent->getContent();
-                $aclDefaultExists = true;
-            }
-            else
-                $aclContent = '';
+            $aclContent = '';
         }
         else
         {
             $aclContent = $aclArticle->getContent();
             $aclSDName = $aclTitle->getText();
-            list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($aclSDName);
         }
+        if ($aclTitle)
+            list($aclPEName, $aclPEType) = HACLSecurityDescriptor::nameOfPE($aclTitle->getText());
         /* Run template */
         ob_start();
         require(dirname(__FILE__).'/HACL_ACLEditor.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
-        $wgOut->setPageTitle($aclTitle ? wfMsg('hacl_acl_edit', $aclTitle->getText()) : wfMsg('hacl_acl_create'));
+        if ($aclArticle)
+            $msg = 'hacl_acl_edit';
+        elseif ($aclTitle)
+            $msg = 'hacl_acl_create_title';
+        else
+            $msg = 'hacl_acl_create';
+        $wgOut->setPageTitle(wfMsg($msg, $aclTitle ? $aclTitle->getText() : ''));
         $wgOut->addHTML($html);
     }
 
@@ -171,23 +167,18 @@ class HaloACLSpecial extends SpecialPage
             foreach ($args as $k => $v)
                 if (substr($k, 0, 3) == 'qa_')
                     $ids[] = substr($k, 3);
-            HACLStorage::getDatabase()->saveQuickAcl($wgUser->getId(), $ids);
+            HACLStorage::getDatabase()->saveQuickAcl($wgUser->getId(), $ids, $args['qa_default']);
             wfGetDB(DB_MASTER)->commit();
             header("Location: $wgScript?title=Special:HaloACL&action=quickaccess&like=".urlencode($args['like']));
             exit;
         }
         /* Load data */
         $templates = HACLStorage::getDatabase()->getSDs2('right', $args['like']);
-        if ($aclOwnTemplate = HACLStorage::getDatabase()->getSDForPE($wgUser->getId(), 'template'))
-        {
-            $aclOwnTemplate = HACLSecurityDescriptor::newFromId($aclOwnTemplate);
-            $aclOwnTemplate->owntemplate = true;
-            array_unshift($templates, $aclOwnTemplate);
-        }
         $quickacl = HACLQuickacl::newForUserId($wgUser->getId());
         $quickacl_ids = array_flip($quickacl->getSD_IDs());
         foreach ($templates as $sd)
         {
+            $sd->default = $quickacl->default_sd_id == $sd->getSDId();
             $sd->selected = array_key_exists($sd->getSDId(), $quickacl_ids);
             $sd->editlink = $wgScript.'?title=Special:HaloACL&action=acl&sd='.urlencode($sd->getSDName());
             $sd->viewlink = Title::newFromText($sd->getSDName(), HACL_NS_ACL)->getLocalUrl();
@@ -197,7 +188,7 @@ class HaloACLSpecial extends SpecialPage
         require(dirname(__FILE__).'/HACL_QuickACL.tpl.php');
         $html = ob_get_contents();
         ob_end_clean();
-        $wgOut->setPageTitle(wfMsg('hacl_quickaccess_manage'));
+        $wgOut->setPageTitle(wfMsg('hacl_qacl_manage'));
         $wgOut->addHTML($html);
     }
 

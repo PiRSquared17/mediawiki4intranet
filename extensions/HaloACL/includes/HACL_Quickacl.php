@@ -29,8 +29,9 @@ if (!defined('MEDIAWIKI'))
 
 class HACLQuickacl
 {
-    private $userid = 0;
-    private $sd_ids = array();
+    protected $userid = 0;
+    protected $sd_ids = array();
+    var $default_sd_id = 0;
 
     public function getUserid()
     {
@@ -42,10 +43,23 @@ class HACLQuickacl
         $this->userid = $userid;
     }
 
-    function __construct($userid, $sd_ids)
+    function __construct($userid, $sd_ids, $default_sd_id = NULL)
     {
         $this->userid = $userid;
         $this->sd_ids = array_flip($sd_ids);
+        $this->default_sd_id = $default_sd_id ? $default_sd_id : 0;
+    }
+
+    public function getDefaultSD_ID()
+    {
+        return $this->default_sd_id;
+    }
+
+    public function setDefaultSD_ID($id)
+    {
+        if ($id)
+            $this->sd_ids[$id] = true;
+        $this->default_sd_id = $id ? $id : 0;
     }
 
     public function getSD_IDs()
@@ -70,17 +84,11 @@ class HACLQuickacl
 
     public function save()
     {
-        return HACLStorage::getDatabase()->saveQuickacl($this->userid, array_keys($this->sd_ids));
+        return HACLStorage::getDatabase()->saveQuickacl($this->userid, array_keys($this->sd_ids), $this->default_sd_id);
     }
 
     public static function removeQuickAclsForSD($sdid)
     {
         return HACLStorage::getDatabase()->deleteQuickaclForSD($sdid);
-    }
-
-    public static function getGlobalDefault()
-    {
-        // FIXME
-        return NULL;
     }
 }
