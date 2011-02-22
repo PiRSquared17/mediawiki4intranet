@@ -75,7 +75,7 @@ class HACLStorageSQL {
 
         HACLDBHelper::setupTable($table, array(
             'pe_id'    => 'INT(8) NOT NULL',
-            'type'     => "ENUM('category','page','namespace','property','whitelist') DEFAULT 'page' NOT NULL",
+            'type'     => "ENUM('category','page','namespace','property') DEFAULT 'page' NOT NULL",
             'right_id' => 'INT(8) UNSIGNED NOT NULL'),
         $dbw, $verbose, "pe_id,type,right_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose);
@@ -1192,8 +1192,9 @@ class HACLStorageSQL {
      * @return array<int>
      *         An array of IDs of rights that match the given constraints.
      */
-    public function getRights($peID, $type, $actionID) {
-        $dbr =& wfGetDB( DB_SLAVE );
+    public function getRights($peID, $type, $actionID)
+    {
+        $dbr = wfGetDB( DB_SLAVE );
         $rt = $dbr->tableName('halo_acl_rights');
         $rpet = $dbr->tableName('halo_acl_pe_rights');
 
@@ -1206,13 +1207,11 @@ class HACLStorageSQL {
         $res = $dbr->query($sql, __METHOD__);
 
         $rightIDs = array();
-        while ($row = $dbr->fetchObject($res)) {
+        while ($row = $dbr->fetchObject($res))
             $rightIDs[] = $row->right_id;
-        }
         $dbr->freeResult($res);
 
         return $rightIDs;
-
     }
 
     /**
@@ -1295,74 +1294,6 @@ class HACLStorageSQL {
                 $r->mg_users ? $r->mg_users : array()
             );
         return $rights;
-    }
-
-    /***************************************************************************
-     *
-     * Functions for the whitelist
-     *
-     **************************************************************************/
-
-    /**
-     * Stores the whitelist that is given in an array of page IDs in the database.
-     * All previous whitelist entries are deleted before the new list is inserted.
-     *
-     * @param array(int) $pageIDs
-     *         An array of page IDs of all articles that are part of the whitelist.
-     */
-    public function saveWhitelist($pageIDs) {
-        $dbw =& wfGetDB( DB_MASTER );
-
-        // delete old whitelist entries
-        $dbw->delete('halo_acl_pe_rights', array('type' => 'whitelist'), __METHOD__);
-
-        $setValues = array();
-        foreach ($pageIDs as $pid) {
-            $setValues[] = array(
-                'pe_id'     => $pid,
-                'type'      => 'whitelist',
-                'right_id'  => 0);
-        }
-        $dbw->insert('halo_acl_pe_rights', $setValues, __METHOD__);
-    }
-
-    /**
-     * Returns the IDs of all pages that are in the whitelist.
-     *
-     * @return array(int)
-     *         Article-IDs of all pages in the whitelist
-     *
-     */
-    public function getWhitelist() {
-        $dbr =& wfGetDB( DB_SLAVE );
-
-        $res = $dbr->select('halo_acl_pe_rights', 'pe_id', array('type' => 'whitelist'), __METHOD__);
-        $pageIDs = array();
-        while ($row = $dbr->fetchObject($res)) {
-            $pageIDs[] = (int)$row->pe_id;
-        }
-        $dbr->freeResult($res);
-
-        return $pageIDs;
-    }
-
-    /**
-     * Checks if the article with the ID <$pageID> is part of the whitelist.
-     *
-     * @param int $pageID
-     *         IDs of the page which is checked for membership in the whitelist
-     *
-     * @return bool
-     *         <true>, if the article is part of the whitelist
-     *         <false>, otherwise
-     */
-    public function isInWhitelist($pageID) {
-        $dbr =& wfGetDB( DB_SLAVE );
-
-        $obj = $dbr->selectRow('halo_acl_pe_rights', 'pe_id',
-            array('type' => 'whitelist', 'pe_id' => $pageID), __METHOD__);
-        return $obj !== false;
-
     }
 
     /***************************************************************************

@@ -77,9 +77,7 @@ class HACLToolbar
             {
                 $pageSD = HACLSecurityDescriptor::newFromId($pageSDId);
                 $pageSDTitle = Title::newFromId($pageSDId);
-                list($r, $sd) = HACLEvaluator::checkACLManager($pageSDTitle, $wgUser, 'edit');
-                if (!$r)
-                    $canModify = false;
+                $canModify = HACLEvaluator::checkACLManager($pageSDTitle, $wgUser, HACLLanguage::RIGHT_EDIT);
                 // Check if page SD is a single predefined right inclusion
                 if ($single = $pageSD->isSinglePredefinedRightInclusion())
                     $pageSDid = $single;

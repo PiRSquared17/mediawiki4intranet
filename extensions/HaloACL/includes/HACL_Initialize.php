@@ -32,9 +32,8 @@
  * @author Thomas Schweitzer
  *
  */
-if ( !defined( 'MEDIAWIKI' ) ) {
-    die( "This file is part of the HaloACL extension. It is not a valid entry point.\n" );
-}
+if (!defined('MEDIAWIKI'))
+    die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 define('HACL_STORE_SQL', 'HaclStoreSQL');
 // constant for special schema properties
@@ -152,23 +151,14 @@ if (!$haclgNamespaceIndex)
     $haclgNamespaceIndex = 102;
 haclfInitNamespaces();
 
-// mediawiki-groups that may access whitelists
-if ($haclWhitelistGroups === NULL)
-    $haclWhitelistGroups = array('bureaucrat');
-
-// mediawiki-groups that may access other user template
-// mediawiki-groups that may access whitelists
+// mediawiki-groups that may change Quick ACL of other users
 if ($haclCrossTemplateAccess === NULL)
     $haclCrossTemplateAccess = array('bureaucrat');
-
-$wgGroupPermissions['*']['propertyread'] = true;
-$wgGroupPermissions['*']['propertyformedit'] = true;
-$wgGroupPermissions['*']['propertyedit'] = true;
-$wgGroupPermissions['*']['formedit'] = true;
-$wgGroupPermissions['*']['annotate'] = true;
-$wgGroupPermissions['*']['wysiwyg'] = true;
 
 // add rights that are newly available with the haloACL
 $wgAvailableRights[] = 'propertyread';
 $wgAvailableRights[] = 'propertyformedit';
 $wgAvailableRights[] = 'propertyedit';
+$wgGroupPermissions['*']['propertyread'] = true;
+$wgGroupPermissions['*']['propertyformedit'] = true;
+$wgGroupPermissions['*']['propertyedit'] = true;

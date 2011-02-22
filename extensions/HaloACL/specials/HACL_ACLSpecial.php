@@ -39,7 +39,6 @@ class HaloACLSpecial extends SpecialPage
         'quickaccess' => 1,
         'grouplist'   => 1,
         'group'       => 1,
-        'whitelist'   => 1,
     );
 
     var $aclTargetTypes = array(
@@ -127,7 +126,7 @@ class HaloACLSpecial extends SpecialPage
         $aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL);
         $t = HACLEvaluator::hacl_type($aclTitle);
         if (!($q['sd'] && $aclTitle &&
-            ($t != 'whitelist' && $t != 'group') &&
+            $t != 'group' &&
             ($aclArticle = new Article($aclTitle)) &&
             $aclArticle->exists()))
         {
@@ -212,7 +211,7 @@ class HaloACLSpecial extends SpecialPage
         elseif ($act == 'group' && $q['group'])
             $act = 'groupedit';
         $html = array();
-        foreach (array('acllist', 'acl', 'quickaccess', 'grouplist', 'group', 'whitelist') as $action)
+        foreach (array('acllist', 'acl', 'quickaccess', 'grouplist', 'group') as $action)
         {
             $a = '<b>'.wfMsg("hacl_action_$action").'</b>';
             if ($act != $action)
@@ -260,13 +259,6 @@ class HaloACLSpecial extends SpecialPage
         ob_end_clean();
         $wgOut->setPageTitle($grpTitle ? wfMsg('hacl_grp_editing', $grpTitle->getText()) : wfMsg('hacl_grp_creating'));
         $wgOut->addHTML($html);
-    }
-
-    /* Manage page whitelist */
-    public function html_whitelist(&$q)
-    {
-        global $wgOut;
-        
     }
 
     /* Recursively get rights of SD by name or ID */
