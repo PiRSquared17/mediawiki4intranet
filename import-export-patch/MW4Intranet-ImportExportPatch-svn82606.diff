@@ -1,6 +1,18 @@
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1290777240 -10800
+
+Totally improved MediaWiki Import and Export engine with conflict detection,
+advanced export page list building options and support for exporting file data
+over HTTP or inside the export file.
+
+Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+installation.
+
+Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
+
 Index: skins/common/shared.css
 ===================================================================
---- skins/common/shared.css	(revision 82604)
+--- skins/common/shared.css	(revision 82606)
 +++ skins/common/shared.css	(working copy)
 @@ -519,6 +519,8 @@
  	font-size: 90%;
@@ -13,21 +25,21 @@ Index: skins/common/shared.css
  strong.mw-revdelundel-link {
 Index: includes/filerepo/LocalFile.php
 ===================================================================
---- includes/filerepo/LocalFile.php	(revision 82604)
+--- includes/filerepo/LocalFile.php	(revision 82606)
 +++ includes/filerepo/LocalFile.php	(working copy)
-@@ -851,6 +851,66 @@
+@@ -851,6 +851,64 @@
  	}
  
  	/**
 +	 * Upload a file directly into archive. Generally for Special:Import
 +	 */
-+	function uploadIntoArchive( $srcPath, $comment, $pageText, $flags = 0, $props = false, $timestamp = false )
++	function uploadIntoArchive( $srcPath, $comment, $pageText, $flags = 0, $props = false, $timestamp = false, $user = NULL )
 +	{
 +		$this->lock();
-+		$dstName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $timestamp ) ) . '!' . $this->getName();
++		$dstName = $this->generateArchiveName( $timestamp );
 +		$status = $this->publish( $srcPath, $flags, $dstName );
 +		if ( $status->ok ) {
-+			if ( !$this->recordOldUpload( $dstName, $comment, $pageText, $props, $timestamp ) ) {
++			if ( !$this->recordOldUpload( $dstName, $comment, $pageText, $props, $timestamp, $user ) ) {
 +				$status->fatal( 'filenotfound', $srcPath );
 +			}
 +		}
@@ -38,10 +50,8 @@ Index: includes/filerepo/LocalFile.php
 +	/**
 +	 * Record a file upload in the upload log and the oldimage table
 +	 */
-+	function recordOldUpload( $dstName, $comment, $pageText, $props = false, $timestamp = false )
++	function recordOldUpload( $dstName, $comment, $pageText, $props = false, $timestamp = false, $user = NULL )
 +	{
-+		global $wgUser;
-+
 +		$dbw = $this->repo->getMasterDB();
 +
 +		$dstPath = $this->repo->getZonePath('public') . '/archive/' . $this->getHashPath() . $dstName;
@@ -49,7 +59,7 @@ Index: includes/filerepo/LocalFile.php
 +		if (!$props['fileExists'])
 +			return false;
 +
-+		$props['timestamp'] = wfTimestamp( TS_MW, $timestamp );
++		$props['timestamp'] = $dbw->timestamp( $timestamp );
 +		list($props['major_mime'], $props['minor_mime']) =
 +			self::splitMime( "{$props['major_mime']}/{$props['minor_mime']}" );
 +
@@ -63,8 +73,8 @@ Index: includes/filerepo/LocalFile.php
 +				'oi_bits'         => $props['bits'],
 +				'oi_timestamp'    => $props['timestamp'],
 +				'oi_description'  => $comment,
-+				'oi_user'         => $wgUser->getId(),
-+				'oi_user_text'    => $wgUser->getName(),
++				'oi_user'         => $user->getId(),
++				'oi_user_text'    => $user->getName(),
 +				'oi_metadata'     => $props['metadata'],
 +				'oi_media_type'   => $props['media_type'],
 +				'oi_major_mime'   => $props['major_mime'],
@@ -82,7 +92,21 @@ Index: includes/filerepo/LocalFile.php
  	 * Record a file upload in the upload log and the image table
  	 */
  	function recordUpload2( $oldver, $comment, $pageText, $props = false, $timestamp = false, $user = null )
-@@ -1038,16 +1098,22 @@
+@@ -1030,6 +1088,13 @@
+ 
+ 	/**
+ 	 * Move or copy a file to its public location. If a file exists at the
++	 */
++	function generateArchiveName( $timestamp ) {
++		return gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $timestamp ) ) . '!'. $this->getName();
++	}
++
++	/**
++	 * Move or copy a file to its public location. If a file exists at the
+ 	 * destination, move it to an archive. Returns a FileRepoStatus object with
+ 	 * the archive name in the "value" member on success.
+ 	 *
+@@ -1038,16 +1103,22 @@
  	 *
  	 * @param $srcPath String: local filesystem path to the source image
  	 * @param $flags Integer: a bitwise combination of:
@@ -106,13 +130,13 @@ Index: includes/filerepo/LocalFile.php
 +			$dstRel = 'archive/' . $this->getHashPath() . $dstName;
 +		/* Original gmdate( 'YmdHis' ) is not corrent AT ALL! */
 +		/* It gives an inconsistency: file name has one timestamp and database row has another. */
-+		$archiveName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $this->getTimestamp() ) ) . '!'. $this->getName();
++		$archiveName = $this->generateArchiveName( $this->getTimestamp() );
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
 Index: includes/Export.php
 ===================================================================
---- includes/Export.php	(revision 82604)
+--- includes/Export.php	(revision 82606)
 +++ includes/Export.php	(working copy)
 @@ -3,6 +3,7 @@
   * Base classes for dumps and export
@@ -294,7 +318,7 @@ Index: includes/Export.php
  	 * @return bool
 Index: includes/specials/SpecialImport.php
 ===================================================================
---- includes/specials/SpecialImport.php	(revision 82604)
+--- includes/specials/SpecialImport.php	(revision 82606)
 +++ includes/specials/SpecialImport.php	(working copy)
 @@ -3,6 +3,7 @@
   * Implements Special:Import
@@ -391,7 +415,7 @@ Index: includes/specials/SpecialImport.php
  
 Index: includes/specials/SpecialExport.php
 ===================================================================
---- includes/specials/SpecialExport.php	(revision 82604)
+--- includes/specials/SpecialExport.php	(revision 82606)
 +++ includes/specials/SpecialExport.php	(working copy)
 @@ -3,6 +3,7 @@
   * Implements Special:Export
@@ -943,7 +967,7 @@ Index: includes/specials/SpecialExport.php
 +}
 Index: includes/Import.php
 ===================================================================
---- includes/Import.php	(revision 82604)
+--- includes/Import.php	(revision 82606)
 +++ includes/Import.php	(working copy)
 @@ -3,6 +3,7 @@
   * MediaWiki page data importer
@@ -1224,7 +1248,7 @@ Index: includes/Import.php
  		// @todo Fixme: upload() uses $wgUser, which is wrong here
  		// it may also create a page without our desire, also wrong potentially.
  		// and, it will record a *current* upload, but we might want an archive version here
-@@ -1064,26 +1135,67 @@
+@@ -1064,26 +1135,66 @@
  			return false;
  		}
  
@@ -1262,9 +1286,6 @@ Index: includes/Import.php
 -			File::DELETE_SOURCE,
 -			false, // props...
 -			$this->getTimestamp() );
-+		// @fixme upload() uses $wgUser, which is wrong here
-+		// it may also create a page without our desire, also wrong potentially.
- 
 +		if ($file->exists() && $file->getTimestamp() > $this->getTimestamp())
 +		{
 +			/* Upload an *archive* version */
@@ -1274,7 +1295,8 @@ Index: includes/Import.php
 +				$this->getComment(), // Initial page, if none present...
 +				File::DELETE_SOURCE,
 +				false, // props...
-+				$this->getTimestamp() );
++				$this->getTimestamp(),
++				$wgUser );
 +		}
 +		else
 +		{
@@ -1285,9 +1307,10 @@ Index: includes/Import.php
 +				$this->getComment(), // Initial page, if none present...
 +				File::DELETE_SOURCE,
 +				false, // props...
-+				$this->getTimestamp() );
++				$this->getTimestamp(),
++				$wgUser );
 +		}
-+
+ 
  		if( $status->isGood() ) {
  			// yay?
 -			wfDebug( "IMPORT: is ok?\n" );
@@ -1300,7 +1323,7 @@ Index: includes/Import.php
  		return false;
  
  	}
-@@ -1094,29 +1206,41 @@
+@@ -1094,29 +1205,41 @@
  			return false;
  		}
  
@@ -1349,7 +1372,7 @@ Index: includes/Import.php
  }
  
  /**
-@@ -1141,6 +1265,10 @@
+@@ -1141,6 +1264,10 @@
  			return $this->mString;
  		}
  	}
@@ -1360,7 +1383,7 @@ Index: includes/Import.php
  }
  
  /**
-@@ -1148,20 +1276,131 @@
+@@ -1148,20 +1275,131 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -1497,7 +1520,7 @@ Index: includes/Import.php
  		}
 Index: languages/messages/MessagesRu.php
 ===================================================================
---- languages/messages/MessagesRu.php	(revision 82604)
+--- languages/messages/MessagesRu.php	(revision 82606)
 +++ languages/messages/MessagesRu.php	(working copy)
 @@ -2696,13 +2696,21 @@
  'exportnohistory'   => "----
@@ -1552,7 +1575,7 @@ Index: languages/messages/MessagesRu.php
  
 Index: languages/messages/MessagesEn.php
 ===================================================================
---- languages/messages/MessagesEn.php	(revision 82604)
+--- languages/messages/MessagesEn.php	(revision 82606)
 +++ languages/messages/MessagesEn.php	(working copy)
 @@ -3260,13 +3260,21 @@
  'exportnohistory'   => "----
