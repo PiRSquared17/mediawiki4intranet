@@ -51,7 +51,6 @@ abstract class HACLLanguage
     const PF_MANAGE_GROUP       = 3;
     const PF_PREDEFINED_RIGHT   = 4;
     const PF_PROPERTY_ACCESS    = 5;
-    const PF_WHITELIST          = 6;
     const PF_MEMBER             = 7;
 
     //--- IDs of parser function parameters ---
@@ -59,7 +58,6 @@ abstract class HACLLanguage
     const PFP_ACTIONS           = 9;
     const PFP_DESCRIPTION       = 10;
     const PFP_RIGHTS            = 11;
-    const PFP_PAGES             = 12;
     const PFP_MEMBERS           = 13;
     const PFP_NAME              = 14;
 
@@ -102,7 +100,6 @@ abstract class HACLLanguage
         self::PF_MANAGE_GROUP       => 'manage group',
         self::PF_PREDEFINED_RIGHT   => 'predefined right',
         self::PF_PROPERTY_ACCESS    => 'property access',
-        self::PF_WHITELIST          => 'whitelist',
         self::PF_MEMBER             => 'member'
     );
 
@@ -112,7 +109,6 @@ abstract class HACLLanguage
         self::PFP_ACTIONS       => 'actions',
         self::PFP_DESCRIPTION   => 'description',
         self::PFP_RIGHTS        => 'rights',
-        self::PFP_PAGES         => 'pages',
         self::PFP_MEMBERS       => 'members',
         self::PFP_NAME          => 'name'
     );
@@ -163,9 +159,6 @@ abstract class HACLLanguage
 
     // Group page prefix (ACL:Group/Name)
     public $mGroupPrefix = 'Group';
-
-    // Whitelist page title (ACL:Whitelist)
-    public $mWhitelist = 'Whitelist';
 
     // Lookup array: ACL:Prefix/Name --> lowercased prefix --> protected element type constant
     // Add language-dependent protected element type names here
@@ -235,7 +228,6 @@ abstract class HACLLanguage
     // Get self::RIGHT_* action ID by action name $name
     public function getActionId($name)  { return $this->mActionAliases[mb_strtolower($name)]; }
 
-    public function getWhitelist()      { return $this->mWhitelist; }
     public function getPetPrefix($type) { return $this->mPetPrefixes[$type]; }
     public function getPetPrefixes()    { return $this->mPetPrefixes; }
     public function getPrefix($prefix)  { return $this->mPrefixes[mb_strtolower($prefix)]; }
