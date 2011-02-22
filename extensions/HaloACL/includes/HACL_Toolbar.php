@@ -48,8 +48,6 @@ class HACLToolbar
         global $wgUser, $wgRequest, $haclgContLang, $wgContLang,
             $haclgIP, $haclgHaloScriptPath, $wgScriptPath, $wgOut;
 
-        haclCheckScriptPath();
-
         $wgOut->addHeadItem('hacl_toolbar_js', '<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/HACL_Toolbar.js"></script>');
         $wgOut->addHeadItem('hacl_toolbar_css', '<link rel="stylesheet" type="text/css" media="screen, projection" href="'.$haclgHaloScriptPath.'/skins/haloacl_toolbar.css" />');
 
@@ -104,6 +102,7 @@ class HACLToolbar
 
         // Add Quick ACLs
         $quickacl = HACLQuickacl::newForUserId($wgUser->getId());
+        $default = $quickacl->getDefaultSD_ID();
         foreach ($quickacl->getSDs() as $sd)
         {
             try
@@ -112,13 +111,22 @@ class HACLToolbar
                 // FIXME do no such check, simply remove SD definition from database when it is corrupted
                 if ($sd->checkIntegrity() === true)
                 {
-                    $options[] = array(
+                    $option = array(
                         'name'    => $sd->getPEName(),
                         'value'   => $sd->getSDId(),
                         'current' => $pageSDId == $sd->getSDId(),
                         'title'   => $ns.':'.$sd->getSDName(),
                     );
                     $found = $found || ($pageSDId == $sd->getSDId());
+                    if ($default == $sd->getSDId())
+                    {
+                        // Always insert default SD as the second option
+                        if (!$title->exists())
+                            $option['current'] = true;
+                        array_splice($options, 1, 0, array($option));
+                    }
+                    else
+                        $options[] = $option;
                 }
             } catch (HACLException $e) {}
         }
@@ -155,10 +163,12 @@ class HACLToolbar
         if ($globalACL)
         {
             foreach ($globalACL as &$t)
-                $t = Xml::element('a', array('href' => $t->getLocalUrl()), $t->getText());
+                $t = Xml::element('a', array('href' => $t->getLocalUrl(), 'target' => '_blank'), $t->getText());
             unset($t); // prevent reference bugs
             $globalACL = implode(', ', $globalACL);
         }
+
+        $quick_acl_link = Title::newFromText('Special:HaloACL')->getLocalUrl(array('action' => 'quickaccess'));
 
         // Run template
         ob_start();

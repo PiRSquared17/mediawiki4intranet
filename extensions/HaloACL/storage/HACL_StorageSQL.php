@@ -136,12 +136,14 @@ class HACLStorageSQL {
         $dbw, $verbose, "id,name");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "id,name");
 
-        // setup quickacl-table
+        // halo_acl_quickacl:
+        //        stores quick ACL lists for users
         $table = $dbw->tableName('halo_acl_quickacl');
 
         HACLDBHelper::setupTable($table, array(
-            'sd_id'     => 'INT(8) NOT NULL',
-            'user_id'     => 'INT(10) NOT NULL'),
+            'sd_id'      => 'INT(8) NOT NULL',
+            'user_id'    => 'INT(10) NOT NULL',
+            'qa_default' => 'TINYINT(1) NOT NULL'),
         $dbw, $verbose, "sd_id,user_id");
         HACLDBHelper::reportProgress("   ... done!\n",$verbose, "sd_id,user_id");
 
@@ -981,7 +983,7 @@ class HACLStorageSQL {
             array('sd_id' => $SDID, 'page_id=sd_id'),
             __METHOD__
         );
-        if ($dbr->numRows($res) == 1)
+        if (!is_array($SDID))
             return self::rowToSD($dbr->fetchObject($res));
         elseif (is_array($SDID))
         {
@@ -1403,7 +1405,7 @@ class HACLStorageSQL {
      *
      **************************************************************************/
 
-    public function saveQuickAcl($user_id, $sd_ids)
+    public function saveQuickAcl($user_id, $sd_ids, $default_sd_id = NULL)
     {
         $dbw = wfGetDB(DB_MASTER);
 
@@ -1413,8 +1415,9 @@ class HACLStorageSQL {
         $rows = array();
         foreach ($sd_ids as $sd_id)
             $rows[] = array(
-                'sd_id'   => $sd_id,
-                'user_id' => $user_id
+                'sd_id'         => $sd_id,
+                'user_id'       => $user_id,
+                'qa_default'    => $default_sd_id == $sd_id ? 1 : 0,
             );
         $dbw->insert('halo_acl_quickacl', $rows, __METHOD__);
     }
@@ -1423,13 +1426,18 @@ class HACLStorageSQL {
     {
         $dbr = wfGetDB( DB_SLAVE );
 
-        $res = $dbr->select('halo_acl_quickacl', 'sd_id', array('user_id' => $user_id), __METHOD__);
+        $res = $dbr->select('halo_acl_quickacl', 'sd_id, qa_default', array('user_id' => $user_id), __METHOD__);
         $sd_ids = array();
+        $default_id = NULL;
         while ($row = $dbr->fetchObject($res))
+        {
             $sd_ids[] = (int)$row->sd_id;
+            if ($row->qa_default)
+                $default_id = (int)$row->sd_id;
+        }
         $dbr->freeResult($res);
 
-        $quickacl = new HACLQuickacl($user_id, $sd_ids);
+        $quickacl = new HACLQuickacl($user_id, $sd_ids, $default_id);
         return $quickacl;
     }
 
