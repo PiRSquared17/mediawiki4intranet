@@ -796,16 +796,17 @@ class HACLStorageSQL {
      *         Exception
      *         ... on database failure
      */
-    public function setInlineRightsForProtectedElements($inlineRights, $securityDescriptors) {
-        $dbw =& wfGetDB( DB_MASTER );
-
-        foreach ($securityDescriptors as $sd) {
+    public function setInlineRightsForProtectedElements($inlineRights, $securityDescriptors)
+    {
+        $dbw = wfGetDB(DB_MASTER);
+        foreach ($securityDescriptors as $sd)
+        {
             // retrieve the protected element and its type
             $obj = $dbw->selectRow('halo_acl_security_descriptors', 'pe_id, type', array('sd_id' => $sd), __METHOD__);
-            if (!$obj) {
+            if (!$obj)
                 continue;
-            }
-            foreach ($inlineRights as $ir) {
+            foreach ($inlineRights as $ir)
+            {
                 $dbw->replace('halo_acl_pe_rights', NULL, array(
                     'pe_id'    => $obj->pe_id,
                     'type'     => $obj->type,
@@ -900,42 +901,41 @@ class HACLStorageSQL {
      * predefined right. The IDs of all SDs that include this right (via the
      * hierarchy of rights) are returned.
      *
-     * @param int $prID
+     * @param  int $prID
      *         IDs of the protected right
      *
      * @return array<int>
      *         An array of IDs of all SD that include the PR via the hierarchy
-     *      of PRs.
+     *         of PRs.
      */
     public function getSDsIncludingPR($prID)
     {
-        $dbr = wfGetDB( DB_SLAVE );
+        $dbr = wfGetDB(DB_SLAVE);
 
-        $parentIDs = array();
+        $parentIDs = array($prID => true);
         $childIDs = array($prID);
         $exclude = array();
-        while (true) {
+        while (true)
+        {
             $res = $dbr->select(
                 'halo_acl_rights_hierarchy', 'parent_right_id',
                 array('child_id' => $childIDs), __METHOD__,
                 array('DISTINCT')
             );
-
-            $exclude = array_merge($exclude, $childIDs);
             $childIDs = array();
-
-            while ($row = $dbr->fetchObject($res)) {
-                $prid = (int) $row->parent_right_id;
-                if (!in_array($prid, $parentIDs)) {
-                    $parentIDs[] = $prid;
-                }
-                if (!in_array($prid, $exclude)) {
-                    // Add a new child for the next level in the hierarchy
+            while ($row = $dbr->fetchObject($res))
+            {
+                $prid = (int)$row->parent_right_id;
+                $parentIDs[$prid] = true;
+                if (!$exclude[$prid])
+                {
                     $childIDs[] = $prid;
+                    $exclude[$prid] = true;
                 }
             }
             $dbr->freeResult($res);
-            if (empty($childIDs)) {
+            if (empty($childIDs))
+            {
                 // No further children found
                 break;
             }
@@ -945,15 +945,12 @@ class HACLStorageSQL {
         // => select only the SDs
 
         $sdIDs = array();
-        if (empty($parentIDs)) {
-            return $sdIDs;
-        }
+        if (!$parentIDs)
+            return array();
         $res = $dbr->select('halo_acl_security_descriptors', 'sd_id',
-            array("type != 'right'", 'sd_id' => $parentIDs), __METHOD__);
-
-        while ($row = $dbr->fetchObject($res)) {
-            $sdIDs[] = (int) $row->sd_id;
-        }
+            array("type != 'right'", 'sd_id' => array_keys($parentIDs)), __METHOD__);
+        while ($row = $dbr->fetchObject($res))
+            $sdIDs[] = (int)$row->sd_id;
         $dbr->freeResult($res);
 
         return $sdIDs;
@@ -1181,13 +1178,13 @@ class HACLStorageSQL {
      * Returns the IDs of all inline rights for the protected element with the
      * ID $peID that have the protection type $type and match the action $actionID.
      *
-     * @param int $peID
+     * @param  int $peID
      *         ID of the protected element
-     * @param string $type
+     * @param  string $type
      *         Type of the protected element: One of
      *         HACLLanguage::PET_*
      *
-     * @param int $actionID
+     * @param  int $actionID
      *         ID of the action. One of
      *         HACLLanguage::RIGHT_*
      *
@@ -1196,24 +1193,22 @@ class HACLStorageSQL {
      */
     public function getRights($peID, $type, $actionID)
     {
-        $dbr = wfGetDB( DB_SLAVE );
+        $dbr = wfGetDB(DB_SLAVE);
         $rt = $dbr->tableName('halo_acl_rights');
         $rpet = $dbr->tableName('halo_acl_pe_rights');
 
-        $sql = "SELECT rights.right_id FROM $rt AS rights, $rpet AS pe ".
+        $sql = "SELECT rights.* FROM $rt AS rights, $rpet AS pe ".
             "WHERE pe.pe_id = $peID AND pe.type = '$type' AND ".
             "rights.right_id = pe.right_id AND".
             "(rights.actions & $actionID) != 0;";
-        $sd = NULL;
 
         $res = $dbr->query($sql, __METHOD__);
-
-        $rightIDs = array();
+        $rights = array();
         while ($row = $dbr->fetchObject($res))
-            $rightIDs[] = $row->right_id;
+            $rights[] = self::rowToRight($row);
         $dbr->freeResult($res);
 
-        return $rightIDs;
+        return $rights;
     }
 
     /**

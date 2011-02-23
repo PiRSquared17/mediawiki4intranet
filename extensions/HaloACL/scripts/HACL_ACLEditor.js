@@ -477,7 +477,7 @@ HACLACLEditor.prototype.to_name_change = function()
         // - if right is granted through some group
         // - or if no grant target selected
         // - or if a=='template' and we are page right
-        c.disabled = !g_to || grp || a == 'template' && !this.last_target_type == 'page';
+        c.disabled = !g_to || grp || a == 'template' && this.last_target_type == 'page';
         l.className = c.disabled ? 'act_disabled' : '';
         c.title = l.title = (grp ? this.msg.indirect_grant.replace('$1', grp) : this.msg['edit_ahint_'+a]);
     }
@@ -615,7 +615,7 @@ HACLACLEditor.prototype.target_hint_focus = function(f)
 
 HACLACLEditor.prototype.inc_hint_fill = function(h, v)
 {
-    sajax_do_call('haclAutocomplete', [ 'sd/right', v ],
+    sajax_do_call('haclAutocomplete', [ 'sd', v ],
         function (request) { if (request.status == 200) h.change_ajax(request.responseText) })
 };
 
