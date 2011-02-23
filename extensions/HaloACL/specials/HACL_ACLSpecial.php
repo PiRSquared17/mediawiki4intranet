@@ -323,7 +323,7 @@ class HaloACLSpecial extends SpecialPage
         $where = array();
         foreach ($haclgContLang->getPetAliases() as $k => $v)
             if (!$t || array_key_exists($v, $t))
-                $where[] = 'page_title COLLATE utf8_unicode_ci LIKE '.$dbr->addQuotes($k.'/'.$n.'%');
+                $where[] = 'CAST(page_title AS CHAR CHARACTER SET utf8) COLLATE utf8_unicode_ci LIKE '.$dbr->addQuotes($k.'/'.$n.'%');
         $where = 'page_namespace='.HACL_NS_ACL.' AND ('.implode(' OR ', $where).')';
         /* Run select */
         $res = $dbr->select('page', '*', $where, __METHOD__);

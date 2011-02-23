@@ -359,7 +359,6 @@ class HACLParserFunctions
         $text .= $this->showWarnings($warnings);
 
         return $text;
-
     }
 
     /**

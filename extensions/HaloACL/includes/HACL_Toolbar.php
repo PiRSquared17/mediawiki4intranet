@@ -46,7 +46,8 @@ class HACLToolbar
     static function get($title)
     {
         global $wgUser, $wgRequest, $haclgContLang, $wgContLang,
-            $haclgIP, $haclgHaloScriptPath, $wgScriptPath, $wgOut;
+            $haclgIP, $haclgHaloScriptPath, $wgScriptPath, $wgOut,
+            $haclgOpenWikiAccess;
 
         $wgOut->addHeadItem('hacl_toolbar_js', '<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/HACL_Toolbar.js"></script>');
         $wgOut->addHeadItem('hacl_toolbar_css', '<link rel="stylesheet" type="text/css" media="screen, projection" href="'.$haclgHaloScriptPath.'/skins/haloacl_toolbar.css" />');
@@ -163,7 +164,8 @@ class HACLToolbar
         if ($globalACL)
         {
             foreach ($globalACL as &$t)
-                $t = Xml::element('a', array('href' => $t->getLocalUrl(), 'target' => '_blank'), $t->getText());
+                if ($haclgOpenWikiAccess || $t->userCanReadEx())
+                    $t = Xml::element('a', array('href' => $t->getLocalUrl(), 'target' => '_blank'), $t->getText());
             unset($t); // prevent reference bugs
             $globalACL = implode(', ', $globalACL);
         }

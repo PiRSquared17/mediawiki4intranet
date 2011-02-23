@@ -309,7 +309,6 @@ class HACLSecurityDescriptor
         } else {
             $this->mManageUsers = array();
         }
-
     }
 
     /**
@@ -449,26 +448,17 @@ class HACLSecurityDescriptor
      *         HACLSDException(HACLSDException::CANNOT_ADD_SD)
      *         ... if an SD is added to an SD or PR
      */
-    public function addPredefinedRights($rights, $user = null) {
-        if (empty($rights)) {
+    public function addPredefinedRights($rights, $user = null)
+    {
+        if (empty($rights))
             return;
-        }
-
-        // Check if all rights are predefined rights
-        foreach ($rights as $r) {
-            if ($r->getPEType() !== HACLLanguage::PET_RIGHT) {
-                throw new HACLSDException(HACLSDException::CANNOT_ADD_SD,
-                                          $this->getSDName(), $r->getSDName());
-            }
-        }
 
         // Can the user modify this SD/PR
         $this->userCanModify($user, true);
 
         // Update the hierarchy of SDs/PRs
-        foreach ($rights as $r) {
+        foreach ($rights as $r)
             HACLStorage::getDatabase()->addRightToSD($this->getSDID(), $r->getSDID());
-        }
 
         // Assign rights to all protected elements
         $this->materializeRightsHierarchy();
@@ -579,22 +569,16 @@ class HACLSecurityDescriptor
     }
 
     /**
-     * Finds all (real) security descriptors that are related to this
-     * SD or PR. If $this is an SD, it is returned. If
-     * $this is a PR, all SDs that include this right (via the hierarchy of
-     * rights) are returned.
+     * Finds all security descriptors that are including this one.
+     * Note that the inclusion of an SD into different SD/PR is also allowed.
      *
      * @return array<int>
-     *         An array of IDs of all SD that include $this SD or PR via the hierarchy
-     *         of PRs.
+     *         An array of IDs of all SD that include $this SD or PR
+     *         via the hierarchy of PRs, including $this one.
      */
-    public function getSDsIncludingPR() {
-        if ($this->mPEType === HACLLanguage::PET_RIGHT) {
-            return HACLStorage::getDatabase()->getSDsIncludingPR($this->mSDID);
-        } else {
-            // $this is an SD
-            return array($this->mSDID);
-        }
+    public function getSDsIncludingPR()
+    {
+        return HACLStorage::getDatabase()->getSDsIncludingPR($this->mSDID);
     }
 
     /**
@@ -784,14 +768,6 @@ class HACLSecurityDescriptor
         if ($this->mSDID == 0)
             throw new HACLSDException(HACLSDException::NO_SD_ID, $this->mSDName);
 
-        if (count($this->mManageGroups) == 0 && count($this->mManageUsers) == 0)
-        {
-            // no user has the right to modify this right
-            // => add the current user as manager
-            global $wgUser;
-            $this->mManageUsers[] = $wgUser->getId();
-        }
-
         $this->userCanModify($user, true);
 
         HACLStorage::getDatabase()->saveSD($this);
@@ -820,22 +796,19 @@ class HACLSecurityDescriptor
      * SDs protect elements (e.g. pages). For faster evaluation of rights, all
      * inline rights that belong to an SD through the hierarchy of rights are
      * assigned to the protected element in the database.
-     *
      */
-    public function materializeRightsHierarchy() {
+    public function materializeRightsHierarchy()
+    {
         // Recursively find all inline rights that belong to right
         $ir = $this->getInlineRights(true);
 
         // Recursively find all security descriptors that get the new right
-        if (!empty($ir)) {
+        if (!empty($ir))
             $sd = $this->getSDsIncludingPR();
-        }
 
         // Add all inline rights to all protected elements (i.e. materialize the
         // hierarchy of rights)
-        if (!empty($ir) && !empty($sd)) {
+        if (!empty($ir) && !empty($sd))
             HACLStorage::getDatabase()->setInlineRightsForProtectedElements($ir, $sd);
-        }
-
     }
 }
