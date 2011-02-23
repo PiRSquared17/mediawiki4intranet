@@ -89,7 +89,7 @@ class HACLEvaluator
         $etc = haclfDisableTitlePatch();
 
         // $R = array(final log message, access granted?, continue hook processing?);
-        $R = NULL;
+        $R = array('', false, false);
         self::startLog($title, $user, $action);
         if (!$title)
         {
@@ -114,22 +114,23 @@ class HACLEvaluator
         // to MediaWiki's "Permission error"
         if ($title->getPrefixedText() == $haclgContLang->getPermissionDeniedPage())
         {
-            $R = array('Special handling of "Permission denied" page.', false, false);
+            $R = array('Special handling of "Permission denied" page.', false, true);
+            goto fin;
+        }
+
+        // Check action
+        $actionID = HACLRight::getActionID($action);
+        if ($actionID == 0)
+        {
+            // unknown action => nothing can be said about this
+            $R = array('Unknown action.', true, true);
             goto fin;
         }
 
         // Check rights for managing ACLs
         if ($title->getNamespace() == HACL_NS_ACL)
         {
-            $R = array('Checked ACL modification rights.', self::checkACLManager($title, $user, $actionID), false);
-            goto fin;
-        }
-
-        $actionID = HACLRight::getActionID($action);
-        if ($actionID == 0)
-        {
-            // unknown action => nothing can be said about this
-            $R = array('Unknown action.', true, true);
+            $R = array('Checked ACL modification rights.', self::checkACLManager($title, $user, $actionID), true);
             goto fin;
         }
 
@@ -156,7 +157,7 @@ class HACLEvaluator
             //      to force adding this category to article source.
             // Check if the title belongs to a namespace with an SD
             list($r, $sd) = self::checkNamespaceRight($title->getNamespace(), $userID, $actionID);
-            $R = $sd ? array('Access is determined by namespace right.', $r, true) : NULL;
+            $R = array('Checked namespace access right.', $r, $sd);
             goto fin;
         }
 
@@ -189,26 +190,28 @@ class HACLEvaluator
                 $allowed = $savePage || self::checkProperties($title, $userID, $actionID);
             if (!$allowed)
             {
-                $R = array("The article contains protected properties.", false, false);
+                $R = array('The article contains protected properties.', false, false);
                 goto fin;
             }
         }
 
-        $R = self::hasSD($title, $articleID, $actionID, $userID);
+        $R = self::hasSD($title, $articleID, $userID, $actionID);
 
     fin:
         // Articles with no SD are not protected if $haclgOpenWikiAccess is
         // true. Otherwise access is denied for non-bureaucrats.
-        if (!$R)
+        if ($R[0] && (!$R[1] || !$R[2]))
+            $R[0] .= ' ';
+        if (!$R[2])
         {
-            if (!$hasSD)
-                $R = array(
-                    'No security descriptor for article found. HaloACL is configured to '.
-                    ($haclgOpenWikiAccess ? 'Open' : 'Closed').' Wiki access',
-                    $haclgOpenWikiAccess, true
-                );
-            else
-                $R = array('Access is denied.', false, false);
+            $R[2] = $R[1] = $haclgOpenWikiAccess;
+            $R[0] .= 'No security descriptor for article found. HaloACL is configured to '.
+                ($haclgOpenWikiAccess ? 'Open' : 'Closed').' Wiki access';
+        }
+        elseif (!$R[1])
+        {
+            $R[0] .= 'Access is denied.';
+            $R[2] = false; // Other extensions can not decide anything if access is denied
         }
 
         haclfRestoreTitlePatch($etc);
@@ -259,7 +262,7 @@ class HACLEvaluator
         if ($sd && $r)
             return array('Action allowed by namespace right.', true, true);
 
-        return NULL;
+        return array('', false, $hasSD);
     }
 
     /**
@@ -281,15 +284,13 @@ class HACLEvaluator
     public static function hasRight($titleID, $type, $userID, $actionID)
     {
         // retrieve all appropriate rights from the database
-        $rightIDs = HACLStorage::getDatabase()->getRights($titleID, $type, $actionID);
+        global $wgUser;
+        $rights = HACLStorage::getDatabase()->getRights($titleID, $type, $actionID);
 
         // Check for all rights, if they are granted for the given user
-        foreach ($rightIDs as $r)
-        {
-            $right = HACLRight::newFromID($r);
+        foreach ($rights as $right)
             if ($right->grantedForUser($userID))
                 return true;
-        }
 
         return false;
     }
@@ -475,7 +476,7 @@ class HACLEvaluator
      *             <true>, if there is an SD for the article
      *             <false>, if not
      */
-    private static function hasCategoryRight($parents, $userID, $actionID, $visitedParents = array())
+    public static function hasCategoryRight($parents, $userID, $actionID, $visitedParents = array())
     {
         if (is_string($parents) || is_object($parents))
         {
@@ -557,13 +558,8 @@ class HACLEvaluator
     {
         $hasSD = HACLSecurityDescriptor::getSDForPE($nsID, HACLLanguage::PET_NAMESPACE) !== false;
         if (!$hasSD)
-        {
-            global $haclgOpenWikiAccess;
-            // Articles with no SD are not protected if $haclgOpenWikiAccess is
-            // true. Otherwise access is denied
-            return array('Unprotected namespace access '.($haclgOpenWikiAccess ? 'allowed.' : 'denied.'), $haclgOpenWikiAccess, false);
-        }
-        return array('Found namespace right.', self::hasRight($nsID, HACLLanguage::PET_NAMESPACE, $userID, $actionID), $hasSD);
+            return array(false, false);
+        return array(self::hasRight($nsID, HACLLanguage::PET_NAMESPACE, $userID, $actionID), $hasSD);
     }
 
     /**
@@ -620,8 +616,8 @@ class HACLEvaluator
                     // of categories and namespaces
                     $title = Title::newFromText($name);
                     $articleID = haclfArticleID($title);
-                    list($msg, $r, $sd) = self::hasSD($title, $articleID, $userID, HACLLanguage::RIGHT_MANAGE);
-                    return $r || !$sd;
+                    $R = self::hasSD($title, $articleID, $userID, HACLLanguage::RIGHT_MANAGE);
+                    return is_array($R) && $R[1] || !$R;
                 }
                 else
                 {
