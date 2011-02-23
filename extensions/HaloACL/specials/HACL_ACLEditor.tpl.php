@@ -48,7 +48,8 @@
   </p>
   <?php if($predefinedRightsExist) { ?>
   <p>
-   <?= wfMsg('hacl_edit_include_right') ?> <input type="text" id="inc_acl" />
+   <label for="inc_acl"><?= wfMsg('hacl_edit_include_right') ?></label>
+   <input type="text" id="inc_acl" />
    <input type="button" value="<?= wfMsg('hacl_edit_include_do') ?>" onclick="AE.include_acl()" />
   </p>
   <?php } ?>

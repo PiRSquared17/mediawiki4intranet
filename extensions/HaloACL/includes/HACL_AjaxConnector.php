@@ -187,16 +187,14 @@ function haclAutocomplete($t, $n, $limit = 11, $checkbox_prefix = false)
             }
         }
     }
-    // ACL definitions of type = substr($t, 3)
-    elseif (substr($t, 0, 3) == 'sd/')
+    // ACL definitions, optionally of type = substr($t, 3)
+    elseif (substr($t, 0, 2) == 'sd')
     {
         $ip = 'ri_';
-        foreach (HACLStorage::getDatabase()->getSDs2(substr($t, 3), $n, $limit) as $sd)
+        foreach (HACLStorage::getDatabase()->getSDs2($t == 'sd' ? NULL : substr($t, 3), $n, $limit) as $sd)
         {
             $rn = $sd->getSDName();
-            if ($p = strpos($rn, '/'))
-                $rn = substr($rn, $p+1);
-            $a[] = array($rn, $sd->getSDName());
+            $a[] = array($rn, $rn);
         }
     }
     // No items
