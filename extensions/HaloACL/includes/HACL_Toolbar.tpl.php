@@ -28,5 +28,7 @@
  </div>
 <?php } if ($title->exists()) { ?>
  &nbsp; <a target="_blank" href="index.php?title=Special:HaloACL&action=acl&sd=<?= urlencode($haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).'/'.$title) ?>"><?= wfMsg('hacl_toolbar_advanced') ?></a>
+<?php } if (count($options) > 1 && $canModify) { ?>
+ <div class="qacl"><a target="_blank" href="<?= $quick_acl_link ?>" title="<?= wfMsg('hacl_toolbar_qacl_title') ?>"><?= wfMsg('hacl_toolbar_qacl') ?></a></div>
 <?php } ?>
 </div>
