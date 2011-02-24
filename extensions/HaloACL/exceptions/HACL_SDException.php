@@ -1,34 +1,35 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-*  This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
 
-/**
- * Exceptions for security descriptors
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of IntraACL MediaWiki extension. License: GPLv3.
+ * http://wiki.4intra.net/IntraACL
+ * $Id: $
  *
- * @author Thomas Schweitzer
- * Date: 16.04.2009
+ * Based on HaloACL
+ * Copyright 2009, ontoprise GmbH
  *
+ * The IntraACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The IntraACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+
 if (!defined('MEDIAWIKI'))
     die("This file is part of the HaloACL extension. It is not a valid entry point.");
 
 /**
  * Exceptions for the operations on security descriptors (SD) of HaloACL.
- *
+ * @author Thomas Schweitzer
+ * Date: 16.04.2009
  */
 class HACLSDException extends HACLException
 {
@@ -81,9 +82,11 @@ class HACLSDException extends HACLException
         parent::__construct($args);
     }
 
-    protected function createMessage($args) {
+    protected function createMessage($args)
+    {
         $msg = "";
-        switch ($args[0]) {
+        switch ($args[0])
+        {
             case self::NO_SD_ID:
                 $msg = "The article for the security descriptor $args[1] is not yet created.";
                 break;
@@ -101,7 +104,6 @@ class HACLSDException extends HACLException
                 break;
             case self::CANNOT_ADD_SD:
                 $msg = "You can not add the security descriptor \"$args[2]\" as right to the security descriptor \"$args[1]\"";
-
         }
         return $msg;
     }
