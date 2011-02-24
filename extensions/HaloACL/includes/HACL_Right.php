@@ -1,27 +1,33 @@
 <?php
-/*  Copyright 2009, ontoprise GmbH
-*  This file is part of the HaloACL-Extension.
-*
-*   The HaloACL-Extension is free software; you can redistribute it and/or modify
-*   it under the terms of the GNU General Public License as published by
-*   the Free Software Foundation; either version 3 of the License, or
-*   (at your option) any later version.
-*
-*   The HaloACL-Extension is distributed in the hope that it will be useful,
-*   but WITHOUT ANY WARRANTY; without even the implied warranty of
-*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-*   GNU General Public License for more details.
-*
-*   You should have received a copy of the GNU General Public License
-*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
-*/
+
+/* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
+ * This file is part of IntraACL MediaWiki extension. License: GPLv3.
+ * http://wiki.4intra.net/IntraACL
+ * $Id: $
+ *
+ * Based on HaloACL
+ * Copyright 2009, ontoprise GmbH
+ *
+ * The IntraACL-Extension is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * The IntraACL-Extension is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 /**
  * This file contains the class HACLRight.
  *
  * @author Thomas Schweitzer
  * Date: 17.04.2009
- *
  */
 if (!defined('MEDIAWIKI'))
     die("This file is part of the HaloACL extension. It is not a valid entry point.");
@@ -216,6 +222,9 @@ class HACLRight
             case "move":
                 $actionID = HACLLanguage::RIGHT_MOVE;
                 break;
+            case "manage":
+                $actionID = HACLLanguage::RIGHT_MANAGE;
+                break;
         }
         return $actionID;
     }
@@ -398,66 +407,6 @@ class HACLRight
     public function save() {
         $this->mRightID = HACLStorage::getDatabase()->saveRight($this);
     }
-
-    /**
-     * Returns all users who own this right. This does not include the users that
-     * are collected in groups.
-     *
-     * @param int $mode
-     *         HACLRight::NAME:   The names of all users are returned.
-     *         HACLRight::ID:     The IDs of all users are returned.
-     *         HACLRight::OBJECT: User-objects for all users are returned.
-     *
-     * @return array(string/int/User)
-     *         List of all direct users in this group.
-     *
-     *
-    public function getUsersEx($mode)
-    {
-        if ($mode === self::ID)
-            return $this->mUsers;
-        // retrieve the IDs of all users in this group
-        $users = array();
-
-        foreach ($this->mUsers as $u)
-        {
-            if ($mode === self::NAME)
-                $users[] = User::whoIs($u);
-            elseif ($mode === self::OBJECT)
-                $users[] = User::newFromId($u);
-        }
-        return $users;
-    }*/
-
-    /**
-     * Returns all groups who who own this right. These are only the groups that
-     * are directly assigned to this right. This method does not collect all
-     * groups recursively from the hierarchy of groups.
-     *
-     * @param int $mode
-     *         HACLRight::NAME:   The names of all groups are returned.
-     *         HACLRight::ID:     The IDs of all groups are returned.
-     *         HACLRight::OBJECT: HACLGroup-objects for all groups are returned.
-     *
-     * @return array(string/int/HACLGroup)
-     *         List of all direct groups in this group.
-     *
-     *
-    public function getGroupsEx($mode)
-    {
-        // retrieve the IDs of all groups in this group
-        if ($mode === self::ID)
-            return $this->mGroups;
-        $groups = array();
-        foreach ($this->mGroups as $g)
-        {
-            if ($mode === self::NAME)
-                $groups[] = HACLGroup::nameForID($g);
-            elseif ($mode === self::OBJECT)
-                $groups[] = HACLGroup::newFromID($g);
-        }
-        return $groups;
-    }*/
 
     /**
      * Deletes this right from the database. All references to this right are
