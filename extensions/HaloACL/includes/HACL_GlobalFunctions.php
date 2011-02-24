@@ -2,18 +2,19 @@
 
 /* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
  *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
- * This file is part of heavily modified "Web 1.0" HaloACL-extension.
- * http://wiki.4intra.net/Mediawiki4Intranet
+ * This file is part of IntraACL MediaWiki extension. License: GPLv3.
+ * http://wiki.4intra.net/IntraACL
  * $Id: $
  *
+ * Based on HaloACL
  * Copyright 2009, ontoprise GmbH
  *
- * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * The IntraACL-Extension is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * The IntraACL-Extension is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -43,11 +44,10 @@ function enableHaloACL()
 {
     global $haclgIP;
 
-    // Register messages (MW=>1.11), special page aliases
-    global $wgExtensionFunctions, $wgExtensionMessagesFiles, $wgExtensionAliasesFiles;
+    // Register messages (MW=>1.11)
+    global $wgExtensionFunctions, $wgExtensionMessagesFiles;
     $wgExtensionFunctions[] = 'haclfSetupExtension';
     $wgExtensionMessagesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Messages.php';
-    $wgExtensionAliasesFiles['HaloACL'] = $haclgIP . '/languages/HACL_Aliases.php';
 
     // Register special pages
     global $wgSpecialPages, $wgSpecialPageGroups;
@@ -75,7 +75,6 @@ function enableHaloACL()
 
         // Exception classes
         'HACLException'             => "$haclgIP/exceptions/HACL_Exception.php",
-        'HACLStorageException'      => "$haclgIP/exceptions/HACL_StorageException.php",
         'HACLGroupException'        => "$haclgIP/exceptions/HACL_GroupException.php",
         'HACLSDException'           => "$haclgIP/exceptions/HACL_SDException.php",
         'HACLRightException'        => "$haclgIP/exceptions/HACL_RightException.php",
@@ -494,13 +493,6 @@ function haclfAddToolbarForEditPage($content_actions)
 function haclfAddToolbarForSemanticForms($pageTitle, &$html)
 {
     $html = HACLToolbar::get($pageTitle);
-    return true;
-}
-
-function haclfRegisterACIcon(&$namespaceMappings)
-{
-    global $haclgIP;
-    $namespaceMappings[HACL_NS_ACL] = "/extensions/HaloACL/skins/images/ACL_AutoCompletion.gif";
     return true;
 }
 

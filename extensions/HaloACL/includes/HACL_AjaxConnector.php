@@ -2,18 +2,19 @@
 
 /* Copyright 2010+, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
  *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
- * This file is part of heavily modified "Web 1.0" HaloACL-extension.
- * http://wiki.4intra.net/Mediawiki4Intranet
+ * This file is part of IntraACL MediaWiki extension. License: GPLv3.
+ * http://wiki.4intra.net/IntraACL
  * $Id: $
  *
+ * Based on HaloACL
  * Copyright 2009, ontoprise GmbH
  *
- * The HaloACL-Extension is free software; you can redistribute it and/or modify
+ * The IntraACL-Extension is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
- * The HaloACL-Extension is distributed in the hope that it will be useful,
+ * The IntraACL-Extension is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
@@ -23,50 +24,13 @@
  */
 
 /**
- * This file contains functions for client/server communication with Ajax.
- *
- * @author B2browse/Patrick Hilsbos, Steffen Schachtler
- * Date: 07.10.2009
- *
+ * This file contains functions for client/server communication with AJAX.
+ * ALL buggy HaloACL AJAX code removed by now.
+ * @author Vitaliy Filippov
  */
 
 /**
- * @param <string> javascript-escaped string
- * @return <string> unescaped string
- */
-function unescape($source) {
-    $decodedStr = '';
-    $pos = 0;
-    $len = strlen ($source);
-
-    while ($pos < $len) {
-        $charAt = substr ($source, $pos, 1);
-        if ($charAt == '%') {
-            $pos++;
-            $charAt = substr ($source, $pos, 1);
-            if ($charAt == 'u') {
-                // we got a unicode character
-                $pos++;
-                $unicodeHexVal = substr ($source, $pos, 4);
-                $unicode = hexdec ($unicodeHexVal);
-                $decodedStr .= code2utf($unicode);
-                $pos += 4;
-            } else {
-                // we have an escaped ascii character
-                $hexVal = substr ($source, $pos, 2);
-                $decodedStr .= code2utf (hexdec ($hexVal));
-                $pos += 2;
-            }
-        } else {
-            $decodedStr .= $charAt;
-            $pos++;
-        }
-    }
-    return $decodedStr;
-}
-
-/*
- * defining ajax-callable functions
+ * Define ajax-callable functions
  */
 global $wgAjaxExportList;
 $wgAjaxExportList[] = 'haclAutocomplete';
