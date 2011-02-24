@@ -110,14 +110,8 @@ if ($haclgBaseStore === NULL)
     $haclgBaseStore = HACL_STORE_SQL;
 
 ###
-# This array contains the names of all namespaces that can not be protected by
-# HaloACL. This bears the risk that users can block all articles of a namespace
-# if it has no security descriptor yet.
-# On the other hand, if each namespace would have a security descriptor, then
-# all authorized users for that namespace will be able to access all articles
-# in that namespace, even if security descriptors for individual articles define
-# another set authorized users.
-# The name of the main namespace is 'Main'.
+# Values of this array are treated as language-dependent names of namespaces which
+# can not be protected by HaloACL.
 if ($haclgUnprotectableNamespaces === NULL)
     $haclgUnprotectableNamespaces = array();
 

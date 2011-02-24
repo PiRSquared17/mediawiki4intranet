@@ -242,7 +242,7 @@ class HACLSecurityDescriptor
     /**
      * Checks if the SD with the ID $sdID exists in the database.
      *
-     * @param int $sdID
+     * @param  int $sdID
      *         ID of the SD
      *
      * @return bool
@@ -258,10 +258,10 @@ class HACLSecurityDescriptor
      * Tries to find the ID of the security descriptor for the protected element
      * with the ID $peID.
      *
-     * @param int $peID
+     * @param  int $peID
      *         ID of the protected element
      *
-     * @param int $peType
+     * @param  int $peType
      *         Type of the protected element
      *
      * @return mixed int|bool
@@ -270,6 +270,11 @@ class HACLSecurityDescriptor
      */
     public static function getSDForPE($peID, $peType)
     {
+        // FIXME Add SD caching here:
+        //static $cache = array();
+        //if ($sd = self::$cache['sd_for_pe']["$peID/$peType"])
+        //    return $sd;
+        //return self::$cache['sd_for_pe']["$peID/$peType"] =
         return HACLStorage::getDatabase()->getSDForPE($peID, $peType);
     }
 
@@ -714,20 +719,22 @@ class HACLSecurityDescriptor
         if (in_array('sysop', $groups) || in_array('bureaucrat', $groups))
             return true;
 
-        // Check for direct RIGHT_MANAGE, for all except right templates
+        // Check for RIGHT_MANAGE inherited from included SDs, for all except PRs
         if ($this->mPEType != HACLLanguage::PET_RIGHT &&
-            HACLEvaluator::hasRight($this->mPEID, $this->mPEType, $userID, HACLLanguage::RIGHT_MANAGE))
+            HACLEvaluator::hasRight(
+                $this->mPEID, $this->mPEType, $userID,
+                HACLLanguage::RIGHT_MANAGE,
+                // Include direct RIGHT_MANAGE only for page SDs
+                $this->mPEType == HACLLanguage::PET_PAGE ? NULL : $this->mSDID
+            ))
             return true;
 
-        // Check for inherited RIGHT_MANAGE, only for page SDs!
-        if ($this->mPEType == HACLLanguage::PET_PAGE)
-        {
-            $etc = haclfDisableTitlePatch();
-            $r = $this->checkIndirectManageRight($userID);
-            haclfRestoreTitlePatch($etc);
-            if ($r)
-                return true;
-        }
+        // Check for RIGHT_MANAGE inherited from namespaces and categories
+        $etc = haclfDisableTitlePatch();
+        $r = $this->checkIndirectManageRight($userID);
+        haclfRestoreTitlePatch($etc);
+        if ($r)
+            return true;
 
         if ($throwException)
         {

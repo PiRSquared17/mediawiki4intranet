@@ -157,9 +157,11 @@ function haclfSetupExtension()
         $wgHooks['EditFilter'][]         = 'HACLEvaluator::onEditFilter';
     }
 
-    //-- Hooks for ACL toolbar--
+    //-- Hooks for ACL toolbar --
     $wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
     $wgHooks['sfEditPageBeforeForm'][] = 'haclfAddToolbarForSemanticForms';
+    $wgHooks['SkinTemplateContentActions'][] = 'HACLToolbar::SkinTemplateContentActions';
+    $wgHooks['SkinTemplateNavigation'][] = 'HACLToolbar::SkinTemplateNavigation';
 
     //-- includes for Ajax calls --
     global $wgUseAjax, $wgRequest;

@@ -1090,6 +1090,81 @@ class HACLStorageSQL {
         }
     }
 
+    /**
+     * Retrieve the list of content used in article with page_id=$peID
+     * from $linkstable = one of 'imagelinks', 'templatelinks', with following info:
+     * - count of pages on which it is used
+     * - its SD title
+     * - modification timestamp its SD, if one does exist, for conflict detection
+     * - is its SD a single inclusion of other SD with ID $sdID?
+     *   $sdID usually is SD ID for the page $peID as the protection of embedded
+     *   content is usually including page SD.
+     * with their security descriptors' modification timestamps (if they exist),
+     * and the status of these SDs - are they a single inclusion of $sdID ?
+     *
+     * This is a very high-level subroutine, for optimisation purposes.
+     * This method does not return used content with recursion as it used to
+     * determine embedded content of only ONE article.
+     *
+     * @param int $peID
+     *      Page ID to retrieve the list of content used in.
+     * @param int $sdID
+     *      SD ID to check if used content SDs are a single inclusion of $sdID.
+     * @param $linkstable
+     *      'imagelinks' (retrieve used images) or 'templatelinks' (retrieve used templates).
+     * @return array(array('title' => , 'sd_touched' => , 'single' => ))
+     */
+    public function getEmbedded($peID, $sdID, $linkstable)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        if ($linkstable == 'imagelinks')
+        {
+            $linksjoin = "p1.page_title=il1.il_to AND p1.page_namespace=".NS_FILE;
+            $linksfield = "il_from";
+        }
+        elseif ($linkstable == 'templatelinks')
+        {
+            $linksjoin = "p1.page_title=il1.tl_title AND p1.page_namespace=il1.tl_namespace";
+            $linksfield = "tl_from";
+        }
+        else
+            die("Unknown \$linkstable='$linkstable' passed to ".__METHOD__);
+        $linksjoin2 = str_replace('il1.', 'il2.', $linksjoin);
+        $il = $dbr->tableName($linkstable);
+        $p  = $dbr->tableName('page');
+        $sd = $dbr->tableName('halo_acl_security_descriptors');
+        $r  = $dbr->tableName('halo_acl_rights');
+        $rh = $dbr->tableName('halo_acl_rights_hierarchy');
+        $sql = "SELECT p1.*, p2.page_title sd_title, p2.page_touched sd_touched,
+                 (SELECT 1=SUM(CASE WHEN child_id=$sdID THEN 1 ELSE 2 END)
+                  FROM $rh rh WHERE rh.parent_right_id=sd.sd_id) sd_inc_single,
+                 (NOT EXISTS (SELECT * FROM $r r WHERE r.origin_id=sd.sd_id)) sd_no_rights,
+                 (COUNT(il2.$linksfield)) used_on_pages
+                FROM $il il1 INNER JOIN $p p1 ON $linksjoin
+                LEFT JOIN $sd sd ON sd.type='page' AND sd.pe_id=p1.page_id
+                LEFT JOIN $p p2 ON p2.page_id=sd.sd_id
+                LEFT JOIN $il il2 ON $linksjoin2
+                WHERE il1.$linksfield=$peID
+                GROUP BY p1.page_id
+                ORDER BY p1.page_namespace, p1.page_title";
+        $res = $dbr->query($sql, __METHOD__);
+        $embedded = array();
+        foreach ($res as $obj)
+        {
+            $embedded[] = array(
+                'title' => Title::newFromRow($obj),
+                'sd_title' => $obj->sd_title ? Title::makeTitleSafe(HACL_NS_ACL, $obj->sd_title) : NULL,
+                // Modification timestamp of an SD
+                'sd_touched' => $obj->sd_touched,
+                // Is SD a single inclusion of $sdID?
+                'sd_single' => $obj->sd_inc_single && $obj->sd_no_rights,
+                // Count of pages on which it is used
+                'used_on_pages' => $obj->used_on_pages,
+            );
+        }
+        return $embedded;
+    }
+
     /***************************************************************************
      *
      * Functions for inline rights
@@ -1191,7 +1266,7 @@ class HACLStorageSQL {
      * @return array<int>
      *         An array of IDs of rights that match the given constraints.
      */
-    public function getRights($peID, $type, $actionID)
+    public function getRights($peID, $type, $actionID, $originNotEqual = NULL)
     {
         $dbr = wfGetDB(DB_SLAVE);
         $rt = $dbr->tableName('halo_acl_rights');
@@ -1200,7 +1275,18 @@ class HACLStorageSQL {
         $sql = "SELECT rights.* FROM $rt AS rights, $rpet AS pe ".
             "WHERE pe.pe_id = $peID AND pe.type = '$type' AND ".
             "rights.right_id = pe.right_id AND".
-            "(rights.actions & $actionID) != 0;";
+            "(rights.actions & $actionID) != 0";
+        if ($originNotEqual)
+        {
+            if (!is_array($originNotEqual))
+                $sql .= " AND origin_id!=".intval($originNotEqual);
+            else
+            {
+                foreach($originNotEqual as &$o)
+                    $o = intval($o);
+                $sql .= " AND origin_id NOT IN (".implode(", ", $originNotEqual).")";
+            }
+        }
 
         $res = $dbr->query($sql, __METHOD__);
         $rights = array();

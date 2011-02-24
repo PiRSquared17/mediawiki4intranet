@@ -90,6 +90,8 @@ class HACLToolbar
                         'title' => $pageSDTitle->getFullText(),
                     );
                 }
+                // Get the list of content used by page (images and templates)
+                
             }
             // Get categories which have SDs and to which belongs this article (for hint)
             foreach ($title->getParentCategories() as $p => $true)
@@ -279,5 +281,102 @@ class HACLToolbar
 
         // Continue hook processing
         return true;
+    }
+
+    // Get checkbox-list for page embedded content
+    public function getEmbeddedHtml($peID, $sdID)
+    {
+        global $haclgContLang;
+        $st = HACLStorage::getDatabase();
+        // Retrieve the list of templates used on the page with id=$peID
+        $templatelinks = $st->getEmbedded($peID, $sdID, 'templatelinks');
+        // Retrieve the list of images used on the page
+        $imagelinks = $st->getEmbedded($peID, $sdID, 'imagelinks');
+        // Build HTML code for embedded content toolbar
+        $links = array_merge($templatelinks, $imagelinks);
+        $html = array('<div class="hacl_emb_text">'.wfMsgForContent('hacl_toolbar_protect_embedded').'</div>');
+        foreach ($links as $link)
+        {
+            $id = $link['title']->getArticleId();
+            $href = $link['title']->getLocalUrl();
+            $t = $link['title']->getPrefixedText();
+            $ts = $link['sd_touched'];
+            if ($link['sd_title'] && !$link['single'])
+            {
+                // Custom SD defined
+                $customprot = wfMsgForContent('hacl_toolbar_emb_custom_prot', $link['sd_title']->getLocalUrl());
+            }
+            else
+                $customprot = '';
+            if ($link['used_on_pages'] > 1)
+            {
+                $usedon = Title::newFromText("Special:WhatLinksHere/$t")->getLocalUrl();
+                $usedon = wfMsgForContent('hacl_toolbar_used_on', $link['used_on_pages'], $usedon);
+            }
+            else
+                $usedon = '';
+            $P = $customprot || $usedon ? " — " : "";
+            $S = $customprot && $usedon ? "; " : "";
+            // [x] Title — custom SD defined; used on Y pages
+            $h = '<input type="checkbox" name="sd_emb_'.$id.'" value="'.$sdID.'/'.$ts.'" '.
+                ($link['single'] ? ' checked="checked" disabled="disabled"' : '').' />'.
+                ' <label for="sd_emb_'.$id.'"><a target="_blank" href="'.htmlspecialchars($href).'">'.
+                htmlspecialchars($t).'</a></label>'.$P.$customprot.$S.$usedon;
+            $h = '<div class="hacl_embed'.($link['single'] ? '_disabled' : '').'">'.$h.'</div>';
+            $html[] = $h;
+        }
+        $html = implode("\n", $html);
+        return $html;
+    }
+
+    // Hook for displaying "ACL" tab for standard skins
+    static function SkinTemplateContentActions(&$actions)
+    {
+        if ($act = self::getContentAction())
+            $actions[] = $act;
+        return true;
+    }
+
+    // Hook for displaying "ACL" tab for Vector skin
+    static function SkinTemplateNavigation(&$skin, &$links)
+    {
+        if ($act = self::getContentAction())
+            $links['namespaces'][] = $act;
+        return true;
+    }
+
+    // Returns content-action for inserting into skin tabs
+    static function getContentAction()
+    {
+        global $wgTitle, $haclgContLang;
+        if ($wgTitle->getNamespace() == HACL_NS_ACL)
+        {
+            list($peName, $peType) = HACLSecurityDescriptor::nameOfPE($wgTitle->getText());
+            if ($peType == 'page' || $peType == 'category')
+            {
+                $title = Title::newFromText($peName);
+                return array(
+                    'class' => false,
+                    'text'  => wfMsg("hacl_tab_$peType"),
+                    'href'  => $title->getLocalUrl(),
+                );
+            }
+        }
+        elseif ($wgTitle->exists())
+        {
+            if ($wgTitle->getNamespace() == NS_CATEGORY)
+                $sd = $haclgContLang->getPetPrefix(HACLLanguage::PET_CATEGORY).
+                    '/'.$wgTitle->getText();
+            else
+                $sd = $haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).
+                    '/'.$wgTitle->getPrefixedText();
+            $sd = Title::newFromText($sd, HACL_NS_ACL);
+            return array(
+                'class' => $sd->exists() ? false : 'new',
+                'text'  => wfMsg('hacl_tab_acl'),
+                'href'  => $sd->getLocalUrl(),
+            );
+        }
+        return NULL;
     }
 }
