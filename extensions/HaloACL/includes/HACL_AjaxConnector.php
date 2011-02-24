@@ -72,7 +72,7 @@ global $wgAjaxExportList;
 $wgAjaxExportList[] = 'haclAutocomplete';
 $wgAjaxExportList[] = 'haclAcllist';
 $wgAjaxExportList[] = 'haclGroupClosure';
-$wgAjaxExportList[] = 'haclSDExists';
+$wgAjaxExportList[] = 'haclSDExists_GetEmbedded';
 $wgAjaxExportList[] = 'haclGrouplist';
 $wgAjaxExportList[] = 'haclGroupExists';
 
@@ -275,13 +275,25 @@ function haclGroupClosure($groups, $predefined = '')
     return json_encode(array('groups' => $members, 'rights' => $rights));
 }
 
-function haclSDExists($type, $name)
+function haclSDExists_GetEmbedded($type, $name)
 {
-    // FIXME this does not return incorrect SD definitions
+    $st = HACLStorage::getDatabase();
+    $data = array(
+        'exists' => false,
+        'embedded' => '',
+    );
     $peID = HACLSecurityDescriptor::peIDforName($name, $type);
-    if (!$peID)
-        return 'false';
-    return HACLStorage::getDatabase()->getSDForPE($peID, $type) ? 'true' : 'false';
+    if ($peID && ($sdID = $st->getSDForPE($peID, $type)))
+    {
+        // FIXME returns true only for correct SD definitions
+        $data['exists'] = true;
+        if ($type == 'page') // PET_PAGE
+        {
+            // Build HTML code for embedded protection toolbar
+            $data['embedded'] = HACLToolbar::getEmbeddedHtml($peID, $sdID);
+        }
+    }
+    return json_encode($data);
 }
 
 function haclGroupExists($name)

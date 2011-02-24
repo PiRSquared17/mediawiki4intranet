@@ -122,7 +122,6 @@ class HaloACLSpecial extends SpecialPage
     public function html_acl(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang, $wgContLang;
-        $predefinedRightsExist = HACLStorage::getDatabase()->getSDForPE(0, 'right');
         $aclTitle = Title::newFromText($q['sd'], HACL_NS_ACL);
         $t = HACLEvaluator::hacl_type($aclTitle);
         if (!($q['sd'] && $aclTitle &&

@@ -728,46 +728,48 @@ class HACLParserFunctions
     /* Return HTML consistency check status for pages in ACL namespace */
     private function consistencyCheckHtml()
     {
-        $id = $this->mTitle->getArticleId();
-        if ($this->mTitle->getNamespace() != HACL_NS_ACL || !$id)
-            return '';
-
         global $haclgContLang, $haclgHaloScriptPath;
-        $msg = $this->checkConsistency();
-
-        // Article does not correspond to any ACL definition
-        if (!$this->mType)
+        if ($this->mTitle->getNamespace() != HACL_NS_ACL)
             return '';
-
-        if ($msg === true)
+        $id = $this->mTitle->getArticleId();
+        if ($id)
         {
-            // Check if the article is already represented in HaloACL storage
-            $exists = false;
-            switch ($this->mType)
+            $msg = $this->checkConsistency();
+
+            // Article does not correspond to any ACL definition
+            if (!$this->mType)
+                return '';
+
+            if ($msg === true)
             {
-                case 'group':
-                    $exists = HACLGroup::exists($id);
-                    break;
-                default:
-                    $exists = HACLSecurityDescriptor::exists($id);
-                    break;
+                // Check if the article is already represented in HaloACL storage
+                $exists = false;
+                switch ($this->mType)
+                {
+                    case 'group':
+                        $exists = HACLGroup::exists($id);
+                        break;
+                    default:
+                        $exists = HACLSecurityDescriptor::exists($id);
+                        break;
+                }
+                if (!$exists)
+                    $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
             }
-            if (!$exists)
-                $msg = array(wfMsgForContent('hacl_acl_element_not_in_db'));
+
+            $html = '';
+            if ($msg !== true)
+            {
+                $html .= wfMsgForContent('hacl_consistency_errors');
+                $html .= wfMsgForContent('hacl_definitions_will_not_be_saved');
+                $html .= "<ul>";
+                foreach ($msg as $m)
+                    $html .= "<li>$m</li>";
+                $html .= "</ul>";
+            }
         }
 
-        $html = '';
-        if ($msg !== true)
-        {
-            $html .= wfMsgForContent('hacl_consistency_errors');
-            $html .= wfMsgForContent('hacl_definitions_will_not_be_saved');
-            $html .= "<ul>";
-            foreach ($msg as $m)
-                $html .= "<li>$m</li>";
-            $html .= "</ul>";
-        }
-
-        $html .= wfMsgForContent('hacl_edit_with_special',
+        $html .= wfMsgForContent($id ? 'hacl_edit_with_special' : 'hacl_create_with_special',
             Title::newFromText('Special:HaloACL')->getLocalUrl(array(
                 'action' => 'acl',
                 'sd' => $this->mTitle->getPrefixedText(),

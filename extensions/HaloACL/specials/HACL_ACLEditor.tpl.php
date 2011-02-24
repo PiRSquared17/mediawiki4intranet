@@ -19,8 +19,17 @@
      </optgroup>
     <?php } ?>
    </select>
-   <input type="text" autocomplete="off" id="acl_name" onchange="AE.target_change(true)" onkeyup="AE.target_change()" style="width: 200px" />
+   <input type="text" autocomplete="off" id="acl_name" style="width: 200px" />
   </p>
+  <p id="acl_pns">
+   <span><a id="acl_pn" class="acl_pn" href="#"></a></span>
+   <input type="submit" name="wpSave" value="<?= wfMsg($aclArticle ? 'hacl_edit_save' : 'hacl_edit_create') ?>" id="wpSave" />
+   <a id="acl_delete_link" href="<?= $aclArticle ? $aclTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_edit_delete') ?></a>
+  </p>
+  <p id="acl_pnhint" class="acl_error" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
+  <p id="acl_exists_hint" class="acl_info" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
+  <p id="acl_define_rights" class="acl_error"><?= wfMsg('hacl_edit_define_rights') ?></p>
+  <p id="acl_define_manager" class="acl_error"></p>
  </td>
  <td style="vertical-align: top">
   <p><b><?= wfMsg('hacl_edit_modify_definition') ?></b></p>
@@ -46,25 +55,15 @@
    <label for="act_<?= $k ?>" id="act_label_<?= $k ?>"><?= wfMsg("hacl_edit_action_$k") ?></label>
    <?php } ?>
   </p>
-  <?php if($predefinedRightsExist) { ?>
   <p>
    <label for="inc_acl"><?= wfMsg('hacl_edit_include_right') ?></label>
    <input type="text" id="inc_acl" />
    <input type="button" value="<?= wfMsg('hacl_edit_include_do') ?>" onclick="AE.include_acl()" />
   </p>
-  <?php } ?>
+  <div id="acl_embed" style="display: none"></div>
  </td>
 </tr>
 </table>
-<p id="acl_pns">
- <span><a id="acl_pn" class="acl_pn" href="#"></a></span>
- <input type="submit" name="wpSave" value="<?= wfMsg($aclArticle ? 'hacl_edit_save' : 'hacl_edit_create') ?>" id="wpSave" />
- <a id="acl_delete_link" href="<?= $aclArticle ? $aclTitle->getLocalUrl(array('action' => 'delete')) : '' ?>"><?= wfMsg('hacl_edit_delete') ?></a>
-</p>
-<p id="acl_pnhint" class="acl_error" style="display: none"><?= wfMsg('hacl_edit_enter_name_first') ?></p>
-<p id="acl_exists_hint" class="acl_info" style="display: none"><?= wfMsg('hacl_edit_sd_exists') ?></p>
-<p id="acl_define_rights" class="acl_error"><?= wfMsg('hacl_edit_define_rights') ?></p>
-<p id="acl_define_manager" class="acl_error"></p>
 </form>
 
 <script language="JavaScript" src="<?= $haclgHaloScriptPath ?>/scripts/exAttach.js"></script>

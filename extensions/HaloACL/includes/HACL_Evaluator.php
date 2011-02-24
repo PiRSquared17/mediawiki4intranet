@@ -99,7 +99,10 @@ class HACLEvaluator
 
         $groups = $user->getGroups();
         if (in_array('bureaucrat', $groups))
+        {
             $R = array('User is a bureaucrat and can do anything.', true, true);
+            goto fin;
+        }
 
         // Check if property access is requested.
         global $haclgProtectProperties;
@@ -223,16 +226,19 @@ class HACLEvaluator
     public static function hasSD($title, $articleID, $userID, $actionID)
     {
         $hasSD = false;
+        $msg = array();
 
         if ($articleID)
         {
             // First check page rights
-            $hasSD = $hasSD || HACLSecurityDescriptor::getSDForPE($articleID, HACLLanguage::PET_PAGE);
+            $sd = HACLSecurityDescriptor::getSDForPE($articleID, HACLLanguage::PET_PAGE);
+            $hasSD = $hasSD || $sd;
             if ($hasSD)
             {
-                self::log("The article is protected with a security descriptor.");
-                if ($r = self::hasRight($articleID, HACLLanguage::PET_PAGE, $userID, $actionID))
-                    return array("Access allowed by page right.", true, true);
+                $r = self::hasRight($articleID, HACLLanguage::PET_PAGE, $userID, $actionID);
+                $msg[] = ($r ? 'Access allowed by' : 'Found') . ' page SD.';
+                if ($r)
+                    goto ok;
             }
 
             // If the page is a category page, check the category right
@@ -242,27 +248,36 @@ class HACLEvaluator
                 $hasSD = $hasSD || $sd;
                 if ($sd)
                 {
-                    self::log("The article is a category page and this category is protected with a security descriptor.");
                     $r = self::hasRight($articleID, HACLLanguage::PET_CATEGORY, $userID, $actionID);
+                    $msg[] = ($r ? 'Access allowed by' : 'Found') . ' category SD for category page.';
                     if ($r)
-                        return array("Access allowed for category page by category right.", true, true);
+                        goto ok;
                 }
             }
 
             // Check category rights
             list($r, $sd) = self::hasCategoryRight($title, $userID, $actionID);
             $hasSD = $hasSD || $sd;
-            if ($sd && $r)
-                return array('Action allowed by category right.', true, true);
+            if ($sd)
+            {
+                $msg[] = ($r ? 'Access allowed by' : 'Found') . ' category SD.';
+                if ($r)
+                    goto ok;
+            }
         }
 
         // Check namespace rights
         list($r, $sd) = self::checkNamespaceRight($title->getNamespace(), $userID, $actionID);
         $hasSD = $hasSD || $sd;
-        if ($sd && $r)
-            return array('Action allowed by namespace right.', true, true);
+        if ($sd)
+        {
+            $msg[] = ($r ? 'Access allowed by' : 'Found') . ' namespace SD.';
+            if ($r)
+                goto ok;
+        }
 
-        return array('', false, $hasSD);
+ok:
+        return array(implode(' ', $msg), $hasSD && $r, $hasSD);
     }
 
     /**
@@ -281,11 +296,11 @@ class HACLEvaluator
      *         <true>, if the user has the right to perform the action
      *         <false>, otherwise
      */
-    public static function hasRight($titleID, $type, $userID, $actionID)
+    public static function hasRight($titleID, $type, $userID, $actionID, $originNE = NULL)
     {
         // retrieve all appropriate rights from the database
         global $wgUser;
-        $rights = HACLStorage::getDatabase()->getRights($titleID, $type, $actionID);
+        $rights = HACLStorage::getDatabase()->getRights($titleID, $type, $actionID, $originNE);
 
         // Check for all rights, if they are granted for the given user
         foreach ($rights as $right)
