@@ -348,7 +348,7 @@ class HACLToolbar
     // Returns content-action for inserting into skin tabs
     static function getContentAction()
     {
-        global $wgTitle, $haclgContLang;
+        global $wgTitle, $haclgContLang, $haclgDisableACLTab;
         if ($wgTitle->getNamespace() == HACL_NS_ACL)
         {
             list($peName, $peType) = HACLSecurityDescriptor::nameOfPE($wgTitle->getText());
@@ -371,6 +371,8 @@ class HACLToolbar
                 $sd = $haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).
                     '/'.$wgTitle->getPrefixedText();
             $sd = Title::newFromText($sd, HACL_NS_ACL);
+            if ($haclgDisableACLTab && !$sd->exists())
+                return NULL;
             return array(
                 'class' => $sd->exists() ? false : 'new',
                 'text'  => wfMsg('hacl_tab_acl'),

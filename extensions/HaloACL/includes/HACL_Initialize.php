@@ -99,26 +99,29 @@ if ($haclgOpenWikiAccess === NULL)
 if ($haclgProtectProperties === NULL)
     $haclgProtectProperties = false;
 
-###
+##
 # By design several databases can be connected to HaloACL. (However, in the first
 # version there is only an implementation for MySQL.) With this variable you can
 # specify which store will actually be used.
 # Possible values:
 # - HACL_STORE_SQL
-##
 if ($haclgBaseStore === NULL)
     $haclgBaseStore = HACL_STORE_SQL;
 
-###
+##
 # Values of this array are treated as language-dependent names of namespaces which
 # can not be protected by HaloACL.
 if ($haclgUnprotectableNamespaces === NULL)
     $haclgUnprotectableNamespaces = array();
 
 ##
+# If this is true, "ACL" tab will be hidden for unprotected pages.
+if ($haclgDisableACLTab === NULL)
+    $haclgDisableACLTab = false;
+
+##
 # If $haclgEvaluatorLog is <true>, you can specify the URL-parameter "hacllog=true".
 # In this case HaloACL echos the reason why actions are permitted or prohibited.
-#
 if ($haclgEvaluatorLog === NULL)
     $haclgEvaluatorLog = true;
 
