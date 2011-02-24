@@ -1,57 +1,40 @@
-Installation instructions for HaloACL extension v1.0
----------------------------------------------------------------
+= IntraACL extension for MediaWiki =
 
-Requirements: 
-=============
+IntraACL extension for MediaWiki is the page rights extension based on
+HaloACL, correcting its endless bugs and inconveniences.
 
-    MediaWiki 1.13.2
-    SMW 1.4.2 (optional)
+* Homepage and help: http://wiki.4intra.net/IntraACL
+* License: GPLv3
+* Copyright (c) 2010+, Vitaliy Filippov, Stas Fomin
+* Copyright 2009, ontoprise GmbH
 
-Installation:
-=============
+== REQUIREMENTS ==
 
-The easiest way to install HaloACL is using the deployment framework:
+The only requirement is MediaWiki of at least version 1.13.2.
+If you want to use Semantic MediaWiki, its version must be at least 1.4.2.
 
- smwadmin -i haloacl
+== INSTALLATION ==
 
-This installs the extension and patches MediaWiki and SMW.
+* Add the following lines into your LocalSettings.php:
+  require_once('extensions/HaloACL/includes/HACL_Initialize.php');
+  enableHaloACL();
+* You can also add custom configuration options before enableHaloACL() call.
+  For the option list, see extensions/HaloACL/includes/HACL_Initialize.php
+  or http://wiki.4intra.net/IntraACL
+* Apply patches for appropriate version of MediaWiki.
+  cd YOUR_WIKI_INSTALLATION_DIR
+  patch -p0 < patches/intraacl_mw_<YOUR_VERSION>.diff
+* Run MediaWiki database update tool:
+  php maintenance/update.php
+* You should check all your extensions for compatibility with IntraACL
+  because of possible security breaches.
 
-For a manual installation, you have to copy the folder HaloACL into 
-the extensions folder of MediaWiki. HaloACL will then already work, if you 
-activate it in LocalSetting.php (see below). 
+The method of IntraACL installation via the super-duper-installer
+of Halo MediaWiki bundle is now removed as very non-standard.
 
-However, you can apply two patches:
-* patch_for_MW_1.13.2.txt: 
-	This patch for MediaWiki 1.13.2 removes all links to protected pages from 
-	the rendered articles and listings. If a link can not be removed, it is 
-	replaced by a link to the page 'Permission denied'. This patch is optional.
-* patch_for_SMW_1.4.2.txt: 
-	This patch for SMW 1.4.2 is mandatory, if you want to protect the values of 
-	semantic properties.
+== MediaWiki 4 Intranet ==
 
+You can also use Mediawiki4Intranet bundle. It already includes IntraACL and
+many other useful extensions which are made compatible with it.
 
-Updating the database
----------------------
-
-The HaloACL extension requires some additional tables in the database that must
-be added to the existing database schema. Existing data will not be modified.
-Therefore change into the maintenance folder of the HaloACL extension and run the
-setup script:
- cd /folder_to_mediawiki/extension/HaloACL/maintenance
- php HACL_Setup.php
-
-
-Activating HaloACL
-------------------
-
-The extension is activated by adding the following lines to LocalSettings.php:
-
-include_once('extensions/HaloACL/includes/HACL_Initialize.php');
-enableHaloACL(); 
-
-
-Options:
-========
-
-All configuration options are defined and described in HACL_Initialize.php.
-
+See http://wiki.4intra.net/Mediawiki4Intranet
