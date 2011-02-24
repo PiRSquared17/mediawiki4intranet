@@ -60,6 +60,7 @@ HACLACLEditor.prototype.target_change = function(total_change)
     var an = document.getElementById('acl_name');
     if (this.last_target_type != what)
     {
+        total_change = true;
         if (this.last_target_type)
         {
             // remember name for each type separately
@@ -71,12 +72,15 @@ HACLACLEditor.prototype.target_change = function(total_change)
             else
                 an.value = '';
             this.target_hint.curValue = null; // force SHint refill
-            this.target_hint.change();
+            this.last_target_type = what; // prevent recursion
+            this.target_hint.change_old();
         }
         this.last_target_type = what;
     }
     var name = an.value.trim();
-    if (this.last_target_names[this.last_target_type] && this.last_target_names[this.last_target_type] == name && !total_change)
+    if (this.last_target_names[this.last_target_type] &&
+        this.last_target_names[this.last_target_type] == name &&
+        !total_change)
         return;
     this.last_target_names[this.last_target_type] = name;
     // yes, target really changed, hide/show elements
@@ -91,7 +95,17 @@ HACLACLEditor.prototype.target_change = function(total_change)
         document.getElementById('acl_delete_link').href = wgScript + '?title=' + encodeURI(t) + '&action=delete';
         var ae = this;
         if (total_change)
-            sajax_do_call('haclSDExists', [ what, name ], function(request) { ae.pe_exists_ajax(request) });
+        {
+            // Retrieve SD status and embedded content list
+            sajax_do_call('haclSDExists_GetEmbedded', [ what, name ], function(request) { ae.ajax_sd_exists(request) });
+        }
+    }
+    else
+    {
+        // Clear Embedded ACL list for empty names
+        var emb = document.getElementById('acl_embed');
+        emb.innerHTML = '';
+        emb.style.display = 'none';
     }
     if (!t || !total_change)
         document.getElementById('acl_exists_hint').style.display = 'none';
@@ -100,17 +114,20 @@ HACLACLEditor.prototype.target_change = function(total_change)
     document.getElementById('acl_pnhint').style.display = t ? 'none' : '';
 };
 
-// react to item existence check
-HACLACLEditor.prototype.pe_exists_ajax = function(request)
+// haclSDExists_GetEmbedded callback
+HACLACLEditor.prototype.ajax_sd_exists = function(request)
 {
     if (request.status != 200)
         return;
-    var exists = eval('('+request.responseText+')'); // json parse
-    if (exists)
+    var data = eval('('+request.responseText+')'); // json parse
+    if (data.exists)
         document.getElementById('acl_exists_hint').style.display = '';
     else
         document.getElementById('acl_delete_link').style.display = 'none';
-    document.getElementById('wpSave').value = exists ? this.msg.edit_save : this.msg.edit_create;
+    var emb = document.getElementById('acl_embed');
+    emb.innerHTML = data.exists && data.embedded ? data.embedded : '';
+    emb.style.display = data.exists && data.embedded ? '' : 'none';
+    document.getElementById('wpSave').value = data.exists ? this.msg.edit_save : this.msg.edit_create;
 };
 
 // add predefined ACL inclusion
@@ -476,8 +493,7 @@ HACLACLEditor.prototype.to_name_change = function()
         // disable checkbox:
         // - if right is granted through some group
         // - or if no grant target selected
-        // - or if a=='template' and we are page right
-        c.disabled = !g_to || grp || a == 'template' && this.last_target_type == 'page';
+        c.disabled = !g_to || grp;
         l.className = c.disabled ? 'act_disabled' : '';
         c.title = l.title = (grp ? this.msg.indirect_grant.replace('$1', grp) : this.msg['edit_ahint_'+a]);
     }
@@ -648,6 +664,9 @@ HACLACLEditor.prototype.init = function(aclTitle, aclType, aclExists)
     this.to_name_change();
     // create autocompleter for protection target
     this.target_hint = new SHint('acl_name', 'hacl', function(h, v) { ge.target_hint_fill(h, v) });
+    this.target_hint.change_old = this.target_hint.change;
+    this.target_hint.change = function(ev) { ge.target_change(!ev); ge.target_hint.change_old(); };
+    this.target_hint.h_blur = function(ev) { ge.target_change(true); ge.target_hint.focus(false); return 1; };
     // do not hint template targets
     this.target_hint.focus = function(f) { ge.target_hint_focus(f) };
     this.target_hint.onset = function(ev, e) { ge.target_change(ev, e) };

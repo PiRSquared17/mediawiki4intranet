@@ -115,7 +115,8 @@ var SHint = function(input, style_prefix, fill_handler)
     {
         for (var i in e.childNodes)
         {
-            if (e.childNodes[i].className &&
+            if (e.childNodes[i] &&
+                e.childNodes[i].className &&
                 e.childNodes[i].className.indexOf(sl.style_prefix+'_ti') >= 0)
             {
                 exAttach(e.childNodes[i], 'mouseover', sl.change_highlight);

@@ -1,7 +1,9 @@
 /* styles used by HaloACL toolbar */
 #hacl_toolbar { border: 1px solid gray; background-color: #eee; padding: 5px; margin-bottom: 4px; }
 #hacl_toolbar select { vertical-align: middle; }
-#hacl_toolbar_gaclt { border: 1px solid gray; background-color: white; padding: 0 4px; }
+#hacl_toolbar_gaclt { border: 1px solid gray; background-color: white; padding: 1px 4px; }
 #hacl_toolbar_global_acl { display: inline-block; }
 #hacl_toolbar_global_acl_tip { position: relative; }
 #hacl_toolbar_global_acl div.x { white-space: nowrap; position: absolute; top: -1px; background-color: white; padding: 3px 5px; border: 1px solid gray; }
+#hacl_toolbar div.qacl { float: right; margin-top: 2px; }
+.hacl_embed_disabled { color: gray; }
