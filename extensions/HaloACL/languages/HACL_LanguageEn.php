@@ -4,7 +4,7 @@
  *                  Stas Fomin <stas.fomin[d.o.g]yandex.ru>
  * This file is part of IntraACL MediaWiki extension. License: GPLv3.
  * http://wiki.4intra.net/IntraACL
- * $Id: $
+ * $Id$
  *
  * Based on HaloACL
  * Copyright 2009, ontoprise GmbH
