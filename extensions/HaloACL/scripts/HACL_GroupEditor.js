@@ -341,7 +341,7 @@ HACLGroupEditor.prototype.get_empty_hint = function(who, what)
             j++;
         }
     }
-    var ht = '<div class="hacl_tt">'+(empty
+    var ht = '<div class="hacl_tt">'+(current.length == 0
         ? this.msg['no_'+who+'_'+what]+' '+this.msg['start_typing_'+what]
         : this.msg['current_'+who+'_'+what])+'</div>'+current.join('');
     return ht;

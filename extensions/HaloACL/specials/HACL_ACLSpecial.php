@@ -349,11 +349,7 @@ class HaloACLSpecial extends SpecialPage
             );
             list($d['type'], $d['real']) = explode('/', $d['real'], 2);
             if ($d['real'])
-            {
                 $d['type'] = $haclgContLang->getPetAlias($d['type']);
-                if ($d['type'] == 'template' && $d['real'] == $wgUser->getName())
-                    $d['real'] = wfMsg('hacl_acllist_own_template', $d['real']);
-            }
             else
                 $d['real'] = $d['type'];
             $lists[$d['type']][] = $d;
