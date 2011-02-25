@@ -3869,7 +3869,7 @@ class Title {
 			return true;
 		}
 		global $haclgContLang;
-		if ( $this->mTextform !== $haclgContLang->getPermissionDeniedPage() ) {
+		if ( $this->mTextform === $haclgContLang->getPermissionDeniedPage() ) {
 			// Special handling of "Permission denied" page
 			return false;
 		}
