@@ -34,7 +34,9 @@ class HACLToolbar
      * This method returns HTML code for the HaloACL toolbar,
      * for the $title editing mode.
      *
-     * Page protection: <selectbox>. Also using: [[ACL:Namespace/Main]], [[ACL:Category/XX]].
+     * Looks like the following:
+     * Page protection: <selectbox>. [Additional ACL ↓] [Used content ↓] [Edit ACL] ... [Manage Quick ACL]
+     *
      * Options for selectbox:
      * - [no custom rights] - use only category/namespace rights
      * - [ACL:Page/XXX] - use custom ACL
@@ -61,6 +63,9 @@ class HACLToolbar
 
         if (!is_object($title))
             $title = Title::newFromText($title);
+
+        if ($title->getNamespace() == HACL_NS_ACL)
+            return '';
 
         // $found = "is current page SD in the list?"
         $found = false;
@@ -91,8 +96,6 @@ class HACLToolbar
                         'title' => $pageSDTitle->getFullText(),
                     );
                 }
-                // Get the list of content used by page (images and templates)
-                
             }
             // Get categories which have SDs and to which belongs this article (for hint)
             foreach ($title->getParentCategories() as $p => $true)
@@ -173,6 +176,44 @@ class HACLToolbar
             $globalACL = implode(', ', $globalACL);
         }
 
+        // Check if the article does include any content
+        if ($title->exists() && $pageSDId)
+        {
+            $c = false;
+            foreach ($wgRequest->getValues() as $k => $v)
+            {
+                if (substr($k, 0, 7) == 'sd_emb_')
+                {
+                    $c = true;
+                    break;
+                }
+            }
+            if ($c)
+            {
+                // If there were any changes in the embedded content
+                // toolbar, display it initially
+                $embeddedToolbar = self::getEmbeddedHtml($title->getArticleId(), $pageSDId);
+            }
+            else
+            {
+                // Else only check for imagelinks/templatelinks existence
+                $dbr = wfGetDB(DB_SLAVE);
+                $res = $dbr->query(
+                    $dbr->selectSQLText('imagelinks', '1',
+                        array('il_from' => $title->getArticleId()),
+                        __METHOD__, array('GROUP BY' => 'il_from')) . ' UNION ' .
+                    $dbr->selectSQLText('templatelinks', '1',
+                        array('tl_from' => $title->getArticleId()),
+                        __METHOD__, array('GROUP BY' => 'tl_from')),
+                    __METHOD__
+                );
+                $res = $res->fetchObject();
+                if ($res)
+                    $anyLinks = true;
+            }
+        }
+
+        // Link to Quick ACL manage page
         $quick_acl_link = Title::newFromText('Special:HaloACL')->getLocalUrl(array('action' => 'quickaccess'));
 
         // Run template
@@ -285,9 +326,10 @@ class HACLToolbar
     }
 
     // Get checkbox-list for page embedded content
+    // FIXME do not require SD to exist
     public function getEmbeddedHtml($peID, $sdID)
     {
-        global $haclgContLang;
+        global $haclgContLang, $wgRequest;
         $st = HACLStorage::getDatabase();
         // Retrieve the list of templates used on the page with id=$peID
         $templatelinks = $st->getEmbedded($peID, $sdID, 'templatelinks');
@@ -295,13 +337,16 @@ class HACLToolbar
         $imagelinks = $st->getEmbedded($peID, $sdID, 'imagelinks');
         // Build HTML code for embedded content toolbar
         $links = array_merge($templatelinks, $imagelinks);
-        $html = array('<div class="hacl_emb_text">'.wfMsgForContent('hacl_toolbar_protect_embedded').'</div>');
+        $html = array();
+        $html[] = '<div class="hacl_emb_text">'.wfMsgForContent('hacl_toolbar_protect_embedded').'</div>';
         foreach ($links as $link)
         {
             $id = $link['title']->getArticleId();
             $href = $link['title']->getLocalUrl();
             $t = $link['title']->getPrefixedText();
             $ts = $link['sd_touched'];
+            if ($prev = $wgRequest->getVal("sd_emb_$id"))
+                list($unused, $ts) = explode($prev, '/', 2);
             if ($link['sd_title'] && !$link['single'])
             {
                 // Custom SD defined
@@ -319,8 +364,9 @@ class HACLToolbar
             $P = $customprot || $usedon ? " — " : "";
             $S = $customprot && $usedon ? "; " : "";
             // [x] Title — custom SD defined; used on Y pages
-            $h = '<input type="checkbox" name="sd_emb_'.$id.'" value="'.$sdID.'/'.$ts.'" '.
-                ($link['single'] ? ' checked="checked" disabled="disabled"' : '').' />'.
+            $h = '<input type="checkbox" name="sd_emb_'.$id.'"'.
+                ($link['single'] ? ' value="" checked="checked" disabled="disabled"' : " value=\"$sdID/$ts\"").
+                ($prev ? ' checked="checked"' : '').' />'.
                 ' <label for="sd_emb_'.$id.'"><a target="_blank" href="'.htmlspecialchars($href).'">'.
                 htmlspecialchars($t).'</a></label>'.$P.$customprot.$S.$usedon;
             $h = '<div class="hacl_embed'.($link['single'] ? '_disabled' : '').'">'.$h.'</div>';
@@ -352,6 +398,7 @@ class HACLToolbar
         global $wgTitle, $haclgContLang, $haclgDisableACLTab;
         if ($wgTitle->getNamespace() == HACL_NS_ACL)
         {
+            // Display the link to article or category
             list($peName, $peType) = HACLSecurityDescriptor::nameOfPE($wgTitle->getText());
             if ($peType == 'page' || $peType == 'category')
             {
@@ -365,6 +412,7 @@ class HACLToolbar
         }
         elseif ($wgTitle->exists())
         {
+            // Display the ACL link, if not $haclgDisableACLTab
             if ($wgTitle->getNamespace() == NS_CATEGORY)
                 $sd = $haclgContLang->getPetPrefix(HACLLanguage::PET_CATEGORY).
                     '/'.$wgTitle->getText();

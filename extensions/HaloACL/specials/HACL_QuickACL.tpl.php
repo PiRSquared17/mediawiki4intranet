@@ -15,10 +15,10 @@
  <input type="hidden" name="like" value="<?= htmlspecialchars($args['like']) ?>" />
  <table class="wikitable">
   <tr>
-   <th>Select</th>
-   <th>Default</th>
-   <th>Name</th>
-   <th>Actions</th>
+   <th><?= wfMsg('hacl_qacl_col_select') ?></th>
+   <th><?= wfMsg('hacl_qacl_col_default') ?></th>
+   <th><?= wfMsg('hacl_qacl_col_name') ?></th>
+   <th><?= wfMsg('hacl_qacl_col_actions') ?></th>
   </tr>
   <?php foreach ($templates as $sd) { ?>
    <tr>
@@ -30,7 +30,7 @@
     <td style="text-align: center">
      <input onchange="set_checked(<?= $sd->getSDId() ?>)" type="radio" name="qa_default" id="qd_<?= $sd->getSDId() ?>" value="<?= $sd->getSDId() ?>" <?= $sd->default ? ' checked="checked"' : '' ?> />
     </td>
-    <td><a title="<?= $sd->getSDName() ?>" href="<?= $sd->viewlink ?>"><?= $sd->getSDName() ?></a></td>
+    <td style="text-align: center"><a title="<?= $sd->getSDName() ?>" href="<?= $sd->viewlink ?>"><?= $sd->getSDName() ?></a></td>
     <td style="text-align: center">
      <a title="<?= wfMsg('hacl_acllist_edit') ?>" href="<?= $sd->editlink ?>">
       <img src="<?= $haclgHaloScriptPath ?>/skins/images/edit.png" />
