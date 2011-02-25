@@ -16,10 +16,11 @@ class SVGEditHooks {
 	 * @param $skin Skin current skin
 	 */
 	public static function beforePageDisplay( $out, $skin ) {
-		global $wgUser, $wgSVGEditInline, $wgScriptPath;
-		$title = $out->getTitle();
+		global $wgUser, $wgSVGEditInline, $wgScriptPath, $wgTitle;
+		$title = $wgTitle;
 		if( self::trigger( $title ) )
 		{
+			wfLoadExtensionMessages( 'SVGEdit' );
 			$out->addHeadItem( 'jquery', '<script language="JavaScript" src="'.$wgScriptPath.'/extensions/SVGEdit/modules/jquery.min.js"></script>' );
 			$out->addHeadItem( 'jquery-ui', '<script language="JavaScript" src="'.$wgScriptPath.'/extensions/SVGEdit/modules/jquery-ui.min.js"></script>' );
 			$out->addHeadItem( 'js-mediaWiki-emu', '<script type="text/javascript">
@@ -39,6 +40,7 @@ var mediaWiki = {
 		"addPortletLink" : addPortletLink
 	},
 };
+var wgScriptExtension = \'.php\';
 </script>');
 			$out->addHeadItem( 'svgedit.embedapi', '<script language="JavaScript" src="'.$wgScriptPath.'/extensions/SVGEdit/modules/ext.svgedit.embedapi.js"></script>' );
 			$out->addHeadItem( 'svgedit.formmultipart', '<script language="JavaScript" src="'.$wgScriptPath.'/extensions/SVGEdit/modules/ext.svgedit.formmultipart.js"></script>' );
@@ -82,5 +84,4 @@ var mediaWiki = {
 		return $title && $title->getNamespace() == NS_FILE &&
 			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
 	}
-
 }
