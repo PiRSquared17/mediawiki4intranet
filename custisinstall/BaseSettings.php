@@ -149,11 +149,11 @@ require_once($IP.'/extensions/SimpleForms/SimpleForms.php'); /* useful at least 
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 
-# HaloACL
-if (!isset($egDisableHaloACL))
+# IntraACL
+if (!isset($egDisableIntraACL))
 {
-    require_once('extensions/HaloACL/includes/HACL_Initialize.php');
-    enableHaloACL();
+    require_once('extensions/IntraACL/includes/HACL_Initialize.php');
+    enableIntraACL();
     $haclgInclusionDeniedMessage = '';
     $haclgEnableTitleCheck = true;
 }
