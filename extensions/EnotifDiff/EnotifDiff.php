@@ -8,6 +8,7 @@
  *
  * ATTENTION: This extension requires a patched includes/UserMailer.php
  *            (see MediaWiki4Intranet patch 000-html-emails)
+ * ATTENTION2: This extension requires PreferencesExtension for MediaWiki < 1.16
  *
  * @author Vitaliy Filippov <vitalif@mail.ru>
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
@@ -32,8 +33,30 @@ $wgExtensionCredits['other'][] = array (
 
 function wfEnotifDiff()
 {
-    global $wgEmailContentType;
+    global $wgEmailContentType, $wgVersion, $IP;
     wfLoadExtensionMessages('EnotifDiff');
+    if ($wgVersion < '1.16')
+    {
+        if (!function_exists('wfAddPreferences'))
+        {
+            wfDebug('EnotifDiff requires PreferencesExtension for MediaWiki versions below 1.16. Install it from http://www.mediawiki.org/wiki/Extension:PreferencesExtension');
+            return;
+        }
+        wfAddPreferences(array(
+            array(
+                'name'    => 'enotifsenddiffs',
+                'section' => 'prefs-personal',
+                'type'    => PREF_TOGGLE_T,
+                'default' => 0,
+            ),
+            array(
+                'name'    => 'enotifsendmultiple',
+                'section' => 'prefs-personal',
+                'type'    => PREF_TOGGLE_T,
+                'default' => 0,
+            )
+        ));
+    }
     $wgEmailContentType = 'text/html';
 }
 
