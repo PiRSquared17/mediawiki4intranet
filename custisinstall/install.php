@@ -41,7 +41,7 @@ $EXT_OUR = explode(' ',
     ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
     ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
-    ' HaloACL OpenID Calendar Wikilog GlobalAuth HaloACL PlantUML SubPageList2 HttpAuth'.
+    ' IntraACL OpenID Calendar Wikilog GlobalAuth PlantUML SubPageList2 HttpAuth'.
     ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit');
 $SKINS_OUR = explode(' ',
     'custis custisru dumphtml ichick');
@@ -115,14 +115,7 @@ foreach (glob("$SELFDIR/patches/Y-*") as $p)
     cmd("echo Applying $p\npatch -d $DIR -p0 < $p");
 
 if ($UPGRADE)
-{
     cmd("php maintenance/update.php");
-    if (!file_exists("$DIR/extensions/HaloACL"))
-    {
-        cmd("php extensions/HaloACL/maintenance/HACL_Setup.php");
-        cmd("php maintenance/update.php");
-    }
-}
 
 if (!$WINDOWS)
 {
