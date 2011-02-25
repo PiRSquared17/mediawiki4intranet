@@ -3836,15 +3836,24 @@ class Title {
 	 * 		true, if this title can be read
 	 * 		false, if the title is protected or "Permission denied".
 	 */
-	public function userCanReadEx()
+	public function userCanReadEx( $otherUser = NULL )
 	{
 		if (!defined('HACL_HALOACL_VERSION')) {
-			//HaloACL is disabled
+			// IntraACL is disabled
 			return true;
 		}
 		global $haclgContLang;
-		return $this->mTextform !== $haclgContLang->getPermissionDeniedPage()
-		       && $this->userCanRead();
+		if ( $this->mTextform !== $haclgContLang->getPermissionDeniedPage() ) {
+			// Special handling of "Permission denied" page
+			return false;
+		}
+		if ( $otherUser )
+		{
+			$canRead = false;
+			$status = HACLEvaluator::userCan( $this, $otherUser, 'read', $canRead );
+			return $canRead;
+		}
+		return $this->userCanRead();
 	}
 
 	/**
