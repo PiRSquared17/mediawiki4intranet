@@ -157,7 +157,7 @@ function haclfSetupExtension()
     }
 
     //-- Hooks for ACL toolbar --
-    $wgHooks['EditPage::showEditForm:initial'][] = 'haclfAddToolbarForEditPage';
+    $wgHooks['EditPage::showEditForm:fields'][] = 'haclfAddToolbarForEditPage';
     $wgHooks['sfEditPageBeforeForm'][] = 'haclfAddToolbarForSemanticForms';
     $wgHooks['SkinTemplateContentActions'][] = 'HACLToolbar::SkinTemplateContentActions';
     $wgHooks['SkinTemplateNavigation'][] = 'HACLToolbar::SkinTemplateNavigation';

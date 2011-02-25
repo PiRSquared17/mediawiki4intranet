@@ -771,8 +771,8 @@ class HACLParserFunctions
 
         $html .= wfMsgForContent($id ? 'hacl_edit_with_special' : 'hacl_create_with_special',
             Title::newFromText('Special:HaloACL')->getLocalUrl(array(
-                'action' => 'acl',
-                'sd' => $this->mTitle->getPrefixedText(),
+                'action' => ($this->mType == 'group' ? 'group' : 'acl'),
+                ($this->mType == 'group' ? 'group' : 'sd') => $this->mTitle->getPrefixedText(),
             )),
             $haclgHaloScriptPath . '/skins/images/edit.png');
 

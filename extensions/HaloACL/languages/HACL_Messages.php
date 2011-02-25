@@ -181,8 +181,8 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_define_default'               => 'Define global template:',
 
     // ACL list
-    'hacl_acllist'                      => 'Halo Access Control Lists',
-    'hacl_acllist_hello'                => 'Hi, this is \'\'\'HaloACL[http://4intra.net/ <sup>4</sup>IN]\'\'\', the best MediaWiki rights extension. You can get help [http://wiki.4intra.net/HaloACL here]. Select function below to start working:',
+    'hacl_acllist'                      => 'Intranet Access Control Lists',
+    'hacl_acllist_hello'                => 'Hi, this is \'\'\'[http://wiki.4intra.net/IntraACL IntraACL]\'\'\', the best MediaWiki rights extension. You can get help [http://wiki.4intra.net/IntraACL here]. Select function below to start working:',
     'hacl_acllist_empty'                => '<span style="color:red;font-weight:bold">No matching ACL definitions found.</span>',
     'hacl_acllist_filter_name'          => 'Filter by name:',
     'hacl_acllist_filter_type'          => 'Filter by type:',
@@ -204,7 +204,6 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_acllist_right'                => 'Predefined rights:',
     'hacl_acllist_template'             => 'Templates for users:',
     'hacl_acllist_default'              => 'Default template for new ACLs:',
-    'hacl_acllist_own_template'         => '<b>$1 (your default template)</b>',
     'hacl_acllist_edit'                 => 'Edit',
     'hacl_acllist_view'                 => 'View',
 
@@ -213,12 +212,18 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_qacl_filter'                  => 'Name starts with:',
     'hacl_qacl_filter_submit'           => 'Apply',
     'hacl_qacl_manage'                  => 'HaloACL: Manage Quick Access list',
-    'hacl_qacl_manage_text'             => 'This is a list of all the ACL templates that you can use in your quick access list.<br />This list defines the ACLs that will be in the dropdown box that is on the top of every page in the edit or creation mode.',
+    'hacl_qacl_manage_text'             =>
+        'This is a list of all the ACL templates that you can use in your quick access list.
+        Quick ACL will be shown in the dropdown box in protection toolbar every time you edit some page.
+        The template marked as default will be selected by default for new pages.',
     'hacl_qacl_save'                    => 'Save selections',
     'hacl_qacl_hint'                    => 'Select some ACL templates and then click Save selections:',
-    'hacl_qacl_own_template'            => '(your default template is always present in Quick ACL list)',
     'hacl_qacl_empty'                   => 'There are no ACL templates available for Quick Access. Create one using <b>Create new ACL definition</b>.',
     'hacl_qacl_clear_default'           => 'Clear default',
+    'hacl_qacl_col_select'              => 'Select',
+    'hacl_qacl_col_default'             => 'Default',
+    'hacl_qacl_col_name'                => 'Name',
+    'hacl_qacl_col_actions'             => 'Actions',
 
     // Group list
     'hacl_grouplist'                    => 'HaloACL Groups',
@@ -255,15 +260,18 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_current_member_group'         => 'Member groups:',
     'hacl_current_manager_user'         => 'Manager users:',
     'hacl_current_manager_group'        => 'Manager groups:',
-    'hacl_regexp_user'                  => '(^|,\s*)Участник:',
+    'hacl_regexp_user'                  => '',
     'hacl_regexp_group'                 => '(^|,\s*)Group:',
 
     // Toolbar and parts
     'hacl_toolbar_page_prot'            => 'Page protection:',
-    'hacl_toolbar_advanced'             => 'Advanced rights definition',
+    'hacl_toolbar_advanced_edit'        => 'Edit ACL',
+    'hacl_toolbar_advanced_create'      => 'Create ACL',
     'hacl_toolbar_goto'                 => 'Go to $1.',
     'hacl_toolbar_global_acl'           => 'Additional ACL &darr;',
     'hacl_toolbar_global_acl_tip'       => 'These definitions also have effect on this page:',
+    'hacl_toolbar_embedded_acl'         => 'Used content &darr;',
+    'hacl_toolbar_loading'              => 'Loading...',
     'hacl_toolbar_cannot_modify'        => 'You can not modify page protection.',
     'hacl_toolbar_no_right_templates'   => 'No custom page rights and no <a href="$1">Quick ACL</a> selected.',
     'hacl_toolbar_unprotected'          => 'No custom rights',
@@ -274,6 +282,127 @@ If you want to protect some pages, ACL page must be named as one of: ACL:Page/*,
     'hacl_toolbar_qacl_title'           => 'Manage the list of templates always available in the select box.',
     'hacl_comment_protect_with'         => 'Page protected with $1.',
     'hacl_comment_unprotect'            => 'Custom page rights removed.',
+);
+
+/**
+ * Russian
+ */
+$messages['ru'] = array(
+
+    // General
+    'haloacl'                           => 'HaloACL',
+    'hacl_special_page'                 => 'HaloACL',  // Name of the special page for administration
+    'hacl_unknown_user'                 => 'Пользователя "$1" не существует.',
+    'hacl_unknown_group'                => 'Группы "$1" не существует.',
+    'hacl_missing_parameter'            => 'Не хватает параметра "$1".',
+    'hacl_missing_parameter_values'     => 'Некорректное значение параметра "$1".',
+    'hacl_invalid_predefined_right'     => 'Шаблон прав "$1" не существует или не содержит корректных определений прав.',
+    'hacl_invalid_action'               => 'Действия "$1" не существует.',
+    'hacl_wrong_namespace'              => 'Страницы с определениями прав или групп должны быть в пространстве имён "ACL".',
+    'hacl_group_must_have_members'      => 'В группу должен кто-то входить (пользователь или другая группа).',
+    'hacl_group_must_have_managers'     => 'Группой должен кто-то управлять (пользователь или другая группа).',
+    'hacl_invalid_parser_function'      => 'В данной статье нельзя использовать функцию "#$1".',
+    'hacl_right_must_have_rights'       => 'Определение прав должно содержать хотя бы одно право или включение других прав.',
+    'hacl_right_must_have_managers'     => 'Должны быть заданы права модификации, чтобы кто-нибудь смог изменять это право.',
+    'hacl_pf_rightname_title'           => "===$1===\n",
+    'hacl_pf_rights_title'              => "===Права: $1===\n",
+    'hacl_pf_rights'                    => ":;Права:\n:: $1\n",
+    'hacl_pf_right_managers_title'      => "===Могут изменять права===\n",
+    'hacl_pf_predefined_rights_title'   => "===Включения прав===\n",
+    'hacl_pf_group_managers_title'      => "===Могут изменять группу===\n",
+    'hacl_pf_group_members_title'       => "===Члены группы===\n",
+    'hacl_assigned_user'                => 'Выданы пользователям:',
+    'hacl_assigned_groups'              => 'Выданы группам:',
+    'hacl_user_member'                  => 'Эти пользователи входят в группу:',
+    'hacl_group_member'                 => 'Эти группы входят в группу:',
+    'hacl_description'                  => 'Описание:',
+    'hacl_error'                        => 'Ошибки:',
+    'hacl_warning'                      => 'Предупреждения:',
+    'hacl_consistency_errors'           => '<h2>Определение содержит ошибки</h2>',
+    'hacl_definitions_will_not_be_saved' => '(Определение на данной странице не будет сохранено и не будет работать из-за следующих ошибок:)',
+    'hacl_will_not_work_as_expected'    => '(Следующие ошибки некритичны, но из-за них определение может не работать так, как задумано:)',
+    'hacl_errors_in_definition'         => 'Определение на данной странице содержит ошибки, обратите внимание на подробности ниже!',
+    'hacl_anonymous_users'              => 'анонимные пользователи',
+    'hacl_registered_users'             => 'зарегистрированные пользователи',
+    'hacl_acl_element_not_in_db'        => 'Эта статья не сохранена в базе данных прав. Пожалуйста, пересохраните её.',
+    'hacl_unprotectable_namespace'      => 'Это пространство имён относится к незащищаемым. Обратитесь к администраторам MediaWiki.',
+    'hacl_permission_denied'            => "Вам запрещено это действие на данной странице.\n\nВернуться на [[Заглавная страница|главную страницу]].",
+
+    // Messages for semantic protection (properties etc.)
+    'hacl_sp_query_modified'            => "- Запрос был изменён, потому что содержит защищённые от чтения свойства.\n",
+    'hacl_sp_empty_query'               => "- Запрос не выполнен, потому что состоит только из защищённых от чтения свойств.\n",
+    'hacl_sp_results_removed'           => "- Часть результатов запроса удалена в связи с ограничением доступа.\n",
+    'hacl_sp_cant_save_article'         => "'''Статья содержит следующие защищённые свойства:'''\n$1'''Вы не можете изменять из значения. Удалите их и сохраните статью заново.'''",
+
+    /**** IntraACL: ****/
+
+    // General
+    'hacl_invalid_prefix'               =>
+'Эта страница ничего не защищает и не задаёт группы. Либо так и задумано, либо она некорректно создана.
+Если вы хотите что-то защитить, создавайте статьи с именами: ACL:Page/*, ACL:Category/*, ACL:Namespace/*, ACL:Property/*, ACL:Right/*.',
+    'hacl_pe_not_exists'                => 'То, что должна защищать эта статья, не существует.',
+    'hacl_edit_with_special'            => '<p><a href="$1"><img src="$2" width="16" height="16" alt="Править" /> Править это определение редактором HaloACL.</a></p><hr />',
+    'hacl_create_with_special'          => '<p><a href="$1"><img src="$2" width="16" height="16" alt="Создать" /> Создать это определение редактором HaloACL.</a></p><hr />',
+    'hacl_tab_acl'                      => 'ACL',
+    'hacl_tab_page'                     => 'Страница',
+    'hacl_tab_category'                 => 'Категория',
+
+    // Special:HaloACL actions
+    'hacl_action_acllist'               => 'Список ACL',
+    'hacl_action_acl'                   => 'Создать новый ACL',
+    'hacl_action_quickaccess'           => 'Шаблоны быстрого доступа',
+    'hacl_action_grouplist'             => 'Группы',
+    'hacl_action_group'                 => 'Создать группу',
+
+    // ACL Editor
+    'hacl_autocomplete_no_users'        => 'Пользователи не найдены',
+    'hacl_autocomplete_no_groups'       => 'Группы не найдены',
+    'hacl_autocomplete_no_pages'        => 'Страницы не найдены',
+    'hacl_autocomplete_no_namespaces'   => 'Пространства имён не найдены',
+    'hacl_autocomplete_no_categorys'    => 'Категории не найдены',
+    'hacl_autocomplete_no_propertys'    => 'Свойства не найдены',
+    'hacl_autocomplete_no_sds'          => 'Определения прав не найдены',
+
+    // Quick ACL list editor
+    'hacl_qacl_filter_sds'              => 'Выбор по имени',
+    'hacl_qacl_filter'                  => 'Начало имени:',
+    'hacl_qacl_filter_submit'           => 'Выбрать',
+    'hacl_qacl_manage'                  => 'HaloACL — Шаблоны быстрого доступа',
+    'hacl_qacl_manage_text'             =>
+        'Это список шаблонов прав, которые вы можете использовать как шаблоны быстрого доступа.
+        Выбранные шаблоны показываются для выбора в режиме редактирования и создания каждой вики-страницы.
+        Шаблон по умолчанию будет изначально выбран для новых страниц.',
+    'hacl_qacl_save'                    => 'Сохранить выбор',
+    'hacl_qacl_hint'                    => 'Отметьте какие-нибудь шаблоны прав и нажмите "Сохранить выбор":',
+    'hacl_qacl_empty'                   => 'Таких шаблонов, которые можно выбрать для быстрого доступа, нет. Для создания нажмите <b>Создать новый ACL</b>.',
+    'hacl_qacl_clear_default'           => 'Сбросить шаблон по умолчанию',
+    'hacl_qacl_col_select'              => 'Выбрать',
+    'hacl_qacl_col_default'             => 'По умолчанию',
+    'hacl_qacl_col_name'                => 'Имя шаблона',
+    'hacl_qacl_col_actions'             => 'Действия',
+
+    'hacl_regexp_user'                  => '(^|,\s*)Участник:',
+    'hacl_regexp_group'                 => '(^|,\s*)(Group|Группа)[:/]',
+
+    // Toolbar and parts
+    'hacl_toolbar_advanced_edit'        => 'Править редактором',
+    'hacl_toolbar_advanced_create'      => 'Создать редактором',
+    'hacl_toolbar_goto'                 => 'Перейти к $1.',
+    'hacl_toolbar_global_acl'           => 'Другие права &darr;',
+    'hacl_toolbar_global_acl_tip'       => 'Эти определения прав также действуют на страницу:',
+    'hacl_toolbar_embedded_acl'         => 'Связанное содержимое &darr;',
+    'hacl_toolbar_loading'              => 'Загрузка...',
+    'hacl_toolbar_page_prot'            => 'Права доступа:',
+    'hacl_toolbar_cannot_modify'        => 'Вам запрещено изменять защиту статьи.',
+    'hacl_toolbar_no_right_templates'   => 'Права не заданы, <a href="$1">шаблоны быстрого доступа</a> не выбраны.',
+    'hacl_toolbar_unprotected'          => 'Особых прав нет',
+    'hacl_toolbar_used_on'              => 'на <a href="$2">$1 страницах</a>',
+    'hacl_toolbar_protect_embedded'     => 'Защитить включённые файлы и статьи теми же правами, что и статью (внимание — существующие права будут перезаписаны):',
+    'hacl_toolbar_emb_custom_prot'      => 'заданы <a href="$1">права доступа</a>',
+    'hacl_toolbar_qacl'                 => 'Шаблоны быстрого доступа',
+    'hacl_toolbar_qacl_title'           => 'Управление списком шаблонов прав, доступных на этой панели.',
+    'hacl_comment_protect_with'         => 'Страница защищена $1.',
+    'hacl_comment_unprotect'            => 'Особые права страницы удалены.',
 );
 
 /**

@@ -1,7 +1,7 @@
 <div id="hacl_toolbar">
 <?php if (count($options) > 1 && $canModify) { ?>
  <label for="hacl_protected_with"><?= wfMsg('hacl_toolbar_page_prot') ?></label>
- <select name="hacl_protected_with" id="hacl_protected_with" onchange="hacl_change_toolbar_goto(this, '<?= wfMsg('hacl_toolbar_goto') ?>')">
+ <select name="hacl_protected_with" id="hacl_protected_with" onchange="haclt_change_goto(this, '<?= wfMsg('hacl_toolbar_goto') ?>')">
   <?php foreach($options as $o) { ?>
    <option title="<?= htmlspecialchars($o['title']) ?>" <?= $o['current'] ? ' selected="selected"' : '' ?> value="<?= htmlspecialchars($o['value']) ?>"><?= htmlspecialchars($o['name']) ?></option>
   <?php } ?>
@@ -20,14 +20,21 @@
 <?php } else { ?>
  <?= wfMsg('hacl_toolbar_no_right_templates', $quick_acl_link) ?>
 <?php } if ($globalACL) { ?>
- <div id="hacl_toolbar_global_acl" onmouseover="hacl_show_gacl(true)" onmouseout="hacl_show_gacl(false)">
-  <span id="hacl_toolbar_gaclt"><?= wfMsg('hacl_toolbar_global_acl') ?></span>
-  <div id="hacl_toolbar_global_acl_tip" style="display: none"><div class="x">
+ <div class="haclt_tip" onmouseover="haclt_show('gacl', true)" onmouseout="haclt_show('gacl', false)">
+  <span class="haclt_title" id="haclt_gacl_title"><?= wfMsg('hacl_toolbar_global_acl') ?></span>
+  <div class="haclt_text" id="haclt_gacl_text" style="display: none"><div class="x">
    <?= wfMsg('hacl_toolbar_global_acl_tip') ?><br /><?= $globalACL ?>
   </div></div>
  </div>
+<?php } if ($anyLinks || $embeddedToolbar) { ?>
+ <div class="haclt_tip" onmouseover="haclt_show('emb', true)" onmouseout="haclt_show('emb', false)">
+  <span class="haclt_title" id="haclt_emb_title"><?= wfMsg('hacl_toolbar_embedded_acl') ?></span>
+  <div class="haclt_text" id="haclt_emb_text" style="display: none"><div class="x<?= $embeddedToolbar ? ' xl' : '' ?>" id="haclt_emb">
+   <?= $embeddedToolbar ? $embeddedToolbar : wfMsg('hacl_toolbar_loading') ?>
+  </div></div>
+ </div>
 <?php } if ($title->exists()) { ?>
- &nbsp; <a target="_blank" href="index.php?title=Special:HaloACL&action=acl&sd=<?= urlencode($haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).'/'.$title) ?>"><?= wfMsg('hacl_toolbar_advanced') ?></a>
+ <a style="text-decoration: none" class="haclt_title" target="_blank" href="index.php?title=Special:HaloACL&action=acl&sd=<?= urlencode($haclgContLang->getPetPrefix(HACLLanguage::PET_PAGE).'/'.$title) ?>"><img src="<?= $haclgHaloScriptPath ?>/skins/images/edit.png" width="16" height="16" alt="Edit" /> <?= wfMsg('hacl_toolbar_advanced_'.($pageSDId ? 'edit' : 'create')) ?></a>
 <?php } if (count($options) > 1 && $canModify) { ?>
  <div class="qacl"><a target="_blank" href="<?= $quick_acl_link ?>" title="<?= wfMsg('hacl_toolbar_qacl_title') ?>"><?= wfMsg('hacl_toolbar_qacl') ?></a></div>
 <?php } ?>
