@@ -2169,6 +2169,7 @@ class Parser
 				if ( $emptyLines > 1 )
 				{
 					// start a new paragraph
+					$lastParagraphPos = strlen( $output );
 					$this->mLastSection = 'p';
 					$output .= '<p><br />';
 					$emptyLines = 0;
