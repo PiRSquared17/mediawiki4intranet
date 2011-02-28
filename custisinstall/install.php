@@ -35,7 +35,7 @@ $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
     ' StringFunctions DeleteBatch');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions');
+    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud');
 $EXT_OUR = explode(' ',
     'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
     ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
@@ -91,8 +91,6 @@ foreach ($SKINS_OUR as $s)
     cmd("svn export $SVN_OUR/skins/$s.php $DIR/skins/$s.php");
 
 cmd("svn export $SVN_OUR/extensions/FullLocalImage.php $DIR/extensions/FullLocalImage.php");
-cmd("svn co --force svn://svn.nadir-point.com/mediawiki-extensions/branches/stable/WikiCategoryTagCloud/ $DIR/extensions/WikiCategoryTagCloud/");
-cmd("svn revert -R $DIR/extensions/WikiCategoryTagCloud");
 cmd("svn co --force http://geshi.svn.sourceforge.net/svnroot/geshi/trunk/geshi-1.0.X/src/ $DIR/extensions/geshi/");
 cmd("svn revert -R $DIR/extensions/geshi");
 
