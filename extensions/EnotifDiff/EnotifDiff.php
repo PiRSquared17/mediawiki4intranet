@@ -40,7 +40,7 @@ function wfEnotifDiff()
         if (!function_exists('wfAddPreferences'))
         {
             wfDebug('EnotifDiff requires PreferencesExtension for MediaWiki versions below 1.16. Install it from http://www.mediawiki.org/wiki/Extension:PreferencesExtension');
-            return;
+            die('EnotifDiff requires PreferencesExtension for MediaWiki versions below 1.16. Install it from http://www.mediawiki.org/wiki/Extension:PreferencesExtension');
         }
         wfAddPreferences(array(
             array(
