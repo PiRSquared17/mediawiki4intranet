@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 60
-/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/UserMerge
+/svnroot/mediawiki/!svn/ver/81606/trunk/extensions/UserMerge
 END
 UserMerge_body.php
 K 25
@@ -13,7 +13,7 @@ UserMerge.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 79
-/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/UserMerge/UserMerge.i18n.php
+/svnroot/mediawiki/!svn/ver/81606/trunk/extensions/UserMerge/UserMerge.i18n.php
 END
 UserMerge.php
 K 25

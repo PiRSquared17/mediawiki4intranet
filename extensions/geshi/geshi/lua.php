@@ -4,7 +4,7 @@
  * -------
  * Author: Roberto Rossi (rsoftware@altervista.org)
  * Copyright: (c) 2004 Roberto Rossi (http://rsoftware.altervista.org), Nigel McNie (http://qbnz.com/highlighter)
- * Release Version: 1.0.8.9
+ * Release Version: 1.0.8.10
  * Date Started: 2004/07/10
  *
  * LUA language file for GeSHi.
@@ -100,7 +100,7 @@ $language_data = array (
             'nil', 'false', 'true'
             ),
         5 => array(
-            'Nil', 'Boolean', 'Number', 'String', 'function', 'Userdata', 'Thread', 'Table'
+            'Nil', 'Boolean', 'Number', 'String', 'Userdata', 'Thread', 'Table'
             )
         ),
     'SYMBOLS' => array(
@@ -156,7 +156,11 @@ $language_data = array (
             )
         ),
     'URLS' => array(
-        1 => ''
+        1 => '',
+        2 => '',
+        3 => '',
+        4 => '',
+        5 => ''
         ),
     'OOLANG' => false,
     'OBJECT_SPLITTERS' => array(
