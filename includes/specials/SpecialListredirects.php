@@ -44,6 +44,12 @@ class ListredirectsPage extends QueryPage {
 		if( $revision ) {
 			# Make a link to the destination page
 			$target = Title::newFromRedirect( $revision->getText() );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			if (!$target->userCanReadEx()) {
+				return;
+			}
+/*op-patch|TS|2009-06-19|end*/  
+			
 			if( $target ) {
 				$arr = $wgContLang->getArrow() . $wgContLang->getDirMark();
 				$targetLink = $skin->link( $target );
