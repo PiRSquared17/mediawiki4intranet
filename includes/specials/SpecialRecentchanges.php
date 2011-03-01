@@ -385,6 +385,13 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$s = $list->beginRecentChangesList();
 		foreach( $rows as $obj ) {
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			$rc = RecentChange::newFromRow( $obj );
+			if (!$rc->getTitle()->userCanReadEx()) {
+				continue;
+			}
+/*op-patch|TS|2009-06-19|end*/  
+
 			if( $limit == 0 ) break;
 			$rc = RecentChange::newFromRow( $obj );
 			$rc->counter = $counter++;
