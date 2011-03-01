@@ -77,7 +77,7 @@ class MovePageForm {
 			$this->fixRedirects = $wgRequest->getBool( 'wpFixRedirects', true );
 			$this->leaveRedirect = $wgRequest->getBool( 'wpLeaveRedirect', true );
 		}
-		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', false );
+		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', true );
 		$this->deleteAndMove = $wgRequest->getBool( 'wpDeleteAndMove' ) && $wgRequest->getBool( 'wpConfirm' );
 		$this->moveOverShared = $wgRequest->getBool( 'wpMoveOverSharedFile', false );
 		$this->watch = $wgRequest->getCheck( 'wpWatch' ) && $wgUser->isLoggedIn();
