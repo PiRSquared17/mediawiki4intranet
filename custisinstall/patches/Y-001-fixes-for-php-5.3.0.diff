@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297181968 -10800
+# Date 1298998568 -10800
 Depends on: Y-000-debug-wikilog.diff
 
 Patch includes several simple fixes required for MediaWiki to run under
@@ -8,7 +8,7 @@ more restrictive PHP 5.3.x.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r b11befdd7427 -r 7b2ad2190a43 extensions/Interwiki/Interwiki_body.php
+diff -r 9cc4b1960d33 -r 2e6990a578d2 extensions/Interwiki/Interwiki_body.php
 --- extensions/Interwiki/Interwiki_body.php
 +++ extensions/Interwiki/Interwiki_body.php
 @@ -176,7 +176,7 @@
@@ -31,3 +31,15 @@ diff -r b11befdd7427 -r 7b2ad2190a43 extensions/Interwiki/Interwiki_body.php
  			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
  			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
  			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
+diff -r 9cc4b1960d33 -r 2e6990a578d2 extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+--- extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
++++ extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+@@ -45,7 +45,7 @@
+ }
+ 
+ function invalidateCache() {
+-	$titles[0] = explode( "\n", wfMsg( 'tagcloudpages' ) );
++	$titles = explode( "\n", wfMsg( 'tagcloudpages' ) );
+ 
+ 	for ( $i = 0; $i < count( $titles ); $i++ ) {
+ 		$t = Title::newFromText( $titles[$i] );
