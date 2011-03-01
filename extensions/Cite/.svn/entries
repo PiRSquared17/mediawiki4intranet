@@ -1,7 +1,7 @@
 10
 
 dir
-81532
+83020
 http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/Cite
 http://svn.wikimedia.org/svnroot/mediawiki
 
@@ -536,40 +536,6 @@ has-props
 
 2256
 
-cite_text-kk-tr
-file
-
-
-
-
-2011-02-04T18:15:53.092245Z
-3ccdedb4eea8e2f1f3e32381613f6092
-2007-04-26T19:01:16.560429Z
-21631
-raymond
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4131
-
 cite_text-de
 file
 
@@ -604,17 +570,17 @@ has-props
 
 2755
 
-cite_text-arz
+cite_text-kk-tr
 file
 
 
 
 
-2011-02-04T18:15:53.076245Z
-8813016004f8eff96adfc5d54b4ef1ec
-2008-06-14T11:32:09.424324Z
-36289
-mfarag
+2011-02-04T18:15:53.092245Z
+3ccdedb4eea8e2f1f3e32381613f6092
+2007-04-26T19:01:16.560429Z
+21631
+raymond
 has-props
 
 
@@ -636,7 +602,7 @@ has-props
 
 
 
-3668
+4131
 
 cite_text-he
 file
@@ -671,6 +637,40 @@ has-props
 
 
 3713
+
+cite_text-arz
+file
+
+
+
+
+2011-02-04T18:15:53.076245Z
+8813016004f8eff96adfc5d54b4ef1ec
+2008-06-14T11:32:09.424324Z
+36289
+mfarag
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3668
 
 cite_text-fi
 file
@@ -774,40 +774,6 @@ has-props
 
 3624
 
-cite_text-kk-cn
-file
-
-
-
-
-2011-02-04T18:15:53.084245Z
-614c2fad106fde6e90236c0a7206a1cc
-2007-05-10T19:53:55.410417Z
-22081
-raymond
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4711
-
 SpecialCite.i18n.php
 file
 
@@ -841,6 +807,40 @@ has-props
 
 
 53592
+
+cite_text-kk-cn
+file
+
+
+
+
+2011-02-04T18:15:53.084245Z
+614c2fad106fde6e90236c0a7206a1cc
+2007-05-10T19:53:55.410417Z
+22081
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4711
 
 cite_text-fr
 file

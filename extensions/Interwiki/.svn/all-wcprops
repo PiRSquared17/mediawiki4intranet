@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 60
-/svnroot/mediawiki/!svn/ver/81107/trunk/extensions/Interwiki
+/svnroot/mediawiki/!svn/ver/82907/trunk/extensions/Interwiki
 END
 Interwiki.alias.php
 K 25
@@ -19,13 +19,13 @@ Interwiki.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 79
-/svnroot/mediawiki/!svn/ver/81107/trunk/extensions/Interwiki/Interwiki.i18n.php
+/svnroot/mediawiki/!svn/ver/82907/trunk/extensions/Interwiki/Interwiki.i18n.php
 END
 Interwiki.php
 K 25
 svn:wc:ra_dav:version-url
 V 74
-/svnroot/mediawiki/!svn/ver/65202/trunk/extensions/Interwiki/Interwiki.php
+/svnroot/mediawiki/!svn/ver/81579/trunk/extensions/Interwiki/Interwiki.php
 END
 Interwiki.css
 K 25

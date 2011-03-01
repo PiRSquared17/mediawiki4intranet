@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 61
-/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler
+/svnroot/mediawiki/!svn/ver/82148/trunk/extensions/PdfHandler
 END
 CreatePdfThumbnailsJob.class.php
 K 25
@@ -19,7 +19,7 @@ PdfHandler.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/PdfHandler/PdfHandler.i18n.php
+/svnroot/mediawiki/!svn/ver/82148/trunk/extensions/PdfHandler/PdfHandler.i18n.php
 END
 PdfHandler.php
 K 25
