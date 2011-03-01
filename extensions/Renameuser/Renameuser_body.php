@@ -46,18 +46,10 @@ class SpecialRenameuser extends SpecialPage {
 		$nun = is_object( $newusername ) ? $newusername->getText() : '';
 		$token = $wgUser->editToken();
 		$reason = $wgRequest->getText( 'reason' );
-		// If nothing given for these flags, assume they are checked
-		// unless this is a POST submission.
-		$move_checked = true;
-		$suppress_checked = false;
-		if ( $wgRequest->wasPosted() ) {
-			if ( !$wgRequest->getCheck( 'movepages' ) ) {
-				$move_checked = false;
-			}
-			if ( $wgRequest->getCheck( 'suppressredirect' ) ) {
-				$suppress_checked = true;
-			}
-		}
+
+		$move_checked = $wgRequest->getCheck( 'movepages' );
+		$suppress_checked = $wgRequest->getCheck( 'suppressredirect' );
+
 		$warnings = array();
 		if ( $oun && $nun && !$wgRequest->getCheck( 'confirmaction' )  ) {
 			wfRunHooks( 'RenameUserWarning', array( $oun, $nun, &$warnings ) );
@@ -177,24 +169,18 @@ class SpecialRenameuser extends SpecialPage {
 			# Let user read warnings
 			return;
 		} elseif ( !$wgRequest->wasPosted() || !$wgUser->matchEditToken( $wgRequest->getVal( 'token' ) ) ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameuser-error-request' ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>", 'renameuser-error-request' );
 			return;
 		} elseif ( !is_object( $oldusername ) ) {
-			$wgOut->addWikiText(
-				"<div class=\"errorbox\">"
-				. wfMsg( 'renameusererrorinvalid', $wgRequest->getText( 'oldusername' ) )
-				. "</div>"
-			);
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrorinvalid', $wgRequest->getText( 'oldusername' ) ) );
 			return;
 		} elseif ( !is_object( $newusername ) ) {
-			$wgOut->addWikiText(
-				"<div class=\"errorbox\">"
-				. wfMsg( 'renameusererrorinvalid', $wgRequest->getText( 'newusername' ) )
-				. "</div>"
-			);
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrorinvalid', $wgRequest->getText( 'newusername' ) ) );
 			return;
 		} elseif ( $oldusername->getText() == $newusername->getText() ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameuser-error-same-user' ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>", 'renameuser-error-same-user' );
 			return;
 		}
 
@@ -204,13 +190,13 @@ class SpecialRenameuser extends SpecialPage {
 
 		// It won't be an object if for instance "|" is supplied as a value
 		if ( !is_object( $olduser ) ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameusererrorinvalid',
-				$oldusername->getText() ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrorinvalid', $oldusername->getText() ) );
 			return;
 		}
 		if ( !is_object( $newuser ) || !User::isCreatableName( $newuser->getName() ) ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameusererrorinvalid',
-				$newusername->getText() ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrorinvalid', $newusername->getText() ) );
 			return;
 		}
 
@@ -237,14 +223,14 @@ class SpecialRenameuser extends SpecialPage {
 		}
 
 		if ( $uid == 0 ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameusererrordoesnotexist' ,
-				$oldusername->getText() ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrordoesnotexist', $oldusername->getText() ) );
 			return;
 		}
 
 		if ( $newuser->idForName() != 0 ) {
-			$wgOut->addWikiText( "<div class=\"errorbox\">" . wfMsg( 'renameusererrorexists',
-				$newusername->getText() ) . "</div>" );
+			$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+				array( 'renameusererrorexists', $newusername->getText() ) );
 			return;
 		}
 
@@ -254,13 +240,11 @@ class SpecialRenameuser extends SpecialPage {
 		// Check edit count
 		if ( !$wgUser->isAllowed( 'siteadmin' ) ) {
 			if ( RENAMEUSER_CONTRIBLIMIT != 0 && $contribs > RENAMEUSER_CONTRIBLIMIT ) {
-				$wgOut->addWikiText( "<div class=\"errorbox\">" .
-					wfMsg( 'renameusererrortoomany',
-						$oldusername->getText(),
+				$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
+					array( 'renameusererrortoomany', $oldusername->getText(),
 						$wgLang->formatNum( $contribs ),
 						$wgLang->formatNum( RENAMEUSER_CONTRIBLIMIT )
-					)
-				 . "</div>" );
+				) );
 				return;
 			}
 		}
@@ -337,8 +321,8 @@ class SpecialRenameuser extends SpecialPage {
 		}
 
 		// Output success message stuff :)
-		$wgOut->addWikiText( "<div class=\"successbox\">" . wfMsg( 'renameusersuccess', $oldusername->getText(),
-		$newusername->getText() ) . "</div><br style=\"clear:both\" />" );
+		$wgOut->wrapWikiMsg( "<div class=\"successbox\">$1</div><br style=\"clear:both\" />",
+			array( 'renameusersuccess', $oldusername->getText(), $newusername->getText() ) );
 	}
 
 	function showLogExtract( $username, $type, &$out ) {
@@ -395,7 +379,7 @@ class RenameuserSQL {
 		$this->tables = array(); // Immediate updates
 		$this->tables['image'] = array( 'img_user_text', 'img_user' );
 		$this->tables['oldimage'] = array( 'oi_user_text', 'oi_user' );
-		# FIXME: $this->tables['filearchive'] = array('fa_user_text','fa_user'); (not indexed yet)
+		$this->tables['filearchive'] = array('fa_user_text','fa_user');
 		$this->tablesJob = array(); // Slow updates
 		// If this user has a large number of edits, use the jobqueue
 		if ( User::edits( $this->uid ) > RENAMEUSER_CONTRIBJOB ) {

@@ -1084,8 +1084,8 @@ Klik "{{int:usermerge-submit}}" kanggo nerusaké.',
  */
 $messages['km'] = array(
 	'usermerge' => 'បញ្ចូលរួមគ្នានិង​លុបអ្នកប្រើប្រាស់',
-	'usermerge-badolduser' => 'ឈ្មោះអ្នកប្រើប្រាស់ចាស់មិនត្រឹមត្រូវទេ',
-	'usermerge-badnewuser' => 'ឈ្មោះអ្នកប្រើប្រាស់ថ្មីមិនត្រឹមត្រូវទេ',
+	'usermerge-badolduser' => 'អត្តនាមចាស់មិនត្រឹមត្រូវទេ',
+	'usermerge-badnewuser' => 'អត្តនាមថ្មីមិនត្រឹមត្រូវទេ',
 	'usermerge-olduser' => 'អ្នកប្រើប្រាស់ចាស់(បញ្ចូលរួមគ្នាពី)៖',
 	'usermerge-newuser' => 'អ្នកប្រើប្រាស់ថ្មី(បញ្ចូលរួមគ្នាទៅ)៖',
 	'usermerge-deleteolduser' => 'លុបអ្នកប្រើប្រាស់ចាស់ចោល',
@@ -1738,6 +1738,7 @@ Kliknite »{{int:usermerge-submit}}« za sprejetje.',
 
 /** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
  * @author Rancher
+ * @author Жељко Тодоровић
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
@@ -1756,7 +1757,7 @@ $messages['sr-ec'] = array(
 	'usermerge-success' => 'Спајање $1 ($2) са $3 ($4) је завршено.',
 	'usermerge-success-log' => 'Корисник $2 ($3) је спојен са $4 ($5)',
 	'usermerge-logpage' => 'Историја спајања корисника',
-	'usermerge-logpagetext' => 'Ово је историјат спајања корисника.',
+	'usermerge-logpagetext' => 'Ово је историја спајања корисника.',
 	'usermerge-noselfdelete' => 'Не можете да се обришете или спојите са другим налогом!',
 	'usermerge-protectedgroup' => 'Није могуђе спојити овог корисника са другим — налази се у заштићеној групи.',
 	'right-usermerge' => 'Споји кориснике',
