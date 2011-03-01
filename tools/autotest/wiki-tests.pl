@@ -144,31 +144,42 @@ EOF
     exit;
 }
 
+sub make_request
+{
+    my ($ua, $req, $msg, $expect) = @_;
+    my $response = $ua->request($req);
+    $expect = { map { $_ => 1 } $expect =~ /(\d+)/g };
+    die logp()." [".$req->uri."] Could not $msg: ".$response->status_line.': '.$response->content
+        if !$expect->{$response->code};
+    check_php_warnings($response->content);
+    return $response;
+}
+
 sub test_login
 {
     my ($url, $params, $ua) = @_;
     my $bu = $params->{httpuser} || 'benderbot@custis.ru';
     # логинимся по назначению, если надо
     my $uri = URI->new($url)->canonical;
+    my $response;
     $ua->credentials($uri->host_port, undef, $bu, $params->{httppassword});
     if ($params->{password})
     {
+        $response = make_request($ua, GET("$url/index.php?title=Special:UserLogin"), "retrieve login form", 200);
+        my ($token) = $response->content =~ /<input[^<>]*name="wpLoginToken"[^<>]*value="([^"]+)"[^<>]*>/so;
         my $user = $params->{user} || 'TestBot';
-        my $response = $ua->request(POST("$url/index.php?title=Special:UserLogin&action=submitlogin&type=login",
+        $response = make_request($ua, POST("$url/index.php?title=Special:UserLogin&action=submitlogin&type=login",
             Content => [
                 wpName         => $user,
                 wpPassword     => $params->{password},
                 wpLoginAttempt => 1,
+                wpLoginToken   => $token,
             ],
-        ));
-        die logp()." Could not login into wiki '$url' under user '$user': ".$response->status_line
-            unless $response->code == 302;
+        ), "login into wiki '$url' under user '$user'", 302);
     }
     elsif ($params->{httppassword})
     {
-        my $response = $ua->request(GET("$url/index.php/Main_Page"));
-        die logp()." Could not login into wiki '$url' under HTTP user '$bu': ".$response->status_line
-            if $response->code == 401;
+        make_request($ua, GET("$url/index.php/Main_Page"), "login into wiki '$url' under HTTP user '$bu'", '200 302');
     }
 }
 
@@ -178,11 +189,8 @@ sub test_save
     my $tp = $params->{savepage} || 'Test/Keepalive';
 
     # вытаскиваем форму редактирования
-    my $response = $ua->request(GET "$url/index.php?title=$tp&action=edit");
-    die logp()." Could not retrieve edit page from '$url/index.php?title=$tp&action=edit': ".$response->status_line
-        unless $response->is_success;
+    my $response = make_request($ua, GET("$url/index.php?title=$tp&action=edit"), "retrieve edit page", 200);
     my $text = $response->content;
-    check_php_warnings($text);
 
     # вытаскиваем скрытые поля
     my ($form) = $text =~ /<form[^<>]*name=["']editform["'][^<>]*>(.*?)<\/form>/iso;
@@ -197,21 +205,15 @@ sub test_save
     $hidden = { map { @$_ } @$hidden };
 
     # записываем тестовый контент
-    $response = $ua->request(POST "$url/index.php?title=$tp&action=submit", Content => [
+    $response = make_request($ua, POST("$url/index.php?title=$tp&action=submit", Content => [
         %$hidden,
         wpTextbox1  => "Страница для автоматических тестов MediaWiki.\n\n".strftime('Automatic test: %Y-%m-%d %H:%M:%S.', localtime),
         wpSummary   => strftime('Automatic test: %Y-%m-%d %H:%M:%S', localtime),
         wpSave      => "Записать страницу",
         wpMinoredit => 1,
-    ]);
-    die logp()." Could not save wikitext into $tp: ".$response->status_line."\n".$response->content
-        unless $response->code == 302;
-    check_php_warnings($response->content);
+    ]), "save wikitext into $tp", 302);
     my $u = $response->header('Location');
-    $response = $ua->request(GET $u);
-    die logp()." Could not GET '$u': ".$response->status_line
-        unless $response->code == 200;
-    check_php_warnings($response->content);
+    make_request($ua, GET($u), "request updated page", 200);
 }
 
 sub test_random_search
@@ -222,11 +224,8 @@ sub test_random_search
     my ($title, $i, $response, $text) = ('', 0);
     while ((length($title) < 2 || $title eq 'Доступ запрещён' || $title eq 'Permission denied') && $i < 10)
     {
-        $response = $ua->request(GET "$url/index.php/Special:Random");
-        die logp()." Could not retrieve random page redirect from '$url/index.php/Special:Random': ".$response->status_line
-            unless $response->code == 200;
+        $response = make_request($ua, GET("$url/index.php/Special:Random"), "retrieve random page redirect", 200);
         $text = $response->content;
-        check_php_warnings($text);
         ($title) = $text =~ /^\s*var\s*wgTitle\s*=\s*\"([^\"]*)\";\s*$/imo;
         $title = decode 'unicode-escape', $title;
     }
@@ -259,11 +258,7 @@ sub test_search
         $u = $u1;
         $u =~ s/\{PAGE\}/uri_escape($page)/gsoe;
         $u = "$url/index.php$u";
-        my $response = $ua->request(GET $u);
-        die logp()." Could not GET search page '$u': ".$response->status_line
-            unless $response->code == 200;
-        $text = $response->content;
-        check_php_warnings($text);
+        $text = make_request($ua, GET($u), "get search page", 200)->content;
         @found = $text =~ /<li>(.*?)<\/li>/giso;
         decode_entities($_) for @found;
         push @all_found, @found;
@@ -276,11 +271,7 @@ sub test_search
 sub test_checkurl
 {
     my ($url, $params, $ua) = @_;
-    my $response = $ua->request(GET $url.$params->{checkurl});
-    die logp()." Could not check URL '$url$params->{checkurl}': ".$response->status_line
-        unless $response->code == 200;
-    my $text = $response->content;
-    check_php_warnings($text);
+    my $text = make_request($ua, GET($url.$params->{checkurl}), 'check URL', 200)->content;
     if ($params->{validate})
     {
         my $parser = XML::LibXML->new();
