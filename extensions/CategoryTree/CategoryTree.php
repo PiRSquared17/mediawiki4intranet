@@ -377,3 +377,31 @@ function efCategoryTreeSkinJoinCategoryLinks( &$skin, &$links, &$result ) {
 
 	return false;
 }
+
+$wgExtensionMessagesFiles['SubcategorizedCategoryPage'] = dirname(__FILE__)."/SubcatCat.i18n.php";
+$wgHooks['MagicWordwgVariableIDs'][] = 'efSubcatCatMagicWordwgVariableIDs';
+$wgHooks['OutputPageParserOutput'][] = 'efSubcatCatOutputPageParserOutput';
+$wgHooks['ParserBeforeInternalParse'][] = 'efSubcatCatParserBeforeInternalParse';
+
+function efSubcatCatMagicWordwgVariableIDs(&$wgVariableIDs)
+{
+    wfLoadExtensionMessages('SubcategorizedCategoryPage');
+    $wgVariableIDs[] = 'nocategorysubcatlist';
+    return true;
+}
+
+function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
+{
+    if (!is_null($parserOutput->useSubcategorizedList))
+        $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
+    return true;
+}
+
+function efSubcatCatParserBeforeInternalParse($parser, $text, $stripState)
+{
+    if (MagicWord::get('nocategorysubcatlist')->matchAndRemove($text))
+        $parser->mOutput->useSubcategorizedList = FALSE;
+    if (MagicWord::get('categorysubcatlist')->matchAndRemove($text))
+        $parser->mOutput->useSubcategorizedList = TRUE;
+    return true;
+}
