@@ -1,19 +1,15 @@
 10
 
 dir
-227
-svn://svn.nadir-point.com/mediawiki-extensions/branches/stable/WikiCategoryTagCloud
-svn://svn.nadir-point.com/mediawiki-extensions
+83020
+http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/WikiCategoryTagCloud
+http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-11-08T04:15:45.833324Z
-227
-daniel
-
-
-
-
+2010-05-30T17:33:59.184864Z
+67090
+simetrical
 
 
 
@@ -24,7 +20,11 @@ daniel
 
 
 
-22ce5f58-d21d-46c2-970d-d76bf29883f9
+
+
+
+
+dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 WikiCategoryTagCloud.php
 file
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:18:24.116682Z
-548c574a259d50093432f73a2238612d
-2010-11-08T04:15:45.833324Z
-227
-daniel
+2011-03-01T16:49:23.285537Z
+8151d969c1701337818001234bb8179b
+2010-05-30T17:33:59.184864Z
+67090
+simetrical
 has-props
 
 
@@ -58,5 +58,5 @@ has-props
 
 
 
-4894
+4855
 
