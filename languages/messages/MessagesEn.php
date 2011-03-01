@@ -137,6 +137,7 @@ $datePreferences = array(
 	'mdy',
 	'dmy',
 	'ymd',
+	'ymd hms',
 	'ISO 8601',
 );
 
@@ -183,6 +184,10 @@ $dateFormats = array(
 	'ISO 8601 time' => 'xnH:xni:xns',
 	'ISO 8601 date' => 'xnY-xnm-xnd',
 	'ISO 8601 both' => 'xnY-xnm-xnd"T"xnH:xni:xns',
+
+	'ymd hms time' => 'xnH:xni:xns',
+	'ymd hms date' => 'xnY-xnm-xnd',
+	'ymd hms both' => 'xnY-xnm-xnd" "xnH:xni:xns',
 );
 
 /**
@@ -2144,7 +2149,7 @@ PICT # misc.
  #</pre> <!-- leave this line exactly as it is -->', # only translate this message to other languages if you have to change it
 
 'upload-proto-error'        => 'Incorrect protocol',
-'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
+'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code>, <code>https://</code> or <code>ftp://</code>.',
 'upload-file-error'         => 'Internal error',
 'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
 Please contact an [[Special:ListUsers/sysop|administrator]].',
@@ -3136,13 +3141,20 @@ In the latter case you can also use a link, for example [[{{#Special:Export}}/{{
 'exportnohistory'   => "----
 '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
 'export-submit'     => 'Export',
-'export-addcattext' => 'Add pages from category:',
+'export-addpages'   => "'''Add pages:'''",
 'export-addcat'     => 'Add',
-'export-addnstext'  => 'Add pages from namespace:',
-'export-addns'      => 'Add',
+'export-catname'    => 'Category:',
+'export-modifydate' => 'Changed after:',
+'export-namespace'  => 'Namespace:',
+'export-invalid-catname' => '<font color=red>\'\'\'Unknown category ignored: \'$1\'\'\'\'.</font>',
+'export-invalid-namespace' => '<font color=red>\'\'\'Unknown namespace ignored: \'$1\'\'\'\'.</font>',
+'export-invalid-modifydate' => '<font color=red>\'\'\'Incorrect timestamp ignored (use format <u>YYYY-MM-DD HH:MM:SS</u>): \'$1\'\'\'\'.</font>',
+'export-images'     => 'Export images',
+'export-selfcontained' => 'Include image contents into the export file',
 'export-download'   => 'Save as file',
 'export-templates'  => 'Include templates',
-'export-pagelinks'  => 'Include linked pages to a depth of:',
+'export-pagelinks'  => 'Include linked articles',
+'export-closure'    => 'Include subcategories',
 
 # Namespace 8 related
 'allmessages'                   => 'System messages',
@@ -3189,7 +3201,6 @@ All transwiki import actions are logged at the [[Special:Log/import|import log]]
 'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
 Save it to your computer and upload it here.',
 'importstart'                => 'Importing pages...',
-'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
 'importnopages'              => 'No pages to import.',
 'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
 'importunknownsource'        => 'Unknown import source type',
@@ -3208,11 +3219,16 @@ The file was only partially uploaded.',
 A temporary folder is missing.',
 'import-parse-failure'       => 'XML import parse failure',
 'import-noarticle'           => 'No page to import!',
-'import-nonewrevisions'      => 'All revisions were previously imported.',
 'xml-error-string'           => '$1 at line $2, col $3 (byte $4): $5',
 'import-upload'              => 'Upload XML data',
-'import-token-mismatch'      => 'Loss of session data.
-Please try again.',
+'import-norevisions'         => 'No revisions to import.',
+'import-nonewrevisions-localnewer' => 'All revisions were previously imported. Page changed locally.',
+'import-nonewrevisions'      => 'All revisions were previously imported. No local changes.',
+'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
+'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
+'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
+'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
+'import-token-mismatch'      => 'Loss of session data. Please try again.',
 'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
 
 # Import log
