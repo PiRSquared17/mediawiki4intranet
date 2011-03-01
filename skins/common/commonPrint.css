@@ -32,7 +32,9 @@ div.floatright {
     border: 0.5em solid White;
     border-width: 0.5em 0 0.8em 1.4em;
 }
-div.floatright p { font-style: italic;} 
+div.floatright p { font-style: italic;}
+
+div.floatright div.paragraph { font-style: italic;} 
 div.floatleft { 
     float: left; 
     margin: 0.3em 0.5em 0.5em 0;
@@ -40,7 +42,9 @@ div.floatleft {
     border: 0.5em solid White;
     border-width: 0.5em 1.4em 0.8em 0;
 }
-div.floatleft p { font-style: italic; } 
+div.floatleft p { font-style: italic; }
+
+div.floatleft div.paragraph { font-style: italic; } 
 /* thumbnails */
 div.thumb {
     margin-bottom: 0.5em;
@@ -139,7 +143,16 @@ p, .documentDescription {
     line-height: 1.2em;
 }
 
+div.paragraph, .documentDescription {
+    margin: 1em 0 ! important;
+    line-height: 1.2em;
+}
+
 .tocindent p {
+	margin: 0 0 0 0 ! important;
+}
+
+.tocindent div.paragraph {
 	margin: 0 0 0 0 ! important;
 }
 
