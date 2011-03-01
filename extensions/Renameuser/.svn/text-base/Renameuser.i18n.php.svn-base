@@ -2010,7 +2010,7 @@ $messages['kk-latn'] = array(
  * @author គីមស៊្រុន
  */
 $messages['km'] = array(
-	'renameuser' => 'ប្តូរឈ្មោះអ្នកប្រើប្រាស់',
+	'renameuser' => 'ប្តូរអត្តនាម',
 	'renameuser-linkoncontribs' => 'ប្តូរឈ្មោះអ្នកប្រើប្រាស់',
 	'renameuser-linkoncontribs-text' => 'ប្ដូរឈ្មោះអ្នកប្រើប្រាស់នេះ',
 	'renameuser-desc' => "ប្តូរឈ្មោះអ្នកប្រើប្រាស់(ត្រូវការសិទ្ធិ ''ប្តូរឈ្មោះអ្នកប្រើប្រាស់'')",
@@ -2018,6 +2018,7 @@ $messages['km'] = array(
 	'renameusernew' => 'ឈ្មោះអ្នកប្រើប្រាស់ថ្មី៖',
 	'renameuserreason' => 'មូលហេតុ៖',
 	'renameusermove' => 'ប្តូរទីតាំងទំព័រអ្នកប្រើប្រាស់និងទំព័រពិភាក្សា(រួមទាំងទំព័ររងផងដែរ)ទៅឈ្មោះថ្មី',
+	'renameusersuppress' => 'កុំបង្កើតការបញ្ជូនបន្តទៅឈ្មោះថ្មី',
 	'renameuserreserve' => 'ហាមឃាត់គណនីចាស់ពីការប្រើប្រាស់នាពេលអនាគត',
 	'renameuserwarnings' => 'បម្រាម​៖',
 	'renameuserconfirm' => 'បាទ/ចាស៎ សូមប្តូរឈ្មោះអ្នកប្រើប្រាស់នេះ',
@@ -3420,15 +3421,19 @@ $messages['sli'] = array(
 /** Albanian (Shqip)
  * @author Dori
  * @author Mikullovci11
+ * @author Olsi
  */
 $messages['sq'] = array(
 	'renameuser' => 'Riemëroje përdoruesin',
 	'renameuser-linkoncontribs' => 'Riemëroje përdoruesin',
 	'renameuser-linkoncontribs-text' => 'Riemëroje këtë përdoruesin',
+	'renameuser-desc' => "Shton një [[Special:Renameuser|faqe speciale]] për të riemëruar një përdorues (duhet e drejta ''renameuser'')",
 	'renameuserold' => 'Emri i tanishëm',
 	'renameusernew' => 'Emri i ri',
 	'renameuserreason' => 'Arsyeja për riemërim:',
 	'renameusermove' => 'Zhvendos faqet e përdoruesit dhe të diskutimit (dhe nën-faqet e tyre) tek emri i ri',
+	'renameusersuppress' => 'Mos krijoni përcjellime tek emri i ri',
+	'renameuserreserve' => 'Bllokoni emrin e vjetër të përdoruesit të përdorim në të ardhmen',
 	'renameuserwarnings' => 'Paralajmërimet:',
 	'renameuserconfirm' => 'Po, ndërrojë emrin e përdoruesit',
 	'renameusersubmit' => 'Ndryshoje',
@@ -3436,12 +3441,21 @@ $messages['sq'] = array(
 	'renameusererrorexists' => 'Përdoruesi me emër "<nowiki>$1</nowiki>" ekziston',
 	'renameusererrorinvalid' => 'Emri "<nowiki>$1</nowiki>" nuk është i lejuar',
 	'renameusererrortoomany' => 'Përdoruesi "<nowiki>$1</nowiki>" ka dhënë $2 {{PLURAL:$2|kontribut|kontribute}}. Ndryshimi i emrit të një përdoruesi me më shumë se $3 {{PLURAL:$3|kontribut|kontribute}} mund të ndikojë rëndë tek rendimenti i shërbyesave.',
+	'renameuser-error-request' => 'Kishte një problem me marrjen e kërkesës.
+Ju lutemi kthehuni prapa dhe provoni përsëri.',
+	'renameuser-error-same-user' => 'Ju nuk mund të riemëroni një përdorues tek e njëjta gjë si më parë.',
 	'renameusersuccess' => 'Përdoruesi "<nowiki>$1</nowiki>" u riemërua në "<nowiki>$2</nowiki>"',
+	'renameuser-page-exists' => 'Faqja $1 ekziston dhe nuk mund të mbivendoset automatikisht.',
+	'renameuser-page-moved' => 'Faqja $1 është zhvendosur tek $2.',
+	'renameuser-page-unmoved' => "Faqja $1 s'mund të zhvendosej tek $2.",
 	'renameuserlogpage' => 'Regjistri i emër-ndryshimeve',
 	'renameuserlogpagetext' => 'Ky është një regjistër i ndryshimeve së emrave të përdoruesve',
 	'renameuserlogentry' => 'riemëruar $1 tek "$2"',
 	'renameuser-log' => '{{PLURAL:$1|1 redaktim|$1 redaktime}}. Arsyeja: $2',
+	'renameuser-move-log' => 'Lëvizi faqen automatikisht kur riemëroi përdoruesin "[[User:$1|$1]]" në "[[User:$2|$2]]"',
 	'right-renameuser' => 'Riemëroni përdorueset',
+	'renameuser-renamed-notice' => 'Ky përdorues është riemëruar.
+Regjistri i riemërimit është poshtë për referencë.',
 );
 
 /** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
@@ -3455,11 +3469,12 @@ $messages['sr-ec'] = array(
 	'renameuser' => 'Преименуј корисника',
 	'renameuser-linkoncontribs' => 'преименуј корисника',
 	'renameuser-linkoncontribs-text' => 'Преименуј овог корисника',
-	'renameuser-desc' => "Додаје [[Special:Renameuser|посебну страницу]] за преименовање корисника (потребно право ''renameuser'').",
+	'renameuser-desc' => "Додаје [[Special:Renameuser|посебну страницу]] за преименовање корисника (потребно право ''renameuser'')",
 	'renameuserold' => 'Тренутно корисничко име:',
 	'renameusernew' => 'Ново корисничко име:',
 	'renameuserreason' => 'Разлог:',
 	'renameusermove' => 'Премести корисничку страницу и страницу за разговор (и њихове подстранице) на нови назив',
+	'renameusersuppress' => 'Не правите преусмерења на нови назив',
 	'renameuserreserve' => 'Блокирај старо корисничко име за даљу употребу',
 	'renameuserwarnings' => 'Упозорења:',
 	'renameuserconfirm' => 'Да, преименуј корисника',
@@ -3476,7 +3491,7 @@ $messages['sr-ec'] = array(
 	'renameuser-page-moved' => 'Страница $1 је премештена у $2.',
 	'renameuser-page-unmoved' => 'Страница $1 се не може преместити у $2.',
 	'renameuserlogpage' => 'Историја преименовања корисника',
-	'renameuserlogpagetext' => 'Ово је историјат измена корисничких имена.',
+	'renameuserlogpagetext' => 'Ово је историја измена корисничких имена.',
 	'renameuserlogentry' => '{{GENDER:|је преименовао|је преименовала|преименова}} $1 у „$2“',
 	'renameuser-log' => '{{PLURAL:$1|1 измена|$1 измене|$1 измена}}.
 Разлог: $2',
@@ -3515,7 +3530,7 @@ $messages['sr-el'] = array(
 	'renameuser-page-moved' => 'Stranica $1 je premeštena na $2.',
 	'renameuser-page-unmoved' => 'Stranica $1 ne može biti premeštena na $2.',
 	'renameuserlogpage' => 'Istorija preimenovanja korisnika',
-	'renameuserlogpagetext' => 'Ovo je istorija izmena preimenovanja korisnika',
+	'renameuserlogpagetext' => 'Ovo je istorija izmena korisničkih imena.',
 	'renameuserlogentry' => 'je preimenovao $1 u „$2“',
 	'renameuser-log' => '{{PLURAL:$1|1 izmena|$1 izmene|$1 izmena}}. Razlog: $2',
 	'renameuser-move-log' => 'Automatski pomerene stranice prilikom preimenovanja korisničkog imena: „[[User:$1|$1]]“ u „[[User:$2|$2]]“.',

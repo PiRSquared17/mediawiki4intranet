@@ -4,7 +4,7 @@
  * ----------
  * Author: Jason Dagit (dagit@codersbase.com) based on ocaml.php by Flaie (fireflaie@gmail.com)
  * Copyright: (c) 2005 Flaie, Nigel McNie (http://qbnz.com/highlighter)
- * Release Version: 1.0.8.9
+ * Release Version: 1.0.8.10
  * Date Started: 2005/08/27
  *
  * Haskell language file for GeSHi.
@@ -46,8 +46,8 @@ $language_data = array (
         3 => "/{-(?:(?R)|.)-}/s", //Nested Comments
         ),
     'CASE_KEYWORDS' => 0,
-    'QUOTEMARKS' => array('"'),
-    'ESCAPE_CHAR' => "\\",
+    'QUOTEMARKS' => array('"',"'"),
+    'ESCAPE_CHAR' => '\\',
     'KEYWORDS' => array(
         /* main haskell keywords */
         1 => array(

@@ -12,15 +12,21 @@ modified by me for consistency/bug fixing.
 Please send any bug reports to BenBE@omorphia.de, or use the bug report tracker
 at sourceforge (http://sourceforge.net/tracker/?group_id=114997&atid=670231)
 
+Version 1.0.8.11
+  -  Added language files
+     * DCL (Petr Hendl)
+  -  Improvements to language files (BenBE)
 Version 1.0.8.10
   -  Added language files
      * BASCOM AVR (Michal Goralczyk)
      * C: Loadrunner dialect (Stuart Moncrieff)
      * CoffeeScript (Trevor Burnham)
      * EPC (Thorsten Muehlfelder)
+     * Euphoria (Nicholas Koceja)
      * Falcon (billykater)
      * HTML5 (Robert Lidberg)
      * LLVM (Azriel Fasten)
+     * PL/I (Robert Prins)
      * ProFTPd (Benny Baumann)
      * PyCon (Benny Baumann)
      * UnrealScript (pospi)
@@ -53,6 +59,7 @@ Version 1.0.8.10
      * Fixed incorrect highlighting of certain keywords in Erlang (SF#3138853, BenBE)
      * Escape chars in C++/C++QT handled incorrectly (SF#3122706, C. Pötsch)
      * Empty parameters of LaTeX commands tipped the highlighting off (SF#3098329, James Oldfield, BenBE)
+     * Additional Keywords and minor tweaks to Logtalk (Paulo Moura)
 Version 1.0.8.9
   -  Added language files
      * Algol68 (Neville Dempsey)
