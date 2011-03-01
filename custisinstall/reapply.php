@@ -5,8 +5,8 @@
 # Useful for manually updating Wiki installations
 # (c) Vitaliy Filippov, 2011
 
-$PATCHED_DIRS = explode(' ', 'includes languages skins/common');
-$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree Cite DeleteBatch Interwiki PdfHandler');
+$PATCHED_DIRS = explode(' ', 'includes languages skins/chick skins/common skins/modern skins/monobook skins/simple skins/vector');
+$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree Cite DeleteBatch Interwiki PdfHandler WikiCategoryTagCloud');
 $CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php');
 
 $SELFDIR = realpath(dirname(__FILE__));
