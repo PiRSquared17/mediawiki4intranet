@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 61
-/svnroot/mediawiki/!svn/ver/81222/trunk/extensions/Renameuser
+/svnroot/mediawiki/!svn/ver/83006/trunk/extensions/Renameuser
 END
 Renameuser.alias.php
 K 25
@@ -19,19 +19,19 @@ Renameuser_body.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/81220/trunk/extensions/Renameuser/Renameuser_body.php
+/svnroot/mediawiki/!svn/ver/83006/trunk/extensions/Renameuser/Renameuser_body.php
 END
 Renameuser.i18n.php
 K 25
 svn:wc:ra_dav:version-url
 V 81
-/svnroot/mediawiki/!svn/ver/81222/trunk/extensions/Renameuser/Renameuser.i18n.php
+/svnroot/mediawiki/!svn/ver/82485/trunk/extensions/Renameuser/Renameuser.i18n.php
 END
 Renameuser.php
 K 25
 svn:wc:ra_dav:version-url
 V 76
-/svnroot/mediawiki/!svn/ver/74340/trunk/extensions/Renameuser/Renameuser.php
+/svnroot/mediawiki/!svn/ver/82804/trunk/extensions/Renameuser/Renameuser.php
 END
 SpecialRenameuser.php
 K 25
