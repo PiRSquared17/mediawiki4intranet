@@ -2153,6 +2153,7 @@ class Parser
 				( $this->mLastSection === 'pre' || trim($t) != '' ) )
 			{
 				// <pre>formatted text
+				$emptyLines = 0;
 				if ( $this->mLastSection !== 'pre' )
 				{
 					$output .= $this->closeParagraph().'<pre>';
@@ -2226,6 +2227,7 @@ class Parser
 					{
 						// this is </pre> closing tag
 						$this->mInPre = false;
+						$inNoPre--;
 					}
 					elseif ( $uniq )
 					{
@@ -2268,6 +2270,7 @@ class Parser
 								$inNoPre = 0;
 							}
 						}
+						// if not an enclosed XML element
 						if ( !$empty )
 						{
 							if ( $noPre[ $tag ] )
