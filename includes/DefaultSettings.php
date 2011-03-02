@@ -467,6 +467,8 @@ $wgAllowCopyUploads = false;
  * normal uploads is currently to edit php.ini.
  */
 $wgMaxUploadSize = 1024*1024*100; # 100MB
+/** Maximum length for filenames shown in image gallery. */
+$wgMaxFilenameLength = 20;
 
 /**
  * Point the upload navigation link to an external URL
