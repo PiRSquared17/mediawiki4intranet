@@ -1,0 +1,2 @@
+Bug 60996 - Support environment proxy settings for cURL downloads
+Upload-proto-error-text message is fixed only in English and Russian languages.
