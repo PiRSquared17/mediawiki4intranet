@@ -1,7 +1,8 @@
 #!/usr/bin/perl
-# TODO (Bug 71834) переписать на PHP
-# Автоматический скрипт репликации вики-статей
-# Реплицирует как сами статьи, так и изображения, используемые в них
+# TODO (Bug 71834) rewrite into PHP and possibly use API for import
+# A script for Wiki page replication
+# Replicates pages with used images and templates, using MW4Intranet patch:
+# http://wiki.4intra.net/MW_Import_Export
 
 use strict;
 
@@ -28,8 +29,10 @@ use HTTP::Date;
 use HTTP::Request::Common;
 use HTML::Entities;
 
+my $BUFSIZE = 0x10000;
+
 my $config = read_config(shift @ARGV) || die <<EOF;
-MediaWiki replicate script by Vitaliy Filippov <vfilippov\@custis.ru>
+MediaWiki replication script by Vitaliy Filippov <vitalif\@mail.ru>
 
 USAGE: $0 <replication-config.ini> [targets...]
 When called without target list, $0 will attempt to replicate all targets
@@ -64,11 +67,37 @@ my @targets = map { lc } @ARGV;
 @targets = keys %$config unless @targets;
 for (@targets)
 {
-    # replicate targets
+    # Replication targets
     $replicating = $_;
     print logp()." Begin replication\n";
     eval { replicate($config->{$_}->{src}, $config->{$_}->{dest}) };
     print STDERR logp()." Could not replicate:\n$@" if $@;
+}
+
+# Login into wiki described by $params with LWP user agent $ua,
+# $msgdesc is the wiki description for log messages
+sub login_into
+{
+    my ($ua, $params, $msgdesc) = @_;
+    my $uri = URI->new($params->{url})->canonical;
+    $ua->credentials($uri->host_port, undef, $params->{basiclogin} || undef, $params->{basicpassword});
+    if ($params->{user} && $params->{password})
+    {
+        my $response = $ua->request(GET("$params->{url}/index.php?title=Special:UserLogin"));
+        die logp()." Could not retrieve login form from the $msgdesc: ".$response->status_line
+            unless $response->code == 200;
+        my ($token) = $response->content =~ /<input[^<>]*name="wpLoginToken"[^<>]*value="([^"]+)"[^<>]*>/so;
+        $response = $ua->request(POST("$params->{url}/index.php?title=Special:UserLogin&action=submitlogin&type=login",
+            Content => [
+                wpName         => $params->{user},
+                wpPassword     => $params->{password},
+                wpLoginAttempt => 1,
+                wpLoginToken   => $token,
+            ],
+        ));
+        die logp()." Could not login into $msgdesc under user '$params->{user}': ".$response->status_line
+            unless $response->code == 302;
+    }
 }
 
 sub replicate
@@ -77,22 +106,9 @@ sub replicate
     my $ua = MYLWPUserAgent->new;
     $ua->cookie_jar(HTTP::Cookies->new);
     my ($uri, $response);
-    # Логинимся в исходную вики, если надо
-    $uri = URI->new($src->{url})->canonical;
-    $ua->credentials($uri->host_port, undef, $src->{basiclogin} || undef, $src->{basicpassword});
-    if ($src->{user} && $src->{password})
-    {
-        $response = $ua->request(POST("$src->{url}/index.php?title=Special:UserLogin&action=submitlogin&type=login",
-            Content => [
-                wpName         => $src->{user},
-                wpPassword     => $src->{password},
-                wpLoginAttempt => 1,
-            ],
-        ));
-        die logp()." Could not login into source wiki under user '$src->{user}': ".$response->status_line
-            unless $response->code == 302;
-    }
-    # Читаем список страниц категории
+    # Login into source wiki
+    login_into($ua, $src, 'source wiki');
+    # Read category page list
     $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
     die logp()." Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
     my $text = $response->content;
@@ -100,7 +116,7 @@ sub replicate
     die logp()." No pages in category $src->{category}" unless $text;
     decode_entities($text);
     my $ts = clock_gettime(CLOCK_REALTIME);
-    # Читаем экспортную XML-ку
+    # Read export XML / multipart file
     my $fh = File::Temp->new;
     my $fn = $fh->filename;
     my $auth;
@@ -113,53 +129,29 @@ sub replicate
             wpDownload    => 1,
             curonly       => !$src->{fullhistory} ? 1 : 0,
             pages         => $text,
-        ])
+        ]),
+        $fn, # Let LWP::UserAgent write response content into this file
     );
     die logp()." Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
         unless $response->is_success;
-    my $text = $response->content;
-    $response->content('');
-    my $text2 = '';
-    # Нужно вырезать "конфиденциальные данные"
+    # Optionally filter the file and remove "confidential data"
     if ($src->{removeconfidential})
     {
-        if ($text =~ /^Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\1\n/so)
-        {
-            # из файлов и т.п. вырезать ничего не нужно!
-            $text2 = index($text, $&, length $&);
-            $text2 = substr($text, $text2, length($text)-$text2, '');
-        }
-        $text =~ s/<!--\s*begindsp\s*\@?\s*-->.*?<!--\s*enddsp\s*\@?\s*-->//giso;
-        $text =~ s/\{\{CONFIDENTIAL-BEGIN.*?\{\{CONFIDENTIAL-END.*?\}\}//giso;
+        $fh = filter_confidential($fh);
+        $fn = $fh->filename;
     }
-    print $fh $text;
-    print $fh $text2;
     my $tx = clock_gettime(CLOCK_REALTIME);
-    print sprintf(logp()." Retrieved %d bytes in %.2f seconds\n", tell($fh), $tx-$ts);
-    close $fh;
-    # Логинимся по назначению, если надо
-    $uri = URI->new($dest->{url})->canonical;
-    $ua->credentials($uri->host_port, undef, $dest->{basiclogin} || undef, $dest->{basicpassword});
-    if ($dest->{user} && $dest->{password})
-    {
-        $response = $ua->request(POST("$dest->{url}/index.php?title=Special:UserLogin&action=submitlogin&type=login",
-            Content => [
-                wpName         => $dest->{user},
-                wpPassword     => $dest->{password},
-                wpLoginAttempt => 1,
-            ],
-        ));
-        die logp()." Could not login into destination wiki under user '$dest->{user}': ".$response->status_line
-            unless $response->code == 302;
-    }
-    # Вытаскиваем editToken, мля. Какой от него толк - хрен знает.
+    print sprintf(logp()." Retrieved %d bytes in %.2f seconds\n", -s $fn, $tx-$ts);
+    # Login into destination wiki
+    login_into($ua, $dest, 'destination wiki');
+    # Retrieve token for importing
     $response = $ua->request(GET "$dest->{url}/index.php?title=Special:Import");
     die logp()." Could not retrieve Special:Import page from '$dest->{url}/index.php?title=Special:Import: ".$response->status_line
         unless $response->is_success;
     $text = $response->content;
     my $token = $text =~ /<input([^<>]*name="editToken"[^<>]*)>/iso &&
         $1 =~ /value=\"([^\"]*)\"/iso && $1 || undef;
-    # Запускаем импорт исправленной XML-ки
+    # Run the import
     $response = $ua->request(POST("$dest->{url}/index.php?title=Special:Import&action=submit",
         Content_Type => 'form-data',
         Content      => [
@@ -174,7 +166,7 @@ sub replicate
     my $tp = clock_gettime(CLOCK_REALTIME);
     print sprintf(logp()." Imported in %.2f seconds\n", $tp-$tx);
     $text = $response->content;
-    # Извлекаем отчёт
+    # Extract the import report
     my ($report) = $text =~ /<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/iso;
     for ($report)
     {
@@ -189,8 +181,86 @@ sub replicate
     die logp()." Could not replicate, no import report found in response content:\n$text\n"
         unless $report;
     print logp()." Report:\n$report\n";
-    # Всё ОК
+    # Finished
     1;
+}
+
+# Filter opened file $fh into a new temporary file and return
+# a descriptor of it opened at the beginning
+sub filter_confidential
+{
+    my ($fh) = @_;
+    my $fh_filtered = File::Temp->new;
+    my $buffer = '';
+    my $boundary;
+    sysread($fh, $buffer, $BUFSIZE);
+    # Check if the file is multipart
+    if ($buffer =~ /^(Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n)/so)
+    {
+        $boundary = "$2\n";
+        syswrite($fh_filtered, $buffer, length $1);
+        substr($buffer, 0, length($1), '');
+    }
+    my (@p, $found, $overlap);
+    my $state = 0;
+    $overlap = 22; # max length of string we are searching for + 2 newlines
+    $overlap = length $boundary if $boundary && length $boundary > $overlap;
+    do
+    {
+        # Find first substring
+        $p[0] = $state < 3 && $boundary ? index($buffer, $boundary) : -1;
+        $p[1] = $state == 0 ? index($buffer, '{{CONFIDENTIAL-BEGIN') : -1;
+        $p[2] = $state == 1 ? index($buffer, 'CONFIDENTIAL-END}}') : -1;
+        $p[3] = $state == 1 ? index($buffer, '</text>') : -1;
+        $found = -1;
+        for my $i (0..$#p)
+        {
+            if ($p[$i] >= 0 && ($found < 0 || $p[$found] >= 0 && $p[$found] > $p[$i]))
+            {
+                $found = $i;
+            }
+        }
+        if ($found <= 0)
+        {
+            # Nothing found or multipart boundary
+            $state = 3 if $found == 0;
+            # Allow some overlap to find substrings on buffer boundary
+            syswrite($fh_filtered, $buffer, length($buffer) - $overlap);
+            $buffer = $overlap ? substr($buffer, -$overlap) : '';
+        }
+        elsif ($found == 1)
+        {
+            # Confidential begins, remove empty newlines before {{CONFIDENTIAL-BEGIN}}
+            my $str = substr($buffer, 0, $p[$found], '');
+            $str =~ s/\s+$//so;
+            syswrite($fh_filtered, $str);
+            $state = 1;
+        }
+        elsif ($found == 2)
+        {
+            # Confidential ends
+            substr($buffer, 0, $p[$found]+18, '');
+            $state = 0;
+        }
+        elsif ($found == 3)
+        {
+            # Revision text ends while we are inside confidential, exit confidential
+            substr($buffer, 0, $p[$found], '');
+            $state = 0;
+        }
+        if (length $buffer <= $overlap)
+        {
+            my $eof = !sysread($fh, $buffer, $BUFSIZE, length $buffer);
+            if ($eof)
+            {
+                # Set $overlap to 0 at EOF
+                $overlap = 0;
+            }
+        }
+    } while (length $buffer > $overlap);
+    seek($fh_filtered, 0, 0);
+    # Replace $fh with new temporary file object
+    return $fh_filtered;
 }
 
 sub read_config
