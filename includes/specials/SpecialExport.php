@@ -125,6 +125,8 @@ class SpecialExport extends SpecialPage {
 		
 		$wgOut->addWikiMsg( 'exporttext' );
 		
+		$form = Xml::openElement( 'form', array( 'method' => 'post',
+			'action' => $this->getTitle()->getLocalUrl( 'action=submit' ) ) );
 		foreach ($state['errors'] as $e)
 			$form .= wfMsgExt($e[0], array('parse'), $e[1]);
 		
