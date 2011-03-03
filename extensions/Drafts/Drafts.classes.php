@@ -281,7 +281,7 @@ abstract class Drafts {
 				$wgOut->addHTML(
 					Xml::element( 'td',
 						null,
-						$wgLang->timeanddate( $draft->getSaveTime() )
+						$wgLang->timeanddate( $draft->getSaveTime(), true )
 					)
 				);
 				$wgOut->addHTML(
