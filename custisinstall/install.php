@@ -41,7 +41,7 @@ $EXT_OUR = explode(' ',
     ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
     ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
-    ' IntraACL OpenID Calendar Wikilog GlobalAuth PlantUML SubPageList2 HttpAuth'.
+    ' IntraACL ListFeed OpenID Calendar Wikilog GlobalAuth PlantUML SubPageList2 HttpAuth'.
     ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit');
 $SKINS_OUR = explode(' ',
     'custis custisru dumphtml ichick');
