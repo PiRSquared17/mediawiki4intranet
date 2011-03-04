@@ -1138,9 +1138,9 @@ class EditPage {
 		}
 		if ( $wgUser->getOption( 'minordefault' ) ) $this->minoredit = true;
 		if ( $this->textbox1 === false ) return false;
-		$text = $this->getContent( false );
-		if ( $text === false ) return false;
-		if ( $text !== NULL ) $this->textbox1 = $text;
+		if ( !trim( $this->textbox1 ) ) {
+			$this->textbox1 = $this->getContent( false );
+		}
 		wfProxyCheck();
 		return true;
 	}
