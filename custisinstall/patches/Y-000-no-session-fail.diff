@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297179033 -10800
+# Date 1299273469 -10800
 Bug 65397 - Don`t display session fail when no preview is requested
 
-diff -r b11befdd7427 -r cb45c475d8be includes/EditPage.php
+diff -r 9cc4b1960d33 -r 93d13f8a5f48 includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
 @@ -547,7 +547,7 @@
@@ -36,9 +36,9 @@ diff -r b11befdd7427 -r cb45c475d8be includes/EditPage.php
  		}
  		if ( $wgUser->getOption( 'minordefault' ) ) $this->minoredit = true;
  		if ( $this->textbox1 === false ) return false;
-+		$text = $this->getContent( false );
-+		if ( $text === false ) return false;
-+		if ( $text !== NULL ) $this->textbox1 = $text;
++		if ( !trim( $this->textbox1 ) ) {
++			$this->textbox1 = $this->getContent( false );
++		}
  		wfProxyCheck();
  		return true;
  	}
