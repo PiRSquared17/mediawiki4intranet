@@ -33,7 +33,7 @@ var mwSVG = window.mwSVG = {
 		$.get(mwSVG.api(), params, function(data) {
 			var imageinfo = null;
 			$.each(data.query.pages, function(key, pageInfo) {
-				if (pageInfo.imageinfo.length) {
+				if (pageInfo.imageinfo && pageInfo.imageinfo.length) {
 					imageinfo = pageInfo.imageinfo[0];
 				}
 			});

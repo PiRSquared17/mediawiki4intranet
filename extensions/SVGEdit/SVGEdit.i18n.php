@@ -13,6 +13,7 @@ $messages = array();
  */
 $messages['en'] = array(
 	'svgedit-editbutton-edit' => 'Edit drawing',
+	'svgedit-editbutton-create' => 'Create image with SVGEdit',
 	'svgedit-summary-label' => 'Edit summary',
 	'svgedit-summary-default' => '/* Modified in svg-edit */',
 	'svgedit-editor-save-close' => 'Save and close',
@@ -337,6 +338,7 @@ $messages['pt-br'] = array(
  */
 $messages['ru'] = array(
 	'svgedit-editbutton-edit' => 'Редактировать рисунок',
+	'svgedit-editbutton-create' => 'Создать рисунок в SVGEdit',
 	'svgedit-summary-label' => 'Описание изменений',
 	'svgedit-summary-default' => '/ * Изменено в svg-edit * /',
 	'svgedit-editor-save-close' => 'Сохранить и закрыть',

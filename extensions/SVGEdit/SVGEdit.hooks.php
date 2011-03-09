@@ -31,6 +31,7 @@ var mediaWiki = {
 		"svgedit-editor-save-close" : "' . addslashes( wfMsg( 'svgedit-editor-save-close' ) ) . '",
 		"svgedit-editor-close" : "'      . addslashes( wfMsg( 'svgedit-editor-close' ) )      . '",
 		"svgedit-editbutton-edit" : "'   . addslashes( wfMsg( 'svgedit-editbutton-edit' ) )   . '",
+		"svgedit-editbutton-create" : "' . addslashes( wfMsg( 'svgedit-editbutton-create' ) ) . '",
 		"svgedit-edit-tab" : "'          . addslashes( wfMsg( 'svgedit-edit-tab' ) )          . '",
 		"svgedit-edit-tab-tooltip" : "'  . addslashes( wfMsg( 'svgedit-edit-tab-tooltip' ) )  . '",
 		"svgedit-editbutton-edit" : "'   . addslashes( wfMsg( 'svgedit-editbutton-edit' ) )   . '"
