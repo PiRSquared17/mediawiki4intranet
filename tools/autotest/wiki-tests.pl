@@ -226,8 +226,9 @@ sub test_random_search
     {
         $response = make_request($ua, GET("$url/index.php/Special:Random"), "retrieve random page redirect", 200);
         $text = $response->content;
-        ($title) = $text =~ /^\s*var\s*wgTitle\s*=\s*\"([^\"]*)\";\s*$/imo;
+        ($title) = $text =~ /wgTitle\s*=\s*\"([^\"]*)\"/iso;
         $title = decode 'unicode-escape', $title;
+        $i++;
     }
     return if length $title < 2;
 
