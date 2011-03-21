@@ -1,11 +1,21 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297452568 -10800
+# Date 1300730052 -10800
 Bug 55101 - Allow some html in uploads (for SVG)
+Bug 75888 - Correct message parameters
 
-diff -r b11befdd7427 -r fa145a9478e6 includes/upload/UploadBase.php
+diff -r 9cc4b1960d33 -r 1dd53fd9b424 includes/upload/UploadBase.php
 --- includes/upload/UploadBase.php
 +++ includes/upload/UploadBase.php
+@@ -338,7 +338,7 @@
+ 		global $wgCheckFileExtensions, $wgFileExtensions;
+ 		if ( $wgCheckFileExtensions ) {
+ 			if ( !$this->checkFileExtension( $this->mFinalExtension, $wgFileExtensions ) ) {
+-				$warnings['filetype-unwanted-type'] = $this->mFinalExtension;
++				$warnings['filetype-unwanted-type'] = array( $this->mFinalExtension, implode( ', ', $wgFileExtensions ) );
+ 			}
+ 		}
+ 
 @@ -646,7 +646,7 @@
  	 * @return bool true if the file contains something looking like embedded scripts
  	 */
