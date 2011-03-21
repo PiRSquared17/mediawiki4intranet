@@ -338,7 +338,7 @@ abstract class UploadBase {
 		global $wgCheckFileExtensions, $wgFileExtensions;
 		if ( $wgCheckFileExtensions ) {
 			if ( !$this->checkFileExtension( $this->mFinalExtension, $wgFileExtensions ) ) {
-				$warnings['filetype-unwanted-type'] = $this->mFinalExtension;
+				$warnings['filetype-unwanted-type'] = array( $this->mFinalExtension, implode( ', ', $wgFileExtensions ) );
 			}
 		}
 
