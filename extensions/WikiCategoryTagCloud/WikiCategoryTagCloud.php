@@ -45,7 +45,7 @@ function registerTagCloudExtension( &$parser ) {
 }
 
 function invalidateCache() {
-	$titles[0] = explode( "\n", wfMsg( 'tagcloudpages' ) );
+	$titles = explode( "\n", wfMsg( 'tagcloudpages' ) );
 
 	for ( $i = 0; $i < count( $titles ); $i++ ) {
 		$t = Title::newFromText( $titles[$i] );
