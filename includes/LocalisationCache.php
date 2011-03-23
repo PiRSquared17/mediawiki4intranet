@@ -781,7 +781,7 @@ class LCStore_Accel implements LCStore
 
 	public function finishWrite()
 	{
-		if ($this->currentLang)
+		if ( $this->currentLang )
 		{
 			$k = wfMemcKey( 'l10n', $code, 'l' );
 			$this->cache->set( $k, array_keys( $this->keys ) );
@@ -792,11 +792,11 @@ class LCStore_Accel implements LCStore
 
 	public function set( $key, $value )
 	{
-		if ($this->currentLang)
+		if ( $this->currentLang )
 		{
-			$k = wfMemcKey( 'l10n', $code, 'k', $key );
+			$k = wfMemcKey( 'l10n', $this->currentLang, 'k', $key );
 			$this->keys[$k] = true;
-			$this->cache->set( wfMemcKey( $k, $value ), $value );
+			$this->cache->set( $k, $value );
 		}
 	}
 }
