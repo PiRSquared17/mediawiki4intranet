@@ -1,23 +1,26 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1300901591 -10800
+# Date 1300901968 -10800
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 9cc4b1960d33 -r dc017e5a9227 includes/LocalisationCache.php
+diff -r 9cc4b1960d33 -r 8be5fd631137 includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
-@@ -155,7 +155,10 @@
+@@ -155,8 +155,12 @@
  				case 'db':
  					$storeClass = 'LCStore_DB';
  					break;
 +				case 'accel':
  				case 'detect':
+-					$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
 +					if ( !( wfGetCache( CACHE_ACCEL ) instanceof FakeMemCachedClient ) )
 +						$storeClass = 'LCStore_Accel';
- 					$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
++					else
++						$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
  					break;
  				default:
-@@ -744,6 +747,60 @@
+ 					throw new MWException( 
+@@ -744,6 +748,60 @@
  }
  
  /**
