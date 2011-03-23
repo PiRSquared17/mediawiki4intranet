@@ -159,7 +159,8 @@ class LocalisationCache {
 				case 'detect':
 					if ( !( wfGetCache( CACHE_ACCEL ) instanceof FakeMemCachedClient ) )
 						$storeClass = 'LCStore_Accel';
-					$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
+					else
+						$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
 					break;
 				default:
 					throw new MWException( 
