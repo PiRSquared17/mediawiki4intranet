@@ -1322,7 +1322,7 @@ You are also promising us that you wrote this yourself, or copied it from a publ
 '''Do not submit copyrighted work without permission!'''",
 'editpage-tos-summary'             => '-', # do not translate or duplicate this message to other languages
 'longpagewarning'                  => "'''Warning:''' This page is $1 kilobytes long;
-some browsers may have problems editing pages approaching or longer than 32kb.
+The reasonable maximum for article size is $2 KB.
 Please consider breaking the page into smaller sections.",
 'longpageerror'                    => "'''Error: The text you have submitted is $1 kilobytes long, which is longer than the maximum of $2 kilobytes.'''
 It cannot be saved.",
