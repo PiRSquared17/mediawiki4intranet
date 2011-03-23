@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1300901968 -10800
+# Date 1300902308 -10800
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 9cc4b1960d33 -r 8be5fd631137 includes/LocalisationCache.php
+diff -r 9cc4b1960d33 -r fb99a0543b2b includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
 @@ -155,8 +155,12 @@
@@ -57,7 +57,7 @@ diff -r 9cc4b1960d33 -r 8be5fd631137 includes/LocalisationCache.php
 +
 +	public function finishWrite()
 +	{
-+		if ($this->currentLang)
++		if ( $this->currentLang )
 +		{
 +			$k = wfMemcKey( 'l10n', $code, 'l' );
 +			$this->cache->set( $k, array_keys( $this->keys ) );
@@ -68,11 +68,11 @@ diff -r 9cc4b1960d33 -r 8be5fd631137 includes/LocalisationCache.php
 +
 +	public function set( $key, $value )
 +	{
-+		if ($this->currentLang)
++		if ( $this->currentLang )
 +		{
-+			$k = wfMemcKey( 'l10n', $code, 'k', $key );
++			$k = wfMemcKey( 'l10n', $this->currentLang, 'k', $key );
 +			$this->keys[$k] = true;
-+			$this->cache->set( wfMemcKey( $k, $value ), $value );
++			$this->cache->set( $k, $value );
 +		}
 +	}
 +}
