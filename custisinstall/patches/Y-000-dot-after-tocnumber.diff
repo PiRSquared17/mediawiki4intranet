@@ -1,9 +1,24 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297452760 -10800
+# Date 1300969814 -10800
 Bug 52772 - Optional dots (.) after TOC item numbers
 
-diff -r b11befdd7427 -r 31f24eacdc5d includes/parser/Parser.php
+diff -r 9cc4b1960d33 -r cd5b10634b39 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -1141,6 +1141,11 @@
+ $wgMaxPPExpandDepth = 40;
+ 
+ /**
++ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
++ */
++$wgDotAfterTocnumber = false;
++
++/**
+  * If true, removes (substitutes) templates in "~~~~" signatures.
+  */
+ $wgCleanSignatures = true;
+diff -r 9cc4b1960d33 -r cd5b10634b39 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3499,7 +3499,7 @@
@@ -15,12 +30,12 @@ diff -r b11befdd7427 -r 31f24eacdc5d includes/parser/Parser.php
  
  		$doNumberHeadings = $this->mOptions->getNumberHeadings();
  		$showEditLink = $this->mOptions->getEditSection();
-@@ -3647,6 +3647,8 @@
- 					$numbering .= $wgContLang->formatNum( $sublevelCount[$i] );
+@@ -3648,6 +3648,8 @@
  					$dot = 1;
  				}
-+				if ($wgDotAfterTocnumber)
-+					$numbering .= '.';
  			}
++			if ( $wgDotAfterTocnumber )
++				$numbering .= '.';
  
  			# The safe header is a version of the header text safe to use for links
+ 			# Avoid insertion of weird stuff like <math> by expanding the relevant sections
