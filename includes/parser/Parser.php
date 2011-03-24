@@ -3647,9 +3647,9 @@ class Parser
 					$numbering .= $wgContLang->formatNum( $sublevelCount[$i] );
 					$dot = 1;
 				}
-				if ($wgDotAfterTocnumber)
-					$numbering .= '.';
 			}
+			if ( $wgDotAfterTocnumber )
+				$numbering .= '.';
 
 			# The safe header is a version of the header text safe to use for links
 			# Avoid insertion of weird stuff like <math> by expanding the relevant sections
