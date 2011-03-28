@@ -43,15 +43,23 @@ function wfSpecialBatchEditor($par = null)
     $a_regexp = $wgRequest->getCheck('a_regexp') ? ' checked="checked" ' : false;
     $a_one    = $wgRequest->getCheck('a_one') ? ' checked="checked" ' : false;
 
-    /* If CustIS-modified Import/Export engine is available */
+    /* Is Mediawiki4Intranet Import/Export engine available? */
     require_once("$IP/includes/specials/SpecialExport.php");
+    $mw4i_addpages = NULL;
     if (function_exists('wfExportAddPagesExec'))
+        $mw4i_addpages = array('wfExportAddPagesExec', 'wfExportAddPagesForm');
+    elseif (method_exists('SpecialExport', 'addPagesExec'))
+        $mw4i_addpages = array(
+            array('SpecialExport', 'addPagesExec'),
+            array('SpecialExport', 'addPagesForm'),
+        );
+    if ($mw4i_addpages)
     {
         $state = $_POST;
         $state['pages'] = $a_titles;
         if ($wgRequest->getCheck('addcat'))
         {
-            wfExportAddPagesExec($state);
+            call_user_func($mw4i_addpages[0], $state);
             $a_titles = $state['pages'];
         }
     }
@@ -67,7 +75,7 @@ function wfSpecialBatchEditor($par = null)
 <tr valign="top">
     <td style="vertical-align: top; padding-right: 20px"><?=wfMsgExt('batcheditor-list-title', array('parseinline'))?></td>
     <td><textarea name="a_titles" rows="8" cols="60"><?=htmlspecialchars($a_titles)?></textarea></td>
-    <td rowspan="2" style="padding-left: 16px"><?= function_exists('wfExportAddPagesExec') ? wfExportAddPagesForm($state) : '' ?></td>
+    <td rowspan="2" style="padding-left: 16px"><?= $mw4i_addpages ? call_user_func($mw4i_addpages[1], $state) : '' ?></td>
 </tr>
 <tr valign="top">
     <td><?=wfMsgExt('batcheditor-comment-title', array('parseinline'))?></td>
