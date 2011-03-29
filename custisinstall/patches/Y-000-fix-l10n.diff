@@ -1,0 +1,39 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297452972 -10800
+Bug 73938 - YMD HMS date format
+
+diff -r b11befdd7427 -r 2cd40a272ac0 includes/specials/SpecialUserlogin.php
+--- includes/specials/SpecialUserlogin.php
++++ includes/specials/SpecialUserlogin.php
+@@ -977,7 +977,7 @@
+ 			$linkq .= '&uselang=' . $this->mLanguage;
+ 
+ 		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
+-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
++		$link .= wfMsgExt( $linkmsg . 'link', array( 'parseinline' ) ); # Calling either 'gotaccountlink' or 'nologinlink'
+ 		$link .= '</a>';
+ 
+ 		# Don't show a "create account" link if the user can't
+diff -r b11befdd7427 -r 2cd40a272ac0 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -137,6 +137,7 @@
+ 	'mdy',
+ 	'dmy',
+ 	'ymd',
++	'ymd hms',
+ 	'ISO 8601',
+ );
+ 
+@@ -183,6 +184,10 @@
+ 	'ISO 8601 time' => 'xnH:xni:xns',
+ 	'ISO 8601 date' => 'xnY-xnm-xnd',
+ 	'ISO 8601 both' => 'xnY-xnm-xnd"T"xnH:xni:xns',
++
++	'ymd hms time' => 'xnH:xni:xns',
++	'ymd hms date' => 'xnY-xnm-xnd',
++	'ymd hms both' => 'xnY-xnm-xnd" "xnH:xni:xns',
+ );
+ 
+ /**
