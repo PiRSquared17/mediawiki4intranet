@@ -1,0 +1,104 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297267124 -10800
+Bug 68935 - Vector skin fixes: allow SEARCH in sidebar, wider search in p-cactions
+
+diff -r b11befdd7427 -r c66f6da3e6ad skins/Vector.php
+--- skins/Vector.php
++++ skins/Vector.php
+@@ -575,6 +575,31 @@
+ 			echo "\n<!-- {$name} -->\n";
+ 			switch( $name ) {
+ 				case 'SEARCH':
++					global $wgUseTwoButtonsSearchForm;
++?>
++<div class="portal" id="po-search">
++	<h5><label for="searchInput2"><?php $this->msg('search') ?></label></h5>
++	<div id="searchBody2" class="pBody">
++		<form action="<?php $this->text('wgScript') ?>" id="searchform2">
++			<input type='hidden' name="title" value="<?php $this->text('searchtitle') ?>"/>
++			<?php
++	echo Html::input( 'search',
++		isset( $this->data['search'] ) ? $this->data['search'] : '', 'search',
++		array(
++			'id' => 'searchInput2',
++			'title' => $this->skin->titleAttrib( 'search' ),
++			'accesskey' => $this->skin->accesskey( 'search' )
++		) ); ?>
++
++			<input type='submit' name="go" class="searchButton" id="searchGoButton2"	value="<?php $this->msg('searcharticle') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-go' ); ?> /><?php if ($wgUseTwoButtonsSearchForm) { ?>&nbsp;
++			<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton2" value="<?php $this->msg('searchbutton') ?>"<?php echo $this->skin->tooltipAndAccesskey( 'search-fulltext' ); ?> /><?php } else { ?>
++
++			<div><a href="<?php $this->text('searchaction') ?>" rel="search"><?php $this->msg('powersearch-legend') ?></a></div><?php } ?>
++
++		</form>
++	</div>
++</div>
++<?php
+ 					break;
+ 				case 'TOOLBOX':
+ ?>
+diff -r b11befdd7427 -r c66f6da3e6ad skins/vector/main-ltr.css
+--- skins/vector/main-ltr.css
++++ skins/vector/main-ltr.css
+@@ -62,6 +62,35 @@
+ 	margin: 0;
+ 	padding: 0;
+ }
++/*
++** Search portlet
++*/
++#po-search {
++	position: relative;
++	z-index: 3;
++}
++#po-search input.searchButton {
++	margin-top: 1px;
++	font-size: 80%;
++}
++#po-search #searchGoButton2 {
++	padding-left: .5em;
++	padding-right: .5em;
++	font-weight: bold;
++}
++#po-search #searchInput2 {
++	width: 10.9em;
++	margin: 0;
++	font-size: 80%;
++}
++#po-search .pBody {
++	padding: 0;
++	text-align: center;
++}
++#po-search #searchform2 div div {
++	margin-top: .4em;
++	font-size: 80%;
++}
+ 	/* Hide empty portlets */
+ 	div.emptyPortlet {
+ 		display: none;
+@@ -334,6 +363,15 @@
+ 		margin: 0;
+ 		margin-top: 0.4em;
+ 	}
++	#p-search input {
++		width: 22em;
++	}
++	#p-search input#searchGoButton {
++		font-weight: bold;
++	}
++	#p-search input.searchButton {
++		width: auto;
++	}
+ 	#simpleSearch {
+ 		margin-top: 0.5em;
+ 		position: relative;
+@@ -393,7 +431,7 @@
+ 	left: 0;
+ }
+ 	#mw-panel div.portal {
+-		padding-bottom: 1.5em;
++		padding-bottom: 1em;
+ 	}
+ 	#mw-panel div.portal h5 {
+ 		font-weight: normal;
