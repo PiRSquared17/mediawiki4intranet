@@ -1,6 +1,7 @@
 include .
 exclude custisinstall
 include custisinstall/BaseSettings.php
+include custisinstall/ServerSettings.php
 include custisinstall/curl-env-proxy.php
 include custisinstall/favicons/toolswiki.ico
 include custisinstall/favicons/uml2.ico
@@ -18,7 +19,11 @@ include custisinstall/patches-1.13.1
 include custisinstall/patches-1.14.1
 include custisinstall/reapply.php
 include custisinstall/replicate.pl
-include custisinstall/ServerSettings.php
+# needed to correctly clone the history of custisinstall:
+include custisinstall/reapply.pl
+include custisinstall/translit-upload-filenames.diff
+include custisinstall/includes.diff
+include custisinstall/extensions.diff
 include sphinxsearch
 exclude sphinxsearch/sphinxconf.php
 exclude sphinxsearch/makesphinx.php
