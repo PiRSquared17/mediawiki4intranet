@@ -24,5 +24,3 @@ exclude sphinxsearch/sphinxconf.php
 exclude sphinxsearch/makesphinx.php
 exclude sphinxsearch/sphinx.wikis.php
 exclude tools/autotest/wiki.sh
-# Test:
-exclude extensions/BatchEditor
