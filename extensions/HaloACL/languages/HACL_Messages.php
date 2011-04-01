@@ -1,0 +1,802 @@
+<?php
+/*  Copyright 2009, ontoprise GmbH
+*  This file is part of the HaloACL-Extension.
+*
+*   The HaloACL-Extension is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License as published by
+*   the Free Software Foundation; either version 3 of the License, or
+*   (at your option) any later version.
+*
+*   The HaloACL-Extension is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+/**
+ * Internationalization file for Halo ACL
+ *
+ */
+
+$messages = array();
+
+/**
+ * English
+ */
+$messages['en'] = array(
+    /* general/maintenance messages */
+    'haloacl'                           => 'HaloACL',
+    'hacl_special_page'                 => 'HaloACL',  // Name of the special page for administration
+    'specialpages-group-hacl_group'     => 'HaloACL',
+    'hacl_tt_initializeDatabase'        => 'Initialize or update the database tables for HaloACL.',
+    'hacl_initializeDatabase'           => 'Initialize database',
+    'hacl_db_setupsuccess'              => 'Setting up the database for HaloACL was successful.',
+    'hacl_haloacl_return'               => 'Return to ',
+    'hacl_unknown_user'                 => 'The user "$1" is unknown.',
+    'hacl_unknown_group'                => 'The group "$1" is unknown.',
+    'hacl_missing_parameter'            => 'The parameter "$1" is missing.',
+    'hacl_missing_parameter_values'     => 'There are no valid values for parameter "$1".',
+    'hacl_invalid_predefined_right'     => 'A rights template with the name "$1" does not exist or it contains no valid rights definition.',
+    'hacl_invalid_action'               => '"$1" is an invalid value for an action.',
+    'hacl_too_many_categories'          => 'This article belongs to multiple categories ($1). Please remove it from them and leave it in only one category!',
+    'hacl_wrong_namespace'              => 'Articles with rights or group definitions must belong to the namespace "ACL".',
+    'hacl_group_must_have_members'      => 'A group must have at least one member (group or user).',
+    'hacl_group_must_have_managers'     => 'A group must have at least one manager (group or user).',
+    'hacl_invalid_parser_function'      => 'The use of the "#$1" function in this article is not allowed.',
+    'hacl_right_must_have_rights'       => 'A right or security descriptor must contain rights or reference other rights.',
+    'hacl_right_must_have_managers'     => 'A right or security descriptor must have at least one manager (group or user).',
+    'hacl_whitelist_must_have_pages'    => 'The whitelist is empty. Please add pages .',
+    'hacl_add_to_group_cat'             => 'This article contains functions that define a group. They will not be taken into effect until you add the category "[[Category:ACL/Group]]".',
+    'hacl_add_to_right_cat'             => 'This article contains the functions that define a security descriptor or a right template. They will not be taken to effect until you add the category "[[Category:ACL/ACL]]" or "[[Category:ACL/Right]]".',
+    'hacl_add_to_whitelist'             => 'The article contains functions that define a whitelist. This function may only be used in the "ACL:Whitelist" article.',
+    'hacl_pf_rightname_title'           => "===$1===\n",
+    'hacl_pf_rights_title'              => "===Right(s): $1===\n",
+    'hacl_pf_rights'                    => ":;Right(s):\n:: $1\n",
+    'hacl_pf_right_managers_title'      => "===Right managers===\n",
+    'hacl_pf_predefined_rights_title'   => "===Right templates===\n",
+    'hacl_pf_whitelist_title'           => "===Whitelist===\n",
+    'hacl_pf_group_managers_title'      => "===Group managers===\n",
+    'hacl_pf_group_members_title'       => "===Group members===\n",
+    'hacl_assigned_user'                => 'Assigned users: ',
+    'hacl_assigned_groups'              => 'Assigned groups:',
+    'hacl_user_member'                  => 'Users who are member of this group:',
+    'hacl_group_member'                 => 'Groups who are member of this group:',
+    'hacl_description'                  => 'Description:',
+    'hacl_error'                        => 'Errors:',
+    'hacl_warning'                      => 'Warnings:',
+    'hacl_consistency_errors'           => '<h2>There are errors in ACL definition</h2>',
+    'hacl_definitions_will_not_be_saved' => '(The definitions in this article will not be saved and they will not be taken to effect due to the following errors.)',
+    'hacl_will_not_work_as_expected'    => '(Because of the following warnings, the definition will not work as expected.)',
+    'hacl_errors_in_definition'         => 'The definitions in this article have errors. Please refer to the details below!',
+    'hacl_anonymous_users'              => 'anonymous users',
+    'hacl_registered_users'             => 'registered users',
+    'hacl_acl_element_not_in_db'        => 'No entry has been made in the ACL database about this article. Please re-save it again with all the articles that use it.',
+    'hacl_whitelist_mismatch'           => 'The whitelist in this article contains nonexistent articles. Please remove them and save the whitelist again.',
+    'hacl_unprotectable_namespace'      => 'This namespace cannot be protected. Please contact the wiki administrator.',
+
+    /* NEW */
+    'hacl_invalid_prefix'               =>
+'This page does not protect anything, create any rights or right templates.
+Either it is supposed to be included into other ACL definitions, or is created incorrectly.
+If you want to protect some pages, ACL page must be named as one of: ACL:Page/*, ACL:Category/*, ACL:Namespace/*, ACL:Property/*, ACL:Right/*, ACL:Template/*.',
+    'hacl_pe_not_exists'                => 'The element supposed to be protected with this ACL does not exist.',
+
+    'hacl_autocomplete_no_users'        => 'No users found',
+    'hacl_autocomplete_no_groups'       => 'No groups found',
+    'hacl_autocomplete_no_pages'        => 'No pages found',
+    'hacl_autocomplete_no_namespaces'   => 'No namespaces found',
+    'hacl_autocomplete_no_categorys'    => 'No categories found',
+    'hacl_autocomplete_no_propertys'    => 'No properties found',
+    'hacl_autocomplete_no_sd/rights'    => 'No right templates found',
+
+    'hacl_acl_create'                   => 'Create ACL definition',
+    'hacl_acl_edit'                     => 'Editing ACL definition: $1',
+    'hacl_edit_default_taken'           => '\'\'Initial default content for new ACLs taken from [[$1]].\'\'',
+    'hacl_edit_default_is_here'         => '\'\'You can place default content for new ACLs here: [[$1]].\'\'',
+    'hacl_edit_definition_text'         => 'Definition text:',
+    'hacl_edit_definition_target'       => 'Definition target:',
+    'hacl_edit_modify_definition'       => 'Modify definition:',
+    'hacl_edit_include_right'           => 'Include predefined right:',
+    'hacl_edit_include_do'              => 'Include',
+    'hacl_edit_save'                    => 'Save ACL',
+    'hacl_edit_create'                  => 'Create ACL',
+    'hacl_edit_delete'                  => 'Delete ACL',
+    'hacl_edit_protect'                 => 'Protect:',
+    'hacl_edit_define'                  => 'Define:',
+
+    'hacl_indirect_grant'               => 'This right is granted through $1, cannot revoke.',
+    'hacl_indirect_grant_all'           => 'all users right',
+    'hacl_indirect_grant_reg'           => 'all registered users right',
+    'hacl_indirect_through'             => '(through $1)',
+
+    'hacl_edit_sd_exists'               => 'This definition already exists.',
+    'hacl_edit_enter_name_first'        => 'Error: Enter name to save ACL!',
+    'hacl_edit_define_rights'           => 'Error: ACL must include at least 1 right!',
+    'hacl_edit_define_manager'          => 'Error: ACL must have at least 1 manager!',
+
+    'hacl_start_typing_page'            => 'Start typing to display page list...',
+    'hacl_start_typing_category'        => 'Start typing to display category list...',
+    'hacl_start_typing_user'            => 'Start typing to display user list...',
+    'hacl_start_typing_group'           => 'Start typing to display group list...',
+    'hacl_edit_users_affected'          => 'Users affected:',
+    'hacl_edit_groups_affected'         => 'Groups affected:',
+    'hacl_edit_no_users_affected'       => 'No users affected.',
+    'hacl_edit_no_groups_affected'      => 'No groups affected.',
+
+    'hacl_edit_user'                    => 'User',
+    'hacl_edit_group'                   => 'Group',
+    'hacl_edit_all'                     => 'All users',
+    'hacl_edit_reg'                     => 'Registered users',
+    'hacl_define_page'                  => 'Protect page:',
+    'hacl_define_namespace'             => 'Protect namespace:',
+    'hacl_define_category'              => 'Protect category:',
+    'hacl_define_property'              => 'Protect property:',
+    'hacl_define_right'                 => 'Define right:',
+    'hacl_define_template'              => 'Define user template:',
+
+    'hacl_action_acllist'               => 'Manage ACL',
+    'hacl_action_acl'                   => 'Create new ACL definition',
+    'hacl_action_quickaccess'           => 'Manage Quick ACL',
+    'hacl_action_owntemplate'           => 'Edit own default template',
+    'hacl_action_grouplist'             => 'Manage groups',
+    'hacl_action_group'                 => 'Create a group',
+    'hacl_action_whitelist'             => 'Manage whitelist',
+
+    'hacl_acllist'                      => 'Halo Access Control Lists',
+    'hacl_acllist_hello'                => 'Hi, this is \'\'\'HaloACL[http://4intra.net/ <sup>4</sup>IN]\'\'\', the best MediaWiki rights extension. You can get help [http://wiki.4intra.net/HaloACL here]. Select function below to start working:',
+    'hacl_acllist_empty'                => '<span style="color:red;font-weight:bold">No matching ACL definitions found.</span>',
+    'hacl_acllist_filter_name'          => 'Filter by name:',
+    'hacl_acllist_filter_type'          => 'Filter by type:',
+    'hacl_acllist_typegroup_all'        => 'All definitions',
+    'hacl_acllist_typegroup_protect'    => 'Rights for:',
+    'hacl_acllist_typegroup_define'     => 'Templates:',
+
+    'hacl_acllist_type_page'            => 'Page',
+    'hacl_acllist_type_namespace'       => 'Namespace',
+    'hacl_acllist_type_category'        => 'Category',
+    'hacl_acllist_type_property'        => 'Property',
+    'hacl_acllist_type_right'           => 'Predefined rights',
+    'hacl_acllist_type_template'        => 'User templates',
+
+    'hacl_acllist_page'                 => 'Rights for pages:',
+    'hacl_acllist_namespace'            => 'Rights for namespaces:',
+    'hacl_acllist_category'             => 'Rights for categories:',
+    'hacl_acllist_property'             => 'Rights for properties:',
+    'hacl_acllist_right'                => 'Predefined rights:',
+    'hacl_acllist_template'             => 'Templates for users:',
+    'hacl_acllist_default'              => 'Default template for new ACLs:',
+    'hacl_acllist_own_template'         => '<b>$1 (your default template)</b>',
+    'hacl_acllist_edit'                 => 'Edit',
+    'hacl_acllist_view'                 => 'View',
+
+    'hacl_quickaccess_filter_sds'       => 'Filter templates by name',
+    'hacl_quickaccess_filter'           => 'Name starts with:',
+    'hacl_quickaccess_filter_submit'    => 'Apply',
+    'hacl_quickaccess_manage'           => 'HaloACL: Manage Quick Access list',
+    'hacl_quickaccess_manage_text'      => 'This is a list of all the ACL templates that you can use in your quick access list.<br />This list defines the ACLs that will be in the dropdown box that is on the top of every page in the edit or creation mode.',
+    'hacl_quickaccess_save'             => 'Save selections',
+    'hacl_quickaccess_hint'             => 'Select some ACL templates and then click Save selections:',
+    'hacl_quickaccess_own_template'     => '(your default template is always present in Quick ACL list)',
+    'hacl_quickaccess_empty'            => 'There are no ACL templates available for Quick Access. Create one using <b>Create new ACL definition</b>.',
+
+    'hacl_grouplist'                    => 'HaloACL Groups',
+    'hacl_grouplist_filter_name'        => 'Filter by name:',
+    'hacl_grouplist_empty'              => '<span style="color:red;font-weight:bold">No matching HaloACL groups found.</span>',
+    'hacl_grouplist_view'               => 'View',
+    'hacl_grouplist_edit'               => 'Edit',
+
+    'hacl_grp_creating'                 => 'Create HaloACL group',
+    'hacl_grp_editing'                  => 'Editing HaloACL group: $1',
+    'hacl_grp_create'                   => 'Create group',
+    'hacl_grp_save'                     => 'Save group',
+    'hacl_grp_delete'                   => 'Delete group',
+    'hacl_grp_name'                     => 'Group name:',
+    'hacl_grp_definition_text'          => 'Group definition text:',
+    'hacl_grp_member_all'               => 'All users',
+    'hacl_grp_member_reg'               => 'All registered users',
+    'hacl_grp_members'                  => 'Group members:',
+    'hacl_grp_managers'                 => 'Group managers:',
+    'hacl_grp_users'                    => 'Users:',
+    'hacl_grp_groups'                   => 'Groups:',
+
+    'hacl_grp_exists'                   => 'This group already exists.',
+    'hacl_grp_enter_name_first'         => 'Error: Enter name to save group!',
+    'hacl_grp_define_members'           => 'Error: Group must have at least 1 member!',
+    'hacl_grp_define_managers'          => 'Error: Group must have at least 1 manager!',
+
+    'hacl_no_member_user'               => 'No member users by now.',
+    'hacl_no_member_group'              => 'No member groups by now.',
+    'hacl_no_manager_user'              => 'No manager users by now.',
+    'hacl_no_manager_group'             => 'No manager groups by now.',
+    'hacl_current_member_user'          => 'Member users:',
+    'hacl_current_member_group'         => 'Member groups:',
+    'hacl_current_manager_user'         => 'Manager users:',
+    'hacl_current_manager_group'        => 'Manager groups:',
+    'hacl_regexp_user'                  => '(^|,\s*)Участник:',
+    'hacl_regexp_group'                 => '(^|,\s*)Group:',
+    /* /NEW */
+
+    /* Messages for semantic protection (properties etc.) */
+    'hacl_sp_query_modified'            => "- The query was modified because it contains protected properties.\n",
+    'hacl_sp_empty_query'               => "- Your query consists only of protected properties. It was not executed.\n",
+    'hacl_sp_results_removed'           => "- Some results were removed due to access restrictions.\n",
+    'hacl_sp_cant_save_article'         => "'''The article contains the following protected properties:'''\n$1'''You do not have the permission to set their values. Please remove these properties and save again.'''",
+
+    /* Messages for Special:ACL */
+    'hacl_tab_create_acl'               => 'Create ACL',
+    'hacl_tab_manage_acls'              => 'Manage ACLs',
+    'hacl_tab_manage_user'              => 'Manage Groups',
+    'hacl_tab_manage_whitelist'         => 'Manage Whitelist',
+
+    /* Messages for 'Create ACL' tab */
+    'hacl_create_acl_subtab1'           => 'Create standard ACL',
+    'hacl_create_acl_subtab2'           => 'Create ACL template',
+    'hacl_create_acl_subtab3'           => 'Create ACL default user template',
+
+    /* Messages for sub tab 'Create standard ACL' ("csa") */
+
+    /* Messages for sub tab 'Create ACL template' ("cat") */
+
+    /* Messages for sub tab 'Create ACL default user template ("dut")' */
+    'hacl_create_acl_dut_headline'              => 'Create Access Control List (ACL) default user template',
+    'hacl_create_acl_dut_info'                  => 'You can create your own ACL default user template in this tab.<br />New articles will be protected by this template automatically',
+
+    'hacl_create_acl_dut_general'               => '1. General',
+    'hacl_create_acl_dut_general_definefor'     => 'Define for:',
+    'hacl_create_acl_dut_general_private_use'   => 'Me',
+    'hacl_create_acl_dut_general_all'           => 'All users',
+    'hacl_create_acl_dut_general_specific'      => 'Specific user and/or groups of users',
+
+    'hacl_create_acl_dut_rights'                => '2. Rights',
+    'hacl_create_acl_dut_button_create_right'   => 'Create right',
+    'hacl_create_acl_dut_button_add_template'   => 'Add right template',
+    'hacl_create_acl_dut_new_right_legend'      => 'Right: New right $1',
+    'hacl_create_acl_dut_new_right_legend_status_saved' => '[saved]',
+    'hacl_create_acl_dut_new_right_legend_status_notsaved' => '[Not saved]',
+    'hacl_create_acl_dut_new_right_name'        => 'Name:',
+    'hacl_create_acl_dut_new_right_defaultname' => 'new right:',
+    'hacl_create_acl_dut_new_right_rights'      => 'Rights:',
+    #TODO: can we get this from s.w. else???
+    'hacl_create_acl_dut_new_right_fullaccess'  => 'Full access',
+    'hacl_create_acl_dut_new_right_read'        => 'read',
+    'hacl_create_acl_dut_new_right_ewf'         => 'edit with form',
+    'hacl_create_acl_dut_new_right_edit'        => 'edit',
+    'hacl_create_acl_dut_new_right_create'      => 'create',
+    'hacl_create_acl_dut_new_right_move'        => 'move',
+    'hacl_create_acl_dut_new_right_delete'      => 'delete',
+    'hacl_create_acl_dut_new_right_annotate'    => 'annotate',
+    'hacl_create_acl_dut_new_right_select_user' => 'Select users/groups',
+    'hacl_create_acl_dut_new_right_assigned_user'   => 'Assigned users/groups',
+    'hacl_create_acl_dut_new_right_column_users'    => 'Groups and users',
+    'hacl_create_acl_dut_new_right_column_filter'   => 'Filter',
+    'hacl_create_acl_dut_new_right_column_user' => 'User',
+    'hacl_create_acl_dut_new_right_desc'        => 'Description:',
+    'hacl_create_acl_dut_new_right_button_save' => 'Save',
+    'hacl_create_acl_dut_button_next'           => 'Next',
+
+    'hacl_create_acl_dut_mod'                   => '3. Modification rights',
+    'hacl_create_acl_dut_mod_info'              => 'Define the Access Control List modification rights.',
+    'hacl_create_acl_dut_mod_legend'            => 'Modification rights',
+
+    'hacl_create_acl_dut_save'                  => '4. Save Access Control List',
+    'hacl_create_acl_dut_save_info'             => 'The system will automatically generate a system name.',
+    'hacl_create_acl_dut_save_name'             => 'ACL Name:',
+    'hacl_create_acl_dut_save'                  => '',
+
+    'hacl_create_acl_dut_save_button_discard'   => 'Discard ACL',
+    'hacl_create_acl_dut_save_button_save'      => 'Save ACL',
+
+    /* Messages for 'Manage ACLs' tab */
+    'hacl_manage_acls_subtab1'                  => 'Manage all ACLs',
+    'hacl_manage_acls_subtab2'                  => 'Manage own default user template',
+    /* Messages for 'Manage User' tab */
+    /* Messages for 'Manage Whitelist' tab */
+    'hacl_whitelist_headline'                   => 'Manage Whitelist',
+    'hacl_whitelist_info'                       => 'You may edit and create the Whitelist in this tab',
+    'hacl_whitelist_filter'                     => 'Filter:',
+    'hacl_whitelist_pageset_header'             => 'Page',
+    'hacl_whitelist_pagename'                   => 'Page-Name:',
+    'hacl_whitelist_addbutton'                  => 'Add Page',
+
+    'hacl_createRightContent_help'              => 'Click on <strong>&quot;Create right&quot;</strong> if you want to create a new right.<br /><br />Note: <br />You may create multiple rights e.g.:<br /> Right1 = Read only for User1 + Right 2 = Full access for User2 etc.<br /><br /> Choose <strong>&quot;Add right template&quot;</strong> if you wish to select a predefined ACL.',
+
+    'hacl_haloacl_tab_section_header_title'     => 'Rights',
+
+    'hacl_createModificationRightContent_help'  => 'You may now choose other groups and/or users who you wish to grant permission to maintain and modify this ACL. <br/><br/>Note:<br/>The current user is granted the modification rights by default.',
+    'hacl_haloacl_tab_section_header_mod_title' => 'Modification Rights',
+    'hacl_haloacl_mod_1' => 'Expand the box below, if you like to allow other users or groups to modify this access control list.',
+    'hacl_haloacl_mod_2' => 'Attention: You do not have this ACL’s modification rights at this time!',
+    'hacl_haloacl_mod_3' => 'Please select at least one group or user who has the permission to modify this ACL',
+
+    'hacl_createSaveContent_1'                  => 'Save ACL',
+    'hacl_createSaveContent_2'                  => 'ACL name:',
+    'hacl_createSaveContent_3'                  => 'ACL saved',
+    'hacl_createSaveContent_4'                  => 'An error occured when saving the ACL',
+
+    'hacl_createManageACLContent_2'             => 'You have edit rights to all the ACLs in this tab.',
+    'hacl_createManageACLContent_1'             => 'Manage existing ACLs',
+
+    'hacl_createManageUserTemplateContent_1'    => 'Manage your own Default ACL User Template',
+
+    'hacl_createGeneralContent_1'               => 'You can create an Access Control List (ACL) in the following four steps. Click the help icon at any time to get help about each step.',
+    'hacl_createGeneralContent_2'               => 'General',
+    'hacl_createGeneralContent_3'               => 'Protect:',
+    'hacl_createGeneralContent_4'               => 'Page',
+    'hacl_createGeneralContent_5'               => 'Property',
+    'hacl_createGeneralContent_6'               => 'Pages in Namespace',
+    'hacl_createGeneralContent_7'               => 'Pages in Category',
+    'hacl_createGeneralContent_8'               => 'Name:',
+    'hacl_createGeneralContent_9'               => 'Define for:',
+    'hacl_createGeneralContent_10'              => 'Me',
+    'hacl_createGeneralContent_11'              => 'Individual user and/or groups of user',
+    'hacl_createGeneralContent_12'              => 'All Users',
+    'hacl_createGeneralContent_13'              => 'All Registered Users',
+    'hacl_createGeneralContent_14'              => 'All Anonymous Users',
+    'hacl_createGeneralContent_message1'        => 'Please set what you would like to protect. ',
+    'hacl_createGeneralContent_message2'        => 'Please set a name. ',
+    'hacl_createGeneralContent_message3'        => 'Please set for whom the acl is defined for .',
+    'hacl_createGeneralContent_message4'        => 'Some data missing',
+
+    'hacl_createACLContent_1'                   => '<strong>General:</strong><br />An Access Control List (ACL) is a page which is mapped to the element that  you wish to protect. Lets say that you want to protect the page &quot;MyNotes&quot;. A new page called &quot;ACL:Page/MyNotes&quot; containing this articles access control list will be created.<br /> The ACL article always consists of:<br /> - the type you wish to protect e.g. page, property etc<br /> - the right settings e.g. read access for userX<br /> - the definitions about the  persons who have the ACLs modification rights<br /><br /> <strong>Protect:</strong><br />Choose the type you wish to protect :<br />- Page<br />- Property<br />- All pages in a category<br />- All pages in a namespace <br /><br /> <strong>Name:</strong><br /> Enter the name or use the autocomplete feature to specify the item that you wish to protect. <br /><br />Note:<br />If you came from a page, you will find the name of the page in the text entry box.<br /><br />',
+    'hacl_createACLContent_2'                   => 'General',
+
+    'hacl_createACLTemplateContent_1'           => '<strong>General:</strong><br />An Access Control List template is a predefined ACL. Once you create a template, you can assign this template to any type of element you wish to protect e.g. page, property, etc. You may additionally use the ACL templates in your quick access list on every page. You just need to select the templates you want to have in the quick access list from the manage quick access ACL tab. <br /><br /><strong>Name:</strong><br /> Enter the name of the template you want to create.<br /><br />',
+    'hacl_createACLTemplateContent_2'           => 'General',
+
+    'hacl_createUserTemplateContent_1'          => '<strong>General:</strong><br />A default ACL user template is an Access Control List which will be used as your default ACL whenever you create new pages within the wiki. You are free to change the access right state from your default ACL template to unprotected at anytime.<br /><br />',
+    'hacl_createUserTemplateContent_2'          => 'General',
+
+    'hacl_manageUserGroupPanel_1'               => 'Name:',
+
+    'hacl_rightsPanel_1' => 'Name:',
+    'hacl_rightsPanel_2' => 'Rights:',
+    'hacl_rightsPanel_3' => 'Right description:',
+    'hacl_rightsPanel_4' => 'Autogenerate description text:',
+    'hacl_rightsPanel_5' => 'on',
+    'hacl_rightsPanel_6' => 'off',
+    'hacl_rightsPanel_7' => 'autogenerated',
+    'hacl_rightsPanel_8' => 'Delete right',
+    'hacl_rightsPanel_9' => 'Reset right',
+    'hacl_rightsPanel_10' => 'Save right',
+    'hacl_rightsPanel_11' => 'Modification Rights',
+    'hacl_rightsPanel_12' => 'modification rights',
+    'hacl_rightsPanel_13' => 'Private right for user',
+
+    'hacl_rightsPanel_right_fullaccess' => 'Full access',
+    'hacl_rightsPanel_right_read' => 'Read',
+    'hacl_rightsPanel_right_edit' => 'Edit',
+    'hacl_rightsPanel_right_editfromform' => 'Edit with form',
+    'hacl_rightsPanel_right_WYSIWYG' => 'WYSIWYG',
+    'hacl_rightsPanel_right_create' => 'Create',
+    'hacl_rightsPanel_right_move' => 'Move',
+    'hacl_rightsPanel_right_delete' => 'Delete',
+    'hacl_rightsPanel_right_annotate' => 'Annotate',
+
+    'hacl_rightsPanel_allUsersRegistered' => 'all users registered',
+    'hacl_rightsPanel_allAnonymousUsers' => 'all anonymous users',
+    'hacl_rightsPanel_allUsers' => 'all users',
+
+    'hacl_rightPanelSelectDeselectTab_1' => 'Groups and Users',
+    'hacl_rightPanelSelectDeselectTab_2' => 'Filter in groups:',
+    'hacl_rightPanelSelectDeselectTab_3' => 'Users',
+    'hacl_rightPanelSelectDeselectTab_4' => 'User',
+    'hacl_rightPanelSelectDeselectTab_5' => 'Filter:',
+
+    'hacl_rightList_All' => 'All',
+    'hacl_rightList_StandardACLs' => 'Standard ACLs',
+    'hacl_rightList_Page' => 'Page',
+    'hacl_rightList_Category' => 'Category',
+    'hacl_rightList_Property' => 'Property',
+    'hacl_rightList_Namespace' => 'Namespace',
+    'hacl_rightList_ACLtemplates' => 'ACL templates',
+    'hacl_rightList_Defaultusertemplates' => 'Default user templates',
+
+    'hacl_rightList_1' => 'Existing ACLs',
+
+    'hacl_SDRightsPanelContainer_1' => 'Editing:',
+    'hacl_SDRightsPanelContainer_2' => 'Delete right',
+    'hacl_SDRightsPanelContainer_3' => 'Discard Changes',
+    'hacl_SDRightsPanelContainer_4' => 'Save ACL',
+
+    'hacl_RightsContainer_1' => '[ACL templates]',
+    'hacl_RightsContainer_2' => 'Use selected template',
+
+    'hacl_saveTempGroup_1' => 'group saved',
+
+    'hacl_deleteSecurityDescriptor_1' => 'Right successfully deleted.',
+
+    'hacl_manageUser_1' => 'Manage ACL group and user',
+    'hacl_manageUser_2' => 'This tab lets you create, edit and delete ACL groups. An ACL group is a collection of users. This group may also include other user groups.<br /> You can use these groups to easily assign rights to a specific set of users whenever you create an ACL.',
+    'hacl_manageUser_3' => 'Add new group',
+    'hacl_manageUser_4' => 'Add subgroup',
+    'hacl_manageUser_5' => 'Add subgroup on same level',
+    'hacl_manageUser_6' => 'Existing groups',
+    'hacl_manageUser_7' => 'Delete selected',
+    'hacl_manageUser_8' => 'ACL Group Explorer',
+    'hacl_manageUser_9' => 'Editing',
+    'hacl_manageUser_10' => 'Save group',
+
+    'hacl_whitelist_1' => 'Manage whitelisted pages',
+    'hacl_whitelist_2' => 'This tab lets you create and delete whitelist entries.',
+    'hacl_whitelist_3' => 'Whitelisted Pages',
+    'hacl_whitelist_4' => 'Add page to whitelist:',
+
+    'hacl_deleteGroup_1' => 'The marked items have been deleted successfully.',
+
+    'hacl_quickACL_1' => 'Manage quick access ACLs',
+    'hacl_quickACL_2' => 'This tab has a list of all the ACL templates that you can use in your quick access list. This list defines the ACL´s that will be in the dropdown box that is on the top of every page in the edit or creation mode. You may select up to 15 ACL templates.',
+    'hacl_quickACL_3' => 'Quick access ACLs',
+    'hacl_quickACL_4' => 'QuickACL saved',
+
+    'hacl_general_nextStep' => 'Next Step',
+    'hacl_nothing_deleted' => 'No elements have been deleted',
+    'hacl_quickacl_limit' => 'Only 15 templates are allowed in the QuickAccessList.',
+    'hacl_nodefusertpl'=>"no default template for user",
+    'hacl_nodefusertpl_link'=>"click here to create",
+    'hacl_showing_text'=>"Showing",
+    'hacl_showing_elements_text'=>"element(s)",
+    'hacl_selected'=>"Selected",
+
+    'hacl_discard_changes' => "Discard changes",
+    'hacl_save_acl' => "Save ACL",
+    'hacl_create_right' => "Create right",
+    'hacl_add_template' => "Add template",
+    'hacl_groupsettings' => "Groupsettings",
+
+    'hacl_saved' => "Saved",
+    'hacl_notsaved' => "Not saved",
+    'hacl_default' => "Default",
+
+    'hacl_tooltip_enternameforexisting' => "Enter a name of an existing item you want to protect",
+    'hacl_tooltip_eneternamefortemplate' => "Enter a name for the template",
+
+    'hacl_tooltip_clickto_delete_right'=> "Click here to delete the right",
+    'hacl_tooltip_clickto_reset_right'=> "Click here to reset the right",
+    'hacl_tooltip_clickto_save_right'=> "Click here to save the right",
+    'hacl_tooltip_clickto_save_modright'=> "Click here to save the modificationright",
+
+    'hacl_editing_group' => "Editing Group",
+
+    'hacl_delete_selected' => "Delete selected",
+    'hacl_select' => "Select",
+
+    'hacl_deletetplfromacl' => "Delete template from ACL",
+    'hacl_addtpltoacl' => "Add template to ACL",
+
+    'hacl_tpl_already_exists' => "The template already exists",
+    'hacl_setexisting_name' => "Please enter a name of an existing element",
+    'hacl_already_protected' => "The element is already protected. Please go to ManageACLs to change the ACL.",
+    'hacl_already_protected_by_ns_or_cat' => "The element is already protected by a category or a namespace. You are not entitled to add a new right.",
+    'hacl_showacls' => "Show ACLs",
+    'hacl_groupdescription'=> 'Group description',
+    'hacl_advancedToolbarTooltip'=>'Click here to open advanced access rights definition in a new tab',
+    'hacl_reset_groupsettings'=>'Reset groupsettings',
+    'hacl_createSavehelpopup1' => 'The ACL name is autogenerated. Please click Save ACL to save the ACL.',
+    'hacl_help_popup'=>'Help',
+    'hacl_jumptoarticle'=>"Jump to article.",
+    'hacl_no_groups_or_users' => "<h4>&nbsp;&nbsp;No groups or users have been selected.</h4><h4>&nbsp;&nbsp;Please select a group or an user.</h4>",
+    'hacl_protected_label'=>'protected',
+    'hacl_unprotected_label'=>'unprotected',
+    'hacl_delete_link_header' => 'Delete',
+
+    'hacl_permission_denied' => "You are not allowed to perform the requested action on this page.\n\nReturn to [[Main Page]].",
+);
+
+/**
+ * German
+ */
+$messages['de'] = array(
+    /* general/maintenance messages */
+    'haloacl'             => 'HaloACL',
+    'hacl_special_page' => 'HaloACL',   // Name of the special page for administration
+    'specialpages-group-hacl_group'    => 'HaloACL',
+    'hacl_tt_initializeDatabase'    => 'Initialisiert oder aktualisiert die Datenbanktabellen für HaloACL.',
+    'hacl_initializeDatabase'        => 'Datenbank initialisieren',
+    'hacl_db_setupsuccess'            => 'Die Datenbank für HaloACL wurde erfolgreich erstellt.',
+    'hacl_haloacl_return'            => 'Zurück zu ',
+    'hacl_unknown_user'                => 'Der Benutzer "$1" ist unbekannt.',
+    'hacl_unknown_group'            => 'Die Gruppe "$1" ist unbekannt.',
+    'hacl_missing_parameter'        => 'Der Parameter "$1" fehlt.',
+    'hacl_missing_parameter_values' => 'Der Parameter "$1" hat keine gültigen Werte.',
+    'hacl_invalid_predefined_right' => 'Es existiert keine Rechtevorlage mit dem Namen "$1" oder sie enthält keine gültige Rechtedefinition.',
+    'hacl_invalid_action'            => '"$1" ist ein ungültiger Wert für eine Aktion.',
+    'hacl_too_many_categories'        => 'Dieser Artikel gehört zu vielen Kategorien an ($1). Bitte entfernen Sie alle bis auf eine!',
+    'hacl_wrong_namespace'            => 'Artikel mit Rechte- oder Gruppendefinitionen müssen zum Namensraum "Rechte" gehören.',
+    'hacl_group_must_have_members'  => 'Eine Gruppe muss mindestens ein Mitglied haben (Gruppe oder Benutzer).',
+    'hacl_group_must_have_managers' => 'Eine Gruppe muss mindestens einen Verwalter haben (Gruppe oder Benutzer).',
+    'hacl_invalid_parser_function'    => 'Sie dürfen die Funktion "#$1" in diesem Artikel nicht verwenden.',
+    'hacl_right_must_have_rights'   => 'Ein Recht oder eine Sicherheitsbeschreibung müssen Rechte oder Verweise auf Rechte enthalten.',
+    'hacl_right_must_have_managers' => 'Ein Recht oder eine Sicherheitsbeschreibung müssen mindestens einen Verwalter haben (Gruppe oder Benutzer).',
+    'hacl_whitelist_must_have_pages' => 'Die Positivliste ist leer. Bitte fügen Sie Seiten hinzu.',
+    'hacl_add_to_group_cat'            => 'Der Artikel enthält Funktionen zur Definition von Gruppen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Gruppe]]" hinzufügen.',
+    'hacl_add_to_right_cat'            => 'Der Artikel enthält Funktionen zur Definition von Rechten oder Sicherheitsbeschreibungen. Dies wird nur berücksichtigt wenn Sie "[[Kategorie:Rechte/Recht]]" oder "[[Kategorie:Rechte/Sicherheitsbeschreibung]]" hinzufügen.',
+    'hacl_add_to_whitelist'            => 'Der Artikel enthält Funktionen zur Definition einer "Positivliste". Diese Funktion darf nur im Artikel "Rechte:Positivliste" benutzt werden.',
+    'hacl_pf_rightname_title'        => "===$1===\n",
+    'hacl_pf_rights_title'            => "===Recht(e): $1===\n",
+    'hacl_pf_rights'                => ":;Recht(e):\n:: $1\n",
+    'hacl_pf_right_managers_title'    => "===Rechteverwalter===\n",
+    'hacl_pf_predefined_rights_title' => "===Rechtevorlagen===\n",
+    'hacl_pf_whitelist_title'         => "===Positivliste===\n",
+    'hacl_pf_group_managers_title'    => "===Gruppenverwalter===\n",
+    'hacl_pf_group_members_title'    => "===Gruppenmitglieder===\n",
+    'hacl_assigned_user'            => 'Zugewiesene Benutzer: ',
+    'hacl_assigned_groups'            => 'Zugewiesene Gruppen:',
+    'hacl_user_member'                => 'Benutzer, die Mitglied dieser Gruppe sind:',
+    'hacl_group_member'                => 'Gruppen, die Mitglied dieser Gruppe sind:',
+    'hacl_description'                => 'Beschreibung:',
+    'hacl_error'                    => 'Fehler:',
+    'hacl_warning'                    => 'Warnungen:',
+    'hacl_consistency_errors'        => '<h2>Fehler in der Rechtedefinition</h2>',
+    'hacl_definitions_will_not_be_saved' => '(Wegen der folgenden Fehler werden die Definitionen dieses Artikel nicht gespeichert und haben keine Auswirkungen.)',
+    'hacl_will_not_work_as_expected'=> '(Wegen der folgenden Warnungen wird die Definition nicht wie erwartet angewendet.)',
+    'hacl_errors_in_definition'        => 'Die Definitionen in diesem Artikel sind fehlerhaft. Bitte schauen Sie sich die folgenden Details an!',
+    'hacl_anonymous_users'            => 'anonyme Benutzer',
+    'hacl_registered_users'            => 'registrierte Benutzer',
+    'hacl_acl_element_not_in_db'    => 'Zu diesem Artikel gibt es keinen Eintrag in der Rechtedatenbank. Vermutlich wurde er gelöscht und wiederhergestellt. Bitte speichern Sie ihn und alle Artikel die ihn verwenden neu.',
+    'hacl_whitelist_mismatch'        => 'Die "Positivliste" in diesem Artikel enthält Artikel, die nicht existieren. Bitte entfernen Sie diese und speichern Sie die "Positivliste" erneut.' ,
+    'hacl_unprotectable_namespace'  => 'Dieser Namensraum kann nicht geschützt werden. Bitte fragen Sie Ihren Wikiadministrator.',
+
+    /* Messages for semantic protection (properties etc.) */
+    'hacl_sp_query_modified'        => "- Ihre Anfrage wurde modifiziert, das sie geschützte Attribute enthält.\n",
+    'hacl_sp_empty_query'            => "- Ihre Anfrage besteht nur aus geschützten Attributen und konnte deshalb nicht ausgeführt werden.of protected properties.\n",
+    'hacl_sp_results_removed'        => "- Wegen Zugriffbeschränkungen wurden einige Resultate entfernt.\n",
+    'hacl_sp_cant_save_article'        => "'''Der Artikel enthält die folgenden geschützten Attribute:'''\n$1'''Sie haben nicht die Berechtigung, deren Werte zu setzen. Bitte entfernen Sie die Attribute und speichern Sie erneut.'''",
+
+    /* Messages for Special:ACL */
+    'hacl_tab_create_acl' => 'Recht erzeugen',
+    'hacl_tab_manage_acls' => 'Rechte verwalten',
+    'hacl_tab_manage_user' => 'Gruppen verwalten',
+    'hacl_tab_manage_whitelist' => 'Positivliste verwalten',
+
+    /* Messages for 'Create ACL' tab */
+    'hacl_create_acl_subtab1' => 'Standardrecht erzeugen',
+    'hacl_create_acl_subtab2' => 'Rechtevorlage erzeugen',
+    'hacl_create_acl_subtab3' => 'Persönliche Standardrechtevorlage erzeugen',
+
+    /* Messages for sub tab 'Create standard ACL' ("csa") */
+
+    /* Messages for sub tab 'Create ACL template' ("cat") */
+
+    /* Messages for sub tab 'Create ACL default user template ("dut")' */
+    'hacl_create_acl_dut_headline' => 'Standardrechtevorlage für Benutzer erzeugen',
+    'hacl_create_acl_dut_info' => 'Auf dieser Seite können Sie Ihre persönliche Standardrechtevorlage erzeugen.<br/>Ihre neuen Artikel werden automatisch mit diesen Rechten geschützt.',
+
+    'hacl_create_acl_dut_general' => '1. Allgemein',
+    'hacl_create_acl_dut_general_definefor' => 'Definiere für:',
+    'hacl_create_acl_dut_general_private_use' => 'Mich',
+    'hacl_create_acl_dut_general_all' => 'Alle Benutzer',
+    'hacl_create_acl_dut_general_specific' => 'Bestimmer Benutzer und/oder Gruppen',
+
+    'hacl_create_acl_dut_rights' => '2. Rechte',
+    'hacl_create_acl_dut_button_create_right' => 'Recht erzeugen',
+    'hacl_create_acl_dut_button_add_template' => 'Rechtevorlage hinzufügen',
+    'hacl_create_acl_dut_new_right_legend' => 'Recht: Neues Recht $1',
+    'hacl_create_acl_dut_new_right_legend_status_saved' => '[gespeichert]',
+    'hacl_create_acl_dut_new_right_legend_status_notsaved' => '[nicht gespeichert]',
+    'hacl_create_acl_dut_new_right_name' => 'Name:',
+    'hacl_create_acl_dut_new_right_defaultname' => 'Neues Recht:',
+    'hacl_create_acl_dut_new_right_rights' => 'Rechte:',
+    #TODO: can we get this from s.w. else???
+    'hacl_create_acl_dut_new_right_fullaccess' => 'Vollzugriff',
+    'hacl_create_acl_dut_new_right_read' => 'lesen',
+    'hacl_create_acl_dut_new_right_ewf' => 'mit Formular editieren',
+    'hacl_create_acl_dut_new_right_edit' => 'editieren',
+    'hacl_create_acl_dut_new_right_create' => 'erzeugen',
+    'hacl_create_acl_dut_new_right_move' => 'verschieben',
+    'hacl_create_acl_dut_new_right_delete' => 'löschen',
+    'hacl_create_acl_dut_new_right_annotate' => 'annotieren',
+    'hacl_create_acl_dut_new_right_select_user' => 'Benutzer/Gruppen auswählen',
+    'hacl_create_acl_dut_new_right_assigned_user' => 'Zugewiesene Benutzer/Gruppen',
+    'hacl_create_acl_dut_new_right_column_users' => 'Gruppen und Benutzer',
+    'hacl_create_acl_dut_new_right_column_filter' => 'Filter',
+    'hacl_create_acl_dut_new_right_column_user' => 'Benutzer',
+    'hacl_create_acl_dut_new_right_desc' => 'Beschreibung:',
+    'hacl_create_acl_dut_new_right_button_save' => 'Speichern',
+    'hacl_create_acl_dut_button_next' => 'Weiter',
+
+    'hacl_create_acl_dut_mod' => '3. Modifizierungsrechte',
+    'hacl_create_acl_dut_mod_info' => 'Sie können spezifizieren, wer diese Rechte verändern darf.<br/>Beachten Sie: Standardmäßig hat der Erzeuger der Rechtedefinition alle Rechte (~"Besitzerrecht").',
+    'hacl_create_acl_dut_mod_legend' => 'Modifizierungsrechte',
+
+    'hacl_create_acl_dut_save' => '4. Rechtedefinition speichern',
+    'hacl_create_acl_dut_save_info' => 'Das System generiert automatisch einen Namen für die Rechte.',
+    'hacl_create_acl_dut_save_name' => 'Rechtename:',
+    'hacl_create_acl_dut_save' => '',
+
+    'hacl_create_acl_dut_save_button_discard' => 'Rechte verwerfen',
+    'hacl_create_acl_dut_save_button_save' => 'Rechte speichern',
+
+    /* Messages for 'Manage ACLs' tab */
+    /* Messages for 'Manage User' tab */
+    /* Messages for 'Manage Whitelists' tab */
+    'hacl_whitelists_headline' => 'Positivliste verwalten',
+    'hacl_whitelists_info' => 'Auf dieser Seite können Sie die Positivliste erzeugen und bearbeiten.',
+    'hacl_whitelists_filter' => 'Filter:',
+    'hacl_whitelists_addlink' => 'Seite:',
+    'hacl_whitelists_pagename' => 'Seitenname',
+    'hacl_whitelists_addbutton' => 'Seite hinzufügen',
+
+    'hacl_createRightContent_help' => 'Klicken Sie auf <strong>Recht erstellen</strong> um ein neues Recht zu erstellen. Sie können beliebige viele Rechte erstellen (bspw.: ein Recht welches Vollzugriff für bestimmte Nutzer erlaubt sowie ein Recht welches lediglich Lesezugriff für alle Nutzer realisiert).<br /><br />Wählen Sie <strong>Template hinzufügen</strong> wenn Sie vordefinierte ACL templates in in Ihre Rechtedefinition einbinden möchten.',
+    'hacl_haloacl_tab_section_header_title' =>  'Rechte',
+
+    'hacl_createModificationRightContent_help' => 'Wählen Sie die Gruppen/Nutzer, welche diese Access Control List editieren können.',
+    'hacl_haloacl_tab_section_header_mod_title' => 'Modifikationsrechte',
+    'hacl_haloacl_mod_1' => 'Klappen Sie die Box unten auf, wenn Sie anderen Nutzern oder Gruppen die Modifikation dieser ACL erlauben wollen.',
+    'hacl_haloacl_mod_2' => 'Vorsicht. Momentan sind Sie selbst weder direkt, noch über eine Gruppe im Modifikationsrecht eingeschlossen!',
+    'hacl_haloacl_mod_3' => 'Bitte wählen Sie mindestens eine Gruppe oder einen User in den Modification Rights aus',
+
+    'hacl_createSaveContent_1' => 'ACL speichern',
+    'hacl_createSaveContent_2' => 'ACL Name:',
+    'hacl_createSaveContent_3' => 'ACL gespeichert',
+    'hacl_createSaveContent_4' => 'Beim speichern des ACL trat ein Fehler auf',
+
+    'hacl_createManageACLContent_2' => 'Hier können Sie vorhandene ACLs editieren und löschen.',
+    'hacl_createManageACLContent_1' => 'ACLs verwalten',
+
+    'hacl_createManageUserTemplateContent_1' => 'Eigenes Default User Template verwalten',
+
+    'hacl_createGeneralContent_1' => 'Um eine Access Control List zu erzeugen, führen Sie die folgenden vier Schritte durch. <br />Sie können in jedem Schritt auf das Hilfe-Icon klicken um Hilfe zu erhalten.',
+    'hacl_createGeneralContent_2' => 'Allgemein',
+    'hacl_createGeneralContent_3' => 'Zu schützen:',
+    'hacl_createGeneralContent_4' => 'Seite',
+    'hacl_createGeneralContent_5' => 'Attribut',
+    'hacl_createGeneralContent_6' => 'Seiten in Namensraum',
+    'hacl_createGeneralContent_7' => 'Seiten in Kategorie',
+    'hacl_createGeneralContent_8' => 'Name:',
+    'hacl_createGeneralContent_9' => 'Festlegen für:',
+    'hacl_createGeneralContent_10' => 'Mich',
+    'hacl_createGeneralContent_11' => 'Individuelle Nutzer und/oder Nutzergruppen',
+    'hacl_createGeneralContent_12' => 'Alle Nutzer',
+    'hacl_createGeneralContent_13' => 'Alle registrierten Nutzer',
+    'hacl_createGeneralContent_14' => 'Alle anonymen Nutzer',
+    'hacl_createGeneralContent_message1' => 'Bitte wählen Sie den Typ des zu schützenden Elements. ',
+    'hacl_createGeneralContent_message2' => 'Bitte legen Sie einen Namen fest. ',
+    'hacl_createGeneralContent_message3' => 'Bitte definieren Sie, für wen das ACL gilt. ',
+    'hacl_createGeneralContent_message4' => 'Daten reichen nicht aus',
+
+    'hacl_createACLContent_1' => '<strong>Zu schützen:</strong><br />Bitte wählen Sie hier, was Sie schützen möchten (eine einzelne Seite/Attribut oder alle Seiten in einem Namensraum/Kategorie).<br /><br /><strong>Name:</strong><br />Geben Sie den Namen des Elementes ein, welches Sie schützen möchten.<br /><br />',
+    'hacl_createACLContent_2' => 'Allgemein',
+
+    'hacl_createACLTemplateContent_1' => '<strong>Name:</strong><br />Bitte geben Sie einen Namen f&uuml;r das zu erstellende Template ein.<br /><br />',
+    'hacl_createACLTemplateContent_2' => 'Allgemein',
+
+    'hacl_createUserTemplateContent_1' => 'Erstellen Sie hier Ihr standard Nutzer Template. Alle von Ihnen erstellten Seiten werden danach automatisch mit diesem Template geschützt. Sie können jedoch jederzeit den Status einer Seite wieder auf -ungeschützt- oder andere ACL´s setzen.',
+    'hacl_createUserTemplateContent_2' => 'Allgemein',
+
+    'hacl_manageUserGroupPanel_1' => 'Name:',
+
+    'hacl_rightsPanel_1' => 'Name:',
+    'hacl_rightsPanel_2' => 'Rechte:',
+    'hacl_rightsPanel_3' => 'Beschreibung:',
+    'hacl_rightsPanel_4' => 'Beschreibung automatisch generieren:',
+    'hacl_rightsPanel_5' => 'Ja',
+    'hacl_rightsPanel_6' => 'Nein',
+    'hacl_rightsPanel_7' => 'automatisch generiert',
+    'hacl_rightsPanel_8' => 'Recht löschen',
+    'hacl_rightsPanel_9' => 'Recht zurücksetzen',
+    'hacl_rightsPanel_10' => 'Recht zwischenspeichern',
+    'hacl_rightsPanel_11' => 'Modifikationsrechte',
+    'hacl_rightsPanel_12' => 'Modifikationsrechte',
+    'hacl_rightsPanel_13' => 'Privates Recht für Nutzer',
+
+    'hacl_rightsPanel_right_fullaccess' => 'Voller Zugriff',
+    'hacl_rightsPanel_right_read' => 'Lesen',
+    'hacl_rightsPanel_right_edit' => 'Editieren',
+    'hacl_rightsPanel_right_editfromform' => 'Edit mit Form',
+    'hacl_rightsPanel_right_WYSIWYG' => 'WYSIWYG',
+    'hacl_rightsPanel_right_create' => 'Erzeugen',
+    'hacl_rightsPanel_right_move' => 'Verschieben',
+    'hacl_rightsPanel_right_delete' => 'Löschen',
+    'hacl_rightsPanel_right_annotate' => 'Kommentieren',
+
+    'hacl_rightsPanel_allUsersRegistered' => 'alle registrierten Nutzer',
+    'hacl_rightsPanel_allAnonymousUsers' => 'alle anonymen Nutzer',
+    'hacl_rightsPanel_allUsers' => 'alle Nutzer',
+
+    'hacl_rightPanelSelectDeselectTab_1' => 'Gruppen und Nutzer',
+    'hacl_rightPanelSelectDeselectTab_2' => 'Gruppenfilter:',
+    'hacl_rightPanelSelectDeselectTab_3' => 'Nutzer',
+    'hacl_rightPanelSelectDeselectTab_4' => 'Nutzer',
+    'hacl_rightPanelSelectDeselectTab_5' => 'Filter:',
+
+    'hacl_rightList_All' => 'Alle',
+    'hacl_rightList_StandardACLs' => 'Standard ACLs',
+    'hacl_rightList_Page' => 'Seite',
+    'hacl_rightList_Category' => 'Kategorie',
+    'hacl_rightList_Property' => 'Eigenschaft',
+    'hacl_rightList_Namespace' => 'Namensraum',
+    'hacl_rightList_ACLtemplates' => 'ACL Templates',
+    'hacl_rightList_Defaultusertemplates' => 'Standard Nutzer Templates',
+
+    'hacl_rightList_1' => 'Vorhandene ACLs',
+
+    'hacl_SDRightsPanelContainer_1' => 'Editieren:',
+    'hacl_SDRightsPanelContainer_2' => 'Recht löschen',
+    'hacl_SDRightsPanelContainer_3' => 'Änderungen verwerfen',
+    'hacl_SDRightsPanelContainer_4' => 'Recht speichern',
+
+    'hacl_RightsContainer_1' => 'Auswählen...',
+    'hacl_RightsContainer_2' => 'Markierte Templates auswählen',
+
+    'hacl_saveTempGroup_1' => 'Gruppen gespeichert',
+
+    'hacl_deleteSecurityDescriptor_1' => 'Das Recht wurde erfolgreicht gelöscht.',
+
+    'hacl_manageUser_1' => 'ACL Gruppen und Nutzer verwalten',
+    'hacl_manageUser_2' => 'Hier können ACL Gruppen angelegt, editiert und gelöscht werden.',
+    'hacl_manageUser_3' => 'Neue Gruppe hinzufügen',
+    'hacl_manageUser_4' => 'Untergruppe hinzufügen',
+    'hacl_manageUser_5' => 'Untergruppe auf gleicher Ebene hinzufügen',
+    'hacl_manageUser_6' => 'Vorhandene Gruppen',
+    'hacl_manageUser_7' => 'Ausgewählte Elemente löschen',
+    'hacl_manageUser_8' => 'ACL Gruppen Explorer',
+    'hacl_manageUser_9' => 'Editieren',
+    'hacl_manageUser_10' => 'Gruppe speichern',
+
+    'hacl_whitelist_1' => 'Whitelist Einträge verwalten',
+    'hacl_whitelist_2' => 'Hier können Whitelist Einträge angelegt und gelöscht werden.',
+    'hacl_whitelist_3' => 'Whitelisted Einträge',
+    'hacl_whitelist_4' => 'Eintrag zu Whitelist hinzufügen:',
+
+    'hacl_deleteGroup_1' => 'Die markierten Einträge wurden erfolgreich gelöscht',
+
+    'hacl_quickACL_1' => 'ACL Favoriten verwalten',
+    'hacl_quickACL_2' => 'Hier können ACLs zu Ihren Favoriten hinzugefügt oder von diesen entfernt werden.',
+    'hacl_quickACL_3' => 'ACL Favoriten',
+    'hacl_quickACL_4' => 'Favoriten wurden gespeichert.',
+
+    'hacl_general_nextStep' => 'Nächster Schritt',
+    'hacl_nothing_deleted' => 'Es wurden keine Elemente gelöscht',
+    'hacl_quickacl_limit' => 'Es sind maximal 15 Templates in der Schnellauswahl erlaubt.',
+    'hacl_nodefusertpl' => "Es existiert kein Standard Nutzer Template",
+    'hacl_nodefusertpl_link' => "Es existiert kein Standard Nutzer Template",
+    'hacl_showing_text' => "Zeige",
+    'hacl_showing_elements_text' => "Element(e)",
+    'hacl_selected' => "Ausgew&auml;hlt",
+
+    'hacl_discard_changes' => "&Auml;nderungen verwerfen",
+    'hacl_save_acl' => "ACL speichern",
+    'hacl_create_right' => "Recht erstellen",
+    'hacl_add_template' => "Template hinzuf&uuml;gen",
+    'hacl_groupsettings' => "Gruppeneinstellungen",
+
+    'hacl_saved' => "Gespeichert",
+    'hacl_notsaved' => "Nicht gespeichert",
+    'hacl_default' => "Standard",
+
+    'hacl_tooltip_enternameforexisting' => "Bitte den Name eines existierenden Elements angeben",
+    'hacl_tooltip_eneternamefortemplate' => "Bitte einen Name f&uuml;r das Template angeben",
+
+    'hacl_tooltip_clickto_delete_right'=> "Hier klicken um das Recht zu l&ouml;schen",
+    'hacl_tooltip_clickto_reset_right'=> "Hier klicken um das Recht zu zur&uuml;ckzusetzen",
+    'hacl_tooltip_clickto_save_right'=> "Hier klicken um das Recht zu speichern",
+    'hacl_tooltip_clickto_save_modright'=> "Hier klicken um das Modifikationsrecht zu speichern",
+
+    'hacl_editing_group' => "Editiere Gruppe",
+
+    'hacl_delete_selected' => "Ausgew&auml;hlte l&ouml;schen",
+    'hacl_select' => "<span style='margin-right:0px'>Ausw.</span>",
+
+    'hacl_deletetplfromacl' => "Template von ACL entfernen",
+    'hacl_addtpltoacl' => "Template zu ACL hinzuf&uuml;gen",
+
+    'hacl_tpl_already_exists' => "Ein Template mit diesem Name existiert bereits",
+    'hacl_setexisting_name' => "Bitte einen Namen eines existierenden Elements eingeben",
+    'hacl_already_protected' => "Das Element ist bereits gesch&uuml;tzt. Zum &Auml;ndern bitte in die Rechteverwaltung wechseln. ",
+    'hacl_already_protected_by_ns_or_cat' => "Das Element ist bereits durch eine Kategorie oder einen Namensraum geschützt. Sie sind nicht berechtigt, neue Rechte hinzuzufügen.",
+    'hacl_showacls' => "Zeige ACLs",
+    'hacl_groupdescription'=> 'Gruppenbeschreibung',
+    'hacl_advancedToolbarTooltip' => 'Hier klicken um erweiterte Rechtedefinitionen in einem neuen Tab zu öffnen',
+    'hacl_reset_groupsettings' => 'Gruppeneinstellungen zur&uuml;cksetzen',
+    'hacl_createSavehelpopup1' =>'Der ACL-Name wurde automatisch generiert. <br /> Klicken Sie auf Save ACL klicken, um diese Access Control List zu speichern.',
+    'hacl_help_popup' => 'Hilfe',
+    'hacl_jumptoarticle' => "Zum Artikel springen.",
+    'hacl_no_groups_or_users' => "<h4>&nbsp;&nbsp;Keine Gruppe oder Benutzer gewählt..</h4><h4>&nbsp;&nbsp;Bitte wählen Sie eine Gruppe oder einen Benutzer.</h4>",
+    'hacl_protected_label' => 'geschützt',
+    'hacl_unprotected_label' => 'ungeschützt',
+    'hacl_delete_link_header' => '<span style="margin-right:-12px">Löschen</span>',
+
+    'hacl_permission_denied' => "Sie dürfen die gewünschte Aktion auf dieser Seite nicht durchführen.\n\nZurück zur [[Hauptseite]].",
+);

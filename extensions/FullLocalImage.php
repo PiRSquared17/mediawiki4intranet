@@ -31,8 +31,10 @@ class wgFLImageFuncts {
 	function Fullimage ( &$parser, $name = '', $arg = null ) {
 		global $wgServer;
 		$img = Image::newFromName( $name );
-		if( $img != NULL ) return $wgServer . $img->getURL();
-		return '';
+		if( !$img ) return '';
+		$url = $img->getURL();
+		if( substr( $url, 0, strlen( $wgServer ) ) != $wgServer ) $url = $wgServer . $url;
+		return $url;
 	}
 }
  

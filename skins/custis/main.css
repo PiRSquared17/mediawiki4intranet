@@ -1,0 +1,11 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   main.css
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+@import url("body.css");
+@import url("layout.css");
+
