@@ -1,7 +1,7 @@
 <?php
 /**
- * upload.php -- Simple PHP backend for SWFUpload and MediaWiki
- * Copyright 2009 Vitaliy Filippov <vitalif@mail.ru>
+ * upload.php -- Simple PHP backend for using SWFUpload inside MediaWiki
+ * Copyright 2009-2011 Vitaliy Filippov <vitalif@mail.ru>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -36,7 +36,8 @@ if ($_POST['cookies'])
         $args[] = urlencode($k).'='.urlencode($v);
     $args = join('&', $args);
     $_SERVER['REQUEST_URI'] = preg_replace('#extensions/SWFUpload/upload\.php(\?.*)?$#s', 'index.php?' . $args, $_SERVER['REQUEST_URI']);
-    chdir('../..');
+    $IP = preg_replace('#[/\\\\]*[^/\\\\]+[/\\\\]+[^/\\\\]+[/\\\\]+upload\.php$#', '', $_SERVER['SCRIPT_FILENAME']);
+    chdir($IP);
     error_reporting(E_ERROR | E_PARSE);
     print "m";
     ob_start();
@@ -45,6 +46,6 @@ if ($_POST['cookies'])
     ob_end_clean();
     if (preg_match('#<span[^<>]*class=["\']error[^<>]*>(.*?)</span>#is', $ob, $m))
         echo trim($m[1]);
-    else if ($ob)
+    elseif ($ob)
         echo "msg-unknown-error";
 }
