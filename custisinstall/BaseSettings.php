@@ -151,6 +151,17 @@ require_once($IP.'/extensions/UserMessage/UserMessage.php');
 require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/HttpAuth/HttpAuth.php');
 require_once($IP.'/extensions/SimpleForms/SimpleForms.php'); /* useful at least for {{#request:...}} */
+require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
+require_once($IP.'/extensions/Polls/poll.php');
+
+# Extension:Drafts
+require_once($IP.'/extensions/Drafts/Drafts.php');
+$egDraftsAutoSaveWait = 60;   // 1 minute
+
+# Extension:FlvHandler
+$wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
+$wgFileExtensions[] = 'flv';
+require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
@@ -222,3 +233,23 @@ $wgNamespacesToBeSearchedDefault = array(
 $wgShellLocale = 'ru_RU.UTF-8';
 
 $wgNoCopyrightWarnings = true;
+
+$wgCookieHttpOnly      = false;
+$wgEnableMWSuggest     = true;
+$wgOpenSearchTemplate  = true;
+
+// Don't purge recent changes... (keep them for 50 years)
+$wgRCMaxAge = 50 * 365 * 86400;
+
+$wgGroupPermissions['*']['delete'] = true;
+$wgGroupPermissions['*']['undelete'] = true;
+$wgGroupPermissions['*']['upload_by_url'] = true;
+$wgGroupPermissions['sysop']['deletebatch'] = true;
+
+// Default settings for Sphinx search
+$wgSphinxSearch_weights = array('page_title' => 2, 'old_text' => 1);
+$wgSphinxSearch_matches = 20;
+$wgSphinxMatchAll = 1;
+$wgSphinxSuggestMode = true;
+
+$wgMaxImageArea = 5000*5000;
