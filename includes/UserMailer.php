@@ -141,7 +141,7 @@ class UserMailer {
 			if ( $replyto ) {
 				$headers['Reply-To'] = $replyto->toString();
 			}
-			$headers['Subject'] = wfQuotedPrintable( $subject );
+			$headers['Subject'] = wfMimeBase64( $subject );
 			$headers['Date'] = date( 'r' );
 			$headers['MIME-Version'] = '1.0';
 			$headers['Content-type'] = (is_null($contentType) ?
