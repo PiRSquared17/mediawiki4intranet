@@ -1,6 +1,6 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1299080619 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1300224160 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -17,7 +17,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r f6fe0b014618 -r a7ec710b2480 includes/Export.php
+diff -r f6fe0b014618 -r ec61506a27fd includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -146,7 +146,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Export.php
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
  		} else {
-@@ -592,12 +645,12 @@
+@@ -592,13 +645,15 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
  	 */
@@ -157,11 +157,15 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Export.php
  			if( $img ) {
  				$out = '';
 -				foreach( array_reverse( $img->getHistory() ) as $ver ) {
-+				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
- 					$out .= $this->writeUpload( $ver );
+-					$out .= $this->writeUpload( $ver );
++				if ( !$limit || $limit > 1 ) {
++					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
++						$out .= $this->writeUpload( $ver );
++					}
  				}
  				$out .= $this->writeUpload( $img );
-@@ -608,13 +661,22 @@
+ 				return $out;
+@@ -608,13 +663,22 @@
  	}
  
  	function writeUpload( $file ) {
@@ -188,7 +192,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Export.php
  			"    </upload>\n";
  	}
  
-@@ -650,6 +712,10 @@
+@@ -650,6 +714,10 @@
  		$this->write( $string );
  	}
  
@@ -199,7 +203,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r f6fe0b014618 -r a7ec710b2480 includes/Import.php
+diff -r f6fe0b014618 -r ec61506a27fd includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -694,7 +698,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Import.php
 +				$part['tempfile'] = $tempfile;
 +				if ($part['content_id'])
 +				{
-+					$part['sha1'] = sha1_file($part['tempfile']);
++					$part['sha1'] = File::sha1Base36($part['tempfile']);
 +					$this->parts[$part['content_id']] = $part;
 +				}
 +				else
@@ -740,7 +744,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r f6fe0b014618 -r a7ec710b2480 includes/filerepo/LocalFile.php
+diff -r f6fe0b014618 -r ec61506a27fd includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -836,7 +840,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r f6fe0b014618 -r a7ec710b2480 includes/specials/SpecialExport.php
+diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,5 +1,6 @@
@@ -1342,7 +1346,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r f6fe0b014618 -r a7ec710b2480 includes/specials/SpecialImport.php
+diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1441,7 +1445,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r f6fe0b014618 -r a7ec710b2480 languages/messages/MessagesEn.php
+diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3118,13 +3118,20 @@
@@ -1497,7 +1501,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r f6fe0b014618 -r a7ec710b2480 languages/messages/MessagesRu.php
+diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2573,13 +2573,20 @@
@@ -1550,7 +1554,7 @@ diff -r f6fe0b014618 -r a7ec710b2480 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r f6fe0b014618 -r a7ec710b2480 skins/common/shared.css
+diff -r f6fe0b014618 -r ec61506a27fd skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,5 @@
