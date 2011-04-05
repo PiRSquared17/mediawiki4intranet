@@ -176,7 +176,7 @@ if (!isset($egDisableIntraACL))
 }
 
 # MWQuizzer
-$egMWQuizzerAdmins = array('VitaliyFilippov', 'StasFomin', 'WikiSysop');
+$egMWQuizzerIntraACLAdminGroup = 'Group/QuizAdmin';
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 MediawikiQuizzer::setupNamespace(104);
 
