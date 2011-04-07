@@ -1,0 +1,3 @@
+Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
+Bug 68935 - Update for MediaWiki 1.16
+MediaWikiBug 6200 (https://bugzilla.wikimedia.org/show_bug.cgi?id=6200) - Completely rewrite doBlockLevels to correctly handle nested tags
