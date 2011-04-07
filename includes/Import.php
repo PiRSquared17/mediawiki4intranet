@@ -1253,7 +1253,7 @@ class ImportStreamSource {
 				$part['tempfile'] = $tempfile;
 				if ($part['content_id'])
 				{
-					$part['sha1'] = sha1_file($part['tempfile']);
+					$part['sha1'] = File::sha1Base36($part['tempfile']);
 					$this->parts[$part['content_id']] = $part;
 				}
 				else
