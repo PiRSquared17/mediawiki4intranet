@@ -1,20 +1,20 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1298387322 -10800
+# Date 1302184764 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
 advanced export page list building options and support for exporting file data
 over HTTP or inside the export file.
 
-Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+Requires running file-upload-renamer.php when applied to a non-empty MediaWiki
 installation.
 
 Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
 
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
---- includes/Export.php
-+++ includes/Export.php
+diff -r 98a60024775f includes/Export.php
+--- a/includes/Export.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/includes/Export.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -28,7 +28,8 @@
  	var $list_authors = false ; # Return distinct author list (when not returning full history)
  	var $author_list = "" ;
@@ -141,7 +141,7 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
  		} else {
-@@ -566,12 +619,12 @@
+@@ -566,13 +619,15 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
  	 */
@@ -152,11 +152,15 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
  			if( $img ) {
  				$out = '';
 -				foreach( array_reverse( $img->getHistory() ) as $ver ) {
-+				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
- 					$out .= $this->writeUpload( $ver );
+-					$out .= $this->writeUpload( $ver );
++				if ( !$limit || $limit > 1 ) {
++					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
++						$out .= $this->writeUpload( $ver );
++					}
  				}
  				$out .= $this->writeUpload( $img );
-@@ -582,13 +635,22 @@
+ 				return $out;
+@@ -582,13 +637,22 @@
  	}
  
  	function writeUpload( $file ) {
@@ -183,7 +187,7 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
  			"    </upload>\n";
  	}
  
-@@ -624,6 +686,10 @@
+@@ -624,6 +688,10 @@
  		$this->write( $string );
  	}
  
@@ -194,9 +198,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Import.php
---- includes/Import.php
-+++ includes/Import.php
+diff -r 98a60024775f includes/Import.php
+--- a/includes/Import.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/includes/Import.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -39,6 +39,7 @@
  	var $type = "";
  	var $action = "";
@@ -847,7 +851,7 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Import.php
 +				$part['tempfile'] = $tempfile;
 +				if ($part['content_id'])
 +				{
-+					$part['sha1'] = sha1_file($part['tempfile']);
++					$part['sha1'] = File::sha1Base36($part['tempfile']);
 +					$this->parts[$part['content_id']] = $part;
 +				}
 +				else
@@ -893,9 +897,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/filerepo/LocalFile.php
---- includes/filerepo/LocalFile.php
-+++ includes/filerepo/LocalFile.php
+diff -r 98a60024775f includes/filerepo/LocalFile.php
+--- a/includes/filerepo/LocalFile.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/includes/filerepo/LocalFile.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -776,6 +776,66 @@
  	}
  
@@ -989,9 +993,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialExport.php
---- includes/specials/SpecialExport.php
-+++ includes/specials/SpecialExport.php
+diff -r 98a60024775f includes/specials/SpecialExport.php
+--- a/includes/specials/SpecialExport.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/includes/specials/SpecialExport.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -21,28 +21,54 @@
   * @ingroup SpecialPage
   */
@@ -1328,9 +1332,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialExport.php
  
  	$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
  	$form .= Xml::closeElement( 'form' );
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialImport.php
---- includes/specials/SpecialImport.php
-+++ includes/specials/SpecialImport.php
+diff -r 98a60024775f includes/specials/SpecialImport.php
+--- a/includes/specials/SpecialImport.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/includes/specials/SpecialImport.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -264,7 +264,9 @@
  		$wgOut->addHTML( "<ul>\n" );
  	}
@@ -1426,9 +1430,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesEn.php
---- languages/messages/MessagesEn.php
-+++ languages/messages/MessagesEn.php
+diff -r 98a60024775f languages/messages/MessagesEn.php
+--- a/languages/messages/MessagesEn.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/languages/messages/MessagesEn.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -2763,10 +2763,20 @@
  'exportnohistory'   => "----
  '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
@@ -1476,9 +1480,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesEn.php
  'import-token-mismatch'      => 'Loss of session data. Please try again.',
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesRu.php
---- languages/messages/MessagesRu.php
-+++ languages/messages/MessagesRu.php
+diff -r 98a60024775f languages/messages/MessagesRu.php
+--- a/languages/messages/MessagesRu.php	Fri Jan 14 18:06:06 2011 +0300
++++ b/languages/messages/MessagesRu.php	Thu Apr 07 17:59:00 2011 +0400
 @@ -2321,10 +2321,20 @@
  'exportnohistory'   => "----
  '''Замечание:''' экспорт полной истории изменений страниц отключен из-за проблем с производительностью.",
@@ -1526,9 +1530,9 @@ diff -r 1f23ac6aaec1 -r dc2d53c26dc1 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 1f23ac6aaec1 -r dc2d53c26dc1 skins/common/shared.css
---- skins/common/shared.css
-+++ skins/common/shared.css
+diff -r 98a60024775f skins/common/shared.css
+--- a/skins/common/shared.css	Fri Jan 14 18:06:06 2011 +0300
++++ b/skins/common/shared.css	Thu Apr 07 17:59:00 2011 +0400
 @@ -311,3 +311,5 @@
  div.mw-warning-with-logexcerpt ul li {
  	font-size: 90%;

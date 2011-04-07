@@ -1,13 +1,13 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1298387154 -10800
+# Date 1302184764 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
 advanced export page list building options and support for exporting file data
 over HTTP or inside the export file.
 
-Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+Requires running file-upload-renamer.php when applied to a non-empty MediaWiki
 installation.
 
 Bug 47362 - Include images into export files
@@ -17,9 +17,9 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Export.php
---- includes/Export.php
-+++ includes/Export.php
+diff -r 45da8fc662c9 includes/Export.php
+--- a/includes/Export.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/includes/Export.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -28,7 +28,8 @@
  	var $list_authors = false ; # Return distinct author list (when not returning full history)
  	var $author_list = "" ;
@@ -146,7 +146,7 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Export.php
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
  		} else {
-@@ -592,12 +645,12 @@
+@@ -592,13 +645,15 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
  	 */
@@ -157,11 +157,15 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Export.php
  			if( $img ) {
  				$out = '';
 -				foreach( array_reverse( $img->getHistory() ) as $ver ) {
-+				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
- 					$out .= $this->writeUpload( $ver );
+-					$out .= $this->writeUpload( $ver );
++				if ( !$limit || $limit > 1 ) {
++					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
++						$out .= $this->writeUpload( $ver );
++					}
  				}
  				$out .= $this->writeUpload( $img );
-@@ -608,13 +661,22 @@
+ 				return $out;
+@@ -608,13 +663,22 @@
  	}
  
  	function writeUpload( $file ) {
@@ -188,7 +192,7 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Export.php
  			"    </upload>\n";
  	}
  
-@@ -650,6 +712,10 @@
+@@ -650,6 +714,10 @@
  		$this->write( $string );
  	}
  
@@ -199,9 +203,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Import.php
---- includes/Import.php
-+++ includes/Import.php
+diff -r 45da8fc662c9 includes/Import.php
+--- a/includes/Import.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/includes/Import.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -39,6 +39,7 @@
  	var $type = "";
  	var $action = "";
@@ -694,7 +698,7 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Import.php
 +				$part['tempfile'] = $tempfile;
 +				if ($part['content_id'])
 +				{
-+					$part['sha1'] = sha1_file($part['tempfile']);
++					$part['sha1'] = File::sha1Base36($part['tempfile']);
 +					$this->parts[$part['content_id']] = $part;
 +				}
 +				else
@@ -740,9 +744,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 38ead8d644cd -r 1455b7ed0b8b includes/filerepo/LocalFile.php
---- includes/filerepo/LocalFile.php
-+++ includes/filerepo/LocalFile.php
+diff -r 45da8fc662c9 includes/filerepo/LocalFile.php
+--- a/includes/filerepo/LocalFile.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/includes/filerepo/LocalFile.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -783,6 +783,66 @@
  	}
  
@@ -836,9 +840,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 38ead8d644cd -r 1455b7ed0b8b includes/specials/SpecialExport.php
---- includes/specials/SpecialExport.php
-+++ includes/specials/SpecialExport.php
+diff -r 45da8fc662c9 includes/specials/SpecialExport.php
+--- a/includes/specials/SpecialExport.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/includes/specials/SpecialExport.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -1,5 +1,6 @@
  <?php
  # Copyright (C) 2003-2008 Brion Vibber <brion@pobox.com>
@@ -1344,9 +1348,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 38ead8d644cd -r 1455b7ed0b8b includes/specials/SpecialImport.php
---- includes/specials/SpecialImport.php
-+++ includes/specials/SpecialImport.php
+diff -r 45da8fc662c9 includes/specials/SpecialImport.php
+--- a/includes/specials/SpecialImport.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/includes/specials/SpecialImport.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -288,7 +288,9 @@
  		$wgOut->addHTML( "<ul>\n" );
  	}
@@ -1443,9 +1447,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 38ead8d644cd -r 1455b7ed0b8b languages/messages/MessagesEn.php
---- languages/messages/MessagesEn.php
-+++ languages/messages/MessagesEn.php
+diff -r 45da8fc662c9 languages/messages/MessagesEn.php
+--- a/languages/messages/MessagesEn.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/languages/messages/MessagesEn.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -3118,13 +3118,20 @@
  'exportnohistory'   => "----
  '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
@@ -1499,9 +1503,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 38ead8d644cd -r 1455b7ed0b8b languages/messages/MessagesRu.php
---- languages/messages/MessagesRu.php
-+++ languages/messages/MessagesRu.php
+diff -r 45da8fc662c9 languages/messages/MessagesRu.php
+--- a/languages/messages/MessagesRu.php	Thu Apr 07 16:51:17 2011 +0400
++++ b/languages/messages/MessagesRu.php	Thu Apr 07 18:01:25 2011 +0400
 @@ -2573,13 +2573,20 @@
  'exportnohistory'   => "----
  '''Замечание:''' экспорт полной истории изменений страниц отключён из-за проблем с производительностью.",
@@ -1552,9 +1556,9 @@ diff -r 38ead8d644cd -r 1455b7ed0b8b languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 38ead8d644cd -r 1455b7ed0b8b skins/common/shared.css
---- skins/common/shared.css
-+++ skins/common/shared.css
+diff -r 45da8fc662c9 skins/common/shared.css
+--- a/skins/common/shared.css	Thu Apr 07 16:51:17 2011 +0400
++++ b/skins/common/shared.css	Thu Apr 07 18:01:25 2011 +0400
 @@ -829,3 +829,5 @@
  a.sortheader {
  	margin: 0 0.3em;
