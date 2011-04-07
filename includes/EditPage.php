@@ -321,8 +321,13 @@ class EditPage {
 
 		$permErrors = $this->getEditPermissionErrors();
 		if ( $permErrors ) {
-			wfDebug( __METHOD__ . ": User can't edit\n" );
-			$this->readOnlyPage( $this->getContent( false ), true, $permErrors, 'edit' );
+			wfDebug( __METHOD__.": User can't edit\n" );
+			$this->readOnlyPage(
+			    $this->textbox2 ? $this->textbox2 :
+			    $this->textbox1 ? $this->textbox1 :
+			                      $this->getContent( false ),
+			    true, $permErrors, 'edit'
+			);
 			wfProfileOut( __METHOD__ );
 			return;
 		} else {
