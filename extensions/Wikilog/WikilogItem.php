@@ -16,12 +16,13 @@
  *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * http://www.gnu.org/copyleft/gpl.html
  */
 
 /**
- * @addtogroup Extensions
+ * @file
+ * @ingroup Extensions
  * @author Juliano F. Ravasi < dev juliano info >
  */
 
@@ -49,6 +50,7 @@ class WikilogItem
 	public    $mTags        = array();	///< Array of tags.
 	public    $mNumComments = null;		///< Cached number of comments.
 	public    $mVisited     = null;		///< Is post already visited by current user?
+	public    $mTalkUpdated = null;		///< Maximum of post and its talk update date.
 
 	/**
 	 * Constructor.
@@ -92,6 +94,13 @@ class WikilogItem
 	}
 
 	/**
+	 * Returns the last update date of the article or its talk.
+	 */
+	public function getTalkUpdatedDate() {
+		return $this->mTalkUpdated;
+	}
+
+	/**
 	 * Returns the number of comments in the article.
 	 */
 	public function getNumComments() {
@@ -113,6 +122,7 @@ class WikilogItem
 				'wlp_title'   => $this->mName,
 				'wlp_publish' => $this->mPublish,
 				'wlp_pubdate' => $this->mPubDate ? $dbw->timestamp( $this->mPubDate ) : '',
+				'wlp_talk_updated' => $this->mTalkUpdated ? $dbw->timestamp( $this->mTalkUpdated ) : '', //??
 				'wlp_updated' => $this->mUpdated ? $dbw->timestamp( $this->mUpdated ) : '',
 				'wlp_authors' => serialize( $this->mAuthors ),
 				'wlp_tags'    => serialize( $this->mTags ),
@@ -147,7 +157,7 @@ class WikilogItem
 
 			$count = $row[0];
 			$talk_updated = $row[1];
-			if ( !$talk_updated )
+			if ( !$talk_updated || $this->getPublishDate() > $talk_updated )
 				$talk_updated = $this->getPublishDate();
 			$talk_updated = wfTimestamp( TS_MW, $talk_updated );
 
@@ -207,6 +217,8 @@ class WikilogItem
 			}
 		}
 
+		list( $date, $time, $tz ) = WikilogUtils::getLocalDateTime( $this->mPubDate );
+
 		/*
 		 * This is probably the largest amount of parameters to a
 		 * system message in MediaWiki. This is the price of allowing
@@ -220,41 +232,15 @@ class WikilogItem
 			/* $5  */ count( $authors ),
 			/* $6  */ ( count( $authors ) > 0 ? $authors[0] : '' ),
 			/* $7  */ $authorsFmt,
-			/* $8  */ $wgLang->date( $this->mPubDate, true ),
-			/* $9  */ $wgLang->time( $this->mPubDate, true ),
+			/* $8  */ $date,
+			/* $9  */ $time,
 			/* $10 */ $commentsFmt,
 			/* $11 */ count( $categories ),
 			/* $12 */ $categoriesFmt,
 			/* $13 */ count( $tags ),
-			/* $14 */ $tagsFmt
+			/* $14 */ $tagsFmt,
+			/* $15 */ $tz,
 		);
-	}
-
-	/**
-	 * Returns an array with all published comments.
-	 * @deprecated Doesn't scale well, use query and pager objects instead.
-	 */
-	public function getComments( $thread = null ) {
-		wfDeprecated( __METHOD__ );
-		$dbr = wfGetDB( DB_SLAVE );
-
-		if ( $thread ) {
-			$result = WikilogComment::fetchAllFromItemThread( $dbr, $this->mID, $thread );
-		} else {
-			$result = WikilogComment::fetchAllFromItem( $dbr, $this->mID );
-		}
-
-		$comments = array();
-		foreach ( $result as $row ) {
-			$comment = WikilogComment::newFromRow( $this, $row );
-			if ( $comment->mCommentRev ) {
-				$rev = Revision::newFromId( $row->mCommentRev );
-				$comment->setText( $rev->getText() );
-			}
-			$comments[] = $comment;
-		}
-		$result->free();
-		return $comments;
 	}
 
 	/**
@@ -273,6 +259,7 @@ class WikilogItem
 		$item->mPublish     = intval( $row->wlp_publish );
 		$item->mPubDate     = $row->wlp_pubdate ? wfTimestamp( TS_MW, $row->wlp_pubdate ) : null;
 		$item->mUpdated     = $row->wlp_updated ? wfTimestamp( TS_MW, $row->wlp_updated ) : null;
+		$item->mTalkUpdated = $row->wlp_talk_updated ? wfTimestamp( TS_MW, $row->wlp_talk_updated ) : null;
 		$item->mNumComments = $row->wlp_num_comments;
 		$item->mAuthors     = unserialize( $row->wlp_authors );
 		$item->mTags        = unserialize( $row->wlp_tags );

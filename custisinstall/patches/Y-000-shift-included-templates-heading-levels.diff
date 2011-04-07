@@ -1,9 +1,10 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297453283 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1302180602 -14400
 Bug 53818 - Allow optional shifting of included template/article heading levels
+Bug 75714 - Remove \n\n before special page inclusion
 
-diff -r b11befdd7427 -r 758eba8799a5 includes/parser/Parser.php
+diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -2780,6 +2780,7 @@
@@ -51,7 +52,16 @@ diff -r b11befdd7427 -r 758eba8799a5 includes/parser/Parser.php
  			$isLocalObj = false;
  		}
  
-diff -r b11befdd7427 -r 758eba8799a5 includes/parser/Preprocessor_DOM.php
+@@ -3057,7 +3061,7 @@
+ 		# Add a blank line preceding, to prevent it from mucking up
+ 		# immediately preceding headings
+ 		if ( $isHTML ) {
+-			$text = "\n\n" . $this->insertStripItem( $text );
++			$text = "\n" . $this->insertStripItem( $text );
+ 		}
+ 		# Escape nowiki-style return values
+ 		elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
+diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Preprocessor_DOM.php
 --- includes/parser/Preprocessor_DOM.php
 +++ includes/parser/Preprocessor_DOM.php
 @@ -263,6 +263,13 @@

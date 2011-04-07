@@ -16,12 +16,13 @@
  *
  * You should have received a copy of the GNU General Public License along
  * with this program; if not, write to the Free Software Foundation, Inc.,
- * 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
  * http://www.gnu.org/copyleft/gpl.html
  */
 
 /**
- * @addtogroup Extensions
+ * @file
+ * @ingroup Extensions
  * @author Juliano F. Ravasi < dev juliano info >
  */
 
@@ -60,6 +61,7 @@ class WikilogSummaryPager
 	public $mQuery = null;			///< Wikilog item query data
 	public $mIncluding = false;		///< If pager is being included
 	public $noActions = false;		///< Hide "Actions" column, used in SpecialWikilog.php
+	public $mShowEditLink = false;	///< If edit links are shown.
 
 	/**
 	 * Constructor.
@@ -91,11 +93,17 @@ class WikilogSummaryPager
 		if ( $this->mLimit > $wgWikilogExpensiveLimit )
 			$this->mLimit = $wgWikilogExpensiveLimit;
 
+		# Check parser state, setup edit links.
+		global $wgOut, $wgParser, $wgTitle;
+		if ( $this->mIncluding ) {
+			$popt = $wgParser->getOptions();
+		} else {
+			$popt = $wgOut->parserOptions();
+
 		# We will need a clean parser if not including.
-		global $wgParser;
-		if ( !$this->mIncluding ) {
-			$wgParser->clearState();
+			$wgParser->startExternalParse( $wgTitle, $popt, Parser::OT_HTML );
 		}
+		$this->mShowEditLink = $popt->getEditSection();
 	}
 
 	/**
@@ -115,6 +123,12 @@ class WikilogSummaryPager
 		return 'wlp_pubdate';
 	}
 
+	function setSort( $field )
+	{
+		if ( WikilogArchivesPager::isFieldSortable( $field ) )
+			$this->mIndexField = $field;
+	}
+
 	function getStartBody() {
 		return "<div class=\"wl-roll visualClear\">\n";
 	}
@@ -128,11 +142,7 @@ class WikilogSummaryPager
 	}
 
 	function getNavigationBar() {
-		# NOTE (Mw1.15- COMPAT): IndexPager::isNavigationBarShown introduced
-		# in Mw1.16. Remove this guard in Wl1.1.
-		if ( method_exists( $this, 'isNavigationBarShown' ) ) {
 			if ( !$this->isNavigationBarShown() ) return '';
-		}
 		if ( !isset( $this->mNavigationBar ) ) {
 			$navbar = new WikilogNavbar( $this, 'chrono-rev' );
 			$this->mNavigationBar = $navbar->getNavigationBar( $this->mLimit );
@@ -161,10 +171,10 @@ class WikilogSummaryPager
 		$heading = $skin->link( $item->mTitle, $titleText, array(), array(),
 			array( 'known', 'noclasses' )
 		);
-		$heading = Xml::tags( 'h2', null, $heading );
-		if ( $item->mTitle->quickUserCan( 'edit' ) ) {
-			$heading = $this->editLink( $item->mTitle ) . $heading;
+		if ( $this->mShowEditLink && $item->mTitle->quickUserCan( 'edit' ) ) {
+			$heading = $this->doEditLink( $item->mTitle, $item->mName ) . $heading;
 		}
+		$heading = Xml::tags( 'h2', null, $heading );
 
 		# Sumary entry header.
 		$key = $this->mQuery->isSingleWikilog()
@@ -229,14 +239,28 @@ class WikilogSummaryPager
 	/**
 	 * Returns a wikilog article edit link, much similar to a section edit
 	 * link in normal articles.
-	 * @param $title Wikilog article title object.
-	 * @return HTML fragment.
+	 * @param $title Title  The title of the target article.
+	 * @param $tooltip string  The tooltip to be included in the link, wrapped
+	 *   in the 'wikilog-edit-hint' message.
+	 * @return string  HTML fragment.
 	 */
-	private function editLink( $title ) {
+	private function doEditLink( $title, $tooltip = null ) {
 		$skin = $this->getSkin();
-		$url = $skin->makeKnownLinkObj( $title, wfMsg( 'wikilog-edit-lc' ), 'action=edit' );
-		$result = wfMsg( 'editsection-brackets', $url );
-		return "<span class=\"editsection\">$result</span>";
+		$attribs = array();
+		if ( !is_null( $tooltip ) ) {
+			$attribs['title'] = wfMsg( 'wikilog-edit-hint', $tooltip );
+		}
+		$link = $skin->link( $title, wfMsg( 'wikilog-edit-lc' ),
+			$attribs,
+			array( 'action' => 'edit' ),
+			array( 'noclasses', 'known' )
+		);
+
+		$result = wfMsgHtml ( 'editsection-brackets', $link );
+		$result = "<span class=\"editsection\">$result</span>";
+
+		wfRunHooks( 'DoEditSectionLink', array( $skin, $title, "", $tooltip, &$result ) );
+		return $result;
 	}
 }
 
@@ -255,9 +279,13 @@ class WikilogSummaryPager
  * - 'authors': authors
  * - 'tags': tags
  * - 'published': empty (draft) or "*" (published)
- * - 'pubdate': article publication date
- * - 'updated': article last update date
+ * - 'date': article publication date
+ * - 'time': article publication time
+ * - 'tz': timezone information
+ * - 'updatedDate': article last update date
+ * - 'updatedTime': article last update time
  * - 'summary': article summary
+ * - 'hasMore': empty (summary only) or "*" (has more than summary)
  * - 'comments': comments page link
  */
 class WikilogTemplatePager
@@ -290,19 +318,16 @@ class WikilogTemplatePager
 	}
 
 	function getStartBody() {
-		return "<div class=\"wl-tpl-roll\">\n";
+		return '';
 	}
 
 	function getEndBody() {
-		return "</div>\n";
+		return '';
 	}
 
-	/**
-	 * @todo (On or after Wl 1.2.0) Remove {{{pubdate}}} and {{{updated}}}.
-	 * @todo (Req >= Mw 1.16) Remove bug 20431 workaround.
-	 */
 	function formatRow( $row ) {
 		global $wgParser, $wgLang;
+		global $wgWikilogPagerDateFormat;
 
 		# Retrieve article parser output and other data.
 		$item = WikilogItem::newFromRow( $row );
@@ -322,14 +347,22 @@ class WikilogTemplatePager
 		$divclass = 'wl-entry' . ( $item->getIsPublished() ? '' : ' wl-draft' );
 
 		$itemPubdate = $item->getPublishDate();
-		$pubdate = $wgLang->timeanddate( $itemPubdate, true );
-		$publishedDate = $wgLang->date( $itemPubdate, true );
-		$publishedTime = $wgLang->time( $itemPubdate, true );
+		list( $publishedDate, $publishedTime, $publishedTz ) =
+				WikilogUtils::getLocalDateTime( $itemPubdate, $wgWikilogPagerDateFormat );
+
+		$now = wfTimestampNow( TS_MW );
 
 		$itemUpdated = $item->getUpdatedDate();
-		$updated = $wgLang->timeanddate( $itemUpdated, true );
-		$updatedDate = $wgLang->date( $itemUpdated, true );
-		$updatedTime = $wgLang->time( $itemUpdated, true );
+		list( $updatedDate, $updatedTime, ) =
+				WikilogUtils::getLocalDateTime( $itemUpdated, $wgWikilogPagerDateFormat );
+
+		$itemTalkUpdated = $item->getTalkUpdatedDate();
+		list( $talkUpdatedDate, $talkUpdatedTime, ) =
+				WikilogUtils::getLocalDateTime( $itemTalkUpdated, $wgWikilogPagerDateFormat );
+
+		$nc = $item->getNumComments();
+		if (!$nc)
+			$nc = '';
 
 		# Template parameters.
 		$vars = array(
@@ -338,27 +371,25 @@ class WikilogTemplatePager
 			'wikilogPage'   => $item->mParentTitle->getPrefixedText(),
 			'title'         => $item->mName,
 			'page'          => $item->mTitle->getPrefixedText(),
+			'talkpage'      => $item->mTitle->getTalkPage()->getPrefixedText(),
 			'authors'       => $authors,
 			'tags'          => $tags,
 			'published'     => $item->getIsPublished() ? '*' : '',
-			'pubdate'       => $pubdate, # Deprecated, to be removed on Wl 1.2.0.
+			'dateInFuture'  => $itemPubdate > $now,
 			'date'          => $publishedDate,
 			'time'          => $publishedTime,
-			'updated'       => $updated, # Deprecated, to be removed on Wl 1.2.0.
+			'tz'            => $publishedTz,
 			'updatedDate'   => $updatedDate,
 			'updatedTime'   => $updatedTime,
+			'talkUpdatedDate' => $talkUpdatedDate,
+			'talkUpdatedTime' => $talkUpdatedTime,
 			'summary'       => $wgParser->insertStripItem( $summary ),
 			'hasMore'       => $hasMore ? '*' : '',
-			'comments'      => $comments
+			'comments'      => $comments,
+			'ncomments'     => $nc,
 		);
 
 		$frame = $wgParser->getPreprocessor()->newCustomFrame( $vars );
-
-		# XXX: Work around MediaWiki bug 20431
-		# https://bugzilla.wikimedia.org/show_bug.cgi?id=20431
-		$frame->title = $frame->parser->mTitle;
-		$frame->titleCache = array( $frame->title ? $frame->title->getPrefixedDBkey() : false );
-
 		$text = $frame->expand( $this->mTemplate );
 
 		return $this->parse( $text );
@@ -438,12 +469,13 @@ class WikilogArchivesPager
 		return in_array( $field, self::$sortableFields );
 	}
 
+	function setSort( $field ) {
+		if ( self::isFieldSortable( $field ) )
+			$this->mIndexField = $field;
+	}
+
 	function getNavigationBar() {
-		# NOTE (Mw1.15- COMPAT): IndexPager::isNavigationBarShown introduced
-		# in Mw1.16. Remove this guard in Wl1.1.
-		if ( method_exists( $this, 'isNavigationBarShown' ) ) {
 			if ( !$this->isNavigationBarShown() ) return '';
-		}
 		if ( !isset( $this->mNavigationBar ) ) {
 			$navbar = new WikilogNavbar( $this, 'pages' );
 			$this->mNavigationBar = $navbar->getNavigationBar( $this->mLimit );
@@ -464,7 +496,7 @@ class WikilogArchivesPager
 			$value = isset( $row->$field ) ? $row->$field : null;
 			$formatted = strval( $this->formatValue( $field, $value ) );
 			if ( $formatted == '' ) {
-				$formatted = '&nbsp;';
+				$formatted = WL_NBSP;
 			}
 			$class = 'TablePager_col_' . htmlspecialchars( $field );
 			$columns[] = "<td class=\"$class\">$formatted</td>";
@@ -512,12 +544,14 @@ class WikilogArchivesPager
 			case 'wlw_title':
 				$page = $this->mCurrentItem->mParentTitle;
 				$text = $this->mCurrentItem->mParentName;
-				return $this->getSkin()->makeKnownLinkObj( $page, $text );
+				return $this->getSkin()->link( $page, $text, array(), array(),
+					array( 'known', 'noclasses' ) );
 
 			case 'wlp_title':
 				$page = $this->mCurrentItem->mTitle;
 				$text = $this->mCurrentItem->mName;
-				$s = $this->getSkin()->makeKnownLinkObj( $page, $text );
+				$s = $this->getSkin()->link( $page, $text, array(), array(),
+					array( 'known', 'noclasses' ) );
 				if ( !$this->mCurrentRow->wlp_publish ) {
 					$draft = wfMsg( 'wikilog-draft-title-mark' );
 					$s = Xml::wrapClass( "$s $draft", 'wl-draft-inline' );
@@ -527,11 +561,12 @@ class WikilogArchivesPager
 			case 'wlp_num_comments':
 				$page = $this->mCurrentItem->mTitle->getTalkPage();
 				$text = $this->mCurrentItem->getNumComments();
-				return $this->getSkin()->makeKnownLinkObj( $page, $text );
+				return $this->getSkin()->link( $page, $text, array(), array(),
+					array( 'known', 'noclasses' ) );
 
 			case '_wl_actions':
 				if ( $this->mCurrentItem->mTitle->quickUserCan( 'edit' ) ) {
-					return $this->editLink( $this->mCurrentItem->mTitle );
+					return $this->doEditLink( $this->mCurrentItem->mTitle, $this->mCurrentItem->mName );
 				} else {
 					return '';
 				}
@@ -608,13 +643,26 @@ class WikilogArchivesPager
 	}
 
 	/**
-	 * Returns a wikilog article edit link for the actions column of the table.
-	 * @param $title Wikilog article title object.
-	 * @return HTML fragment.
+	 * Returns a wikilog article edit link, much similar to a section edit
+	 * link in normal articles.
+	 * @param $title Title  The title of the target article.
+	 * @param $tooltip string  The tooltip to be included in the link, wrapped
+	 *   in the 'wikilog-edit-hint' message.
+	 * @return string  HTML fragment.
 	 */
-	private function editLink( $title ) {
+	private function doEditLink( $title, $tooltip = null ) {
 		$skin = $this->getSkin();
-		$url = $skin->makeKnownLinkObj( $title, wfMsg( 'wikilog-edit-lc' ), 'action=edit' );
-		return wfMsg( 'wikilog-brackets', $url );
+		$attribs = array();
+		if ( !is_null( $tooltip ) ) {
+			$attribs['title'] = wfMsg( 'wikilog-edit-hint', $tooltip );
+		}
+		$link = $skin->link( $title, wfMsg( 'wikilog-edit-lc' ),
+			$attribs,
+			array( 'action' => 'edit' ),
+			array( 'noclasses', 'known' )
+		);
+
+		$result = wfMsgHtml ( 'editsection-brackets', $link );
+		return $result;
 	}
 }

@@ -32,8 +32,7 @@ $FILES_WIKIMEDIA = explode(' ',
     'api.php index.php COPYING thumb.php trackback.php'.
     ' opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
-    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree'.
-    ' StringFunctions DeleteBatch');
+    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
     'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud');
 $EXT_OUR = explode(' ',
