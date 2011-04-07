@@ -650,8 +650,10 @@ class XmlDumpWriter {
 			$img = wfFindFile( $row->page_title );
 			if( $img ) {
 				$out = '';
-				foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
-					$out .= $this->writeUpload( $ver );
+				if ( !$limit || $limit > 1 ) {
+					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
+						$out .= $this->writeUpload( $ver );
+					}
 				}
 				$out .= $this->writeUpload( $img );
 				return $out;
