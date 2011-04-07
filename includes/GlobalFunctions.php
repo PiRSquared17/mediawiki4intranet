@@ -1273,6 +1273,27 @@ function wfQuotedPrintable( $string, $charset = '' ) {
 	return $out;
 }
 
+// Uses iconv php extension, calls wfQuotedPrintable if it's unavailable
+function wfMimeBase64( $string, $charset = '' )
+{
+	if( empty( $charset ) )
+	{
+		global $wgInputEncoding;
+		$charset = $wgInputEncoding;
+	}
+	if ( !function_exists( 'iconv_mime_encode' ) )
+	{
+		// Do not split and recode the string when iconv is unavailable
+		return '=?'.$charset.'?B?'.base64_encode( $string ).'?=';
+	}
+	return substr( iconv_mime_encode( '', $string, array(
+		'input-charset' => $charset,
+		'output-charset' => 'utf-8',
+		'line-length' => 76,
+		'line-break-chars' => "\n",
+		'scheme' => 'B'
+	) ), 2 );
+}
 
 /**
  * @todo document
