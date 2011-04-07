@@ -3061,7 +3061,7 @@ class Parser
 		# Add a blank line preceding, to prevent it from mucking up
 		# immediately preceding headings
 		if ( $isHTML ) {
-			$text = "\n\n" . $this->insertStripItem( $text );
+			$text = "\n" . $this->insertStripItem( $text );
 		}
 		# Escape nowiki-style return values
 		elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
