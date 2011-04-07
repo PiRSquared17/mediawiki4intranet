@@ -5,11 +5,11 @@
 cd `dirname $0`
 SVN=svn://svn.office.custis.ru/mediawiki
 EXTPATH_FILE=./mw4i-extpath
-EXTPATH=`grep ^ext_repo $EXTPATH_FILE | awk '{print $2}' | head -n1`
-CHGPATH=`grep ^chg_repo $EXTPATH_FILE | awk '{print $2}' | head -n1`
+EXTPATH=`grep ^ext_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+CHGPATH=`grep ^chg_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
 
 if [ -z "$EXTPATH" -o -z "$CHGPATH" ]; then
-    echo <<EOF
+    cat <<EOF
 Before running this script, you must create file '$EXTPATH_FILE' with following contents:
 ext_repo <full path to desired hg mw4i repository>
 chg_repo <full path to hg repository with patch branches>
