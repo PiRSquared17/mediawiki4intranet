@@ -848,3 +848,5 @@ td.mw-enhanced-rc {
 a.sortheader {
 	margin: 0 0.3em;
 }
+
+.addpages div { display: inline-block; text-align: right; vertical-align: top; padding-right: 8px; }
