@@ -467,6 +467,8 @@ $wgAllowCopyUploads = false;
  * normal uploads is currently to edit php.ini.
  */
 $wgMaxUploadSize = 1024*1024*100; # 100MB
+/** Maximum length for filenames shown in image gallery. */
+$wgMaxFilenameLength = 20;
 
 /**
  * Point the upload navigation link to an external URL
@@ -1125,6 +1127,7 @@ $wgRedirectSources = false;
 $wgShowIPinHeader	= true; # For non-logged in users
 $wgMaxSigChars		= 255;  # Maximum number of Unicode characters in signature
 $wgMaxArticleSize	= 2048; # Maximum article size in kilobytes
+$wgWarnArticleSize	= 128;  # Article size in kilobytes to show MediaWiki:Longpagewarning
 # Maximum number of bytes in username. You want to run the maintenance
 # script ./maintenancecheckUsernames.php once you have changed this value
 $wgMaxNameChars		= 255;
