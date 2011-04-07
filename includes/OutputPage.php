@@ -1738,7 +1738,7 @@ class OutputPage {
 		if ( $this->getTitle() ) {
 			$this->mDebugtext .= 'Original title: ' . $this->getTitle()->getPrefixedText() . "\n";
 		}
-		$this->setPageTitle( wfMsg( $title ) );
+		$this->setPageTitle( is_array( $title ) ? strip_tags( call_user_func_array( 'wfMsgExt', $title ) ) : wfMsg( $title ) );
 		$this->setHTMLTitle( wfMsg( 'errorpagetitle' ) );
 		$this->setRobotPolicy( 'noindex,nofollow' );
 		$this->setArticleRelated( false );
@@ -1746,8 +1746,12 @@ class OutputPage {
 		$this->mRedirect = '';
 		$this->mBodytext = '';
 
-		array_unshift( $params, 'parse' );
-		array_unshift( $params, $msg );
+		if ( is_array( $msg ) )
+			$params = $msg;
+		else {
+			array_unshift( $params, 'parse' );
+			array_unshift( $params, $msg );
+		}
 		$this->addHTML( call_user_func_array( 'wfMsgExt', $params ) );
 
 		$this->returnToMain();
@@ -2106,7 +2110,9 @@ class OutputPage {
 		} else {
 			$titleObj = Title::newFromText( $returnto );
 		}
-		if ( !is_object( $titleObj ) ) {
+/*patch|2011-04-05|IntraACL|start*/
+		if ( !$titleObj instanceof Title || method_exists( $titleObj, 'userCanReadEx' ) && !$titleObj->userCanReadEx() ) {
+/*patch|2011-04-05|IntraACL|end*/
 			$titleObj = Title::newMainPage();
 		}
 
