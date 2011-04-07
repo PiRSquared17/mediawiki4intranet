@@ -91,8 +91,8 @@ $wgSMTP = false;
 $wgShowExceptionDetails = true;
 
 require_once($IP.'/extensions/ParserFunctions/ParserFunctions.php');
-define('MW_PARSER_VERSION', '1.6.1');
-require_once($IP.'/extensions/StringFunctions/StringFunctions.php');
+$wgPFEnableStringFunctions = true;
+require_once($IP.'/extensions/RegexParserFunctions/RegexParserFunctions.php');
 require_once($IP.'/extensions/CharInsert/CharInsert.php');
 require_once($IP.'/extensions/CharInsertList/CharInsertList.php');
 require_once($IP.'/extensions/Cite/Cite.php');
@@ -176,7 +176,7 @@ if (!isset($egDisableIntraACL))
 }
 
 # MWQuizzer
-$egMWQuizzerAdmins = array('VitaliyFilippov', 'StasFomin', 'WikiSysop');
+$egMWQuizzerIntraACLAdminGroup = 'Group/QuizAdmin';
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
 MediawikiQuizzer::setupNamespace(104);
 
@@ -184,6 +184,7 @@ MediawikiQuizzer::setupNamespace(104);
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
 define('NS_BLOG', 100);
 Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
+$wgWikilogPagerDateFormat = 'ymd hms';
 $wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
 $wgWikilogMaxCommentSize = 0x7FFFFFFF;
 $wgWikilogDefaultNotCategory = 'Скрытые';
