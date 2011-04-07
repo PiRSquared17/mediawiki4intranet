@@ -978,8 +978,8 @@ class HACLStorageSQL {
      */
     public function getSDByID($SDID)
     {
-        if (is_array($SDID) && !$SDID)
-            return array();
+        if (!$SDID)
+            return is_array($SDID) ? array() : NULL;
         $dbr = wfGetDB(DB_SLAVE);
         $res = $dbr->select(
             array('halo_acl_security_descriptors', 'page'),
@@ -1009,6 +1009,8 @@ class HACLStorageSQL {
     /* Create HACLSecurityDescriptor from DB row object */
     static function rowToSD($row)
     {
+        if (!$row)
+            return NULL;
         if (!$row->page_title)
             $row->page_title = HACLSecurityDescriptor::nameForID($sdID);
         return new HACLSecurityDescriptor(
@@ -1291,6 +1293,8 @@ class HACLStorageSQL {
      */
     public function rowToRight($row)
     {
+        if (!$row)
+            return NULL;
         $rightID     = $row->right_id;
         $actions     = $row->actions;
         $groups      = self::strToIntArray($row->groups);
