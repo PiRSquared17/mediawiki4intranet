@@ -198,13 +198,11 @@ class SpecialExport extends SpecialPage {
 			$step++;
 		} while( $t+$p+$i > 1 && $added > 0 && ( !$this->linkDepth || $step < $this->linkDepth ) );
 		
-/*op-patch|TS|2011-02-08|HaloACL|SafeTitle|start*/
 		$pages = array();
 		/* Bug 8824: Only export pages the user can read */
 		foreach ( $inputPages as $title )
 			if ( $title->userCanRead() )
 				$pages[] = $title;
-/*op-patch|TS|2011-02-08|end*/
 		
 		/* Ok, let's get to it... */
 		if( $history == WikiExporter::CURRENT ) {
