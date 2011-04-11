@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1300224160 -10800
+# Date 1302186708 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -17,7 +17,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r f6fe0b014618 -r ec61506a27fd includes/Export.php
+diff -r 85fec3228ef8 -r 399c1049009d includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -203,7 +203,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r f6fe0b014618 -r ec61506a27fd includes/Import.php
+diff -r 85fec3228ef8 -r 399c1049009d includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -744,7 +744,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r f6fe0b014618 -r ec61506a27fd includes/filerepo/LocalFile.php
+diff -r 85fec3228ef8 -r 399c1049009d includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -840,7 +840,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
+diff -r 85fec3228ef8 -r 399c1049009d includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,5 +1,6 @@
@@ -983,7 +983,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
  		$pageSet = array(); // Inverted index of all pages to look up
  		
  		// Split up and normalize input
-@@ -199,37 +179,33 @@
+@@ -199,37 +179,31 @@
  			$title = Title::newFromText( $pageName );
  			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
  				// Only record each page once!
@@ -1012,13 +1012,11 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
 -		if( $this->templates ) {
 -			$pageSet = $this->getTemplates( $inputPages, $pageSet );
 -		}
-+/*op-patch|TS|2011-02-08|HaloACL|SafeTitle|start*/
 +		$pages = array();
 +		/* Bug 8824: Only export pages the user can read */
 +		foreach ( $inputPages as $title )
 +			if ( $title->userCanRead() )
 +				$pages[] = $title;
-+/*op-patch|TS|2011-02-08|end*/
  		
 -		if( $linkDepth = $this->pageLinkDepth ) {
 -			$pageSet = $this->getPageLinks( $inputPages, $pageSet, $linkDepth );
@@ -1042,7 +1040,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
  		/* Ok, let's get to it... */
  		if( $history == WikiExporter::CURRENT ) {
  			$lb = false;
-@@ -248,25 +224,10 @@
+@@ -248,25 +222,10 @@
  		}
  		$exporter = new WikiExporter( $db, $history, $buffer );
  		$exporter->list_authors = $list_authors;
@@ -1071,7 +1069,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
  			$exporter->pageByTitle( $title );
  		}
  		
-@@ -276,73 +237,120 @@
+@@ -276,73 +235,120 @@
  		}
  	}
  
@@ -1238,7 +1236,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
  			return 0;
  		}
  		if ( !$this->userCanOverrideExportDepth() ) {
-@@ -350,65 +358,65 @@
+@@ -350,65 +356,65 @@
  				return $wgExportMaxLinkDepth;
  			}
  		}
@@ -1346,7 +1344,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialImport.php
+diff -r 85fec3228ef8 -r 399c1049009d includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1445,7 +1443,7 @@ diff -r f6fe0b014618 -r ec61506a27fd includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesEn.php
+diff -r 85fec3228ef8 -r 399c1049009d languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3118,13 +3118,20 @@
@@ -1501,7 +1499,7 @@ diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesRu.php
+diff -r 85fec3228ef8 -r 399c1049009d languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2573,13 +2573,20 @@
@@ -1554,7 +1552,7 @@ diff -r f6fe0b014618 -r ec61506a27fd languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r f6fe0b014618 -r ec61506a27fd skins/common/shared.css
+diff -r 85fec3228ef8 -r 399c1049009d skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,5 @@

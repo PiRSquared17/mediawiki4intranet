@@ -1,12 +1,21 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1300902308 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1302191338 -14400
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 9cc4b1960d33 -r fb99a0543b2b includes/LocalisationCache.php
+diff -r 45da8fc662c9 -r 029de29965c8 includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
-@@ -155,8 +155,12 @@
+@@ -2,6 +2,8 @@
+ 
+ define( 'MW_LC_VERSION', 1 );
+ 
++require_once 'ObjectCache.php';
++
+ /**
+  * Class for caching the contents of localisation files, Messages*.php
+  * and *.i18n.php.
+@@ -155,8 +157,12 @@
  				case 'db':
  					$storeClass = 'LCStore_DB';
  					break;
@@ -20,7 +29,7 @@ diff -r 9cc4b1960d33 -r fb99a0543b2b includes/LocalisationCache.php
  					break;
  				default:
  					throw new MWException( 
-@@ -744,6 +748,60 @@
+@@ -744,6 +750,60 @@
  }
  
  /**
