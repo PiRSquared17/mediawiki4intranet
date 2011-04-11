@@ -2,6 +2,8 @@
 
 define( 'MW_LC_VERSION', 1 );
 
+require_once 'ObjectCache.php';
+
 /**
  * Class for caching the contents of localisation files, Messages*.php
  * and *.i18n.php.
