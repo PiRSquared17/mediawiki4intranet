@@ -133,7 +133,6 @@ sub init
         params    => $params,
         check_url => $murl,
         ra        => $ra,
-        ras       => {},
         server    => $s,
         auth_prov => $auth_providers,
     }, $class;
@@ -176,6 +175,9 @@ sub print_error
     return OK;
 }
 
+# кэш объектов SVN::Ra
+my $RAS = {};
+
 # обработчик
 sub handler
 {
@@ -200,7 +202,8 @@ sub handler
             # пустой урл
             return print_error($r, "Requested URL does not contain repository name");
         }
-        $ra = $self->{ras}->{$rname};
+        my $K = $self->{params}->{repos_username} . '@' . $self->{params}->{repos_parent} . $rname;
+        $ra = $RAS->{$K};
         unless ($ra)
         {
             # открываем репозиторий
@@ -213,7 +216,7 @@ sub handler
                 # репозиторий не открывается
                 return print_error($r, "Failed to open Subversion repository '$rname'", $@);
             }
-            $self->{ras}->{$rname} = $ra;
+            $RAS->{$K} = $ra;
         }
     }
     if ($self->{params}->{enc_from_to})
