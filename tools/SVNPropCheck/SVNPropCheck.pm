@@ -1,23 +1,30 @@
 #!/usr/bin/perl
-# PerlMapToStorageHandler для проксирования запросов к Subversion-репозиториям
+# mod_perl-скрипт для проксирования запросов к Subversion-репозиториям
 # с проверкой свойств по регулярному выражению или просто на существование
 # (файлы, для которых проверка не удаётся, представляются как несуществующие)
 
 package SVNPropCheck;
 
 use strict;
+use POSIX qw(strftime);
 use Encode qw(from_to);
 use File::Path 2.06 qw(make_path);
+use LWP::MediaTypes;
 
+use APR::Const;
 use Apache2::Const qw(:common :http);
 use Apache2::ServerRec;
 use Apache2::ServerUtil;
 use Apache2::RequestRec;
+use Apache2::RequestIO;
+use Apache2::RequestUtil;
 use Apache2::Directive;
 
 use SVN::Core;
 use SVN::Client;
 use SVN::Ra;
+
+my $instances = [];
 
 # Создание объекта и установка обработчика PerlMapToStorageHandler
 # <Perl>
@@ -38,20 +45,19 @@ use SVN::Ra;
 #     Пример: "https://svn.office.custis.ru/"
 #  3. repos_username - имя пользователя Subversion (нужен доступ только на чтение)
 #  4. repos_password - пароль пользователя Subversion (нужен доступ только на чтение)
-#  5. check_prop_name - название свойства, значение которого делает файлы публичными
+#  5. check_prop_name - название свойства, значение которого делает файлы доступными
 #     Пример: "wiki:visible"
 #  6. check_prop_re - регулярное выражение для проверки значения свойства.
 #     В случае, если параметр не указан или имеет значение undef, указанное
 #     свойство просто должно быть задано.
-#  7. check_prop_inherit - включить (истина) или выключить (ложь) наследование для
-#     проверки свойств. При включённом установленное значение свойства на каталог
-#     открывает все файлы в нём.
-#  8. cache_path - директория локального кэша файлов.
-#  9. enc_from_to - массив из двух названий кодировок. Первая из них - входная
+#  7. cache_path - директория локального кэша файлов.
+#  8. enc_from_to - массив из двух названий кодировок. Первая из них - входная
 #     кодировка обрабатываемых адресов, вторая - кодировка, в которой имена файлов
 #     должны передаваться библиотекам Subversion для доступа. Параметр необязательный,
 #     и если он не указан, перекодировка не осуществляется.
 #     Пример: [ "cp1251", "utf8" ]
+#  9. access_log - если true, то логгировать все запросы на STDERR
+# 10. mime_types - путь к файлу /etc/mime.types или подобному
 sub init
 {
     my $class = shift;
@@ -59,11 +65,10 @@ sub init
     my ($params) = @_;
     my $ra;
     unless ($params->{cache_path} && $params->{location} &&
-        $params->{repos_username} && exists $params->{repos_password} &&
-        $params->{check_prop_name})
+        $params->{repos_username} && exists $params->{repos_password})
     {
         # ругаемся
-        warn __PACKAGE__.": parameters cache_path, location, repos_username, repos_password, check_prop_name are mandatory";
+        warn __PACKAGE__.": parameters cache_path, location, repos_username, repos_password are mandatory";
         return undef;
     }
     $params->{cache_path} =~ s!/+$!!so;
@@ -128,41 +133,57 @@ sub init
         params    => $params,
         check_url => $murl,
         ra        => $ra,
-        ras       => {},
         server    => $s,
         auth_prov => $auth_providers,
     }, $class;
-    # устанавливаем PerlMapToStorageHandler
-    $s->set_handlers(PerlMapToStorageHandler => sub { $self->handler(@_) });
-    my $cfg;
-    if ($rurl)
+    my $ino = @$instances;
+    push @$instances, $self;
+    if (!$ino)
     {
-        $cfg = <<"EOF";
-Alias $rurl '$params->{cache_path}'
+        # на первый раз инициализируем LWP::MediaTypes
+        # он всё равно глобальный, так что смысла
+        # всасывать типы из разных файлов нет
+        LWP::MediaTypes::read_media_types($params->{mime_types} || '/etc/mime.types');
+    }
+    my $cfg = <<"EOF";
 <Location "$rurl">
+    RewriteEngine off
+    Options +ExecCGI
     SetHandler perl-script
+    PerlSetVar ${class}Instance $ino
+    PerlResponseHandler ${class}
 </Location>
 EOF
-    }
-    else
-    {
-        $cfg = <<"EOF";
-DocumentRoot '$params->{cache_path}'
-<Location "/">
-    Options -ExecCGI -Indexes
-    SetHandler perl-script
-</Location>
-EOF
-    }
     $s->add_config([split("\n", $cfg)]);
     return $self;
 }
 
+# Отправить сообщение об ошибке
+sub print_error
+{
+    my ($r, $errmsg, $diemsg) = @_;
+    $diemsg ||= '';
+    $diemsg =~ s/ at \S+ line \d+.*$//so;
+    $errmsg =~ s/\.*$/./so;
+    $errmsg .= ":\n$diemsg" if $diemsg;
+    print STDERR (strftime("[%Y-%m-%d %H:%M:%S] ", localtime) . __PACKAGE__ . $errmsg . "\n");
+    $errmsg =~ s/\n/<br \/>/gso;
+    my $p = __PACKAGE__;
+    $errmsg = "<html><head><title>$p: Error</title></head><body><h1>Error</h1><p>$errmsg</p><hr /><p>$p/0.5</p></body></html>";
+    $r->content_type('text/html; charset=utf-8');
+    $r->print($errmsg);
+    return OK;
+}
+
+# кэш объектов SVN::Ra
+my $RAS = {};
+
 # обработчик
 sub handler
 {
-    my $self = shift;
     my ($r) = @_;
+    my $self = $instances->[$r->dir_config(__PACKAGE__.'Instance')];
+    my $LP = strftime("[%Y-%m-%d %H:%M:%S] ", localtime) . __PACKAGE__;
     # проверяем, относится ли к нам этот URL
     my $murl = $self->{check_url};
     my $uri = $r->hostname . $r->uri;
@@ -175,14 +196,14 @@ sub handler
     unless ($ra)
     {
         # необходимо открыть репозиторий Subversion
-        $uri =~ s!^([^/]+/)/*!!so;
+        $uri =~ s!^([^/]+)/*!!so;
         unless ($rname = $1)
         {
             # пустой урл
-            warn "Requested URL does not contain repository name";
-            return HTTP_BAD_REQUEST;
+            return print_error($r, "Requested URL does not contain repository name");
         }
-        $ra = $self->{ras}->{$rname};
+        my $K = $self->{params}->{repos_username} . '@' . $self->{params}->{repos_parent} . $rname;
+        $ra = $RAS->{$K};
         unless ($ra)
         {
             # открываем репозиторий
@@ -193,10 +214,9 @@ sub handler
             unless ($ra)
             {
                 # репозиторий не открывается
-                warn "Failed to open Subversion repository '$rname': $@.";
-                return HTTP_BAD_REQUEST;
+                return print_error($r, "Failed to open Subversion repository '$rname'", $@);
             }
-            $self->{ras}->{$rname} = $ra;
+            $RAS->{$K} = $ra;
         }
     }
     if ($self->{params}->{enc_from_to})
@@ -207,40 +227,21 @@ sub handler
     my ($revnum, $props);
     if ($uri !~ /\/$/so)
     {
-        eval { ($revnum, $props) = $ra->get_file($uri, $SVN::Core::INVALID_REVNUM, undef) };
+        eval
+        {
+            ($revnum, $props) = $ra->get_file($uri, $SVN::Core::INVALID_REVNUM, undef);
+        };
     }
     # проверяем, есть ли файл
     if (!$props)
     {
         if ($@ && $@ =~ /405\s+Method\s+Not\s+Allowed/so)
         {
-            warn "Unknown repository '$rname': $@";
-            return HTTP_BAD_REQUEST;
+            return print_error($r, "Unknown repository '$rname'", $@);
         }
-        warn "File '$uri' not found in Subversion repository '$rname'".($@ ? ": $@" : "");
-        return NOT_FOUND;
-    }
-    # проверка значения свойства
-    if ($self->{params}->{check_prop_name})
-    {
-        my ($n, $re) = ($self->{params}->{check_prop_name}, $self->{params}->{check_prop_re});
-        my $ok = defined $re && $props->{$n} =~ /$re/ || !defined $re && exists $props->{$n};
-        if ($self->{params}->{check_prop_inherit})
+        else
         {
-            # тупое наследование - интересно, будут ли тормоза?
-            my $diruri = $uri;
-            my $props;
-            while (!$ok && $diruri =~ s!/+[^/]*$!!iso)
-            {
-                $props = {};
-                eval { (undef, undef, $props) = $ra->get_dir($diruri, $SVN::Core::INVALID_REVNUM) };
-                $ok = defined $re && $props->{$n} =~ /$re/ || !defined $re && $props->{$n};
-            }
-        }
-        if (!$ok)
-        {
-            warn "Denied access to '$uri' from Subversion repository '$rname'";
-            return FORBIDDEN;
+            return print_error($r, "File '$uri' not found in Subversion repository '$rname'", $@);
         }
     }
     # кэшируем файл, если нужно
@@ -249,37 +250,86 @@ sub handler
     $dir =~ s!/+[^/]*$!!so;
     unless (-d $dir || make_path($dir))
     {
-        warn "Failed to create path '$dir'";
-        return SERVER_ERROR;
+        return print_error($r, "Failed to create cache path '$dir'");
     }
-    my $fd;
+    my ($uptodate, $mime_type, $fd, $cached_rev);
     if (-f $path && open $fd, "<$path.rev")
     {
-        local $/ = undef;
-        my $cached_rev = <$fd>;
+        $cached_rev = <$fd>;
+        $mime_type = <$fd>;
+        chomp $mime_type;
         close $fd;
         $cached_rev =~ s/^\s*//so;
         $cached_rev =~ s/\s*$//so;
-        # если закэшировано более или менее старое - пропускаем
-        return DECLINED if $revnum <= $cached_rev;
+        if ($props->{'svn:entry:committed-rev'} <= $cached_rev && $mime_type)
+        {
+            # закэшировано актуальное
+            if ($self->{params}->{access_log})
+            {
+                # логгируем запрос
+                print STDERR "$LP: file $rname$uri is up to date, latest ".$props->{'svn:entry:committed-rev'}.", cached $cached_rev\n";
+            }
+            $uptodate = 1;
+        }
     }
-    # записываем содержимое файла
-    eval
+    if (!$uptodate)
     {
-        die "Could not open $path: $!" unless open $fd, ">$path";
-        ($revnum, $props) = $ra->get_file($uri, $revnum, $fd);
-        close $fd;
-        die "Could not open $path.rev: $!" unless open $fd, ">$path.rev";
-        print $fd $revnum;
-        close $fd;
-    };
-    if ($@)
-    {
-        warn "Failed to checkout '$uri' @ rev.$revnum from Subversion repository '$rname' into local file '$path': $@";
-        return SERVER_ERROR;
+        # проверка значения свойства - только при обновлении
+        if ($self->{params}->{check_prop_name})
+        {
+            my ($n, $re) = ($self->{params}->{check_prop_name}, $self->{params}->{check_prop_re});
+            my $ok = defined $re && $props->{$n} =~ /$re/ || !defined $re && exists $props->{$n};
+            if ($self->{params}->{check_prop_inherit})
+            {
+                # тупое наследование - интересно, будут ли тормоза?
+                my $diruri = $uri;
+                my $props;
+                while (!$ok && $diruri =~ s!/+[^/]*$!!iso)
+                {
+                    $props = {};
+                    eval { (undef, undef, $props) = $ra->get_dir($diruri, $SVN::Core::INVALID_REVNUM) };
+                    $ok = defined $re && $props->{$n} =~ /$re/ || !defined $re && $props->{$n};
+                }
+            }
+            if (!$ok)
+            {
+                return print_error($r, "Access to '$uri' from Subversion repository '$rname' is forbidden");
+            }
+        }
+        # угадать MIME-тип
+        $mime_type = $props->{'svn:mime-type'};
+        if (!$mime_type)
+        {
+            $mime_type = LWP::MediaTypes::guess_media_type($path);
+        }
+        # записываем содержимое файла
+        eval
+        {
+            die "Could not open $path: $!" unless open $fd, ">$path";
+            ($revnum, $props) = $ra->get_file($uri, $revnum, $fd);
+            close $fd;
+            die "Could not open $path.rev: $!" unless open $fd, ">$path.rev";
+            print $fd $props->{'svn:entry:committed-rev'}, "\n", $mime_type, "\n";
+            close $fd;
+        };
+        if ($@)
+        {
+            return print_error($r, "Failed to checkout '$uri' @ rev.$revnum from Subversion repository '$rname' into local file '$path': $@");
+        }
+        # логгируем запрос
+        if ($self->{params}->{access_log})
+        {
+            print STDERR $cached_rev
+                ? "$LP: file $rname$uri, updated to latest $revnum = ".$props->{'svn:entry:committed-rev'}." from cached $cached_rev\n"
+                : "$LP: file $rname$uri, checked out $revnum\n";
+        }
     }
-    # ну и пускай апач его того, отдаёт
-    return DECLINED;
+    $r->content_type($mime_type);
+    unless ($r->sendfile($path) == APR::Const::SUCCESS)
+    {
+        return print_error($r, "Cannot read $path");
+    }
+    return OK;
 }
 
 1;
