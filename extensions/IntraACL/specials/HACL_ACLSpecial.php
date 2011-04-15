@@ -287,13 +287,19 @@ class IntraACLSpecial extends SpecialPage
                 $actions[] = 'move';
             if ($actmask & HACLLanguage::RIGHT_DELETE)
                 $actions[] = 'delete';
+            $memberids = array(
+                'user' => array_flip($r->getUsers()),
+                'group' => array_flip($r->getGroups()),
+            );
+            /* get groups closure */
+            $memberids = $st->getGroupMembersRecursive(array_keys($memberids['group']), $memberids);
             $members = array();
             /* get user names */
-            foreach ($st->getUserNames($r->getUsers()) as $u)
+            foreach ($st->getUserNames(array_keys($memberids['user'])) as $u)
                 $members[] = 'User:'.$u['user_name'];
             /* get group names */
-            foreach ($st->getGroupNames($r->getGroups()) as $g)
-                $members[] = 'Group/'.$g['group_name'];
+            foreach ($st->getGroupNames(array_keys($memberids['group'])) as $g)
+                $members[] = $g['group_name'];
             /* merge into result */
             foreach ($members as $m)
                 foreach ($actions as $a)
