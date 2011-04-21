@@ -1,8 +1,12 @@
 <?php
 /**
  * MediaWiki camouflaged like custis.ru
+ * Configuration:
+ *  $wgCatlinksTop =
+ *   false (default): Show category links below article content
+ *   true: Show category links below and above article content
+ *   'only': Show category links above article content only
  *
- * @todo document
  * @file
  * @ingroup Skins
  */
@@ -14,7 +18,6 @@ require_once( dirname( dirname( __FILE__ ) ) . '/includes/SkinTemplate.php');
 
 /**
  * Inherit main code from SkinTemplate, set the CSS and template filter.
- * @todo document
  * @ingroup Skins
  */
 class SkinCustisRu extends SkinTemplate {
@@ -64,10 +67,9 @@ class CustisRuTemplate extends QuickTemplate {
      * @access private
      */
     function execute() {
-        global $wgRequest;
+        global $wgRequest, $wgScriptPath, $wgCatlinksTop;
         $this->skin = $skin = $this->data['skin'];
         $action = $wgRequest->getText( 'action' );
-        global $wgScriptPath;
         $sp = $wgScriptPath;
 
         // Suppress warnings to prevent notices about missing indexes in $this->data
@@ -228,8 +230,9 @@ class CustisRuTemplate extends QuickTemplate {
     <?php if($this->data['newtalk'] ) { ?><div class="usermessage"><?php $this->html('newtalk')  ?></div><?php } ?>
     <?php if($this->data['showjumplinks']) { ?><div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div><?php } ?>
     <!-- start content -->
+    <?php if($this->data['catlinks'] && $wgCatlinksTop) { $this->html('catlinks'); } ?>
     <?php $this->html('bodytext') ?>
-    <?php if($this->data['catlinks']) { $this->html('catlinks'); } ?>
+    <?php if($this->data['catlinks'] && $wgCatlinksTop !== 'only') { $this->html('catlinks'); } ?>
     <!-- end content -->
     <?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
     <div class="visualClear"></div>
