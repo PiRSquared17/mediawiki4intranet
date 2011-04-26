@@ -2108,7 +2108,7 @@ class Parser
 				$emptyLines = 0;
 			} elseif( $prefixLength || $lastPrefixLength ) {
 				$output .= $this->closeParagraph();
-				$dontStartParagraph = 2;
+				$dontStartParagraph = $prefixLength ? 2 : 0;
 				// We need to open or close prefixes, or both.
 
 				// Either open or close a level...
