@@ -254,3 +254,6 @@ $wgSphinxMatchAll = 1;
 $wgSphinxSuggestMode = true;
 
 $wgMaxImageArea = 5000*5000;
+
+// Allow all ?action=raw content types
+$wgAllowedRawCTypes = true;
