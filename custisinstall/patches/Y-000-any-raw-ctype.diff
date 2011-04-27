@@ -1,0 +1,33 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1303919906 -14400
+Bug 76186 - (optional) Allow any content type for action=raw
+
+diff -r 45da8fc662c9 -r 30263491bf0b includes/RawPage.php
+--- includes/RawPage.php
++++ includes/RawPage.php
+@@ -21,9 +21,12 @@
+ 	var $mContentType, $mExpandTemplates;
+ 
+ 	function __construct( &$article, $request = false ) {
+-		global $wgRequest, $wgInputEncoding, $wgSquidMaxage, $wgJsMimeType, $wgGroupPermissions;
++		global $wgRequest, $wgInputEncoding, $wgSquidMaxage,
++			$wgJsMimeType, $wgGroupPermissions, $wgAllowedRawCTypes;
+ 
+-		$allowedCTypes = array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
++		$allowedCTypes = $wgAllowedRawCTypes
++			? $wgAllowedRawCTypes
++			: array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
+ 		$this->mArticle =& $article;
+ 		$this->mTitle =& $article->mTitle;
+ 
+@@ -101,7 +104,8 @@
+ 			$this->mPrivateCache = false;
+ 		}
+ 
+-		if( $ctype == '' or ! in_array( $ctype, $allowedCTypes ) ) {
++		// Allow any content type for action=raw when $wgAllowedRawCTypes === true
++		if( $ctype == '' || $allowedCTypes !== true && ! in_array( $ctype, $allowedCTypes ) ) {
+ 			$this->mContentType = 'text/x-wiki';
+ 		} else {
+ 			$this->mContentType = $ctype;
