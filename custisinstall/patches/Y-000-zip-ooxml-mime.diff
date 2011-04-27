@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1303910158 -14400
+# Date 1303910303 -14400
 Bug 79501 - Determine OOXML types correctly, allow external mime magic for invalid zip files
 
-diff -r 45da8fc662c9 -r 2f7db1b257c1 includes/MimeMagic.php
+diff -r 45da8fc662c9 -r 5a6d9d0b43f8 includes/MimeMagic.php
 --- includes/MimeMagic.php
 +++ includes/MimeMagic.php
 @@ -11,6 +11,18 @@
