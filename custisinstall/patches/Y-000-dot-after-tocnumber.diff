@@ -1,0 +1,41 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1300969814 -10800
+Bug 52772 - Optional dots (.) after TOC item numbers
+
+diff -r 9cc4b1960d33 -r cd5b10634b39 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -1141,6 +1141,11 @@
+ $wgMaxPPExpandDepth = 40;
+ 
+ /**
++ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
++ */
++$wgDotAfterTocnumber = false;
++
++/**
+  * If true, removes (substitutes) templates in "~~~~" signatures.
+  */
+ $wgCleanSignatures = true;
+diff -r 9cc4b1960d33 -r cd5b10634b39 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -3499,7 +3499,7 @@
+ 	 * @private
+ 	 */
+ 	function formatHeadings( $text, $origText, $isMain=true ) {
+-		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds;
++		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
+ 
+ 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
+ 		$showEditLink = $this->mOptions->getEditSection();
+@@ -3648,6 +3648,8 @@
+ 					$dot = 1;
+ 				}
+ 			}
++			if ( $wgDotAfterTocnumber )
++				$numbering .= '.';
+ 
+ 			# The safe header is a version of the header text safe to use for links
+ 			# Avoid insertion of weird stuff like <math> by expanding the relevant sections

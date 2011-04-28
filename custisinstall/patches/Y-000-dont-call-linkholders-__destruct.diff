@@ -1,0 +1,17 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297452685 -10800
+Do not explicitly call destructor of mLinkHolders as it causes errors in some cases
+
+diff -r b11befdd7427 -r f4a4d8e13f52 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -154,7 +154,7 @@
+ 	 */
+ 	function __destruct() {
+ 		if ( isset( $this->mLinkHolders ) ) {
+-			$this->mLinkHolders->__destruct();
++			unset( $this->mLinkHolders );
+ 		}
+ 		foreach ( $this as $name => $value ) {
+ 			unset( $this->$name );

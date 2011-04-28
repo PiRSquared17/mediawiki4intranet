@@ -1,0 +1,53 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1301777230 -14400
+Bug 63447, add hook for MediaWiki::preliminaryChecks()
+Bug 71769, add hook for overriding grouping values for enhanced recent changes view
+
+diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/ChangesList.php
+--- includes/ChangesList.php
++++ includes/ChangesList.php
+@@ -751,6 +751,7 @@
+ 			if( $rc_type == RC_LOG ){
+ 				$secureName = SpecialPage::getTitleFor( 'Log', $rc_log_type )->getPrefixedDBkey();
+ 			}
++			wfRunHooks( 'EnhancedChangesListGroupBy', array( &$rc, &$title, &$secureName ) );
+ 			if( !isset( $this->rc_cache[$secureName] ) ) {
+ 				$this->rc_cache[$secureName] = array();
+ 			}
+diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Title.php
+--- includes/Title.php
++++ includes/Title.php
+@@ -1277,12 +1277,20 @@
+ 			return $errors;
+ 		}
+ 
++		/**
++		 * Do not deny all actions except 'createaccount' and 'execute'
++		 * on special pages, let them decide themselves.
++		 * -- vitalif@mail.ru 2011-04-03
++		 * <commented out>:
++		 *
+ 		# Only 'createaccount' and 'execute' can be performed on
+ 		# special pages, which don't actually exist in the DB.
+ 		$specialOKActions = array( 'createaccount', 'execute' );
+ 		if( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions) ) {
+ 			$errors[] = array('ns-specialprotected');
+ 		}
++		 * </commented out>
++		 */
+ 
+ 		# Check $wgNamespaceProtection for restricted namespaces
+ 		if( $this->isNamespaceProtected() ) {
+diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Wiki.php
+--- includes/Wiki.php
++++ includes/Wiki.php
+@@ -152,6 +152,8 @@
+ 			// Do this above the read whitelist check for security...
+ 			$title = SpecialPage::getTitleFor( 'Search' );
+ 		}
++		if ( !wfRunHooks( 'MediaWikiPreliminaryChecks', array( &$title, &$output, $request ) ) )
++			return false;
+ 		# If the user is not logged in, the Namespace:title of the article must be in
+ 		# the Read array in order for the user to see it. (We have to check here to
+ 		# catch special pages etc. We check again in Article::view())

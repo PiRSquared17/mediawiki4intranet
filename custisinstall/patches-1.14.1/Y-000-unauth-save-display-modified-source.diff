@@ -1,0 +1,18 @@
+Index: includes/EditPage.php
+===================================================================
+--- includes/EditPage.php	(revision 47934)
++++ includes/EditPage.php	(working copy)
+@@ -419,7 +419,12 @@
+ 		
+ 		if ( $permErrors ) {
+ 			wfDebug( __METHOD__.": User can't edit\n" );
+-			$this->readOnlyPage( $this->getContent(), true, $permErrors, 'edit' );
++			$this->readOnlyPage(
++			    $this->textbox2 ? $this->textbox2 :
++			    $this->textbox1 ? $this->textbox1 :
++			                      $this->getContent(),
++			    true, $permErrors, 'edit'
++			);
+ 			wfProfileOut( __METHOD__ );
+ 			return;
+ 		} else {
