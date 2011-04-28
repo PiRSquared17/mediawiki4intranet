@@ -59,7 +59,7 @@ function wfSpecialBatchEditor($par = null)
         $state['pages'] = $a_titles;
         if ($wgRequest->getCheck('addcat'))
         {
-            call_user_func($mw4i_addpages[0], $state);
+            call_user_func_array($mw4i_addpages[0], array(&$state));
             $a_titles = $state['pages'];
         }
     }
