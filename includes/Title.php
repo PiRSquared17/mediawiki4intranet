@@ -3874,40 +3874,49 @@ class Title {
 	 * 		$this, if access is granted on this title or
 	 * 		the title for "Permission denied" if not.
 	 */
-	private function checkAccessControl() {
-		if (!defined('HACL_HALOACL_VERSION')) {
-			// HaloACL is disabled or not fully initialized
+	private function checkAccessControl()
+	{
+		if (!defined('HACL_HALOACL_VERSION'))
+		{
+			// IntraACL is disabled or not fully initialized
 			return $this;
 		}
 		global $haclgEnableTitleCheck;
-		if (isset($haclgEnableTitleCheck) && $haclgEnableTitleCheck === false) {
+		if (isset($haclgEnableTitleCheck) && $haclgEnableTitleCheck === false)
 			return $this;
-		}
 		static $permissionCache = array();
 		
 		global $wgRequest;
-		$action = $wgRequest->getVal( 'action', 'read');
+		$action = $wgRequest->getVal( 'action', 'read' );
 		$currentTitle = $wgRequest->getVal('title');
-		$currentTitle = str_replace( '_', ' ', $currentTitle);
-		if ($this->getFullText() != $currentTitle) {
+		$currentTitle = str_replace( '_', ' ', $currentTitle );
+		if ($this->getFullText() != $currentTitle)
 			$action = 'read';
-		}
-		$index = $this->getFullText().'-'.$action; // A bug was fixed here thanks to Dave MacDonald
+		$index = $this->getFullText().'-'.$action;
 		$allowed = @$permissionCache[$index];
-		if (!isset($allowed)) {
-			switch ($action) {
+		if (!isset($allowed))
+		{
+			switch ($action)
+			{
 				case 'create':
-				case 'edit':
 				case 'move':
 				case 'delete':
 					$allowed = $this->userCan($action);
 					break;
+				case 'edit':
+					// If the article does not exist and edit right was requested,
+					// check for create right.
+					$allowed = $this->userCan($this->exists() ? 'edit' : 'create');
+					break;
 				default:
-					$allowed = $this->userCanRead();
+					// If the user has no read access to a non-existing page,
+					// but has the right to create it - allow him to "read" it
+					$allowed = $this->userCanRead() || !$this->exists() && $this->userCan('create');
 			}
 			$permissionCache[$index] = $allowed;
 		}
-		if ($allowed === false) {
+		if ($allowed === false)
+		{
 			global $haclgContLang;
 			$etc = $haclgEnableTitleCheck;
 			$haclgEnableTitleCheck = false;
