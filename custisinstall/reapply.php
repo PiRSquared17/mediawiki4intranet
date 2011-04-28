@@ -6,7 +6,7 @@
 # (c) Vitaliy Filippov, 2011
 
 $PATCHED_DIRS = explode(' ', 'includes languages skins/chick skins/common skins/modern skins/monobook skins/simple skins/vector maintenance skins/Vector.php');
-$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree Cite DeleteBatch Interwiki PdfHandler WikiCategoryTagCloud SyntaxHighlight_GeSHi');
+$PATCHED_EXTENSIONS = explode(' ', 'CategoryTree Cite DeleteBatch Interwiki PdfHandler WikiCategoryTagCloud SyntaxHighlight_GeSHi ParserFunctions');
 $CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php');
 
 $SELFDIR = realpath(dirname(__FILE__));
