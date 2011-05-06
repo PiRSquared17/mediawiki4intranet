@@ -675,9 +675,9 @@ special external link styling */
 	margin: 0;
 }
 
-/*
-** Invisible controls
-*/
+/**
+ * Invisible controls
+ */
 
 #p-navigation, #p-tb {
     display: block;
@@ -696,14 +696,15 @@ special external link styling */
     margin: 0;
     padding: 0;
 }
+#p-wikilogcalendar { display: none }
 
 #p-navigation h5, #p-logo, #p-tb h5, #p-search, #footer {
 	display: none;
 }
 
-/*
-** the personal toolbar
-*/
+/**
+ * the personal toolbar
+ */
 #p-personal {
 	position: absolute;
 	left: 0;
