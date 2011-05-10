@@ -121,7 +121,8 @@ class MarkupBabel
     {
         global $wgAutoHighlightExtensions, $wgOut;
         if ($wgAutoHighlightExtensions &&
-            preg_match('!\.('.implode('|', array_keys($wgAutoHighlightExtensions)).')$!u', $article->getTitle()->getText(), $m))
+            preg_match('!\.('.implode('|', array_keys($wgAutoHighlightExtensions)).')$!u', $article->getTitle()->getText(), $m) &&
+            $article->exists())
         {
             $text = $article->getContent();
             if (!preg_match('#^\s*<(source|code-|nowiki)#is', $text))
