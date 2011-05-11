@@ -58,7 +58,7 @@ class SpecialNewpages extends SpecialPage {
 		global $wgLang;
 		$bits = preg_match_all(
 			'/(shownav|hide(?:liu|patrolled|bots|redirs))|'.
-			'(limit|offset|username|category|namespace|format)\s*=\s*(?:([^,]+)|"([^"]*)"|\'([^\']*)\')/is',
+			'(limit|offset|username|category|namespace|format)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^,]+))/is',
 			$par, $m, PREG_SET_ORDER );
 		foreach ( $m as $bit )
 		{
@@ -73,7 +73,7 @@ class SpecialNewpages extends SpecialPage {
 					$this->opts->setValue( 'namespace', $ns );
 			}
 			else
-				$this->opts->setValue( $bit[2], $bit[3] ? $bit[3] : ( $bit[4] ? $bit[4] : $bit[5] ) );
+				$this->opts->setValue( $bit[2], $bit[5] ? $bit[5] : str_replace( '_', ' ', $bit[3] ? $bit[3] : $bit[4] ) );
 		}
 	}
 
