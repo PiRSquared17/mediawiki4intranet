@@ -59,7 +59,7 @@ class SpecialNewpages extends SpecialPage {
 		$bits = preg_match_all(
 			'/(shownav|hide(?:liu|patrolled|bots|redirs))|'.
 			'(limit|offset|username|category|namespace|format)\s*=\s*(?:([^,]+)|"([^"]*)"|\'([^\']*)\')/is',
-			$bits, $m, PREG_SET_ORDER );
+			$par, $m, PREG_SET_ORDER );
 		foreach ( $m as $bit )
 		{
 			if ( $bit[1] == 'shownav' )
