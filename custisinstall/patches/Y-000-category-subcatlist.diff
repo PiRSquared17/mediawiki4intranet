@@ -1,15 +1,41 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297181625 -10800
-Bug 62054 - Remove alpha-bars in categories
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1305131187 -14400
+Bug 62054 -
+  __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
+  enable/disable "tag-like" page grouping based on their other categories,
+  __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryPageSubclass.php
+diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
-@@ -61,4 +61,157 @@
+@@ -61,4 +61,182 @@
  		}
  		parent::finaliseCategoryState();
  	}
++
++    /**
++     * Format a list of articles chunked by letter, either as a
++     * bullet list or a columnar format, depending on the length.
++     *
++     * @param $articles Array
++     * @param $articles_start_char Array
++     * @param $cutoff Int
++     * @return String
++     * @private
++     */
++    function formatList($articles, $articles_start_char, $cutoff = 6)
++    {
++        global $wgOut;
++        if (!$wgOut->noCategoryColumns && count($articles) > $cutoff)
++            return $this->columnList($articles, $articles_start_char);
++        elseif ($articles)
++        {
++            // for short lists of articles in categories.
++            return $this->shortList($articles, $articles_start_char);
++        }
++        return '';
++    }
 +
 +    function addPage($title, $sortkey, $pageLength, $isRedirect = false)
 +    {
@@ -146,16 +172,18 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryPageSubclas
 +        /* Replace article and subtitle list and call parent */
 +        $this->articles = $new;
 +        $this->articles_start_char = $newkey;
-+        $this->nonplanar_short_list = true;
 +        $html = parent::getPagesSection();
-+        $this->nonplanar_short_list = false;
 +        return $html;
 +    }
 +
 +    /* Short list without subtitles, if not called from $this->getPagesSection() */
 +    function shortList($articles, $articles_start_char)
 +    {
-+        if ($this->nonplanar_short_list)
++        global $wgMinUncatPagesAlphaList;
++        $cutoff = $wgMinUncatPagesAlphaList;
++        if (!$cutoff || $cutoff < 0)
++            $cutoff = 10;
++        if (count($articles) >= $cutoff)
 +            return parent::shortList($articles, $articles_start_char);
 +        $r = '<ul>';
 +        foreach ($articles as $a)
@@ -164,10 +192,10 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryTree.php
+diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
-@@ -377,3 +377,31 @@
+@@ -377,3 +377,36 @@
  
  	return false;
  }
@@ -181,6 +209,7 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryTree.php
 +{
 +    wfLoadExtensionMessages('SubcategorizedCategoryPage');
 +    $wgVariableIDs[] = 'nocategorysubcatlist';
++    $wgVariableIDs[] = 'nocategorycolumns';
 +    return true;
 +}
 +
@@ -188,6 +217,8 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryTree.php
 +{
 +    if (!is_null($parserOutput->useSubcategorizedList))
 +        $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
++    if (!is_null($parserOutput->noCategoryColumns))
++        $out->noCategoryColumns = $parserOutput->noCategoryColumns;
 +    return true;
 +}
 +
@@ -197,12 +228,14 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->useSubcategorizedList = FALSE;
 +    if (MagicWord::get('categorysubcatlist')->matchAndRemove($text))
 +        $parser->mOutput->useSubcategorizedList = TRUE;
++    if (MagicWord::get('nocategorycolumns')->matchAndRemove($text))
++        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/SubcatCat.i18n.php
+diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
-@@ -0,0 +1,8 @@
+@@ -0,0 +1,9 @@
 +<?php
 +
 +$magicWords = array();
@@ -210,4 +243,5 @@ diff -r b11befdd7427 -r 980ae21aaf2a extensions/CategoryTree/SubcatCat.i18n.php
 +$magicWords['en'] = array(
 +    'nocategorysubcatlist' => array(0, '__NOCATEGORYSUBCATLIST__'),
 +    'categorysubcatlist' => array(0, '__CATEGORYSUBCATLIST__'),
++    'nocategorycolumns' => array(0, '__NOCATEGORYCOLUMNS__'),
 +);
