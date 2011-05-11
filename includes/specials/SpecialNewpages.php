@@ -12,9 +12,12 @@ class SpecialNewpages extends SpecialPage {
 	// Some internal settings
 	protected $showNavigation = false;
 
+	// Default item format
+	var $format = '$date $time $dm$plink $hist $dm[$length] $dm$ulink $utlink $comment $ctags';
+
 	public function __construct() {
 		parent::__construct( 'Newpages' );
-		$this->includable( true );	
+		$this->includable( true );
 	}
 
 	protected function setup( $par ) {
@@ -31,8 +34,10 @@ class SpecialNewpages extends SpecialPage {
 		$opts->add( 'offset', '' );
 		$opts->add( 'namespace', '0' );
 		$opts->add( 'username', '' );
+		$opts->add( 'category', '' );
 		$opts->add( 'feed', '' );
 		$opts->add( 'tagfilter', '' );
+		$opts->add( 'format', $this->format );
 
 		// Set values
 		$opts->fetchValuesFromRequest( $wgRequest );
@@ -48,37 +53,27 @@ class SpecialNewpages extends SpecialPage {
 		$this->skin = $wgUser->getSkin();
 	}
 
-	protected function parseParams( $par ) {
+	protected function parseParams( $par )
+	{
 		global $wgLang;
-		$bits = preg_split( '/\s*,\s*/', trim( $par ) );
-		foreach ( $bits as $bit ) {
-			if ( 'shownav' == $bit )
+		$bits = preg_match_all(
+			'/(shownav|hide(?:liu|patrolled|bots|redirs))|'.
+			'(limit|offset|username|category|namespace|format)\s*=\s*(?:([^,]+)|"([^"]*)"|\'([^\']*)\')/is',
+			$bits, $m, PREG_SET_ORDER );
+		foreach ( $m as $bit )
+		{
+			if ( $bit[1] == 'shownav' )
 				$this->showNavigation = true;
-			if ( 'hideliu' === $bit )
-				$this->opts->setValue( 'hideliu', true );
-			if ( 'hidepatrolled' == $bit )
-				$this->opts->setValue( 'hidepatrolled', true );
-			if ( 'hidebots' == $bit )
-				$this->opts->setValue( 'hidebots', true );
-			if ( 'showredirs' == $bit )
-				$this->opts->setValue( 'hideredirs', false );
-			if ( is_numeric( $bit ) )
-				$this->opts->setValue( 'limit', intval( $bit ) );
-
-			$m = array();
-			if ( preg_match( '/^limit=(\d+)$/', $bit, $m ) )
-				$this->opts->setValue( 'limit', intval($m[1]) );
-			// PG offsets not just digits!
-			if ( preg_match( '/^offset=([^=]+)$/', $bit, $m ) )
-				$this->opts->setValue( 'offset',  intval($m[1]) );
-			if ( preg_match( '/^username=(.*)$/', $bit, $m ) )
-				$this->opts->setValue( 'username', $m[1] );
-			if ( preg_match( '/^namespace=(.*)$/', $bit, $m ) ) {
-				$ns = $wgLang->getNsIndex( $m[1] );
-				if( $ns !== false ) {
-					$this->opts->setValue( 'namespace',  $ns );
-				}
+			elseif ( $bit[1] )
+				$this->opts->setValue( $bit[1], true );
+			elseif ( $bit[2] == 'namespace' )
+			{
+				$ns = $wgLang->getNsIndex( $bit[3] ? $bit[3] : ( $bit[4] ? $bit[4] : $bit[5] ) );
+				if( $ns !== false )
+					$this->opts->setValue( 'namespace', $ns );
 			}
+			else
+				$this->opts->setValue( $bit[2], $bit[3] ? $bit[3] : ( $bit[4] ? $bit[4] : $bit[5] ) );
 		}
 	}
 
@@ -111,6 +106,7 @@ class SpecialNewpages extends SpecialPage {
 		$pager = new NewPagesPager( $this, $this->opts );
 		$pager->mLimit = $this->opts->getValue( 'limit' );
 		$pager->mOffset = $this->opts->getValue( 'offset' );
+		$this->format = $this->opts->getValue( 'format' );
 
 		if( $pager->getNumRows() ) {
 			$navigation = '';
@@ -159,7 +155,7 @@ class SpecialNewpages extends SpecialPage {
 	}
 
 	protected function form() {
-		global $wgOut, $wgEnableNewpagesUserFilter, $wgScript;
+		global $wgOut, $wgEnableNewpagesUserFilter, $wgDisableNewpagesCategoryFilter, $wgScript;
 
 		// Consume values
 		$this->opts->consumeValue( 'offset' ); // don't carry offset, DWIW
@@ -170,6 +166,8 @@ class SpecialNewpages extends SpecialPage {
 		// Check username input validity
 		$ut = Title::makeTitleSafe( NS_USER, $username );
 		$userText = $ut ? $ut->getText() : '';
+
+		$category = $this->opts->consumeValue( 'category' );
 
 		// Store query values in hidden fields so that form submission doesn't lose them
 		$hidden = array();
@@ -211,6 +209,15 @@ class SpecialNewpages extends SpecialPage {
 					Xml::input( 'username', 30, $userText, array( 'id' => 'mw-np-username' ) ) .
 				"</td>
 			</tr>" : "" ) .
+			($wgDisableNewpagesCategoryFilter ? "" :
+			"<tr>
+				<td class='mw-label'>" .
+					Xml::label( wfMsg( 'newpages-category' ), 'mw-np-category' ) .
+				"</td>
+				<td class='mw-input'>" .
+					Xml::input( 'category', 30, $category, array( 'id' => 'mw-np-category' ) ) .
+				"</td>
+			</tr>") .
 			"<tr> <td></td>
 				<td class='mw-submit'>" .
 					Xml::submitButton( wfMsg( 'allpagessubmit' ) ) .
@@ -246,46 +253,46 @@ class SpecialNewpages extends SpecialPage {
 	public function formatRow( $result ) {
 		global $wgLang, $wgContLang;
 
-		$classes = array();
-		
-		$dm = $wgContLang->getDirMark();
-
 		$title = Title::makeTitleSafe( $result->rc_namespace, $result->rc_title );
-		$time = htmlspecialchars( $wgLang->timeAndDate( $result->rc_timestamp, true ) );
+/*patch|2011-05-11|IntraACL|start*/
+		if (!$title->userCanReadEx())
+			return '';
+/*patch|2011-05-11|IntraACL|end*/
 
-		$query = array( 'redirect' => 'no' );
-
-		if( $this->patrollable( $result ) )
-			$query['rcid'] = $result->rc_id;
-
-		$plink = $this->skin->linkKnown(
-			$title,
-			null,
-			array(),
-			$query
-		);
-		$hist = $this->skin->linkKnown(
-			$title,
-			wfMsgHtml( 'hist' ),
-			array(),
-			array( 'action' => 'history' )
-		);
+		$dm = $wgContLang->getDirMark();
 		$length = wfMsgExt( 'nbytes', array( 'parsemag', 'escape' ),
 			$wgLang->formatNum( $result->length ) );
-		$ulink = $this->skin->userLink( $result->rc_user, $result->rc_user_text ) . ' ' .
-			$this->skin->userToolLinks( $result->rc_user, $result->rc_user_text );
 		$comment = $this->skin->commentBlock( $result->rc_comment );
-		
-		if ( $this->patrollable( $result ) )
+
+		$query = array( 'redirect' => 'no' );
+		$classes = array();
+
+		if( $this->patrollable( $result ) )
+		{
+			$query['rcid'] = $result->rc_id;
 			$classes[] = 'not-patrolled';
+		}
 
 		# Tags, if any.
 		list( $tagDisplay, $newClasses ) = ChangeTags::formatSummaryRow( $result->ts_tags, 'newpages' );
 		$classes = array_merge( $classes, $newClasses );
 
+		$params = array(
+			'$dm'       => $dm,
+			'$date'     => htmlspecialchars( $wgLang->date( $result->rc_timestamp, true ) ),
+			'$time'     => htmlspecialchars( $wgLang->time( $result->rc_timestamp, true ) ),
+			'$plink'    => $this->skin->linkKnown($title, null, array(), $query),
+			'$ulink'    => $this->skin->userLink( $result->rc_user, $result->rc_user_text ),
+			'$utlink'   => $this->skin->userToolLinks( $result->rc_user, $result->rc_user_text ),
+			'$hist'     => $this->skin->linkKnown($title, wfMsgHtml('hist'), array(), array('action' => 'history')),
+			'$length'   => $length,
+			'$comment'  => $comment,
+			'$ctags'    => $tagDisplay,
+		);
+
 		$css = count($classes) ? ' class="'.implode( " ", $classes).'"' : '';
 
-		return "<li{$css}>{$time} {$dm}{$plink} ({$hist}) {$dm}[{$length}] {$dm}{$ulink} {$comment} {$tagDisplay}</li>\n";
+		return "<li$css>".str_replace( array_keys( $params ), array_values( $params ), $this->format )."</li>\n";
 	}
 
 	/**
@@ -408,6 +415,10 @@ class NewPagesPager extends ReverseChronologicalPager {
 		$username = $this->opts->getValue( 'username' );
 		$user = Title::makeTitleSafe( NS_USER, $username );
 
+		$category = $this->opts->getValue( 'category' );
+		$categoryTitle = $category ? Title::newFromText( $category, NS_CATEGORY ) : NULL;
+		$category = $categoryTitle && $categoryTitle->exists() ? $categoryTitle->getDBkey() : '';
+
 		if( $namespace !== false ) {
 			$conds['rc_namespace'] = $namespace;
 			$rcIndexes = array( 'new_name_timestamp' );
@@ -445,6 +456,13 @@ class NewPagesPager extends ReverseChronologicalPager {
 				'page' => array('INNER JOIN', 'page_id=rc_cur_id'),
 			),
 		);
+
+		if ( $category !== NULL )
+		{
+			$info['tables'][] = 'categorylinks';
+			$info['join_conds']['categorylinks'] = array('INNER JOIN', 'cl_from = page_id');
+			$info['conds']['cl_to'] = $category;
+		}
 
 		## Empty array for fields, it'll be set by us anyway.
 		$fields = array();
