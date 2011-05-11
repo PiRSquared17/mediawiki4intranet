@@ -62,6 +62,29 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
 		parent::finaliseCategoryState();
 	}
 
+    /**
+     * Format a list of articles chunked by letter, either as a
+     * bullet list or a columnar format, depending on the length.
+     *
+     * @param $articles Array
+     * @param $articles_start_char Array
+     * @param $cutoff Int
+     * @return String
+     * @private
+     */
+    function formatList($articles, $articles_start_char, $cutoff = 6)
+    {
+        global $wgOut;
+        if (!$wgOut->noCategoryColumns && count($articles) > $cutoff)
+            return $this->columnList($articles, $articles_start_char);
+        elseif ($articles)
+        {
+            // for short lists of articles in categories.
+            return $this->shortList($articles, $articles_start_char);
+        }
+        return '';
+    }
+
     function addPage($title, $sortkey, $pageLength, $isRedirect = false)
     {
         $this->titles[] = $title;
@@ -197,16 +220,18 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         /* Replace article and subtitle list and call parent */
         $this->articles = $new;
         $this->articles_start_char = $newkey;
-        $this->nonplanar_short_list = true;
         $html = parent::getPagesSection();
-        $this->nonplanar_short_list = false;
         return $html;
     }
 
     /* Short list without subtitles, if not called from $this->getPagesSection() */
     function shortList($articles, $articles_start_char)
     {
-        if ($this->nonplanar_short_list)
+        global $wgMinUncatPagesAlphaList;
+        $cutoff = $wgMinUncatPagesAlphaList;
+        if (!$cutoff || $cutoff < 0)
+            $cutoff = 10;
+        if (count($articles) >= $cutoff)
             return parent::shortList($articles, $articles_start_char);
         $r = '<ul>';
         foreach ($articles as $a)
