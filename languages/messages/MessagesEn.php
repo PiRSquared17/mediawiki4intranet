@@ -2423,6 +2423,7 @@ It now redirects to [[$2]].',
 'newpages'                        => 'New pages',
 'newpages-summary'                => '', # do not translate or duplicate this message to other languages
 'newpages-username'               => 'Username:',
+'newpages-category'               => 'Category:',
 'ancientpages'                    => 'Oldest pages',
 'ancientpages-summary'            => '', # do not translate or duplicate this message to other languages
 'move'                            => 'Move',
