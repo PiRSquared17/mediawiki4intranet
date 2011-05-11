@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1305149059 -14400
+# Date 1305149690 -14400
 Bug 79835 - Patch for Special:NewPages adds category and format options
 
 Depends on: 000-intraacl-rights
 
-diff -r 873ece4ed621 -r 739e873dc8c4 includes/specials/SpecialNewpages.php
+diff -r 873ece4ed621 -r b4648eab102a includes/specials/SpecialNewpages.php
 --- includes/specials/SpecialNewpages.php
 +++ includes/specials/SpecialNewpages.php
 @@ -12,9 +12,12 @@
@@ -46,7 +46,7 @@ diff -r 873ece4ed621 -r 739e873dc8c4 includes/specials/SpecialNewpages.php
 -			if ( 'shownav' == $bit )
 +		$bits = preg_match_all(
 +			'/(shownav|hide(?:liu|patrolled|bots|redirs))|'.
-+			'(limit|offset|username|category|namespace|format)\s*=\s*(?:([^,]+)|"([^"]*)"|\'([^\']*)\')/is',
++			'(limit|offset|username|category|namespace|format)\s*=\s*(?:"([^"]*)"|\'([^\']*)\'|([^,]+))/is',
 +			$par, $m, PREG_SET_ORDER );
 +		foreach ( $m as $bit )
 +		{
@@ -85,7 +85,7 @@ diff -r 873ece4ed621 -r 739e873dc8c4 includes/specials/SpecialNewpages.php
 +					$this->opts->setValue( 'namespace', $ns );
  			}
 +			else
-+				$this->opts->setValue( $bit[2], $bit[3] ? $bit[3] : ( $bit[4] ? $bit[4] : $bit[5] ) );
++				$this->opts->setValue( $bit[2], $bit[5] ? $bit[5] : str_replace( '_', ' ', $bit[3] ? $bit[3] : $bit[4] ) );
  		}
  	}
  
@@ -229,7 +229,7 @@ diff -r 873ece4ed621 -r 739e873dc8c4 includes/specials/SpecialNewpages.php
  		## Empty array for fields, it'll be set by us anyway.
  		$fields = array();
  
-diff -r 873ece4ed621 -r 739e873dc8c4 languages/messages/MessagesEn.php
+diff -r 873ece4ed621 -r b4648eab102a languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2423,6 +2423,7 @@
@@ -240,7 +240,7 @@ diff -r 873ece4ed621 -r 739e873dc8c4 languages/messages/MessagesEn.php
  'ancientpages'                    => 'Oldest pages',
  'ancientpages-summary'            => '', # do not translate or duplicate this message to other languages
  'move'                            => 'Move',
-diff -r 873ece4ed621 -r 739e873dc8c4 languages/messages/MessagesRu.php
+diff -r 873ece4ed621 -r b4648eab102a languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -1918,6 +1918,7 @@
