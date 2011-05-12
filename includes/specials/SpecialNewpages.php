@@ -311,7 +311,7 @@ class SpecialNewpages extends SpecialPage {
 	 * @param string $type
 	 */
 	protected function feed( $type ) {
-		global $wgFeed, $wgFeedClasses, $wgFeedLimit;
+		global $wgFeed, $wgFeedClasses, $wgFeedLimit, $wgUser, $wgLang, $wgRequest;
 
 		if ( !$wgFeed ) {
 			global $wgOut;
@@ -325,15 +325,43 @@ class SpecialNewpages extends SpecialPage {
 			return;
 		}
 
+		$pager = new NewPagesPager( $this, $this->opts );
+		$limit = $this->opts->getValue( 'limit' );
+		$pager->mLimit = min( $limit, $wgFeedLimit );
+		$lastmod = $pager->lastModifiedTime();
+
+		// "Consume" feed value from request
+		$wgRequest->setVal( 'feed', '' );
+
+		$userid = $wgUser->getId();
+		$optionsHash = md5( serialize( $this->opts->getAllValues() ) );
+		$timekey = wfMemcKey( 'npfeed', $userid, $optionsHash, 'timestamp' );
+		$key = wfMemcKey( 'npfeed', $userid, $wgLang->getCode(), $optionsHash );
+
+		FeedUtils::checkPurge($timekey, $key);
+
 		$feed = new $wgFeedClasses[$type](
 			$this->feedTitle(),
 			wfMsgExt( 'tagline', 'parsemag' ),
 			$this->getTitle()->getFullUrl() );
 
-		$pager = new NewPagesPager( $this, $this->opts );
-		$limit = $this->opts->getValue( 'limit' );
-		$pager->mLimit = min( $limit, $wgFeedLimit );
+		$cachedFeed = $this->loadFromCache( $lastmod, $timekey, $key );
+		if( is_string( $cachedFeed ) ) {
+			wfDebug( "New pages: Outputting cached feed\n" );
+			$feed->httpHeaders();
+			echo $cachedFeed;
+		} else {
+			wfDebug( "New pages: rendering new feed and caching it\n" );
+			ob_start();
+			$this->generateFeed( $pager, $feed );
+			$cachedFeed = ob_get_contents();
+			ob_end_flush();
+			$this->saveToCache( $cachedFeed, $timekey, $key );
+		}
+	}
 
+	public function generateFeed( $pager, $feed )
+	{
 		$feed->outHeader();
 		if( $pager->getNumRows() > 0 ) {
 			while( $row = $pager->mResult->fetchObject() ) {
@@ -341,6 +369,39 @@ class SpecialNewpages extends SpecialPage {
 			}
 		}
 		$feed->outFooter();
+	}
+
+	public function loadFromCache( $lastmod, $timekey, $key ) {
+		global $wgFeedCacheTimeout, $messageMemc;
+		$feedLastmod = $messageMemc->get( $timekey );
+
+		if( ( $wgFeedCacheTimeout > 0 ) && $feedLastmod ) {
+			/*
+			* If the cached feed was rendered very recently, we may
+			* go ahead and use it even if there have been edits made
+			* since it was rendered. This keeps a swarm of requests
+			* from being too bad on a super-frequently edited wiki.
+			*/
+
+			$feedAge = time() - wfTimestamp( TS_UNIX, $feedLastmod );
+			$feedLastmodUnix = wfTimestamp( TS_UNIX, $feedLastmod );
+			$lastmodUnix = wfTimestamp( TS_UNIX, $lastmod );
+
+			if( $feedAge < $wgFeedCacheTimeout || $feedLastmodUnix > $lastmodUnix) {
+				wfDebug( "New pages: loading feed from cache ($key; $feedLastmod; $lastmod)...\n" );
+				return $messageMemc->get( $key );
+			} else {
+				wfDebug( "New pages: cached feed timestamp check failed ($feedLastmod; $lastmod)\n" );
+			}
+		}
+		return false;
+	}
+
+	public function saveToCache( $feed, $timekey, $key ) {
+		global $messageMemc;
+		$expire = 3600 * 24; # One day
+		$messageMemc->set( $key, $feed, $expire );
+		$messageMemc->set( $timekey, wfTimestamp( TS_MW ), $expire );
 	}
 
 	protected function feedTitle() {
@@ -352,7 +413,11 @@ class SpecialNewpages extends SpecialPage {
 
 	protected function feedItem( $row ) {
 		$title = Title::MakeTitle( intval( $row->rc_namespace ), $row->rc_title );
-		if( $title ) {
+/*patch|2011-05-12|IntraACL|start*/
+		if( $title && ( !method_exists( $title, 'userCanReadEx' ) ||
+			$title->userCanReadEx() ) )
+/*patch|2011-05-12|IntraACL|end*/
+		{
 			$date = $row->rc_timestamp;
 			$comments = $title->getTalkPage()->getFullURL();
 
@@ -372,13 +437,30 @@ class SpecialNewpages extends SpecialPage {
 		return isset( $row->rc_user_text ) ? $row->rc_user_text : '';
 	}
 
-	protected function feedItemDesc( $row ) {
+	protected function feedItemDesc( $row )
+	{
+		global $wgNewpagesFeedNoHtml, $wgUser, $wgParser;
 		$revision = Revision::newFromId( $row->rev_id );
-		if( $revision ) {
+		if( $revision )
+		{
+			$t = $revision->getText();
+			if ( $wgNewpagesFeedNoHtml )
+				$t = nl2br( htmlspecialchars( $t ) );
+			else
+			{
+				if ( !$this->parserOptions )
+				{
+					$this->parserOptions = ParserOptions::newFromUser( $wgUser );
+					$this->parserOptions->setEditSection( false );
+				}
+				$t = $wgParser->getSection( $t, 0 );
+				$t = $wgParser->parse( $t, $revision->getTitle(), $this->parserOptions );
+				$t = $t->getText();
+			}
 			return '<p>' . htmlspecialchars( $revision->getUserText() ) . wfMsgForContent( 'colon-separator' ) .
-				htmlspecialchars( FeedItem::stripComment( $revision->getComment() ) ) . 
+				htmlspecialchars( FeedItem::stripComment( $revision->getComment() ) ) .
 				"</p>\n<hr />\n<div>" .
-				nl2br( htmlspecialchars( $revision->getText() ) ) . "</div>";
+				$t . "</div>";
 		}
 		return '';
 	}
@@ -476,6 +558,19 @@ class NewPagesPager extends ReverseChronologicalPager {
 										$this->opts['tagfilter'] );
 
 		return $info;
+	}
+
+	function lastModifiedTime() {
+		$mtimequery = $this->getQueryInfo();
+		$dbr = wfGetDB( DB_SLAVE );
+		$res = $dbr->select(
+			$mtimequery['tables'], 'MAX(rc_timestamp)',
+			$mtimequery['conds'], __FUNCTION__,
+			$mtimequery['options'], $mtimequery['join_conds']
+		);
+		$lastmod = $res->fetchRow();
+		$lastmod = $lastmod[0];
+		return $lastmod;
 	}
 
 	function getIndexField() {
