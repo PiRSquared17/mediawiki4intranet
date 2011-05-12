@@ -417,7 +417,7 @@ class NewPagesPager extends ReverseChronologicalPager {
 
 		$category = $this->opts->getValue( 'category' );
 		$categoryTitle = $category ? Title::newFromText( $category, NS_CATEGORY ) : NULL;
-		$category = $categoryTitle && $categoryTitle->exists() ? $categoryTitle->getDBkey() : '';
+		$category = $categoryTitle && $categoryTitle->exists() ? $categoryTitle->getDBkey() : NULL;
 
 		if( $namespace !== false ) {
 			$conds['rc_namespace'] = $namespace;
