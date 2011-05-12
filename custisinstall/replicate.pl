@@ -225,7 +225,7 @@ sub filter_confidential
             # Nothing found or multipart boundary
             $state = 3 if $found == 0;
             # Allow some overlap to find substrings on buffer boundary
-            syswrite($fh_filtered, $buffer, length($buffer) - $overlap);
+            syswrite($fh_filtered, $buffer, length($buffer) - $overlap) if $state != 1;
             $buffer = $overlap ? substr($buffer, -$overlap) : '';
         }
         elsif ($found == 1)
