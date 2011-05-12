@@ -387,6 +387,7 @@ function efSubcatCatMagicWordwgVariableIDs(&$wgVariableIDs)
 {
     wfLoadExtensionMessages('SubcategorizedCategoryPage');
     $wgVariableIDs[] = 'nocategorysubcatlist';
+    $wgVariableIDs[] = 'nocategorycolumns';
     return true;
 }
 
@@ -394,6 +395,8 @@ function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
 {
     if (!is_null($parserOutput->useSubcategorizedList))
         $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
+    if (!is_null($parserOutput->noCategoryColumns))
+        $out->noCategoryColumns = $parserOutput->noCategoryColumns;
     return true;
 }
 
@@ -403,5 +406,7 @@ function efSubcatCatParserBeforeInternalParse($parser, $text, $stripState)
         $parser->mOutput->useSubcategorizedList = FALSE;
     if (MagicWord::get('categorysubcatlist')->matchAndRemove($text))
         $parser->mOutput->useSubcategorizedList = TRUE;
+    if (MagicWord::get('nocategorycolumns')->matchAndRemove($text))
+        $parser->mOutput->noCategoryColumns = TRUE;
     return true;
 }

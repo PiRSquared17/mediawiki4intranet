@@ -251,11 +251,10 @@ class SpecialNewpages extends SpecialPage {
 		$dm = $wgContLang->getDirMark();
 
 		$title = Title::makeTitleSafe( $result->rc_namespace, $result->rc_title );
-/*op-patch|TS|2011-02-08|HaloACL|SafeTitle|start*/
-		if (!$title->userCanReadEx()) {
-			return;
-		}
-/*op-patch|TS|2011-02-08|end*/
+/*patch|2011-05-11|IntraACL|start*/
+		if (!$title->userCanReadEx())
+			return '';
+/*patch|2011-05-11|IntraACL|end*/
 
 		$time = htmlspecialchars( $wgLang->timeAndDate( $result->rc_timestamp, true ) );
 
