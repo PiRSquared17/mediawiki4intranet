@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1305149690 -14400
+# Date 1305199506 -14400
 Bug 79835 - Patch for Special:NewPages adds category and format options
 
 Depends on: 000-intraacl-rights
 
-diff -r 873ece4ed621 -r b4648eab102a includes/specials/SpecialNewpages.php
+diff -r 873ece4ed621 -r ff446dc6963b includes/specials/SpecialNewpages.php
 --- includes/specials/SpecialNewpages.php
 +++ includes/specials/SpecialNewpages.php
 @@ -12,9 +12,12 @@
@@ -210,7 +210,7 @@ diff -r 873ece4ed621 -r b4648eab102a includes/specials/SpecialNewpages.php
  
 +		$category = $this->opts->getValue( 'category' );
 +		$categoryTitle = $category ? Title::newFromText( $category, NS_CATEGORY ) : NULL;
-+		$category = $categoryTitle && $categoryTitle->exists() ? $categoryTitle->getDBkey() : '';
++		$category = $categoryTitle && $categoryTitle->exists() ? $categoryTitle->getDBkey() : NULL;
 +
  		if( $namespace !== false ) {
  			$conds['rc_namespace'] = $namespace;
@@ -229,7 +229,7 @@ diff -r 873ece4ed621 -r b4648eab102a includes/specials/SpecialNewpages.php
  		## Empty array for fields, it'll be set by us anyway.
  		$fields = array();
  
-diff -r 873ece4ed621 -r b4648eab102a languages/messages/MessagesEn.php
+diff -r 873ece4ed621 -r ff446dc6963b languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -2423,6 +2423,7 @@
@@ -240,7 +240,7 @@ diff -r 873ece4ed621 -r b4648eab102a languages/messages/MessagesEn.php
  'ancientpages'                    => 'Oldest pages',
  'ancientpages-summary'            => '', # do not translate or duplicate this message to other languages
  'move'                            => 'Move',
-diff -r 873ece4ed621 -r b4648eab102a languages/messages/MessagesRu.php
+diff -r 873ece4ed621 -r ff446dc6963b languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -1918,6 +1918,7 @@
