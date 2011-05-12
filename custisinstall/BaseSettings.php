@@ -138,6 +138,7 @@ $wgAutoloadClasses['CurlEnvProxy'] = dirname(__FILE__).'/curl-env-proxy.php';
 
 $wgAllowCategorizedRecentChanges = true;
 
+require_once($IP.'/extensions/NewPagesEx/NewPagesEx.php');
 require_once($IP.'/extensions/Calendar/Calendar.php');
 require_once($IP.'/extensions/SimpleTable/SimpleTable.php');
 require_once($IP.'/extensions/MagicNumberedHeadings/MagicNumberedHeadings.php');
