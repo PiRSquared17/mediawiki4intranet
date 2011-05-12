@@ -1,0 +1,1 @@
+Bug 78064 - Use MIME-Base64 encoding for mail headers instead of MIME-QuotedPrintable
