@@ -1,9 +1,9 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297181810 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1305305665 -14400
 Bug 61871 - Allow (optional) article merging for SAME user
 
-diff -r b11befdd7427 -r 57e54df0229b includes/EditPage.php
+diff -r 45da8fc662c9 -r f258cfeb5090 includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
 @@ -758,6 +758,7 @@
@@ -23,3 +23,21 @@ diff -r b11befdd7427 -r 57e54df0229b includes/EditPage.php
  			wfDebug( __METHOD__ . ": Suppressing edit conflict, same user.\n" );
  			$this->isConflict = false;
  		}
+@@ -2034,14 +2035,9 @@
+ 		$currentText = $currentRevision->getText();
+ 
+ 		$result = '';
+-		if ( wfMerge( $baseText, $editText, $currentText, $result ) ) {
+-			$editText = $result;
+-			wfProfileOut( __METHOD__ );
+-			return true;
+-		} else {
+-			wfProfileOut( __METHOD__ );
+-			return false;
+-		}
++		$conflict = wfMerge( $baseText, $editText, $currentText, $editText );
++		wfProfileOut( __METHOD__ );
++		return $conflict;
+ 	}
+ 
+ 	/**
