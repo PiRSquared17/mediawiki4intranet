@@ -2035,14 +2035,9 @@ INPUTS
 		$currentText = $currentRevision->getText();
 
 		$result = '';
-		if ( wfMerge( $baseText, $editText, $currentText, $result ) ) {
-			$editText = $result;
-			wfProfileOut( __METHOD__ );
-			return true;
-		} else {
-			wfProfileOut( __METHOD__ );
-			return false;
-		}
+		$conflict = wfMerge( $baseText, $editText, $currentText, $editText );
+		wfProfileOut( __METHOD__ );
+		return $conflict;
 	}
 
 	/**
