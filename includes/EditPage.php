@@ -948,12 +948,15 @@ class EditPage {
 			$text = $this->textbox1; // do not try to merge here!
 		} else if ( $this->isConflict ) {
 			# Attempt merge
-			if ( $this->mergeChangesInto( $text ) ) {
+			if ( $result = $this->mergeChangesInto( $text ) ) {
 				// Successful merge! Maybe we should tell the user the good news?
 				$this->isConflict = false;
 				wfDebug( __METHOD__ . ": Suppressing edit conflict, successful merge.\n" );
 			} else {
 				$this->section = '';
+				// was merging available?
+				$this->mMergeAvailable = $result !== NULL;
+				$this->textbox2 = $this->textbox1;
 				$this->textbox1 = $text;
 				wfDebug( __METHOD__ . ": Keeping edit conflict, failed merge.\n" );
 			}
@@ -1286,7 +1289,7 @@ HTML
 			// and fallback to the raw wpTextbox1 since editconflicts can't be
 			// resolved between page source edits and custom ui edits using the
 			// custom edit ui.
-			$this->showTextbox1( null, $this->getContent() );
+			$this->showTextbox1( null );
 		} else {
 			$this->showContentForm();
 		}
@@ -1330,7 +1333,7 @@ HTML
 	protected function showHeader() {
 		global $wgOut, $wgUser, $wgTitle, $wgMaxArticleSize, $wgLang;
 		if ( $this->isConflict ) {
-			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", 'explainconflict' );
+			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", $this->mMergeAvailable ? 'explainconflictmerged' : 'explainconflict' );
 			$this->edittime = $this->mArticle->getTimestamp();
 		} else {
 			if ( $this->section != '' && !$this->isSectionEditSupported() ) {
@@ -1621,11 +1624,11 @@ INPUTS
 		$this->showTextbox( isset($textoverride) ? $textoverride : $this->textbox1, 'wpTextbox1', $attribs );
 	}
 
-	protected function showTextbox2() {
+	public function showTextbox2() {
 		$this->showTextbox( $this->textbox2, 'wpTextbox2', array( 'tabindex' => 6 ) );
 	}
 
-	protected function showTextbox( $content, $name, $customAttribs = array() ) {
+	public function showTextbox( $content, $name, $customAttribs = array() ) {
 		global $wgOut, $wgUser;
 
 		$wikitext = $this->safeUnicodeOutput( $content );
@@ -1767,16 +1770,15 @@ INPUTS
 	 */
 	protected function showConflict() {
 		global $wgOut;
-		$this->textbox2 = $this->textbox1;
-		$this->textbox1 = $this->getContent();
 		if ( wfRunHooks( 'EditPageBeforeConflictDiff', array( &$this, &$wgOut ) ) ) {
+			$this->textbox2 = $this->getContent();
 			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "yourdiff" );
 
 			$de = new DifferenceEngine( $this->mTitle );
-			$de->setText( $this->textbox2, $this->textbox1 );
+			$de->setText( $this->textbox1, $this->getContent() );
 			$de->showDiff( wfMsg( "yourtext" ), wfMsg( "storedversion" ) );
 
-			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "yourtext" );
+			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "storedversion" );
 			$this->showTextbox2();
 		}
 	}
