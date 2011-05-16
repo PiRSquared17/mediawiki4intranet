@@ -96,6 +96,19 @@ function wfParseDiff3( $merged )
     {
         if ( trim( $line ) == $m_mine )
         {
+            if ( $postcontext !== NULL )
+            {
+                $conflicts[] = array(
+                    'line'  => $conflictline,
+                    'pre'   => $precontext,
+                    'mine'  => $mine,
+                    'old'   => $old,
+                    'their' => $their,
+                    'post'  => $postcontext,
+                );
+                $postcontext = $mine = $old = $their = NULL;
+                $precontext = array();
+            }
             $conflictline = $lineno;
             $mine = array();
             $to = &$mine;
@@ -140,7 +153,8 @@ function wfParseDiff3( $merged )
                             'their' => $their,
                             'post'  => $postcontext,
                         );
-                        $postcontext = $mine = $old = $their = $precontext = NULL;
+                        $postcontext = $mine = $old = $their = NULL;
+                        $precontext = array();
                     }
                 }
                 else
@@ -166,12 +180,14 @@ function wfParseDiff3( $merged )
 
 function wfFormatDiff3Conflicts( $conflicts )
 {
+    // Table header
     $html =
         '<tr><th colspan="2">'.wfMsg('yourtext').
         '</th><th colspan="2">'.wfMsg('basetext').
         '</th><th colspan="2">'.wfMsg('storedversion').'</th></tr>';
     foreach ( $conflicts as $conflict )
     {
+        // Conflict header
         $html .= '<tr><th colspan="2" style="text-align: left">'.
             wfMsg('lineno', $conflict['line'][0]+1-count($conflict['pre'])).
             '</th><th colspan="2" style="text-align: left">'.
@@ -181,16 +197,17 @@ function wfFormatDiff3Conflicts( $conflicts )
             '</th></tr>';
         $lines = max( count( $conflict['mine'] ), count( $conflict['old'] ), count( $conflict['their'] ) );
         $lines_with_context = count( $conflict['pre'] ) + count( $conflict[ 'post' ] ) + $lines;
+        $tr = array();
+        // Pre-context
         foreach ( $conflict['pre'] as $i => $str )
         {
             $str = htmlspecialchars( $str );
             if ( $str == '' )
                 $str = '&nbsp;';
             $str = "<td>$str</td>";
-            if ( !$i )
-                $str = '<th rowspan="'.$lines_with_context.'" class="diff3_pad"></th>'.$str;
-            $html .= "<tr class='diff3_context'>$str$str$str</tr>";
+            $tr[] = array( ' class="diff3_context"', $str, $str, $str );
         }
+        // Conflicting lines
         for ( $i = 0; $i < $lines; $i++ )
         {
             $mine = htmlspecialchars( $conflict['mine'][$i] );
@@ -198,19 +215,26 @@ function wfFormatDiff3Conflicts( $conflicts )
             $their = htmlspecialchars( $conflict['their'][$i] );
             if ( $mine == '' && $old == '' && $their == '' )
                 $mine = '&nbsp;';
-            $html .=
-                "<tr><td class='diff3_mine'>$mine".
-                "</td><td class='diff3_old'>$old".
-                "</td><td class='diff3_their'>$their".
-                "</td></tr>";
+            $tr[] = array( '',
+                "<td class='diff3_mine'>$mine</td>",
+                "<td class='diff3_old'>$old</td>",
+                "<td class='diff3_their'>$their</td>",
+            );
         }
+        // Post-context
         foreach ( $conflict['post'] as $str )
         {
             $str = htmlspecialchars($str);
             if ( $str == '' )
                 $str = '&nbsp;';
-            $html .= "<tr class='diff3_context'><td>$str</td><td>$str</td><td>$str</td></tr>";
+            $str = "<td>$str</td>";
+            $tr[] = array(' class="diff3_context"', $str, $str, $str);
         }
+        // Add spanned cells for margins into the first row
+        $str = '<th rowspan="'.$lines_with_context.'" class="diff3_pad"></th>';
+        $tr[0] = array( $tr[0][0], $str, $tr[0][1], $str, $tr[0][2], $str, $tr[0][3] );
+        foreach ( $tr as $t )
+            $html .= '<tr'.array_shift($t).'>'.implode('', $t).'</tr>';
     }
     $html = "<table class='diff3_table'>$html</table>";
     return $html;
