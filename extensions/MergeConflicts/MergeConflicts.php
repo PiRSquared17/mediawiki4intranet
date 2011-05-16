@@ -174,7 +174,8 @@ function wfShowMergeConflicts( $editpage, $out )
 </style>');
     $out->addHTML( $html );
 
-    $out->wrapWikiMsg( '<h2>$1</h2>', "yourtext" );
+    $out->wrapWikiMsg( '<h2>$1</h2>', "storedversion" );
+    $editpage->textbox2 = $editpage->getContent();
     $editpage->showTextbox2();
 
     return false;
