@@ -1,17 +1,19 @@
 <?php
 
-if ( !defined( 'MW_PATCH_MERGE_CONFLICTS' ) )
+if ( defined( 'MW_PATCH_MERGE_CONFLICTS' ) )
+{
+    $wgHooks['EditPageBeforeConflictDiff'][] = 'wfShowMergeConflicts';
+    $wgExtensionMessagesFiles['MergeConflicts'] = dirname(__FILE__).'/MergeConflicts.i18n.php';
+    $wgExtensionFunctions[] = 'wfSetupMergeConflicts';
+}
+else
 {
     /* Refuse to work if MW_PATCH_MERGE_CONFLICTS is not defined,
        which means our patch is not applied to this installation */
-    die('MergeConflicts extension patch is not applied to this MediaWiki installation.
+    wfDebug('ATTENTION! MergeConflicts extension patch is not applied to this MediaWiki installation.
 Please apply it before using this extension with the following command:
-patch -d "'.$IP.'" -p0 < "'.dirname(__FILE__).'/MergeConflicts.diff"');
+patch -d "'.$IP.'" -p0 < "'.dirname(__FILE__).'/MergeConflicts.diff"'."\n");
 }
-
-$wgHooks['EditPageBeforeConflictDiff'][] = 'wfShowMergeConflicts';
-$wgExtensionMessagesFiles['MergeConflicts'] = dirname(__FILE__).'/MergeConflicts.i18n.php';
-$wgExtensionFunctions[] = 'wfSetupMergeConflicts';
 
 function wfSetupMergeConflicts()
 {
