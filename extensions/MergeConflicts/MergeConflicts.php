@@ -1,5 +1,67 @@
 <?php
 
+/* MergeConflicts extension
+ * Copyright (c) 2011, Vitaliy Filippov <vitalif[d.o.g]mail.ru>
+ * License: GPLv3.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+# (!) This extension requires a patch into core MediaWiki code (!)
+# Apply it with GNU patch utility, with the following command:
+# patch -p0 -d <your_mediawiki_directory> < MergeConflicts.diff
+
+# When $wgDiff3 is available, this extension enables 3-column display of
+# edit conflicts and also places the merged text with conflicts bracketed
+# in the standard diff3 style (see 'man diff3') into the upper textbox.
+
+# When $wgDiff3 is unavailable, the patch coming with this extension swaps
+# upper and lower textboxes, so your text is not places into the second
+# textbox, but remains in the first one.
+# WARNING: this changes core MediaWiki editing behaviour and, despite of that
+# changed behaviour is usually more convenient, it could be confusing for your users
+# and does not force them to copy their changes from the lower textbox into the
+# upper one, which (as MediaWiki authors probably think) could lead to that they'll
+# always overwrite conflicting changes with their own simply clicking on "Save" and
+# not reading any warnings.
+
+# (!) Расширение для работы требует патча в код MediaWiki (!)
+# Применяйте его утилитой GNU patch и командой:
+# patch -p0 -d <ДИРЕКТОРИЯ_С_MEDIAWIKI> < MergeConflicts.diff
+
+# Когда $wgDiff3 установлен, это расширение включает показ конфликтов
+# редактирования в 3 колонки и помещает объединённый текст со стандартным
+# выделением конфликтов в верхнее поле редактирования.
+
+# Когда $wgDiff3 недоступен, патч, идущий в комплекте с этим расширением,
+# меняет верхнее и нижнее поля местами, так что ваш текст остаётся в верхнем поле,
+# а не перемещается в нижнее, как это происходит в обычной MediaWiki.
+# ВНИМАНИЕ: это меняет базовое поведение MediaWiki при конфликтах редактирования,
+# и хотя изменённое поведение обычно более удобно, оно может быть непривычно для ваших
+# пользователей и не заставляет их копировать их изменения из нижнего поля в верхнее,
+# а это (как, по-видимому, думают авторы MediaWiki) может привести к тому, что они
+# просто будут перезаписывать чужие правки своими, тупо нажимая "Сохранить" и не читая
+# предупреждения.
+
+$wgExtensionCredits['other'][] = array(
+    'name'           => 'MergeConflicts',
+    'version'        => '2011-05-16',
+    'author'         => 'Vitaliy Filippov',
+    'url'            => 'http://wiki.4intra.net/MergeConflicts',
+    'description'    => 'Allows 3-column edit conflict display and swaps editboxes on conflict',
+);
+
 if ( defined( 'MW_PATCH_MERGE_CONFLICTS' ) )
 {
     $wgHooks['EditPageBeforeConflictDiff'][] = 'wfShowMergeConflicts';
