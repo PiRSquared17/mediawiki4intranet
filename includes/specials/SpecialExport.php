@@ -360,7 +360,7 @@ class SpecialExport extends SpecialPage {
 				$categories = $categories->getDBkey();
 			$cats = array();
 			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c )
-				$cats[$c] = true;
+				$cats[ $c ] = true;
 			// Get subcategories
 			while ( $categories && $closure )
 			{
@@ -372,8 +372,8 @@ class SpecialExport extends SpecialPage {
 				{
 					if ( !$cats[ $row->page_title ] )
 					{
-						$categories[] = $row->getDBkey();
-						$cats[ $row->getArticleId() ] = $row;
+						$categories[] = $row->page_title;
+						$cats[ $row->page_title ] = $row;
 					}
 				}
 			}
