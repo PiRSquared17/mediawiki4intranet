@@ -230,14 +230,33 @@ class SpecialExport extends SpecialPage {
 				$pageSet[ $title->getPrefixedText() ] = $title;
 			}
 		}
-		// Add pages from requested category
+
+		// Validate parameter values
 		$catname = $state['catname'];
-		$modifydate = $state['modifydate'];
+		$notcategory = $state['notcategory'];
 		$namespace = $state['namespace'];
-		$catpages = self::getPagesFromCategory( $catname, $modifydate, $namespace, $state['closure'] );
-		if ( $catpages )
+		$modifydate = $state['modifydate'];
+		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
+			$modifydate = NULL;
+		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
+			$catname->getNamespace() != NS_CATEGORY )
+			$catname = NULL;
+		if ( !strlen( $notcategory ) || !( $notcategory = Title::newFromText( $notcategory, NS_CATEGORY ) ) ||
+			$notcategory->getNamespace() != NS_CATEGORY )
+			$notcategory = NULL;
+		if ( !strlen( $namespace ) || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
+			$namespace = NULL;
+		else
+			$namespace = $namespace->getNamespace();
+
+		// Add pages from requested category and/or namespace
+		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL )
+		{
+			$catpages = self::getPagesFromCategory( $catname, $state['closure'], $namespace, $modifydate );
 			foreach ( $catpages as $title )
 				$pageSet[ $title->getPrefixedText() ] = $title;
+		}
+
 		// Look up any linked pages if asked...
 		$t = $state[ 'templates' ] ? 1 : 0;
 		$p = $state[ 'pagelinks' ] ? 1 : 0;
@@ -252,21 +271,41 @@ class SpecialExport extends SpecialPage {
 			if( $i ) $added += self::getImages( $pageSet );
 			$step++;
 		} while( $t+$p+$i > 1 && $added > 0 && ( !$this->linkDepth || $step < $this->linkDepth ) );
+
 		// Filter user-readable pages (also MW Bug 8824)
 		foreach ( $pageSet as $key => $title )
 			if ( !$title->userCanRead() )
 				unset( $pageSet[ $key ] );
+
+		// Filter pages by $modifydate
+		if ( $modifydate !== NULL && $pageSet )
+		{
+			$ids = array();
+			foreach ( $pageSet as $key => $title )
+				$ids[ $title->getArticleId() ] = $title;
+			$dbr = wfGetDB( DB_SLAVE );
+			$res = $dbr->select( 'page', 'page_id',
+				array( 'page_id' => $ids, 'page_touched > '.$dbr->timestamp( $modifydate ) ),
+				__METHOD__ );
+			foreach ( $res as $row )
+				unset( $ids[ $row->page_id ] );
+			foreach ( $ids as $title )
+				unset( $pageSet[ $title->getPrefixedText() ] );
+		}
+
 		// Filter pages from requested NOT-category
-		$notcategory = $state['notcategory'];
-		$nc = NULL;
-		$notlist = self::getPagesFromCategory( $notcategory, $nc, $nc, $nc );
-		if ( $notlist )
+		if ( $notcategory !== NULL )
+		{
+			$notlist = self::getPagesFromCategory( $notcategory );
 			foreach ( $notlist as $title )
 				unset( $pageSet[ $title->getPrefixedText() ] );
+		}
+
 		// Save resulting page list
 		$pages = array_keys( $pageSet );
 		sort( $pages );
 		$state['pages'] = implode( "\n", $pages );
+
 		// Save errors
 		$state['errors'] = array();
 		if ( !$catname && strlen( $state['catname'] ) )
@@ -310,67 +349,57 @@ class SpecialExport extends SpecialPage {
 		return $form;
 	}
 
-	// Get pages that meet following conditions:
-	// - from category $catname, and from its subcategories if $closure is true
-	// - modified after $modifydate
-	// - from namespace $namespace
-	// Conditions are optional, but an empty list is returned if no rule is specified
-	// You can still request full page list explicitly with $modifydate = '1970-01-01 00:00:00'
-	static function getPagesFromCategory( &$catname, &$modifydate, &$namespace, $closure )
+	// Get pages from ((category possibly with subcategories) and/or namespace), or (modified after $modifydate)
+	static function getPagesFromCategory( $categories, $closure = false, $namespace = NULL, $modifydate = NULL )
 	{
-		if ( !strlen($catname) || !( $catname = Title::makeTitleSafe( NS_CATEGORY, $catname ) ) )
-			$catname = NULL;
-		else
-			$catname = $catname->getDbKey();
-		if (!strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
-			$modifydate = NULL;
-		if (!strlen( $namespace ) || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
-			$namespace = NULL;
-		else
-			$namespace = $namespace->getNamespace();
-		// Prevent full listings (you can still request it with modifydate=1970-01-01 00:00:00)
-		if ( $catname === NULL && $modifydate === NULL && $namespace === NULL )
-			return array();
-		$pages = array();
-		self::rgetPagesFromCategory( $catname, $modifydate, $namespace, $closure, $pages );
-		return array_values( $pages );
-	}
-
-	// Recursive function which gets pages from category and/or namespace
-	// and/or modified after the specified date
-	static function rgetPagesFromCategory( $catname, $modifydate, $namespace, $closure, &$pages )
-	{
-		global $wgContLang;
 		$dbr = wfGetDB( DB_SLAVE );
-		$from = array( 'page' );
-		$where = array();
-		
-		if ( !is_null( $catname ) )
+
+		if ( $categories )
 		{
-			$from[] = 'categorylinks';
-			$where[] = 'cl_from=page_id';
-			$where['cl_to'] = $catname;
-		}
-		
-		if ( !is_null( $modifydate ) )
-			$where[] = "page_touched>$modifydate";
-		
-		if ( !is_null( $namespace ) )
-			$where['page_namespace'] = $namespace;
-		
-		$res = $dbr->select( $from, array( 'page_namespace', 'page_title' ), $where, __METHOD__ );
-		while ( $row = $dbr->fetchRow( $res ) )
-		{
-			$row = Title::makeTitleSafe( $row['page_namespace'], $row['page_title'] );
-			if ( $row && !$pages[ $row->getArticleId() ] )
+			if ( is_object( $categories ) )
+				$categories = $categories->getDBkey();
+			$cats = array();
+			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c )
+				$cats[$c] = true;
+			// Get subcategories
+			while ( $categories && $closure )
 			{
-				$pages[ $row->getArticleId() ] = $row;
-				if ( $closure && $row->getNamespace() == NS_CATEGORY )
-					self::rgetPagesFromCategory( $row->getDbKey(), $modifydate, $namespace, $closure, $pages );
+				$res = $dbr->select( array( 'page', 'categorylinks' ), 'page_title',
+					array( 'cl_from=page_id', 'cl_to' => $categories, 'page_namespace' => NS_CATEGORY ),
+					__METHOD__ );
+				$categories = array();
+				foreach ( $res as $row )
+				{
+					if ( !$cats[ $row->page_title ] )
+					{
+						$categories[] = $row->getDBkey();
+						$cats[ $row->getArticleId() ] = $row;
+					}
+				}
 			}
+			$categories = array_keys( $cats );
 		}
-		
-		return $pages;
+
+		// Get pages
+		$tables = array( 'page' );
+		$fields = 'page.*';
+		$where = array();
+		if ( $categories )
+		{
+			$tables[] = 'categorylinks';
+			$where[] = 'cl_from=page_id';
+			$where['cl_to'] = $categories;
+		}
+		if ( $namespace !== NULL )
+			$where['page_namespace'] = $namespace;
+		elseif ( $categories === NULL && $modifydate !== NULL )
+			$where[] = 'page_touched >= '.$dbr->timestamp( $modifydate );
+		$res = $dbr->select( $tables, $fields, $where, __METHOD__ );
+		$pages = array();
+		foreach ( $res as $row )
+			$pages[] = Title::newFromRow( $row );
+
+		return array_values( $pages );
 	}
 
 	/**
