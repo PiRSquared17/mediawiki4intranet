@@ -2,6 +2,7 @@
 # Copyright (C) 2003-2008 Brion Vibber <brion@pobox.com>
 #           (C) 2010-2011 Vitaliy Filippov <vitalif@mail.ru>
 # http://www.mediawiki.org/
+# http://wiki.4intra.net/MW_Import_Export
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -17,6 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
 # http://www.gnu.org/copyleft/gpl.html
+
 /**
  * @file
  * @ingroup SpecialPage
@@ -127,8 +129,8 @@ class SpecialExport extends SpecialPage {
 		
 		$form = Xml::openElement( 'form', array( 'method' => 'post',
 			'action' => $this->getTitle()->getLocalUrl( 'action=submit' ) ) );
-		foreach ($state['errors'] as $e)
-			$form .= wfMsgExt($e[0], array('parse'), $e[1]);
+		foreach ( $state['errors'] as $e )
+			$form .= wfMsgExt( $e[0], array('parse'), $e[1] );
 		
 		$form .= self::addPagesForm($state);
 		
@@ -140,10 +142,7 @@ class SpecialExport extends SpecialPage {
 		} else {
 			$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
 		}
-		$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', $wgRequest->getCheck('templates') ? true : false ) . '<br />';
-		$form .= Xml::checkLabel( wfMsg( 'export-pagelinks' ), 'pagelinks', 'wpExportPagelinks', $wgRequest->getCheck('pagelinks') ? true : false ) . '<br />';
-		// Enable this when we can do something useful exporting/importing image information. :)
-		$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
+		$form .= Xml::checkLabel( wfMsg( 'export-include-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
 		if( $wgExportMaxLinkDepth || $this->userCanOverrideExportDepth() ) {
@@ -170,39 +169,20 @@ class SpecialExport extends SpecialPage {
 		global $wgExportMaxHistory;
 		global $wgRequest;
 		
-		$inputPages = array(); // Set of original pages to pass on to further manipulation...
-		$pageSet = array(); // Inverted index of all pages to look up
-		
 		// Split up and normalize input
-		foreach( explode( "\n", $page ) as $pageName ) {
+		$pages = array();
+		foreach( explode( "\n", $page ) as $pageName )
+		{
 			$pageName = trim( $pageName );
 			$title = Title::newFromText( $pageName );
-			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
+			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' &&
+			    $title->userCanRead() )
+			{
 				// Only record each page once!
-				$inputPages[] = $title;
-				$pageSet[$title->getPrefixedText()] = true;
+				$pages[ $title->getPrefixedText() ] = $title;
 			}
 		}
-		
-		// Look up any linked pages if asked...
-		$t = $wgRequest->getCheck( 'templates' ) ? 1 : 0;
-		$p = $wgRequest->getCheck( 'pagelinks' ) ? 1 : 0;
-		$i = $wgRequest->getCheck( 'images' ) ? 1 : 0;
-		$step = 0;
-		do
-		{
-			$added = 0;
-			if( $t ) $added += self::getTemplates( $inputPages, $pageSet );
-			if( $p ) $added += self::getPagelinks( $inputPages, $pageSet );
-			if( $i ) $added += self::getImages( $inputPages, $pageSet );
-			$step++;
-		} while( $t+$p+$i > 1 && $added > 0 && ( !$this->linkDepth || $step < $this->linkDepth ) );
-		
-		$pages = array();
-		/* Bug 8824: Only export pages the user can read */
-		foreach ( $inputPages as $title )
-			if ( $title->userCanRead() )
-				$pages[] = $title;
+		$pages = array_values( $pages );
 		
 		/* Ok, let's get to it... */
 		if( $history == WikiExporter::CURRENT ) {
@@ -235,89 +215,154 @@ class SpecialExport extends SpecialPage {
 		}
 	}
 
-	static function addPagesExec(&$state)
+	// Execute page selection form, save page list to $state['pages'] and errors to $state['errors']
+	static function addPagesExec( &$state )
 	{
+		// Split up and normalize input
+		$pageSet = array();
+		foreach( explode( "\n", $state['pages'] ) as $pageName )
+		{
+			$pageName = trim( $pageName );
+			$title = Title::newFromText( $pageName );
+			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' )
+			{
+				// Only record each page once!
+				$pageSet[ $title->getPrefixedText() ] = $title;
+			}
+		}
+		// Add pages from requested category
 		$catname = $state['catname'];
 		$modifydate = $state['modifydate'];
 		$namespace = $state['namespace'];
-		$closure = $state['closure'];
-		$catpages = self::getPagesFromCategory($catname, $modifydate, $namespace, $closure);
-		if ($catpages)
+		$catpages = self::getPagesFromCategory( $catname, $modifydate, $namespace, $state['closure'] );
+		if ( $catpages )
+			foreach ( $catpages as $title )
+				$pageSet[ $title->getPrefixedText() ] = $title;
+		// Look up any linked pages if asked...
+		$t = $state[ 'templates' ] ? 1 : 0;
+		$p = $state[ 'pagelinks' ] ? 1 : 0;
+		$i = $state[ 'images' ] ? 1 : 0;
+		$step = 0;
+		do
 		{
-			foreach ($catpages as $title)
-			{
-/*op-patch|TS|2010-04-26|HaloACL|SafeTitle|start*/
-				if (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx())
-/*op-patch|TS|2010-04-26|end*/
-					$state['pages'] .= "\n" . $title->getPrefixedText();
-			}
-		}
+			// Loop as there may be more than one closure type
+			$added = 0;
+			if( $t ) $added += self::getTemplates( $pageSet );
+			if( $p ) $added += self::getPagelinks( $pageSet );
+			if( $i ) $added += self::getImages( $pageSet );
+			$step++;
+		} while( $t+$p+$i > 1 && $added > 0 && ( !$this->linkDepth || $step < $this->linkDepth ) );
+		// Filter user-readable pages (also MW Bug 8824)
+		foreach ( $pageSet as $key => $title )
+			if ( !$title->userCanRead() )
+				unset( $pageSet[ $key ] );
+		// Filter pages from requested NOT-category
+		$notcategory = $state['notcategory'];
+		$nc = NULL;
+		$notlist = self::getPagesFromCategory( $notcategory, $nc, $nc, $nc );
+		if ( $notlist )
+			foreach ( $notlist as $title )
+				unset( $pageSet[ $title->getPrefixedText() ] );
+		// Save resulting page list
+		$pages = array_keys( $pageSet );
+		sort( $pages );
+		$state['pages'] = implode( "\n", $pages );
+		// Save errors
 		$state['errors'] = array();
-		if (!$catname && strlen($state['catname']))
-			$state['errors'][] = array('export-invalid-catname', $state['catname']);
-		if ($modifydate)
+		if ( !$catname && strlen( $state['catname'] ) )
+			$state['errors'][] = array( 'export-invalid-catname', $state['catname'] );
+		if ( !$notcategory && strlen( $state['notcategory'] ) )
+			$state['errors'][] = array( 'export-invalid-notcategory', $state['notcategory'] );
+		if ( $modifydate )
 			$state['modifydate'] = wfTimestamp(TS_DB, $modifydate);
-		else if ($state['modifydate'])
-			$state['errors'][] = array('export-invalid-modifydate', $state['modifydate']);
-		if (!$namespace && strlen($state['namespace']))
-			$state['errors'][] = array('export-invalid-namespace', $state['namespace']);
+		elseif ( $state['modifydate'] )
+			$state['errors'][] = array( 'export-invalid-modifydate', $state['modifydate'] );
+		if ( !$namespace && strlen( $state['namespace'] ) )
+			$state['errors'][] = array( 'export-invalid-namespace', $state['namespace'] );
 	}
 
-	static function addPagesForm($state)
+	// Display page selection form, enclosed into a <fieldset>
+	static function addPagesForm( $state )
 	{
 		$form .= '<fieldset class="addpages">';
-		$form .= '<legend>' . wfMsgExt('export-addpages', 'parse') . '</legend>';
-		$form .= '<div class="ap_catname">' . Xml::inputLabel(wfMsg('export-catname'), 'catname', 'catname', 40, $state['catname']) .
-		         '<br />' . Xml::checkLabel(wfMsg('export-closure'), 'closure', 'wpExportClosure', $state['closure'] ? true : false) . '</div>';
-		$form .= '<div class="ap_namespace">' . Xml::inputLabel(wfMsg('export-namespace'), 'namespace', 'namespace', 20, $state['namespace']) . '</div>';
-		$form .= '<div class="ap_modifydate">' . Xml::inputLabel(wfMsg('export-modifydate'), 'modifydate', 'modifydate', 20, $state['modifydate']) . '</div>';
-		$form .= '<div class="ap_submit">' . Xml::submitButton(wfMsg('export-addcat'), array('name' => 'addcat')) . '</div>';
+		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
+		$textboxes = array(
+			'catname'     => 20,
+			'namespace'   => 20,
+			'modifydate'  => 18,
+			'notcategory' => 20,
+		);
+		// Textboxes:
+		foreach ( $textboxes as $k => $size )
+			$form .= '<div class="ap_'.$k.'">' .
+				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, $state[ $k ] ) . '</div>';
+		// Checkboxes:
+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks' ) as $k )
+		{
+			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
+				wfMsg( "export-$k" ), $k, "ap-$k", $state[ $k ] && true,
+				array( 'style' => 'vertical-align: middle' )
+			) . '</div>';
+		}
+		// Submit button:
+		$form .= '<div class="ap_submit">' . Xml::submitButton( wfMsg( 'export-addcat' ), array( 'name' => 'addcat' ) ) . '</div>';
 		$form .= '</fieldset>';
 		return $form;
 	}
 
-	static function getPagesFromCategory(&$catname, &$modifydate, &$namespace, $closure)
+	// Get pages that meet following conditions:
+	// - from category $catname, and from its subcategories if $closure is true
+	// - modified after $modifydate
+	// - from namespace $namespace
+	// Conditions are optional, but an empty list is returned if no rule is specified
+	// You can still request full page list explicitly with $modifydate = '1970-01-01 00:00:00'
+	static function getPagesFromCategory( &$catname, &$modifydate, &$namespace, $closure )
 	{
-		if (!strlen($catname) || !($catname = Title::makeTitleSafe(NS_CATEGORY, $catname)))
+		if ( !strlen($catname) || !( $catname = Title::makeTitleSafe( NS_CATEGORY, $catname ) ) )
 			$catname = NULL;
 		else
 			$catname = $catname->getDbKey();
-		if (!strlen($modifydate) || !($modifydate = wfTimestampOrNull(TS_MW, $modifydate)))
+		if (!strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
 			$modifydate = NULL;
-		if (!strlen($namespace) || !($namespace = Title::newFromText("$namespace:A", NS_MAIN)))
+		if (!strlen( $namespace ) || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
 			$namespace = NULL;
 		else
 			$namespace = $namespace->getNamespace();
+		// Prevent full listings (you can still request it with modifydate=1970-01-01 00:00:00)
+		if ( $catname === NULL && $modifydate === NULL && $namespace === NULL )
+			return array();
 		$pages = array();
-		self::rgetPagesFromCategory($catname, $modifydate, $namespace, $closure, $pages);
-		return array_values($pages);
+		self::rgetPagesFromCategory( $catname, $modifydate, $namespace, $closure, $pages );
+		return array_values( $pages );
 	}
 
-	static function rgetPagesFromCategory($catname, $modifydate, $namespace, $closure, &$pages)
+	// Recursive function which gets pages from category and/or namespace
+	// and/or modified after the specified date
+	static function rgetPagesFromCategory( $catname, $modifydate, $namespace, $closure, &$pages )
 	{
 		global $wgContLang;
-		$dbr = wfGetDB(DB_SLAVE);
-		$from = array('page');
+		$dbr = wfGetDB( DB_SLAVE );
+		$from = array( 'page' );
 		$where = array();
 		
-		if (!is_null($catname))
+		if ( !is_null( $catname ) )
 		{
 			$from[] = 'categorylinks';
 			$where[] = 'cl_from=page_id';
 			$where['cl_to'] = $catname;
 		}
 		
-		if (!is_null($modifydate))
+		if ( !is_null( $modifydate ) )
 			$where[] = "page_touched>$modifydate";
 		
-		if (!is_null($namespace))
+		if ( !is_null( $namespace ) )
 			$where['page_namespace'] = $namespace;
 		
 		$res = $dbr->select( $from, array( 'page_namespace', 'page_title' ), $where, __METHOD__ );
 		while ( $row = $dbr->fetchRow( $res ) )
 		{
 			$row = Title::makeTitleSafe( $row['page_namespace'], $row['page_title'] );
-			if ($row && !$pages[ $row->getArticleId() ] )
+			if ( $row && !$pages[ $row->getArticleId() ] )
 			{
 				$pages[ $row->getArticleId() ] = $row;
 				if ( $closure && $row->getNamespace() == NS_CATEGORY )
@@ -326,21 +371,6 @@ class SpecialExport extends SpecialPage {
 		}
 		
 		return $pages;
-	}
-
-	/**
-	 * Expand a list of pages to include templates used in those pages.
-	 * @param $inputPages array, list of titles to look up
-	 * @param $pageSet array, associative array indexed by titles for output
-	 * @return array associative array index by titles
-	 */
-	private function getTemplates( &$inputPages, &$pageSet ) {
-		return $this->getLinks(
-			$inputPages,
-			$pageSet,
-			'templatelinks',
-			array( 'tl_namespace AS namespace', 'tl_title AS title' ),
-			array( 'page_id=tl_from' ) );
 	}
 
 	/**
@@ -359,10 +389,25 @@ class SpecialExport extends SpecialPage {
 		return $depth;
 	}
 
+	/**
+	 * Expand a list of pages to include templates used in those pages.
+	 * @param $inputPages array, list of titles to look up
+	 * @param $pageSet array, associative array indexed by titles for output
+	 * @return array associative array index by titles
+	 */
+	private static function getTemplates( &$pageSet )
+	{
+		return self::getLinks(
+			$pageSet,
+			'templatelinks',
+			array( 'tl_namespace AS namespace', 'tl_title AS title' ),
+			array( 'page_id=tl_from' ) );
+	}
+
 	/** Expand a list of pages to include pages linked to from that page. */
-	private function getPageLinks( &$inputPages, &$pageSet ) {
-		return $this->getLinks(
-			$inputPages,
+	private static function getPageLinks( &$pageSet )
+	{
+		return self::getLinks(
 			$pageSet,
 			'pagelinks',
 			array( 'pl_namespace AS namespace', 'pl_title AS title' ),
@@ -376,9 +421,9 @@ class SpecialExport extends SpecialPage {
 	 * @param $pageSet array, associative array indexed by titles for output
 	 * @return array associative array index by titles
 	 */
-	private function getImages( &$inputPages, &$pageSet ) {
-		return $this->getLinks(
-			$inputPages,
+	private static function getImages( &$pageSet )
+	{
+		return self::getLinks(
 			$pageSet,
 			'imagelinks',
 			array( NS_FILE . ' AS namespace', 'il_to AS title' ),
@@ -389,11 +434,12 @@ class SpecialExport extends SpecialPage {
 	 * Expand a list of pages to include items used in those pages.
 	 * @private
 	 */
-	private function getLinks( &$inputPages, &$pageSet, $table, $fields, $join ) {
+	private static function getLinks( &$pageSet, $table, $fields, $join )
+	{
 		$dbr = wfGetDB( DB_SLAVE );
 		$byns = array();
-		foreach( $inputPages as $title )
-			$byns[$title->getNamespace()][] = $title->getDBkey();
+		foreach( $pageSet as $title )
+			$byns[ $title->getNamespace() ][] = $title->getDBkey();
 		$added = 0;
 		foreach( $byns as $ns => $titles )
 		{
@@ -409,8 +455,7 @@ class SpecialExport extends SpecialPage {
 				$add = Title::makeTitle( $row->namespace, $row->title );
 				if( $add && !$pageSet[ $add->getPrefixedText() ] )
 				{
-					$pageSet[ $add->getPrefixedText() ] = true;
-					$inputPages[] = $add;
+					$pageSet[ $add->getPrefixedText() ] = $add;
 					$added++;
 				}
 			}
