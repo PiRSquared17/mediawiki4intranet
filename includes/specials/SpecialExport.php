@@ -461,6 +461,8 @@ class SpecialExport extends SpecialPage {
 	 */
 	private static function getLinks( &$pageSet, $table, $id_field, $join )
 	{
+		if ( !$pageSet )
+			return 0;
 		$dbr = wfGetDB( DB_SLAVE );
 		$ids = array();
 		foreach( $pageSet as $title )
