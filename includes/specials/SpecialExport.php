@@ -26,7 +26,7 @@
 
 class SpecialExport extends SpecialPage {
 
-	private $curonly, $doExport, $linkDepth, $templates;
+	private $curonly, $doExport, $templates;
 	private $images;
 
 	public function __construct() {
@@ -46,8 +46,6 @@ class SpecialExport extends SpecialPage {
 		$this->doExport = false;
 		$this->templates = $wgRequest->getCheck( 'templates' );
 		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
-		$this->linkDepth = $this->validateLinkDepth(
-			$wgRequest->getIntOrNull( 'link-depth' ) );
 		$nsindex = '';
 		
 		$state = $wgRequest->getValues();
@@ -145,7 +143,7 @@ class SpecialExport extends SpecialPage {
 		$form .= Xml::checkLabel( wfMsg( 'export-include-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
-		if( $wgExportMaxLinkDepth || $this->userCanOverrideExportDepth() ) {
+		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
 			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
 		}
 		
@@ -154,7 +152,7 @@ class SpecialExport extends SpecialPage {
 		$wgOut->addHTML( $form );
 	}
 
-	private function userCanOverrideExportDepth() {
+	public static function userCanOverrideExportDepth() {
 		global $wgUser;
 		
 		return $wgUser->isAllowed( 'override-export-depth' );
@@ -258,6 +256,7 @@ class SpecialExport extends SpecialPage {
 		}
 
 		// Look up any linked pages if asked...
+		$linkDepth = self::validateLinkDepth( $state['link-depth'] );
 		$t = $state[ 'templates' ] ? 1 : 0;
 		$p = $state[ 'pagelinks' ] ? 1 : 0;
 		$i = $state[ 'images' ] ? 1 : 0;
@@ -270,7 +269,7 @@ class SpecialExport extends SpecialPage {
 			if( $p ) $added += self::getPagelinks( $pageSet );
 			if( $i ) $added += self::getImages( $pageSet );
 			$step++;
-		} while( $t+$p+$i > 1 && $added > 0 && ( !$this->linkDepth || $step < $this->linkDepth ) );
+		} while( $t+$p+$i > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
 
 		// Filter user-readable pages (also MW Bug 8824)
 		foreach ( $pageSet as $key => $title )
@@ -284,9 +283,12 @@ class SpecialExport extends SpecialPage {
 			foreach ( $pageSet as $key => $title )
 				$ids[ $title->getArticleId() ] = $title;
 			$dbr = wfGetDB( DB_SLAVE );
-			$res = $dbr->select( 'page', 'page_id',
-				array( 'page_id' => $ids, 'page_touched > '.$dbr->timestamp( $modifydate ) ),
-				__METHOD__ );
+			$res = $dbr->select( array( 'page', 'revision' ), 'page_id',
+				array(
+					'page_latest=rev_id',
+					'page_id' => array_keys( $ids ),
+					'rev_timestamp > '.$dbr->timestamp( $modifydate )
+				), __METHOD__ );
 			foreach ( $res as $row )
 				unset( $ids[ $row->page_id ] );
 			foreach ( $ids as $title )
@@ -360,7 +362,7 @@ class SpecialExport extends SpecialPage {
 				$categories = $categories->getDBkey();
 			$cats = array();
 			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c )
-				$cats[$c] = true;
+				$cats[ $c ] = true;
 			// Get subcategories
 			while ( $categories && $closure )
 			{
@@ -372,8 +374,8 @@ class SpecialExport extends SpecialPage {
 				{
 					if ( !$cats[ $row->page_title ] )
 					{
-						$categories[] = $row->getDBkey();
-						$cats[ $row->getArticleId() ] = $row;
+						$categories[] = $row->page_title;
+						$cats[ $row->page_title ] = $row;
 					}
 				}
 			}
@@ -405,16 +407,14 @@ class SpecialExport extends SpecialPage {
 	/**
 	 * Validate link depth setting, if available.
 	 */
-	private function validateLinkDepth( $depth ) {
+	public static function validateLinkDepth( $depth )
+	{
 		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
-		if( $depth <= 0 ) {
+		if( $depth <= 0 )
 			return 0;
-		}
-		if ( !$this->userCanOverrideExportDepth() ) {
-			if( $depth > $wgExportMaxLinkDepth ) {
-				return $wgExportMaxLinkDepth;
-			}
-		}
+		if ( !self::userCanOverrideExportDepth() &&
+			$depth > $wgExportMaxLinkDepth )
+			return $wgExportMaxLinkDepth;
 		return $depth;
 	}
 
@@ -424,23 +424,20 @@ class SpecialExport extends SpecialPage {
 	 * @param $pageSet array, associative array indexed by titles for output
 	 * @return array associative array index by titles
 	 */
-	private static function getTemplates( &$pageSet )
+	public static function getTemplates( &$pageSet )
 	{
 		return self::getLinks(
-			$pageSet,
-			'templatelinks',
-			array( 'tl_namespace AS namespace', 'tl_title AS title' ),
-			array( 'page_id=tl_from' ) );
+			$pageSet, 'templatelinks', 'tl_from',
+			array( 'page_namespace=tl_namespace', 'page_title=tl_title' )
+		);
 	}
 
 	/** Expand a list of pages to include pages linked to from that page. */
-	private static function getPageLinks( &$pageSet )
+	public static function getPageLinks( &$pageSet )
 	{
 		return self::getLinks(
-			$pageSet,
-			'pagelinks',
-			array( 'pl_namespace AS namespace', 'pl_title AS title' ),
-			array( 'page_id=pl_from' )
+			$pageSet, 'pagelinks', 'pl_from',
+			array( 'page_namespace=pl_namespace', 'page_title=pl_title' )
 		);
 	}
 
@@ -450,43 +447,37 @@ class SpecialExport extends SpecialPage {
 	 * @param $pageSet array, associative array indexed by titles for output
 	 * @return array associative array index by titles
 	 */
-	private static function getImages( &$pageSet )
+	public static function getImages( &$pageSet )
 	{
 		return self::getLinks(
-			$pageSet,
-			'imagelinks',
-			array( NS_FILE . ' AS namespace', 'il_to AS title' ),
-			array( 'page_id=il_from' ) );
+			$pageSet, 'imagelinks', 'il_from',
+			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
+		);
 	}
 
 	/**
 	 * Expand a list of pages to include items used in those pages.
 	 * @private
 	 */
-	private static function getLinks( &$pageSet, $table, $fields, $join )
+	private static function getLinks( &$pageSet, $table, $id_field, $join )
 	{
 		$dbr = wfGetDB( DB_SLAVE );
-		$byns = array();
+		$ids = array();
 		foreach( $pageSet as $title )
-			$byns[ $title->getNamespace() ][] = $title->getDBkey();
+			$ids[ $title->getArticleId() ] = true;
 		$added = 0;
-		foreach( $byns as $ns => $titles )
+		$result = $dbr->select(
+			array( 'page', $table ), 'page.*',
+			$join + array( $id_field => $ids ),
+			__METHOD__,
+			array( 'GROUP BY' => 'page_id' )
+		);
+		foreach( $result as $row )
 		{
-			$result = $dbr->select(
-				array( 'page', $table ),
-				$fields,
-				array_merge( $join, array(
-					'page_namespace' => $ns,
-					'page_title' => $titles ) ),
-				__METHOD__ );
-			foreach( $result as $row )
+			if( !$ids[ $row->page_id ] )
 			{
-				$add = Title::makeTitle( $row->namespace, $row->title );
-				if( $add && !$pageSet[ $add->getPrefixedText() ] )
-				{
-					$pageSet[ $add->getPrefixedText() ] = $add;
-					$added++;
-				}
+				$pageSet[ $add->getPrefixedText() ] = Title::newFromRow( $row );
+				$added++;
 			}
 		}
 		return $added;
