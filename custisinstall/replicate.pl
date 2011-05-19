@@ -80,7 +80,7 @@ if ($ARGV[0] eq '-t')
 {
     shift @ARGV;
     $since_time = int(time - 3600*shift @ARGV);
-    $since_time = sprintf("%Y-%m-%d %H:%M:%S", localtime($since_time));
+    $since_time = strftime("%Y-%m-%d %H:%M:%S", localtime($since_time));
 }
 
 $| = 1;
@@ -143,11 +143,11 @@ sub page_list
             modifydate  => ($modifydate ||= ''),
         ],
     );
+    my $desc = "Category:$cat";
+    $desc .= " MINUS category:$notcat" if $notcat ne '';
+    $desc .= ", modified after $modifydate" if $modifydate ne '';
     unless ($response->is_success)
     {
-        my $desc = "Category:$cat";
-        $desc .= " MINUS category:$notcat" if $notcat ne '';
-        $desc .= ", modified after $modifydate" if $modifydate ne '';
         die logp()." Could not retrieve page list from $desc ".
             "($src->{url}/index.php?title=Special:Export&action=submit): ".
             $response->status_line;
@@ -157,6 +157,10 @@ sub page_list
     $text =~ s/^\s*//so;
     $text =~ s/\s*$//so;
     decode_entities($text);
+    if (!$text)
+    {
+        print logp()." No pages need replication in $desc\n";
+    }
     return $text;
 }
 
@@ -170,6 +174,11 @@ sub replicate
     login_into($ua, $src, 'source wiki');
     # Read page list for replication
     my $text = page_list($ua, $src, $src->{category}, $src->{notcategory}, $since_time);
+    if (!$text)
+    {
+        # No pages
+        return 1;
+    }
     my $ts = clock_gettime(CLOCK_REALTIME);
     # Read export XML / multipart file
     my $fh = File::Temp->new;
@@ -195,7 +204,7 @@ sub replicate
         $fn = $fh->filename;
     }
     my $tx = clock_gettime(CLOCK_REALTIME);
-    print sprintf(logp()." Retrieved %d bytes in %.2f seconds\n", -s $fn, $tx-$ts);
+    print logp().sprintf(" Retrieved %d bytes in %.2f seconds\n", -s $fn, $tx-$ts);
     # Login into destination wiki
     login_into($ua, $dest, 'destination wiki');
     # Retrieve token for importing
