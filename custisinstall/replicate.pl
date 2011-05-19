@@ -1,7 +1,17 @@
 #!/usr/bin/perl
 # TODO (Bug 71834) rewrite into PHP and possibly use API for import
-# A script for Wiki page replication
-# Replicates pages with used images and templates, using MW4Intranet patch:
+
+# A script for MediaWiki4Intranet page replication, automatically
+# replicating used images and templates, and supporting incremental
+# replication.
+# Скрипт для репликации вики-страниц между разными MediaWiki,
+# поддерживает автоматическую репликацию использованных изображений
+# и шаблонов, и инкрементальную репликацию.
+
+# REQUIRES modified MediaWiki import/export mechanism, see MediaWiki4Intranet patch:
+# http://wiki.4intra.net/MW_Import_Export
+
+# ТРЕБУЕТ модифицированного механизма импорта/экспорта MediaWiki, см. патч MediaWiki4Intranet:
 # http://wiki.4intra.net/MW_Import_Export
 
 use strict;
@@ -32,9 +42,16 @@ use HTML::Entities;
 my $BUFSIZE = 0x10000;
 
 my $config = read_config(shift @ARGV) || die <<EOF;
-MediaWiki replication script by Vitaliy Filippov <vitalif\@mail.ru>
+MediaWiki4Intranet replication script
+Copyright (c) 2010+ Vitaliy Filippov <vitalif\@mail.ru>
 
-USAGE: $0 <replication-config.ini> [targets...]
+USAGE: $0 <replication-config.ini> [-t HOURS] [targets...]
+OPTIONS:
+  -t HOURS --- only select pages which were changed during last HOURS hours.
+    I.e. if the replication script is ran each day, you can specify -t 24 to
+    export only pages changed since last run, or better -t 25 to allow some
+    overlap with previous day and make replication more reliable.
+
 When called without target list, $0 will attempt to replicate all targets
 found in config file. There must be 2 sections in config file according to
 each target and named "<Target>SourceWiki" and "<Target>DestinationWiki".
@@ -43,7 +60,8 @@ Config file fragment syntax (Replace __Test__ with desired [target] name):
 
 [__Test__SourceWiki]
 URL=<source wiki url>
-Category=<source category name>
+Category=<source category name for selecting pages>
+NotCategory=<source category name for replication denial>
 RemoveConfidential=<'yes' or 'no' (default)>
 FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
 BasicLogin=<HTTP basic auth username, if needed>
@@ -56,6 +74,14 @@ BasicPassword=<HTTP basic auth password, if needed>
 User=<name of a user having import rights in destination wiki>
 Password=<his password>
 EOF
+
+my $since_time;
+if ($ARGV[0] eq '-t')
+{
+    shift @ARGV;
+    $since_time = int(time - 3600*shift @ARGV);
+    $since_time = sprintf("%Y-%m-%d %H:%M:%S", localtime($since_time));
+}
 
 $| = 1;
 
@@ -100,6 +126,40 @@ sub login_into
     }
 }
 
+# Retrieve list of Wiki pages from category $cat,
+# NOT in category $notcat, with all used images and
+# templates by default, but only modified after $modifydate
+sub page_list
+{
+    my ($ua, $src, $cat, $notcat, $modifydate) = @_;
+    my $response = $ua->request(
+        POST "$src->{url}/index.php?title=Special:Export&action=submit",
+        [
+            addcat      => "Добавить",
+            templates   => 1,
+            images      => 1,
+            catname     => ($cat ||= ''),
+            notcat      => ($notcat ||= ''),
+            modifydate  => ($modifydate ||= ''),
+        ],
+    );
+    unless ($response->is_success)
+    {
+        my $desc = "Category:$cat";
+        $desc .= " MINUS category:$notcat" if $notcat ne '';
+        $desc .= ", modified after $modifydate" if $modifydate ne '';
+        die logp()." Could not retrieve page list from $desc ".
+            "($src->{url}/index.php?title=Special:Export&action=submit): ".
+            $response->status_line;
+    }
+    my $text = $response->content;
+    ($text) = $text =~ m!<textarea[^<>]*>(.*?)</textarea>!iso;
+    $text =~ s/^\s*//so;
+    $text =~ s/\s*$//so;
+    decode_entities($text);
+    return $text;
+}
+
 sub replicate
 {
     my ($src, $dest) = @_;
@@ -108,13 +168,8 @@ sub replicate
     my ($uri, $response);
     # Login into source wiki
     login_into($ua, $src, 'source wiki');
-    # Read category page list
-    $response = $ua->request(POST "$src->{url}/index.php?title=Special:Export&action=submit", [ addcat => "Добавить", catname => $src->{category} ]);
-    die logp()." Could not post '$src->{url}/index.php?title=Special:Export&action=submit&catname=$src->{category}': ".$response->status_line unless $response->is_success;
-    my $text = $response->content;
-    ($text) = $text =~ m!<textarea[^<>]*>(.*?)</textarea>!iso;
-    die logp()." No pages in category $src->{category}" unless $text;
-    decode_entities($text);
+    # Read page list for replication
+    my $text = page_list($ua, $src, $src->{category}, $src->{notcategory}, $since_time);
     my $ts = clock_gettime(CLOCK_REALTIME);
     # Read export XML / multipart file
     my $fh = File::Temp->new;
@@ -123,7 +178,6 @@ sub replicate
     $auth = 'Basic '.encode_base64($src->{basiclogin}.':'.$src->{basicpassword}) if $src->{basiclogin};
     $response = $ua->request(
         POST("$src->{url}/index.php?title=Special:Export&action=submit", [
-            templates     => 1,
             images        => 1,
             selfcontained => 1,
             wpDownload    => 1,
@@ -151,7 +205,7 @@ sub replicate
     $text = $response->content;
     my $token = $text =~ /<input([^<>]*name="editToken"[^<>]*)>/iso &&
         $1 =~ /value=\"([^\"]*)\"/iso && $1 || undef;
-    # Run the import
+    # Run import
     $response = $ua->request(POST("$dest->{url}/index.php?title=Special:Import&action=submit",
         Content_Type => 'form-data',
         Content      => [
