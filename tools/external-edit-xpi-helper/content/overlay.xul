@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE overlay SYSTEM "chrome://wikihelper/locale/wikihelper.dtd">
+<overlay id="wikiHelperToolsOverlay" xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+<!--
+  <stringbundleset id="stringbundleset">
+    <stringbundle id="bundle_wikihelper" src="chrome://wikihelper/locale/theplugin.properties" />
+  </stringbundleset>
+-->
+  <script type="application/x-javascript" src="md5.js" />
+  <script type="application/x-javascript" src="UrlDownloader.js" />
+  <script type="application/x-javascript" src="WikiHelper.js" />
+  <script type="application/x-javascript">
+    var wgWikiHelperStrings = {
+      'error':          "&wikihelper.error;",
+      'enterpath':      "&wikihelper.enterpath;",
+      'editornotfound': "&wikihelper.editornotfound;",
+      'notexecutable':  "&wikihelper.notexecutable;",
+      'ecommenttitle':  "&wikihelper.ecommenttitle;",
+      'entercomment':   "&wikihelper.entercomment;",
+      'defaultcomment': "&wikihelper.defaultcomment;",
+    };
+    var wgWikiHelper = new WikiHelper();
+  </script>
+<!--  <menupopup id="menu_ToolsPopup">
+    <menuitem insertafter="devToolsSeparator" label="Install WikiHelper" oncommand="alert('Will install'); var wh = new WikiHelper(); alert('OK');" />
+  </menupopup>-->
+</overlay>
