@@ -121,12 +121,14 @@ function SVNIntegrationArticleSave(&$article, &$user, &$text, &$summary, $minor,
 
 /**
  * Hook function used to remove content from SVN from the article's text before editing.
- * 
+ *
  * @param EditPage $editpage The editpage (object) being called.
  * @return boolean Always returns true.
  */
 function SVNIntegrationEditFormInitial(&$editpage)
-{ 
+{
+	if (strpos($editpage->textbox1, "###SVNCONTENT_START###") === false)
+		return true;
 	$content = $editpage->textbox1;
 	$lines = explode("\n", $content);
 	
