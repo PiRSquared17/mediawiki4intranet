@@ -1,0 +1,12 @@
+K 13
+svn:eol-style
+V 6
+native
+K 13
+svn:mergeinfo
+V 266
+/branches/REL1_15/phase3/includes/OutputHandler.php:51646
+/branches/sqlite/includes/OutputHandler.php:58211-58321
+/branches/wmf-deployment/includes/OutputHandler.php:53381
+/trunk/phase3/includes/OutputHandler.php:63549,63764,63897-63901,64876,64881,64948,69770,79561
+END
