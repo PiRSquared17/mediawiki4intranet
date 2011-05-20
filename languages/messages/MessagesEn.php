@@ -3136,25 +3136,29 @@ This can be imported into another wiki using MediaWiki via the [[Special:Import|
 
 To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
 
-In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".',
+In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".
+
+Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' filter full page list from the textbox, \'\'not only added pages\'\'.',
 'exportcuronly'     => 'Include only the current revision, not the full history',
 'exportnohistory'   => "----
 '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
 'export-submit'     => 'Export',
 'export-addpages'   => "'''Add pages:'''",
 'export-addcat'     => 'Add',
-'export-catname'    => 'Category:',
+'export-catname'    => 'From category:',
+'export-notcategory' => 'Not from category:',
 'export-modifydate' => 'Changed after:',
 'export-namespace'  => 'Namespace:',
 'export-invalid-catname' => '<font color=red>\'\'\'Unknown category ignored: \'$1\'\'\'\'.</font>',
 'export-invalid-namespace' => '<font color=red>\'\'\'Unknown namespace ignored: \'$1\'\'\'\'.</font>',
 'export-invalid-modifydate' => '<font color=red>\'\'\'Incorrect timestamp ignored (use format <u>YYYY-MM-DD HH:MM:SS</u>): \'$1\'\'\'\'.</font>',
-'export-images'     => 'Export images',
+'export-include-images' => 'Export images',
 'export-selfcontained' => 'Include image contents into the export file',
 'export-download'   => 'Save as file',
+'export-images'     => 'Include images',
 'export-templates'  => 'Include templates',
 'export-pagelinks'  => 'Include linked articles',
-'export-closure'    => 'Include subcategories',
+'export-closure'    => 'Include articles from subcategories',
 
 # Namespace 8 related
 'allmessages'                   => 'System messages',
