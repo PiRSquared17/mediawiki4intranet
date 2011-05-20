@@ -4365,3 +4365,5 @@ $wgUploadMaintenance = false;
  */
 $wgOldChangeTagsIndex = false;
 
+/** Defines that MergeConflicts extension patch was applied to this MW installation */
+define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );
