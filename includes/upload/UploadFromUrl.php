@@ -68,7 +68,7 @@ class UploadFromUrl extends UploadBase {
 
 	public static function isValidUrl( $url ) {
 		// Only allow HTTP or FTP for now
-		return (bool)preg_match( '!^(http://|ftp://)!', $url );
+		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
 	}
 
 	/**
@@ -105,6 +105,12 @@ class UploadFromUrl extends UploadBase {
 		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
 		curl_setopt( $ch, CURLOPT_URL, $this->mUrl);
 		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
+		if ( class_exists( 'CurlEnvProxy' ) )
+		{
+			// Set the cURL proxy from system environment variables
+			// $ENV['http_proxy'], $ENV['no_proxy']
+			CurlEnvProxy::set( $ch, $url );
+		}
 		curl_exec( $ch );
 		$error =  curl_errno( $ch );
 		curl_close( $ch );
