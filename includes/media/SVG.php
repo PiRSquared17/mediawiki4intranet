@@ -65,7 +65,7 @@ class SvgThumbnailImage extends ThumbnailImage
 		$linkurl = $this->file->getThumbUrl() . $hash;
 		// Cache changed SVGs only when TRANSFORM_LATER is on
 		if ( $this->later )
-			$mtime = filemtime( $linkfn );
+			$mtime = @filemtime( $linkfn );
 		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 		{
 			$svg = file_get_contents( $this->file->getPath() );
