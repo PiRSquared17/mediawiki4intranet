@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1306427527 -14400
+# Date 1306427640 -14400
 Bug 80684 - SVG double-render
 
-diff -r 45da8fc662c9 -r 2c6db6c8a059 includes/media/SVG.php
+diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
 @@ -4,6 +4,92 @@
@@ -71,7 +71,7 @@ diff -r 45da8fc662c9 -r 2c6db6c8a059 includes/media/SVG.php
 +		$linkurl = $this->file->getThumbUrl() . $hash;
 +		// Cache changed SVGs only when TRANSFORM_LATER is on
 +		if ( $this->later )
-+			$mtime = filemtime( $linkfn );
++			$mtime = @filemtime( $linkfn );
 +		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 +		{
 +			$svg = file_get_contents( $this->file->getPath() );
