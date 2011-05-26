@@ -4,6 +4,73 @@
  * @ingroup Media
  */
 
+class SvgThumbnailImage extends ThumbnailImage
+{
+	function SvgThumbnailImage($file, $url, $svgurl, $width, $height, $path = false, $page = false)
+	{
+		$this->svgurl = $svgurl;
+		$this->ThumbnailImage($file, $url, $width, $height, $path, $page);
+	}
+	function toHtml($options = array())
+	{
+		if ( count( func_get_args() ) == 2 ) {
+			throw new MWException( __METHOD__ .' called in the old style' );
+		}
+
+		$alt = empty( $options['alt'] ) ? '' : $options['alt'];
+		$query = empty( $options['desc-query'] )  ? '' : $options['desc-query'];
+
+		if ( !empty( $options['custom-url-link'] ) ) {
+			$linkAttribs = array( 'href' => $options['custom-url-link'] );
+			if ( !empty( $options['title'] ) ) {
+				$linkAttribs['title'] = $options['title'];
+			}
+		} elseif ( !empty( $options['custom-title-link'] ) ) {
+			$title = $options['custom-title-link'];
+			$linkAttribs = array(
+				'href' => $title->getLinkUrl(),
+				'title' => empty( $options['title'] ) ? $title->getFullText() : $options['title']
+			);
+		} elseif ( !empty( $options['desc-link'] ) ) {
+			$linkAttribs = $this->getDescLinkAttribs( empty( $options['title'] ) ? null : $options['title'], $query );
+		} elseif ( !empty( $options['file-link'] ) ) {
+			$linkAttribs = array( 'href' => $this->file->getURL() );
+		} else {
+			$linkAttribs = false;
+		}
+
+		$attribs = array(
+			'alt' => $alt,
+			'src' => $this->url,
+			'width' => $this->width,
+			'height' => $this->height,
+		);
+		if ( !empty( $options['valign'] ) ) {
+			$attribs['style'] = "vertical-align: {$options['valign']}";
+		}
+		if ( !empty( $options['img-class'] ) ) {
+			$attribs['class'] = $options['img-class'];
+		}
+		$attribs['id'] = 'rsvg'.rand();
+		$vecatt = $attribs;
+		$vecatt['id'] = substr( $attribs['id'], 1 );
+		$vecatt['src'] = $this->svgurl;
+		$vecatt['style'] = "display: none;".$vecatt['style'];
+		$html = $this->linkWrap( $linkAttribs,
+			Xml::element( 'img', $attribs ) .
+			Xml::element( 'img', $vecatt )
+		);
+		$html .= 
+'<script type="text/javascript">
+if ( document.implementation.hasFeature( "http"+"://www.w3.org/TR/SVG11/feature#BasicStructure", "1.1" ) ) {
+document.getElementById("'.$attribs['id'].'").style.display = "none";
+document.getElementById("'.$vecatt['id'].'").style.display = "";
+}
+</script>';
+		return $html;
+	}
+}
+
 /**
  * @ingroup Media
  */
@@ -27,7 +94,7 @@ class SvgHandler extends ImageHandler {
 		if ( !parent::normaliseParams( $image, $params ) ) {
 			return false;
 		}
-		# Don't make an image bigger than wgMaxSVGSize
+		// Don't make an image bigger than wgMaxSVGSize
 		$params['physicalWidth'] = $params['width'];
 		$params['physicalHeight'] = $params['height'];
 		if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
@@ -50,7 +117,7 @@ class SvgHandler extends ImageHandler {
 		$srcPath = $image->getPath();
 
 		if ( $flags & self::TRANSFORM_LATER ) {
-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
+			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath );
 		}
 
 		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
@@ -60,7 +127,7 @@ class SvgHandler extends ImageHandler {
 		
 		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
 		if( $status === true ) {
-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
+			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath );
 		} else {
 			return $status; // MediaTransformError
 		}
