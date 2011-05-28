@@ -85,6 +85,8 @@ class SvgThumbnailImage extends ThumbnailImage
 			'type' => 'image/svg+xml',
 			'data' => $linkurl,
 			'style' => 'overflow: hidden',
+			'width' => $this->width,
+			'height' => $this->height,
 		), $html );
 		return $html;
 	}
