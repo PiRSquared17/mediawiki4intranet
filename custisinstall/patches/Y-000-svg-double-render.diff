@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1306427640 -14400
+# Date 1306622139 -14400
 Bug 80684 - SVG double-render
 
-diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
+diff -r 45da8fc662c9 -r 810d623c2f0f includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
-@@ -4,6 +4,92 @@
+@@ -4,6 +4,94 @@
   * @ingroup Media
   */
  
@@ -91,6 +91,8 @@ diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
 +			'type' => 'image/svg+xml',
 +			'data' => $linkurl,
 +			'style' => 'overflow: hidden',
++			'width' => $this->width,
++			'height' => $this->height,
 +		), $html );
 +		return $html;
 +	}
@@ -99,7 +101,7 @@ diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
  /**
   * @ingroup Media
   */
-@@ -27,7 +113,7 @@
+@@ -27,7 +115,7 @@
  		if ( !parent::normaliseParams( $image, $params ) ) {
  			return false;
  		}
@@ -108,7 +110,7 @@ diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
  		$params['physicalWidth'] = $params['width'];
  		$params['physicalHeight'] = $params['height'];
  		if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
-@@ -50,7 +136,7 @@
+@@ -50,7 +138,7 @@
  		$srcPath = $image->getPath();
  
  		if ( $flags & self::TRANSFORM_LATER ) {
@@ -117,7 +119,7 @@ diff -r 45da8fc662c9 -r af63423dbefb includes/media/SVG.php
  		}
  
  		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
-@@ -60,7 +146,7 @@
+@@ -60,7 +148,7 @@
  		
  		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
  		if( $status === true ) {
