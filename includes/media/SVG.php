@@ -60,26 +60,43 @@ class SvgThumbnailImage extends ThumbnailImage
 		if ( $href{0} == '/' )
 			$href = $wgServer . $href;
 		$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
-		$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" . $linkAttribs['title'] ) . '.svg';
+		$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
+			$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
 		$linkfn = $this->file->getThumbPath() . $hash;
 		$linkurl = $this->file->getThumbUrl() . $hash;
+
 		// Cache changed SVGs only when TRANSFORM_LATER is on
 		if ( $this->later )
 			$mtime = @filemtime( $linkfn );
 		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 		{
+			// Load original SVG and extract opening element
 			$svg = file_get_contents( $this->file->getPath() );
 			preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
 			$open = $m[0][0];
+			// Add xlink namespace, if not yet
 			if ( !strpos( $open, 'xmlns:xlink' ) )
 				$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
+			$sw = $this->width / $this->file->getWidth();
+			$sh = $this->height / $this->file->getHeight();
+			$close = '';
+			if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
+			{
+				// Wrap contents into a scaled layer
+				$open .= "<g transform='scale($sw $sh)'>";
+				$close = "</g>";
+			}
+			// Wrap contents into a hyperlink
 			$open .= '<a xlink:href="'.htmlspecialchars( $href ).
 				'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
+			$close = "</a>$close";
+			// Write modified SVG
 			$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
-			$svg = str_replace( '</svg>', '</a></svg>', $svg );
+			$svg = str_replace( '</svg>', $close.'</svg>', $svg );
 			file_put_contents( $linkfn, $svg );
 		}
 
+		// Output PNG <img> wrapped into SVG <object>
 		$html = $this->linkWrap( $linkAttribs, Xml::element( 'img', $attribs ) );
 		$html = Xml::tags( 'object', array(
 			'type' => 'image/svg+xml',
