@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1303829269 -14400
+# Date 1306856095 -14400
 Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
 Bug 68935 - Update for MediaWiki 1.16
 MediaWikiBug 6200 (https://bugzilla.wikimedia.org/show_bug.cgi?id=6200) - Completely rewrite doBlockLevels to correctly handle nested tags
 
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 extensions/Cite/citeParserTests.txt
+diff -r 45da8fc662c9 -r 080e2decaed4 extensions/Cite/citeParserTests.txt
 --- extensions/Cite/citeParserTests.txt
 +++ extensions/Cite/citeParserTests.txt
 @@ -22,8 +22,7 @@
@@ -178,7 +178,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 extensions/Cite/citeParserTests.txt
  no text was provided for refs named <code>foo</code></strong></li></ol>
  <p><strong class="error">Cite error: <code>&lt;ref&gt;</code> tag with name "unused" defined in <code>&lt;references&gt;</code> is not used in prior text.</strong><br />
  <strong class="error">Cite error: <code>&lt;ref&gt;</code> tag in <code>&lt;references&gt;</code> has conflicting group attribute "1".</strong><br />
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
+diff -r 45da8fc662c9 -r 080e2decaed4 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -1888,7 +1888,7 @@
@@ -349,7 +349,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
  
  				// Close all the prefixes which aren't shared.
  				while( $commonPrefixLength < $lastPrefixLength ) {
-@@ -2085,75 +2140,173 @@
+@@ -2085,75 +2140,176 @@
  					++$commonPrefixLength;
  				}
  				$lastPrefix = $prefix2;
@@ -409,11 +409,11 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
 +				while ( strlen( $t ) )
 +				{
 +					// match HTML tag or UNIQ prefix
-+					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-pre)/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
++					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-(pre|html).*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
 +					{
 +						$textBefore = substr( $t, 0, $m[0][1] );
 +						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
-+						if ( !$closesParagraph[ $m[2][0] ] )
++						if ( $m[2][0] && !$closesParagraph[ $m[2][0] ] )
 +						{
 +							$textBefore .= $m[0][0];
 +							$m[0][0] = '';
@@ -451,6 +451,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
 +					$tag   = $m[2][0];
 +					$empty = $m[3][0];
 +					$uniq  = $m[4][0];
++					$uniqt = $m[5][0];
 +					if ( $textBefore !== '' )
 +					{
 +						// Here is the place where the text gets inside <p>aragraphs
@@ -492,8 +493,10 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
 +					}
 +					elseif ( $uniq )
 +					{
-+						// UNIQ prefix closes paragraph
-+						$output .= $this->closeParagraph();
++						// UNIQ <pre> closes paragraph
++						if ( $uniqt == 'pre' )
++							$output .= $this->closeParagraph();
++						// UNIQ <html> is matched to not start a paragraph
 +					}
 +					elseif ( $closesParagraph[ $tag ] )
 +					{
@@ -580,7 +583,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 includes/parser/Parser.php
  		}
  		while ( $prefixLength ) {
  			$output .= $this->closeList( $prefix2[$prefixLength-1] );
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 maintenance/parserTests.txt
+diff -r 45da8fc662c9 -r 080e2decaed4 maintenance/parserTests.txt
 --- maintenance/parserTests.txt
 +++ maintenance/parserTests.txt
 @@ -192,7 +192,6 @@
@@ -1057,7 +1060,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 maintenance/parserTests.txt
  
  !! end
  
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/chick/main.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/chick/main.css
 --- skins/chick/main.css
 +++ skins/chick/main.css
 @@ -32,8 +32,15 @@
@@ -1103,7 +1106,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/chick/main.css
  /* thumbnails */
  div.thumb {
  	margin-bottom: 0.5em;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/cologneblue.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/cologneblue.css
 --- skins/common/cologneblue.css
 +++ skins/common/cologneblue.css
 @@ -17,11 +17,23 @@
@@ -1142,7 +1145,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/cologneblue.css
  a { color: #223366; }
  a.external { color: #336644; }
  a:visited { color: #8D0749; }
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/commonPrint.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/commonPrint.css
 --- skins/common/commonPrint.css
 +++ skins/common/commonPrint.css
 @@ -32,7 +32,9 @@
@@ -1187,7 +1190,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/commonPrint.css
  pre {
      border: 1pt dashed black;
      white-space: pre;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/common_rtl.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/common_rtl.css
 --- skins/common/common_rtl.css
 +++ skins/common/common_rtl.css
 @@ -35,6 +35,12 @@
@@ -1203,7 +1206,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/common_rtl.css
  table.filehistory th {
  	text-align: right;
  }
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/nostalgia.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/nostalgia.css
 --- skins/common/nostalgia.css
 +++ skins/common/nostalgia.css
 @@ -14,4 +14,6 @@
@@ -1213,7 +1216,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/nostalgia.css
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  
 +
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/oldshared.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/oldshared.css
 --- skins/common/oldshared.css
 +++ skins/common/oldshared.css
 @@ -30,9 +30,13 @@
@@ -1230,7 +1233,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/oldshared.css
  
  /* Print-specific things to hide */
  .printfooter {
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/shared.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -132,6 +132,13 @@
@@ -1273,7 +1276,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/shared.css
  table.mw-allpages-table-form tr  {
  	vertical-align: top;
  }
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/wikiprintable.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/wikiprintable.css
 --- skins/common/wikiprintable.css
 +++ skins/common/wikiprintable.css
 @@ -43,4 +43,6 @@
@@ -1283,7 +1286,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/wikiprintable.css
 +
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  */
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/wikistandard.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/common/wikistandard.css
 --- skins/common/wikistandard.css
 +++ skins/common/wikistandard.css
 @@ -41,7 +41,11 @@
@@ -1298,7 +1301,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/common/wikistandard.css
  .catlinks { font-size:small; margin-top:0; text-align:right;}
  td { empty-cells:show; }
  td.bottom { border-top: 1px solid gray; }
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/modern/main.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/modern/main.css
 --- skins/modern/main.css
 +++ skins/modern/main.css
 @@ -281,6 +281,10 @@
@@ -1366,7 +1369,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/modern/main.css
  .mw-topbox {
          color: black;
          font-weight: bold;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/modern/rtl.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/modern/rtl.css
 --- skins/modern/rtl.css
 +++ skins/modern/rtl.css
 @@ -87,6 +87,11 @@
@@ -1392,7 +1395,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/modern/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/monobook/main.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/monobook/main.css
 --- skins/monobook/main.css
 +++ skins/monobook/main.css
 @@ -100,10 +100,19 @@
@@ -1480,7 +1483,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/monobook/main.css
  div.multipageimagenavbox {
     border: solid 1px silver;
     padding: 4px;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/monobook/rtl.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/monobook/rtl.css
 --- skins/monobook/rtl.css
 +++ skins/monobook/rtl.css
 @@ -219,6 +219,11 @@
@@ -1506,7 +1509,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/monobook/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/simple/main.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/simple/main.css
 --- skins/simple/main.css
 +++ skins/simple/main.css
 @@ -84,8 +84,15 @@
@@ -1543,7 +1546,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/simple/main.css
  /* thumbnails */
  div.thumb {
      margin-bottom: 0.5em;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/simple/rtl.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/simple/rtl.css
 --- skins/simple/rtl.css
 +++ skins/simple/rtl.css
 @@ -156,6 +156,11 @@
@@ -1570,7 +1573,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/simple/rtl.css
 +	text-align: left;
 +}
 +
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/vector/main-ltr.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/vector/main-ltr.css
 --- skins/vector/main-ltr.css
 +++ skins/vector/main-ltr.css
 @@ -697,9 +697,18 @@
@@ -1623,7 +1626,7 @@ diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/vector/main-ltr.css
  /* Categories */
  .catlinks {
  	border: 1px solid #aaa;
-diff -r 45da8fc662c9 -r 8c5139ecf5b1 skins/vector/main-rtl.css
+diff -r 45da8fc662c9 -r 080e2decaed4 skins/vector/main-rtl.css
 --- skins/vector/main-rtl.css
 +++ skins/vector/main-rtl.css
 @@ -697,9 +697,18 @@
