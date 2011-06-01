@@ -3920,12 +3920,7 @@ class Title {
 			return $this;
 		static $permissionCache = array();
 		
-		global $wgRequest;
-		$action = $wgRequest->getVal( 'action', 'read' );
-		$currentTitle = $wgRequest->getVal('title');
-		$currentTitle = str_replace( '_', ' ', $currentTitle );
-		if ($this->getFullText() != $currentTitle)
-			$action = 'read';
+		$action = 'read';
 		$index = $this->getFullText().'-'.$action;
 		$allowed = @$permissionCache[$index];
 		if (!isset($allowed))
