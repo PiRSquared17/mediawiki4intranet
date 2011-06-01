@@ -2234,7 +2234,25 @@ class Parser
 						// UNIQ <pre> closes paragraph
 						if ( $uniqt == 'pre' )
 							$output .= $this->closeParagraph();
-						// UNIQ <html> is matched to not start a paragraph
+						// UNIQ <html> turns <p> into a <div class="paragraph">
+						// because it may contain block elements
+						elseif ( $uniqt == 'html' )
+						{
+							if ( $this->mLastSection == 'p' )
+							{
+								$output =
+									substr( $output, 0, $lastParagraphPos ) .
+									'<div class="paragraph">' .
+									substr( $output, $lastParagraphPos+3 );
+								$this->mLastSection = 'div';
+							}
+							elseif ( !$this->mLastSection )
+							{
+								$lastParagraphPos = strlen( $output );
+								$output .= '<div class="paragraph">';
+								$this->mLastSection = 'div';
+							}
+						}
 					}
 					elseif ( $closesParagraph[ $tag ] )
 					{
