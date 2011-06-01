@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1306932032 -14400
+# Date 1306932374 -14400
 Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
 Bug 68935 - Update for MediaWiki 1.16
 MediaWikiBug 6200 (https://bugzilla.wikimedia.org/show_bug.cgi?id=6200) - Completely rewrite doBlockLevels to correctly handle nested tags
 
-diff -r 45da8fc662c9 -r bb5c55abcbab extensions/Cite/citeParserTests.txt
+diff -r 45da8fc662c9 -r 71f7e7d474ff extensions/Cite/citeParserTests.txt
 --- extensions/Cite/citeParserTests.txt
 +++ extensions/Cite/citeParserTests.txt
 @@ -22,8 +22,7 @@
@@ -178,207 +178,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab extensions/Cite/citeParserTests.txt
  no text was provided for refs named <code>foo</code></strong></li></ol>
  <p><strong class="error">Cite error: <code>&lt;ref&gt;</code> tag with name "unused" defined in <code>&lt;references&gt;</code> is not used in prior text.</strong><br />
  <strong class="error">Cite error: <code>&lt;ref&gt;</code> tag in <code>&lt;references&gt;</code> has conflicting group attribute "1".</strong><br />
-diff -r 45da8fc662c9 -r bb5c55abcbab includes/parser/.svn/entries
---- includes/parser/.svn/entries
-+++ includes/parser/.svn/entries
-@@ -32,7 +32,7 @@
- 
- 
- 
--2011-02-04T18:14:23.451985Z
-+2011-05-31T15:35:37.354058Z
- a6ea9a92b7d322bce411377d8f105f00
- 2009-09-04T00:43:51.419362Z
- 55795
-@@ -66,7 +66,7 @@
- 
- 
- 
--2011-02-04T18:14:23.455985Z
-+2011-05-31T15:35:37.346058Z
- 477beacac824215bb9cf84298442be77
- 2009-06-13T12:39:00.253655Z
- 51820
-@@ -134,7 +134,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.346058Z
- 91c1683adbb04a9cee1288986c8f5243
- 2010-02-19T05:19:32.022150Z
- 62689
-@@ -168,7 +168,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.346058Z
- 223e1027347a0f70866ec1d8100c9f2c
- 2008-08-19T04:44:34.850884Z
- 39635
-@@ -202,7 +202,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.346058Z
- 4e8f5427c0eae3470489367435b867f1
- 2009-08-21T20:39:35.551692Z
- 55433
-@@ -236,7 +236,7 @@
- 
- 
- 
--2011-02-04T18:14:23.463985Z
-+2011-05-31T15:35:37.350058Z
- 50334838afa270ed0653b769383494cb
- 2010-02-03T07:10:58.123968Z
- 61913
-@@ -270,7 +270,7 @@
- 
- 
- 
--2011-02-04T18:14:23.451985Z
-+2011-05-31T15:35:37.354058Z
- b75bed7a6cfbce86779393778364d762
- 2009-01-27T15:20:31.531021Z
- 46348
-@@ -298,13 +298,47 @@
- 
- 5058
- 
-+ParserOutput.php
-+file
-+
-+
-+
-+
-+2011-05-31T15:35:37.350058Z
-+656b90c32deb505b62cbba1b10c611da
-+2010-02-16T03:37:19.595658Z
-+62577
-+mah
-+has-props
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+
-+8391
-+
- Parser_LinkHooks.php
- file
- 
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.350058Z
- 1363072f555f8f19921f8bfd19160c1d
- 2008-08-19T04:44:34.850884Z
- 39635
-@@ -332,47 +366,13 @@
- 
- 10448
- 
--ParserOutput.php
--file
--
--
--
--
--2011-02-04T18:14:23.455985Z
--656b90c32deb505b62cbba1b10c611da
--2010-02-16T03:37:19.595658Z
--62577
--mah
--has-props
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--
--8391
--
- ParserCache.php
- file
- 
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.350058Z
- e4612ce62f851bfc380872cfbc32c095
- 2009-07-08T08:12:35.028193Z
- 52888
-@@ -406,7 +406,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.350058Z
- 23b4d6ab78eb71ae6edb025c6615e289
- 2008-08-26T14:37:15.731097Z
- 40020
-@@ -440,7 +440,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-06-01T12:39:55.078877Z
- baedc37f93f94397ac333930641c2b51
- 2009-09-04T00:43:51.419362Z
- 55795
-@@ -474,7 +474,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.350058Z
- 6f06f84ee14ef84c07e47d148b4e53a8
- 2009-07-02T16:21:30.799027Z
- 52700
-@@ -508,7 +508,7 @@
- 
- 
- 
--2011-02-04T18:14:23.459985Z
-+2011-05-31T15:35:37.346058Z
- 57bd2ccca044943bd8d4f3d10b1ed414
- 2010-02-19T23:21:58.296387Z
- 62726
-diff -r 45da8fc662c9 -r bb5c55abcbab includes/parser/Parser.php
+diff -r 45da8fc662c9 -r 71f7e7d474ff includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -1888,7 +1888,7 @@
@@ -801,7 +601,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab includes/parser/Parser.php
  		}
  		while ( $prefixLength ) {
  			$output .= $this->closeList( $prefix2[$prefixLength-1] );
-diff -r 45da8fc662c9 -r bb5c55abcbab maintenance/parserTests.txt
+diff -r 45da8fc662c9 -r 71f7e7d474ff maintenance/parserTests.txt
 --- maintenance/parserTests.txt
 +++ maintenance/parserTests.txt
 @@ -192,7 +192,6 @@
@@ -1278,7 +1078,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab maintenance/parserTests.txt
  
  !! end
  
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/chick/main.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/chick/main.css
 --- skins/chick/main.css
 +++ skins/chick/main.css
 @@ -32,8 +32,15 @@
@@ -1324,7 +1124,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/chick/main.css
  /* thumbnails */
  div.thumb {
  	margin-bottom: 0.5em;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/cologneblue.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/cologneblue.css
 --- skins/common/cologneblue.css
 +++ skins/common/cologneblue.css
 @@ -17,11 +17,23 @@
@@ -1363,7 +1163,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/cologneblue.css
  a { color: #223366; }
  a.external { color: #336644; }
  a:visited { color: #8D0749; }
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/commonPrint.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/commonPrint.css
 --- skins/common/commonPrint.css
 +++ skins/common/commonPrint.css
 @@ -32,7 +32,9 @@
@@ -1408,7 +1208,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/commonPrint.css
  pre {
      border: 1pt dashed black;
      white-space: pre;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/common_rtl.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/common_rtl.css
 --- skins/common/common_rtl.css
 +++ skins/common/common_rtl.css
 @@ -35,6 +35,12 @@
@@ -1424,7 +1224,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/common_rtl.css
  table.filehistory th {
  	text-align: right;
  }
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/nostalgia.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/nostalgia.css
 --- skins/common/nostalgia.css
 +++ skins/common/nostalgia.css
 @@ -14,4 +14,6 @@
@@ -1434,7 +1234,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/nostalgia.css
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  
 +
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/oldshared.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/oldshared.css
 --- skins/common/oldshared.css
 +++ skins/common/oldshared.css
 @@ -30,9 +30,13 @@
@@ -1451,7 +1251,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/oldshared.css
  
  /* Print-specific things to hide */
  .printfooter {
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/shared.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -132,6 +132,13 @@
@@ -1494,7 +1294,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/shared.css
  table.mw-allpages-table-form tr  {
  	vertical-align: top;
  }
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/wikiprintable.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/wikiprintable.css
 --- skins/common/wikiprintable.css
 +++ skins/common/wikiprintable.css
 @@ -43,4 +43,6 @@
@@ -1504,7 +1304,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/wikiprintable.css
 +
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  */
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/wikistandard.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/common/wikistandard.css
 --- skins/common/wikistandard.css
 +++ skins/common/wikistandard.css
 @@ -41,7 +41,11 @@
@@ -1519,7 +1319,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/common/wikistandard.css
  .catlinks { font-size:small; margin-top:0; text-align:right;}
  td { empty-cells:show; }
  td.bottom { border-top: 1px solid gray; }
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/modern/main.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/modern/main.css
 --- skins/modern/main.css
 +++ skins/modern/main.css
 @@ -281,6 +281,10 @@
@@ -1587,7 +1387,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/modern/main.css
  .mw-topbox {
          color: black;
          font-weight: bold;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/modern/rtl.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/modern/rtl.css
 --- skins/modern/rtl.css
 +++ skins/modern/rtl.css
 @@ -87,6 +87,11 @@
@@ -1613,7 +1413,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/modern/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/monobook/main.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/monobook/main.css
 --- skins/monobook/main.css
 +++ skins/monobook/main.css
 @@ -100,10 +100,19 @@
@@ -1701,7 +1501,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/monobook/main.css
  div.multipageimagenavbox {
     border: solid 1px silver;
     padding: 4px;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/monobook/rtl.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/monobook/rtl.css
 --- skins/monobook/rtl.css
 +++ skins/monobook/rtl.css
 @@ -219,6 +219,11 @@
@@ -1727,7 +1527,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/monobook/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/simple/main.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/simple/main.css
 --- skins/simple/main.css
 +++ skins/simple/main.css
 @@ -84,8 +84,15 @@
@@ -1764,7 +1564,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/simple/main.css
  /* thumbnails */
  div.thumb {
      margin-bottom: 0.5em;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/simple/rtl.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/simple/rtl.css
 --- skins/simple/rtl.css
 +++ skins/simple/rtl.css
 @@ -156,6 +156,11 @@
@@ -1791,7 +1591,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/simple/rtl.css
 +	text-align: left;
 +}
 +
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/vector/main-ltr.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/vector/main-ltr.css
 --- skins/vector/main-ltr.css
 +++ skins/vector/main-ltr.css
 @@ -697,9 +697,18 @@
@@ -1844,7 +1644,7 @@ diff -r 45da8fc662c9 -r bb5c55abcbab skins/vector/main-ltr.css
  /* Categories */
  .catlinks {
  	border: 1px solid #aaa;
-diff -r 45da8fc662c9 -r bb5c55abcbab skins/vector/main-rtl.css
+diff -r 45da8fc662c9 -r 71f7e7d474ff skins/vector/main-rtl.css
 --- skins/vector/main-rtl.css
 +++ skins/vector/main-rtl.css
 @@ -697,9 +697,18 @@
