@@ -2182,11 +2182,11 @@ class Parser
 				while ( strlen( $t ) )
 				{
 					// match HTML tag or UNIQ prefix
-					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-pre)/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
+					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-(pre|html).*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
 					{
 						$textBefore = substr( $t, 0, $m[0][1] );
 						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
-						if ( !$closesParagraph[ $m[2][0] ] )
+						if ( $m[2][0] && !$closesParagraph[ $m[2][0] ] )
 						{
 							$textBefore .= $m[0][0];
 							$m[0][0] = '';
@@ -2202,6 +2202,7 @@ class Parser
 					$tag   = $m[2][0];
 					$empty = $m[3][0];
 					$uniq  = $m[4][0];
+					$uniqt = $m[5][0];
 					if ( $textBefore !== '' )
 					{
 						// Here is the place where the text gets inside <p>aragraphs
@@ -2231,8 +2232,28 @@ class Parser
 					}
 					elseif ( $uniq )
 					{
-						// UNIQ prefix closes paragraph
-						$output .= $this->closeParagraph();
+						// UNIQ <pre> closes paragraph
+						if ( $uniqt == 'pre' )
+							$output .= $this->closeParagraph();
+						// UNIQ <html> turns <p> into a <div class="paragraph">
+						// because it may contain block elements
+						elseif ( $uniqt == 'html' )
+						{
+							if ( $this->mLastSection == 'p' )
+							{
+								$output =
+									substr( $output, 0, $lastParagraphPos ) .
+									'<div class="paragraph">' .
+									substr( $output, $lastParagraphPos+3 );
+								$this->mLastSection = 'div';
+							}
+							elseif ( !$this->mLastSection )
+							{
+								$lastParagraphPos = strlen( $output );
+								$output .= '<div class="paragraph">';
+								$this->mLastSection = 'div';
+							}
+						}
 					}
 					elseif ( $closesParagraph[ $tag ] )
 					{
