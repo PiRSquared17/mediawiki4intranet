@@ -470,7 +470,7 @@ class SpecialExport extends SpecialPage {
 		$added = 0;
 		$result = $dbr->select(
 			array( 'page', $table ), 'page.*',
-			$join + array( $id_field => $ids ),
+			$join + array( $id_field => array_keys( $ids ) ),
 			__METHOD__,
 			array( 'GROUP BY' => 'page_id' )
 		);
@@ -478,7 +478,8 @@ class SpecialExport extends SpecialPage {
 		{
 			if( !$ids[ $row->page_id ] )
 			{
-				$pageSet[ $add->getPrefixedText() ] = Title::newFromRow( $row );
+				$add = Title::newFromRow( $row );
+				$pageSet[ $add->getPrefixedText() ] = $add;
 				$added++;
 			}
 		}

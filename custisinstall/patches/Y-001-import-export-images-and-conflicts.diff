@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1305889186 -14400
+# Date 1306412041 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 85fec3228ef8 -r 862e8029c3b8 includes/Export.php
+diff -r 85fec3228ef8 -r b8602c749491 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -204,7 +204,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 85fec3228ef8 -r 862e8029c3b8 includes/Import.php
+diff -r 85fec3228ef8 -r b8602c749491 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -745,7 +745,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 85fec3228ef8 -r 862e8029c3b8 includes/filerepo/LocalFile.php
+diff -r 85fec3228ef8 -r b8602c749491 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -841,7 +841,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialExport.php
+diff -r 85fec3228ef8 -r b8602c749491 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -1064,7 +1064,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialExport.php
  			$exporter->pageByTitle( $title );
  		}
  		
-@@ -276,139 +213,275 @@
+@@ -276,139 +213,276 @@
  		}
  	}
  
@@ -1431,7 +1431,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialExport.php
 +		$added = 0;
 +		$result = $dbr->select(
 +			array( 'page', $table ), 'page.*',
-+			$join + array( $id_field => $ids ),
++			$join + array( $id_field => array_keys( $ids ) ),
 +			__METHOD__,
 +			array( 'GROUP BY' => 'page_id' )
 +		);
@@ -1439,7 +1439,8 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialExport.php
 +		{
 +			if( !$ids[ $row->page_id ] )
 +			{
-+				$pageSet[ $add->getPrefixedText() ] = Title::newFromRow( $row );
++				$add = Title::newFromRow( $row );
++				$pageSet[ $add->getPrefixedText() ] = $add;
 +				$added++;
  			}
  		}
@@ -1448,7 +1449,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialImport.php
+diff -r 85fec3228ef8 -r b8602c749491 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1547,7 +1548,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 85fec3228ef8 -r 862e8029c3b8 languages/messages/MessagesEn.php
+diff -r 85fec3228ef8 -r b8602c749491 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,29 @@
@@ -1613,7 +1614,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 85fec3228ef8 -r 862e8029c3b8 languages/messages/MessagesRu.php
+diff -r 85fec3228ef8 -r b8602c749491 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,29 @@
@@ -1676,7 +1677,7 @@ diff -r 85fec3228ef8 -r 862e8029c3b8 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 85fec3228ef8 -r 862e8029c3b8 skins/common/shared.css
+diff -r 85fec3228ef8 -r b8602c749491 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@
