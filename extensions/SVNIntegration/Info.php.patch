@@ -1,0 +1,21 @@
+Index: Info.php
+===================================================================
+--- Info.php    (revision 15)
++++ Info.php    (working copy)
+@@ -212,6 +212,7 @@
+                         break;
+                     default:
+                         // that's all, folks!
++                        $_switches .= "--$switch $val ";
+                         break;
+                 }
+             } else {
+@@ -266,7 +267,7 @@
+                 break;
+             case VERSIONCONTROL_SVN_FETCHMODE_ASSOC:
+                 // Temporary, see parseOutputArray below
+-                return join("\n", $out);
++                return $out;
+                 break;
+             case VERSIONCONTROL_SVN_FETCHMODE_OBJECT:
+                 // Temporary, will return object-ified array from

@@ -1,0 +1,29 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297451754 -10800
+Bug 54081 - Add flags imagegallery=>true, imagehistory=>true to transform() params.
+This allows extensions (FlvHandler) to decide whether to insert one code or another.
+
+diff -r b11befdd7427 -r cb7e6dc378ae includes/ImageGallery.php
+--- includes/ImageGallery.php
++++ includes/ImageGallery.php
+@@ -232,7 +232,7 @@
+ 		if( $this->mCaption )
+ 			$s .= "\n\t<caption>{$this->mCaption}</caption>";
+ 
+-		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights );
++		$params = array( 'width' => $this->mWidths, 'height' => $this->mHeights, 'imagegallery' => true );
+ 		$i = 0;
+ 		foreach ( $this->mImages as $pair ) {
+ 			$nt = $pair[0];
+diff -r b11befdd7427 -r cb7e6dc378ae includes/ImagePage.php
+--- includes/ImagePage.php
++++ includes/ImagePage.php
+@@ -999,6 +999,7 @@
+ 			$params = array(
+ 				'width' => '120',
+ 				'height' => '120',
++				'imagehistory' => true,
+ 			);
+ 			$timestamp = wfTimestamp(TS_MW, $file->getTimestamp());
+ 
