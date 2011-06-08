@@ -4,7 +4,7 @@
  * Features:
  * - <subpages> tag produces a templated list of all subpages of the current page
  * - {{#getsection|Title|section number}} parser function for extracting page sections
- * - $wgSubpageListEverywhere setting to display subpage list using AJAX on every page which has subpages
+ * - $egSubpageListEverywhere setting to display subpage list using AJAX on every page which has subpages
  *
  * @package MediaWiki
  * @subpackage Extensions
@@ -46,10 +46,10 @@ $wgAjaxExportList[] = 'efAjaxSubpageList';
  */
 function efSubpageList()
 {
-    global $wgParser, $wgHooks, $wgSubpageAjaxListEverywhere;
+    global $wgParser, $wgHooks, $egSubpageAjaxListEverywhere;
     $wgParser->setHook('subpages', 'efRenderSubpageList');
     $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
-    if ($wgSubpageAjaxListEverywhere)
+    if ($egSubpageAjaxListEverywhere)
         $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
 }
 
