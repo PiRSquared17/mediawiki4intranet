@@ -4,7 +4,10 @@
  * Features:
  * - <subpages> tag produces a templated list of all subpages of the current page
  * - {{#getsection|Title|section number}} parser function for extracting page sections
- * - $egSubpageListEverywhere setting to display subpage list using AJAX on every page which has subpages
+ * - $egSubpagelistAjaxNamespaces(NS_MAIN => true) setting to display subpage list
+ *   using AJAX on every page with subpages from these namespaces.
+ *   $egSubpagelistAjaxDisableRE is a regexp which is additionally checked and if matched,
+ *   AJAX lister is hidden.
  *
  * @package MediaWiki
  * @subpackage Extensions
@@ -46,10 +49,10 @@ $wgAjaxExportList[] = 'efAjaxSubpageList';
  */
 function efSubpageList()
 {
-    global $wgParser, $wgHooks, $egSubpageAjaxListEverywhere;
+    global $wgParser, $wgHooks, $egSubpagelistAjaxNamespaces;
     $wgParser->setHook('subpages', 'efRenderSubpageList');
     $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
-    if ($egSubpageAjaxListEverywhere)
+    if ($egSubpagelistAjaxNamespaces)
         $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
 }
 
@@ -155,19 +158,26 @@ function efAjaxSubpageList($pagename)
  */
 function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
 {
-    $dbr = wfGetDB(DB_SLAVE);
+    global $egSubpagelistAjaxNamespaces, $egSubpagelistAjaxDisableRE;
     $title = $article->getTitle();
+    // Filter pages based on namespace and title regexp
+    if (!$egSubpagelistAjaxNamespaces ||
+        !array_key_exists($title->getNamespace(), $egSubpagelistAjaxNamespaces) ||
+        $egSubpagelistAjaxDisableRE && preg_match($egSubpagelistAjaxDisableRE, $title->getPrefixedText()))
+        return true;
+    $dbr = wfGetDB(DB_SLAVE);
     $subpagecount = $dbr->selectField('page', 'COUNT(*)', array(
         'page_namespace' => $title->getNamespace(),
         'page_title '.$dbr->buildLike($title->getDBkey().'/', $dbr->anyString()),
     ), __METHOD__);
     if ($subpagecount > 0)
     {
+        // Add AJAX lister
         global $wgOut;
         wfLoadExtensionMessages('SubPageList2');
         $wgOut->addHTML(
-            '<div id="subpagelist_ajax" class="catlinks"><a href="javascript:void(0)"'.
-            ' onclick="sajax_do_call(\'efAjaxSubpageList\', [wgTitle], function(request){'.
+            '<div id="subpagelist_ajax" class="catlinks" style="margin-top: 0"><a href="javascript:void(0)"'.
+            ' onclick="sajax_do_call(\'efAjaxSubpageList\', [wgPageName], function(request){'.
             ' if (request.status != 200) return; var s = document.getElementById(\'subpagelist_ajax\');'.
             ' s.innerHTML = s.childNodes[0].innerHTML+request.responseText; })">'.
             wfMsgNoTrans('subpagelist-view', $subpagecount).
