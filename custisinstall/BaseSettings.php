@@ -169,7 +169,7 @@ require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 # SubPageList2
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
-$wgSubpageListEverywhere = true;
+$egSubpageListEverywhere = true;
 
 # IntraACL
 if (!isset($egDisableIntraACL))
