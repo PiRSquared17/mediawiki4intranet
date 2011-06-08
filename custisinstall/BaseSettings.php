@@ -166,11 +166,6 @@ $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
-# SubPageList2
-require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
-$egSubpagelistDefaultTemplate = 'Template:SubPageList';
-$egSubpageListEverywhere = true;
-
 # IntraACL
 if (!isset($egDisableIntraACL))
 {
@@ -195,6 +190,11 @@ $wgWikilogMaxCommentSize = 0x7FFFFFFF;
 $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
+
+# SubPageList2
+require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
+$egSubpagelistDefaultTemplate = 'Template:SubPageList';
+$egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
 
 $wgMaxFilenameLength = 50;
 
