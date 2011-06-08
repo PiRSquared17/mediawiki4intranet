@@ -157,17 +157,19 @@ require_once($IP.'/extensions/SimpleForms/SimpleForms.php'); /* useful at least 
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 require_once($IP.'/extensions/Polls/poll.php');
 
-# Extension:Drafts
+# Drafts
 require_once($IP.'/extensions/Drafts/Drafts.php');
 $egDraftsAutoSaveWait = 60;   // 1 minute
 
-# Extension:FlvHandler
+# FlvHandler
 $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
 $wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
+# SubPageList2
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
+$wgSubpageListEverywhere = true;
 
 # IntraACL
 if (!isset($egDisableIntraACL))
