@@ -195,6 +195,7 @@ $wgWikilogCommentsOnItemPage = true;
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
 $egSubpagelistDefaultTemplate = 'Template:SubPageList';
 $egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
+$egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
 $wgMaxFilenameLength = 50;
 
