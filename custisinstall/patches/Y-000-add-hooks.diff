@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1301777230 -14400
+# Date 1308052880 -14400
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 
-diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/ChangesList.php
+diff -r 45da8fc662c9 -r 756b832d4320 includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
 @@ -751,6 +751,7 @@
@@ -15,7 +15,7 @@ diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/ChangesList.php
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Title.php
+diff -r 45da8fc662c9 -r 756b832d4320 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -1277,12 +1277,20 @@
@@ -39,7 +39,7 @@ diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Title.php
  
  		# Check $wgNamespaceProtection for restricted namespaces
  		if( $this->isNamespaceProtected() ) {
-diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Wiki.php
+diff -r 45da8fc662c9 -r 756b832d4320 includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
 @@ -152,6 +152,8 @@
@@ -51,3 +51,15 @@ diff -r 9cc4b1960d33 -r ca12bf6e1bf5 includes/Wiki.php
  		# If the user is not logged in, the Namespace:title of the article must be in
  		# the Read array in order for the user to see it. (We have to check here to
  		# catch special pages etc. We check again in Article::view())
+diff -r 45da8fc662c9 -r 756b832d4320 includes/specials/SpecialMovepage.php
+--- includes/specials/SpecialMovepage.php
++++ includes/specials/SpecialMovepage.php
+@@ -212,7 +212,7 @@
+ 					Xml::label( wfMsg( 'newtitle' ), 'wpNewTitle' ) .
+ 				"</td>
+ 				<td class='mw-input'>" .
+-					Xml::input( 'wpNewTitle', 40, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
++					Xml::input( 'wpNewTitle', 80, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
+ 					Xml::hidden( 'wpOldTitle', $this->oldTitle->getPrefixedText() ) .
+ 				"</td>
+ 			</tr>

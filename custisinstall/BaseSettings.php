@@ -56,6 +56,7 @@ $wgRightsText = "";
 $wgRightsIcon = "";
 $wgRightsCode = "";
 
+$wgExternalDiffEngine = 'wikidiff3';
 $wgDiff3 = "diff3";
 $wgImageMagickConvertCommand = "convert";
 
