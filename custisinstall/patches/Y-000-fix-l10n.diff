@@ -1,9 +1,10 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297452972 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1308053033 -14400
 Bug 73938 - YMD HMS date format
+Bug 81603 - fix <movepage> title of Special:MovePage
 
-diff -r b11befdd7427 -r 2cd40a272ac0 includes/specials/SpecialUserlogin.php
+diff -r 45da8fc662c9 -r ebbd4ee7b08e includes/specials/SpecialUserlogin.php
 --- includes/specials/SpecialUserlogin.php
 +++ includes/specials/SpecialUserlogin.php
 @@ -977,7 +977,7 @@
@@ -15,7 +16,7 @@ diff -r b11befdd7427 -r 2cd40a272ac0 includes/specials/SpecialUserlogin.php
  		$link .= '</a>';
  
  		# Don't show a "create account" link if the user can't
-diff -r b11befdd7427 -r 2cd40a272ac0 languages/messages/MessagesEn.php
+diff -r 45da8fc662c9 -r ebbd4ee7b08e languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -137,6 +137,7 @@
@@ -37,3 +38,15 @@ diff -r b11befdd7427 -r 2cd40a272ac0 languages/messages/MessagesEn.php
  );
  
  /**
+diff -r 45da8fc662c9 -r ebbd4ee7b08e languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -2478,7 +2478,7 @@
+ 'databasenotlocked'   => 'База данных не была заблокирована.',
+ 
+ # Move page
+-'move-page'                    => '$1 — переименование',
++'movepage'                     => '$1 — переименование',
+ 'move-page-legend'             => 'Переименование страницы',
+ 'movepagetext'                 => "Воспользовавшись формой ниже, вы переименуете страницу, одновременно переместив на новое место её журнал изменений.
+ Старое название станет перенаправлением на новое название.
