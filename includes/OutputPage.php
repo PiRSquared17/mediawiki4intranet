@@ -437,18 +437,9 @@ class OutputPage {
 
 	/**
 	 * "HTML title" means the contents of <title>.
-	 * It is stored as plain, unescaped text and will be run through htmlspecialchars in the skin file.
-	 * If $name is from page title, it can only override names which are also from page title,
-	 * but if it is not from page title, it can override all other names.
 	 */
 	public function setHTMLTitle( $name, $frompagetitle = false ) {
-		if ( $frompagetitle && $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-		}
-		elseif ( $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-			$this->mHTMLtitleFromPagetitle = false;
-		}
+		$this->mHTMLtitle = $name;
 	}
 
 	/**
@@ -478,7 +469,7 @@ class OutputPage {
 		}
 
 		# change "<i>foo&amp;bar</i>" to "foo&bar"
-		$this->setHTMLTitle( wfMsg( 'pagetitle', Sanitizer::stripAllTags( $nameWithTags ) ), true );
+		$this->setHTMLTitle( wfMsg( 'pagetitle', Sanitizer::stripAllTags( $nameWithTags ) ) );
 	}
 
 	/**
