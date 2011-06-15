@@ -301,14 +301,15 @@ class DeleteBatchForm {
 			/*this is absolutely required - creating a new ImagePage object does not automatically
 			provide it with image  */
 			$art->img = new Image( $art->mTitle );
+			$art->delete();
 		} else {
 			$art = new Article( $page );
+			$art->doDelete( $reason );
 		}
 
 		/* what is the generic reason for page deletion?
 		   something about the content, I guess...
 		*/
-		$art->doDelete( $reason );
 		$db->commit();
 		return true;
 	}
