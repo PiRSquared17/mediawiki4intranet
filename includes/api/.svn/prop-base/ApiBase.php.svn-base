@@ -1,0 +1,17 @@
+K 13
+svn:eol-style
+V 6
+native
+K 12
+svn:keywords
+V 2
+Id
+K 13
+svn:mergeinfo
+V 372
+/branches/REL1_15/phase3/includes/api/ApiBase.php:51646
+/branches/sqlite/includes/api/ApiBase.php:58211-58321
+/branches/wmf/1.16wmf4/includes/api/ApiBase.php:70064
+/branches/wmf-deployment/includes/api/ApiBase.php:53381,59952
+/trunk/phase3/includes/api/ApiBase.php:63549,63764,63897-63901,64454,64881,64948,69339,69347,69350,69369,69379,69776,69931,70062,74098-74099,79561
+END
