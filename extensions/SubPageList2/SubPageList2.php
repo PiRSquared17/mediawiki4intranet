@@ -1,18 +1,24 @@
 <?php
 
 /**
- * Add a <subpages> tag which produces a templated list of all subpages of the current page
+ * Features:
+ * - <subpages> tag produces a templated list of all subpages of the current page
+ * - {{#getsection|Title|section number}} parser function for extracting page sections
+ * - $egSubpagelistAjaxNamespaces(NS_MAIN => true) setting to display subpage list
+ *   using AJAX on every page with subpages from these namespaces.
+ *   $egSubpagelistAjaxDisableRE is a regexp which is additionally checked and if matched,
+ *   AJAX lister is hidden.
  *
  * @package MediaWiki
  * @subpackage Extensions
  * @author Vitaliy Filippov <vitalif@mail.ru>
  * @author based @ Martin Schallnahs <myself@schaelle.de>, Rob Church <robchur@gmail.com>
- * @copyright (c) 2009 Vitaliy Filippov, original Martin Schallnahs, Rob Church
+ * @copyright (c) 2009+ Vitaliy Filippov, original Martin Schallnahs, Rob Church
  * @licence GNU General Public Licence 2.0 or later
- * @link http://yourcmc.ru/wiki/SubPageList_(MediaWiki)
+ * @link http://wiki.4intra.net/SubPageList_(MediaWiki)
  * @todo usage of the attributes category, namespace and parent like ignore
- * @todo save all <subpages> occurrences into the DB, save templatelinks, flush pages on page edits
  *
+ * @TODO caching save all <subpages> occurrences into the DB, save templatelinks, flush pages on page edits
  */
 
 if (!defined('MEDIAWIKI'))
@@ -28,11 +34,13 @@ if (file_exists('extensions/SubPageList.php'))
 }
 
 $wgExtensionFunctions[] = 'efSubpageList';
+$wgExtensionMessagesFiles['SubPageList2'] = dirname(__FILE__).'/SubPageList2.i18n.php';
 $wgHooks['LanguageGetMagic'][] = 'efSubpageListLanguageGetMagic';
 $wgExtensionCredits['parserhook'][] = array(
     'name'   => 'Subpage List 3',
     'author' => 'Vitaliy Filippov, Martin Schallnahs, Rob Church'
 );
+$wgAjaxExportList[] = 'efAjaxSubpageList';
 
 /* $egSubpagelistDefaultTemplate = "Template:SubPageList_Default"; */
 
@@ -41,9 +49,11 @@ $wgExtensionCredits['parserhook'][] = array(
  */
 function efSubpageList()
 {
-    global $wgParser;
+    global $wgParser, $wgHooks, $egSubpagelistAjaxNamespaces;
     $wgParser->setHook('subpages', 'efRenderSubpageList');
     $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
+    if ($egSubpagelistAjaxNamespaces)
+        $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
 }
 
 function efSubpageListLanguageGetMagic(&$magicWords, $langCode = "en")
@@ -65,6 +75,116 @@ function efFunctionHookGetSection($parser, $num)
     $text = $parser->getSection($args, $num);
     $parser->mStripState = $st;
     return $text;
+}
+
+/**
+ * This function outputs nested html list with all subpages of a specific page
+ */
+function efAjaxSubpageList($pagename)
+{
+    global $wgUser;
+    $title = Title::newFromText($pagename);
+    if (!$title)
+        return '';
+    $dbr = wfGetDB(DB_SLAVE);
+    $res = $dbr->select(
+        'page', '*', array(
+            'page_namespace' => $title->getNamespace(),
+            'page_title '.$dbr->buildLike($title->getDBkey().'/', $dbr->anyString()),
+        ), __METHOD__,
+        array('ORDER BY' => 'page_title')
+    );
+    $pagelevel = substr_count($title->getText(), '/');
+    $rows = array();
+    foreach ($res as $row)
+    {
+        $row->title = Title::newFromRow($row);
+        // TODO IntraACL: batch right checking (probably LinkBatch)
+        if (!$row->title->userCanRead())
+            continue;
+        $parts = explode('/', $row->page_title);
+        $row->level = count($parts)-1;
+        $row->last_part = $parts[$row->level];
+        $s = $sp = '';
+        for ($i = 0; $i < count($parts)-1; $i++)
+        {
+            $s .= $sp.$parts[$i];
+            $sp = '/';
+            if (!$rows[$s] && $i > $pagelevel)
+                $rows[$s] = (object)array('page_title' => $s, 'level' => $i);
+        }
+        $rows[$row->page_title] = $row;
+    }
+    $res = NULL;
+    if (!$rows)
+        return '';
+    $html = '';
+    $stack = array($pagelevel);
+    foreach ($rows as $row)
+    {
+        if ($row->title)
+            $link = $wgUser->getSkin()->link($row->title, $row->title->getSubpageText());
+        else
+        {
+            $link = str_replace('_', ' ', $row->page_title);
+            if (($p = strrpos($link, '/')) !== false)
+                $link = substr($link, $p+1);
+        }
+        if ($row->level > $stack[0])
+        {
+            $html .= '<ul><li>'.$link;
+            array_unshift($stack, $row->level);
+        }
+        else
+        {
+            while ($row->level < $stack[0])
+            {
+                $html .= '</li></ul>';
+                array_shift($stack);
+            }
+            $html .= '</li><li>'.$link;
+        }
+    }
+    while ($stack[0] > $pagelevel)
+    {
+        $html .= '</li></ul>';
+        array_shift($stack);
+    }
+    return $html;
+}
+
+/**
+ * Set to ArticleViewHeader hook, outputs JS subpage lister, if there are any subpages available.
+ */
+function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
+{
+    global $egSubpagelistAjaxNamespaces, $egSubpagelistAjaxDisableRE;
+    $title = $article->getTitle();
+    // Filter pages based on namespace and title regexp
+    if (!$egSubpagelistAjaxNamespaces ||
+        !array_key_exists($title->getNamespace(), $egSubpagelistAjaxNamespaces) ||
+        $egSubpagelistAjaxDisableRE && preg_match($egSubpagelistAjaxDisableRE, $title->getPrefixedText()))
+        return true;
+    $dbr = wfGetDB(DB_SLAVE);
+    $subpagecount = $dbr->selectField('page', 'COUNT(*)', array(
+        'page_namespace' => $title->getNamespace(),
+        'page_title '.$dbr->buildLike($title->getDBkey().'/', $dbr->anyString()),
+    ), __METHOD__);
+    if ($subpagecount > 0)
+    {
+        // Add AJAX lister
+        global $wgOut;
+        wfLoadExtensionMessages('SubPageList2');
+        $wgOut->addHTML(
+            '<div id="subpagelist_ajax" class="catlinks" style="margin-top: 0"><a href="javascript:void(0)"'.
+            ' onclick="sajax_do_call(\'efAjaxSubpageList\', [wgPageName], function(request){'.
+            ' if (request.status != 200) return; var s = document.getElementById(\'subpagelist_ajax\');'.
+            ' s.innerHTML = s.childNodes[0].innerHTML+request.responseText; })">'.
+            wfMsgNoTrans('subpagelist-view', $subpagecount).
+            '</a></div>'
+        );
+    }
+    return true;
 }
 
 /**
@@ -158,7 +278,7 @@ class SubpageList
      */
     function checkCat($category)
     {
-        $dbr =& wfGetDB(DB_SLAVE);
+        $dbr = wfGetDB(DB_SLAVE);
         $exists = $dbr->selectField('categorylinks', '1', array('cl_to' => $category), __METHOD__);
         return intval($exists) > 0;
     }
@@ -263,7 +383,7 @@ class SubpageList
     function getPages()
     {
         wfProfileIn(__METHOD__);
-        $dbr =& wfGetDB(DB_SLAVE);
+        $dbr = wfGetDB(DB_SLAVE);
 
         $conditions = array();
         $deepness = '';

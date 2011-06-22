@@ -12,7 +12,7 @@ $messages = array();
  * @author Brion Vibber <brion@pobox.com>
  */
 $messages['en'] = array(
-	'svgedit-editbutton-edit' => 'Edit drawing',
+	'svgedit-editbutton-edit' => 'Edit image with SVGEdit',
 	'svgedit-editbutton-create' => 'Create image with SVGEdit',
 	'svgedit-summary-label' => 'Edit summary',
 	'svgedit-summary-default' => '/* Modified in svg-edit */',
@@ -20,7 +20,8 @@ $messages['en'] = array(
 	'svgedit-editor-close' => 'Cancel',
 	'svgedit-desc' => 'In-browser editing of SVG drawings with [http://code.google.com/p/svg-edit/ SVG-Edit]',
 	'svgedit-edit-tab' => 'Edit drawing',
-	'svgedit-edit-tab-tooltip' => 'You can edit this SVG drawing in your browser'
+	'svgedit-edit-tab-tooltip' => 'You can edit this SVG drawing in your browser',
+	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Also, you can <a href="$1">create/edit this SVG file with SVGEdit</a>.</div>',
 );
 
 /** Message documentation (Message documentation)
@@ -337,7 +338,7 @@ $messages['pt-br'] = array(
  * @author Александр Сигачёв
  */
 $messages['ru'] = array(
-	'svgedit-editbutton-edit' => 'Редактировать рисунок',
+	'svgedit-editbutton-edit' => 'Редактировать рисунок в SVGEdit',
 	'svgedit-editbutton-create' => 'Создать рисунок в SVGEdit',
 	'svgedit-summary-label' => 'Описание изменений',
 	'svgedit-summary-default' => '/ * Изменено в svg-edit * /',
@@ -346,6 +347,7 @@ $messages['ru'] = array(
 	'svgedit-desc' => 'Редактирование SVG-изображений в браузере с помощью [http://code.google.com/p/svg-edit/ SVG-Edit]',
 	'svgedit-edit-tab' => 'Править рисунок',
 	'svgedit-edit-tab-tooltip' => 'Вы можете редактировать этот SVG-рисунок в вашем браузере',
+	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Также вы можете <a href="$1">создать/изменить этот SVG-файл с помощью SVGEdit</a>.</div>',
 );
 
 /** Slovenian (Slovenščina)

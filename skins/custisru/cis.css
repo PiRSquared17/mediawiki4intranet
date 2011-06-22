@@ -42,7 +42,5 @@ td.vb { vertical-align: bottom; }
 table.wl-calendar, .wl-calendar-nav, .wl-calendar-month { font-size: 125%; text-align: center; }
 table.wl-calendar td { padding: 0 6px; }
 .wl-calendar-nav a.mw-nextlink { margin: 0 16px 0 0; }
-.wl-entry ul, ol { display: inline-block; }
-.wl-entry ol { margin-left: 15pt !important; }
 .newdate div { text-align: right; margin: 0 0 4px 0; }
 .newdate { text-align: right; padding: 0 8px 8px 0; }
