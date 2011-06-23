@@ -49,7 +49,10 @@ foreach ($orig_argv as $page)
     elseif ($proc && !is_integer($page))
     {
         if (substr($page, 0, 2) == '--')
+        {
             $proc = false;
+            $new_argv[] = $page;
+        }
         else
         {
             $title = Title::newFromText($page);
