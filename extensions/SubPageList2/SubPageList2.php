@@ -627,7 +627,8 @@ class SubpageList3
             $args['odd']           = $i&1 ? 0 : 1;
             $args['ns_'.$article->getTitle()->getNamespace()] = 1;
             $args['title']         = $t;
-            $args['title_rel']     = substr($t, strlen($this->options['parent'])+1);
+            if ($this->options['parent'])
+                $args['title_rel']     = substr($t, strlen($this->options['parent']->getText())+1);
             $xml = '<root>';
             $xml .= '<template><title>'.$tpl.'</title>';
             foreach ($args as $k => $v)
@@ -641,8 +642,7 @@ class SubpageList3
                 $this->error('spl-preprocess-error');
                 return '';
             }
-            $text .= $this->preprocess($article, $dom);
-            $text = rtrim($text) . "\n";
+            $text .= trim($this->preprocess($article, $dom)) . "\n";
         }
         return $text;
     }
