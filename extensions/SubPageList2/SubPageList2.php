@@ -367,7 +367,7 @@ class SubpageList3
             list($key, $value) = explode("=", $line, 2);
             $key = trim($key);
             $value = trim($value);
-            if (!$key || !$value)
+            if ($key === '' || $value === '')
                 continue;
             switch ($key)
             {
