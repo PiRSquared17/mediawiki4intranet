@@ -567,6 +567,7 @@ class SubpageList3
             $t = $dbr->tableName('categorylinks')." notcl";
             $tables[] = $t;
             $joins[$t] = array('LEFT JOIN', array('page_id=notcl.cl_from', 'notcl.cl_to' => $O['notcategory']));
+            $where[] = 'notcl.cl_to IS NULL';
         }
 
         foreach ($O['order'] as $o)
