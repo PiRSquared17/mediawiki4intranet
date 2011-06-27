@@ -1,8 +1,11 @@
 <?php
 
 /**
+ * Extension is similar to DynamicPageList & company, but code is simpler
+ * and functionality is more advanced.
+ *
  * Features:
- * - <subpages> tag produces a templated list of all subpages of the current page
+ * - <subpagelist> tag produces a simple or templated list of pages selected by dynamic conditions
  * - {{#getsection|Title|section number}} parser function for extracting page sections
  * - $egSubpagelistAjaxNamespaces(NS_MAIN => true) setting to display subpage list
  *   using AJAX on every page with subpages from these namespaces.
@@ -11,46 +14,96 @@
  *
  * @package MediaWiki
  * @subpackage Extensions
- * @author Vitaliy Filippov <vitalif@mail.ru>
- * @author based @ Martin Schallnahs <myself@schaelle.de>, Rob Church <robchur@gmail.com>
- * @copyright (c) 2009+ Vitaliy Filippov, original Martin Schallnahs, Rob Church
- * @licence GNU General Public Licence 2.0 or later
- * @link http://wiki.4intra.net/SubPageList_(MediaWiki)
- * @todo usage of the attributes category, namespace and parent like ignore
+ * @author Vitaliy Filippov <vitalif@mail.ru>, 2009+
+ * @author based on SubPageList by Martin Schallnahs <myself@schaelle.de>, Rob Church <robchur@gmail.com>
+ * @license GNU General Public Licence 2.0 or later
+ * @link http://wiki.4intra.net/SubPageList
  *
- * @TODO caching save all <subpages> occurrences into the DB, save templatelinks, flush pages on page edits
+ * @TODO caching: save all <subpages> occurrences into the DB, save templatelinks, flush pages on page edits
+ */
+
+/**
+ * Syntax is backwards compatible with Wikimedia's DynamicPageList syntax,
+ * except for 'firstcategorydate' related stuff. The text inside <subpagelist>
+ * is preprocessed, so you can use templates, magic words and parser functions
+ * inside it.
+ *
+ * <subpagelist>
+ *
+ *   namespace = Main|Talk|...       restrict list to some namespaces
+ *   category = A|B|C
+ *   category = D|E
+ *     Restrict page list to pages which are in one of these categories.
+ *     this option may be specified multiple times, following occurrences
+ *     will be appended as a conjunction, i.e., the resulting expression will be
+ *     (A or B or C) & (D or E). This is compatible with Wikimedia's DynamicPageList
+ *     syntax, but allows more complex queries.
+ *   notcategory = A                 exclude pages which are in category A
+ *   parent = P                      restrict listing to subpages of P
+ *   level = L or MIN..MAX           set wanted subpage nesting levels (i.e. number of '/' in title)
+ *                                   it must be equal to L or be within MIN..MAX
+ *   deepness = D or MIN..MAX        set wanted subpage nesting levels, relative to parent
+ *   ignore = L1|L2|...              ignore pages which match L1 or L2 or ... LIKE patterns:
+ *                                   '\_' and ' ' match single space
+ *                                   '_' matches any single character
+ *                                   '%' matches any substring
+ *                                   '\%' matches single '%' character
+ *   redirect = yes|no               restring listing to redirect or non-redirect pages
+ *
+ *   order|ordermethod = Y1 [asc|desc],Y2 [asc|desc],...
+ *     Sort pages by Y1,Y2,..., asc|desc can be specified right after Yi, each Yi is one of:
+ *       title
+ *       titlewithoutnamespace
+ *       lastedit
+ *       user
+ *       created|firstedit
+ *       length|size
+ *       popularity|pagecounter
+ *   order = ASC or DESC             ascending or descending sort order for all Yi (compatibility)
+ *   count|limit = N                 show at most N pages
+ *   offset = M                      skip first M pages
+ *
+ *   template = X
+ *     Use template:X for output. The template will be preprocessed just like when included
+ *     into listed article. I.e. all standard MediaWiki magic variables ({{PAGENAME}} {{REVISIONDAY}} etc)
+ *     will generate values corresponding to listed articles.
+ *     Additionally, the following parameters are passed to this template:
+ *       {{{index}}}                 list index, beginning at 0
+ *       {{{number}}}                list index, beginning at 1
+ *       {{{odd}}}                   is {{{number}}} odd? (1 or 0)
+ *       {{{ns_N}}}                  N is namespace index, value is 1
+ *       {{{title}}}                 full title
+ *       {{{title_rel}}}             title relative to parent specified in options
+ *
+ *   suppresserrors|noerrors|silent = true
+ *     suppress errors
+ *
+ * </subpagelist>
  */
 
 if (!defined('MEDIAWIKI'))
 {
     echo "This file is an extension to the MediaWiki software and cannot be used standalone.\n";
-    die(1);
-}
-
-if (file_exists('extensions/SubPageList.php'))
-{
-    echo "<strong>Fatal Error [Subpage List 2]:</strong> The orginal version of the SubpageList extension <em>(SubPageList.php)</em> is found in the extension dir, that may can produce a fatal error while using the <subpages> element.\n";
-    die(1);
+    die();
 }
 
 $wgExtensionFunctions[] = 'efSubpageList';
-$wgExtensionMessagesFiles['SubPageList2'] = dirname(__FILE__).'/SubPageList2.i18n.php';
+$wgExtensionMessagesFiles['SubPageList3'] = dirname(__FILE__).'/SubPageList2.i18n.php';
 $wgHooks['LanguageGetMagic'][] = 'efSubpageListLanguageGetMagic';
 $wgExtensionCredits['parserhook'][] = array(
-    'name'   => 'Subpage List 3',
-    'author' => 'Vitaliy Filippov, Martin Schallnahs, Rob Church'
+    'name'    => 'Subpage List 3 (Yet Another)',
+    'author'  => 'Vitaliy Filippov',
+    'url'     => 'http://wiki.4intra.net/SubPageList',
+    'version' => '2011-06-27',
 );
 $wgAjaxExportList[] = 'efAjaxSubpageList';
 
-/* $egSubpagelistDefaultTemplate = "Template:SubPageList_Default"; */
-
-/**
- * Hook in function
- */
 function efSubpageList()
 {
     global $wgParser, $wgHooks, $egSubpagelistAjaxNamespaces;
     $wgParser->setHook('subpages', 'efRenderSubpageList');
+    $wgParser->setHook('subpagelist', 'efRenderSubpageList');
+    $wgParser->setHook('dynamicpagelist', 'efRenderSubpageList');
     $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
     if ($egSubpagelistAjaxNamespaces)
         $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
@@ -174,7 +227,7 @@ function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
     {
         // Add AJAX lister
         global $wgOut;
-        wfLoadExtensionMessages('SubPageList2');
+        wfLoadExtensionMessages('SubPageList3');
         $wgOut->addHTML(
             '<div id="subpagelist_ajax" class="catlinks" style="margin-top: 0"><a href="javascript:void(0)"'.
             ' onclick="sajax_do_call(\'efAjaxSubpageList\', [wgPageName], function(request){'.
@@ -195,53 +248,41 @@ function efRenderSubpageList($input, $args, $parser)
     global $egInSubpageList;
     if (!$egInSubpageList)
         $egInSubpageList = array();
-    $key = array();
-    ksort($args);
-    foreach ($args as $k => $v)
-    {
-        $key[] = addslashes($k);
-        $key[] = addslashes($v);
-    }
-    $key = implode('"', $key);
     /* An ugly hack for diff display: does it hook Article::getContent() ?!!! */
-    if ($egInSubpageList[$key])
+    if ($egInSubpageList[$input])
         return '';
-    $egInSubpageList[$key] = 1;
-    $list = new SubpageList($parser);
-    $list->options($args);
+    $egInSubpageList[$input] = 1;
+    $list = new SubpageList3($input, $args, $parser);
     $r = $list->render();
-    unset($egInSubpageList[$key]);
+    unset($egInSubpageList[$input]);
     return $r;
 }
 
-class SubpageList
+class SubpageList3
 {
-    /* MediaWiki objects */
-    var $parser;
-    var $oldParser;
-    var $title;
-    var $language;
+    var $oldParser, $parser, $title;
 
-    /* Page set specification */
-    var $namespace = NULL;
-    var $parent    = NULL;
-    var $category  = array();
-    var $ignore    = NULL;
-    var $deepmin   = '';
-    var $deepmax   = '';
-
-    /* Title of template used for transformation */
-    var $template  = NULL;
-
-    /* Order and limit specification */
-    var $ordermethod = 'title';     /* title, lastedit, pagecounter */
-    var $order = 'ASC';
-    var $count = NULL;
-    var $offset = 0;
-
-    /* Debug mode variables */
-    var $debug = 0;
+    var $options = array();
     var $errors = array();
+
+    static $order = array(
+        'title' => 'page_namespace, UPPER(page_title)',
+        'titlewithoutnamespace' => 'UPPER(page_title)',
+        'lastedit' => 'lastedit.rev_timestamp',
+        'user' => 'lastedit.rev_user_text',
+        'firstedit' => 'creation.rev_timestamp',
+        'creation' => 'creation.rev_timestamp',
+        'pagecounter' => 'page_counter',
+        'popularity'  => 'page_counter',
+        'length' => 'page_len',
+        'size' => 'page_len',
+    );
+    static $order_join = array(
+        'user'      => array('revision', 'lastedit', 'lastedit.rev_id=page_latest'),
+        'lastedit'  => array('revision', 'lastedit', 'lastedit.rev_id=page_latest'),
+        'firstedit' => array('revision', 'creation', 'creation.rev_page=page_id AND creation.rev_timestamp=(SELECT MIN(rev_timestamp) FROM revision WHERE rev_page=page_id)'),
+        'creation'  => array('revision', 'creation', 'creation.rev_page=page_id AND creation.rev_timestamp=(SELECT MIN(rev_timestamp) FROM revision WHERE rev_page=page_id)'),
+    );
 
     /**
      * Constructor function of the class
@@ -250,24 +291,31 @@ class SubpageList
      * @see SubpageList
      * @private
      */
-    function SubpageList(&$parser)
+    function __construct($input, $args, $parser)
     {
-        global $wgContLang;
-        $parser->disableCache();
+        wfLoadExtensionMessages('SubPageList3');
         $this->oldParser = $parser;
         $this->parser = clone $parser;
         $this->title = $parser->mTitle;
-        $this->language = $wgContLang;
+        $this->options = $this->parseOptions($input);
     }
 
-    function error($message)
+    function error()
     {
-        $this->errors[] = "<strong>Error [Subpage List 2]:</strong> $message";
+        $args = func_get_args();
+        $msg = array_shift($args);
+        $this->errors[] = htmlspecialchars(wfMsg($msg, $args));
     }
 
     function getErrors()
     {
-        return implode("\n", $this->errors);
+        if (!$this->errors)
+            return '';
+        $html = "<p><strong>".wfMsg('spl-errors')."</strong></p><ul>";
+        foreach ($this->errors as $e)
+            $html .= "<li>$e</li>";
+        $html .= "</ul>";
+        return $html;
     }
 
     /**
@@ -276,101 +324,181 @@ class SubpageList
      * @return boolean if there is a cat with this title
      * @todo Anyone in #mediawiki means this way isn't the best
      */
-    function checkCat($category)
+    static function checkCat($category)
     {
         $dbr = wfGetDB(DB_SLAVE);
         $exists = $dbr->selectField('categorylinks', '1', array('cl_to' => $category), __METHOD__);
         return intval($exists) > 0;
     }
 
-    /* Parse <subpagelist> options */
-    function options($options)
+    /**
+     * check category $value and push it to $array
+     */
+    function pushCat(&$array, $value)
     {
-        global $egSubpagelistDefaultTemplate, $wgTitle;
-        foreach ($options as $k => &$v)
-            if (trim($v))
-                $v = trim($this->preprocess($wgTitle, $v));
-        unset($v);
-        if (($c = str_replace(' ', '_', $options['category'])) && $c != '-1')
-        {
-            $cats = explode('|', $c);
-            foreach ($cats as $c)
-            {
-                if ($this->checkCat($c))
-                    $this->category[] = $c;
-                else
-                    $this->error("Category '$c' is undefined.");
-            }
-        }
-        if ($t = $options['template'])
-            $this->template = $t;
-        elseif ($egSubpagelistDefaultTemplate)
-            $this->template = $egSubpagelistDefaultTemplate;
+        $title = Title::newFromText($value, NS_CATEGORY);
+        if ($title && $title->userCanRead() && self::checkCat($title->getDBkey()))
+            $array[] = $title->getDBkey();
         else
-            $this->template = $this->language->getNsText(NS_TEMPLATE).':'.$this->title->getPrefixedText();
-        if (($n = intval($options['count'])) > 0)
-            $this->count = $n;
-        if (($o = intval($options['offset'])) > 0)
-            $this->offset = $o;
-        if (($o = $options['debug']) && strtolower($o) != 'false' && strtolower($o) != 'no')
-            $this->debug = 1;
-        if ($d = $options['deepness'])
-        {
-            list ($min, $max) = split('\\.\\.', $d, 2);
-            if (($min = intval($min)) > 0)
-                $this->deepmin = $min;
-            if (($max = intval($max)) > 0 && $max >= $min)
-                $this->deepmax = $max;
-        }
-        if ($options['ignore'] && $options['ignore'] != '-1')
-            $this->ignore = preg_split('/[\s\|]*\|[\s\|]*/', trim($options['ignore']));
-        if ($o = strtolower($options['order']))
-        {
-            if ($o == 'asc' || $o == 'desc')
-                $this->order = $o;
-            else
-                $this->error("Value '$o' is invalid for option order, valid values are ASC and DESC.");
-        }
-        if ($o = strtolower($options['ordermethod']))
-        {
-            if ($o == 'title' || $o == 'lastedit' || $o == 'pagecounter' || $o == 'creation')
-                $this->ordermethod = $o;
-            else
-                $this->error("Value '$o' is invalid for option order, valid values are TITLE, LASTEDIT, and PAGECOUNTER.");
-        }
-        if (isset($options['namespace']) && ($o = $options['namespace']) != '-1')
-        {
-            if (!$o)
-                $this->namespace = NULL;
-            else if ($i = $this->language->getNsIndex($o))
-                $this->namespace = $i;
-            else
-            {
-                $this->namespace = $this->title->getNamespace();
-                $this->error("Namespace $o is undefined.");
-            }
-        }
-        if (isset($options['parent']) && ($o = $options['parent']) != '-1')
-            $this->parent = $o;
+            $this->error('spl-invalid-category', $value);
     }
 
     /**
-     * Produce the templatized page list
+     * Extract options from text $text
+     */
+    function parseOptions($text)
+    {
+        global $wgTitle, $wgContLang;
+        $text = $this->preprocess($wgTitle, $text);
+
+        $options = array(
+            'namespace' => array(),
+            'category' => array(),
+            'notcategory' => array(),
+            'ignore' => array(),
+            'redirect' => NULL,
+            'defaultorder' => 'asc',
+            'order' => array(),
+            'output' => 'list',
+        );
+
+        foreach (explode("\n", $text) as $line)
+        {
+            list($key, $value) = explode("=", $line, 2);
+            $key = trim($key);
+            $value = trim($value);
+            if (!$key || !$value)
+                continue;
+            switch ($key)
+            {
+            case 'namespace':
+                foreach (preg_split('/[\|\s]*\|[\|\s]*/u', $value) as $ns)
+                {
+                    if ($i = $wgContLang->getNsIndex($ns))
+                        $options['namespace'][] = $i;
+                    else
+                        $this->error('spl-invalid-ns', $ns);
+                }
+                break;
+            case 'category':
+                $or = array();
+                foreach (preg_split('/[\|\s]*\|[\|\s]*/u', $value) as $cat)
+                    $this->pushCat($or, $cat);
+                if ($or)
+                    $options['category'][] = $or;
+                break;
+            case 'notcategory':
+                $this->pushCat($options['notcategory'], $value);
+                break;
+            case 'parent':
+                $t = Title::newFromText($value);
+                if ($t && $t->userCanRead())
+                    $options['parent'] = $t;
+                break;
+            case 'ignore':
+                $options['ignore'] = array_merge($options['ignore'], $value);
+                break;
+            case 'redirect':
+                $options['redirect'] = $value == 'yes' || $value == 'true' || $value === '1';
+                break;
+            case 'deepness':
+                $options['level_relative'] = true;
+            case 'level':
+                $l = preg_split('/\.\.+/', $value, 2);
+                foreach ($l as &$x)
+                    $x = $x === '' ? NULL : intval($x);
+                unset($x);
+                $options['level_min'] = $l[0];
+                $options['level_max'] = count($l) > 1 ? $l[1] : $l[0];
+                break;
+            case 'order':
+                $value = strtolower($value);
+                if ($value == 'asc' || $value == 'desc')
+                {
+                    $options['defaultorder'] = $value;
+                    foreach ($options['order'] as &$o)
+                        $o[1] = $value;
+                    unset($o);
+                    break;
+                }
+            case 'ordermethod':
+                $value = strtolower($value);
+                $options['orderdir'] = array();
+                $options['ordermethod'] = array();
+                foreach (preg_split('/,+/', $value) as $o)
+                {
+                    $d = $options['defaultorder'];
+                    if (preg_match('/\s+(asc|desc)$/', $o, $m))
+                    {
+                        $d = $m[1];
+                        $o = substr($o, 0, -strlen($m[0]));
+                    }
+                    if (self::$order[$o])
+                        $options['order'][] = array($o, $d);
+                    else
+                        $this->error('spl-unknown-order', $value, implode(', ', array_keys(self::$order)));
+                }
+                break;
+            case 'count':
+                $key = 'limit';
+            case 'limit':
+                if (intval($value) <= 0)
+                {
+                    $this->error('spl-invalid-limit', $value);
+                    break;
+                }
+            case 'offset':
+                $options[$key] = intval($value);
+                break;
+            case 'template':
+                $tpl = Title::newFromText($value, NS_TEMPLATE);
+                if ($tpl->exists() && $tpl->userCanRead())
+                {
+                    $options['output'] = 'template';
+                    $options['template'] = $tpl;
+                }
+                else
+                    $this->error('spl-invalid-template', $value);
+                break;
+            case 'silent':
+            case 'noerrors':
+            case 'suppresserrors':
+                $options['silent'] = true;
+                break;
+            default:
+                $this->error('spl-unknown-option', $key, $value);
+            }
+        }
+
+        if (!$options['order'])
+            $options['order'] = array(array('title', $options['defaultorder']));
+
+        return $options;
+    }
+
+    /**
+     * Render page list
      * @return string html output
      */
     function render()
     {
         wfProfileIn(__METHOD__);
+        $this->oldParser->disableCache();
         $pages = $this->getPages();
         if (count($pages) > 0)
         {
-            $list = $this->makeList($pages);
-            $html = $this->parse($list);
-            $html = preg_replace('#^<p>(.*)</p>$#is', '\1', $html);
+            if ($this->options['output'] == 'template')
+            {
+                $list = $this->makeTemplatedList($pages);
+                $html = $this->parse($list);
+                $html = preg_replace('#^<p>(.*)</p>$#is', '\1', $html);
+            }
+            else
+                $html = $this->makeSimpleList($pages);
         }
         else
             $html = '';
-        if ($this->debug)
+        if (!$this->options['silent'])
             $html = $this->getErrors() . $html;
         wfProfileOut(__METHOD__);
         return $html;
@@ -384,61 +512,94 @@ class SubpageList
     {
         wfProfileIn(__METHOD__);
         $dbr = wfGetDB(DB_SLAVE);
+        $O = $this->options; // input options
 
-        $conditions = array();
-        $deepness = '';
-        $options = array();
-        $order = strtoupper($this->order);
-        $parent = '';
-        $tables = array('page');
+        $where = array(); // query conditions
+        $opt = array(); // query options
+        $tables = array('page'); // query tables
+        $joins = array(); // join conditions
 
-        if ($this->count)
-            $options['LIMIT'] = $this->count;
-        if ($this->offset)
-            $options['OFFSET'] = $this->offset;
-        if ($this->deepmax || $this->deepmin)
-            $deepness = '/?([^/]+(/|$)){' . $this->deepmin . ',' . $this->deepmax . '}$';
-        if (!is_null($this->namespace))
-            $conditions['page_namespace'] = $this->namespace;
-        if ($this->ordermethod == 'title')
-            $options['ORDER BY'] = '`page_namespace`, UPPER(`page_title`) ' . $order;
-        else if ($this->ordermethod == 'pagecounter')
-            $options['ORDER BY'] = '`page_counter` ' . $order;
-        else if ($this->ordermethod == 'creation')
-            $options['ORDER BY'] = '(SELECT rev_timestamp FROM `revision` WHERE rev_page=page_id ORDER BY rev_timestamp LIMIT 1) ' . $order;
-        else // if ($this->ordermethod == 'lastedit')
-            $options['ORDER BY'] = '`page_touched` ' . $order;
-        if ($this->parent || !is_null($this->parent) && ($this->category || $deepness))
-            $parent = str_replace(' ', '_', $this->parent);
-        elseif (is_null($this->parent))
-            $parent = $this->title->getDBkey() . '/';
-        if ($this->ignore)
-            foreach ($this->ignore as $aignore)
-                $conditions[] = '`page_title` NOT LIKE ' . $dbr->addQuotes($parent . $aignore);
-
-        $conditions['page_is_redirect'] = 0;
-        if ($parent || $deepness)
-            $conditions[] = '`page_title` REGEXP ' . $dbr->addQuotes('^' . preg_quote($parent) . $deepness);
-
-        if ($this->category)
+        if ($O['limit'])
+            $opt['LIMIT'] = $O['limit'];
+        if ($O['offset'])
+            $opt['OFFSET'] = $O['offset'];
+        $i = $O['level_min'];
+        $a = $O['level_max'];
+        if ($i !== NULL || $a !== NULL)
         {
-            $tables[] = 'categorylinks';
-            $conditions[] = 'page_id=cl_from';
-            $conditions['cl_to'] = $this->category;
+            if ($O['level_relative'])
+            {
+                $r = substr_count($O['parent']->getText(), '/');
+                if ($i !== NULL) $i += $r;
+                if ($a !== NULL) $a += $r;
+            }
+            $where[] = 'page_title REGEXP '.$dbr->addQuotes('^([^/]+(/|$)){' . ($i === NULL ? 0 : $i) . ',' . $a . '}[^/]+$');
+        }
+        if ($O['namespace'])
+            $where['page_namespace'] = $O['namespace'];
+        if ($O['parent'])
+            $where[] = 'page_title LIKE '.$dbr->addQuotes(str_replace(array('_', '%'), array('\_', '\%'), $O['parent']->getDBkey()).'/%');
+        if ($O['ignore'])
+            foreach ($O['ignore'] as $a)
+                $where[] = 'page_title NOT LIKE '.$dbr->addQuotes(str_replace(' ', '\_', $a));
+        if (($r = $O['redirect']) !== NULL)
+            $where['page_is_redirect'] = $r;
+
+        if ($O['category'])
+        {
+            $group = false;
+            foreach ($O['category'] as $i => $or)
+            {
+                $t = $dbr->tableName('categorylinks')." cl$i";
+                $tables[] = $t;
+                $joins[$t] = array('INNER JOIN', array("page_id=cl$i.cl_from", "cl$i.cl_to" => $or));
+                if (count($or) > 1)
+                    $group = true;
+            }
+            if ($group)
+                $opt['GROUP BY'] = 'page_id';
+        }
+
+        if ($O['notcategory'])
+        {
+            $t = $dbr->tableName('categorylinks')." notcl";
+            $tables[] = $t;
+            $joins[$t] = array('LEFT JOIN', array('page_id=notcl.cl_from', 'notcl.cl_to' => $O['notcategory']));
+        }
+
+        foreach ($O['order'] as $o)
+        {
+            $opt['ORDER BY'][] = self::$order[$o[0]] . ' ' . $o[1];
+            if ($j = self::$order_join[$o[0]])
+            {
+                $t = $dbr->tableName($j[0]).' '.$j[1];
+                if (!$joins[$t])
+                {
+                    $tables[] = $t;
+                    $joins[$t] = array('INNER JOIN', $j[2]);
+                }
+            }
+        }
+        $opt['ORDER BY'] = implode(', ', $opt['ORDER BY']);
+
+        if (!$where && !$joins)
+        {
+            $this->error('spl-no-restrictions');
+            return array();
         }
 
         $content = array();
-        $res = $dbr->select($tables, array('page_namespace', 'page_title'), $conditions, __METHOD__, $options);
-        while ($row = $dbr->fetchObject($res))
+        $res = $dbr->select($tables, 'page.*', $where, __METHOD__, $opt, $joins);
+        foreach ($res as $row)
         {
-            $title = Title::makeTitleSafe($row->page_namespace, $row->page_title);
-            if (is_object($title) && (!method_exists($title, 'userCanReadEx') || $title->userCanReadEx()))
+            $title = Title::newFromRow($row);
+            // TODO IntraACL: batch right checking (probably LinkBatch)
+            if (is_object($title) && $title->userCanRead())
             {
                 $article = new Article($title);
                 $content[] = $article;
             }
         }
-        $dbr->freeResult($res);
 
         wfProfileOut(__METHOD__);
         return $content;
@@ -451,9 +612,10 @@ class SubpageList
      * @param string $template Standard MediaWiki template-like source
      * @return string the parsed output
      */
-    function makeList($pages)
+    function makeTemplatedList($pages)
     {
         $text = '';
+        $tpl = $this->options['template']->getPrefixedText();
         foreach ($pages as $i => $article)
         {
             $args = array();
@@ -461,14 +623,11 @@ class SubpageList
             $args['index']         = $i;
             $args['number']        = $i+1;
             $args['odd']           = $i&1 ? 0 : 1;
-            $args['title_full']    = $article->getTitle()->getPrefixedText();
             $args['ns_'.$article->getTitle()->getNamespace()] = 1;
             $args['title']         = $t;
-            $args['title_rel']     = mb_substr($t, mb_strlen($this->parent));
-            $args['title_last']    = mb_strrpos($t, '/') !== false ? mb_substr($t, mb_strrpos($t, '/')+1) : $t;
-            $args['title_last']    = preg_replace('#\.jpg#is', '', $args['title_last']);
+            $args['title_rel']     = substr($t, strlen($this->options['parent'])+1);
             $xml = '<root>';
-            $xml .= '<template><title>'.$this->template.'</title>';
+            $xml .= '<template><title>'.$tpl.'</title>';
             foreach ($args as $k => $v)
                 $xml .= '<part><name>'.htmlspecialchars($k).'</name>=<value>'.htmlspecialchars($v).'</value></part>';
             $xml .= '</template>';
@@ -477,12 +636,26 @@ class SubpageList
             $result = $dom->loadXML($xml);
             if (!$result)
             {
-                $this->error('Cannot build templatized list.');
+                $this->error('spl-preprocess-error');
                 return '';
             }
             $text .= $this->preprocess($article, $dom);
+            $text = rtrim($text) . "\n";
         }
         return $text;
+    }
+
+    /**
+     * This function builds very simple bullet list of pages, without using any templates.
+     */
+    function makeSimpleList($pages)
+    {
+        global $wgUser;
+        $html = '<ul>';
+        foreach ($pages as $i => $article)
+            $html .= '<li>'.$wgUser->getSkin()->link($article->getTitle()).'</li>';
+        $html .= '</ul>';
+        return $html;
     }
 
     /**
