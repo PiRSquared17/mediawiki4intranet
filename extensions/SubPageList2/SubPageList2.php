@@ -376,6 +376,8 @@ class SubpageList3
                 {
                     if ($i = $wgContLang->getNsIndex($ns))
                         $options['namespace'][] = $i;
+                    elseif ($ns == 'Main' || $ns == '(Main)' || $ns == wfMsg('blanknamespace'))
+                        $options['namespace'][] = 0;
                     else
                         $this->error('spl-invalid-ns', $ns);
                 }
