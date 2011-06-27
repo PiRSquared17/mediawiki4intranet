@@ -98,7 +98,6 @@ require_once($IP.'/extensions/CharInsertList/CharInsertList.php');
 require_once($IP.'/extensions/Cite/Cite.php');
 require_once($IP.'/extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.php');
 require_once($IP.'/extensions/CategoryTree/CategoryTree.php');
-require_once($IP.'/extensions/MultiCategorySearch/MultiCategorySearch.php');
 
 $wgSubcategorizedAlwaysExclude = array('CustisWikiToLib',
     'CustisWikiToSMWiki', 'CustisWikiToSBWiki', 'CustisWikiToRDWiki',
@@ -191,9 +190,8 @@ $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
 
-# SubPageList2
+# SubPageList2 (really 3)
 require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
-$egSubpagelistDefaultTemplate = 'Template:SubPageList';
 $egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
 $egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
