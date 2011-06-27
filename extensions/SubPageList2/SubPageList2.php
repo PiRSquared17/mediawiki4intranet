@@ -1,16 +1,15 @@
 <?php
 
 /**
- * Extension is similar to DynamicPageList & company, but code is simpler
- * and functionality is more advanced.
+ * Extension is similar to DynamicPageList & company, but the code is simpler
+ * and the functionality is more advanced.
  *
  * Features:
  * - <subpagelist> tag produces a simple or templated list of pages selected by dynamic conditions
  * - {{#getsection|Title|section number}} parser function for extracting page sections
- * - $egSubpagelistAjaxNamespaces(NS_MAIN => true) setting to display subpage list
- *   using AJAX on every page with subpages from these namespaces.
- *   $egSubpagelistAjaxDisableRE is a regexp which is additionally checked and if matched,
- *   AJAX lister is hidden.
+ * - Automatic AJAX display of subpages everywhere:
+ *   $egSubpagelistAjaxNamespaces = array(NS_MAIN => true) setting enables this on namespaces specified.
+ *   $egSubpagelistAjaxDisableRE is a regexp disables this on pages whose title match it.
  *
  * @package MediaWiki
  * @subpackage Extensions
@@ -26,7 +25,7 @@
  * Syntax is backwards compatible with Wikimedia's DynamicPageList syntax,
  * except for 'firstcategorydate' related stuff. The text inside <subpagelist>
  * is preprocessed, so you can use templates, magic words and parser functions
- * inside it.
+ * inside it. Options are specified one per line.
  *
  * <subpagelist>
  *
