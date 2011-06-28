@@ -190,8 +190,8 @@ $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
 
-# SubPageList2 (really 3)
-require_once($IP.'/extensions/SubPageList2/SubPageList2.php');
+# TemplatedPageList
+require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
 $egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
 $egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
