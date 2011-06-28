@@ -16,7 +16,7 @@
  * @author Vitaliy Filippov <vitalif@mail.ru>, 2009+
  * @author based on SubPageList by Martin Schallnahs <myself@schaelle.de>, Rob Church <robchur@gmail.com>
  * @license GNU General Public Licence 2.0 or later
- * @link http://wiki.4intra.net/SubPageList
+ * @link http://wiki.4intra.net/TemplatedPageList
  *
  * @TODO caching: save all <subpages> occurrences into the DB, save templatelinks, flush pages on page edits
  */
@@ -86,29 +86,30 @@ if (!defined('MEDIAWIKI'))
     die();
 }
 
-$wgExtensionFunctions[] = 'efSubpageList';
-$wgExtensionMessagesFiles['SubPageList3'] = dirname(__FILE__).'/SubPageList2.i18n.php';
-$wgHooks['LanguageGetMagic'][] = 'efSubpageListLanguageGetMagic';
+$wgExtensionFunctions[] = 'efTemplatedPageList';
+$wgExtensionMessagesFiles['TemplatedPageList'] = dirname(__FILE__).'/TemplatedPageList.i18n.php';
+$wgHooks['LanguageGetMagic'][] = 'efTemplatedPageListLanguageGetMagic';
 $wgExtensionCredits['parserhook'][] = array(
-    'name'    => 'Subpage List 3 (Yet Another)',
+    'name'    => 'Templated Page List',
     'author'  => 'Vitaliy Filippov',
-    'url'     => 'http://wiki.4intra.net/SubPageList',
-    'version' => '2011-06-27',
+    'url'     => 'http://wiki.4intra.net/TemplatedPageList',
+    'version' => '2011-06-28',
 );
 $wgAjaxExportList[] = 'efAjaxSubpageList';
 
-function efSubpageList()
+function efTemplatedPageList()
 {
     global $wgParser, $wgHooks, $egSubpagelistAjaxNamespaces;
-    $wgParser->setHook('subpages', 'efRenderSubpageList');
-    $wgParser->setHook('subpagelist', 'efRenderSubpageList');
-    $wgParser->setHook('dynamicpagelist', 'efRenderSubpageList');
+    $wgParser->setHook('pagelist', 'efRenderTemplatedPageList');
+    $wgParser->setHook('subpages', 'efRenderTemplatedPageList');
+    $wgParser->setHook('subpagelist', 'efRenderTemplatedPageList');
+    $wgParser->setHook('dynamicpagelist', 'efRenderTemplatedPageList');
     $wgParser->setFunctionHook('getsection', 'efFunctionHookGetSection');
     if ($egSubpagelistAjaxNamespaces)
         $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
 }
 
-function efSubpageListLanguageGetMagic(&$magicWords, $langCode = "en")
+function efTemplatedPageListLanguageGetMagic(&$magicWords, $langCode = "en")
 {
     $magicWords['getsection'] = array(0, 'getsection');
     return true;
@@ -226,7 +227,7 @@ function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
     {
         // Add AJAX lister
         global $wgOut;
-        wfLoadExtensionMessages('SubPageList3');
+        wfLoadExtensionMessages('TemplatedPageList');
         $wgOut->addHTML(
             '<div id="subpagelist_ajax" class="catlinks" style="margin-top: 0"><a href="javascript:void(0)"'.
             ' onclick="sajax_do_call(\'efAjaxSubpageList\', [wgPageName], function(request){'.
@@ -242,7 +243,7 @@ function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
 /**
  * Function called by the Hook, returns the wiki text
  */
-function efRenderSubpageList($input, $args, $parser)
+function efRenderTemplatedPageList($input, $args, $parser)
 {
     global $egInSubpageList;
     if (!$egInSubpageList)
@@ -251,13 +252,13 @@ function efRenderSubpageList($input, $args, $parser)
     if ($egInSubpageList[$input])
         return '';
     $egInSubpageList[$input] = 1;
-    $list = new SubpageList3($input, $args, $parser);
+    $list = new TemplatedPageList($input, $args, $parser);
     $r = $list->render();
     unset($egInSubpageList[$input]);
     return $r;
 }
 
-class SubpageList3
+class TemplatedPageList
 {
     var $oldParser, $parser, $title;
 
@@ -283,16 +284,10 @@ class SubpageList3
         'creation'  => array('revision', 'creation', 'creation.rev_page=page_id AND creation.rev_timestamp=(SELECT MIN(rev_timestamp) FROM revision WHERE rev_page=page_id)'),
     );
 
-    /**
-     * Constructor function of the class
-     * @param object $parser the parser object
-     * @global object $wgContLang
-     * @see SubpageList
-     * @private
-     */
+    /* Constructor. $input is tag text, $args is tag arguments, $parser is parser object */
     function __construct($input, $args, $parser)
     {
-        wfLoadExtensionMessages('SubPageList3');
+        wfLoadExtensionMessages('TemplatedPageList');
         $this->oldParser = $parser;
         $this->parser = clone $parser;
         $this->title = $parser->mTitle;
@@ -321,17 +316,17 @@ class SubpageList3
      * check if there is any link to this cat, this is a check if there is a cat.
      * @param string $category the category title
      * @return boolean if there is a cat with this title
-     * @todo Anyone in #mediawiki means this way isn't the best
      */
     static function checkCat($category)
     {
         $dbr = wfGetDB(DB_SLAVE);
-        $exists = $dbr->selectField('categorylinks', '1', array('cl_to' => $category), __METHOD__);
+        $exists = $dbr->selectField('categorylinks', '1', array('cl_to' => $category), __METHOD__, array('LIMIT' => 1));
         return intval($exists) > 0;
     }
 
     /**
-     * check category $value and push it to $array
+     * check category $value, push it to $array, if it is correct,
+     * and remember an error, if not
      */
     function pushCat(&$array, $value)
     {
