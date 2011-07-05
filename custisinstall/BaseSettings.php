@@ -132,9 +132,6 @@ $wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
 require_once($IP.'/extensions/PagedTiffHandler/PagedTiffHandler.php');
 unset($wgAutoloadClasses['PagedTiffHandlerSeleniumTestSuite']);
 
-/* CustIS Bug 60996 cURL environment proxy support */
-$wgAutoloadClasses['CurlEnvProxy'] = dirname(__FILE__).'/curl-env-proxy.php';
-
 $wgAllowCategorizedRecentChanges = true;
 
 require_once($IP.'/extensions/MergeConflicts/MergeConflicts.php');
