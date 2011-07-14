@@ -41,7 +41,7 @@ $EXT_OUR = explode(' ',
     ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
     ' IntraACL ListFeed OpenID Calendar Wikilog GlobalAuth PlantUML TemplatedPageList HttpAuth'.
-    ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit');
+    ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit RegexParserFunctions');
 $SKINS_OUR = explode(' ',
     'custis custisru dumphtml ichick');
 
