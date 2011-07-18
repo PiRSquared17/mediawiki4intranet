@@ -2247,7 +2247,7 @@ class Parser
 									substr( $output, $lastParagraphPos+3 );
 								$this->mLastSection = 'div';
 							}
-							elseif ( !$this->mLastSection )
+							elseif ( !$this->mLastSection && !$dontStartParagraph )
 							{
 								$lastParagraphPos = strlen( $output );
 								$output .= '<div class="paragraph">';

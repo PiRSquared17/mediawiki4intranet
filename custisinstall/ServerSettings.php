@@ -52,3 +52,6 @@ $wgPdfPostProcessor = $wgImageMagickConvertCommand;
 $wgPdfInfo = 'pdfinfo';
 
 $wgDiff3 = '/usr/bin/diff3';
+
+// Bug 82496 - enable scary (cross-wiki) transclusions
+$wgEnableScaryTranscluding = true;
