@@ -1,0 +1,8 @@
+K 13
+svn:mergeinfo
+V 188
+/branches/REL1_15/phase3/includes:51646
+/branches/sqlite/includes:58211-58321
+/branches/wmf-deployment/includes:53381
+/trunk/phase3/includes:63549,63764,63897-63901,64876,64881,64948,79561
+END
