@@ -1,10 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1308052880 -14400
+# Date 1311248773 -14400
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
+Bug 81603, increase page name field size on rename page
+Bug 82496, increase URL length limit for scary (interwiki) transclusions
 
-diff -r 45da8fc662c9 -r 756b832d4320 includes/ChangesList.php
+diff -r 45da8fc662c9 -r d52b426a6020 includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
 @@ -751,6 +751,7 @@
@@ -15,7 +17,7 @@ diff -r 45da8fc662c9 -r 756b832d4320 includes/ChangesList.php
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 45da8fc662c9 -r 756b832d4320 includes/Title.php
+diff -r 45da8fc662c9 -r d52b426a6020 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -1277,12 +1277,20 @@
@@ -39,7 +41,7 @@ diff -r 45da8fc662c9 -r 756b832d4320 includes/Title.php
  
  		# Check $wgNamespaceProtection for restricted namespaces
  		if( $this->isNamespaceProtected() ) {
-diff -r 45da8fc662c9 -r 756b832d4320 includes/Wiki.php
+diff -r 45da8fc662c9 -r d52b426a6020 includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
 @@ -152,6 +152,8 @@
@@ -51,7 +53,19 @@ diff -r 45da8fc662c9 -r 756b832d4320 includes/Wiki.php
  		# If the user is not logged in, the Namespace:title of the article must be in
  		# the Read array in order for the user to see it. (We have to check here to
  		# catch special pages etc. We check again in Article::view())
-diff -r 45da8fc662c9 -r 756b832d4320 includes/specials/SpecialMovepage.php
+diff -r 45da8fc662c9 -r d52b426a6020 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -3217,7 +3217,7 @@
+ 
+ 		$url = $title->getFullUrl( "action=$action" );
+ 
+-		if (strlen($url) > 255)
++		if (strlen($url) > 4095)
+ 			return wfMsg('scarytranscludetoolong');
+ 		return $this->fetchScaryTemplateMaybeFromCache($url);
+ 	}
+diff -r 45da8fc662c9 -r d52b426a6020 includes/specials/SpecialMovepage.php
 --- includes/specials/SpecialMovepage.php
 +++ includes/specials/SpecialMovepage.php
 @@ -212,7 +212,7 @@
