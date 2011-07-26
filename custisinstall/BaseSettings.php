@@ -132,6 +132,8 @@ $wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
 require_once($IP.'/extensions/PagedTiffHandler/PagedTiffHandler.php');
 unset($wgAutoloadClasses['PagedTiffHandlerSeleniumTestSuite']);
 
+require_once($IP.'/extensions/Dia/Dia.php');
+
 $wgAllowCategorizedRecentChanges = true;
 
 require_once($IP.'/extensions/MergeConflicts/MergeConflicts.php');
@@ -202,6 +204,7 @@ require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
+    $wgDIAConverterPath = realpath($IP."/../../app/dia/");
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
