@@ -37,6 +37,9 @@ if (!defined('MEDIAWIKI'))
 $wgHooks['SkinTemplateContentActions'][] = 'DocExport::onSkinTemplateContentActions';
 $wgHooks['UnknownAction'][]              = 'DocExport::onUnknownAction';
 $wgHooks['SkinTemplateNavigation'][]     = 'DocExport::onSkinTemplateNavigation';
+$wgHooks['MagicWordwgVariableIDs'][]     = 'DocExport::MagicWordwgVariableIDs';
+$wgHooks['ParserGetVariableValueSwitch'][] = 'DocExport::ParserGetVariableValueSwitch';
+
 $wgExtensionMessagesFiles['DocExport'] = dirname(__FILE__).'/DocExport.i18n.php';
 $wgExtensionFunctions[] = 'DocExport::Setup';
 $wgExtensionCredits['other'][] = array(
@@ -61,7 +64,23 @@ class DocExport
 
     //// hooks ////
 
-    // Hook for standard skins
+    // Hook that creates {{DOCEXPORT}} magic word
+    static function MagicWordwgVariableIDs(&$mVariablesIDs)
+    {
+        wfLoadExtensionMessages('UserMagic');
+        $mVariablesIDs[] = 'docexport';
+        return true;
+    }
+
+    // Hook that evaluates {{DOCEXPORT}} magic word
+    static function ParserGetVariableValueSwitch(&$parser, &$varCache, &$index, &$ret)
+    {
+        if ($index == 'docexport')
+            $ret = $parser->extIsDocExport ? '1' : '';
+        return true;
+    }
+
+    // Hook used to display a tab in standard skins
     static function onSkinTemplateContentActions(&$content_actions)
     {
         self::fillActions();
@@ -69,7 +88,7 @@ class DocExport
         return true;
     }
 
-    // Hook for Vector (MediaWiki 1.16+) skin
+    // Hook used to display a tab in Vector (MediaWiki 1.16+) skin
     static function onSkinTemplateNavigation(&$skin, &$links)
     {
         self::fillActions();
@@ -268,7 +287,9 @@ class DocExport
         $parserOptions->setEditSection(false);
         $parserOptions->setTidy(true);
         $wgParser->mShowToc = false;
+        $wgParser->extIsDocExport = true;
         $parserOutput = $wgParser->parse($article->preSaveTransform($article->getContent()) ."\n\n", $title, $parserOptions);
+        $wgParser->extIsDocExport = false;
 
         $bhtml = $parserOutput->getText();
         $html = self::html2print($bhtml);
@@ -279,11 +300,14 @@ class DocExport
     {
         global $wgScriptPath, $wgServer;
         $html = self::clearScreenOnly($html);
+        // Remove [svg] graphviz links
         $html = str_replace('[svg]</a>', '</a>', $html);
+        // Remove hyperlinks to images on the server
         $html = self::clearHrefs($html);
+        // Remove enclosing <object type="image/svg+xml"> for SVG+PNG images
+        $html = preg_replace('#<object[^<>]*type=[\"\']?image/svg\+xml[^<>]*>(.*?)</object\s*>#is', '\1', $html);
         // Make image urls absolute
-        $html = str_replace('src="'.$wgScriptPath, 'src="'.$wgServer.$wgUploadPath, $html);
-        $html = preg_replace('#(<object[^<>]*data=")'.preg_quote($wgUploadPath).'#', '\1'.$wgServer.$wgUploadPath, $html);
+        $html = str_replace('src="'.$wgScriptPath, 'src="'.$wgServer, $html);
         return $html;
     }
 
@@ -295,21 +319,21 @@ class DocExport
     static function clearHrefs($text)
     {
         global $wgScriptPath;
-        $regexp = "/<a href=\"". str_replace("/","\/",$wgScriptPath) . "\/images[^\"]+\">/i";
-        return self::stripTags($text, $regexp, "/<\\/\\s*a\\s*>/i");
+        $regexp = "/<a[^<>]*href=[\"\']?" . str_replace("/", "\/", $wgScriptPath) . "\/images[^<>]*>/i";
+        return self::stripTags($text, $regexp, '#</\s*a\s*>#i');
     }
 
     static function stripTags($text, $startRegexp, $endRegexp)
     {
         $stripped = '';
-
         while ('' != $text)
         {
             $p = preg_split($startRegexp, $text, 2);
             $stripped .= $p[0];
-            if ((count($p) < 2) || ('' == $p[1])) {
+            if ((count($p) < 2) || ('' == $p[1]))
                 $text = '';
-            } else {
+            else
+            {
                 $q = preg_split($endRegexp, $p[1], 2);
                 $stripped .= $q[0];
                 $text = $q[1];
