@@ -3,7 +3,7 @@
 --
 
 -- Table for storing page view and rate statistics
-CREATE TABLE /*_*/ppr_page_stats (
+CREATE TABLE /*$wgDBprefix*/ppr_page_stats (
     -- Page ID
     ps_page INT(10) UNSIGNED NOT NULL,
     -- User ID
@@ -13,14 +13,11 @@ CREATE TABLE /*_*/ppr_page_stats (
     -- View or rate timestamp
     ps_timestamp BINARY(14) NOT NULL,
     -- Primary key
-    PRIMARY KEY (ps_page, ps_user, ps_timestamp),
-    -- Foreign keys
-    FOREIGN KEY (ps_user) REFERENCES user (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
-    FOREIGN KEY (ps_page) REFERENCES page (page_id) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (ps_page, ps_user, ps_timestamp)
 ) /*$wgDBTableOptions*/;
 
 -- Table for storing aggregate statistics
-CREATE TABLE /*_*/ppr_page_aggr (
+CREATE TABLE /*$wgDBprefix*/ppr_page_aggr (
     -- Page ID
     pa_page INT(10) UNSIGNED NOT NULL,
     -- Positive votes
@@ -30,7 +27,10 @@ CREATE TABLE /*_*/ppr_page_aggr (
     -- Total unique views
     pa_total INT(10) UNSIGNED NOT NULL,
     -- Primary key
-    PRIMARY KEY (pa_page),
-    -- Foreign key
-    FOREIGN KEY (pa_page) REFERENCES page (page_id) ON DELETE CASCADE ON UPDATE CASCADE
+    PRIMARY KEY (pa_page)
 ) /*$wgDBTableOptions*/;
+
+-- Create foreign keys (InnoDB only)
+ALTER TABLE /*$wgDBprefix*/ppr_page_stats ADD FOREIGN KEY (ps_user) REFERENCES /*$wgDBprefix*/user (user_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE /*$wgDBprefix*/ppr_page_stats ADD FOREIGN KEY (ps_page) REFERENCES /*$wgDBprefix*/page (page_id) ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE /*$wgDBprefix*/ppr_page_aggr ADD FOREIGN KEY (pa_page) REFERENCES /*$wgDBprefix*/page (page_id) ON DELETE CASCADE ON UPDATE CASCADE;
