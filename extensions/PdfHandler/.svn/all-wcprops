@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 61
+/svnroot/mediawiki/!svn/ver/82148/trunk/extensions/PdfHandler
+END
+CreatePdfThumbnailsJob.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/76943/trunk/extensions/PdfHandler/CreatePdfThumbnailsJob.class.php
+END
+PdfHandler_body.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler/PdfHandler_body.php
+END
+PdfHandler.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/82148/trunk/extensions/PdfHandler/PdfHandler.i18n.php
+END
+PdfHandler.php
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/mediawiki/!svn/ver/76941/trunk/extensions/PdfHandler/PdfHandler.php
+END
+PdfHandler.image.php
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/mediawiki/!svn/ver/80806/trunk/extensions/PdfHandler/PdfHandler.image.php
+END
