@@ -70,8 +70,8 @@ class SvgThumbnailImage extends ThumbnailImage
 			$mtime = @filemtime( $linkfn );
 		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 		{
-			// Load original SVG and extract opening element
-			$svg = file_get_contents( $this->file->getPath() );
+			// Load original SVG or SVGZ and extract opening element
+			$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
 			preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
 			$open = $m[0][0];
 			// Add xlink namespace, if not yet
