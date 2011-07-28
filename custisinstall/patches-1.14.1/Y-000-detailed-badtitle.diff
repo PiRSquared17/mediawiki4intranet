@@ -1,0 +1,251 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1274457741 -14400
+Bug 64385 - Detailed "invalid title" diagnostics for MediaWiki
+
+diff -r 9626c7a0e12e -r 5498d1e88697 includes/Exception.php
+--- includes/Exception.php
++++ includes/Exception.php
+@@ -243,7 +243,10 @@
+ 	function __construct( $title, $msg ) {
+ 		$this->title = $title;
+ 		$this->msg = $msg;
+-		parent::__construct( wfMsg( $msg ) );
++		if( is_array( $msg ) )
++			parent::__construct( call_user_func_array( 'wfMsgExt', $msg ) );
++		else
++			parent::__construct( wfMsg( $msg ) );
+ 	}
+ 
+ 	function report() {
+diff -r 9626c7a0e12e -r 5498d1e88697 includes/OutputPage.php
+--- includes/OutputPage.php
++++ includes/OutputPage.php
+@@ -1067,7 +1067,7 @@
+ 		if ( isset($wgTitle) ) {
+ 			$this->mDebugtext .= 'Original title: ' . $wgTitle->getPrefixedText() . "\n";
+ 		}
+-		$this->setPageTitle( wfMsg( $title ) );
++		$this->setPageTitle( is_array( $title ) ? strip_tags( call_user_func_array( 'wfMsgExt', $title ) ) : wfMsg( $title ) );
+ 		$this->setHTMLTitle( wfMsg( 'errorpagetitle' ) );
+ 		$this->setRobotPolicy( 'noindex,nofollow' );
+ 		$this->setArticleRelated( false );
+@@ -1075,8 +1075,12 @@
+ 		$this->mRedirect = '';
+ 		$this->mBodytext = '';
+ 
+-		array_unshift( $params, 'parse' );
+-		array_unshift( $params, $msg );
++		if ( is_array( $msg ) )
++			$params = $msg;
++		else {
++			array_unshift( $params, 'parse' );
++			array_unshift( $params, $msg );
++		}
+ 		$this->addHTML( call_user_func_array( 'wfMsgExt', $params ) );
+ 
+ 		$this->returnToMain();
+diff -r 9626c7a0e12e -r 5498d1e88697 includes/Title.php
+--- includes/Title.php
++++ includes/Title.php
+@@ -27,6 +27,7 @@
+ 	//@{
+ 	static private $titleCache=array();
+ 	static private $interwikiCache=array();
++	static private $lastError=NULL;
+ 	//@}
+ 
+ 	/**
+@@ -2029,6 +2030,7 @@
+ 		global $wgContLang, $wgLocalInterwiki, $wgCapitalLinks;
+ 
+ 		# Initialisation
++		self::$lastError = NULL;
+ 		static $rxTc = false;
+ 		if( !$rxTc ) {
+ 			# Matching titles will be held as illegal.
+@@ -2061,11 +2063,13 @@
+ 		$dbkey = trim( $dbkey, '_' );
+ 
+ 		if ( '' == $dbkey ) {
++			self::$lastError = 'title-invalid-empty';
+ 			return false;
+ 		}
+ 
+ 		if( false !== strpos( $dbkey, UTF8_REPLACEMENT ) ) {
+ 			# Contained illegal UTF-8 sequences or forbidden Unicode chars.
++			self::$lastError = array( 'title-invalid-utf8', array(), UTF8_REPLACEMENT );
+ 			return false;
+ 		}
+ 
+@@ -2093,6 +2097,7 @@
+ 					if( !$firstPass ) {
+ 						# Can't make a local interwiki link to an interwiki link.
+ 						# That's just crazy!
++						self::$lastError = 'title-invalid-double-interwiki';
+ 						return false;
+ 					}
+ 
+@@ -2104,6 +2109,7 @@
+ 					if ( 0 == strcasecmp( $this->mInterwiki, $wgLocalInterwiki ) ) {
+ 						if( $dbkey == '' ) {
+ 							# Can't have an empty self-link
++							self::$lastError = 'title-invalid-empty';
+ 							return false;
+ 						}
+ 						$this->mInterwiki = '';
+@@ -2141,7 +2147,13 @@
+ 
+ 		# Reject illegal characters.
+ 		#
+-		if( preg_match( $rxTc, $dbkey ) ) {
++		if( preg_match( $rxTc, $dbkey, $m, PREG_OFFSET_CAPTURE ) ) {
++			$marked = substr( $dbkey, 0, $m[0][1] ) . '--->' . $m[0][0] . '<---' . substr( $dbkey, $m[0][1] + strlen( $m[0][0] ) );
++			self::$lastError = array( 'title-invalid-characters', array(),
++				$m[0][0], mb_strlen( substr( $dbkey, 0, $m[0][1] ) ),
++				mb_strlen( $m[0][0] ),
++				$marked
++			);
+ 			return false;
+ 		}
+ 
+@@ -2159,13 +2171,15 @@
+ 		       substr( $dbkey, -2 ) == '/.' ||
+ 		       substr( $dbkey, -3 ) == '/..' ) )
+ 		{
++			self::$lastError = 'title-invalid-relative';
+ 			return false;
+ 		}
+ 
+ 		/**
+ 		 * Magic tilde sequences? Nu-uh!
+ 		 */
+-		if( strpos( $dbkey, '~~~' ) !== false ) {
++		if( ( $p = strpos( $dbkey, '~~~' ) ) !== false ) {
++			self::$lastError = array( 'title-invalid-magic-tilde', array(), $p );
+ 			return false;
+ 		}
+ 
+@@ -2176,9 +2190,12 @@
+ 		 * in the database, and may edge over 255 bytes due to subpage syntax
+ 		 * for long titles, e.g. [[Special:Block/Long name]]
+ 		 */
+-		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > 255 ) ||
+-		  strlen( $dbkey ) > 512 )
++		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = 255 ) ) ||
++		  strlen( $dbkey ) > ( $max = 512 ) )
+ 		{
++			$chop = substr( $dbkey, 0, $max+1 );
++			$chop = mb_substr( $chop, 0, mb_strlen( $chop ) - 1 );
++			self::$lastError = array( 'title-invalid-too-long', array(), $max, $chop );
+ 			return false;
+ 		}
+ 
+@@ -2203,6 +2220,7 @@
+ 		if( $dbkey == '' &&
+ 			$this->mInterwiki == '' &&
+ 			$this->mNamespace != NS_MAIN ) {
++			self::$lastError = 'title-invalid-empty';
+ 			return false;
+ 		}
+ 		// Allow IPv6 usernames to start with '::' by canonicalizing IPv6 titles.
+@@ -2215,6 +2233,7 @@
+ 			IP::sanitizeIP( $dbkey ) : $dbkey;
+ 		// Any remaining initial :s are illegal.
+ 		if ( $dbkey !== '' && ':' == $dbkey{0} ) {
++			self::$lastError = 'title-invalid-leading-colon';
+ 			return false;
+ 		}
+ 
+@@ -2228,6 +2247,13 @@
+ 	}
+ 
+ 	/**
++	 * Get last title creation error
++	 */
++	static function getLastError() {
++		return self::$lastError;
++	}
++
++	/**
+ 	 * Set the fragment for this title. Removes the first character from the
+ 	 * specified fragment before setting, so it assumes you're passing it with 
+ 	 * an initial "#".
+diff -r 9626c7a0e12e -r 5498d1e88697 includes/Wiki.php
+--- includes/Wiki.php
++++ includes/Wiki.php
+@@ -173,9 +173,17 @@
+ 
+ 		$action = $this->getVal( 'Action' );
+ 		if( is_null($title) || $title->getDBkey() == '' ) {
++			$error = Title::getLastError();
+ 			$title = SpecialPage::getTitleFor( 'Badtitle' );
+ 			# Die now before we mess up $wgArticle and the skin stops working
+-			throw new ErrorPageError( 'badtitle', 'badtitletext' );
++			if ( !$error )
++				$error = 'badtitle';
++			$errortext = $error;
++			if ( is_array( $errortext ) )
++				$errortext[0] .= 'text';
++			else
++				$errortext .= 'text';
++			throw new ErrorPageError( $error, $errortext );
+ 		} else if( $title->getInterwiki() != '' ) {
+ 			if( $rdfrom = $request->getVal( 'rdfrom' ) ) {
+ 				$url = $title->getFullURL( 'rdfrom=' . urlencode( $rdfrom ) );
+diff -r 9626c7a0e12e -r 5498d1e88697 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -780,6 +780,24 @@
+ 
+ A list of valid special pages can be found at [[Special:SpecialPages|{{int:specialpages}}]].",
+ 
++# Title errors
++'title-invalid-empty'            => 'Empty page title',
++'title-invalid-utf8'             => 'Bad title',
++'title-invalid-double-interwiki' => 'Double interwiki link in page title',
++'title-invalid-characters'       => 'Bad title',
++'title-invalid-relative'         => 'Bad title',
++'title-invalid-magic-tilde'      => 'Bad title',
++'title-invalid-too-long'         => 'Page title is too long',
++'title-invalid-leading-colon'    => 'Bad title',
++'title-invalid-emptytext'            => 'The requested page title is empty or contains only the name of a namespace.',
++'title-invalid-utf8text'             => 'Page title can not contain UTF-8 sequence "$1".',
++'title-invalid-double-interwikitext' => 'The requested page title contains forbidden double interwiki link.',
++'title-invalid-characterstext'       => 'The requested page title contains forbidden characters: "$1" at position $2.',
++'title-invalid-relativetext'         => 'Relative page titles (./, ../) are forbidden, because they will often be unreachable when handled by user\'s browser.',
++'title-invalid-magic-tildetext'      => 'The requested page title contains forbidden magic tilde sequence (~~~).',
++'title-invalid-too-longtext'         => 'The requested page title is too long. It must be no longer than 255 bytes in UTF-8 encoding. Page title short enough would be "$2".',
++'title-invalid-leading-colontext'    => 'The requested page title contains forbidden colons at the beginning.',
++
+ # General errors
+ 'error'                => 'Error',
+ 'databaseerror'        => 'Database error',
+diff -r 9626c7a0e12e -r 5498d1e88697 languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -524,6 +524,24 @@
+ 
+ См. [[Special:SpecialPages|список служебных страниц]].",
+ 
++# Title errors
++'title-invalid-empty'            => 'Пустое имя страницы',
++'title-invalid-utf8'             => 'Недопустимое имя страницы',
++'title-invalid-double-interwiki' => 'Двойная интервики-ссылка',
++'title-invalid-characters'       => 'Недопустимое имя страницы',
++'title-invalid-relative'         => 'Недопустимое имя страницы',
++'title-invalid-magic-tilde'      => 'Недопустимое имя страницы',
++'title-invalid-too-long'         => 'Слишком длинное имя страницы',
++'title-invalid-leading-colon'    => 'Недопустимое имя страницы',
++'title-invalid-emptytext'            => 'Запрашиваемое название страницы пусто либо включает в себя только имя пространства имён без имени страницы.',
++'title-invalid-utf8text'             => 'В названии страницы запрещена UTF-8 последовательность "$1".',
++'title-invalid-double-interwikitext' => 'Запрашиваемое название страницы представляет собой недопустимую двойную интервики-ссылку.',
++'title-invalid-characterstext'       => 'Запрашиваемое название страницы содержит недопустимые символы: "$1" в позиции $2.',
++'title-invalid-relativetext'         => 'Относительные (./, ../) названия страниц запрещены, так как могут быть недоступны при обработке таких последовательностей броузером.',
++'title-invalid-magic-tildetext'      => 'Запрашиваемое название страницы содержит запрещённую магическую последовательность тильд (~~~).',
++'title-invalid-too-longtext'         => 'Запрашиваемое название страницы слишком длинное. Его длина не должна превышать $1 байт в кодировке UTF-8. Корректное по длине название было бы "$2".',
++'title-invalid-leading-colontext'    => 'Запрашиваемое название страницы содержит запрещённые двоеточия в начале.',
++
+ # General errors
+ 'error'                => 'Ошибка',
+ 'databaseerror'        => 'Ошибка базы данных',
