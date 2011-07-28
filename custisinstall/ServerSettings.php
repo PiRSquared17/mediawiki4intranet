@@ -5,6 +5,8 @@
 
 require_once('BaseSettings.php');
 
+$wgLogo    = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
+
 $wgPageShowWatchingUsers = true;
 
 require_once($IP.'/extensions/EnotifDiff/EnotifDiff.php');
