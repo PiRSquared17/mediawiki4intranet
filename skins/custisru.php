@@ -35,20 +35,20 @@ class SkinCustisRu extends SkinTemplate {
 
         // Append to the default screen common & print styles...
         $out->addStyle( 'custisru/cis.css', 'screen' );
-        if( $wgHandheldStyle ) {
-            // Currently in testing... try 'chick/main.css'
+        if( $wgHandheldStyle )
             $out->addStyle( $wgHandheldStyle, 'handheld' );
-        }
 
         $out->addStyle( 'monobook/IE50Fixes.css', 'screen', 'lt IE 5.5000' );
         $out->addStyle( 'monobook/IE55Fixes.css', 'screen', 'IE 5.5000' );
         $out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
         $out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
-
         $out->addStyle( 'custisru/IEFixes.css', 'screen', 'IE' );
 
         $out->addStyle( 'custisru/common.css', 'screen' );
         $out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
+
+        $out->addStyle( 'custisru/print.css', 'print' );
+        $out->addStyle( 'common/commonPrint.css', 'print' );
     }
 }
 
@@ -117,7 +117,7 @@ class CustisRuTemplate extends QuickTemplate {
 <?php if($this->data['body_onload']) { ?> onload="<?php $this->text('body_onload') ?>"<?php } ?>
  class="mediawiki <?php $this->text('dir') ?> <?php $this->text('pageclass') ?> <?php $this->text('skinnameclass') ?>">
 
-<table class="cen header">
+<table class="cen header screenonly">
 <tr>
  <td class="header_background_left" rowspan="2">
   <table class="cen">
@@ -188,9 +188,9 @@ class CustisRuTemplate extends QuickTemplate {
 </tr>
 </table>
 
-<table>
+<table class="printblock">
  <tr>
-  <td width="18%">
+  <td width="18%" class="screenonly">
    <table class="cen">
     <tr>
      <td><img class="iefix1px" alt="" height="56" width="5" src="<?=$sp?>/skins/custisru/menu_top_left.gif"></td>
@@ -219,7 +219,7 @@ class CustisRuTemplate extends QuickTemplate {
   <td rowspan="2" valign="top" class="info_text" width="82%" id="content">
    <a name="top" id="top"></a>
    <div class="headline">
-    <img width="53" height="56" alt="" src="<?=$sp?>/skins/custisru/icon_contact.gif" />
+    <img width="53" height="56" alt="" src="<?=$sp?>/skins/custisru/icon_contact.gif" class="screenonly" />
     <h1 id="firstHeading" class="firstHeading"><?php $this->data['displaytitle']!=""?$this->html('title'):$this->text('title') ?></h1>
    </div>
    <?php /* Site Notice */ if($this->data['sitenotice']) { ?><div id="siteNotice"><?php $this->html('sitenotice') ?></div><?php } ?>
@@ -238,9 +238,9 @@ class CustisRuTemplate extends QuickTemplate {
     <div class="visualClear"></div>
    </div>
   </td>
-  <td class="headline_right ar"><img alt="" height="73" width="17" src="<?=$sp?>/skins/custisru/headline_right.gif" /></td>
+  <td class="headline_right ar screenonly"><img alt="" height="73" width="17" src="<?=$sp?>/skins/custisru/headline_right.gif" /></td>
  </tr>
- <tr>
+ <tr class="screenonly">
   <td valign="top"></td>
   <td class="headline_right ar vb"><img alt="" height="89" width="17" src="<?=$sp?>/skins/custisru/info_bottom_right.gif" /></td>
  </tr>
@@ -248,7 +248,7 @@ class CustisRuTemplate extends QuickTemplate {
 
 <div id="prefooter1"></div>
 
-<table bgcolor="#FBFCFD">
+<table bgcolor="#FBFCFD" class="screenonly">
  <tr>
   <td class="separator_left" width="18%"></td>
   <td class="separator_right" width="82%"></td>
@@ -382,7 +382,7 @@ class CustisRuTemplate extends QuickTemplate {
                 text => $this->translator->translate('permalink'),
             );
 
-        wfRunHooks('SkinTemplateToolboxEnd', array(&$this, $cont));
+        wfRunHooks('SkinTemplateToolboxLinks', array(&$this, &$cont));
         $this->customBox($bar, $cont);
     }
 
@@ -405,6 +405,8 @@ class CustisRuTemplate extends QuickTemplate {
     function customBox( $bar, $cont ) {
         global $wgScriptPath;
         $sp = $wgScriptPath;
+        if (!$cont)
+            return '';
 ?>  <tr>
      <td class="menu_left_background"></td>
      <td class="menu_level_1 vb"><img alt="" height="12" width="4" src="<?=$sp?>/skins/custisru/ic_pass.gif" /><span class="menu_level_1"><?php $out = wfMsg( $bar ); if (wfEmptyMsg($bar, $out)) echo $bar; else echo $out; ?></span></td>
