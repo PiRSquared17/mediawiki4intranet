@@ -73,7 +73,6 @@ $wgNamespacesWithSubpages[NS_TALK] = true;
 $wgNamespacesWithSubpages[NS_USER_TALK] = true;
 $wgUseAjax = true;
 
-$wgLogo                 = "$wgScriptPath/skins/custis/cis-logo.png";
 $wgFileExtensions       = array(
     'png', 'gif', 'jpg', 'jpeg', 'svg',
     'zip', 'rar', '7z', 'gz', 'bz2', 'xpi',
@@ -204,7 +203,7 @@ require_once($IP . '/includes/GlobalFunctions.php');
 if (wfIsWindows())
 {
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
-    $wgDIAConverterPath = realpath($IP."/../../app/dia/");
+    $wgDIAConverterPath = realpath($IP."/../../app/dia/bin/");
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
@@ -212,8 +211,8 @@ if (wfIsWindows())
 
 $wgCookieExpiration = 3650 * 86400;
 
-$wgLogo    = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
-$wgFavicon = "$wgScriptPath/custisinstall/favicons/custiswiki.ico";
+$wgLogo    = "$wgScriptPath/custisinstall/logos/wiki4intranet-logo.png";
+$wgFavicon = "$wgScriptPath/custisinstall/favicons/wiki4intranet.ico";
 
 $wgDebugLogFile = false;
 
