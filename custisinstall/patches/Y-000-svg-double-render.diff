@@ -1,9 +1,94 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1306675627 -14400
+# Date 1311772999 -14400
 Bug 80684 - SVG double-render
+Bug 63356 - SVGZ and generic XML-GZIP mime-types support
 
-diff -r 45da8fc662c9 -r a045258d11d0 includes/media/SVG.php
+diff -r 45da8fc662c9 -r b302ec50bc81 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -419,6 +419,11 @@
+ 		'html'                              			=> 'text/html', // application/xhtml+xml?
+ );
+ 
++$wgXMLMayBeCompressed = array(
++	'image/svg+xml' => true,
++	'application/x-dia-diagram' => true,
++);
++
+ /**
+  * To set 'pretty' URL paths for actions other than
+  * plain page views, add to this array. For instance:
+diff -r 45da8fc662c9 -r b302ec50bc81 includes/MimeMagic.php
+--- includes/MimeMagic.php
++++ includes/MimeMagic.php
+@@ -399,7 +399,7 @@
+ 			'djvu', 'ogg', 'ogv', 'mid', 'pdf', 'wmf', 'xcf',
+ 
+ 			// XML formats we sure hope we recognize reliably
+-			'svg',
++			'svg', 'svgz',
+ 		);
+ 		return in_array( strtolower( $extension ), $types );
+ 	}
+@@ -497,11 +497,16 @@
+ 		 */
+ 		$xml = new XmlTypeCheck( $file );
+ 		if( $xml->wellFormed ) {
+-			global $wgXMLMimeTypes;
+-			if( isset( $wgXMLMimeTypes[$xml->getRootElement()] ) ) {
+-				return $wgXMLMimeTypes[$xml->getRootElement()];
+-			} else {
+-				return 'application/xml';
++			global $wgXMLMimeTypes, $wgXMLMayBeCompressed;
++			$t = $wgXMLMimeTypes[$xml->getRootElement()];
++			if( !$xml->compressed ) {
++				if( $t ) {
++					return $t;
++				} else {
++					return 'application/xml';
++				}
++			} elseif( $wgXMLMayBeCompressed[$t] ) {
++				return $t;
+ 			}
+ 		}
+ 
+diff -r 45da8fc662c9 -r b302ec50bc81 includes/XmlTypeCheck.php
+--- includes/XmlTypeCheck.php
++++ includes/XmlTypeCheck.php
+@@ -20,6 +20,12 @@
+ 	public $rootElement = '';
+ 
+ 	/**
++	 * Name of file compression type (can be only 'gzip' by now),
++	 * or FALSE if the file is uncompressed.
++	 */
++	public $compressed = false;
++
++	/**
+ 	 * @param $file string filename
+ 	 * @param $filterCallback callable (optional)
+ 	 *        Function to call to do additional custom validity checks from the
+@@ -48,6 +54,18 @@
+ 		xml_set_element_handler( $parser, array( $this, 'rootElementOpen' ), false );
+ 
+ 		$file = fopen( $fname, "rb" );
++		$gz = fread( $file, 2 );
++		if ( $gz == "\x1F\x8B" ) {
++			if ( function_exists( 'gzopen' ) ) {
++				fclose( $file );
++				$this->compressed = 'gzip';
++				$file = gzopen( $fname, "rb" );
++			} else {
++				return;
++			}
++		} else {
++			fseek( $file, 0, SEEK_SET );
++		}
+ 		do {
+ 			$chunk = fread( $file, 32768 );
+ 			$ret = xml_parse( $parser, $chunk, feof( $file ) );
+diff -r 45da8fc662c9 -r b302ec50bc81 includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
 @@ -4,6 +4,111 @@
@@ -76,8 +161,8 @@ diff -r 45da8fc662c9 -r a045258d11d0 includes/media/SVG.php
 +			$mtime = @filemtime( $linkfn );
 +		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 +		{
-+			// Load original SVG and extract opening element
-+			$svg = file_get_contents( $this->file->getPath() );
++			// Load original SVG or SVGZ and extract opening element
++			$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
 +			preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
 +			$open = $m[0][0];
 +			// Add xlink namespace, if not yet
