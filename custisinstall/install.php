@@ -41,7 +41,8 @@ $EXT_OUR = explode(' ',
     ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
     ' IntraACL ListFeed OpenID Calendar Wikilog GlobalAuth PlantUML TemplatedPageList HttpAuth'.
-    ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit RegexParserFunctions MergeConflicts Dia');
+    ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit RegexParserFunctions MergeConflicts Dia'.
+    ' AllNsSuggest NewPagesEx');
 $SKINS_OUR = explode(' ',
     'custis custisru dumphtml ichick');
 
@@ -92,19 +93,6 @@ foreach ($SKINS_OUR as $s)
 cmd("svn export $SVN_OUR/extensions/FullLocalImage.php $DIR/extensions/FullLocalImage.php");
 cmd("svn co --force http://geshi.svn.sourceforge.net/svnroot/geshi/trunk/geshi-1.0.X/src/ $DIR/extensions/geshi/");
 cmd("svn revert -R $DIR/extensions/geshi");
-
-/* Switch S5SlideShow from CustIS SVN to SF.net HG */
-if (file_exists("$DIR/extensions/S5SlideShow/.hg"))
-{
-    cmd("hg --cwd $DIR/extensions/S5SlideShow pull");
-    cmd("hg --cwd $DIR/extensions/S5SlideShow up");
-}
-else
-{
-    if (file_exists("$DIR/extensions/S5SlideShow/.svn"))
-        cmd(($WINDOWS ? "rmdir /S" : "rm -rf")." $DIR/extensions/S5SlideShow");
-    cmd("hg clone http://hg.code.sf.net/p/mwslideology/mercurial $DIR/extensions/S5SlideShow");
-}
 
 cmd(($WINDOWS ? "del" : "rm")." $DIR/extensions/CategoryTree/SubcatCat.i18n.php");
 
