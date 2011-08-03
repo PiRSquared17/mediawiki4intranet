@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1302191338 -14400
+# Date 1312375738 -10800
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 45da8fc662c9 -r 029de29965c8 includes/LocalisationCache.php
+diff -r 45da8fc662c9 -r d2890982ba4b includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
 @@ -2,6 +2,8 @@
@@ -29,7 +29,18 @@ diff -r 45da8fc662c9 -r 029de29965c8 includes/LocalisationCache.php
  					break;
  				default:
  					throw new MWException( 
-@@ -744,6 +750,60 @@
+@@ -319,7 +325,9 @@
+ 		}
+ 
+ 		$deps = $this->store->get( $code, 'deps' );
+-		if ( $deps === null ) {
++		// At least in LCStore_Accel list:messages sometimes expires separately
++		$keys = $this->store->get( $code, 'list', 'messages' );
++		if ( $deps === null || $keys === null ) {
+ 			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
+ 			return true;
+ 		}
+@@ -744,6 +752,60 @@
  }
  
  /**
