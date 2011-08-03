@@ -325,7 +325,9 @@ class LocalisationCache {
 		}
 
 		$deps = $this->store->get( $code, 'deps' );
-		if ( $deps === null ) {
+		// At least in LCStore_Accel list:messages sometimes expires separately
+		$keys = $this->store->get( $code, 'list', 'messages' );
+		if ( $deps === null || $keys === null ) {
 			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
 			return true;
 		}
