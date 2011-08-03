@@ -121,8 +121,9 @@ searchd
     read_timeout = 5
     max_children = 30
     pid_file     = /var/run/searchd.pid
-    max_matches  = 1000'.($style == 'rt' ? '
-    listen       = /var/run/searchd.sock:mysql41
+    max_matches  = 1000'.($style == 'rt' ? (substr(php_uname(), 0, 7) == 'Windows' ? '
+    listen       = 127.0.0.1:9306' : '
+    listen       = /var/run/searchd.sock:mysql41').'
     workers      = threads
     compat_sphinxql_magics = 0' : '').'
 }
