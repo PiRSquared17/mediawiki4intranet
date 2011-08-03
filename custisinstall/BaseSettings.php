@@ -207,6 +207,8 @@ if (wfIsWindows())
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
     # Bug 48216
     $wgTransliterateUploadFilenames = true;
+    $wgSphinxQL_host = '127.0.0.1';
+    $wgSphinxQL_port = '9306';
 }
 
 $wgCookieExpiration = 3650 * 86400;
