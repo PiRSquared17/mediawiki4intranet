@@ -227,6 +227,7 @@ sub test_random_search
         $response = make_request($ua, GET("$url/index.php/Special:Random"), "retrieve random page redirect", 200);
         $text = $response->content;
         ($title) = $text =~ /wgTitle\s*=\s*\"((?:[^\"\\]+|\\\"|\\\\)+)\"/iso;
+        die $text if $title eq 'Random';
         $title = decode 'unicode-escape', $title;
         $i++;
     }
@@ -250,8 +251,7 @@ sub test_search
     my $u1 = $su;
     $u = $title;
     Encode::_utf8_on($u);
-    $u =~ s!([/\.\(\)\!\#])!\\$1!gso;
-    $u =~ s!(\s)-!$1\\-!gso;
+    $u =~ s!([/\.\(\)\!\#\-])!\\$1!gso;
     Encode::_utf8_off($u);
     $u1 =~ s/\{TITLE\}/uri_escape($u)/gsoe;
     do
