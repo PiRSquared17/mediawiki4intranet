@@ -168,9 +168,10 @@ index $wiki[name]
 {
     type            = rt
     path            = /var/lib/sphinxsearch/data/$wiki[name]
-    rt_field        = old_text
-    rt_field        = page_title
-    rt_attr_uint    = page_namespace
+    rt_field        = text
+    rt_field        = title
+    rt_attr_uint    = namespace
+    rt_field        = category
     enable_star     = 1
     charset_type    = utf-8
     charset_table   = 0..9, A..Z->a..z, _, -, a..z, U+410..U+42F->U+430..U+44F, U+430..U+44F
