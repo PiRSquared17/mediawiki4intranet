@@ -241,7 +241,7 @@ sub test_random_search
 sub test_search
 {
     my ($url, $params, $ua) = @_;
-    my $su = $params->{searchurl} || '/Special:SphinxSearch?fulltext=Search&match_all=1&ns0=1&ns1=1&ns2=1&ns3=1&ns4=1&ns5=1&ns6=1&ns7=1&ns8=1&ns9=1&ns10=1&ns11=1&ns12=1&ns13=1&ns14=1&ns15=1&ns100=1&ns101=1&search={TITLE}&page={PAGE}';
+    my $su = $params->{searchurl} || '/Special:Search?search={TITLE}&limit=20&offset={OFFSET}&ns0=1&ns1=1&ns2=1&ns3=1&ns4=1&ns5=1&ns6=1&ns7=1&ns8=1&ns9=1&ns10=1&ns11=1&ns12=1&ns13=1&ns14=1&ns15=1&ns100=1&ns101=1&ns102=1&ns103=1&ns104=1&ns105=1&redirs=1';
     my $title = $params->{searchtitle} || return;
     my $page = 1;
     my @found;
@@ -258,6 +258,7 @@ sub test_search
     {
         $u = $u1;
         $u =~ s/\{PAGE\}/uri_escape($page)/gsoe;
+        $u =~ s/\{OFFSET\}/uri_escape($page*20)/gsoe;
         $u = "$url/index.php$u";
         $text = make_request($ua, GET($u), "get search page", 200)->content;
         @found = $text =~ /<li>(.*?)<\/li>/giso;
