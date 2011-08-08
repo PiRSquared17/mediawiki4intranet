@@ -258,7 +258,7 @@ sub test_search
     {
         $u = $u1;
         $u =~ s/\{PAGE\}/uri_escape($page)/gsoe;
-        $u =~ s/\{OFFSET\}/uri_escape($page*20)/gsoe;
+        $u =~ s/\{OFFSET\}/uri_escape(($page-1)*20)/gsoe;
         $u = "$url/index.php$u";
         $text = make_request($ua, GET($u), "get search page", 200)->content;
         @found = $text =~ /<li>(.*?)<\/li>/giso;
