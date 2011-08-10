@@ -274,8 +274,13 @@ class LogEventsList {
 		global $wgLang, $wgUser, $wgContLang;
 
 		$title = Title::makeTitle( $row->log_namespace, $row->log_title );
+/*op-patch|TS|2011-02-08|HaloACL|SafeTitle|start*/
+		if (!$title->userCanReadEx()) {
+			return '';
+		}
+/*op-patch|TS|2011-02-08|end*/
 		$classes = array( "mw-logline-{$row->log_type}" );
-		$time = $wgLang->timeanddate( wfTimestamp( TS_MW, $row->log_timestamp ), true );
+
 		// User links
 		if( self::isDeleted( $row, LogPage::DELETED_USER ) ) {
 			$userLink = '<span class="history-deleted">' . wfMsgHtml( 'rev-deleted-user' ) . '</span>';
