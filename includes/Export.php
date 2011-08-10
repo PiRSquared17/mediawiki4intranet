@@ -495,9 +495,16 @@ class XmlDumpWriter {
 	 * @access private
 	 */
 	function openPage( $row ) {
+		global $wgContLang;
 		$out = "  <page>\n";
 		$title = Title::makeTitle( $row->page_namespace, $row->page_title );
-		$out .= '    ' . Xml::elementClean( 'title', array(), $title->getPrefixedText() ) . "\n";
+		// Use english namespace names
+		$ns = $title->getNamespace();
+		if( MWNamespace::exists( $ns ) )
+			$ns = MWNamespace::getCanonicalName( $ns );
+		else
+			$ns = $wgContLang->getNsText( $ns );
+		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.':'.$title->getText() ) . "\n";
 		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
 		if( $row->page_is_redirect ) {
 			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
