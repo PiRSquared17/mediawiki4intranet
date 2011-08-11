@@ -226,7 +226,9 @@ sub test_random_search
     {
         $response = make_request($ua, GET("$url/index.php/Special:Random"), "retrieve random page redirect", 200);
         $text = $response->content;
+        Encode::_utf8_on($text);
         ($title) = $text =~ /wgTitle\s*=\s*\"((?:[^\"\\]+|\\\"|\\\\)+)\"/iso;
+        $title = 'Permission denied' if $text =~ /Запрошенное действие могут выполнять только участники из групп/so;
         die $text if $title eq 'Random';
         $title = decode 'unicode-escape', $title;
         $i++;
