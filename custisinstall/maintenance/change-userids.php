@@ -1,14 +1,30 @@
 <?php
 
-// A simple script to change user IDs in the Wiki database
-// to be equal with another Wiki's database user IDs.
-// Then you should be capable to use $wgSharedTables=array('user')
+// A simple script: writes SQL code to change user IDs in one Wiki database
+// so that they will be equal with another Wiki's database user IDs.
+// Then you should be capable to use $wgSharedTables[] = 'user'.
 // (c) Vitaliy Filippov, 2011
 
-// Configuration
+// Database configuration
 
-$source_database = array('localhost', 'dpwiki', 'dpwiki', 'dpwiki13');
-$reference_database = array('localhost', 'wiki', 'wiki', 'wiki13');
+if (count($argv) < 8)
+    fwrite(STDERR, "User ID change script
+USAGE: php $argv[0] <mysql_server> <db1> <user1> <pass1> <db2> <user2> <pass2>
+mysql_server is 'address[:port]' or '/path/to/unix/socket' for MySQL
+db1, user1, pass1 specify target database (database in which user IDs must be changed)
+db2, user2, pass2 specify reference database (database WITH which user table will be shared)
+");
+
+$mysql_server = $argv[1];
+$source_db = $argv[2];
+$source_dbuser = $argv[3];
+$source_dbpass = $argv[4];
+$reference_db = $argv[5];
+$reference_dbuser = $argv[6];
+$reference_dbpass = $argv[7];
+
+// Mapping onfiguration
+
 $shared_tables = array('user', 'user_groups', 'mwq_choice', 'mwq_choice_stats', 'mwq_question', 'mwq_question_test', 'mwq_test', 'mwq_ticket');
 
 $ID_LINKS = explode(' ',
@@ -35,34 +51,49 @@ $links['halo_acl_group_members']['child_id'] = 'child_type==user';
 
 // End configuration
 
-$db = mysql_connect($source_database[0], $source_database[1], $source_database[2]);
-$refdb = mysql_connect($reference_database[0], $reference_database[1], $reference_database[2]);
-if (!mysql_select_db($source_database[3], $db) || !mysql_select_db($reference_database[3], $refdb))
-    die("Can't connect");
+$db = mysql_connect($mysql_server, $source_dbuser, $source_dbpass);
+$refdb = mysql_connect($mysql_server, $reference_dbuser, $reference_dbpass);
+if (!mysql_select_db($source_db, $db) || !mysql_select_db($reference_db, $refdb))
+    die("Can't connect to one of databases\n");
 mysql_query('SET NAMES utf8', $db);
 mysql_query('SET NAMES utf8', $refdb);
 
-// Determine NAME=>ID mapping for reference database
-$res = mysql_query('SELECT user_id, user_name FROM user', $refdb);
-$refuserids = array();
-while ($row = mysql_fetch_row($res))
-    $refuserids[$row[1]] = $row[0];
-
-// Determine SRCID=>REFID mapping for users
-$res = mysql_query('SELECT user_id, user_name FROM user', $db);
-$useridbyname = array();
-$useridbyid = array();
+// Determine NAME=>ID / EMAIL=>ID mapping for reference database
+$res = mysql_query('SELECT user_id, user_name, user_email FROM user', $refdb);
+$refuseridbyname = $refuseridbyemail = array();
+$dupemail = array();
 while ($row = mysql_fetch_row($res))
 {
-    if ($refuserids[$row[1]])
-    {
-        $useridbyname[$row[1]] = $refuserids[$row[1]];
-        $useridbyid[$row[0]] = $refuserids[$row[1]];
-    }
+    $refuseridbyname[$row[1]] = $row[0];
+    if ($refuseridbyemail[$row[2]])
+        $dupemail[$row[2]]++;
+    else
+        $refuseridbyemail[$row[2]] = $row[0];
+}
+foreach ($dupemail as $email => $n)
+    unset($refuseridbyemail[$email]);
+
+// Determine SRCID=>REFID mapping for users
+$res = mysql_query('SELECT * FROM user', $db);
+$useridbyid = array();
+while ($row = mysql_fetch_assoc($res))
+{
+    if ($refuseridbyemail[$row['user_email']])
+        $useridbyid[$row['user_id']] = $refuseridbyemail[$row['user_email']];
+    elseif ($refuseridbyname[$row['user_name']])
+        $useridbyid[$row['user_id']] = $refuseridbyname[$row['user_name']];
     else
     {
-        $useridbyname[$row[1]] = $row[0];
-        $useridbyid[$row[0]] = $row[0];
+        // User does not exist in reference database, add it there
+        fwrite(STDERR, "Adding user $row[user_name] to $reference_db\n");
+        $new = $row;
+        unset($new['user_id']);
+        mysql_query(
+            "INSERT INTO `user` (`".implode("`,`", array_keys($new))."`) VALUES ('".
+            implode("','", array_map('mysql_real_escape_string', array_values($new)))."')",
+            $refdb
+        );
+        $useridbyid[$row['user_id']] = mysql_insert_id($refdb);
     }
 }
 
@@ -144,5 +175,5 @@ foreach ($links as $t => $fields)
 }
 
 foreach ($shared_tables as $t)
-    print "GRANT ALL PRIVILEGES ON `$reference_database[3]`.`$t` TO '$source_database[1]'@'localhost';\n";
+    print "GRANT ALL PRIVILEGES ON `$reference_db`.`$t` TO '$source_dbuser'@'localhost';\n";
 print "FLUSH PRIVILEGES;\n";
