@@ -27,13 +27,31 @@ $reference_dbpass = $argv[7];
 
 $shared_tables = array('user', 'user_groups', 'mwq_choice', 'mwq_choice_stats', 'mwq_question', 'mwq_question_test', 'mwq_test', 'mwq_ticket');
 
-$ID_LINKS = explode(' ',
-    'user.user_id external_user.eu_local_id archive.ar_user drafts.draft_user filearchive.fa_deleted_user '.
-    'filearchive.fa_user image.img_user ipblocks.ipb_user logging.log_user mwq_ticket.tk_user_id oldimage.oi_user '.
-    'page_last_visit.pv_user page_restrictions.pr_user protected_titles.pt_user recentchanges.rc_user revision.rev_user '.
-    'user_groups.ug_user user_newtalk.user_id user_properties.up_user watchlist.wl_user wikilog_authors.wla_author '.
-    'wikilog_comments.wlc_user wikilog_subscriptions.ws_user halo_acl_quickacl.user_id'
-);
+$ID_LINKS = explode("\n",
+"user.user_id
+external_user.eu_local_id
+archive.ar_user
+drafts.draft_user
+filearchive.fa_deleted_user
+filearchive.fa_user
+image.img_user
+ipblocks.ipb_user
+logging.log_user
+mwq_ticket.tk_user_id
+oldimage.oi_user
+page_last_visit.pv_user
+page_restrictions.pr_user
+protected_titles.pt_user
+recentchanges.rc_user
+revision.rev_user
+user_groups.ug_user
+user_newtalk.user_id
+user_properties.up_user
+watchlist.wl_user
+wikilog_authors.wla_author
+wikilog_comments.wlc_user
+wikilog_subscriptions.ws_user
+halo_acl_quickacl.user_id");
 
 $links = array();
 foreach ($ID_LINKS as $s)
@@ -49,6 +67,24 @@ $links['halo_acl_rights']['users'] = 'splitid';
 $links['halo_acl_security_descriptors']['mr_users'] = 'splitid';
 $links['halo_acl_group_members']['child_id'] = 'child_type==user';
 
+foreach (explode("\n",
+"user.user_name
+archive.ar_user_text
+filearchive.fa_user_text
+image.img_user_text
+logging.log_user_text
+oldimage.oi_user_text
+mwq_ticket.tk_user_text
+recentchanges.rc_user_text
+revision.rev_user_text
+wikilog_authors.wla_author_text
+wikilog_comments.wlc_user_text
+poll_vote.poll_user") as $s)
+{
+    list($table, $field) = explode('.', $s, 2);
+    $links[$table][$field] = 'name';
+}
+
 // End configuration
 
 $db = mysql_connect($mysql_server, $source_dbuser, $source_dbpass);
@@ -59,32 +95,90 @@ mysql_query('SET NAMES utf8', $db);
 mysql_query('SET NAMES utf8', $refdb);
 
 // Determine NAME=>ID / EMAIL=>ID mapping for reference database
-$res = mysql_query('SELECT user_id, user_name, user_email FROM user', $refdb);
-$refuseridbyname = $refuseridbyemail = array();
-$dupemail = array();
-while ($row = mysql_fetch_row($res))
+$res = mysql_query('SELECT * FROM user', $refdb);
+$refusers = $dupemail = $refuseridbyname = $refuseridbyemail = array();
+while ($row = mysql_fetch_assoc($res))
 {
-    $refuseridbyname[$row[1]] = $row[0];
-    if ($refuseridbyemail[$row[2]])
-        $dupemail[$row[2]]++;
-    else
-        $refuseridbyemail[$row[2]] = $row[0];
+    $refusers[$row['user_id']] = $row;
+    $refuseridbyname[$row['user_name']] = $row['user_id'];
+    if ($row['user_email'])
+    {
+        if ($refuseridbyemail[$row['user_email']])
+            $dupemail[$row['user_email']]++;
+        else
+            $refuseridbyemail[$row['user_email']] = $row['user_id'];
+    }
 }
 foreach ($dupemail as $email => $n)
     unset($refuseridbyemail[$email]);
 
-// Determine SRCID=>REFID mapping for users
+// Find multiple users with one email in source db
 $res = mysql_query('SELECT * FROM user', $db);
-$useridbyid = array();
+$srcusers = $dupemail = $srcuserbyemail = array();
 while ($row = mysql_fetch_assoc($res))
 {
-    if ($refuseridbyemail[$row['user_email']])
-        $useridbyid[$row['user_id']] = $refuseridbyemail[$row['user_email']];
-    elseif ($refuseridbyname[$row['user_name']])
-        $useridbyid[$row['user_id']] = $refuseridbyname[$row['user_name']];
-    else
+    $srcusers[$row['user_id']] = $row;
+    if ($row['user_email'])
     {
-        // User does not exist in reference database, add it there
+        if ($srcuserbyemail[$row['user_email']])
+        {
+            if (!$dupemail[$row['user_email']])
+                $dupemail[$row['user_email']] = array($srcuserbyemail[$row['user_email']]);
+            $dupemail[$row['user_email']][] = $row['user_id'];
+        }
+        else
+            $srcuserbyemail[$row['user_email']] = $row['user_id'];
+    }
+}
+
+if ($dupemail)
+{
+    $t = "Following users have same email address in source db:\n";
+    foreach ($dupemail as $email => $ids)
+    {
+        $l = array();
+        foreach ($ids as $id)
+            $l[] = $srcusers[$id]['user_name'];
+        $t .= "$email: ".implode(', ', $l)."\n";
+    }
+    $t .= "Continue? (Y/n) ";
+    fwrite(STDERR, $t);
+    if (preg_match('/^\s*n/is', fgets(STDIN)))
+        exit;
+    foreach ($dupemail as $email => $ids)
+        unset($refuseridbyemail[$email]);
+}
+
+// Determine SRCID=>REFID mapping for users
+$unknown = $useridbyid = $usernamebyname = array();
+foreach ($srcusers as $row)
+{
+    if ($refuseridbyname[$row['user_name']])
+        $useridbyid[$row['user_id']] = $refuseridbyname[$row['user_name']];
+    elseif ($refuseridbyemail[$row['user_email']])
+    {
+        $name = $refusers[$refuseridbyemail[$row['user_email']]]['user_name'];
+        fwrite(STDERR, "Will rename $row[user_name] to $name\n");
+        $usernamebyname[$row['user_name']] = $name;
+        $useridbyid[$row['user_id']] = $refuseridbyemail[$row['user_email']];
+    }
+    else
+        $unknown[] = $row;
+}
+
+if ($unknown)
+{
+    $l = array();
+    foreach ($unknown as $row)
+        $l[] = $row['user_name'].($row['user_email'] ? '<'.$row['user_email'].'>' : '');
+    $t = "Following users are not found in reference db: ".implode(', ', $l)."\n";
+    $t .= "Add them there and continue? (Y/n) ";
+    fwrite(STDERR, $t);
+    if (preg_match('/^\s*n/is', fgets(STDIN)))
+        exit;
+    foreach ($unknown as $row)
+    {
+        // User does not exist in reference database, add him there
         fwrite(STDERR, "Adding user $row[user_name] to $reference_db\n");
         $new = $row;
         unset($new['user_id']);
@@ -97,7 +191,7 @@ while ($row = mysql_fetch_assoc($res))
     }
 }
 
-// Rewrite user ids and print SQL
+// Print SQL which changes user ids/names
 print "SET NAMES utf8;\n\n";
 foreach ($links as $t => $fields)
 {
@@ -121,22 +215,31 @@ foreach ($links as $t => $fields)
                 if ($useridbyid[$row[$field]])
                     $new = $useridbyid[$row[$field]];
             }
+            elseif ($mapping == 'name')
+            {
+                if ($usernamebyname[$row[$field]])
+                    $new = $usernamebyname[$row[$field]];
+            }
             elseif ($mapping == 'wikilog')
             {
-                $row[$field] = unserialize($row[$field]);
-                foreach ($row[$field] as $username => &$userid)
-                    $userid = $useridbyid[$userid];
-                unset($userid);
-                $new = serialize($row[$field]);
+                $new = array();
+                foreach (unserialize($row[$field]) as $name => $id)
+                {
+                    if ($usernamebyname[$name])
+                        $new[$usernamebyname[$name]] = $useridbyid[$id];
+                    else
+                        $new[$name] = $useridbyid[$id];
+                }
+                $new = serialize($new);
             }
             elseif ($mapping == 'splitid')
             {
-                $row[$field] = explode(',', $row[$field]);
-                foreach ($row[$field] as &$userid)
-                    if ($useridbyid[$userid])
-                        $userid = $useridbyid[$userid];
-                unset($userid);
-                $new = implode(',', $row[$field]);
+                $new = explode(',', $row[$field]);
+                foreach ($new as &$id)
+                    if ($useridbyid[$id])
+                        $id = $useridbyid[$id];
+                unset($id);
+                $new = implode(',', $new);
             }
             elseif ($mapping == 'child_type==user')
             {
@@ -173,6 +276,15 @@ foreach ($links as $t => $fields)
         print ";\n-- (will update $updated rows)\n\n";
     }
 }
+
+// Update ACLs
+foreach ($usernamebyname as $from => $to)
+{
+    print "UPDATE page, revision, text SET old_text=REPLACE(old_text, '$from', '$to')
+WHERE old_text LIKE '%$from%' AND old_id=rev_text_id AND rev_id=page_latest AND page_namespace=102;\n";
+}
+if ($usernamebyname)
+    print "\n";
 
 foreach ($shared_tables as $t)
     print "GRANT ALL PRIVILEGES ON `$reference_db`.`$t` TO '$source_dbuser'@'localhost';\n";
