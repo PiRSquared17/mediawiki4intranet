@@ -1,3 +1,4 @@
+<?php
 /**
  * @defgroup Parser Parser
  *
