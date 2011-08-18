@@ -288,7 +288,9 @@ class ImportReporter {
 		$wgOut->addHTML( "<ul>\n" );
 	}
 
-	function reportPage( $title, $origTitle, $revisionCount, $successCount ) {
+	function reportPage( $title, $origTitle, $revisionCount, $successCount,
+		$lastExistingRevision, $lastLocalRevision, $lastRevision )
+	{
 		global $wgOut, $wgUser, $wgLang, $wgContLang;
 
 		$skin = $wgUser->getSkin();
@@ -298,12 +300,56 @@ class ImportReporter {
 		$localCount = $wgLang->formatNum( $successCount );
 		$contentCount = $wgContLang->formatNum( $successCount );
 
-		if( $successCount > 0 ) {
-			$wgOut->addHTML( "<li>" . $skin->linkKnown( $title ) . " " .
-				wfMsgExt( 'import-revision-count', array( 'parsemag', 'escape' ), $localCount ) .
-				"</li>\n"
-			);
+		/* No revisions in import */
+		if (!$lastExistingRevision && $successCount == 0)
+			$msg = wfMsgHtml('import-norevisions');
 
+		/* New page imported */
+		else if (!$lastLocalRevision && $successCount > 0)
+			$msg = wfMsgExt('import-revision-count-newpage', array('parsemag', 'escape'), $localCount);
+
+		else
+		{
+			$newer = !$lastExistingRevision ||
+				$lastLocalRevision->getTimestamp() > $lastExistingRevision->getTimestamp();
+			if ($successCount > 0)
+			{
+				/* Conflict */
+				if ($newer)
+				{
+					$linktext = wfMsgExt( 'import-conflict-difflink',
+						array( 'parsemag', 'escape' ),
+						$lastRevision->getId(),
+						$lastLocalRevision->getId() );
+					$link = $skin->makeKnownLinkObj(
+						$title, $linktext,
+						'diff=' . $lastRevision->getId() .
+						"&oldid=" . $lastLocalRevision->getId() );
+					$msg = wfMsgExt( 'import-conflict',
+						array( 'parsemag' ),
+						$localCount,
+						$link );
+				}
+				/* Page history continued with new revisions */
+				else
+					$msg = wfMsgExt('import-revision-count', array('parsemag', 'escape'), $localCount);
+			}
+			else
+			{
+				/* Local revision is newer */
+				if ($newer)
+					$msg = wfMsgHtml('import-nonewrevisions-localnewer');
+				/* No changes nowhere */
+				else
+					$msg = wfMsgHtml('import-nonewrevisions');
+			}
+		}
+
+		$msg = $skin->makeKnownLinkObj( $title ) . ': ' . $msg;
+
+		$wgOut->addHtml( "<li>$msg</li>" );
+
+		if( $successCount > 0 ) {
 			$log = new LogPage( 'import' );
 			if( $this->mIsUpload ) {
 				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
@@ -322,19 +368,9 @@ class ImportReporter {
 				}
 				$log->addEntry( 'interwiki', $title, $detail );
 			}
-
-			$comment = $detail; // quick
-			$dbw = wfGetDB( DB_MASTER );
-			$latest = $title->getLatestRevID();
-			$nullRevision = Revision::newNullRevision( $dbw, $title->getArticleId(), $comment, true );
-			$nullRevision->insertOn( $dbw );
-			$article = new Article( $title );
-			# Update page record
-			$article->updateRevisionOn( $dbw, $nullRevision );
-			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
-		} else {
-			$wgOut->addHTML( "<li>" . $skin->linkKnown( $title ) . " " .
-				wfMsgHtml( 'import-nonewrevisions' ) . "</li>\n" );
+			// [MediaWiki4Intranet] do not insert any empty revisions because it leads
+			// to fancy bugs (infinitely multiplicated revisions) in the case of cross
+			// (2-way) import-export.
 		}
 	}
 
