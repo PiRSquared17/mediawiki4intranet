@@ -150,15 +150,32 @@ if ($dupemail)
 }
 
 // Determine SRCID=>REFID mapping for users
-$unknown = $useridbyid = $usernamebyname = array();
+$unknown = $useridbyid = $usernamebyname = $referenced = $merged = array();
 foreach ($srcusers as $row)
 {
     if ($refuseridbyname[$row['user_name']])
+    {
         $useridbyid[$row['user_id']] = $refuseridbyname[$row['user_name']];
+        $referenced[$refuseridbyname[$row['user_name']]] = true;
+    }
+}
+
+// FIXME correct merging/removing of users
+foreach ($srcusers as $row)
+{
+    if ($refuseridbyname[$row['user_name']])
+    {
+    }
     elseif ($refuseridbyemail[$row['user_email']])
     {
         $name = $refusers[$refuseridbyemail[$row['user_email']]]['user_name'];
-        fwrite(STDERR, "Will rename $row[user_name] to $name\n");
+        if ($referenced[$refuseridbyemail[$row['user_email']]])
+        {
+            $merged[$row['user_id']] = true;
+            fwrite(STDERR, "Will merge $row[user_name] to $name\n");
+        }
+        else
+            fwrite(STDERR, "Will rename $row[user_name] to $name\n");
         $usernamebyname[$row['user_name']] = $name;
         $useridbyid[$row['user_id']] = $refuseridbyemail[$row['user_email']];
     }
@@ -169,9 +186,9 @@ foreach ($srcusers as $row)
 if ($unknown)
 {
     $l = array();
+    $t = "Following users are not found in reference db:\n";
     foreach ($unknown as $row)
-        $l[] = $row['user_name'].($row['user_email'] ? '<'.$row['user_email'].'>' : '');
-    $t = "Following users are not found in reference db: ".implode(', ', $l)."\n";
+        $t .= $row['user_name'].($row['user_email'] ? '<'.$row['user_email'].'>' : '') . "\n";
     $t .= "Add them there and continue? (Y/n) ";
     fwrite(STDERR, $t);
     if (preg_match('/^\s*n/is', fgets(STDIN)))
@@ -207,6 +224,11 @@ foreach ($links as $t => $fields)
     $updated = 0;
     while ($row = mysql_fetch_assoc($res))
     {
+        if ($t == 'user' && $merged[$row['user_id']])
+        {
+            // Skip merged users
+            continue;
+        }
         foreach ($fields as $field => $mapping)
         {
             $new = $row[$field];
