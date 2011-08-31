@@ -38,6 +38,7 @@ td.vb { vertical-align: bottom; }
 #prefooter1 img { top: 0; }
 .m_feedlink { margin-left: 10px; }
 .custom_box { font-size: 80%; padding: 0 .5em; }
+#catlinks-top div { float: left; margin: 0; }
 /* Custom styles for Wikilog Calendar */
 table.wl-calendar, .wl-calendar-nav, .wl-calendar-month { font-size: 125%; text-align: center; }
 table.wl-calendar td { padding: 0 6px; }
