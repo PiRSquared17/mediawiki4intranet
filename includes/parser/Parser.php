@@ -3483,7 +3483,7 @@ class Parser
 
 		$url = $title->getFullUrl( "action=$action" );
 
-		if (strlen($url) > 255)
+		if (strlen($url) > 4095)
 			return wfMsg('scarytranscludetoolong');
 		return $this->fetchScaryTemplateMaybeFromCache($url);
 	}
@@ -3992,10 +3992,10 @@ class Parser
 
 			# Don't number the heading if it is the only one (looks silly)
 			if( $doNumberHeadings && count( $matches[3] ) > 1) {
-				# Bug 54239 - Ссылки на разделы с нумерацией
+				# Bug 54239 - Number [[#Section|Section]] links
 				if (!$headNumberReplacer)
 					$headNumberReplacer = new ReplacementArray();
-				$headNumberReplacer->setPair('>'.trim($headline).'</a>', '>'.$numbering.' '.trim($headline).'</a>');
+				$headNumberReplacer->setPair('>'.$headlineHint.'</a>', '>'.$numbering.' '.$headlineHint.'</a>');
 				# the two are different if the line contains a link
 				$headline = $numbering . ' ' . $headline;
 			}
@@ -4075,7 +4075,7 @@ class Parser
 			$this->mOutput->setSections( $tocraw );
 		}
 
-		# Bug 54239 - Ссылки на разделы с нумерацией
+		# Bug 54239 - Number [[#Section|Section]] links
 		if ($headNumberReplacer)
 			$text = $headNumberReplacer->replace($text);
 
