@@ -158,7 +158,7 @@ class DocExport
     // Output HTML code with correct content-type for M$WORD / OO
     static function sendTo($article, $to)
     {
-        global $egDocExportStyles;
+        global $egDocExportStyles, $wgServer;
         $html = self::getPureHTML($article);
         $title = $article->getTitle();
 
@@ -166,15 +166,19 @@ class DocExport
         if (!$st)
             $st = dirname(__FILE__) . "/styles-$to.css";
         $st = @file_get_contents($st);
+        $st = str_replace('{{SERVER}}', $wgServer, $st);
         if ($to == 'word')
         {
             // Add styles for HTML list numbering
             $html = self::multinumLists($html, $st);
+            // Enable page numbering
+            $html = "<div class=\"SectionNumbered\">$html</div>";
         }
 
         $html =
             '<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN"><html><head>' .
             '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' .
+            ($to == 'word' ? '<meta name=ProgId content=Word.Document>' : '') .
             '<style type="text/css"><!--' . "\n" .
             $st .
             '/*-->*/</style></head><body>' .
@@ -291,12 +295,11 @@ class DocExport
         $parserOutput = $wgParser->parse($article->preSaveTransform($article->getContent()) ."\n\n", $title, $parserOptions);
         $wgParser->extIsDocExport = false;
 
-        $bhtml = $parserOutput->getText();
-        $html = self::html2print($bhtml);
+        $html = self::html2print($parserOutput->getText(), $title);
         return $html;
     }
 
-    static function html2print($html)
+    static function html2print($html, $title = NULL)
     {
         global $wgScriptPath, $wgServer;
         $html = self::clearScreenOnly($html);
@@ -308,6 +311,9 @@ class DocExport
         $html = preg_replace('#<object[^<>]*type=[\"\']?image/svg\+xml[^<>]*>(.*?)</object\s*>#is', '\1', $html);
         // Make image urls absolute
         $html = str_replace('src="'.$wgScriptPath, 'src="'.$wgServer, $html);
+        // Replace links to anchors within self to just anchors
+        if ($title)
+            $html = str_replace('href="'.$title->getLocalUrl().'#', 'href="#', $html);
         return $html;
     }
 

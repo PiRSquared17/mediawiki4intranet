@@ -76,8 +76,8 @@ function MagicNumberedHeadingsLanguageGetMagic(&$magicWords, $langCode)
             $magicWords[MAG_NUMBEREDHEADINGS] = array(0, '__ÖVVERSCHRIFTENUMMERIERE__', '__NUMBEREDHEADINGS__');
             break;
         default:
-            $magicWords[MAG_NUMBEREDHEADINGS] = array(0, '__NUMBEREDHEADINGS__');
-            $magicWords[MAG_NONUMBEREDHEADINGS] = array(0, '__NONUMBEREDHEADINGS__');
+            $magicWords['MAG_NUMBEREDHEADINGS'] = array(0, '__NUMBEREDHEADINGS__');
+            $magicWords['MAG_NONUMBEREDHEADINGS'] = array(0, '__NONUMBEREDHEADINGS__');
     }
     return true;
 }
@@ -90,4 +90,3 @@ function MagicNumberedHeadingsParserBeforeInternalParse($parser, $text, $stripSt
         $parser->mOptions->mNumberHeadings = FALSE;
     return true;
 }
-?>

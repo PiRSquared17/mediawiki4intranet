@@ -51,6 +51,8 @@ OPTIONS:
     I.e. if the replication script is ran each day, you can specify -t 24 to
     export only pages changed since last run, or better -t 25 to allow some
     overlap with previous day and make replication more reliable.
+  -t 'YYYY-MM-DD[ HH:MM:SS]' --- same as above, but specify date/time, not
+    the relative period in hours.
 
 When called without target list, $0 will attempt to replicate all targets
 found in config file. There must be 2 sections in config file according to
@@ -79,8 +81,16 @@ my $since_time;
 if ($ARGV[0] eq '-t')
 {
     shift @ARGV;
-    $since_time = int(time - 3600*shift @ARGV);
-    $since_time = strftime("%Y-%m-%d %H:%M:%S", localtime($since_time));
+    $since_time = shift @ARGV;
+    if ($since_time !~ /^\s*(\d{4,}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}:\d{2})?)\s*$/s)
+    {
+        $since_time = int(time - 3600*$since_time);
+        $since_time = strftime("%Y-%m-%d %H:%M:%S", localtime($since_time));
+    }
+    else
+    {
+        $since_time = $1;
+    }
 }
 
 $| = 1;
@@ -190,8 +200,9 @@ sub replicate
             images        => 1,
             selfcontained => 1,
             wpDownload    => 1,
-            curonly       => !$src->{fullhistory} ? 1 : 0,
             pages         => $text,
+            curonly       => 1,
+            (!$src->{fullhistory} ? (curonly => 1) : ()),
         ]),
         $fn, # Let LWP::UserAgent write response content into this file
     );
@@ -223,9 +234,9 @@ sub replicate
             xmlimport => [ $fn ],
         ],
     ));
-    die logp()." Could not import XML data into '$dest->{url}/index.php?title=Special:Import&action=submit': ".$response->status_line
+    die logp()." Could not import into '$dest->{url}/index.php?title=Special:Import&action=submit': ".$response->status_line
         unless $response->is_success;
-    die logp()." Could not import XML data into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
+    die logp()." Could not import into $dest->{url}: $1" if $response->content =~ /<p[^<>]*class\s*=\s*["']?error[^<>]*>\s*(.*?)\s*<\/p\s*>/iso;
     my $tp = clock_gettime(CLOCK_REALTIME);
     print sprintf(logp()." Imported in %.2f seconds\n", $tp-$tx);
     $text = $response->content;
