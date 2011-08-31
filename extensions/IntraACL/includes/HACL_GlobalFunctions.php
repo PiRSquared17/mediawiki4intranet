@@ -133,8 +133,10 @@ function haclfSetupExtension()
         define('HACL_HALOACL_VERSION', '1.0');
         $wgHooks['EditPage::showEditForm:initial'][] = 'HACLToolbar::warnNonReadableCreate';
         $wgHooks['UploadForm:initial'][] = 'HACLToolbar::warnNonReadableUpload';
-        $wgHooks['UploadFormInitDescriptor'][] = 'HACLToolbar::nonReadableUploadTexttopOptions';
         $wgHooks['EditPage::attemptSave'][] = 'HACLToolbar::attemptNonReadableCreate';
+        // ArticleSaveComplete_SaveSD hook must come before articleSaveComplete_SaveEmbedded
+        $wgHooks['ArticleSaveComplete'][] = 'HACLToolbar::articleSaveComplete_SaveSD';
+        $wgHooks['ArticleSaveComplete'][] = 'HACLToolbar::articleSaveComplete_SaveEmbedded';
     }
     else
     {
@@ -158,12 +160,8 @@ function haclfSetupExtension()
     global $wgHooks;
     $wgHooks['userCan'][] = 'HACLEvaluator::userCan';
 
-    // FIXME why always load all these messages? There are many.
     wfLoadExtensionMessages('IntraACL');
 
-    // ArticleSaveComplete_SaveSD hooks must come before articleSaveComplete_SaveEmbedded hook
-    $wgHooks['ArticleSaveComplete'][]   = 'HACLToolbar::articleSaveComplete_SaveSD';
-    $wgHooks['ArticleSaveComplete'][]   = 'HACLToolbar::articleSaveComplete_SaveEmbedded';
     $wgHooks['IsFileCacheable'][]       = 'haclfIsFileCacheable';
     $wgHooks['PageRenderingHash'][]     = 'haclfPageRenderingHash';
 

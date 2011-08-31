@@ -55,7 +55,7 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     $pos = strpos($target->getPrefixedText(), "?");
     $direccion['path'] = substr($target->getPrefixedText(), 0, $pos);
     $tituloArticulo = Title::newFromText($direccion['path']);
-    if (!$tituloArticulo->isKnown())
+    if (!$tituloArticulo || !$tituloArticulo->isKnown())
         return true;
 
     $nuevosArgumentos = array();
