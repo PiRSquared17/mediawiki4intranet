@@ -12,6 +12,21 @@ class SvgThumbnailImage extends ThumbnailImage
 		$this->later = $later;
 		$this->ThumbnailImage( $file, $url, $width, $height, $path, $page );
 	}
+	static function scaleParam( $name, $value, $sw, $sh )
+	{
+		if ( $name == 'viewBox' )
+		{
+			$value = preg_split( '/\s+/', $value );
+			$value[0] *= $sw; $value[1] *= $sh;
+			$value[2] *= $sw; $value[3] *= $sh;
+			$value = implode( ' ', $value );
+		}
+		elseif ( $name == 'width' )
+			$value *= $sw;
+		else
+			$value *= $sh;
+		return "$name=\"$value\"";
+	}
 	function toHtml( $options = array() )
 	{
 		if ( count( func_get_args() ) == 2 ) {
@@ -37,7 +52,7 @@ class SvgThumbnailImage extends ThumbnailImage
 		} elseif ( !empty( $options['file-link'] ) ) {
 			$linkAttribs = array( 'href' => $this->file->getURL() );
 		} else {
-			$linkAttribs = false;
+			$linkAttribs = array( 'href' => '' );
 		}
 
 		$attribs = array(
@@ -53,47 +68,64 @@ class SvgThumbnailImage extends ThumbnailImage
 			$attribs['class'] = $options['img-class'];
 		}
 
-		// :-( The only cross-browser way to link from SVG
-		// is to add an <a xlink:href> into SVG image itself
-		global $wgServer;
-		$href = $linkAttribs['href'];
-		if ( $href{0} == '/' )
-			$href = $wgServer . $href;
-		$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
-		$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
-			$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
-		$linkfn = $this->file->getThumbPath() . $hash;
-		$linkurl = $this->file->getThumbUrl() . $hash;
+		$linkurl = $this->file->getUrl();
 
-		// Cache changed SVGs only when TRANSFORM_LATER is on
-		if ( $this->later )
-			$mtime = @filemtime( $linkfn );
-		if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
+		if ( !empty( $linkAttribs['href'] ) ||
+			$this->width != $this->file->getWidth() ||
+			$this->height != $this->file->getHeight() )
 		{
-			// Load original SVG or SVGZ and extract opening element
-			$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
-			preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
-			$open = $m[0][0];
-			// Add xlink namespace, if not yet
-			if ( !strpos( $open, 'xmlns:xlink' ) )
-				$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
-			$sw = $this->width / $this->file->getWidth();
-			$sh = $this->height / $this->file->getHeight();
-			$close = '';
-			if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
+			if ( empty( $linkAttribs['href'] ) )
+				$linkAttribs['href'] = '';
+			if ( empty( $linkAttribs['title'] ) )
+				$linkAttribs['title'] = '';
+			// :-( The only cross-browser way to link from SVG
+			// is to add an <a xlink:href> into SVG image itself
+			global $wgServer;
+			$href = $linkAttribs['href'];
+			if ( $href{0} == '/' )
+				$href = $wgServer . $href;
+			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
+			$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
+				$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
+			$linkfn = $this->file->getThumbPath() . $hash;
+			$linkurl = $this->file->getThumbUrl() . $hash;
+
+			// Cache changed SVGs only when TRANSFORM_LATER is on
+			if ( $this->later )
+				$mtime = @filemtime( $linkfn );
+			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
 			{
-				// Wrap contents into a scaled layer
-				$open .= "<g transform='scale($sw $sh)'>";
-				$close = "</g>";
+				// Load original SVG or SVGZ and extract opening element
+				$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
+				preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
+				$open = $m[0][0];
+				$sw = $this->width / $this->file->getWidth();
+				$sh = $this->height / $this->file->getHeight();
+				$close = '';
+				// Scale width, height and viewBox
+				$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
+					create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
+				// Add xlink namespace, if not yet
+				if ( !strpos( $open, 'xmlns:xlink' ) )
+					$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
+				if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
+				{
+					// Wrap contents into a scaled layer
+					$open .= "<g transform='scale($sw $sh)'>";
+					$close = "</g>";
+				}
+				// Wrap contents into a hyperlink
+				if ( $href )
+				{
+					$open .= '<a xlink:href="'.htmlspecialchars( $href ).
+						'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
+					$close = "</a>$close";
+				}
+				// Write modified SVG
+				$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
+				$svg = str_replace( '</svg>', $close.'</svg>', $svg );
+				file_put_contents( $linkfn, $svg );
 			}
-			// Wrap contents into a hyperlink
-			$open .= '<a xlink:href="'.htmlspecialchars( $href ).
-				'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
-			$close = "</a>$close";
-			// Write modified SVG
-			$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
-			$svg = str_replace( '</svg>', $close.'</svg>', $svg );
-			file_put_contents( $linkfn, $svg );
 		}
 
 		// Output PNG <img> wrapped into SVG <object>
