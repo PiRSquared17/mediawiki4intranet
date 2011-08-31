@@ -5,7 +5,7 @@
 
 require_once('BaseSettings.php');
 
-$wgLogo    = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
+$wgLogo = "$wgScriptPath/custisinstall/logos/custiswiki-logo.png";
 
 $wgPageShowWatchingUsers = true;
 
@@ -36,9 +36,6 @@ $wgSMTP = array(
     "port"   => "25",
     "auth"   => false,
 );
-
-$wgSphinxSearch_host = 'localhost';
-$wgSphinxSearch_port = 3112;
 
 // Bug 57350 - PDF and Djvu (UNIX only)
 require_once($IP.'/extensions/PdfHandler/PdfHandler.php');

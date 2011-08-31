@@ -52,8 +52,7 @@ class HACLToolbar
             $haclgIP, $haclgHaloScriptPath, $wgScriptPath, $wgOut,
             $haclgOpenWikiAccess;
 
-        $wgOut->addHeadItem('hacl_toolbar_js', '<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/HACL_Toolbar.js"></script>');
-        $wgOut->addHeadItem('hacl_toolbar_css', '<link rel="stylesheet" type="text/css" media="screen, projection" href="'.$haclgHaloScriptPath.'/skins/haloacl_toolbar.css" />');
+        self::addToolbarLinks($wgOut);
 
         $ns = $wgContLang->getNsText(HACL_NS_ACL);
         $canModify = true;
@@ -100,8 +99,11 @@ class HACLToolbar
                     );
                 }
             }
-            // Get categories which have SDs and to which belongs this article (for hint)
-            $globalACL = array_merge($globalACL, HACLStorage::getDatabase()->getParentCategorySDs($title));
+            else
+            {
+                // Get categories which have SDs and to which belongs this article (for hint)
+                $globalACL = array_merge($globalACL, HACLStorage::getDatabase()->getParentCategorySDs($title));
+            }
         }
 
         // Add Quick ACLs
@@ -163,7 +165,8 @@ class HACLToolbar
                 $selectedIndex = $i;
 
         // Check if page namespace has an ACL (for hint)
-        if ($sdid = HACLSecurityDescriptor::getSDForPE($title->getNamespace(), HACLLanguage::PET_NAMESPACE))
+        if (!$pageSDid && !$globalACL &&
+            ($sdid = HACLSecurityDescriptor::getSDForPE($title->getNamespace(), HACLLanguage::PET_NAMESPACE)))
             $globalACL[] = Title::newFromId($sdid);
 
         if ($globalACL)
@@ -225,6 +228,14 @@ class HACLToolbar
         return $html;
     }
 
+    // Add toolbar head-items to $out
+    public static function addToolbarLinks($out)
+    {
+        global $haclgHaloScriptPath;
+        $out->addHeadItem('hacl_toolbar_js', '<script type="text/javascript" src="' . $haclgHaloScriptPath . '/scripts/HACL_Toolbar.js"></script>');
+        $out->addHeadItem('hacl_toolbar_css', '<link rel="stylesheet" type="text/css" media="screen, projection" href="'.$haclgHaloScriptPath.'/skins/haloacl_toolbar.css" />');
+    }
+
     // The only case when the user can create an article non-readable to himself
     //  is when he has create, but no read access to the namespace.
     // The only case when he can correct it by changing saved text
@@ -236,7 +247,7 @@ class HACLToolbar
         $g = $wgUser->getGroups();
         if (!$editpage->eNonReadable &&
             !$editpage->mTitle->getArticleId() &&
-            (!$g || !in_array('bureaucrat', $g)))
+            (!$g || !in_array('bureaucrat', $g) && !in_array('sysop', $g)))
         {
             list($r, $sd) = HACLEvaluator::checkNamespaceRight(
                 $editpage->mTitle->getNamespace(),
@@ -247,11 +258,11 @@ class HACLToolbar
         }
         if ($editpage->eNonReadable)
         {
-            $pe = self::getReadableCategories();
-            if ($pe)
-                $wgOut->addWikiText(wfMsgNoTrans('hacl_nonreadable_create', '[['.implode(']], [[', $pe).']]'));
+            $sel = self::getReadableCategoriesSelectBox();
+            if ($sel)
+                $wgOut->addHTML(wfMsgNoTrans('hacl_nonreadable_create', $sel));
             else
-                $wgOut->addWikiText(wfMsgNoTrans('hacl_nonreadable_create_nocat'));
+                $wgOut->addHTML(wfMsgNoTrans('hacl_nonreadable_create_nocat'));
         }
         return true;
     }
@@ -260,16 +271,39 @@ class HACLToolbar
     public static function getReadableCategories()
     {
         global $wgUser;
-        /* Lookup readable categories */
         $st = HACLStorage::getDatabase();
         $groups = $wgUser->getId() ? $st->getGroupsOfMember('user', $wgUser->getId()) : NULL;
         list($uid) = haclfGetUserID($wgUser);
+        // Lookup readable categories
         $pe = $st->lookupRights($uid, $groups, HACLLanguage::RIGHT_READ, 'category');
-        $names = array();
-        foreach ($pe as $c)
-            if ($t = Title::newFromId($c[1]))
-                $names[] = $t->getPrefixedText();
-        return $names;
+        if ($pe)
+        {
+            foreach ($pe as &$e)
+                $e = $e[1];
+            unset($e);
+            $dbr = wfGetDB(DB_SLAVE);
+            $res = $dbr->select('page', '*', array('page_id' => $pe), __METHOD__);
+            $titles = array();
+            foreach ($res as $row)
+                $titles[] = Title::newFromRow($row);
+            // Add child categories
+            $pe = $st->getAllChildrenCategories($titles);
+        }
+        return $pe;
+    }
+
+    // Get the selectbox which adds a category to wikitext when changed
+    public static function getReadableCategoriesSelectBox($for_upload = false)
+    {
+        $pe = self::getReadableCategories();
+        if (!$pe)
+            return '';
+        $for_upload = $for_upload ? ', 1' : '';
+        $select = array();
+        foreach ($pe as $cat)
+            $select[] = '<a href="javascript:haclt_addcat(\''.htmlspecialchars(addslashes($cat->getPrefixedText())).'\''.$for_upload.')">'.
+                htmlspecialchars($cat->getText()).'</a>';
+        return implode(', ', $select);
     }
 
     // Similar to warnNonReadableCreate, but warns about non-readable file uploads
@@ -277,31 +311,23 @@ class HACLToolbar
     {
         global $haclgOpenWikiAccess, $wgUser, $wgOut;
         $g = $wgUser->getGroups();
-        if (!$g || !in_array('bureaucrat', $g))
+        if (!$g || !in_array('bureaucrat', $g) && !in_array('sysop', $g))
         {
             list($r, $sd) = HACLEvaluator::checkNamespaceRight(
                 NS_FILE, $wgUser->getId(), HACLLanguage::RIGHT_READ
             );
             if (!($sd ? $r : $haclgOpenWikiAccess))
             {
-                $pe = self::getReadableCategories();
-                if ($pe)
-                    $t = wfMsgNoTrans('hacl_nonreadable_upload', '[['.implode(']], [[', $pe).']]');
+                $sel = self::getReadableCategoriesSelectBox(true);
+                if ($sel)
+                {
+                    self::addToolbarLinks($wgOut);
+                    $t = wfMsgNoTrans('hacl_nonreadable_upload', $sel);
+                }
                 else
                     $t = wfMsgNoTrans('hacl_nonreadable_upload_nocat');
                 $upload->uploadFormTextTop .= $t;
             }
-        }
-        return true;
-    }
-
-    // Hack into FUCKING object-oriented HTMLForm code of SpecialUpload
-    public static function nonReadableUploadTexttopOptions(&$descriptor)
-    {
-        if ($descriptor['UploadFormTextTop'])
-        {
-            $descriptor['UploadFormTextTop']['rawrow'] = true;
-            $descriptor['UploadFormTextTop']['default'] = '<tr><td colspan="2">'.$descriptor['UploadFormTextTop']['default'].'</td></tr>';
         }
         return true;
     }
@@ -312,7 +338,7 @@ class HACLToolbar
     {
         global $haclgOpenWikiAccess, $wgUser, $wgParser, $wgRequest, $wgOut;
         $g = $wgUser->getGroups();
-        if (!$editpage->mTitle->getArticleId() && (!$g || !in_array('bureaucrat', $g)))
+        if (!$editpage->mTitle->getArticleId() && (!$g || !in_array('bureaucrat', $g) && !in_array('sysop', $g)))
         {
             list($r, $sd) = HACLEvaluator::checkNamespaceRight(
                 $editpage->mTitle->getNamespace(),
