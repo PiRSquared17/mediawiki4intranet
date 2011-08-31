@@ -1,0 +1,22 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1280400541 -14400
+Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
+
+diff -r 6b77a2bb86d2 -r 52cbdde02c7a includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -2161,10 +2161,10 @@
+ 				wfProfileIn( __METHOD__."-paragraph" );
+ 				# No prefix (not in list)--go to paragraph mode
+ 				// XXX: use a stack for nestable elements like span, table and div
+-				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
++				$openmatch = preg_match('/(?:<table|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
+ 				$closematch = preg_match(
+-					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
+-					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
++					'/(?:<\\/table|<blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
++					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<center)/iS', $t );
+ 				if ( $openmatch or $closematch ) {
+ 					$paragraphStack = false;
+ 					# TODO bug 5718: paragraph closed
