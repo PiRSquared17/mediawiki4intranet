@@ -39,7 +39,7 @@ class PositivePageRate
     {
         global $wgUser;
         /* We are tracking only authorized users */
-        if ($wgUser && $wgUser->mPassword)
+        if ($wgUser && $wgUser->getId())
         {
             $dbr = wfGetDB(DB_SLAVE);
             $user_id = $wgUser->getId();

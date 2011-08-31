@@ -56,7 +56,7 @@ $wgExtensionCredits['other'][] = array(
 $wgHooks['NormalizeMessageKey'][] = 'efUserMessageNormalizeMessageKey';
 $wgHooks['userCan'][] = 'efUserMessageAllowEditPersonalMessages';
 $wgExtensionMessagesFiles['UserMessage'] = dirname(__FILE__) . '/UserMessage.i18n.php';
-if (is_null($wgUserMessageAllowCustomization))
+if (!isset($wgUserMessageAllowCustomization))
     $wgUserMessageAllowCustomization = array('edittools' => true);
 
 function efUserMessageIsPersonalMessage($title)

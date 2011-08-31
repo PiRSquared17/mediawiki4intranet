@@ -18,8 +18,8 @@ $wgExtensionCredits['parserhook'][] = array(
 function wfFLImage() {
 	global $wgParser;
 
-	$wgParser->setFunctionHook( 'Localimage', array( wgFLImageFuncts, 'Localimage' ), SFH_NO_HASH );
-	$wgParser->setFunctionHook( 'Fullimage', array( wgFLImageFuncts, 'Fullimage' ), SFH_NO_HASH );
+	$wgParser->setFunctionHook( 'Localimage', array( 'wgFLImageFuncts', 'Localimage' ), SFH_NO_HASH );
+	$wgParser->setFunctionHook( 'Fullimage', array( 'wgFLImageFuncts', 'Fullimage' ), SFH_NO_HASH );
 }
 
 class wgFLImageFuncts {
