@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1305131187 -14400
+# Date 1314889765 -10800
 Bug 62054 -
   __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
   enable/disable "tag-like" page grouping based on their other categories,
   __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryPageSubclass.php
+diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
 @@ -61,4 +61,182 @@
@@ -192,7 +192,7 @@ diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryTree.php
+diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
 @@ -377,3 +377,36 @@
@@ -215,9 +215,9 @@ diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryTree.php
 +
 +function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
 +{
-+    if (!is_null($parserOutput->useSubcategorizedList))
++    if (isset($parserOutput->useSubcategorizedList))
 +        $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
-+    if (!is_null($parserOutput->noCategoryColumns))
++    if (isset($parserOutput->noCategoryColumns))
 +        $out->noCategoryColumns = $parserOutput->noCategoryColumns;
 +    return true;
 +}
@@ -232,7 +232,7 @@ diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r 45da8fc662c9 -r fd6c4f7ce83e extensions/CategoryTree/SubcatCat.i18n.php
+diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,9 @@

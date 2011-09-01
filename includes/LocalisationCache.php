@@ -787,7 +787,7 @@ class LCStore_Accel implements LCStore
 	{
 		if ( $this->currentLang )
 		{
-			$k = wfMemcKey( 'l10n', $code, 'l' );
+			$k = wfMemcKey( 'l10n', $this->currentLang, 'l' );
 			$this->cache->set( $k, array_keys( $this->keys ) );
 		}
 		$this->currentLang = NULL;

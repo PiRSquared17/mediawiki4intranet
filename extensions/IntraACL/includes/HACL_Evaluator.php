@@ -82,6 +82,7 @@ class HACLEvaluator
     {
         global $haclgContLang, $haclgOpenWikiAccess, $wgRequest;
         $etc = haclfDisableTitlePatch();
+        $actionID = 0;
 
         // $R = array(final log message, access granted?, continue hook processing?);
         $R = array('', false, false);
