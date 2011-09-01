@@ -3723,9 +3723,9 @@ class Parser
 			}
 
 			# Don't number the heading if it is the only one (looks silly)
-			if( $doNumberHeadings && count( $matches[3] ) > 1) {
+			if( $doNumberHeadings && count( $matches[3] ) > 1 ) {
 				# Bug 54239 - Number [[#Section|Section]] links
-				if (!$headNumberReplacer)
+				if ( empty( $headNumberReplacer ) )
 					$headNumberReplacer = new ReplacementArray();
 				$headNumberReplacer->setPair('>'.$headlineHint.'</a>', '>'.$numbering.' '.$headlineHint.'</a>');
 				# the two are different if the line contains a link
@@ -3808,7 +3808,7 @@ class Parser
 		}
 
 		# Bug 54239 - Number [[#Section|Section]] links
-		if ($headNumberReplacer)
+		if ( !empty( $headNumberReplacer ) )
 			$text = $headNumberReplacer->replace($text);
 
 		# split up and insert constructed headlines
