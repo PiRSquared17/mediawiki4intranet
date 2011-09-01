@@ -504,7 +504,9 @@ class XmlDumpWriter {
 			$ns = MWNamespace::getCanonicalName( $ns );
 		else
 			$ns = $wgContLang->getNsText( $ns );
-		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.':'.$title->getText() ) . "\n";
+		if ( $ns !== '' )
+			$ns .= ':';
+		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.$title->getText() ) . "\n";
 		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
 		if( $row->page_is_redirect ) {
 			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
