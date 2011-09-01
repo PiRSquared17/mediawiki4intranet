@@ -188,7 +188,7 @@ class DraftHooks {
 			if ( $attribs['accesskey'] ) {
 				$buttonAttribs['accesskey'] = $attribs['accesskey'];
 			}
-			if ( $tooltip !== false ) {
+			if ( $attribs['tooltip'] !== false ) {
 				$buttonAttribs['title'] = $attribs['title'];
 			}
 			$ajaxButton = Xml::escapeJsString(
