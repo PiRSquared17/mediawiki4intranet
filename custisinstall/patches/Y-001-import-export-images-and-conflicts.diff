@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1312900410 -10800
+# Date 1314886048 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -138,7 +138,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
  
  	/**
  	 * Opens a <page> section on the output stream, with data
-@@ -442,9 +495,16 @@
+@@ -442,9 +495,18 @@
  	 * @access private
  	 */
  	function openPage( $row ) {
@@ -152,11 +152,13 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
 +			$ns = MWNamespace::getCanonicalName( $ns );
 +		else
 +			$ns = $wgContLang->getNsText( $ns );
-+		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.':'.$title->getText() ) . "\n";
++		if ( $ns !== '' )
++			$ns .= ':';
++		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.$title->getText() ) . "\n";
  		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
  		if( $row->page_is_redirect ) {
  			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
-@@ -506,7 +566,7 @@
+@@ -506,7 +568,7 @@
  		} elseif( isset( $row->old_text ) ) {
  			// Raw text from the database may have invalid chars
  			$text = strval( Revision::getRevisionText( $row ) );
@@ -165,7 +167,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
  				array( 'xml:space' => 'preserve' ),
  				strval( $text ) ) . "\n";
  		} else {
-@@ -592,13 +652,15 @@
+@@ -592,13 +654,15 @@
  	/**
  	 * Warning! This data is potentially inconsistent. :(
  	 */
@@ -184,7 +186,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
  				}
  				$out .= $this->writeUpload( $img );
  				return $out;
-@@ -608,13 +670,22 @@
+@@ -608,13 +672,22 @@
  	}
  
  	function writeUpload( $file ) {
@@ -211,7 +213,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
  			"    </upload>\n";
  	}
  
-@@ -650,6 +721,10 @@
+@@ -650,6 +723,10 @@
  		$this->write( $string );
  	}
  
@@ -222,7 +224,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Import.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -763,7 +765,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 85fec3228ef8 -r 6609cfc8c73b includes/filerepo/LocalFile.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -859,7 +861,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 85fec3228ef8 -r 6609cfc8c73b includes/specials/SpecialExport.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -1467,7 +1469,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 85fec3228ef8 -r 6609cfc8c73b includes/specials/SpecialImport.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1566,7 +1568,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 85fec3228ef8 -r 6609cfc8c73b languages/messages/MessagesEn.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,29 @@
@@ -1632,7 +1634,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 85fec3228ef8 -r 6609cfc8c73b languages/messages/MessagesRu.php
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,29 @@
@@ -1695,7 +1697,7 @@ diff -r 85fec3228ef8 -r 6609cfc8c73b languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 85fec3228ef8 -r 6609cfc8c73b skins/common/shared.css
+diff -r 85fec3228ef8 -r 3c5506cfdbb8 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@

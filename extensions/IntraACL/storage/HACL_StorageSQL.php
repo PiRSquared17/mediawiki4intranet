@@ -463,7 +463,7 @@ class HACLStorageSQL {
             foreach ($res as $row)
             {
                 $id = $row->parent_group_id;
-                if (!$groups[$id])
+                if (empty($groups[$id]))
                 {
                     $ids[] = $id;
                     $groups[$id] = true;
@@ -941,7 +941,7 @@ class HACLStorageSQL {
             }
             $r = array();
             foreach ($SDID as $id)
-                if ($byid[$id])
+                if (isset($byid[$id]))
                     $r[] = $byid[$id];
             return $r;
         }
@@ -1403,7 +1403,7 @@ class HACLStorageSQL {
             $categories = array();
             foreach ($res as $row)
             {
-                if (!$cats[$row->page_title])
+                if (empty($cats[$row->page_title]))
                 {
                     $categories[] = $row->page_title;
                     $cats[$row->page_title] = Title::newFromRow($row);
@@ -1479,7 +1479,7 @@ class HACLStorageSQL {
         if ($type !== NULL)
             $where['type'] = $type;
         if (strlen($prefix))
-            $where[] = 'page_title LIKE '.$dbr->addQuotes("$prefix%").' OR page_title LIKE '.$dbr->addQuotes("%/$prefix%");
+            $where[] = 'page_title LIKE '.$dbr->addQuotes('%'.str_replace(' ', '_', $prefix).'%');
         $res = $dbr->select(array('halo_acl_security_descriptors', 'page'),
             'sd_id, pe_id, type, mr_groups, mr_users, page_namespace, page_title',
             $where, __METHOD__,

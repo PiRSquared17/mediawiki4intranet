@@ -393,9 +393,9 @@ function efSubcatCatMagicWordwgVariableIDs(&$wgVariableIDs)
 
 function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
 {
-    if (!is_null($parserOutput->useSubcategorizedList))
+    if (isset($parserOutput->useSubcategorizedList))
         $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
-    if (!is_null($parserOutput->noCategoryColumns))
+    if (isset($parserOutput->noCategoryColumns))
         $out->noCategoryColumns = $parserOutput->noCategoryColumns;
     return true;
 }
