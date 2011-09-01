@@ -1,17 +1,19 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1313686202 -10800
+# Date 1314888765 -10800
 Bug 54239 - Ссылки на разделы с нумерацией
 
-diff -r 45da8fc662c9 -r 9c3231cd4a4f includes/parser/Parser.php
+diff -r 45da8fc662c9 -r 172101176f00 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -3724,6 +3724,10 @@
+@@ -3723,7 +3723,11 @@
+ 			}
  
  			# Don't number the heading if it is the only one (looks silly)
- 			if( $doNumberHeadings && count( $matches[3] ) > 1) {
+-			if( $doNumberHeadings && count( $matches[3] ) > 1) {
++			if( $doNumberHeadings && count( $matches[3] ) > 1 ) {
 +				# Bug 54239 - Number [[#Section|Section]] links
-+				if (!$headNumberReplacer)
++				if ( empty( $headNumberReplacer ) )
 +					$headNumberReplacer = new ReplacementArray();
 +				$headNumberReplacer->setPair('>'.$headlineHint.'</a>', '>'.$numbering.' '.$headlineHint.'</a>');
  				# the two are different if the line contains a link
@@ -22,7 +24,7 @@ diff -r 45da8fc662c9 -r 9c3231cd4a4f includes/parser/Parser.php
  		}
  
 +		# Bug 54239 - Number [[#Section|Section]] links
-+		if ($headNumberReplacer)
++		if ( !empty( $headNumberReplacer ) )
 +			$text = $headNumberReplacer->replace($text);
 +
  		# split up and insert constructed headlines
