@@ -75,16 +75,18 @@ function wfSpecialBatchEditor($par = null)
 <tr valign="top">
     <td style="vertical-align: top; padding-right: 20px"><?=wfMsgExt('batcheditor-list-title', array('parseinline'))?></td>
     <td><textarea name="a_titles" rows="8" cols="60"><?=htmlspecialchars($a_titles)?></textarea></td>
-    <td rowspan="2" style="padding-left: 16px"><?= $mw4i_addpages ? call_user_func($mw4i_addpages[1], $state) : '' ?></td>
+    <td rowspan="3" style="padding-left: 16px"><?= $mw4i_addpages ? call_user_func($mw4i_addpages[1], $state) : '' ?></td>
 </tr>
 <tr valign="top">
     <td><?=wfMsgExt('batcheditor-comment-title', array('parseinline'))?></td>
     <td>
         <input name="a_comment" size="80" value="<?=htmlspecialchars($a_comment)?>" />
-        <input type="checkbox" name="a_minor" <?=$a_minor?> value="1"/><label for='a_minor'><?=wfMsg('minoredit')?></label>
+        <input type="checkbox" name="a_minor" id="a_minor" <?=$a_minor?> value="1"/><label for="a_minor"><?=wfMsg('minoredit')?></label>
     </td>
 </tr>
-</table>
+<tr>
+    <td colspan="2">
+
 <table cellspacing="8">
 <tr>
     <th><?=wfMsgExt('batcheditor-find', array('parseinline'))?></th>
@@ -96,9 +98,9 @@ function wfSpecialBatchEditor($par = null)
 </tr>
 <tr>
     <td colspan="2" align="right">
-        <input type="checkbox" name="a_regexp" <?=$a_regexp?> value="1" />&nbsp;<label for='a_regexp'><?=wfMsgExt('batcheditor-pcre', array('parseinline'))?></label>
+        <input type="checkbox" name="a_regexp" id="a_regexp" <?=$a_regexp?> value="1" />&nbsp;<label for='a_regexp'><?=wfMsgExt('batcheditor-pcre', array('parseinline'))?></label>
         &nbsp; &nbsp;
-        <input type="checkbox" name="a_one" <?=$a_one?> value="1" />&nbsp;<label for='a_one'><?=wfMsgExt('batcheditor-oneline', array('parseinline'))?></label>
+        <input type="checkbox" name="a_one" id="a_one" <?=$a_one?> value="1" />&nbsp;<label for='a_one'><?=wfMsgExt('batcheditor-oneline', array('parseinline'))?></label>
     </td>
 </tr>
 <tr>
@@ -113,6 +115,10 @@ function wfSpecialBatchEditor($par = null)
     <input name='a_preview' value='<?=wfMsgExt('batcheditor-preview', array('parseinline'))?>' type='submit' /> &nbsp; &nbsp;
     <input name='a_run' value='<?=wfMsgExt('batcheditor-run', array('parseinline'))?>' type='submit' /> &nbsp; &nbsp;
 </td></tr>
+</table>
+
+    </td>
+</tr>
 </table>
 </form>
 <?php
