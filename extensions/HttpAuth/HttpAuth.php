@@ -34,7 +34,7 @@ $wgHooks['UserLoadFromSession'][] = 'efHttpAuthUserLoadFromSession';
 function efHttpAuthUserLoadFromSession($user_obj, &$result)
 {
     global $wgSitename, $wgScriptPath, $wgCookiePrefix, $efBasicAuthUnauthHtml, $wgUser;
-    $httpauth = $_GET['httpauth'] || $_POST['httpauth'] || $_COOKIE[$wgCookiePrefix.'httpauth'];
+    $httpauth = !empty($_GET['httpauth']) || !empty($_POST['httpauth']) || !empty($_COOKIE[$wgCookiePrefix.'httpauth']);
     if ($httpauth &&
         ($n = $_SERVER['PHP_AUTH_USER']) &&
         ($p = $_SERVER['PHP_AUTH_PW']))
