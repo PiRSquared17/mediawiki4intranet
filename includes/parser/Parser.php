@@ -2186,7 +2186,7 @@ class Parser
 					{
 						$textBefore = substr( $t, 0, $m[0][1] );
 						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
-						if ( $m[2][0] && !$closesParagraph[ $m[2][0] ] )
+						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) )
 						{
 							$textBefore .= $m[0][0];
 							$m[0][0] = '';
@@ -2197,12 +2197,6 @@ class Parser
 						$textBefore = $t;
 						$t = '';
 					}
-					$match = $m[0][0];
-					$close = $m[1][0];
-					$tag   = $m[2][0];
-					$empty = $m[3][0];
-					$uniq  = $m[4][0];
-					$uniqt = $m[5][0];
 					if ( $textBefore !== '' )
 					{
 						// Here is the place where the text gets inside <p>aragraphs
@@ -2224,6 +2218,14 @@ class Parser
 						}
 						$output .= $textBefore;
 					}
+					if ( !$m )
+						continue;
+					$match = $m[0][0];
+					$close = $m[1][0];
+					$tag   = $m[2][0];
+					$empty = $m[3][0];
+					$uniq  = empty( $m[4] ) ? '' : $m[4][0];
+					$uniqt = empty( $m[5] ) ? '' : $m[5][0];
 					if ( $this->mInPre && $close && $tag == 'pre' )
 					{
 						// this is </pre> closing tag
@@ -2255,7 +2257,7 @@ class Parser
 							}
 						}
 					}
-					elseif ( $closesParagraph[ $tag ] )
+					elseif ( isset( $closesParagraph[ $tag ] ) )
 					{
 						// block element closes current paragraph
 						if ( $tag != 'div' )
@@ -2294,7 +2296,7 @@ class Parser
 						// if not an enclosed XML element
 						if ( !$empty )
 						{
-							if ( $noPre[ $tag ] )
+							if ( isset( $noPre[ $tag ] ) )
 								$inNoPre += $close ? -1 : 1;
 							if ( !$close )
 							{
@@ -3991,9 +3993,9 @@ class Parser
 			}
 
 			# Don't number the heading if it is the only one (looks silly)
-			if( $doNumberHeadings && count( $matches[3] ) > 1) {
+			if( $doNumberHeadings && count( $matches[3] ) > 1 ) {
 				# Bug 54239 - Number [[#Section|Section]] links
-				if (!$headNumberReplacer)
+				if ( empty( $headNumberReplacer ) )
 					$headNumberReplacer = new ReplacementArray();
 				$headNumberReplacer->setPair('>'.$headlineHint.'</a>', '>'.$numbering.' '.$headlineHint.'</a>');
 				# the two are different if the line contains a link
@@ -4076,7 +4078,7 @@ class Parser
 		}
 
 		# Bug 54239 - Number [[#Section|Section]] links
-		if ($headNumberReplacer)
+		if ( !empty( $headNumberReplacer ) )
 			$text = $headNumberReplacer->replace($text);
 
 		# split up and insert constructed headlines
