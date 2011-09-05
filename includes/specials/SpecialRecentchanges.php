@@ -321,7 +321,7 @@ class SpecialRecentChanges extends SpecialPage {
 			$join_conds['watchlist'] = array('LEFT JOIN',
 				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
 		}
-		if ( $wgUser->isAllowed("rollback") && !$join_conds['page'] ) {
+		if ( $wgUser->isAllowed("rollback") && empty( $join_conds['page'] ) ) {
 			$tables[] = 'page';
 			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
 		}
@@ -393,7 +393,7 @@ class SpecialRecentChanges extends SpecialPage {
 		// And now for the content
 		$wgOut->setFeedAppendQuery( $this->getFeedQuery() );
 
-		if( $wgAllowCategorizedRecentChanges ) {
+		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
 			$this->filterByCategories( $rows, $opts );
 		}
 
