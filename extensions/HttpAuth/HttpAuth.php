@@ -53,8 +53,9 @@ function efHttpAuthUserLoadFromSession($user_obj, &$result)
     {
         header('HTTP/1.1 401 Unauthorized');
         header('WWW-Authenticate: Basic realm="'.$wgSitename.'"');
-        if (!$_COOKIE[$wgCookiePrefix.'httpauth'])
-            setcookie($wgCookiePrefix.'httpauth', 1, -1, $wgScriptPath);
+        // TODO check if this is needed for something, but probably not.
+        //if (!$_COOKIE[$wgCookiePrefix.'httpauth'])
+        //   setcookie($wgCookiePrefix.'httpauth', 1, -1, $wgScriptPath);
         if ($efBasicAuthUnauthHtml !== NULL)
             print $efBasicAuthUnauthHtml;
         else
