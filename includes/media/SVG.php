@@ -123,7 +123,7 @@ class SvgThumbnailImage extends ThumbnailImage
 				}
 				// Write modified SVG
 				$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
-				$svg = str_replace( '</svg>', $close.'</svg>', $svg );
+				$svg = preg_replace( '#(.*)</svg>#is', '\1'.$close.'</svg>', $svg );
 				file_put_contents( $linkfn, $svg );
 			}
 		}
