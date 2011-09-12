@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1314797503 -10800
+# Date 1315829090 -10800
 Bug 80684 - SVG double-render
 Bug 63356 - SVGZ and generic XML-GZIP mime-types support
 
-diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/DefaultSettings.php
+diff -r 45da8fc662c9 -r 9b8d4bf86e70 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -419,6 +419,11 @@
@@ -19,7 +19,7 @@ diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/DefaultSettings.php
  /**
   * To set 'pretty' URL paths for actions other than
   * plain page views, add to this array. For instance:
-diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/MimeMagic.php
+diff -r 45da8fc662c9 -r 9b8d4bf86e70 includes/MimeMagic.php
 --- includes/MimeMagic.php
 +++ includes/MimeMagic.php
 @@ -399,7 +399,7 @@
@@ -53,7 +53,7 @@ diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/MimeMagic.php
  			}
  		}
  
-diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/XmlTypeCheck.php
+diff -r 45da8fc662c9 -r 9b8d4bf86e70 includes/XmlTypeCheck.php
 --- includes/XmlTypeCheck.php
 +++ includes/XmlTypeCheck.php
 @@ -20,6 +20,12 @@
@@ -88,7 +88,7 @@ diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/XmlTypeCheck.php
  		do {
  			$chunk = fread( $file, 32768 );
  			$ret = xml_parse( $parser, $chunk, feof( $file ) );
-diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/media/SVG.php
+diff -r 45da8fc662c9 -r 9b8d4bf86e70 includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
 @@ -4,6 +4,143 @@
@@ -214,7 +214,7 @@ diff -r 45da8fc662c9 -r 3b3dac1c7a5a includes/media/SVG.php
 +				}
 +				// Write modified SVG
 +				$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
-+				$svg = str_replace( '</svg>', $close.'</svg>', $svg );
++				$svg = preg_replace( '#(.*)</svg>#is', '\1'.$close.'</svg>', $svg );
 +				file_put_contents( $linkfn, $svg );
 +			}
 +		}
