@@ -188,6 +188,7 @@ $wgWikilogMaxCommentSize = 0x7FFFFFFF;
 $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
+$wgWikilogNumComments = 100;
 
 # TemplatedPageList
 require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
