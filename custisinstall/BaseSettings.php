@@ -195,6 +195,7 @@ $wgNamespacesWithSubpages += array(
     NS_HELP     => true,
     NS_CATEGORY => true,
     NS_QUIZ     => true,
+    NS_QUIZ_TALK => true,
 );
 
 # TemplatedPageList
