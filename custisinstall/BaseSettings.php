@@ -65,15 +65,19 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $wgMainCacheType = CACHE_ACCEL;
 $wgMemCachedServers = array();
 
-$wgRawHtml              = true;
-$wgAllowUserJs          = true;
-$wgNamespacesWithSubpages[NS_MAIN] = true;
-$wgNamespacesWithSubpages[NS_USER] = true;
-$wgNamespacesWithSubpages[NS_TALK] = true;
-$wgNamespacesWithSubpages[NS_USER_TALK] = true;
+$wgRawHtml = true;
+$wgAllowUserJs = true;
 $wgUseAjax = true;
 
-$wgFileExtensions       = array(
+$wgNamespacesWithSubpages += array(
+    NS_MAIN     => true,
+    NS_PROJECT  => true,
+    NS_TEMPLATE => true,
+    NS_HELP     => true,
+    NS_CATEGORY => true,
+);
+
+$wgFileExtensions = array(
     'png', 'gif', 'jpg', 'jpeg', 'svg',
     'zip', 'rar', '7z', 'gz', 'bz2', 'xpi',
     'doc', 'docx', 'ppt', 'pptx', 'pps', 'ppsx', 'xls', 'xlsx', 'vsd',
