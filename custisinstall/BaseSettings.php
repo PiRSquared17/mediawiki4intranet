@@ -189,6 +189,7 @@ $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
 $wgWikilogNumComments = 100;
+$wgWikilogExpensiveLimit = 100;
 
 # TemplatedPageList
 require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
