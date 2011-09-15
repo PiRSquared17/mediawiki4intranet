@@ -69,14 +69,6 @@ $wgRawHtml = true;
 $wgAllowUserJs = true;
 $wgUseAjax = true;
 
-$wgNamespacesWithSubpages += array(
-    NS_MAIN     => true,
-    NS_PROJECT  => true,
-    NS_TEMPLATE => true,
-    NS_HELP     => true,
-    NS_CATEGORY => true,
-);
-
 $wgFileExtensions = array(
     'png', 'gif', 'jpg', 'jpeg', 'svg',
     'zip', 'rar', '7z', 'gz', 'bz2', 'xpi',
@@ -195,9 +187,18 @@ $wgWikilogCommentsOnItemPage = true;
 $wgWikilogNumComments = 100;
 $wgWikilogExpensiveLimit = 100;
 
+# Namespaces with subpages
+$wgNamespacesWithSubpages += array(
+    NS_MAIN     => true,
+    NS_PROJECT  => true,
+    NS_TEMPLATE => true,
+    NS_HELP     => true,
+    NS_CATEGORY => true,
+    NS_QUIZ     => true,
+);
+
 # TemplatedPageList
 require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
-$egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
 $egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
 $wgMaxFilenameLength = 50;
