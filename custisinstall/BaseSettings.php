@@ -259,6 +259,7 @@ $wgRCMaxAge = 50 * 365 * 86400;
 $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['*']['upload_by_url'] = true;
+$wgGroupPermissions['*']['import'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search
