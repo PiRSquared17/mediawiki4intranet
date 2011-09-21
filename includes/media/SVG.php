@@ -97,34 +97,43 @@ class SvgThumbnailImage extends ThumbnailImage
 			{
 				// Load original SVG or SVGZ and extract opening element
 				$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
-				preg_match( '/<svg[^<>]*>/', $svg, $m, PREG_OFFSET_CAPTURE );
-				$open = $m[0][0];
-				$sw = $this->width / $this->file->getWidth();
-				$sh = $this->height / $this->file->getHeight();
-				$close = '';
-				// Scale width, height and viewBox
-				$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
-					create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
-				// Add xlink namespace, if not yet
-				if ( !strpos( $open, 'xmlns:xlink' ) )
-					$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
-				if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
+				preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
+				$closepos = strpos( $svg, '</svg' );
+				if ( $m && $closepos !== false )
 				{
-					// Wrap contents into a scaled layer
-					$open .= "<g transform='scale($sw $sh)'>";
-					$close = "</g>";
+					$open = $m[0][0];
+					$openpos = $m[0][1];
+					$openlen = strlen( $m[0][0] );
+					$sw = $this->width / $this->file->getWidth();
+					$sh = $this->height / $this->file->getHeight();
+					$close = '';
+					// Scale width, height and viewBox
+					$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
+						create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
+					// Add xlink namespace, if not yet
+					if ( !strpos( $open, 'xmlns:xlink' ) )
+						$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
+					if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
+					{
+						// Wrap contents into a scaled layer
+						$open .= "<g transform='scale($sw $sh)'>";
+						$close = "</g>$close";
+					}
+					// Wrap contents into a hyperlink
+					if ( $href )
+					{
+						$open .= '<a xlink:href="'.htmlspecialchars( $href ).
+							'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
+						$close = "</a>$close";
+					}
+					// Write modified SVG
+					$svg = substr( $svg, 0, $openpos ) . $open .
+						substr( $svg, $openpos+$openlen, $closepos-$openpos-$openlen ) . $close .
+						ltrim( substr( $svg, $closepos ), ">\t\r\n" );
+					file_put_contents( $linkfn, $svg );
 				}
-				// Wrap contents into a hyperlink
-				if ( $href )
-				{
-					$open .= '<a xlink:href="'.htmlspecialchars( $href ).
-						'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
-					$close = "</a>$close";
-				}
-				// Write modified SVG
-				$svg = substr( $svg, 0, $m[0][1] ) . $open . substr( $svg, $m[0][1] + strlen( $m[0][0] ) );
-				$svg = preg_replace( '#(.*)</svg>#is', '\1'.$close.'</svg>', $svg );
-				file_put_contents( $linkfn, $svg );
+				else
+					$linkurl = $this->file->getUrl();
 			}
 		}
 
