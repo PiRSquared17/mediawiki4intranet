@@ -39,13 +39,16 @@ if ($_POST['cookies'])
     $IP = preg_replace('#[/\\\\]*[^/\\\\]+[/\\\\]+[^/\\\\]+[/\\\\]+upload\.php$#', '', $_SERVER['SCRIPT_FILENAME']);
     chdir($IP);
     error_reporting(E_ERROR | E_PARSE);
-    print "m";
     ob_start();
     require 'index.php';
     $ob = ob_get_contents();
     ob_end_clean();
+    print "m";
     if (preg_match('#<span[^<>]*class=["\']error[^<>]*>(.*?)</span>#is', $ob, $m))
         echo trim($m[1]);
     elseif ($ob)
+    {
         echo "msg-unknown-error";
+        wfDebug("** SWFUpload ERROR **\n$ob\n** /SWFUpload ERROR **\n");
+    }
 }

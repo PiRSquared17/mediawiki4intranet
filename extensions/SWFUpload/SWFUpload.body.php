@@ -44,7 +44,7 @@ class SpecialSWFUpload extends SpecialPage
         $cook = addslashes(serialize($_COOKIE));
         $sizelimit = 102400;
         $vars = array();
-        foreach (split(' ',
+        foreach (explode(' ',
             'allfiles pending uploading finished cancelled upload-stopped queue-limit-exceeded-0 queue-limit-exceeded-1 queue-limit-exceeded-2 '.
             'queue-limit-exceeded-5 file-too-big file-empty invalid-filetype unknown-error upload-error-http upload-error io-error security-error ' .
             'too-many-files validation-error num-files-uploaded-5 num-files-uploaded-2 num-files-uploaded-1 num-files-uploaded-0') as $k)
