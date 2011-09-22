@@ -33,6 +33,7 @@ $messages['en'] = array(
 	'openid-desc' => 'Log in to the wiki with an [http://openid.net/ OpenID], and log in to other OpenID-aware web sites with a wiki user account',
 
 	'openidlogin' => 'Log in with OpenID',
+	'nologin' => "{{SERVER}}/extensions/OpenID/skin/icons/openid-inputicon.png [[Special:OpenIDLogin|Log in with OpenID]].\n\nDon't have an account? $1.",
 	'openidserver' => 'OpenID server',
 	'openidxrds' => 'Yadis file',
 	'openidconvert' => 'OpenID converter',
@@ -4393,6 +4394,7 @@ $messages['roa-tara'] = array(
 $messages['ru'] = array(
 	'openid-desc' => 'Вход в вики с помощью [http://openid.net/ OpenID], а также вход на другие сайты поддерживающие OpenID с помощью учётной записи в вики',
 	'openidlogin' => 'Вход с помощью OpenID',
+	'nologin' => "{{SERVER}}/extensions/OpenID/skin/icons/openid-inputicon.png [[Special:OpenIDLogin|Вход с помощью OpenID]].\n\nНет учётной записи? '''$1'''.",
 	'openidserver' => 'Сервер OpenID',
 	'openidxrds' => 'Файл Yadis',
 	'openidconvert' => 'Преобразователь OpenID',
