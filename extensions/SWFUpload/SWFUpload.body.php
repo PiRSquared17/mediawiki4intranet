@@ -42,7 +42,6 @@ class SpecialSWFUpload extends SpecialPage
         wfLoadExtensionMessages('SWFUpload');
         $path = $wgScriptPath . '/extensions/SWFUpload/';
         $cook = addslashes(serialize($_COOKIE));
-        $sizelimit = 102400;
         $vars = array();
         foreach (explode(' ',
             'allfiles pending uploading finished cancelled upload-stopped queue-limit-exceeded-0 queue-limit-exceeded-1 queue-limit-exceeded-2 '.
@@ -56,7 +55,6 @@ class SpecialSWFUpload extends SpecialPage
         $wgOut->addScript("<script type=\"$wgJsMimeType\" language=\"JavaScript\">
 var swfupload_path = \"".addslashes($path)."\";
 var swfupload_cookies = \"$cook\";
-var swfupload_sizelimit = \"$sizelimit\";
 var swfupload_lang = {" . join(", ", $vars) . "};
 </script>");
         foreach (array('swfupload.js', 'swfupload.queue.js', 'fileprogress.js', 'handlers.js', 'add.js') as $a)
