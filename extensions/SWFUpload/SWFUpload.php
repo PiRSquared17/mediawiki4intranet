@@ -22,6 +22,12 @@
  * @author Vitaliy Filippov <vitalif@mail.ru>
  */
 
+// INSTALLATION:
+// 1) Make sure Magic Quotes are DISABLED in your PHP settings!
+//    This extension won't work when they're enabled.
+// 2) Put the following into your LocalSettings.php:
+//    require_once "$IP/extensions/SWFUpload/SWFUpload.php";
+
 $dir = dirname(__FILE__) . '/';
 $wgAutoloadClasses['SpecialSWFUpload'] = $dir . 'SWFUpload.body.php';
 $wgExtensionMessagesFiles['SWFUpload'] = $dir . 'SWFUpload.i18n.php';
@@ -32,7 +38,7 @@ SpecialPage::setGroup('SWFUpload', 'media');
 $wgExtensionCredits['specialpage'][] = array(
     'path'        => __FILE__,
     'name'        => 'SWFUpload',
-    'version'     => '0.95 (2011-04-01)',
+    'version'     => '0.96 (2011-09-22)',
     'author'      => 'Vitaliy Filippov',
     'url'         => 'http://wiki.4intra.net/SWFUpload_(MediaWiki)',
     'description' => 'Flash applet support for uploading files into MediaWiki',

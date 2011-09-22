@@ -1,9 +1,9 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297452439 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1315221930 -10800
 Bug 18103 - Allow to view categorized Recent Changes, SQL category filtering
 
-diff -r b11befdd7427 -r 55975ffd5236 includes/specials/SpecialRecentchanges.php
+diff -r 45da8fc662c9 -r d0605c0cf889 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -69,8 +69,10 @@
@@ -68,7 +68,7 @@ diff -r b11befdd7427 -r 55975ffd5236 includes/specials/SpecialRecentchanges.php
 +				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
  		}
 -		if ($wgUser->isAllowed("rollback")) {
-+		if ( $wgUser->isAllowed("rollback") && !$join_conds['page'] ) {
++		if ( $wgUser->isAllowed("rollback") && empty( $join_conds['page'] ) ) {
  			$tables[] = 'page';
  			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
  		}
@@ -79,6 +79,15 @@ diff -r b11befdd7427 -r 55975ffd5236 includes/specials/SpecialRecentchanges.php
 -		global $wgAllowCategorizedRecentChanges;
  
  		$limit = $opts['limit'];
+ 
+@@ -371,7 +393,7 @@
+ 		// And now for the content
+ 		$wgOut->setFeedAppendQuery( $this->getFeedQuery() );
+ 
+-		if( $wgAllowCategorizedRecentChanges ) {
++		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
+ 			$this->filterByCategories( $rows, $opts );
+ 		}
  
 @@ -437,7 +459,7 @@
  

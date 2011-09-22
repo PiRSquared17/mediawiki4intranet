@@ -7,10 +7,10 @@ window.onload = function() {
 		http_success : [ 302 ],
 
 		// File Upload Settings
-		file_size_limit : swfupload_sizelimit,
+		file_size_limit : "0",
 		file_types : "*.*",
 		file_types_description : swfupload_lang['allfiles'],
-		file_upload_limit : "50",
+		file_upload_limit : "0",
 		file_queue_limit : "0",
 		file_post_name : "wpUploadFile",
 
