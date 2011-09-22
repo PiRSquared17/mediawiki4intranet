@@ -87,7 +87,6 @@ class WikilogCommentsPage
 		# Prepare the skin and the comment formatter.
 		$this->mSkin = $wgUser->getSkin();
 		$this->mFormatter = new WikilogCommentFormatter( $this->mSkin, $this->mUserCanPost );
-		$this->mFormatter->setPermalinkTitle( new Title() );
 
 		# Get item object relative to this comments page.
 		$this->mItem = WikilogItem::newFromInfo( $wi );
@@ -217,6 +216,8 @@ class WikilogCommentsPage
 		# Display "post new comment" form, if appropriate.
 		if ( $this->mUserCanPost )
 			$wgOut->addHtml( $this->getPostCommentForm( $this->mSingleComment ) );
+		elseif ( $wgUser->isAnon() )
+			$wgOut->addWikiMsg( 'wikilog-login-to-comment' );
 
 		# Close div.
 		$wgOut->addHtml( Xml::closeElement( 'div' ) );
