@@ -38,7 +38,7 @@ if ($_POST['cookies'])
     $_SERVER['REQUEST_URI'] = preg_replace('#extensions/SWFUpload/upload\.php(\?.*)?$#s', 'index.php?' . $args, $_SERVER['REQUEST_URI']);
     $IP = preg_replace('#[/\\\\]*[^/\\\\]+[/\\\\]+[^/\\\\]+[/\\\\]+upload\.php$#', '', $_SERVER['SCRIPT_FILENAME']);
     chdir($IP);
-    error_reporting(E_ERROR | E_PARSE);
+    error_reporting(E_ALL & ~E_NOTICE & ~E_DEPRECATED);
     ob_start();
     require 'index.php';
     $ob = ob_get_contents();
@@ -52,3 +52,4 @@ if ($_POST['cookies'])
         wfDebug("** SWFUpload ERROR **\n$ob\n** /SWFUpload ERROR **\n");
     }
 }
+exit;
