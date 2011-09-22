@@ -1,0 +1,48 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1288019238 -14400
+Fix "Cannot redeclare wfSpecialUpload()" error message for unauthorized users
+Fix wfShellExec() for Windows >= XP
+
+diff -r 2951a613ce57 -r 5b552695e1e7 includes/GlobalFunctions.php
+--- includes/GlobalFunctions.php
++++ includes/GlobalFunctions.php
+@@ -2119,7 +2119,7 @@
+ 				$cmd = escapeshellarg( $script ) . " $time $mem $filesize " . escapeshellarg( $cmd );
+ 			}
+ 		}
+-	} elseif ( php_uname( 's' ) == 'Windows NT' ) {
++	} elseif ( php_uname( 's' ) == 'Windows NT' && substr( php_uname( 'v' ), 6, 4 ) <= 6001 ) {
+ 		# This is a hack to work around PHP's flawed invocation of cmd.exe
+ 		# http://news.php.net/php.internals/21796
+ 		$cmd = '"' . $cmd . '"';
+diff -r 2951a613ce57 -r 5b552695e1e7 includes/specials/SpecialUpload.php
+--- includes/specials/SpecialUpload.php
++++ includes/specials/SpecialUpload.php
+@@ -4,6 +4,12 @@
+  * @ingroup SpecialPage
+  */
+ 
++# Bug 60996 - cURL environment proxy ($ENV['http_proxy'], $ENV['no_proxy']) support
++require_once(dirname(dirname(dirname(__FILE__))).'/custisinstall/curl-env-proxy.php');
++
++# A CRUTCH fixing 'Fatal error: Cannot redeclare wfspecialupload() (previously declared in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php:12) in /usr/share/wikis/wiki/includes/specials/SpecialUpload.php on line 15'
++if (!function_exists('wfSpecialUpload'))
++{
+ 
+ /**
+  * Entry point
+@@ -184,6 +190,7 @@
+ 		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
+ 		curl_setopt( $ch, CURLOPT_URL, $url);
+ 		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
++		curl_set_env_proxy( $ch, $url ); # Set proxy from environment settings
+ 		curl_exec( $ch );
+ 		$error = curl_errno( $ch ) ? true : false;
+ 		$errornum =  curl_errno( $ch );
+@@ -1809,3 +1816,5 @@
+ 		}
+ 	}
+ }
++
++}
