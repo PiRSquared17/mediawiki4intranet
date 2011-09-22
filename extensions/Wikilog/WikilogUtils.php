@@ -112,7 +112,7 @@ class WikilogUtils
 		$parserOpt->setTidy( true );
 		if ( $feed ) {
 			$parserOpt->setEditSection( false );
-			
+
 			# NOTE (Mw1.16- COMPAT) ParserOptions::addExtraKey() added in
 			# MediaWiki 1.17 (r70822) makes WikilogParserCache obsolete.
 			if ( method_exists( $parserOpt, 'addExtraKey' ) ) {
@@ -225,7 +225,7 @@ class WikilogUtils
 		if ( is_string( $list ) ) {
 			return self::authorSig( $list );
 		}
-		else if ( is_array( $list ) ) {
+		elseif ( is_array( $list ) ) {
 			$authors = array_map( array( __CLASS__, 'authorSig' ), $list );
 			return $wgContLang->listToText( $authors );
 		}
@@ -324,17 +324,22 @@ class WikilogUtils
 				$summary = new DOMDocument();
 				$h = false;
 				# Dive straight into imported <html><body>
-				foreach ($dom->documentElement->childNodes->item(0)->childNodes as $node)
+				foreach ( $dom->documentElement->childNodes->item(0)->childNodes as $node )
 				{
 					# Cut summary at first heading
-					if (preg_match('/^h\d$/is', $node->nodeName))
+					if ( preg_match( '/^h\d$/is', $node->nodeName ) )
 					{
 						$h = true;
 						break;
 					}
-					if ($node->nodeName == 'table' && $node->attributes->getNamedItem('id')->textContent == 'toc' ||
-						$node->nodeName == 'script')
+					if ( $node->nodeName == 'script' )
 						continue;
+					if ( $node->nodeName == 'table' )
+					{
+						$id = $node->attributes->getNamedItem( 'id' );
+						if ( $id && $id->textContent == 'toc' )
+							continue;
+					}
 					$summary->appendChild($summary->importNode($node, true));
 				}
 			}

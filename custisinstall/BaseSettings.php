@@ -65,15 +65,11 @@ $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) )
 $wgMainCacheType = CACHE_ACCEL;
 $wgMemCachedServers = array();
 
-$wgRawHtml              = true;
-$wgAllowUserJs          = true;
-$wgNamespacesWithSubpages[NS_MAIN] = true;
-$wgNamespacesWithSubpages[NS_USER] = true;
-$wgNamespacesWithSubpages[NS_TALK] = true;
-$wgNamespacesWithSubpages[NS_USER_TALK] = true;
+$wgRawHtml = true;
+$wgAllowUserJs = true;
 $wgUseAjax = true;
 
-$wgFileExtensions       = array(
+$wgFileExtensions = array(
     'png', 'gif', 'jpg', 'jpeg', 'svg',
     'zip', 'rar', '7z', 'gz', 'bz2', 'xpi',
     'doc', 'docx', 'ppt', 'pptx', 'pps', 'ppsx', 'xls', 'xlsx', 'vsd',
@@ -188,10 +184,22 @@ $wgWikilogMaxCommentSize = 0x7FFFFFFF;
 $wgWikilogDefaultNotCategory = 'Скрытые';
 $wgWikilogSearchDropdowns = true;
 $wgWikilogCommentsOnItemPage = true;
+$wgWikilogNumComments = 100;
+$wgWikilogExpensiveLimit = 100;
+
+# Namespaces with subpages
+$wgNamespacesWithSubpages += array(
+    NS_MAIN     => true,
+    NS_PROJECT  => true,
+    NS_TEMPLATE => true,
+    NS_HELP     => true,
+    NS_CATEGORY => true,
+    NS_QUIZ     => true,
+    NS_QUIZ_TALK => true,
+);
 
 # TemplatedPageList
 require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
-$egSubpagelistAjaxNamespaces = array_flip(array(NS_MAIN, NS_USER, NS_PROJECT, NS_FILE, NS_MEDIAWIKI, NS_TEMPLATE, NS_HELP, NS_BLOG, NS_QUIZ));
 $egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
 $wgMaxFilenameLength = 50;
@@ -251,6 +259,7 @@ $wgRCMaxAge = 50 * 365 * 86400;
 $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['*']['upload_by_url'] = true;
+$wgGroupPermissions['*']['import'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search
