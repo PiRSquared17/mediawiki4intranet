@@ -2590,6 +2590,7 @@ $1',
 'export-download'   => 'Предложить сохранить как файл',
 'export-templates'  => 'Включить шаблоны',
 'export-pagelinks'  => 'Включить статьи, связанные ссылками',
+'export-subpages'   => 'Включить подстатьи',
 'export-closure'    => 'Включить статьи из подкатегорий',
 
 # Namespace 8 related

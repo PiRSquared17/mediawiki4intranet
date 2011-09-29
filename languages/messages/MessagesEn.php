@@ -3135,6 +3135,7 @@ Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' fil
 'export-images'     => 'Include images',
 'export-templates'  => 'Include templates',
 'export-pagelinks'  => 'Include linked articles',
+'export-subpages'   => 'Include subpages',
 'export-closure'    => 'Include articles from subcategories',
 
 # Namespace 8 related
