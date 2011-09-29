@@ -30,14 +30,14 @@ function wfSpecialBatchEditor($par = null)
 
     $wgOut->setPageTitle(wfMsg('batcheditor-title'));
 
-    extract($wgRequest->getValues('a_titles'));
-    extract($wgRequest->getValues('a_comment'));
-    extract($wgRequest->getValues('a_find'));
-    extract($wgRequest->getValues('a_replace'));
-    extract($wgRequest->getValues('a_add'));
-    extract($wgRequest->getValues('a_delete'));
-    extract($wgRequest->getValues('a_run'));
-    extract($wgRequest->getValues('a_preview'));
+    $a_titles  = $wgRequest->getVal('a_titles');
+    $a_comment = $wgRequest->getVal('a_comment');
+    $a_find    = $wgRequest->getVal('a_find');
+    $a_replace = $wgRequest->getVal('a_replace');
+    $a_add     = $wgRequest->getVal('a_add');
+    $a_delete  = $wgRequest->getVal('a_delete');
+    $a_run     = $wgRequest->getVal('a_run');
+    $a_preview = $wgRequest->getVal('a_preview');
 
     $a_minor  = $wgRequest->getCheck('a_minor') ? ' checked="checked" ' : false;
     $a_regexp = $wgRequest->getCheck('a_regexp') ? ' checked="checked" ' : false;
