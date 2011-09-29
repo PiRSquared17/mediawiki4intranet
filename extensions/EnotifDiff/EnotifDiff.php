@@ -17,6 +17,7 @@
 if (!defined('MEDIAWIKI'))
     die();
 
+define('MEDIAWIKI_HAVE_HTML_EMAIL', 1);
 $wgExtensionFunctions[] = 'wfEnotifDiff';
 $wgHooks['GetPreferences'][] = '_enotifdiff_GetPreferences';
 $wgHooks['EnotifComposeCommonMailtext'][] = '_enotifdiff_compose_common_mailtext';
