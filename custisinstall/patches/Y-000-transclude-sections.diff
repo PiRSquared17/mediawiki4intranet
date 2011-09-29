@@ -1,9 +1,9 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297181928 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1317322263 -10800
 Bug 70192 - named section transclusion
 
-diff -r b11befdd7427 -r dc63b784aeb8 includes/parser/Parser.php
+diff -r 45da8fc662c9 -r 333fbaa4d8f8 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3095,6 +3095,10 @@
@@ -27,7 +27,7 @@ diff -r b11befdd7427 -r dc63b784aeb8 includes/parser/Parser.php
  		$this->mTplDomCache[ $titleText ] = $dom;
  
  		if (! $title->equals($cacheTitle)) {
-@@ -3124,6 +3131,75 @@
+@@ -3124,6 +3131,76 @@
  	}
  
  	/**
@@ -39,6 +39,7 @@ diff -r b11befdd7427 -r dc63b784aeb8 includes/parser/Parser.php
 +		$foundlevel = false;
 +		$newchild = NULL;
 +		$newroot = NULL;
++		$content_started = false;
 +		while( $stack )
 +		{
 +			$ptr = &$stack[ count( $stack ) - 1 ];
@@ -72,7 +73,7 @@ diff -r b11befdd7427 -r dc63b784aeb8 includes/parser/Parser.php
 +						}
 +					}
 +				}
-+				elseif ( $node->childNodes->length )
++				elseif ( $node->childNodes && $node->childNodes->length )
 +					$stack[] = array( $node, 0 );
 +			}
 +			else
