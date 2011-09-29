@@ -3139,6 +3139,7 @@ class Parser
 		$foundlevel = false;
 		$newchild = NULL;
 		$newroot = NULL;
+		$content_started = false;
 		while( $stack )
 		{
 			$ptr = &$stack[ count( $stack ) - 1 ];
@@ -3172,7 +3173,7 @@ class Parser
 						}
 					}
 				}
-				elseif ( $node->childNodes->length )
+				elseif ( $node->childNodes && $node->childNodes->length )
 					$stack[] = array( $node, 0 );
 			}
 			else
