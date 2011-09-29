@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1314886048 -10800
+# Date 1317321419 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Export.php
+diff -r 85fec3228ef8 -r ace4fff5597e includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -224,7 +224,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Import.php
+diff -r 85fec3228ef8 -r ace4fff5597e includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -39,6 +39,7 @@
@@ -765,7 +765,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/filerepo/LocalFile.php
+diff -r 85fec3228ef8 -r ace4fff5597e includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -861,7 +861,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
+diff -r 85fec3228ef8 -r ace4fff5597e includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -899,7 +899,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
  	public function execute( $par ) {
  		global $wgOut, $wgRequest, $wgSitename, $wgExportAllowListContributors;
  		global $wgExportAllowHistory, $wgExportMaxHistory, $wgExportMaxLinkDepth;
-@@ -43,38 +46,14 @@
+@@ -43,40 +46,16 @@
  		$this->doExport = false;
  		$this->templates = $wgRequest->getCheck( 'templates' );
  		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
@@ -923,7 +923,13 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 -					if ( $catpages ) $page .= "\n" . implode( "\n", $catpages );
 -				}
 -			}
--		}
++		$state = $wgRequest->getValues();
++		$state['errors'] = array();
++		if ( !empty( $state['addcat'] ) )
++		{
++			self::addPagesExec( $state );
++			$page = $state['pages'];
+ 		}
 -		else if( $wgRequest->getCheck( 'addns' ) && $wgExportFromNamespaces ) {
 -			$page = $wgRequest->getText( 'pages' );
 -			$nsindex = $wgRequest->getText( 'nsindex', '' );
@@ -935,15 +941,12 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 -				$nspages = $this->getPagesFromNamespace( $nsindex );
 -				if ( $nspages ) $page .= "\n" . implode( "\n", $nspages );
 -			}
-+		$state = $wgRequest->getValues();
-+		$state['errors'] = array();
-+		if ($state['addcat'])
-+		{
-+			self::addPagesExec($state);
-+			$page = $state['pages'];
- 		}
- 		else if( $wgRequest->wasPosted() && $par == '' ) {
+-		}
+-		else if( $wgRequest->wasPosted() && $par == '' ) {
++		elseif ( $wgRequest->wasPosted() && $par == '' ) {
  			$page = $wgRequest->getText( 'pages' );
+ 			$this->curonly = $wgRequest->getCheck( 'curonly' );
+ 			$rawOffset = $wgRequest->getVal( 'offset' );
 @@ -148,41 +127,37 @@
  		
  		$form = Xml::openElement( 'form', array( 'method' => 'post',
@@ -1084,7 +1087,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
  			$exporter->pageByTitle( $title );
  		}
  		
-@@ -276,139 +213,276 @@
+@@ -276,139 +213,316 @@
  		}
  	}
  
@@ -1110,10 +1113,10 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		}
 +
 +		// Validate parameter values
-+		$catname = $state['catname'];
-+		$notcategory = $state['notcategory'];
-+		$namespace = $state['namespace'];
-+		$modifydate = $state['modifydate'];
++		$catname     = isset( $state['catname'] )     ? $state['catname']     : '';
++		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
++		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
++		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
 +		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
 +			$modifydate = NULL;
 +		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
@@ -1122,7 +1125,9 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		if ( !strlen( $notcategory ) || !( $notcategory = Title::newFromText( $notcategory, NS_CATEGORY ) ) ||
 +			$notcategory->getNamespace() != NS_CATEGORY )
 +			$notcategory = NULL;
-+		if ( !strlen( $namespace ) || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
++		if ( $namespace === 'Main' || $namespace == '(Main)' || $namespace === wfMsg( 'blanknamespace' ) )
++			$namespace = 0;
++		elseif ( $namespace === '' || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
 +			$namespace = NULL;
 +		else
 +			$namespace = $namespace->getNamespace();
@@ -1130,16 +1135,17 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		// Add pages from requested category and/or namespace
 +		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL )
 +		{
-+			$catpages = self::getPagesFromCategory( $catname, $state['closure'], $namespace, $modifydate );
++			$catpages = self::getPagesFromCategory( $catname, !empty( $state['closure'] ), $namespace, $modifydate );
 +			foreach ( $catpages as $title )
 +				$pageSet[ $title->getPrefixedText() ] = $title;
 +		}
 +
 +		// Look up any linked pages if asked...
-+		$linkDepth = self::validateLinkDepth( $state['link-depth'] );
-+		$t = $state[ 'templates' ] ? 1 : 0;
-+		$p = $state[ 'pagelinks' ] ? 1 : 0;
-+		$i = $state[ 'images' ] ? 1 : 0;
++		$linkDepth = self::validateLinkDepth( !empty( $state['link-depth'] ) ? $state['link-depth'] : 0 );
++		$t = !empty( $state[ 'templates' ] );
++		$p = !empty( $state[ 'pagelinks' ] );
++		$i = !empty( $state[ 'images' ] );
++		$s = !empty( $state[ 'subpages' ] );
 +		$step = 0;
 +		do
 +		{
@@ -1148,8 +1154,9 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +			if( $t ) $added += self::getTemplates( $pageSet );
 +			if( $p ) $added += self::getPagelinks( $pageSet );
 +			if( $i ) $added += self::getImages( $pageSet );
++			if( $s ) $added += self::getSubpages( $pageSet );
 +			$step++;
-+		} while( $t+$p+$i > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
++		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
 +
 +		// Filter user-readable pages (also MW Bug 8824)
 +		foreach ( $pageSet as $key => $title )
@@ -1205,7 +1212,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +	// Display page selection form, enclosed into a <fieldset>
 +	static function addPagesForm( $state )
 +	{
-+		$form .= '<fieldset class="addpages">';
++		$form = '<fieldset class="addpages">';
 +		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
 +		$textboxes = array(
 +			'catname'     => 20,
@@ -1216,12 +1223,12 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		// Textboxes:
 +		foreach ( $textboxes as $k => $size )
 +			$form .= '<div class="ap_'.$k.'">' .
-+				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, $state[ $k ] ) . '</div>';
++				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
 +		// Checkboxes:
-+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks' ) as $k )
++		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k )
 +		{
 +			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
-+				wfMsg( "export-$k" ), $k, "ap-$k", $state[ $k ] && true,
++				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
 +				array( 'style' => 'vertical-align: middle' )
 +			) . '</div>';
 +		}
@@ -1356,33 +1363,78 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		);
  	}
 -	
--	/**
++
+ 	/**
 -	 * Validate link depth setting, if available.
--	 */
++	 * Expand a list of pages to include pages linked to from that page.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
+ 	 */
 -	private function validateLinkDepth( $depth ) {
 -		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
 -		if( $depth < 0 ) {
 -			return 0;
--		}
--		if ( !$this->userCanOverrideExportDepth() ) {
--			if( $depth > $wgExportMaxLinkDepth ) {
--				return $wgExportMaxLinkDepth;
--			}
--		}
--		/*
--		 * There's a HARD CODED limit of 5 levels of recursion here to prevent a
--		 * crazy-big export from being done by someone setting the depth
--		 * number too high. In other words, last resort safety net.
--		 */
--		return intval( min( $depth, 5 ) );
-+
-+	/** Expand a list of pages to include pages linked to from that page. */
 +	public static function getPageLinks( &$pageSet )
 +	{
 +		return self::getLinks(
 +			$pageSet, 'pagelinks', 'pl_from',
 +			array( 'page_namespace=pl_namespace', 'page_title=pl_title' )
 +		);
++	}
++
++	/**
++	 * Expand a list of pages to include images used in those pages.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
++	 */
++	public static function getImages( &$pageSet )
++	{
++		return self::getLinks(
++			$pageSet, 'imagelinks', 'il_from',
++			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
++		);
++	}
++
++	/**
++	 * Expand a list of pages to include all their subpages.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
++	 */
++	public static function getSubpages( &$pageSet )
++	{
++		$dbr = wfGetDB( DB_SLAVE );
++		$where = array();
++		$ids = array();
++		foreach ( $pageSet as $title )
++		{
++			$ids[ $title->getArticleId() ] = true;
++			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
+ 		}
+-		if ( !$this->userCanOverrideExportDepth() ) {
+-			if( $depth > $wgExportMaxLinkDepth ) {
+-				return $wgExportMaxLinkDepth;
++		$nsx = $where;
++		foreach ( $where as $ns => &$w )
++			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
++		$where = '('.implode( ' OR ', $where ).')';
++		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
++		$added = 0;
++		foreach( $result as $row )
++		{
++			if( empty( $ids[ $row->page_id ] ) )
++			{
++				$add = Title::newFromRow( $row );
++				$pageSet[ $add->getPrefixedText() ] = $add;
++				$added++;
+ 			}
+ 		}
+-		/*
+-		 * There's a HARD CODED limit of 5 levels of recursion here to prevent a
+-		 * crazy-big export from being done by someone setting the depth
+-		 * number too high. In other words, last resort safety net.
+-		 */
+-		return intval( min( $depth, 5 ) );
++		return $added;
  	}
 -	
 -	/** Expand a list of pages to include pages linked to from that page. */
@@ -1396,25 +1448,18 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 -		return $pageSet;
 -	}
 -	
-+
- 	/**
- 	 * Expand a list of pages to include images used in those pages.
- 	 * @param $inputPages array, list of titles to look up
- 	 * @param $pageSet array, associative array indexed by titles for output
- 	 * @return array associative array index by titles
- 	 */
+-	/**
+-	 * Expand a list of pages to include images used in those pages.
+-	 * @param $inputPages array, list of titles to look up
+-	 * @param $pageSet array, associative array indexed by titles for output
+-	 * @return array associative array index by titles
+-	 */
 -	private function getImages( $inputPages, $pageSet ) {
 -		return $this->getLinks( $inputPages, $pageSet,
 -							   'imagelinks',
 -							   array( NS_FILE . ' AS namespace', 'il_to AS title' ),
 -							   array( 'page_id=il_from' ) );
-+	public static function getImages( &$pageSet )
-+	{
-+		return self::getLinks(
-+			$pageSet, 'imagelinks', 'il_from',
-+			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
-+		);
- 	}
+-	}
 -	
 +
  	/**
@@ -1448,16 +1493,16 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
 +		$ids = array();
 +		foreach( $pageSet as $title )
 +			$ids[ $title->getArticleId() ] = true;
-+		$added = 0;
 +		$result = $dbr->select(
 +			array( 'page', $table ), 'page.*',
 +			$join + array( $id_field => array_keys( $ids ) ),
 +			__METHOD__,
 +			array( 'GROUP BY' => 'page_id' )
 +		);
++		$added = 0;
 +		foreach( $result as $row )
 +		{
-+			if( !$ids[ $row->page_id ] )
++			if( empty( $ids[ $row->page_id ] ) )
 +			{
 +				$add = Title::newFromRow( $row );
 +				$pageSet[ $add->getPrefixedText() ] = $add;
@@ -1469,7 +1514,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialImport.php
+diff -r 85fec3228ef8 -r ace4fff5597e includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1568,10 +1613,10 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesEn.php
+diff -r 85fec3228ef8 -r ace4fff5597e languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -3113,18 +3113,29 @@
+@@ -3113,18 +3113,30 @@
  
  To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
  
@@ -1602,11 +1647,12 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesEn.php
  'export-templates'  => 'Include templates',
 -'export-pagelinks'  => 'Include linked pages to a depth of:',
 +'export-pagelinks'  => 'Include linked articles',
++'export-subpages'   => 'Include subpages',
 +'export-closure'    => 'Include articles from subcategories',
  
  # Namespace 8 related
  'allmessages'                   => 'System messages',
-@@ -3171,7 +3182,6 @@
+@@ -3171,7 +3183,6 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -1614,7 +1660,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesEn.php
  'importnopages'              => 'No pages to import.',
  'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
  'importunknownsource'        => 'Unknown import source type',
-@@ -3190,11 +3200,16 @@
+@@ -3190,11 +3201,16 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',
@@ -1634,10 +1680,10 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesRu.php
+diff -r 85fec3228ef8 -r ace4fff5597e languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -2568,18 +2568,29 @@
+@@ -2568,18 +2568,30 @@
  
  Чтобы экспортировать статьи, введите их наименования в поле редактирования, одно название на строку, и выберите хотите ли вы экспортировать всю историю изменений статей или только последние версии статей.
  
@@ -1668,11 +1714,12 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesRu.php
  'export-templates'  => 'Включить шаблоны',
 -'export-pagelinks'  => 'Включить связанные страницы глубиной:',
 +'export-pagelinks'  => 'Включить статьи, связанные ссылками',
++'export-subpages'   => 'Включить подстатьи',
 +'export-closure'    => 'Включить статьи из подкатегорий',
  
  # Namespace 8 related
  'allmessages'                   => 'Системные сообщения',
-@@ -2625,7 +2636,6 @@
+@@ -2625,7 +2637,6 @@
  'import-comment'             => 'Примечание:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
@@ -1680,7 +1727,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesRu.php
  'importnopages'              => 'Нет страниц для импортирования.',
  'importfailed'               => 'Не удалось импортировать: $1',
  'importunknownsource'        => 'Неизвестный тип импортируемой страницы',
-@@ -2641,9 +2651,15 @@
+@@ -2641,9 +2652,15 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -1697,7 +1744,7 @@ diff -r 85fec3228ef8 -r 3c5506cfdbb8 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 85fec3228ef8 -r 3c5506cfdbb8 skins/common/shared.css
+diff -r 85fec3228ef8 -r ace4fff5597e skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@
