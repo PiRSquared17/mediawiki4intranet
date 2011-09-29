@@ -61,7 +61,7 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     $nuevosArgumentos = array();
     foreach (explode('&', $direccion['query']) as $argumento)
     {
-        $valores = split('=',$argumento,2);
+        $valores = explode('=', $argumento, 2);
         $nuevosArgumentos[$valores[0]] = $valores[1];
     }
     $query = array_merge($query, $nuevosArgumentos);
