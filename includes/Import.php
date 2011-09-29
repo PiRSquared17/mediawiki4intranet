@@ -996,10 +996,10 @@ class WikiImporter {
 		if( $this->workRevision ) {
 			$ok = call_user_func_array( $this->mRevisionCallback,
 				array( $this->workRevision, $this ) );
-			if( is_object($ok) && $ok->_imported ) {
+			if( is_object( $ok ) && !empty( $ok->_imported ) ) {
 				$this->lastRevision = $ok;
 				$this->workSuccessCount++;
-			} else if ( is_object($ok) && ( !$this->lastExistingRevision ||
+			} else if ( is_object( $ok ) && ( !$this->lastExistingRevision ||
 				$ok->getTimestamp() > $this->lastExistingRevision->getTimestamp() ) )
 				$this->lastExistingRevision = $ok;
 		}
@@ -1185,6 +1185,7 @@ class ImportStreamSource {
 		$pos = ftell($this->mHandle);
 		$s = fgets($this->mHandle);
 		/* multipart-файл? */
+		// TODO use ZIP instead of multipart/related
 		if (preg_match("/Content-Type:\s*multipart\/related; boundary=([^\r\n]+)\r*\n/s", $s, $m))
 		{
 			$this->boundary = $m[1];
@@ -1210,7 +1211,7 @@ class ImportStreamSource {
 				/* Читаем данные */
 				$tempfile = tempnam(wfTempDir(), "imp");
 				$tempfp = fopen($tempfile, "wb");
-				if (is_numeric($part['content_length']))
+				if (!empty($part['content_length']))
 				{
 					$done = 0;
 					$buf = true;
