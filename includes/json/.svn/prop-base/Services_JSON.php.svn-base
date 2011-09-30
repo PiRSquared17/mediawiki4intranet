@@ -1,0 +1,15 @@
+K 13
+svn:eol-style
+V 6
+native
+K 12
+svn:keywords
+V 2
+Id
+K 13
+svn:mergeinfo
+V 221
+/branches/REL1_15/phase3/includes/api/ApiFormatJson_json.php:51646
+/branches/wmf-deployment/includes/api/ApiFormatJson_json.php:53381
+/trunk/phase3/includes/json/Services_JSON.php:63549,63764,63897-63901,64881,64948,79561
+END
