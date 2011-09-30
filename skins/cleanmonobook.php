@@ -32,16 +32,6 @@ class SkinCleanmonobook extends SkinTemplate {
 
 		// Append to the default screen common & print styles...
 		$out->addStyle( 'ichick/main.css', 'screen' );
-		if( $wgHandheldStyle ) {
-			// Currently in testing... try 'chick/main.css'
-			$out->addStyle( $wgHandheldStyle, 'handheld' );
-		}
-
-		$out->addStyle( 'monobook/IE50Fixes.css', 'screen', 'lt IE 5.5000' );
-		$out->addStyle( 'monobook/IE55Fixes.css', 'screen', 'IE 5.5000' );
-		$out->addStyle( 'monobook/IE60Fixes.css', 'screen', 'IE 6' );
-		$out->addStyle( 'monobook/IE70Fixes.css', 'screen', 'IE 7' );
-
 		$out->addStyle( 'monobook/rtl.css', 'screen', '', 'rtl' );
 	}
 }
