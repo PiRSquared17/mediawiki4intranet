@@ -10,6 +10,16 @@
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
+// This extension probably needs to be decomposed/cleaned. It does the following:
+// 1) Adds &useskin=XXX to all URLs on the page with &useskin=XXX passed
+// 2) Adds WikEd and Russian Wikificator javascripts
+// 3) Adds some styles, some print styles
+// 4) Adds Live-Preview-Refresh ability - allows to display the preview of page
+//    currently being edited in a separate window, and automatically refresh it
+//    each XXX seconds.
+// 5) Adds AJAX function get_category_page_list($cat), which returns the list
+//    of pages that are in category $cat.
+
 if (!defined('MEDIAWIKI'))
 {
 ?>
@@ -19,6 +29,10 @@ if (!defined('MEDIAWIKI'))
 <?php
     exit(1);
 }
+
+$wgAjaxExportList[] = 'get_category_page_list';
+$wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
+$wgHooks['LinkBegin'][] = 'efCustisLinkBeginUseskin';
 
 function wfAddCustisScriptsJS(&$out)
 {
@@ -46,20 +60,18 @@ EOT;
     return true;
 }
 
-$wgHooks['BeforePageDisplay'][] = 'wfAddCustisScriptsJS';
-$wgAjaxExportList[] = 'get_category_page_list';
-
-$wgHooks['LinkBegin'][] = 'LinkBeginUseskin';
-function LinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret) {
-	global $wgRequest;
-	$sk = $wgRequest->getVal('useskin');
-	if ($sk)
-		$query['useskin'] = $sk;
-	return true;
+// Add &useskin=XXX to all URLs on the page with &useskin=XXX passed
+function efCustisLinkBeginUseskin($self, $target, &$text, &$customAttribs, &$query, &$options, &$ret)
+{
+    global $wgRequest;
+    $sk = $wgRequest->getVal('useskin');
+    if ($sk)
+        $query['useskin'] = $sk;
+    return true;
 }
 
 /* Live Refresh hooks */
-/* TODO move it to an extension */
+// TODO move them to a separate extension
 
 $wgHooks['AlternateEdit'][] = 'wfSaveTextboxSession';
 $wgHooks['EditPage::showEditForm:initial'][] = 'wfLoadTextboxSession';
