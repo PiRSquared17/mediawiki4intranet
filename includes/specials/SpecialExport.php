@@ -50,12 +50,12 @@ class SpecialExport extends SpecialPage {
 		
 		$state = $wgRequest->getValues();
 		$state['errors'] = array();
-		if ($state['addcat'])
+		if ( !empty( $state['addcat'] ) )
 		{
-			self::addPagesExec($state);
+			self::addPagesExec( $state );
 			$page = $state['pages'];
 		}
-		else if( $wgRequest->wasPosted() && $par == '' ) {
+		elseif ( $wgRequest->wasPosted() && $par == '' ) {
 			$page = $wgRequest->getText( 'pages' );
 			$this->curonly = $wgRequest->getCheck( 'curonly' );
 			$rawOffset = $wgRequest->getVal( 'offset' );
@@ -230,10 +230,10 @@ class SpecialExport extends SpecialPage {
 		}
 
 		// Validate parameter values
-		$catname = $state['catname'];
-		$notcategory = $state['notcategory'];
-		$namespace = $state['namespace'];
-		$modifydate = $state['modifydate'];
+		$catname     = isset( $state['catname'] )     ? $state['catname']     : '';
+		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
+		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
+		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
 		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
 			$modifydate = NULL;
 		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
@@ -242,7 +242,9 @@ class SpecialExport extends SpecialPage {
 		if ( !strlen( $notcategory ) || !( $notcategory = Title::newFromText( $notcategory, NS_CATEGORY ) ) ||
 			$notcategory->getNamespace() != NS_CATEGORY )
 			$notcategory = NULL;
-		if ( !strlen( $namespace ) || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
+		if ( $namespace === 'Main' || $namespace == '(Main)' || $namespace === wfMsg( 'blanknamespace' ) )
+			$namespace = 0;
+		elseif ( $namespace === '' || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
 			$namespace = NULL;
 		else
 			$namespace = $namespace->getNamespace();
@@ -250,16 +252,17 @@ class SpecialExport extends SpecialPage {
 		// Add pages from requested category and/or namespace
 		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL )
 		{
-			$catpages = self::getPagesFromCategory( $catname, $state['closure'], $namespace, $modifydate );
+			$catpages = self::getPagesFromCategory( $catname, !empty( $state['closure'] ), $namespace, $modifydate );
 			foreach ( $catpages as $title )
 				$pageSet[ $title->getPrefixedText() ] = $title;
 		}
 
 		// Look up any linked pages if asked...
-		$linkDepth = self::validateLinkDepth( $state['link-depth'] );
-		$t = $state[ 'templates' ] ? 1 : 0;
-		$p = $state[ 'pagelinks' ] ? 1 : 0;
-		$i = $state[ 'images' ] ? 1 : 0;
+		$linkDepth = self::validateLinkDepth( !empty( $state['link-depth'] ) ? $state['link-depth'] : 0 );
+		$t = !empty( $state[ 'templates' ] );
+		$p = !empty( $state[ 'pagelinks' ] );
+		$i = !empty( $state[ 'images' ] );
+		$s = !empty( $state[ 'subpages' ] );
 		$step = 0;
 		do
 		{
@@ -268,8 +271,9 @@ class SpecialExport extends SpecialPage {
 			if( $t ) $added += self::getTemplates( $pageSet );
 			if( $p ) $added += self::getPagelinks( $pageSet );
 			if( $i ) $added += self::getImages( $pageSet );
+			if( $s ) $added += self::getSubpages( $pageSet );
 			$step++;
-		} while( $t+$p+$i > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
+		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
 
 		// Filter user-readable pages (also MW Bug 8824)
 		foreach ( $pageSet as $key => $title )
@@ -325,7 +329,7 @@ class SpecialExport extends SpecialPage {
 	// Display page selection form, enclosed into a <fieldset>
 	static function addPagesForm( $state )
 	{
-		$form .= '<fieldset class="addpages">';
+		$form = '<fieldset class="addpages">';
 		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
 		$textboxes = array(
 			'catname'     => 20,
@@ -336,12 +340,12 @@ class SpecialExport extends SpecialPage {
 		// Textboxes:
 		foreach ( $textboxes as $k => $size )
 			$form .= '<div class="ap_'.$k.'">' .
-				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, $state[ $k ] ) . '</div>';
+				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
 		// Checkboxes:
-		foreach ( array( 'closure', 'templates', 'images', 'pagelinks' ) as $k )
+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k )
 		{
 			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
-				wfMsg( "export-$k" ), $k, "ap-$k", $state[ $k ] && true,
+				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
 				array( 'style' => 'vertical-align: middle' )
 			) . '</div>';
 		}
@@ -432,7 +436,11 @@ class SpecialExport extends SpecialPage {
 		);
 	}
 
-	/** Expand a list of pages to include pages linked to from that page. */
+	/**
+	 * Expand a list of pages to include pages linked to from that page.
+	 * @param &$pageSet array, associative array indexed by title prefixed text for output
+	 * @return int count of added pages
+	 */
 	public static function getPageLinks( &$pageSet )
 	{
 		return self::getLinks(
@@ -443,9 +451,8 @@ class SpecialExport extends SpecialPage {
 
 	/**
 	 * Expand a list of pages to include images used in those pages.
-	 * @param $inputPages array, list of titles to look up
-	 * @param $pageSet array, associative array indexed by titles for output
-	 * @return array associative array index by titles
+	 * @param &$pageSet array, associative array indexed by title prefixed text for output
+	 * @return int count of added pages
 	 */
 	public static function getImages( &$pageSet )
 	{
@@ -453,6 +460,39 @@ class SpecialExport extends SpecialPage {
 			$pageSet, 'imagelinks', 'il_from',
 			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
 		);
+	}
+
+	/**
+	 * Expand a list of pages to include all their subpages.
+	 * @param &$pageSet array, associative array indexed by title prefixed text for output
+	 * @return int count of added pages
+	 */
+	public static function getSubpages( &$pageSet )
+	{
+		$dbr = wfGetDB( DB_SLAVE );
+		$where = array();
+		$ids = array();
+		foreach ( $pageSet as $title )
+		{
+			$ids[ $title->getArticleId() ] = true;
+			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
+		}
+		$nsx = $where;
+		foreach ( $where as $ns => &$w )
+			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
+		$where = '('.implode( ' OR ', $where ).')';
+		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
+		$added = 0;
+		foreach( $result as $row )
+		{
+			if( empty( $ids[ $row->page_id ] ) )
+			{
+				$add = Title::newFromRow( $row );
+				$pageSet[ $add->getPrefixedText() ] = $add;
+				$added++;
+			}
+		}
+		return $added;
 	}
 
 	/**
@@ -467,16 +507,16 @@ class SpecialExport extends SpecialPage {
 		$ids = array();
 		foreach( $pageSet as $title )
 			$ids[ $title->getArticleId() ] = true;
-		$added = 0;
 		$result = $dbr->select(
 			array( 'page', $table ), 'page.*',
 			$join + array( $id_field => array_keys( $ids ) ),
 			__METHOD__,
 			array( 'GROUP BY' => 'page_id' )
 		);
+		$added = 0;
 		foreach( $result as $row )
 		{
-			if( !$ids[ $row->page_id ] )
+			if( empty( $ids[ $row->page_id ] ) )
 			{
 				$add = Title::newFromRow( $row );
 				$pageSet[ $add->getPrefixedText() ] = $add;
