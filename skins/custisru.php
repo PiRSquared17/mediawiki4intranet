@@ -163,12 +163,12 @@ class CustisRuTemplate extends QuickTemplate {
                         echo ' class="'.htmlspecialchars($tab['class']).'"';
                     }
                     echo'><a href="'.htmlspecialchars($tab['href']).'"';
-                    # We don't want to give the watch tab an accesskey if the
-                    # page is being edited, because that conflicts with the
-                    # accesskey on the watch checkbox.  We also don't want to
-                    # give the edit tab an accesskey, because that's fairly su-
-                    # perfluous and conflicts with an accesskey (Ctrl-E) often
-                    # used for editing in Safari.
+                    // We don't want to give the watch tab an accesskey if the
+                    // page is being edited, because that conflicts with the
+                    // accesskey on the watch checkbox.  We also don't want to
+                    // give the edit tab an accesskey, because that's fairly su-
+                    // perfluous and conflicts with an accesskey (Ctrl-E) often
+                    // used for editing in Safari.
                     if( in_array( $action, array( 'edit', 'submit' ) )
                     && in_array( $key, array( 'edit', 'watch', 'unwatch' ))) {
                         echo $skin->tooltip( "ca-$key" );
@@ -331,21 +331,21 @@ class CustisRuTemplate extends QuickTemplate {
         $cont = array();
         if($this->data['notspecialpage'])
             $cont[] = array(
-                href => $this->data['nav_urls']['whatlinkshere']['href'],
-                id   => 't-whatlinkshere',
-                text => $this->translator->translate('whatlinkshere'),
+                'href' => $this->data['nav_urls']['whatlinkshere']['href'],
+                'id'   => 't-whatlinkshere',
+                'text' => $this->translator->translate('whatlinkshere'),
             );
         if($this->data['nav_urls']['recentchangeslinked'])
             $cont[] = array(
-                href => $this->data['nav_urls']['recentchangeslinked']['href'],
-                id   => 't-recentchangeslinked',
-                text => $this->translator->translate('recentchangeslinked'),
+                'href' => $this->data['nav_urls']['recentchangeslinked']['href'],
+                'id'   => 't-recentchangeslinked',
+                'text' => $this->translator->translate('recentchangeslinked'),
             );
         if(isset($this->data['nav_urls']['trackbacklink']))
             $cont[] = array(
-                href => $this->data['nav_urls']['trackbacklink']['href'],
-                id   => 't-trackbacklink',
-                text => $this->translator->translate('trackbacklink'),
+                'href' => $this->data['nav_urls']['trackbacklink']['href'],
+                'id'   => 't-trackbacklink',
+                'text' => $this->translator->translate('trackbacklink'),
             );
         if($this->data['feeds'])
         {
@@ -358,32 +358,48 @@ class CustisRuTemplate extends QuickTemplate {
         foreach(array('contributions', 'log', 'blockip', 'emailuser', 'upload', 'specialpages') as $special)
             if($this->data['nav_urls'][$special])
                 $cont[] = array(
-                    href => $this->data['nav_urls'][$special]['href'],
-                    id   => "t-$special",
-                    text => $this->translator->translate($special),
+                    'href' => $this->data['nav_urls'][$special]['href'],
+                    'id'   => "t-$special",
+                    'text' => $this->translator->translate($special),
                 );
 
         if(!empty($this->data['nav_urls']['print']['href']))
             $cont[] = array(
-                href => $this->data['nav_urls']['print']['href'],
-                id   => "t-print",
-                text => $this->translator->translate('printableversion'),
+                'href' => $this->data['nav_urls']['print']['href'],
+                'id'   => "t-print",
+                'text' => $this->translator->translate('printableversion'),
             );
 
         if(!empty($this->data['nav_urls']['permalink']['href']))
             $cont[] = array(
-                href => $this->data['nav_urls']['permalink']['href'],
-                id   => "t-permalink",
-                text => $this->translator->translate('permalink'),
+                'href' => $this->data['nav_urls']['permalink']['href'],
+                'id'   => "t-permalink",
+                'text' => $this->translator->translate('permalink'),
             );
         else if ($this->data['nav_urls']['permalink']['href'] === '')
             $cont[] = array(
-                id   => "t-ispermalink",
-                text => $this->translator->translate('permalink'),
+                'id'   => "t-ispermalink",
+                'text' => $this->translator->translate('permalink'),
             );
 
         wfRunHooks('SkinTemplateToolboxLinks', array(&$this, &$cont));
         $this->customBox($bar, $cont);
+
+        // A hack to support extensions which use SkinTemplateToolboxEnd hook
+        ob_start();
+        wfRunHooks('SkinTemplateToolboxEnd', array(&$this));
+        $ob = ob_get_contents();
+        ob_end_clean();
+        if ($ob !== '')
+        {
+            $ob = preg_replace('#<li[^<>]*>(.*?)</li\s*>#is',
+'<tr><td width="20" class="menu_partition_sep"><img alt="" height="1" width="5" src="'.$wgScriptPath.'/skins/custisru/spacer.gif"></td>
+<td width="100%" class="menu_normal_text">\1</td></tr>
+<tr><td class="menu_partition_sep"></td>
+<td class="menu_separator"></td></tr>
+', $ob);
+            print $ob;
+        }
     }
 
     /*************************************************************************************************/
@@ -426,7 +442,7 @@ class CustisRuTemplate extends QuickTemplate {
      </td>
     </tr>
     <tr>
-     <td class="<?= ($key == $last ? 'menu_left_background' : 'menu_partition_sep') ?>"></td>
+     <td class="menu_partition_sep"></td>
      <td class="menu_separator"></td>
     </tr>
 <?php       } } else { # allow raw HTML block to be defined by extensions ?>
