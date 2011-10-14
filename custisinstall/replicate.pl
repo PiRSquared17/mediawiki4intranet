@@ -15,6 +15,57 @@
 # http://wiki.4intra.net/MW_Import_Export
 
 use strict;
+use constant HELP_TEXT => <<EOF;
+MediaWiki4Intranet replication script
+Copyright (c) 2010+ Vitaliy Filippov <vitalif\@mail.ru>
+
+USAGE: $0 [OPTIONS] <replication-config.ini> [targets...]
+
+OPTIONS:
+
+-t HOURS
+  only select pages which were changed during last HOURS hours.
+  I.e. if the replication script is ran each day, you can specify -t 24 to
+  export only pages changed since last run, or better -t 25 to allow some
+  overlap with previous day and make replication more reliable.
+
+-t 'YYYY-MM-DD[ HH:MM:SS]'
+  same as above, but specify date/time, not the relative period in hours.
+
+-i
+  when using regular incremental replication (-t option), the following
+  situation may be possible:
+  * template was created, say, on 2011-10-11
+  * it is outside replication category, therefore does not replicate by itself
+    (-t 24 is used each day)
+  * article was created, say, on 2011-10-13, in replication category
+  * so article replicates 2011-10-14, but the template does not
+    (because it's not modified during last 24 hours)
+  This replication script by default ignores last modification date for
+  templates and images. You can change this behaviour using this -i option.
+
+When called without target list, $0 will attempt to replicate all targets
+found in config file. There must be 2 sections in config file according to
+each target and named "<Target>SourceWiki" and "<Target>DestinationWiki".
+
+Config file fragment syntax (Replace __Test__ with desired [target] name):
+
+[__Test__SourceWiki]
+URL=<source wiki url>
+Category=<source category name for selecting pages>
+NotCategory=<source category name for replication denial>
+RemoveConfidential=<'yes' or 'no' (default)>
+FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
+BasicLogin=<HTTP basic auth username, if needed>
+BasicPassword=<HTTP basic auth password, if needed>
+
+[__Test__DestinationWiki]
+URL=<destination wiki url>
+BasicLogin=<HTTP basic auth username, if needed>
+BasicPassword=<HTTP basic auth password, if needed>
+User=<name of a user having import rights in destination wiki>
+Password=<his password>
+EOF
 
 BEGIN
 {
@@ -41,57 +92,41 @@ use HTML::Entities;
 
 my $BUFSIZE = 0x10000;
 
-my $config = read_config(shift @ARGV) || die <<EOF;
-MediaWiki4Intranet replication script
-Copyright (c) 2010+ Vitaliy Filippov <vitalif\@mail.ru>
-
-USAGE: $0 <replication-config.ini> [-t HOURS] [targets...]
-OPTIONS:
-  -t HOURS --- only select pages which were changed during last HOURS hours.
-    I.e. if the replication script is ran each day, you can specify -t 24 to
-    export only pages changed since last run, or better -t 25 to allow some
-    overlap with previous day and make replication more reliable.
-  -t 'YYYY-MM-DD[ HH:MM:SS]' --- same as above, but specify date/time, not
-    the relative period in hours.
-
-When called without target list, $0 will attempt to replicate all targets
-found in config file. There must be 2 sections in config file according to
-each target and named "<Target>SourceWiki" and "<Target>DestinationWiki".
-
-Config file fragment syntax (Replace __Test__ with desired [target] name):
-
-[__Test__SourceWiki]
-URL=<source wiki url>
-Category=<source category name for selecting pages>
-NotCategory=<source category name for replication denial>
-RemoveConfidential=<'yes' or 'no' (default)>
-FullHistory=<'yes' or 'no' (default), 'yes' replicates all page revisions, not only the last one>
-BasicLogin=<HTTP basic auth username, if needed>
-BasicPassword=<HTTP basic auth password, if needed>
-
-[__Test__DestinationWiki]
-URL=<destination wiki url>
-BasicLogin=<HTTP basic auth username, if needed>
-BasicPassword=<HTTP basic auth password, if needed>
-User=<name of a user having import rights in destination wiki>
-Password=<his password>
-EOF
-
 my $since_time;
-if ($ARGV[0] eq '-t')
+my $ignore_since_images = 1;
+my $config_file;
+my @targets;
+
+for (my $i = 0; $i < @ARGV; $i++)
 {
-    shift @ARGV;
-    $since_time = shift @ARGV;
-    if ($since_time !~ /^\s*(\d{4,}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}:\d{2})?)\s*$/s)
+    if ($ARGV[$i] eq '-t')
     {
-        $since_time = int(time - 3600*$since_time);
-        $since_time = strftime("%Y-%m-%d %H:%M:%S", localtime($since_time));
+        $since_time = $ARGV[++$i];
+        if ($since_time !~ /^\s*(\d{4,}-\d{2}-\d{2}(?:\s+\d{2}:\d{2}:\d{2})?)\s*$/s)
+        {
+            $since_time = int(time - 3600*$since_time);
+            $since_time = strftime("%Y-%m-%d %H:%M:%S", localtime($since_time));
+        }
+        else
+        {
+            $since_time = $1;
+        }
+    }
+    elsif ($ARGV[$i] eq '-i')
+    {
+        $ignore_since_images = 0;
+    }
+    elsif (!defined $config_file)
+    {
+        $config_file = $ARGV[$i];
     }
     else
     {
-        $since_time = $1;
+        push @targets, lc $ARGV[$i];
     }
 }
+
+my $config = read_config($config_file) || die HELP_TEXT();
 
 $| = 1;
 
@@ -99,7 +134,6 @@ my $replicating;
 sub logp { strftime("[%Y-%m-%d %H:%M:%S] [$replicating]", localtime) }
 
 my $log;
-my @targets = map { lc } @ARGV;
 @targets = keys %$config unless @targets;
 for (@targets)
 {
@@ -136,30 +170,21 @@ sub login_into
     }
 }
 
-# Retrieve list of Wiki pages from category $cat,
-# NOT in category $notcat, with all used images and
-# templates by default, but only modified after $modifydate
-sub page_list
+# Generate export page list from wiki $url using $params and $desc as error description
+sub page_list_load
 {
-    my ($ua, $src, $cat, $notcat, $modifydate) = @_;
+    my ($ua, $url, $desc, $params) = @_;
     my $response = $ua->request(
-        POST "$src->{url}/index.php?title=Special:Export&action=submit",
+        POST "$url/index.php?title=Special:Export&action=submit",
         [
-            addcat      => "Добавить",
-            templates   => 1,
-            images      => 1,
-            catname     => ($cat ||= ''),
-            notcat      => ($notcat ||= ''),
-            modifydate  => ($modifydate ||= ''),
+            addcat => "Добавить",
+            @$params
         ],
     );
-    my $desc = "Category:$cat";
-    $desc .= " MINUS category:$notcat" if $notcat ne '';
-    $desc .= ", modified after $modifydate" if $modifydate ne '';
     unless ($response->is_success)
     {
         die logp()." Could not retrieve page list from $desc ".
-            "($src->{url}/index.php?title=Special:Export&action=submit): ".
+            "($url/index.php?title=Special:Export&action=submit): ".
             $response->status_line;
     }
     my $text = $response->content;
@@ -167,9 +192,45 @@ sub page_list
     $text =~ s/^\s*//so;
     $text =~ s/\s*$//so;
     decode_entities($text);
+    return $text;
+}
+
+# Retrieve list of Wiki pages from category $cat,
+# NOT in category $notcat, with all used images and
+# templates by default, but only modified after $modifydate
+sub page_list
+{
+    my ($ua, $src, $cat, $notcat, $modifydate, $ignore_since_images) = @_;
+    $cat ||= '';
+    $notcat ||= '';
+    $modifydate ||= '';
+    $ignore_since_images = $ignore_since_images && $modifydate ne '';
+    my $desc = "Category:$cat";
+    $desc .= " MINUS category:$notcat" if $notcat ne '';
+    $desc .= ", modified after $modifydate" if $modifydate ne '';
+    $desc .= ", with all used images/templates" if !$ignore_since_images;
+    my $text = page_list_load($ua, $src->{url}, $desc, [
+        catname     => $cat,
+        notcat      => $notcat,
+        modifydate  => $modifydate,
+        ($ignore_since_images ? () : (
+            templates => 1,
+            images    => 1,
+        ))
+    ]);
     if (!$text)
     {
         print logp()." No pages need replication in $desc\n";
+    }
+    elsif ($ignore_since_images)
+    {
+        # Add templates and images in a separate request, without passing modifydate
+        $text = page_list_load($ua, $src->{url}, $desc, [
+            notcat    => ($notcat ||= ''),
+            templates => 1,
+            images    => 1,
+            pages     => $text,
+        ]);
     }
     return $text;
 }
@@ -183,7 +244,7 @@ sub replicate
     # Login into source wiki
     login_into($ua, $src, 'source wiki');
     # Read page list for replication
-    my $text = page_list($ua, $src, $src->{category}, $src->{notcategory}, $since_time);
+    my $text = page_list($ua, $src, $src->{category}, $src->{notcategory}, $since_time, $ignore_since_images);
     if (!$text)
     {
         # No pages
