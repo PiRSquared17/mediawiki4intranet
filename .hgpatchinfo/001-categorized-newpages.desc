@@ -1,0 +1,3 @@
+Bug 79835 - Patch for Special:NewPages adds category and format options
+
+Depends on: 000-intraacl-rights

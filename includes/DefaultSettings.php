@@ -419,6 +419,11 @@ $wgXMLMimeTypes = array(
 		'html'                              			=> 'text/html', // application/xhtml+xml?
 );
 
+$wgXMLMayBeCompressed = array(
+	'image/svg+xml' => true,
+	'application/x-dia-diagram' => true,
+);
+
 /**
  * To set 'pretty' URL paths for actions other than
  * plain page views, add to this array. For instance:
@@ -467,6 +472,8 @@ $wgAllowCopyUploads = false;
  * normal uploads is currently to edit php.ini.
  */
 $wgMaxUploadSize = 1024*1024*100; # 100MB
+/** Maximum length for filenames shown in image gallery. */
+$wgMaxFilenameLength = 20;
 
 /**
  * Point the upload navigation link to an external URL
@@ -1140,6 +1147,11 @@ $wgMaxPPNodeCount = 1000000;  # A complexity limit on template expansion
  */
 $wgMaxTemplateDepth = 40;
 $wgMaxPPExpandDepth = 40;
+
+/**
+ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
+ */
+$wgDotAfterTocnumber = false;
 
 /**
  * If true, removes (substitutes) templates in "~~~~" signatures.
@@ -4358,3 +4370,5 @@ $wgUploadMaintenance = false;
  */
 $wgOldChangeTagsIndex = false;
 
+/** Defines that MergeConflicts extension patch was applied to this MW installation */
+define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );
