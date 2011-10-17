@@ -41,7 +41,11 @@ h6 { font-size: 95%; }
 h6 .editsection { font-size: 105.3%; }
 hr.sep { color:gray;height:1px;background-color:gray;}
 p.subpages { font-size:small;}
+
+div.paragraph.subpages { font-size:small;}
 p.subtitle { padding-top: 0; margin-top: 0;}
+
+div.paragraph.subtitle { padding-top: 0; margin-top: 0;}
 .catlinks { font-size:small; margin-top:0; text-align:right;}
 td { empty-cells:show; }
 td.bottom { border-top: 1px solid gray; }
