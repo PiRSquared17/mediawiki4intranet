@@ -419,6 +419,11 @@ $wgXMLMimeTypes = array(
 		'html'                              			=> 'text/html', // application/xhtml+xml?
 );
 
+$wgXMLMayBeCompressed = array(
+	'image/svg+xml' => true,
+	'application/x-dia-diagram' => true,
+);
+
 /**
  * To set 'pretty' URL paths for actions other than
  * plain page views, add to this array. For instance:
