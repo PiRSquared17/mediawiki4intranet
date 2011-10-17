@@ -19,6 +19,81 @@
  *
  * @ingroup FileRepo
  */
+
+function wfTransliterate($s)
+{
+    $s = strtr($s, array(
+        'а' => 'a',
+        'б' => 'b',
+        'в' => 'v',
+        'г' => 'g',
+        'д' => 'd',
+        'е' => 'e',
+        'ё' => 'e',
+        'ж' => 'zh',
+        'з' => 'z',
+        'и' => 'i',
+        'й' => 'j',
+        'к' => 'k',
+        'л' => 'l',
+        'м' => 'm',
+        'н' => 'n',
+        'о' => 'o',
+        'п' => 'p',
+        'р' => 'r',
+        'с' => 's',
+        'т' => 't',
+        'у' => 'u',
+        'ф' => 'f',
+        'х' => 'h',
+        'ц' => 'ts',
+        'ч' => 'ch',
+        'ш' => 'sh',
+        'щ' => 'sch',
+        'ь' => '',
+        'ъ' => '',
+        'ы' => 'i',
+        'э' => 'e',
+        'ю' => 'yu',
+        'я' => 'ya',
+        'А' => 'A',
+        'Б' => 'B',
+        'В' => 'V',
+        'Г' => 'G',
+        'Д' => 'D',
+        'Е' => 'E',
+        'Ё' => 'E',
+        'Ж' => 'ZH',
+        'З' => 'Z',
+        'И' => 'I',
+        'Й' => 'J',
+        'К' => 'K',
+        'Л' => 'L',
+        'М' => 'M',
+        'Н' => 'N',
+        'О' => 'O',
+        'П' => 'P',
+        'Р' => 'R',
+        'С' => 'S',
+        'Т' => 'T',
+        'У' => 'U',
+        'Ф' => 'F',
+        'Х' => 'H',
+        'Ц' => 'TS',
+        'Ч' => 'CH',
+        'Ш' => 'SH',
+        'Щ' => 'SCH',
+        'Ь' => '',
+        'Ъ' => '',
+        'Ы' => 'I',
+        'Э' => 'E',
+        'Ю' => 'YU',
+        'Я' => 'YA',
+    ));
+    $s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
+    return $s;
+}
+
 abstract class File {
 	const DELETED_FILE = 1;
 	const DELETED_COMMENT = 2;
@@ -465,7 +540,7 @@ abstract class File {
 		}
 		$extension = $this->getExtension();
 		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType() );
-		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getName();
+		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getPhys();
 		if ( $thumbExt != $extension ) {
 			$thumbName .= ".$thumbExt";
 		}
@@ -733,17 +808,33 @@ abstract class File {
 	}
 
 	/**
+	 * Get the physical path of the file
+	 */
+	function getPhys() {
+		global $wgTransliterateUploadFilenames;
+		$name = $this->getName();
+		if ($wgTransliterateUploadFilenames)
+		{
+			if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
+				$name = wfTransliterate($m[1]).'.'.$m[2];
+			else
+				$name = wfTransliterate($name);
+		}
+		return $name;
+	}
+
+	/**
 	 * Get the path of the file relative to the public zone root
 	 */
 	function getRel() {
-		return $this->getHashPath() . $this->getName();
+		return $this->getHashPath() . $this->getPhys();
 	}
 
 	/**
 	 * Get urlencoded relative path of the file
 	 */
 	function getUrlRel() {
-		return $this->getHashPath() . rawurlencode( $this->getName() );
+		return $this->getHashPath() . rawurlencode( $this->getPhys() );
 	}
 
 	/** Get the relative path for an archive file */
