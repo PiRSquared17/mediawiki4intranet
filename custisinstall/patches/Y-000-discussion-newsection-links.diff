@@ -1,12 +1,12 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297446289 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1318856800 -10800
 Add new section by default when editing a discussion page.
 
-diff -r b11befdd7427 -r 5cd54d4d69ef includes/Linker.php
+diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/Linker.php
 --- includes/Linker.php
 +++ includes/Linker.php
-@@ -232,13 +232,24 @@
+@@ -232,13 +232,25 @@
  			$target->mFragment = '';
  		}
  
@@ -24,21 +24,22 @@ diff -r b11befdd7427 -r 5cd54d4d69ef includes/Linker.php
 +			# there's already an action specified, or unless 'edit' makes no sense
 +			# (i.e., for a nonexistent special page).
 +			if( in_array( 'broken', $options ) and empty( $query['action'] )
-+			and $target->getNamespace() != NS_SPECIAL ) {
++			    and $target->getNamespace() != NS_SPECIAL ) {
 +				$query['action'] = 'edit';
 +				$query['redlink'] = '1';
 +			}
-+			if ( $target->isTalkPage() && $query['action'] == 'edit' )
-+			{
-+				if ( !array_key_exists( 'section', $query ) )
++			if ( $target->isTalkPage() && !empty( $query['action'] ) &&
++			    $query['action'] == 'edit' ) {
++				if ( !array_key_exists( 'section', $query ) ) {
 +					$query['section'] = 'new';
-+				else if ( !$query['section'] )
++				} elseif ( !$query['section'] ) {
 +					unset( $query['section'] );
++				}
 +			}
  		}
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
-diff -r b11befdd7427 -r 5cd54d4d69ef includes/SkinTemplate.php
+diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/SkinTemplate.php
 --- includes/SkinTemplate.php
 +++ includes/SkinTemplate.php
 @@ -655,6 +655,8 @@
@@ -50,7 +51,7 @@ diff -r b11befdd7427 -r 5cd54d4d69ef includes/SkinTemplate.php
  		}
  
  		$text = wfMsg( $message );
-diff -r b11befdd7427 -r 5cd54d4d69ef maintenance/parserTests.txt
+diff -r 45da8fc662c9 -r 6c8b1ae6e55a maintenance/parserTests.txt
 --- maintenance/parserTests.txt
 +++ maintenance/parserTests.txt
 @@ -1404,7 +1404,7 @@
