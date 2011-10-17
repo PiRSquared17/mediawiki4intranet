@@ -55,7 +55,7 @@ class MailAddress {
 		if( $this->name != '' && !wfIsWindows() ) {
 			global $wgEnotifUseRealName;
 			$name = ( $wgEnotifUseRealName && $this->realName ) ? $this->realName : $this->name;
-			$quoted = wfQuotedPrintable( $name );
+			$quoted = wfMimeBase64( $name );
 			if( strpos( $quoted, '.' ) !== false || strpos( $quoted, ',' ) !== false ) {
 				$quoted = '"' . $quoted . '"';
 			}
@@ -141,7 +141,7 @@ class UserMailer {
 			if ( $replyto ) {
 				$headers['Reply-To'] = $replyto->toString();
 			}
-			$headers['Subject'] = wfQuotedPrintable( $subject );
+			$headers['Subject'] = wfMimeBase64( $subject );
 			$headers['Date'] = date( 'r' );
 			$headers['MIME-Version'] = '1.0';
 			$headers['Content-type'] = (is_null($contentType) ?
@@ -198,10 +198,10 @@ class UserMailer {
 			if (function_exists('mail')) {
 				if (is_array($to)) {
 					foreach ($to as $recip) {
-						$sent = mail( $recip->toString(), wfQuotedPrintable( $subject ), $body, $headers );
+						$sent = mail( $recip->toString(), wfMimeBase64( $subject ), $body, $headers );
 					}
 				} else {
-					$sent = mail( $to->toString(), wfQuotedPrintable( $subject ), $body, $headers );
+					$sent = mail( $to->toString(), wfMimeBase64( $subject ), $body, $headers );
 				}
 			} else {
 				$wgErrorString = 'PHP is not configured to send mail';
