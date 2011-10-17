@@ -156,6 +156,11 @@ p.mw-filedelete-editreasons, p.mw-delete-editreasons {
 	float: left;
 }
 
+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
+p.mw-filedelete-editreasons, p.mw-delete-editreasons {
+	float: left;
+}
+
 .toggle {
 	margin-left: 0em;
 	margin-right: 2em;
@@ -176,6 +181,14 @@ html > body div#bodyContent ul {
 
 /* Special:Allpages styling */
 td.mw-allpages-nav, p.mw-allpages-nav, td.mw-allpages-alphaindexline {
+	text-align: left;
+
+/* Special:Prefixindex styling */
+td#mw-prefixindex-nav-form  {
+	text-align: left;
+}
+
+td.mw-allpages-nav, div.paragraph.mw-allpages-nav, td.mw-allpages-alphaindexline {
 	text-align: left;
 
 /* Special:Prefixindex styling */
