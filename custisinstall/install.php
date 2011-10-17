@@ -34,7 +34,7 @@ $FILES_WIKIMEDIA = explode(' ',
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'PdfHandler Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud');
+    'Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud');
 $EXT_OUR = explode(' ',
     'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
     ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
@@ -42,7 +42,7 @@ $EXT_OUR = explode(' ',
     ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
     ' IntraACL ListFeed OpenID Calendar Wikilog GlobalAuth PlantUML TemplatedPageList HttpAuth'.
     ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit RegexParserFunctions MergeConflicts Dia'.
-    ' AllNsSuggest NewPagesEx');
+    ' AllNsSuggest NewPagesEx PdfHandler');
 $SKINS_OUR = explode(' ',
     'custis custisru dumphtml ichick');
 
