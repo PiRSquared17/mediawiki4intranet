@@ -47,8 +47,7 @@ $wgDjvuPostProcessor = "ppmtojpeg";
 $wgDjvuOutputExtension = 'jpg';
 
 $wgPdfProcessor = 'nice -n 20 gs';
-$wgPdfPostProcessor = $wgImageMagickConvertCommand;
-$wgPdfInfo = 'pdfinfo';
+$wgPdftoText = ''; // it's useless, disable
 
 $wgDiff3 = '/usr/bin/diff3';
 
