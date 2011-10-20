@@ -23,6 +23,23 @@
  * @ingroup SpecialPage
  */
 
+class FakeUser
+{
+	var $name = "";
+	function __construct( $name )
+	{
+		$this->name = $name;
+	}
+	function getId()
+	{
+		return 0;
+	}
+	function getName()
+	{
+		return $this->name;
+	}
+}
+
 /**
  *
  * @ingroup SpecialPage
@@ -166,9 +183,9 @@ class WikiRevision {
 
 	function importOldRevision() {
 		# Check edit permission
-		if( !$this->getTitle()->userCan('edit') )
+		global $wgUser;
+		if( !$this->getTitle()->userCan( 'edit' ) )
 		{
-			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
 			return false;
 		}
@@ -177,10 +194,11 @@ class WikiRevision {
 
 		# Sneak a single revision into place
 		$user = User::newFromName( $this->getUser() );
-		if( $user ) {
+		if( !$user ) {
 			$userId = intval( $user->getId() );
 			$userText = $user->getName();
 		} else {
+			$user = new FakeUser( $this->getUser() );
 			$userId = 0;
 			$userText = $this->getUser();
 		}
@@ -191,6 +209,7 @@ class WikiRevision {
 
 		$article = new Article( $this->title );
 		$pageId = $article->getId();
+		$dbTimestamp = $dbw->timestamp( $this->timestamp );
 		if( $pageId == 0 ) {
 			# must create the page...
 			$pageId = $article->insertOn( $dbw );
@@ -200,7 +219,7 @@ class WikiRevision {
 
 			$prior = $dbw->selectField( 'revision', 'rev_id',
 				array( 'rev_page' => $pageId,
-					'rev_timestamp' => $dbw->timestamp( $this->timestamp ),
+					'rev_timestamp' => $dbTimestamp,
 					'rev_user_text' => $userText,
 					'rev_comment'   => $this->getComment() ),
 				__METHOD__
@@ -227,7 +246,45 @@ class WikiRevision {
 			) );
 		$revId = $revision->insertOn( $dbw );
 		$changed = $article->updateIfNewerOn( $dbw, $revision );
-		
+
+		# Restore edit/create recent changes entry
+		global $wgUseRCPatrol, $wgUseNPPatrol;
+		# Mark as patrolled if importing user can do so
+		$patrolled = ( $wgUseRCPatrol || $wgUseNPPatrol ) && $this->title->userCan( 'autopatrol' );
+		$prevRev = $dbw->selectRow( 'revision', '*',
+			array( 'rev_page' => $pageId, "rev_timestamp < $dbTimestamp" ), __METHOD__,
+			array( 'LIMIT' => '1', 'ORDER BY' => 'rev_timestamp DESC' ) );
+		if ( $prevRev )
+		{
+			$rc = RecentChange::notifyEdit( $this->timestamp, $this->title, $this->minor,
+				$user, $this->getComment(), $prevRev->rev_id, $prevRev->rev_timestamp, $wgUser->isAllowed( 'bot' ),
+				'', $prevRev->rev_len, strlen( $this->getText() ), $revId, $patrolled );
+		}
+		else
+		{
+			$rc = RecentChange::notifyNew( $this->timestamp, $this->title, $this->minor,
+				$user, $this->getComment(), $wgUser->isAllowed( 'bot' ), '',
+				strlen( $this->getText() ), $revId, $patrolled );
+			if ( !$created )
+			{
+				# If we are importing the first revision, but the page already exists,
+				# that means there was another first revision. Mark it as non-first,
+				# so that import does not depend on revision sequence.
+				$dbw->update( 'recentchanges',
+					array( 'rc_type' => RC_EDIT ),
+					array(
+						'rc_namespace' => $this->title->getNamespace(),
+						'rc_title' => $this->title->getDBkey(),
+						'rc_type' => RC_NEW,
+					),
+					__METHOD__ );
+			}
+		}
+		# Log auto-patrolled edits
+		if ( $patrolled ) {
+			PatrolLog::record( $rc, true );
+		}
+
 		# To be on the safe side...
 		$tempTitle = $GLOBALS['wgTitle'];
 		$GLOBALS['wgTitle'] = $this->title;
