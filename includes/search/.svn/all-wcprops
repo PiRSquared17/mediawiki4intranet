@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search
+END
+SearchEngine.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchEngine.php
+END
+SearchMySQL.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchMySQL.php
+END
+SearchOracle.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchOracle.php
+END
+SearchPostgres.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchPostgres.php
+END
+SearchMySQL4.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchMySQL4.php
+END
+SearchIBM_DB2.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchIBM_DB2.php
+END
+SearchSqlite.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchSqlite.php
+END
+SearchUpdate.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/search/SearchUpdate.php
+END
