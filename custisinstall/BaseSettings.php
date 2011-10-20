@@ -259,6 +259,7 @@ $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['*']['upload_by_url'] = true;
 $wgGroupPermissions['*']['import'] = true;
+$wgGroupPermissions['*']['importupload'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search
