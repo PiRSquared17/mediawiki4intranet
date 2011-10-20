@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1317322274 -10800
+# Date 1318439468 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Export.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -28,7 +28,8 @@
@@ -224,10 +224,34 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Export.php
  	/**
  	 * Override to write to a different stream type.
  	 * @return bool
-diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
-@@ -39,6 +39,7 @@
+@@ -23,6 +23,23 @@
+  * @ingroup SpecialPage
+  */
+ 
++class FakeUser
++{
++	var $name = "";
++	function __construct( $name )
++	{
++		$this->name = $name;
++	}
++	function getId()
++	{
++		return 0;
++	}
++	function getName()
++	{
++		return $this->name;
++	}
++}
++
+ /**
+  *
+  * @ingroup SpecialPage
+@@ -39,6 +56,7 @@
  	var $type = "";
  	var $action = "";
  	var $params = "";
@@ -235,7 +259,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  
  	function setTitle( $title ) {
  		if( is_object( $title ) ) {
-@@ -87,6 +88,10 @@
+@@ -87,6 +105,10 @@
  		$this->filename = $filename;
  	}
  
@@ -246,7 +270,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  	function setSize( $size ) {
  		$this->size = intval( $size );
  	}
-@@ -139,6 +144,10 @@
+@@ -139,6 +161,10 @@
  		return $this->filename;
  	}
  
@@ -257,14 +281,14 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  	function getSize() {
  		return $this->size;
  	}
-@@ -156,6 +165,14 @@
+@@ -156,14 +182,23 @@
  	}
  
  	function importOldRevision() {
 +		# Check edit permission
-+		if( !$this->getTitle()->userCan('edit') )
++		global $wgUser;
++		if( !$this->getTitle()->userCan( 'edit' ) )
 +		{
-+			global $wgUser;
 +			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
 +			return false;
 +		}
@@ -272,16 +296,35 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		$dbw = wfGetDB( DB_MASTER );
  
  		# Sneak a single revision into place
-@@ -181,7 +198,7 @@
+ 		$user = User::newFromName( $this->getUser() );
+-		if( $user ) {
++		if( !$user ) {
+ 			$userId = intval( $user->getId() );
+ 			$userText = $user->getName();
+ 		} else {
++			$user = new FakeUser( $this->getUser() );
+ 			$userId = 0;
+ 			$userText = $this->getUser();
+ 		}
+@@ -174,6 +209,7 @@
+ 
+ 		$article = new Article( $this->title );
+ 		$pageId = $article->getId();
++		$dbTimestamp = $dbw->timestamp( $this->timestamp );
+ 		if( $pageId == 0 ) {
+ 			# must create the page...
+ 			$pageId = $article->insertOn( $dbw );
+@@ -181,18 +217,19 @@
  		} else {
  			$created = false;
  
 -			$prior = $dbw->selectField( 'revision', '1',
 +			$prior = $dbw->selectField( 'revision', 'rev_id',
  				array( 'rev_page' => $pageId,
- 					'rev_timestamp' => $dbw->timestamp( $this->timestamp ),
+-					'rev_timestamp' => $dbw->timestamp( $this->timestamp ),
++					'rev_timestamp' => $dbTimestamp,
  					'rev_user_text' => $userText,
-@@ -189,10 +206,11 @@
+ 					'rev_comment'   => $this->getComment() ),
  				__METHOD__
  			);
  			if( $prior ) {
@@ -294,7 +337,54 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  			}
  		}
  
-@@ -235,7 +253,9 @@
+@@ -209,7 +246,45 @@
+ 			) );
+ 		$revId = $revision->insertOn( $dbw );
+ 		$changed = $article->updateIfNewerOn( $dbw, $revision );
+-		
++
++		# Restore edit/create recent changes entry
++		global $wgUseRCPatrol, $wgUseNPPatrol;
++		# Mark as patrolled if importing user can do so
++		$patrolled = ( $wgUseRCPatrol || $wgUseNPPatrol ) && $this->title->userCan( 'autopatrol' );
++		$prevRev = $dbw->selectRow( 'revision', '*',
++			array( 'rev_page' => $pageId, "rev_timestamp < $dbTimestamp" ), __METHOD__,
++			array( 'LIMIT' => '1', 'ORDER BY' => 'rev_timestamp DESC' ) );
++		if ( $prevRev )
++		{
++			$rc = RecentChange::notifyEdit( $this->timestamp, $this->title, $this->minor,
++				$user, $this->getComment(), $prevRev->rev_id, $prevRev->rev_timestamp, $wgUser->isAllowed( 'bot' ),
++				'', $prevRev->rev_len, strlen( $this->getText() ), $revId, $patrolled );
++		}
++		else
++		{
++			$rc = RecentChange::notifyNew( $this->timestamp, $this->title, $this->minor,
++				$user, $this->getComment(), $wgUser->isAllowed( 'bot' ), '',
++				strlen( $this->getText() ), $revId, $patrolled );
++			if ( !$created )
++			{
++				# If we are importing the first revision, but the page already exists,
++				# that means there was another first revision. Mark it as non-first,
++				# so that import does not depend on revision sequence.
++				$dbw->update( 'recentchanges',
++					array( 'rc_type' => RC_EDIT ),
++					array(
++						'rc_namespace' => $this->title->getNamespace(),
++						'rc_title' => $this->title->getDBkey(),
++						'rc_type' => RC_NEW,
++					),
++					__METHOD__ );
++			}
++		}
++		# Log auto-patrolled edits
++		if ( $patrolled ) {
++			PatrolLog::record( $rc, true );
++		}
++
+ 		# To be on the safe side...
+ 		$tempTitle = $GLOBALS['wgTitle'];
+ 		$GLOBALS['wgTitle'] = $this->title;
+@@ -235,7 +310,9 @@
  		}
  		$GLOBALS['wgTitle'] = $tempTitle;
  
@@ -305,7 +395,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  	}
  	
  	function importLogItem() {
-@@ -246,6 +266,13 @@
+@@ -246,6 +323,13 @@
  				$this->timestamp . "\n" );
  			return;
  		}
@@ -319,7 +409,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		# Check if it exists already
  		// FIXME: use original log ID (better for backups)
  		$prior = $dbw->selectField( 'logging', '1',
-@@ -281,28 +308,15 @@
+@@ -281,28 +365,15 @@
  		$dbw->insert( 'logging', $data, __METHOD__ );
  	}
  
@@ -357,7 +447,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  
  		// @todo Fixme: upload() uses $wgUser, which is wrong here
  		// it may also create a page without our desire, also wrong potentially.
-@@ -315,26 +329,67 @@
+@@ -315,26 +386,67 @@
  			return false;
  		}
  
@@ -433,7 +523,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		return false;
  
  	}
-@@ -345,29 +400,41 @@
+@@ -345,29 +457,41 @@
  			return false;
  		}
  
@@ -481,7 +571,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  }
  
  /**
-@@ -390,6 +457,7 @@
+@@ -390,6 +514,7 @@
  	function __construct( $source ) {
  		$this->setRevisionCallback( array( $this, "importRevision" ) );
  		$this->setUploadCallback( array( $this, "importUpload" ) );
@@ -489,7 +579,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		$this->setLogItemCallback( array( $this, "importLogItem" ) );
  		$this->mSource = $source;
  	}
-@@ -563,12 +631,13 @@
+@@ -563,12 +688,13 @@
  	}
  
  	/**
@@ -507,7 +597,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  	}
  
  	/**
-@@ -606,12 +675,15 @@
+@@ -606,12 +732,15 @@
  	 * @param $origTitle Title
  	 * @param $revisionCount int
  	 * @param $successCount Int: number of revisions for which callback returned true
@@ -526,7 +616,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		}
  	}
  
-@@ -640,6 +712,9 @@
+@@ -640,6 +769,9 @@
  			$this->workSuccessCount = 0;
  			$this->uploadCount = 0;
  			$this->uploadSuccessCount = 0;
@@ -536,7 +626,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  			xml_set_element_handler( $parser, "in_page", "out_page" );
  		} elseif( $name == 'logitem' ) {
  			$this->push( $name );
-@@ -683,6 +758,28 @@
+@@ -683,6 +815,28 @@
  		}
  	}
  
@@ -565,7 +655,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  
  	function in_page( $parser, $name, $attribs ) {
  		$name = $this->stripXmlNamespace($name);
-@@ -736,7 +833,9 @@
+@@ -736,7 +890,9 @@
  		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
  
  		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
@@ -576,7 +666,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  
  		$this->workTitle = null;
  		$this->workRevision = null;
-@@ -836,7 +935,17 @@
+@@ -836,7 +992,17 @@
  			break;
  		case "src":
  			if( $this->workRevision )
@@ -595,7 +685,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  			break;
  		case "size":
  			if( $this->workRevision )
-@@ -887,9 +996,12 @@
+@@ -887,9 +1053,12 @@
  		if( $this->workRevision ) {
  			$ok = call_user_func_array( $this->mRevisionCallback,
  				array( $this->workRevision, $this ) );
@@ -610,7 +700,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		}
  	}
  
-@@ -944,6 +1056,8 @@
+@@ -944,6 +1113,8 @@
  		case "text":
  		case "filename":
  		case "src":
@@ -619,7 +709,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		case "size":
  			$this->appendfield = $name;
  			xml_set_element_handler( $parser, "in_nothing", "out_append" );
-@@ -1044,6 +1158,10 @@
+@@ -1044,6 +1215,10 @@
  			return $this->mString;
  		}
  	}
@@ -630,7 +720,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  }
  
  /**
-@@ -1051,20 +1169,132 @@
+@@ -1051,20 +1226,132 @@
   * @ingroup SpecialPage
   */
  class ImportStreamSource {
@@ -766,7 +856,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/Import.php
  		if( !$file ) {
  			return new WikiErrorMsg( "importcantopen" );
  		}
-diff -r 85fec3228ef8 -r 4e4c5817f971 includes/filerepo/LocalFile.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -862,7 +952,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 85fec3228ef8 -r 4e4c5817f971 includes/specials/SpecialExport.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -1515,7 +1605,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 85fec3228ef8 -r 4e4c5817f971 includes/specials/SpecialImport.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -288,7 +288,9 @@
@@ -1614,7 +1704,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 85fec3228ef8 -r 4e4c5817f971 languages/messages/MessagesEn.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,30 @@
@@ -1681,7 +1771,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 85fec3228ef8 -r 4e4c5817f971 languages/messages/MessagesRu.php
+diff -r 85fec3228ef8 -r 5ac082298ad4 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,30 @@
@@ -1745,7 +1835,7 @@ diff -r 85fec3228ef8 -r 4e4c5817f971 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 85fec3228ef8 -r 4e4c5817f971 skins/common/shared.css
+diff -r 85fec3228ef8 -r 5ac082298ad4 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@

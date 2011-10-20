@@ -157,7 +157,6 @@ $egDraftsAutoSaveWait = 60;   // 1 minute
 
 # FlvHandler
 $wgFlowPlayer = 'extensions/FlvHandler/flowplayer/flowplayer-3.1.3.swf';
-$wgFileExtensions[] = 'flv';
 require_once($IP.'/extensions/FlvHandler/FlvHandler.php');
 
 # IntraACL
