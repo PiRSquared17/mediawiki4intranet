@@ -48,6 +48,7 @@ $wgDjvuOutputExtension = 'jpg';
 
 $wgPdfProcessor = 'nice -n 20 gs';
 $wgPdftoText = ''; // it's useless, disable
+$wgPdfCreateThumbnailsInJobQueue = true;
 
 $wgDiff3 = '/usr/bin/diff3';
 
