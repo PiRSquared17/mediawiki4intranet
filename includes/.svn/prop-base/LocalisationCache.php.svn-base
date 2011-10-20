@@ -1,0 +1,12 @@
+K 13
+svn:eol-style
+V 6
+native
+K 13
+svn:mergeinfo
+V 276
+/branches/REL1_15/phase3/includes/LocalisationCache.php:51646
+/branches/sqlite/includes/LocalisationCache.php:58211-58321
+/branches/wmf-deployment/includes/LocalisationCache.php:53381
+/trunk/phase3/includes/LocalisationCache.php:63394,63549,63764,63897-63901,64881,64948,79561
+END
