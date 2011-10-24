@@ -211,7 +211,7 @@ sub page_list
     $desc .= ", with all used images/templates" if !$ignore_since_images;
     my $text = page_list_load($ua, $src->{url}, $desc, [
         catname     => $cat,
-        notcat      => $notcat,
+        notcategory => $notcat,
         modifydate  => $modifydate,
         ($ignore_since_images ? () : (
             templates => 1,
@@ -226,10 +226,10 @@ sub page_list
     {
         # Add templates and images in a separate request, without passing modifydate
         $text = page_list_load($ua, $src->{url}, $desc, [
-            notcat    => ($notcat ||= ''),
-            templates => 1,
-            images    => 1,
-            pages     => $text,
+            notcategory => ($notcat ||= ''),
+            templates   => 1,
+            images      => 1,
+            pages       => $text,
         ]);
     }
     return $text;
