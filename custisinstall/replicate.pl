@@ -263,18 +263,13 @@ sub replicate
             wpDownload    => 1,
             pages         => $text,
             curonly       => 1,
-            (!$src->{fullhistory} ? (curonly => 1) : ()),
+            ($src->{removeconfidential} ? () : (confidential => 1)),
+            ($src->{fullhistory}        ? () : (curonly => 1)),
         ]),
         $fn, # Let LWP::UserAgent write response content into this file
     );
     die logp()." Could not retrieve export XML file from '$src->{url}/index.php?title=Special:Export&action=submit': ".$response->status_line
         unless $response->is_success;
-    # Optionally filter the file and remove "confidential data"
-    if ($src->{removeconfidential})
-    {
-        $fh = filter_confidential($fh);
-        $fn = $fh->filename;
-    }
     my $tx = clock_gettime(CLOCK_REALTIME);
     print logp().sprintf(" Retrieved %d bytes in %.2f seconds\n", -s $fn, $tx-$ts);
     # Login into destination wiki
@@ -318,84 +313,6 @@ sub replicate
     print logp()." Report:\n$report\n";
     # Finished
     1;
-}
-
-# Filter opened file $fh into a new temporary file and return
-# a descriptor of it opened at the beginning
-sub filter_confidential
-{
-    my ($fh) = @_;
-    my $fh_filtered = File::Temp->new;
-    my $buffer = '';
-    my $boundary;
-    sysread($fh, $buffer, $BUFSIZE);
-    # Check if the file is multipart
-    if ($buffer =~ /^(Content-Type:\s*multipart[^\n]*boundary=([^\n]+)\n\2\n)/so)
-    {
-        $boundary = "$2\n";
-        syswrite($fh_filtered, $buffer, length $1);
-        substr($buffer, 0, length($1), '');
-    }
-    my (@p, $found, $overlap);
-    my $state = 0;
-    $overlap = 22; # max length of string we are searching for + 2 newlines
-    $overlap = length $boundary if $boundary && length $boundary > $overlap;
-    do
-    {
-        # Find first substring
-        $p[0] = $state < 3 && $boundary ? index($buffer, $boundary) : -1;
-        $p[1] = $state == 0 ? index($buffer, '{{CONFIDENTIAL-BEGIN') : -1;
-        $p[2] = $state == 1 ? index($buffer, 'CONFIDENTIAL-END}}') : -1;
-        $p[3] = $state == 1 ? index($buffer, '</text>') : -1;
-        $found = -1;
-        for my $i (0..$#p)
-        {
-            if ($p[$i] >= 0 && ($found < 0 || $p[$found] >= 0 && $p[$found] > $p[$i]))
-            {
-                $found = $i;
-            }
-        }
-        if ($found <= 0)
-        {
-            # Nothing found or multipart boundary
-            $state = 3 if $found == 0;
-            # Allow some overlap to find substrings on buffer boundary
-            syswrite($fh_filtered, $buffer, length($buffer) - $overlap) if $state != 1;
-            $buffer = $overlap ? substr($buffer, -$overlap) : '';
-        }
-        elsif ($found == 1)
-        {
-            # Confidential begins, remove empty newlines before {{CONFIDENTIAL-BEGIN}}
-            my $str = substr($buffer, 0, $p[$found], '');
-            $str =~ s/\s+$//so;
-            syswrite($fh_filtered, $str);
-            $state = 1;
-        }
-        elsif ($found == 2)
-        {
-            # Confidential ends
-            substr($buffer, 0, $p[$found]+18, '');
-            $state = 0;
-        }
-        elsif ($found == 3)
-        {
-            # Revision text ends while we are inside confidential, exit confidential
-            substr($buffer, 0, $p[$found], '');
-            $state = 0;
-        }
-        if (length $buffer <= $overlap)
-        {
-            my $eof = !sysread($fh, $buffer, $BUFSIZE, length $buffer);
-            if ($eof)
-            {
-                # Set $overlap to 0 at EOF
-                $overlap = 0;
-            }
-        }
-    } while (length $buffer > $overlap);
-    seek($fh_filtered, 0, 0);
-    # Replace $fh with new temporary file object
-    return $fh_filtered;
 }
 
 sub read_config
