@@ -109,16 +109,6 @@ class SpecialExport extends SpecialPage {
 		if ( !$this->curonly || !$wgExportAllowListContributors ) $list_authors = false ;
 		
 		if ( $this->doExport ) {
-			$wgOut->disable();
-			// Cancel output buffering and gzipping if set
-			// This should provide safer streaming for pages with history
-			wfResetOutputBuffers();
-			header( "Content-type: application/xml; charset=utf-8" );
-			if( $wgRequest->getCheck( 'wpDownload' ) ) {
-				// Provide a sane filename suggestion
-				$filename = urlencode( $wgSitename . '-' . wfTimestampNow() . '.xml' );
-				$wgRequest->response()->header( "Content-disposition: attachment;filename={$filename}" );
-			}
 			$this->doExport( $page, $history, $list_authors );
 			return;
 		}
@@ -143,9 +133,7 @@ class SpecialExport extends SpecialPage {
 		$form .= Xml::checkLabel( wfMsg( 'export-include-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
 		$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
-		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
-			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
-		}
+		wfRunHooks( 'ExportAfterChecks', array( $this, &$form ) );
 		
 		$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 		$form .= Xml::closeElement( 'form' );
@@ -164,8 +152,7 @@ class SpecialExport extends SpecialPage {
 	 * @param mixed  $history one of the WikiExporter history export constants
 	 */
 	private function doExport( $page, $history, $list_authors ) {
-		global $wgExportMaxHistory;
-		global $wgRequest;
+		global $wgExportMaxHistory, $wgRequest, $wgOut, $wgSitename;
 		
 		// Split up and normalize input
 		$pages = array();
@@ -198,16 +185,31 @@ class SpecialExport extends SpecialPage {
 			set_time_limit(0);
 			wfRestoreWarnings();
 		}
-		$exporter = new WikiExporter( $db, $history, $buffer );
-		$exporter->list_authors = $list_authors;
-		$exporter->dumpUploads = $wgRequest->getCheck('images') ? true : false;
-		$exporter->selfContained = $wgRequest->getCheck('selfcontained') ? true : false;
+
+		$exporter = new WikiExporter( $db, $history, $buffer, WikiExporter::TEXT,
+			$list_authors, $wgRequest->getCheck( 'images' ), $wgRequest->getCheck( 'selfcontained' ) );
 		$exporter->openStream();
 		foreach( $pages as $title ) {
 			$exporter->pageByTitle( $title );
 		}
-		
 		$exporter->closeStream();
+		$archive = $mimetype = $extension = '';
+		if ( !$exporter->getArchive( $archive, $mimetype, $extension ) ) {
+			die();
+		}
+
+		$wgOut->disable();
+		// Cancel output buffering and gzipping if set
+		// This should provide safer streaming for pages with history
+		wfResetOutputBuffers();
+		header( "Content-type: $mimetype" );
+		if( $wgRequest->getCheck( 'wpDownload' ) ) {
+			// Provide a sane filename suggestion
+			$filename = urlencode( $wgSitename . '-' . wfTimestampNow() . '.' . $extension );
+			header( "Content-disposition: attachment;filename={$filename}" );
+		}
+		readfile( $archive );
+
 		if( $lb ) {
 			$lb->closeAll();
 		}
@@ -329,6 +331,7 @@ class SpecialExport extends SpecialPage {
 	// Display page selection form, enclosed into a <fieldset>
 	static function addPagesForm( $state )
 	{
+		global $wgExportMaxLinkDepth;
 		$form = '<fieldset class="addpages">';
 		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
 		$textboxes = array(
@@ -341,6 +344,9 @@ class SpecialExport extends SpecialPage {
 		foreach ( $textboxes as $k => $size )
 			$form .= '<div class="ap_'.$k.'">' .
 				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
+		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
+			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
+		}
 		// Checkboxes:
 		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k )
 		{
