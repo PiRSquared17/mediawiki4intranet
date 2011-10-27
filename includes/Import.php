@@ -254,19 +254,15 @@ class WikiRevision {
 		$prevRev = $dbw->selectRow( 'revision', '*',
 			array( 'rev_page' => $pageId, "rev_timestamp < $dbTimestamp" ), __METHOD__,
 			array( 'LIMIT' => '1', 'ORDER BY' => 'rev_timestamp DESC' ) );
-		if ( $prevRev )
-		{
+		if ( $prevRev ) {
 			$rc = RecentChange::notifyEdit( $this->timestamp, $this->title, $this->minor,
 				$user, $this->getComment(), $prevRev->rev_id, $prevRev->rev_timestamp, $wgUser->isAllowed( 'bot' ),
 				'', $prevRev->rev_len, strlen( $this->getText() ), $revId, $patrolled );
-		}
-		else
-		{
+		} else {
 			$rc = RecentChange::notifyNew( $this->timestamp, $this->title, $this->minor,
 				$user, $this->getComment(), $wgUser->isAllowed( 'bot' ), '',
 				strlen( $this->getText() ), $revId, $patrolled );
-			if ( !$created )
-			{
+			if ( !$created ) {
 				# If we are importing the first revision, but the page already exists,
 				# that means there was another first revision. Mark it as non-first,
 				# so that import does not depend on revision sequence.
@@ -365,8 +361,7 @@ class WikiRevision {
 		$dbw->insert( 'logging', $data, __METHOD__ );
 	}
 
-	function importUpload()
-	{
+	function importUpload() {
 		# Check edit permission
 		if( !$this->getTitle()->userCan('edit') )
 		{
@@ -386,21 +381,18 @@ class WikiRevision {
 			return false;
 		}
 
-		/* First check if file already exists */
-		if ($file->exists())
-		{
-			/* Backward-compatibility: support export files without sha1 */
-			if ($this->getSha1() && $file->getSha1() == $this->getSha1() ||
-				!$this->getSha1() && $file->getTimestamp() == $this->getTimestamp())
+		// First check if file already exists
+		if ( $file->exists() ) {
+			// Backwards-compatibility: support export files without sha1
+			if ( $this->getSha1() && $file->getSha1() == $this->getSha1() ||
+				!$this->getSha1() && $file->getTimestamp() == $this->getTimestamp() )
 			{
 				wfDebug( "IMPORT: File already exists and is equal to imported (".$this->getTimestamp().").\n" );
 				return false;
 			}
-			$history = $file->getHistory(null, $this->getTimestamp(), $this->getTimestamp());
-			foreach ($history as $oldfile)
-			{
-				if (!$this->getSha1() || $oldfile->getSha1() == $this->getSha1())
-				{
+			$history = $file->getHistory( NULL, $this->getTimestamp(), $this->getTimestamp() );
+			foreach ( $history as $oldfile ) {
+				if (!$this->getSha1() || $oldfile->getSha1() == $this->getSha1()) {
 					wfDebug( "IMPORT: File revision already exists at its timestamp (".$this->getTimestamp().") and is equal to imported.\n" );
 					return false;
 				}
@@ -417,9 +409,8 @@ class WikiRevision {
 		// @fixme upload() uses $wgUser, which is wrong here
 		// it may also create a page without our desire, also wrong potentially.
 
-		if ($file->exists() && $file->getTimestamp() > $this->getTimestamp())
-		{
-			/* Upload an *archive* version */
+		if ( $file->exists() && $file->getTimestamp() > $this->getTimestamp() ) {
+			// Upload an *archive* version
 			wfDebug( "Importing an archive $arch version of file (".$this->getTimestamp().")\n" );
 			$status = $file->uploadIntoArchive( $source,
 				$this->getComment(),
@@ -427,11 +418,9 @@ class WikiRevision {
 				File::DELETE_SOURCE,
 				false, // props...
 				$this->getTimestamp() );
-		}
-		else
-		{
+		} else {
 			wfDebug( "Importing a new current version of file (".$this->getTimestamp().")\n" );
-			/* Upload a *current* version */
+			// Upload a *current* version
 			$status = $file->upload( $source,
 				$this->getComment(),
 				$this->getComment(), // Initial page, if none present...
@@ -458,13 +447,15 @@ class WikiRevision {
 		}
 
 		$src = $this->getSrc();
-		if (!$src)
+		if ( !$src ) {
 			return false;
-		/* Если файл прикреплён как multipart-часть, вернём его */
-		if (is_file( $src ))
+		}
+		if ( is_file( $src ) ) {
+			// The file is already downloaded (as a part of dump archive)
 			return $src;
+		}
 
-		/* Иначе нужно заморочиться и скачать... */
+		// Try to download file over HTTP
 		$this->tempfile = tempnam( wfTempDir(), 'download' );
 		$f = fopen( $this->tempfile, 'wb' );
 		if( !$f ) {
@@ -487,10 +478,10 @@ class WikiRevision {
 		return $this->tempfile;
 	}
 
-	function __destruct()
-	{
-		if ( $this->tempfile && is_file( $this->tempfile ) )
+	function __destruct() {
+		if ( $this->tempfile && is_file( $this->tempfile ) ) {
 			unlink( $this->tempfile );
+		}
 	}
 }
 
@@ -500,7 +491,6 @@ class WikiRevision {
  */
 class WikiImporter {
 	var $mDebug = false;
-	var $mSource = null;
 	var $mPageCallback = null;
 	var $mPageOutCallback = null;
 	var $mRevisionCallback = null;
@@ -511,12 +501,14 @@ class WikiImporter {
 	var $lastfield;
 	var $tagStack = array();
 
-	function __construct( $source ) {
+	var $mArchive = null;
+
+	function __construct( $archive ) {
 		$this->setRevisionCallback( array( $this, "importRevision" ) );
 		$this->setUploadCallback( array( $this, "importUpload" ) );
 		$this->setPageCallback( array( $this, "beginPage" ) );
 		$this->setLogItemCallback( array( $this, "importLogItem" ) );
-		$this->mSource = $source;
+		$this->mArchive = $archive;
 	}
 
 	function throwXmlError( $err ) {
@@ -533,17 +525,14 @@ class WikiImporter {
 
 	function stripXmlNamespace($name) {
 		if( $this->mXmlNamespace ) {
-			return(preg_replace($this->mXmlNamespace,'',$name,1));
-		}
-		else {
-			return($name);
+			return preg_replace( $this->mXmlNamespace, '', $name, 1 );
+		} else {
+			return $name;
 		}
 	}
 
-	# --------------
-
 	function doImport() {
-		if( empty( $this->mSource ) ) {
+		if( empty( $this->mArchive ) ) {
 			return new WikiErrorMsg( "importnotext" );
 		}
 
@@ -556,16 +545,18 @@ class WikiImporter {
 		xml_set_element_handler( $parser, "in_start", "" );
 		xml_set_start_namespace_decl_handler( $parser, "handleXmlNamespace" );
 
+		$fp = fopen( $this->mArchive->getMainPart(), 'rb' );
 		$offset = 0; // for context extraction on error reporting
 		do {
-			$chunk = $this->mSource->readChunk();
-			if( !xml_parse( $parser, $chunk, $this->mSource->atEnd() ) ) {
+			$chunk = fread( $fp, 0x10000 );
+			if( !xml_parse( $parser, $chunk, feof( $fp ) ) ) {
 				wfDebug( "WikiImporter::doImport encountered XML parsing error\n" );
 				return new WikiXmlError( $parser, wfMsgHtml( 'import-parse-failure' ), $chunk, $offset );
 			}
 			$offset += strlen( $chunk );
-		} while( $chunk !== false && !$this->mSource->atEnd() );
+		} while( $chunk !== false && !feof( $fp ) );
 		xml_parser_free( $parser );
+		fclose( $fp );
 
 		return true;
 	}
@@ -781,6 +772,7 @@ class WikiImporter {
 			return $this->throwXMLerror( "Expected <page>, got <$name>" );
 		}
 	}
+
 	function out_mediawiki( $parser, $name ) {
 		$name = $this->stripXmlNamespace($name);
 		$this->debug( "out_mediawiki $name" );
@@ -789,7 +781,6 @@ class WikiImporter {
 		}
 		xml_set_element_handler( $parser, "donothing", "donothing" );
 	}
-
 
 	function in_siteinfo( $parser, $name, $attribs ) {
 		// no-ops for now
@@ -815,8 +806,7 @@ class WikiImporter {
 		}
 	}
 
-	function beginPage( $title )
-	{
+	function beginPage( $title ) {
 		$fields = Revision::selectFields();
 		$fields[] = 'page_namespace';
 		$fields[] = 'page_title';
@@ -834,8 +824,9 @@ class WikiImporter {
 			       'ORDER BY' => 'rev_timestamp DESC' ) );
 		$row = $res->fetchObject();
 		$res->free();
-		if ($row)
+		if ( $row ) {
 			$this->lastLocalRevision = new Revision( $row );
+		}
 	}
 
 	function in_page( $parser, $name, $attribs ) {
@@ -991,17 +982,12 @@ class WikiImporter {
 				$this->workRevision->setFilename( $this->appenddata );
 			break;
 		case "src":
-			if( $this->workRevision )
-			{
-				/* Передаём путь к файлу, если он уже загружен */
-				if ( substr( $this->appenddata, 0, 12 ) == 'multipart://' )
-				{
-					if ( $p = $this->mSource->parts[ substr( $this->appenddata, 12 ) ] )
-						$this->workRevision->setSrc( $p['tempfile'] );
+			if( $this->workRevision ) {
+				$path = $this->mArchive->getBinary( $this->appenddata );
+				if ( !$path ) {
+					$path = $this->appenddata;
 				}
-				/* Иначе передаём URL */
-				else
-					$this->workRevision->setSrc( $this->appenddata );
+				$this->workRevision->setSrc( $path );
 			}
 			break;
 		case "size":
@@ -1191,234 +1177,4 @@ class WikiImporter {
 		return $name;
 	}
 
-}
-
-/**
- * @todo document (e.g. one-sentence class description).
- * @ingroup SpecialPage
- */
-class ImportStringSource {
-	function __construct( $string ) {
-		$this->mString = $string;
-		$this->mRead = false;
-	}
-
-	function atEnd() {
-		return $this->mRead;
-	}
-
-	function readChunk() {
-		if( $this->atEnd() ) {
-			return false;
-		} else {
-			$this->mRead = true;
-			return $this->mString;
-		}
-	}
-
-	function nextPart() {
-		return false;
-	}
-}
-
-/**
- * @todo document (e.g. one-sentence class description).
- * @ingroup SpecialPage
- */
-class ImportStreamSource {
-
-	var $buf;
-	var $eop;
-	var $boundary;
-
-	const BUF_SIZE = 65536;
-
-	function __construct( $handle )
-	{
-		$this->mHandle = $handle;
-		$this->eop = false;
-		$this->buf = '';
-		$this->boundary = '';
-		$pos = ftell($this->mHandle);
-		$s = fgets($this->mHandle);
-		/* multipart-файл? */
-		// TODO use ZIP instead of multipart/related
-		if (preg_match("/Content-Type:\s*multipart\/related; boundary=([^\r\n]+)\r*\n/s", $s, $m))
-		{
-			$this->boundary = $m[1];
-			$this->parts = array();
-			/* Распаковываем файл на части.
-			 * Смысл в том, что процедура импорта загруженных файлов
-			 * должна видеть части. Но они идут после XML-файла в multipart
-			 * документе. Точнее, в принципе, в произвольном месте.
-			 */
-			while (!feof($this->mHandle))
-			{
-				$s = trim(fgets($this->mHandle));
-				if ($s != $this->boundary)
-					break;
-				$part = array();
-				/* Читаем заголовки */
-				while ($s != "\n" && $s != "\r\n")
-				{
-					$s = fgets($this->mHandle);
-					if (preg_match('/([a-z0-9\-\_]+):\s*(.*?)\s*$/is', $s, $m))
-						$part[str_replace('-','_',strtolower($m[1]))] = $m[2];
-				}
-				/* Читаем данные */
-				$tempfile = tempnam(wfTempDir(), "imp");
-				$tempfp = fopen($tempfile, "wb");
-				if (!empty($part['content_length']))
-				{
-					$done = 0;
-					$buf = true;
-					while ($done < $part['content_length'] && $buf)
-					{
-						$buf = fread($this->mHandle, min(self::BUF_SIZE, $part['content_length'] - $done));
-						if ($tempfp)
-							fwrite($tempfp, $buf);
-						$done += strlen($buf);
-					}
-				}
-				else
-				{
-					$buf = true;
-					while ($buf)
-					{
-						$buf = fread($this->mHandle, self::BUF_SIZE);
-						if (($p = strpos($buf, "\n".$this->boundary)) !== false)
-						{
-							$pp = ftell($this->mHandle);
-							fseek($this->mHandle, $p+1-strlen($buf), 1);
-							fwrite($tempfp, substr($buf, 0, $p+1));
-							break;
-						}
-						else
-						{
-							/* Для ситуации, когда $this->boundary попадёт на границу буфера */
-							if (strlen($buf) == self::BUF_SIZE &&
-								($p = strrpos($buf, "\n")) !== false)
-							{
-								fseek($this->mHandle, $p+1-self::BUF_SIZE, 1);
-								$buf = substr($buf, 0, $p+1);
-							}
-							fwrite($tempfp, $buf);
-						}
-					}
-				}
-				fclose($tempfp);
-				/* Запоминаем часть */
-				$part['tempfile'] = $tempfile;
-				if ($part['content_id'])
-				{
-					$part['sha1'] = File::sha1Base36($part['tempfile']);
-					$this->parts[$part['content_id']] = $part;
-				}
-				else
-					unlink($tempfile);
-			}
-			/* Открываем XML-часть */
-			if ($this->parts['Revisions'])
-			{
-				fclose($this->mHandle);
-				$this->mHandle = fopen($this->parts['Revisions']['tempfile'], 'rb');
-			}
-		}
-		/* Обычный XML-файл (не multipart) */
-		else
-			fseek($this->mHandle, $pos, 0);
-	}
-
-	/* Деструктор. Уничтожает временные файлы. */
-	function __destruct()
-	{
-		wfSuppressWarnings();
-		if ($this->mHandle)
-			fclose ($this->mHandle);
-		if ($this->parts)
-			foreach ($this->parts as $part)
-				unlink ($part['tempfile']);
-		wfRestoreWarnings();
-	}
-
-	function atEnd() {
-		return feof( $this->mHandle );
-	}
-
-	/* read next XML part chunk */
-	function readChunk() {
-		return fread( $this->mHandle, self::BUF_SIZE );
-	}
-
-	static function newFromFile( $filename ) {
-		$file = @fopen( $filename, 'rb' );
-		if( !$file ) {
-			return new WikiErrorMsg( "importcantopen" );
-		}
-		return new ImportStreamSource( $file );
-	}
-
-	static function newFromUpload( $fieldname = "xmlimport" ) {
-		$upload =& $_FILES[$fieldname];
-
-		if( !isset( $upload ) || !$upload['name'] ) {
-			return new WikiErrorMsg( 'importnofile' );
-		}
-		if( !empty( $upload['error'] ) ) {
-			switch($upload['error']){
-				case 1: # The uploaded file exceeds the upload_max_filesize directive in php.ini.
-					return new WikiErrorMsg( 'importuploaderrorsize' );
-				case 2: # The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.
-					return new WikiErrorMsg( 'importuploaderrorsize' );
-				case 3: # The uploaded file was only partially uploaded
-					return new WikiErrorMsg( 'importuploaderrorpartial' );
-				case 6: #Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3.
-					return new WikiErrorMsg( 'importuploaderrortemp' );
-				# case else: # Currently impossible
-			}
-
-		}
-		$fname = $upload['tmp_name'];
-		if( is_uploaded_file( $fname ) ) {
-			return ImportStreamSource::newFromFile( $fname );
-		} else {
-			return new WikiErrorMsg( 'importnofile' );
-		}
-	}
-
-	static function newFromURL( $url, $method = 'GET' ) {
-		wfDebug( __METHOD__ . ": opening $url\n" );
-		# Use the standard HTTP fetch function; it times out
-		# quicker and sorts out user-agent problems which might
-		# otherwise prevent importing from large sites, such
-		# as the Wikimedia cluster, etc.
-		$data = Http::request( $method, $url );
-		if( $data !== false ) {
-			$file = tmpfile();
-			fwrite( $file, $data );
-			fflush( $file );
-			fseek( $file, 0 );
-			return new ImportStreamSource( $file );
-		} else {
-			return new WikiErrorMsg( 'importcantopen' );
-		}
-	}
-
-	public static function newFromInterwiki( $interwiki, $page, $history = false, $templates = false, $pageLinkDepth = 0 ) {
-		if( $page == '' ) {
-			return new WikiErrorMsg( 'import-noarticle' );
-		}
-		$link = Title::newFromText( "$interwiki:Special:Export/$page" );
-		if( is_null( $link ) || $link->getInterwiki() == '' ) {
-			return new WikiErrorMsg( 'importbadinterwiki' );
-		} else {
-			$params = array();
-			if ( $history ) $params['history'] = 1;
-			if ( $templates ) $params['templates'] = 1;
-			if ( $pageLinkDepth ) $params['pagelink-depth'] = $pageLinkDepth;
-			$url = $link->getFullUrl( $params );
-			# For interwikis, use POST to avoid redirects.
-			return ImportStreamSource::newFromURL( $url, "POST" );
-		}
-	}
 }

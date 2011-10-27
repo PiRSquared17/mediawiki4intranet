@@ -24,12 +24,11 @@
 /**
  * @ingroup SpecialPage Dump
  */
+// FIXME Pages should be bulk-loaded - calling pageByTitle for each page is slower
 class WikiExporter {
-	var $list_authors = false ; # Return distinct author list (when not returning full history)
-	var $author_list = "" ;
-
-	var $dumpUploads = false;   # Dump uploaded files into the export file
-	var $selfContained = false; # Make export file self-contained (multipart/related)
+	var $listAuthors = false; # Return distinct author list (when not returning full history)
+	var $dumpUploads = false; # Dump uploaded files into the export file
+	var $selfContained = false; # Archive uploaded file contents into the export file (ZIP)
 
 	const FULL = 1;
 	const CURRENT = 2;
@@ -58,39 +57,56 @@ class WikiExporter {
 	 * @param $buffer Int: one of WikiExporter::BUFFER or WikiExporter::STREAM
 	 * @param $text Int: one of WikiExporter::TEXT or WikiExporter::STUB
 	 */
-	function __construct( &$db, $history = WikiExporter::CURRENT,
-			$buffer = WikiExporter::BUFFER, $text = WikiExporter::TEXT ) {
-		$this->db =& $db;
+	function __construct( $db, $history = WikiExporter::CURRENT,
+			$buffer = WikiExporter::BUFFER, $text = WikiExporter::TEXT,
+			$listAuthors = false, $dumpUploads = false, $selfContained = false ) {
+		$this->db = $db;
 		$this->history = $history;
-		$this->buffer  = $buffer;
-		$this->writer  = new XmlDumpWriter();
-		$this->sink    = new DumpOutput();
-		$this->text    = $text;
-	}
+		$this->buffer = $buffer;
+		$this->text = $text;
+		$this->open = true;
+		$this->listAuthors = $listAuthors;
+		$this->dumpUploads = $dumpUploads;
+		$this->selfContained = $dumpUploads && $selfContained;
 
-	/**
-	 * Set the DumpOutput or DumpFilter object which will receive
-	 * various row objects and XML output for filtering. Filters
-	 * can be chained or used as callbacks.
-	 *
-	 * @param $sink mixed
-	 */
-	public function setOutputSink( &$sink ) {
-		$this->sink =& $sink;
+		$this->writer = new XmlDumpWriter();
+		$class = $this->selfContained ? 'ZipDumpArchive' : 'StubDumpArchive';
+		$this->sink = new $class();
+		$this->sink->create( $this->writer->mimetype, $this->writer->extension );
 	}
 
 	public function openStream() {
-		$this->writer->multipart = $this->dumpUploads && $this->selfContained;
-		$output = $this->writer->openStream();
-		$this->sink->writeOpenStream( $output );
+		$this->sink->write( $this->writer->openStream() );
 	}
 
 	public function closeStream() {
-		$output = $this->writer->closeStream();
-		$this->sink->writeCloseStream( $output );
-		/* Dump $this->writer->binaries into multipart/related */
-		while ($part = $this->writer->nextPart())
-			$this->sink->writePart($part);
+		$this->sink->write( $this->writer->closeStream() );
+		$this->sink->close();
+		$this->open = false;
+	}
+
+	public function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
+		if ( $this->open )
+			return false;
+		return $this->sink->getArchive( $outFilename, $outMimetype, $outExtension );
+	}
+
+	protected function writeUploads( $row, $limit = null ) {
+		if( $row->page_namespace == NS_IMAGE ) {
+			$img = wfFindFile( $row->page_title );
+			if( $img ) {
+				if ( !$limit || $limit > 1 ) {
+					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
+						$this->sink->write( $this->writer->writeUpload(
+							$ver, $this->sink->binUrl( $ver ) ) );
+						$this->sink->writeBinary( $ver );
+					}
+				}
+				$this->sink->write( $this->writer->writeUpload(
+					$img, $this->sink->binUrl( $img ) ) );
+				$this->sink->writeBinary( $img );
+			}
+		}
 	}
 
 	/**
@@ -154,31 +170,20 @@ class WikiExporter {
 	}
 
 	# Generates the distinct list of authors of an article
-	# Not called by default (depends on $this->list_authors)
-	# Can be set by Special:Export when not exporting whole history
-	protected function do_list_authors( $page , $revision , $cond ) {
-		$fname = "do_list_authors" ;
-		wfProfileIn( $fname );
-		$this->author_list = "<contributors>";
-		//rev_deleted
-		$nothidden = '('.$this->db->bitAnd('rev_deleted', Revision::DELETED_USER) . ') = 0';
-
-		$sql = "SELECT DISTINCT rev_user_text,rev_user FROM {$page},{$revision} 
-		WHERE page_id=rev_page AND $nothidden AND " . $cond ;
-		$result = $this->db->query( $sql, $fname );
-		$resultset = $this->db->resultObject( $result );
-		while( $row = $resultset->fetchObject() ) {
-			$this->author_list .= "<contributor>" .
-				"<username>" .
-				htmlentities( $row->rev_user_text )  .
-				"</username>" .
-				"<id>" .
-				$row->rev_user .
-				"</id>" .
-				"</contributor>";
-		}
-		wfProfileOut( $fname );
-		$this->author_list .= "</contributors>";
+	# Not called by default (depends on $this->listAuthors)
+	# Allowed when exporting only last revision
+	protected function doListAuthors( $page, $revision, $cond ) {
+		wfProfileIn( __METHOD__ );
+		$nothidden = '('.$this->db->bitAnd( 'rev_deleted', Revision::DELETED_USER ) . ') = 0';
+		$sql = "SELECT DISTINCT rev_user_text,rev_user FROM $page, $revision" .
+			" WHERE page_id=rev_page AND $nothidden AND $cond";
+		$result = $this->db->query( $sql, __METHOD__ );
+		$code = $this->writer->beginContributors();
+		foreach ( $result as $row )
+			$code .= $this->writer->writeContributor( $row->rev_user, $row->rev_user_text );
+		$code .= $this->writer->endContributors();
+		wfProfileOut( __METHOD__ );
+		return $code;
 	}
 
 	protected function dumpFrom( $cond = '' ) {
@@ -239,9 +244,9 @@ class WikiExporter {
 				$join['revision'] = array('INNER JOIN','page_id=rev_page');
 			} elseif( $this->history & WikiExporter::CURRENT ) {
 				# Latest revision dumps...
-				if( $this->list_authors && $cond != '' )  { // List authors, if so desired
+				if( $this->listAuthors && $cond != '' )  { // List authors, if so desired
 					list($page,$revision) = $this->db->tableNamesN('page','revision');
-					$this->do_list_authors( $page, $revision, $cond );
+					$authors = $this->doListAuthors( $page, $revision, $cond );
 				}
 				$join['revision'] = array('INNER JOIN','page_id=rev_page AND page_latest=rev_id');
 			} elseif( $this->history & WikiExporter::STABLE ) {
@@ -280,10 +285,7 @@ class WikiExporter {
 			$result = $this->db->select( $tables, '*', $cond, __METHOD__, $opts, $join );
 			$wrapper = $this->db->resultObject( $result );
 			# Output dump results
-			$this->outputPageStream( $wrapper );
-			if( $this->list_authors ) {
-				$this->outputPageStream( $wrapper );
-			}
+			$this->outputPageStream( $wrapper, $this->listAuthors ? $authors : NULL );
 
 			if( $this->buffer == WikiExporter::STREAM ) {
 				$this->db->bufferResults( $prev );
@@ -304,64 +306,55 @@ class WikiExporter {
 	 *
 	 * @param $resultset ResultWrapper
 	 */
-	protected function outputPageStream( $resultset ) {
+	protected function outputPageStream( $resultset, $authors = '' ) {
 		$last = null;
 		while( $row = $resultset->fetchObject() ) {
+			// Run text filter
+			wfRunHooks( 'ExportFilterText', array( &$row->old_text ) );
 			if( is_null( $last ) ||
 				$last->page_namespace != $row->page_namespace ||
 				$last->page_title     != $row->page_title ) {
 				if( isset( $last ) ) {
-					$output = '';
 					if( $this->dumpUploads ) {
-						$output .= $this->writer->writeUploads( $last,
-							$this->history == WikiExporter::CURRENT ? 1 : null );
+						$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
 					}
-					$output .= $this->writer->closePage();
-					$this->sink->writeClosePage( $output );
+					$this->sink->write( $this->writer->closePage() );
 				}
-				$output = $this->writer->openPage( $row );
-				$this->sink->writeOpenPage( $row, $output );
+				$this->sink->write( $this->writer->openPage( $row ) );
 				$last = $row;
 			}
-			$output = $this->writer->writeRevision( $row );
-			$this->sink->writeRevision( $row, $output );
+			$this->sink->write( $this->writer->writeRevision( $row ) );
 		}
 		if( isset( $last ) ) {
-			$output = '';
 			if( $this->dumpUploads ) {
-				$output .= $this->writer->writeUploads( $last,
-					$this->history == WikiExporter::CURRENT ? 1 : null );
+				$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
 			}
-			$output .= $this->author_list;
-			$output .= $this->writer->closePage();
-			$this->sink->writeClosePage( $output );
+			$this->sink->write( $authors );
+			$this->sink->write( $this->writer->closePage() );
 		}
 	}
 	
 	protected function outputLogStream( $resultset ) {
 		while( $row = $resultset->fetchObject() ) {
-			$output = $this->writer->writeLogItem( $row );
-			$this->sink->writeLogItem( $row, $output );
+			$this->sink->writeLogItem( $this->writer->writeLogItem( $row ) );
 		}
 	}
 }
 
 /**
+ * The purpose of this class is to encapsulate main dump file output.
+ * I.e. now it's XML, but other DumpWriter may produce some other format.
  * @ingroup Dump
  */
 class XmlDumpWriter {
 
-	var $boundary;
-	var $binaries;
-	var $multipart;
-
-	var $currentpart;
+	var $mimetype = 'application/xml; charset=utf-8', $extension = 'xml';
 
 	/**
 	 * Returns the export schema version.
 	 * @return string
 	 */
-	function schemaVersion() {
+	protected function schemaVersion() {
 		return "0.4";
 	}
 
@@ -375,16 +368,10 @@ class XmlDumpWriter {
 	 *
 	 * @return string
 	 */
-	function openStream() {
+	public function openStream() {
 		global $wgContLanguageCode;
 		$ver = $this->schemaVersion();
 		$mp = '';
-		if ($this->multipart)
-		{
-			$this->boundary = '--'.time();
-			$this->binaries = array();
-			$mp = "Content-Type: multipart/related; boundary=".$this->boundary."\n".$this->boundary."\nContent-Type: text/xml\nContent-ID: Revisions\n\n";
-		}
 		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
 			Xml::element( 'mediawiki', array(
 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
@@ -398,7 +385,7 @@ class XmlDumpWriter {
 			$this->siteInfo();
 	}
 
-	function siteInfo() {
+	protected function siteInfo() {
 		$info = array(
 			$this->sitename(),
 			$this->homelink(),
@@ -410,28 +397,28 @@ class XmlDumpWriter {
 			"\n  </siteinfo>\n";
 	}
 
-	function sitename() {
+	protected function sitename() {
 		global $wgSitename;
 		return Xml::element( 'sitename', array(), $wgSitename );
 	}
 
-	function generator() {
+	protected function generator() {
 		global $wgVersion;
 		return Xml::element( 'generator', array(), "MediaWiki $wgVersion" );
 	}
 
-	function homelink() {
+	protected function homelink() {
 		return Xml::element( 'base', array(), Title::newMainPage()->getFullUrl() );
 	}
 
-	function caseSetting() {
+	protected function caseSetting() {
 		global $wgCapitalLinks;
 		// "case-insensitive" option is reserved for future
 		$sensitivity = $wgCapitalLinks ? 'first-letter' : 'case-sensitive';
 		return Xml::element( 'case', array(), $sensitivity );
 	}
 
-	function namespaces() {
+	protected function namespaces() {
 		global $wgContLang;
 		$spaces = "<namespaces>\n";
 		foreach( $wgContLang->getFormattedNamespaces() as $ns => $title ) {
@@ -449,41 +436,8 @@ class XmlDumpWriter {
 	 * Closes the output stream with the closing root element.
 	 * Call when finished dumping things.
 	 */
-	function closeStream() {
+	public function closeStream() {
 		return "</mediawiki>\n";
-	}
-
-	function nextPart()
-	{
-		$data = '';
-		if ( !$this->currentpart )
-		{
-			if ( !$this->multipart || !count( $this->binaries ) )
-				return '';
-			list( $name ) = array_keys( $this->binaries );
-			$filename = $this->binaries[ $name ];
-			unset( $this->binaries[ $name ] );
-			$fp = @fopen( $filename, "rb" );
-			if ( !$fp )
-				return $this->nextPart();
-			$this->currentpart = array(
-				'name' => $name,
-				'filename' => $filename,
-				'fp' => $fp,
-			);
-			$data = $this->boundary.
-				"\nContent-Type: application/binary\n" .
-				"Content-Transfer-Encoding: Little-Endian\n" .
-				"Content-ID: $name\n" .
-				"Content-Length: ".filesize($filename)."\n\n";
-		}
-		$data .= @fread( $this->currentpart['fp'], 1048576 );
-		if ( @feof( $this->currentpart['fp'] ) )
-		{
-			@fclose( $this->currentpart['fp'] );
-			$this->currentpart = NULL;
-		}
-		return $data;
 	}
 
 	/**
@@ -494,7 +448,7 @@ class XmlDumpWriter {
 	 * @return string
 	 * @access private
 	 */
-	function openPage( $row ) {
+	public function openPage( $row ) {
 		global $wgContLang;
 		$out = "  <page>\n";
 		$title = Title::makeTitle( $row->page_namespace, $row->page_title );
@@ -526,7 +480,7 @@ class XmlDumpWriter {
 	 *
 	 * @access private
 	 */
-	function closePage() {
+	public function closePage() {
 		return "  </page>\n";
 	}
 
@@ -538,9 +492,8 @@ class XmlDumpWriter {
 	 * @return string
 	 * @access private
 	 */
-	function writeRevision( $row ) {
-		$fname = 'WikiExporter::dumpRev';
-		wfProfileIn( $fname );
+	public function writeRevision( $row ) {
+		wfProfileIn( __METHOD__ );
 
 		$out  = "    <revision>\n";
 		$out .= "      " . Xml::element( 'id', null, strval( $row->rev_id ) ) . "\n";
@@ -582,7 +535,7 @@ class XmlDumpWriter {
 
 		$out .= "    </revision>\n";
 
-		wfProfileOut( $fname );
+		wfProfileOut( __METHOD__ );
 		return $out;
 	}
 	
@@ -594,11 +547,9 @@ class XmlDumpWriter {
 	 * @return string
 	 * @access private
 	 */
-	function writeLogItem( $row ) {
-		$fname = 'WikiExporter::writeLogItem';
-		wfProfileIn( $fname );
+	public function writeLogItem( $row ) {
+		wfProfileIn( __METHOD__ );
 
-		$out  = "    <logitem>\n";
 		$out .= "      " . Xml::element( 'id', null, strval( $row->log_id ) ) . "\n";
 
 		$out .= $this->writeTimestamp( $row->log_timestamp );
@@ -628,18 +579,26 @@ class XmlDumpWriter {
 				strval( $row->log_params ) ) . "\n";
 		}
 
-		$out .= "    </logitem>\n";
+		$out  = "    <logitem>\n$out    </logitem>\n";
 
-		wfProfileOut( $fname );
+		wfProfileOut( __METHOD__ );
 		return $out;
 	}
 
-	function writeTimestamp( $timestamp ) {
+	protected function writeTimestamp( $timestamp ) {
 		$ts = wfTimestamp( TS_ISO_8601, $timestamp );
 		return "      " . Xml::element( 'timestamp', null, $ts ) . "\n";
 	}
 
-	function writeContributor( $id, $text ) {
+	public function beginContributors() {
+		return "    <contributors>\n";
+	}
+
+	public function endContributors() {
+		return "    </contributors>\n";
+	}
+
+	public function writeContributor( $id, $text ) {
 		$out = "      <contributor>\n";
 		if( $id ) {
 			$out .= "        " . Xml::elementClean( 'username', null, strval( $text ) ) . "\n";
@@ -651,353 +610,27 @@ class XmlDumpWriter {
 		return $out;
 	}
 
-	/**
-	 * Warning! This data is potentially inconsistent. :(
-	 */
-	function writeUploads( $row, $limit = null ) {
-		if( $row->page_namespace == NS_IMAGE ) {
-			$img = wfFindFile( $row->page_title );
-			if( $img ) {
-				$out = '';
-				if ( !$limit || $limit > 1 ) {
-					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
-						$out .= $this->writeUpload( $ver );
-					}
-				}
-				$out .= $this->writeUpload( $img );
-				return $out;
-			}
-		}
-		return '';
-	}
-
-	function writeUpload( $file ) {
+	public function writeUpload( $file, $url ) {
 		if ( !$file->exists() )
 			return "";
-		if ( $this->multipart )
-		{
-			$partname = $file->isOld() ? $file->getArchiveName() : $file->getName();
-			$this->binaries[ $partname ] = $file->getPath();
-		}
 		return "    <upload>\n" .
 			$this->writeTimestamp( $file->getTimestamp() ) .
 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
 			"      " . Xml::ElementClean( 'comment', null, $file->getDescription() ) . "\n" .
 			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
-			"      " . Xml::Element( 'src',
-			                      array('sha1' => $file->getSha1()),
-			                      $this->multipart ? "multipart://$partname" : $file->getFullUrl() ) . "\n" .
+			"      " . Xml::Element( 'src', array( 'sha1' => $file->getSha1() ), $url ) . "\n" .
 			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
 			"    </upload>\n";
 	}
 
 }
 
-
-/**
- * Base class for output stream; prints to stdout or buffer or whereever.
- * @ingroup Dump
- */
-class DumpOutput {
-	function writeOpenStream( $string ) {
-		$this->write( $string );
-	}
-
-	function writeCloseStream( $string ) {
-		$this->write( $string );
-	}
-
-	function writeOpenPage( $page, $string ) {
-		$this->write( $string );
-	}
-
-	function writeClosePage( $string ) {
-		$this->write( $string );
-	}
-
-	function writeRevision( $rev, $string ) {
-		$this->write( $string );
-	}
-	
-	function writeLogItem( $rev, $string ) {
-		$this->write( $string );
-	}
-
-	function writePart( $string ) {
-		$this->write( $string );
-	}
-
-	/**
-	 * Override to write to a different stream type.
-	 * @return bool
-	 */
-	function write( $string ) {
-		print $string;
-	}
-}
-
-/**
- * Stream outputter to send data to a file.
- * @ingroup Dump
- */
-class DumpFileOutput extends DumpOutput {
-	var $handle;
-
-	function DumpFileOutput( $file ) {
-		$this->handle = fopen( $file, "wt" );
-	}
-
-	function write( $string ) {
-		fputs( $this->handle, $string );
-	}
-}
-
-/**
- * Stream outputter to send data to a file via some filter program.
- * Even if compression is available in a library, using a separate
- * program can allow us to make use of a multi-processor system.
- * @ingroup Dump
- */
-class DumpPipeOutput extends DumpFileOutput {
-	function DumpPipeOutput( $command, $file = null ) {
-		if( !is_null( $file ) ) {
-			$command .=  " > " . wfEscapeShellArg( $file );
-		}
-		$this->handle = popen( $command, "w" );
-	}
-}
-
-/**
- * Sends dump output via the gzip compressor.
- * @ingroup Dump
- */
-class DumpGZipOutput extends DumpPipeOutput {
-	function DumpGZipOutput( $file ) {
-		parent::DumpPipeOutput( "gzip", $file );
-	}
-}
-
-/**
- * Sends dump output via the bgzip2 compressor.
- * @ingroup Dump
- */
-class DumpBZip2Output extends DumpPipeOutput {
-	function DumpBZip2Output( $file ) {
-		parent::DumpPipeOutput( "bzip2", $file );
-	}
-}
-
-/**
- * Sends dump output via the p7zip compressor.
- * @ingroup Dump
- */
-class Dump7ZipOutput extends DumpPipeOutput {
-	function Dump7ZipOutput( $file ) {
-		$command = "7za a -bd -si " . wfEscapeShellArg( $file );
-		// Suppress annoying useless crap from p7zip
-		// Unfortunately this could suppress real error messages too
-		$command .= ' >' . wfGetNull() . ' 2>&1';
-		parent::DumpPipeOutput( $command );
-	}
-}
-
-
-
-/**
- * Dump output filter class.
- * This just does output filtering and streaming; XML formatting is done
- * higher up, so be careful in what you do.
- * @ingroup Dump
- */
-class DumpFilter {
-	function DumpFilter( &$sink ) {
-		$this->sink =& $sink;
-	}
-
-	function writeOpenStream( $string ) {
-		$this->sink->writeOpenStream( $string );
-	}
-
-	function writeCloseStream( $string ) {
-		$this->sink->writeCloseStream( $string );
-	}
-
-	function writeOpenPage( $page, $string ) {
-		$this->sendingThisPage = $this->pass( $page, $string );
-		if( $this->sendingThisPage ) {
-			$this->sink->writeOpenPage( $page, $string );
-		}
-	}
-
-	function writeClosePage( $string ) {
-		if( $this->sendingThisPage ) {
-			$this->sink->writeClosePage( $string );
-			$this->sendingThisPage = false;
-		}
-	}
-
-	function writeRevision( $rev, $string ) {
-		if( $this->sendingThisPage ) {
-			$this->sink->writeRevision( $rev, $string );
-		}
-	}
-	
-	function writeLogItem( $rev, $string ) {
-		$this->sink->writeRevision( $rev, $string );
-	}	
-
-	/**
-	 * Override for page-based filter types.
-	 * @return bool
-	 */
-	function pass( $page ) {
-		return true;
-	}
-}
-
-/**
- * Simple dump output filter to exclude all talk pages.
- * @ingroup Dump
- */
-class DumpNotalkFilter extends DumpFilter {
-	function pass( $page ) {
-		return !MWNamespace::isTalk( $page->page_namespace );
-	}
-}
-
-/**
- * Dump output filter to include or exclude pages in a given set of namespaces.
- * @ingroup Dump
- */
-class DumpNamespaceFilter extends DumpFilter {
-	var $invert = false;
-	var $namespaces = array();
-
-	function DumpNamespaceFilter( &$sink, $param ) {
-		parent::DumpFilter( $sink );
-
-		$constants = array(
-			"NS_MAIN"           => NS_MAIN,
-			"NS_TALK"           => NS_TALK,
-			"NS_USER"           => NS_USER,
-			"NS_USER_TALK"      => NS_USER_TALK,
-			"NS_PROJECT"        => NS_PROJECT,
-			"NS_PROJECT_TALK"   => NS_PROJECT_TALK,
-			"NS_FILE"           => NS_FILE,
-			"NS_FILE_TALK"      => NS_FILE_TALK,
-			"NS_IMAGE"          => NS_IMAGE,  // NS_IMAGE is an alias for NS_FILE
-			"NS_IMAGE_TALK"     => NS_IMAGE_TALK,
-			"NS_MEDIAWIKI"      => NS_MEDIAWIKI,
-			"NS_MEDIAWIKI_TALK" => NS_MEDIAWIKI_TALK,
-			"NS_TEMPLATE"       => NS_TEMPLATE,
-			"NS_TEMPLATE_TALK"  => NS_TEMPLATE_TALK,
-			"NS_HELP"           => NS_HELP,
-			"NS_HELP_TALK"      => NS_HELP_TALK,
-			"NS_CATEGORY"       => NS_CATEGORY,
-			"NS_CATEGORY_TALK"  => NS_CATEGORY_TALK );
-
-		if( $param{0} == '!' ) {
-			$this->invert = true;
-			$param = substr( $param, 1 );
-		}
-
-		foreach( explode( ',', $param ) as $key ) {
-			$key = trim( $key );
-			if( isset( $constants[$key] ) ) {
-				$ns = $constants[$key];
-				$this->namespaces[$ns] = true;
-			} elseif( is_numeric( $key ) ) {
-				$ns = intval( $key );
-				$this->namespaces[$ns] = true;
-			} else {
-				throw new MWException( "Unrecognized namespace key '$key'\n" );
-			}
-		}
-	}
-
-	function pass( $page ) {
-		$match = isset( $this->namespaces[$page->page_namespace] );
-		return $this->invert xor $match;
-	}
-}
-
-
-/**
- * Dump output filter to include only the last revision in each page sequence.
- * @ingroup Dump
- */
-class DumpLatestFilter extends DumpFilter {
-	var $page, $pageString, $rev, $revString;
-
-	function writeOpenPage( $page, $string ) {
-		$this->page = $page;
-		$this->pageString = $string;
-	}
-
-	function writeClosePage( $string ) {
-		if( $this->rev ) {
-			$this->sink->writeOpenPage( $this->page, $this->pageString );
-			$this->sink->writeRevision( $this->rev, $this->revString );
-			$this->sink->writeClosePage( $string );
-		}
-		$this->rev = null;
-		$this->revString = null;
-		$this->page = null;
-		$this->pageString = null;
-	}
-
-	function writeRevision( $rev, $string ) {
-		if( $rev->rev_id == $this->page->page_latest ) {
-			$this->rev = $rev;
-			$this->revString = $string;
-		}
-	}
-}
-
-/**
- * Base class for output stream; prints to stdout or buffer or whereever.
- * @ingroup Dump
- */
-class DumpMultiWriter {
-	function DumpMultiWriter( $sinks ) {
-		$this->sinks = $sinks;
-		$this->count = count( $sinks );
-	}
-
-	function writeOpenStream( $string ) {
-		for( $i = 0; $i < $this->count; $i++ ) {
-			$this->sinks[$i]->writeOpenStream( $string );
-		}
-	}
-
-	function writeCloseStream( $string ) {
-		for( $i = 0; $i < $this->count; $i++ ) {
-			$this->sinks[$i]->writeCloseStream( $string );
-		}
-	}
-
-	function writeOpenPage( $page, $string ) {
-		for( $i = 0; $i < $this->count; $i++ ) {
-			$this->sinks[$i]->writeOpenPage( $page, $string );
-		}
-	}
-
-	function writeClosePage( $string ) {
-		for( $i = 0; $i < $this->count; $i++ ) {
-			$this->sinks[$i]->writeClosePage( $string );
-		}
-	}
-
-	function writeRevision( $rev, $string ) {
-		for( $i = 0; $i < $this->count; $i++ ) {
-			$this->sinks[$i]->writeRevision( $rev, $string );
-		}
-	}
-}
+# -- Vitaliy Filippov 2011-10-13:
+# Implementing additional "dump filter" layer is a very silly idea.
+# Page selection must be done OUTSIDE any dumper classes. It's much faster.
 
 function xmlsafe( $string ) {
-	$fname = 'xmlsafe';
-	wfProfileIn( $fname );
+	wfProfileIn( __METHOD__ );
 
 	/**
 	 * The page may contain old data which has not been properly normalized.
@@ -1007,6 +640,6 @@ function xmlsafe( $string ) {
 	$string = UtfNormal::cleanUp( $string );
 
 	$string = htmlspecialchars( $string );
-	wfProfileOut( $fname );
+	wfProfileOut( __METHOD__ );
 	return $string;
 }
