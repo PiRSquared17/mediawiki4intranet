@@ -192,8 +192,9 @@ class SpecialInterwiki extends SpecialPage {
 				$log->addEntry( 'iw_delete', $selfTitle, $reason, array( $prefix ) );
 			}
 			break;
-		case 'edit':
 		case 'add':
+			$prefix = mb_strtolower( $prefix );
+		case 'edit':
 			$theurl = $request->getVal( 'wpInterwikiURL' );
 			$local = $request->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
 			$trans = $request->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
