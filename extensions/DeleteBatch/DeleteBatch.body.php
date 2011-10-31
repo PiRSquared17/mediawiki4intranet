@@ -262,6 +262,15 @@ class DeleteBatchForm {
 		$page = Title::newFromText( $line );
 			if ( is_null( $page ) ) { /* invalid title? */
 				$wgOut->addWikiMsg( 'deletebatch-omitting-invalid', $line );
+		if ( !$multi ) {
+			if ( !is_null( $user ) ) {
+					$wgUser = $user;
+				}
+			}
+			return false;
+		}
+		if ( !$page->exists() ) { /* no such page? */
+			$wgOut->addWikiMsg( 'deletebatch-omitting-nonexistant', $line );
 			if ( !$multi ) {
 				if ( !is_null( $user ) ) {
 					$wgUser = $user;
@@ -269,10 +278,12 @@ class DeleteBatchForm {
 			}
 			return false;
 		}
-		if ( !$page->exists() ) { /* no such page? */
-				$wgOut->addWikiMsg( 'deletebatch-omitting-nonexistant', $line );
-			if ( !$multi ) {
-				if ( !is_null( $user ) ) {
+
+		$allowed = wfRunHooks( 'userCan', array( &$page, &$wgUser, "delete", &$result ) );
+		if( !$allowed ) {
+			$wgOut->addWikiText( wfMsg('deletebatch-permission-denied', $line) );
+			if (!$multi) {
+				if (!is_null($user)) {
 					$wgUser = $user;
 				}
 			}
@@ -290,14 +301,15 @@ class DeleteBatchForm {
 			/*this is absolutely required - creating a new ImagePage object does not automatically
 			provide it with image  */
 			$art->img = new Image( $art->mTitle );
+			$art->delete();
 		} else {
 			$art = new Article( $page );
+			$art->doDelete( $reason );
 		}
 
 		/* what is the generic reason for page deletion?
 		   something about the content, I guess...
 		*/
-		$art->doDelete( $reason );
 		$db->commit();
 		return true;
 	}
