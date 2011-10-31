@@ -1329,6 +1329,7 @@ HTML
 	
 	protected function showHeader() {
 		global $wgOut, $wgUser, $wgTitle, $wgMaxArticleSize, $wgLang;
+		global $wgWarnArticleSize;
 		if ( $this->isConflict ) {
 			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", 'explainconflict' );
 			$this->edittime = $this->mArticle->getTimestamp();
@@ -1450,9 +1451,9 @@ HTML
 			$wgOut->addHTML( "<div class='error' id='mw-edit-longpageerror'>\n" );
 			$wgOut->addWikiMsg( 'longpageerror', $wgLang->formatNum( $this->kblength ), $wgLang->formatNum( $wgMaxArticleSize ) );
 			$wgOut->addHTML( "</div>\n" );
-		} elseif ( $this->kblength > 29 ) {
+		} elseif ( $wgWarnArticleSize !== NULL && $this->kblength > $wgWarnArticleSize ) {
 			$wgOut->addHTML( "<div id='mw-edit-longpagewarning'>\n" );
-			$wgOut->addWikiMsg( 'longpagewarning', $wgLang->formatNum( $this->kblength ) );
+			$wgOut->addWikiMsg( 'longpagewarning', $wgLang->formatNum( $this->kblength ), $wgLang->formatNum( $wgWarnArticleSize ) );
 			$wgOut->addHTML( "</div>\n" );
 		}
 	}
