@@ -9,7 +9,7 @@ $wgExtensionMessagesFiles['RemoveConfidential'] = dirname(__FILE__).'/RemoveConf
 $wgAutoloadClasses['ExportRemoveConfidential'] = dirname(__FILE__).'/RemoveConfidential.class.php';
 
 if (!isset($wgExportConfidentialRegexp))
-    $wgExportConfidentialRegexp = '#\{\{\s*CONFIDENTIAL-BEGIN\s*\}\}.*?\{\{\s*CONFIDENTIAL-END\s*\}\}\s*#s';
+    $wgExportConfidentialRegexp = '#\{\{\s*CONFIDENTIAL-BEGIN.*?\}\}.*?(\{\{\s*CONFIDENTIAL-END\s*\}\}\s*|$)#s';
 
 if (!isset($wgExportConfidentialTemplates))
     $wgExportConfidentialTemplates = array('CONFIDENTIAL');
