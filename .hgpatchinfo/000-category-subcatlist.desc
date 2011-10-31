@@ -1,0 +1,4 @@
+Bug 62054 -
+  __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
+  enable/disable "tag-like" page grouping based on their other categories,
+  __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
