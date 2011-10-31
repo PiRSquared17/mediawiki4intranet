@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1319724347 -10800
+# Date 1320068232 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/AutoLoader.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -51,17 +51,7 @@
@@ -66,7 +66,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/AutoLoader.php
  	'LinkSearchPage' => 'includes/specials/SpecialLinkSearch.php',
  	'ListredirectsPage' => 'includes/specials/SpecialListredirects.php',
  	'LoginForm' => 'includes/specials/SpecialUserlogin.php',
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/DefaultSettings.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -2152,6 +2152,12 @@
@@ -111,7 +111,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/DumpArchive.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,511 @@
@@ -626,7 +626,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Export.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -24,11 +24,11 @@
@@ -1401,7 +1401,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Export.php
 +	wfProfileOut( __METHOD__ );
  	return $string;
  }
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Import.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -23,6 +23,23 @@
@@ -1458,7 +1458,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Import.php
  	function getSize() {
  		return $this->size;
  	}
-@@ -156,14 +182,23 @@
+@@ -156,6 +182,14 @@
  	}
  
  	function importOldRevision() {
@@ -1473,9 +1473,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Import.php
  		$dbw = wfGetDB( DB_MASTER );
  
  		# Sneak a single revision into place
- 		$user = User::newFromName( $this->getUser() );
--		if( $user ) {
-+		if( !$user ) {
+@@ -164,6 +198,7 @@
  			$userId = intval( $user->getId() );
  			$userText = $user->getName();
  		} else {
@@ -2067,7 +2065,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/Import.php
 -		}
 -	}
 -}
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/filerepo/LocalFile.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -2163,7 +2161,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/specials/SpecialExport.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -2857,7 +2855,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/specials/SpecialImport.php
+diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -23,6 +23,74 @@
@@ -3091,7 +3089,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 91aaa8e662fb -r 5a6a7c7be80d languages/messages/MessagesEn.php
+diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,30 @@
@@ -3162,7 +3160,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 91aaa8e662fb -r 5a6a7c7be80d languages/messages/MessagesRu.php
+diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,30 @@
@@ -3230,7 +3228,7 @@ diff -r 91aaa8e662fb -r 5a6a7c7be80d languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 91aaa8e662fb -r 5a6a7c7be80d skins/common/shared.css
+diff -r 91aaa8e662fb -r d0e05882510e skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@
