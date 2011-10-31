@@ -1141,6 +1141,11 @@ $wgMaxTemplateDepth = 40;
 $wgMaxPPExpandDepth = 40;
 
 /**
+ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
+ */
+$wgDotAfterTocnumber = false;
+
+/**
  * If true, removes (substitutes) templates in "~~~~" signatures.
  */
 $wgCleanSignatures = true;
