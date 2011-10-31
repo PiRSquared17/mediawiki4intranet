@@ -437,18 +437,9 @@ class OutputPage {
 
 	/**
 	 * "HTML title" means the contents of <title>.
-	 * It is stored as plain, unescaped text and will be run through htmlspecialchars in the skin file.
-	 * If $name is from page title, it can only override names which are also from page title,
-	 * but if it is not from page title, it can override all other names.
 	 */
 	public function setHTMLTitle( $name, $frompagetitle = false ) {
-		if ( $frompagetitle && $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-		}
-		elseif ( $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-			$this->mHTMLtitleFromPagetitle = false;
-		}
+		$this->mHTMLtitle = $name;
 	}
 
 	/**
@@ -2110,7 +2101,9 @@ class OutputPage {
 		} else {
 			$titleObj = Title::newFromText( $returnto );
 		}
-		if ( !is_object( $titleObj ) ) {
+/*patch|2011-04-05|IntraACL|start*/
+		if ( !$titleObj instanceof Title || method_exists( $titleObj, 'userCanReadEx' ) && !$titleObj->userCanReadEx() ) {
+/*patch|2011-04-05|IntraACL|end*/
 			$titleObj = Title::newMainPage();
 		}
 
