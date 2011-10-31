@@ -7,7 +7,7 @@
 
 $PATCHED_DIRS = explode(' ', 'includes languages skins/chick skins/common skins/modern skins/monobook skins/simple skins/vector maintenance skins/Vector.php');
 $PATCHED_EXTENSIONS = explode(' ', 'CategoryTree Cite DeleteBatch Interwiki PdfHandler WikiCategoryTagCloud SyntaxHighlight_GeSHi ParserFunctions');
-$CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php includes/DumpArchive.php');
+$CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php', 'includes/DumpArchive.php');
 
 $SELFDIR = realpath(dirname(__FILE__));
 $DIR = dirname($SELFDIR); // installation directory
