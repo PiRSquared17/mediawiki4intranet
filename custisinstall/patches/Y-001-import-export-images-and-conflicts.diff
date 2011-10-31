@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1320068232 -10800
+# Date 1320070972 -10800
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 91aaa8e662fb -r d0e05882510e includes/AutoLoader.php
+diff -r 1e8fcd528801 -r 5351241906de includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -51,17 +51,7 @@
@@ -66,7 +66,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/AutoLoader.php
  	'LinkSearchPage' => 'includes/specials/SpecialLinkSearch.php',
  	'ListredirectsPage' => 'includes/specials/SpecialListredirects.php',
  	'LoginForm' => 'includes/specials/SpecialUserlogin.php',
-diff -r 91aaa8e662fb -r d0e05882510e includes/DefaultSettings.php
+diff -r 1e8fcd528801 -r 5351241906de includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -2152,6 +2152,12 @@
@@ -111,7 +111,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 91aaa8e662fb -r d0e05882510e includes/DumpArchive.php
+diff -r 1e8fcd528801 -r 5351241906de includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,511 @@
@@ -626,7 +626,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 91aaa8e662fb -r d0e05882510e includes/Export.php
+diff -r 1e8fcd528801 -r 5351241906de includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -24,11 +24,11 @@
@@ -1401,7 +1401,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/Export.php
 +	wfProfileOut( __METHOD__ );
  	return $string;
  }
-diff -r 91aaa8e662fb -r d0e05882510e includes/Import.php
+diff -r 1e8fcd528801 -r 5351241906de includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -23,6 +23,23 @@
@@ -2065,7 +2065,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/Import.php
 -		}
 -	}
 -}
-diff -r 91aaa8e662fb -r d0e05882510e includes/filerepo/LocalFile.php
+diff -r 1e8fcd528801 -r 5351241906de includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -2161,7 +2161,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
+diff -r 1e8fcd528801 -r 5351241906de includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -2373,7 +2373,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
  		/* Ok, let's get to it... */
  		if( $history == WikiExporter::CURRENT ) {
  			$lb = false;
-@@ -246,169 +185,350 @@
+@@ -246,169 +185,347 @@
  			set_time_limit(0);
  			wfRestoreWarnings();
  		}
@@ -2434,16 +2434,13 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -		$name = $title->getDBkey();
 -		
 +	// Execute page selection form, save page list to $state['pages'] and errors to $state['errors']
-+	static function addPagesExec( &$state )
-+	{
++	static function addPagesExec( &$state ) {
 +		// Split up and normalize input
 +		$pageSet = array();
-+		foreach( explode( "\n", $state['pages'] ) as $pageName )
-+		{
++		foreach( explode( "\n", $state['pages'] ) as $pageName ) {
 +			$pageName = trim( $pageName );
 +			$title = Title::newFromText( $pageName );
-+			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' )
-+			{
++			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
 +				// Only record each page once!
 +				$pageSet[ $title->getPrefixedText() ] = $title;
 +			}
@@ -2454,27 +2451,31 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
 +		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
 +		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
-+		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) )
++		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) ) {
 +			$modifydate = NULL;
++		}
 +		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
-+			$catname->getNamespace() != NS_CATEGORY )
++			$catname->getNamespace() != NS_CATEGORY ) {
 +			$catname = NULL;
++		}
 +		if ( !strlen( $notcategory ) || !( $notcategory = Title::newFromText( $notcategory, NS_CATEGORY ) ) ||
-+			$notcategory->getNamespace() != NS_CATEGORY )
++			$notcategory->getNamespace() != NS_CATEGORY ) {
 +			$notcategory = NULL;
-+		if ( $namespace === 'Main' || $namespace == '(Main)' || $namespace === wfMsg( 'blanknamespace' ) )
++		}
++		if ( $namespace === 'Main' || $namespace == '(Main)' || $namespace === wfMsg( 'blanknamespace' ) ) {
 +			$namespace = 0;
-+		elseif ( $namespace === '' || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) )
++		} elseif ( $namespace === '' || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) ) {
 +			$namespace = NULL;
-+		else
++		} else {
 +			$namespace = $namespace->getNamespace();
++		}
 +
 +		// Add pages from requested category and/or namespace
-+		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL )
-+		{
++		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL ) {
 +			$catpages = self::getPagesFromCategory( $catname, !empty( $state['closure'] ), $namespace, $modifydate );
-+			foreach ( $catpages as $title )
++			foreach ( $catpages as $title ) {
 +				$pageSet[ $title->getPrefixedText() ] = $title;
++			}
 +		}
 +
 +		// Look up any linked pages if asked...
@@ -2484,8 +2485,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +		$i = !empty( $state[ 'images' ] );
 +		$s = !empty( $state[ 'subpages' ] );
 +		$step = 0;
-+		do
-+		{
++		do {
 +			// Loop as there may be more than one closure type
 +			$added = 0;
 +			if( $t ) $added += self::getTemplates( $pageSet );
@@ -2501,11 +2501,11 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +				unset( $pageSet[ $key ] );
 +
 +		// Filter pages by $modifydate
-+		if ( $modifydate !== NULL && $pageSet )
-+		{
++		if ( $modifydate !== NULL && $pageSet ) {
 +			$ids = array();
-+			foreach ( $pageSet as $key => $title )
++			foreach ( $pageSet as $key => $title ) {
 +				$ids[ $title->getArticleId() ] = $title;
++			}
 +			$dbr = wfGetDB( DB_SLAVE );
 +			$res = $dbr->select( array( 'page', 'revision' ), 'page_id',
 +				array(
@@ -2513,18 +2513,20 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +					'page_id' => array_keys( $ids ),
 +					'rev_timestamp > '.$dbr->timestamp( $modifydate )
 +				), __METHOD__ );
-+			foreach ( $res as $row )
++			foreach ( $res as $row ) {
 +				unset( $ids[ $row->page_id ] );
-+			foreach ( $ids as $title )
++			}
++			foreach ( $ids as $title ) {
 +				unset( $pageSet[ $title->getPrefixedText() ] );
++			}
 +		}
 +
 +		// Filter pages from requested NOT-category
-+		if ( $notcategory !== NULL )
-+		{
++		if ( $notcategory !== NULL ) {
 +			$notlist = self::getPagesFromCategory( $notcategory );
-+			foreach ( $notlist as $title )
++			foreach ( $notlist as $title ) {
 +				unset( $pageSet[ $title->getPrefixedText() ] );
++			}
 +		}
 +
 +		// Save resulting page list
@@ -2534,21 +2536,24 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +
 +		// Save errors
 +		$state['errors'] = array();
-+		if ( !$catname && strlen( $state['catname'] ) )
++		if ( !$catname && isset( $state['catname'] ) && $state['catname'] !== '' ) {
 +			$state['errors'][] = array( 'export-invalid-catname', $state['catname'] );
-+		if ( !$notcategory && strlen( $state['notcategory'] ) )
++		}
++		if ( !$notcategory && isset( $state['notcategory'] ) && $state['notcategory'] !== '' ) {
 +			$state['errors'][] = array( 'export-invalid-notcategory', $state['notcategory'] );
-+		if ( $modifydate )
-+			$state['modifydate'] = wfTimestamp(TS_DB, $modifydate);
-+		elseif ( $state['modifydate'] )
++		}
++		if ( $modifydate ) {
++			$state['modifydate'] = wfTimestamp( TS_DB, $modifydate );
++		} elseif ( isset( $state['modifydate'] ) && $state['modifydate'] !== '' ) {
 +			$state['errors'][] = array( 'export-invalid-modifydate', $state['modifydate'] );
-+		if ( !$namespace && strlen( $state['namespace'] ) )
++		}
++		if ( !$namespace && isset( $state['namespace'] ) && $state['namespace'] !== '' ) {
 +			$state['errors'][] = array( 'export-invalid-namespace', $state['namespace'] );
++		}
 +	}
 +
 +	// Display page selection form, enclosed into a <fieldset>
-+	static function addPagesForm( $state )
-+	{
++	static function addPagesForm( $state ) {
 +		global $wgExportMaxLinkDepth;
 +		$form = '<fieldset class="addpages">';
 +		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
@@ -2559,15 +2564,15 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +			'notcategory' => 20,
 +		);
 +		// Textboxes:
-+		foreach ( $textboxes as $k => $size )
++		foreach ( $textboxes as $k => $size ) {
 +			$form .= '<div class="ap_'.$k.'">' .
 +				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
++		}
 +		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
 +			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
 +		}
 +		// Checkboxes:
-+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k )
-+		{
++		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k ) {
 +			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
 +				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
 +				array( 'style' => 'vertical-align: middle' )
@@ -2580,8 +2585,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +	}
 +
 +	// Get pages from ((category possibly with subcategories) and/or namespace), or (modified after $modifydate)
-+	static function getPagesFromCategory( $categories, $closure = false, $namespace = NULL, $modifydate = NULL )
-+	{
++	static function getPagesFromCategory( $categories, $closure = false, $namespace = NULL, $modifydate = NULL ) {
  		$dbr = wfGetDB( DB_SLAVE );
 -		$res = $dbr->select( array('page', 'categorylinks' ),
 -							array( 'page_namespace', 'page_title' ),
@@ -2589,24 +2593,22 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -							__METHOD__, array('LIMIT' => '5000'));
 -		
 +
-+		if ( $categories )
-+		{
-+			if ( is_object( $categories ) )
++		if ( $categories ) {
++			if ( is_object( $categories ) ) {
 +				$categories = $categories->getDBkey();
++			}
 +			$cats = array();
-+			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c )
++			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c ) {
 +				$cats[ $c ] = true;
++			}
 +			// Get subcategories
-+			while ( $categories && $closure )
-+			{
++			while ( $categories && $closure ) {
 +				$res = $dbr->select( array( 'page', 'categorylinks' ), 'page_title',
 +					array( 'cl_from=page_id', 'cl_to' => $categories, 'page_namespace' => NS_CATEGORY ),
 +					__METHOD__ );
 +				$categories = array();
-+				foreach ( $res as $row )
-+				{
-+					if ( !$cats[ $row->page_title ] )
-+					{
++				foreach ( $res as $row ) {
++					if ( !$cats[ $row->page_title ] ) {
 +						$categories[] = $row->page_title;
 +						$cats[ $row->page_title ] = $row;
 +					}
@@ -2619,16 +2621,16 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +		$tables = array( 'page' );
 +		$fields = 'page.*';
 +		$where = array();
-+		if ( $categories )
-+		{
++		if ( $categories ) {
 +			$tables[] = 'categorylinks';
 +			$where[] = 'cl_from=page_id';
 +			$where['cl_to'] = $categories;
 +		}
-+		if ( $namespace !== NULL )
++		if ( $namespace !== NULL ) {
 +			$where['page_namespace'] = $namespace;
-+		elseif ( $categories === NULL && $modifydate !== NULL )
++		} elseif ( $categories === NULL && $modifydate !== NULL ) {
 +			$where[] = 'page_touched >= '.$dbr->timestamp( $modifydate );
++		}
 +		$res = $dbr->select( $tables, $fields, $where, __METHOD__ );
  		$pages = array();
 -		while ( $row = $dbr->fetchObject( $res ) ) {
@@ -2639,12 +2641,12 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -			}
 -			
 -			$pages[] = $n;
--		}
++		foreach ( $res as $row ) {
++			$pages[] = Title::newFromRow( $row );
+ 		}
 -		$dbr->freeResult($res);
 -		
 -		return $pages;
-+		foreach ( $res as $row )
-+			$pages[] = Title::newFromRow( $row );
 +
 +		return array_values( $pages );
  	}
@@ -2666,22 +2668,22 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -			}
 -			
 -			$pages[] = $n;
--		}
--		$dbr->freeResult($res);
--		
--		return $pages;
 +
 +	/**
 +	 * Validate link depth setting, if available.
 +	 */
-+	public static function validateLinkDepth( $depth )
-+	{
++	public static function validateLinkDepth( $depth ) {
 +		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
-+		if( $depth <= 0 )
++		if( $depth <= 0 ) {
 +			return 0;
+ 		}
+-		$dbr->freeResult($res);
+-		
+-		return $pages;
 +		if ( !self::userCanOverrideExportDepth() &&
-+			$depth > $wgExportMaxLinkDepth )
++			$depth > $wgExportMaxLinkDepth ) {
 +			return $wgExportMaxLinkDepth;
++		}
 +		return $depth;
  	}
 +
@@ -2696,8 +2698,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -							   'templatelinks',
 -							   array( 'tl_namespace AS namespace', 'tl_title AS title' ),
 -							   array( 'page_id=tl_from' ) );
-+	public static function getTemplates( &$pageSet )
-+	{
++	public static function getTemplates( &$pageSet ) {
 +		return self::getLinks(
 +			$pageSet, 'templatelinks', 'tl_from',
 +			array( 'page_namespace=tl_namespace', 'page_title=tl_title' )
@@ -2715,8 +2716,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
 -		if( $depth < 0 ) {
 -			return 0;
-+	public static function getPageLinks( &$pageSet )
-+	{
++	public static function getPageLinks( &$pageSet ) {
 +		return self::getLinks(
 +			$pageSet, 'pagelinks', 'pl_from',
 +			array( 'page_namespace=pl_namespace', 'page_title=pl_title' )
@@ -2728,8 +2728,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +	 * @param &$pageSet array, associative array indexed by title prefixed text for output
 +	 * @return int count of added pages
 +	 */
-+	public static function getImages( &$pageSet )
-+	{
++	public static function getImages( &$pageSet ) {
 +		return self::getLinks(
 +			$pageSet, 'imagelinks', 'il_from',
 +			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
@@ -2741,13 +2740,11 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +	 * @param &$pageSet array, associative array indexed by title prefixed text for output
 +	 * @return int count of added pages
 +	 */
-+	public static function getSubpages( &$pageSet )
-+	{
++	public static function getSubpages( &$pageSet ) {
 +		$dbr = wfGetDB( DB_SLAVE );
 +		$where = array();
 +		$ids = array();
-+		foreach ( $pageSet as $title )
-+		{
++		foreach ( $pageSet as $title ) {
 +			$ids[ $title->getArticleId() ] = true;
 +			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
  		}
@@ -2755,15 +2752,14 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -			if( $depth > $wgExportMaxLinkDepth ) {
 -				return $wgExportMaxLinkDepth;
 +		$nsx = $where;
-+		foreach ( $where as $ns => &$w )
++		foreach ( $where as $ns => &$w ) {
 +			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
++		}
 +		$where = '('.implode( ' OR ', $where ).')';
 +		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
 +		$added = 0;
-+		foreach( $result as $row )
-+		{
-+			if( empty( $ids[ $row->page_id ] ) )
-+			{
++		foreach( $result as $row ) {
++			if( empty( $ids[ $row->page_id ] ) ) {
 +				$add = Title::newFromRow( $row );
 +				$pageSet[ $add->getPrefixedText() ] = $add;
 +				$added++;
@@ -2808,10 +2804,10 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
  	 * @private
  	 */
 -	private function getLinks( $inputPages, $pageSet, $table, $fields, $join ) {
-+	private static function getLinks( &$pageSet, $table, $id_field, $join )
-+	{
-+		if ( !$pageSet )
++	private static function getLinks( &$pageSet, $table, $id_field, $join ) {
++		if ( !$pageSet ) {
 +			return 0;
++		}
  		$dbr = wfGetDB( DB_SLAVE );
 -		foreach( $inputPages as $page ) {
 -			$title = Title::newFromText( $page );
@@ -2832,8 +2828,9 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 -					$pageSet[$template->getPrefixedText()] = true;
 -				}
 +		$ids = array();
-+		foreach( $pageSet as $title )
++		foreach( $pageSet as $title ) {
 +			$ids[ $title->getArticleId() ] = true;
++		}
 +		$result = $dbr->select(
 +			array( 'page', $table ), 'page.*',
 +			$join + array( $id_field => array_keys( $ids ) ),
@@ -2841,10 +2838,8 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
 +			array( 'GROUP BY' => 'page_id' )
 +		);
 +		$added = 0;
-+		foreach( $result as $row )
-+		{
-+			if( empty( $ids[ $row->page_id ] ) )
-+			{
++		foreach( $result as $row ) {
++			if( empty( $ids[ $row->page_id ] ) ) {
 +				$add = Title::newFromRow( $row );
 +				$pageSet[ $add->getPrefixedText() ] = $add;
 +				$added++;
@@ -2855,7 +2850,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialImport.php
+diff -r 1e8fcd528801 -r 5351241906de includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -23,6 +23,74 @@
@@ -3089,7 +3084,7 @@ diff -r 91aaa8e662fb -r d0e05882510e includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesEn.php
+diff -r 1e8fcd528801 -r 5351241906de languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,30 @@
@@ -3160,7 +3155,7 @@ diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesRu.php
+diff -r 1e8fcd528801 -r 5351241906de languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,30 @@
@@ -3228,7 +3223,7 @@ diff -r 91aaa8e662fb -r d0e05882510e languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 91aaa8e662fb -r d0e05882510e skins/common/shared.css
+diff -r 1e8fcd528801 -r 5351241906de skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,9 @@
