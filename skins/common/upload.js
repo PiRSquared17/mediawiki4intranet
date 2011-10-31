@@ -270,6 +270,10 @@ function fillDestFilename(id) {
 			return false;
 		}
 	}
+	// Find and make extension lower-case
+	var dot = fname.lastIndexOf('.');
+	if (dot >= 0)
+		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
 
 	// Capitalise first letter and replace spaces by underscores
 	// FIXME: $wgCapitalizedNamespaces
