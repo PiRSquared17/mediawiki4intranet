@@ -2165,6 +2165,12 @@ $wgDiff3 = '/usr/bin/diff3';
 $wgDiff = '/usr/bin/diff';
 
 /**
+ * Paths to zip/unzip utilities.
+ */
+$wgZip = '/usr/bin/zip';
+$wgUnzip = '/usr/bin/unzip';
+
+/**
  * We can also compress text stored in the 'text' table. If this is set on, new
  * revisions will be compressed on page save if zlib support is available. Any
  * compressed revisions will be decompressed on load regardless of this setting
@@ -2620,6 +2626,28 @@ $wgExportMaxLinkDepth = 0;
 * Whether to allow the "export all pages in namespace" option
 */
 $wgExportFromNamespaces = false;
+
+/**
+ * Import/export formats
+ */
+$wgExportFormats = array(
+	array(
+		'extension' => 'xml',
+		'mimetype' => 'application/xml',
+		'reader' => 'WikiImporter',
+		'writer' => 'XmlDumpWriter',
+	),
+);
+
+/**
+ * Archive classes for import
+ */
+$wgDumpArchiveByExt = array(
+	'xml' => array( 'OldMultipartDumpArchive', 'StubDumpArchive' ),
+	'multipart' => array( 'OldMultipartDumpArchive' ),
+	'zip' => array( 'ZipDumpArchive' ),
+	'' => array( 'ZipDumpArchive', 'StubDumpArchive' ),
+);
 
 /**
  * Edits matching these regular expressions in body text
