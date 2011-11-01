@@ -150,6 +150,7 @@ require_once($IP.'/extensions/SimpleForms/SimpleForms.php'); /* useful at least 
 require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/Shortcuts/Shortcuts.php');
+require_once($IP.'/extensions/RemoveConfidential/RemoveConfidential.php');
 
 # Drafts
 require_once($IP.'/extensions/Drafts/Drafts.php');
@@ -259,6 +260,7 @@ $wgGroupPermissions['*']['delete'] = true;
 $wgGroupPermissions['*']['undelete'] = true;
 $wgGroupPermissions['*']['upload_by_url'] = true;
 $wgGroupPermissions['*']['import'] = true;
+$wgGroupPermissions['*']['importupload'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search
