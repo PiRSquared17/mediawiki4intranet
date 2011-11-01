@@ -1,0 +1,32 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   $Id$
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+table.diff {background: #FEFEFE; border: 1px solid #cccccc; padding: 0.5em}
+table.diff td {vertical-align: top;}
+td.diff-otitle a, td.diff-ntitle a, td.diff-otitle a:visited, td.diff-ntitle a:visited {color: #2153B0;}
+td.diff-otitle a:hover, td.diff-ntitle a:hover {text-decoration: underline;}
+td.diff-otitle {}
+td.diff-ntitle {}
+td.diff-addedline {background:#F2F6FF;}
+td.diff-addedline span.diffchange {
+	background: #CDDEFF;
+	border: 1px dashed #676F80;
+	color: green;
+	font-weight: bold;
+	}
+td.diff-deletedline {background:#FFF9F2;}
+td.diff-deletedline span.diffchange {
+	background: #FFE9CB;
+	border: 1px dashed #B3A38E;
+	color: red;
+	font-weight: bold;
+	text-decoration: line-through;
+	}
+td.diff-context {background:#eeeeee;}
+.newpage {color: green;	font-weight: bolder;}
+

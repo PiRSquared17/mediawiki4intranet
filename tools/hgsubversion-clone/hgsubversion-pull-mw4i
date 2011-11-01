@@ -1,0 +1,32 @@
+#!/bin/sh
+# Update MediaWiki4Intranet HG repository previously cloned using
+# hgsubversion-clone-mw4i, merge changes into installation branch,
+# and push to Google Code
+
+cd `dirname $0`
+SVN=svn://svn.office.custis.ru/mediawiki
+EXTPATH_FILE=./mw4i-extpath
+EXTPATH=`grep ^ext_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+CHGPATH=`grep ^chg_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+GOOGLECODE=`grep ^googlecode_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+
+if [ -z "$EXTPATH" -o -z "$CHGPATH" ]; then
+    cat <<EOF
+Before running this script, you must create file '$EXTPATH_FILE' with following contents:
+ext_repo <full path to desired hg mw4i repository>
+chg_repo <full path to hg repository with patch branches>
+googlecode_repo <full path to cloned Google Code mediawiki4intranet repository>
+EOF
+else
+    cd $EXTPATH && \
+    hg pull $SVN && \
+    hg pull -f -r all $CHGPATH && \
+    rm -f .hg/pgraph && \
+    hg pmerge mw4install
+    if [ ! -z "$GOOGLECODE" -a $? -eq 0 ]; then
+        echo "Pushing to Google code repository $GOOGLECODE"
+        hg push -f $GOOGLECODE && \
+        cd $GOOGLECODE && \
+        hg push -f
+    fi
+fi
