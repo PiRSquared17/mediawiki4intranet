@@ -321,8 +321,13 @@ class EditPage {
 
 		$permErrors = $this->getEditPermissionErrors();
 		if ( $permErrors ) {
-			wfDebug( __METHOD__ . ": User can't edit\n" );
-			$this->readOnlyPage( $this->getContent( false ), true, $permErrors, 'edit' );
+			wfDebug( __METHOD__.": User can't edit\n" );
+			$this->readOnlyPage(
+			    $this->textbox2 ? $this->textbox2 :
+			    $this->textbox1 ? $this->textbox1 :
+			                      $this->getContent( false ),
+			    true, $permErrors, 'edit'
+			);
 			wfProfileOut( __METHOD__ );
 			return;
 		} else {
@@ -547,7 +552,7 @@ class EditPage {
 				# If the form is incomplete, force to preview.
 				wfDebug( __METHOD__ . ": Form data appears to be incomplete\n" );
 				wfDebug( "POST DATA: " . var_export( $_POST, true ) . "\n" );
-				$this->preview = true;
+				$this->preview = $request->getCheck( 'wpPreview' );
 			} else {
 				/* Fallback for live preview */
 				$this->preview = $request->getCheck( 'wpPreview' ) || $request->getCheck( 'wpLivePreview' );
@@ -573,7 +578,7 @@ class EditPage {
 					$this->preview = true;
 				}
 			}
-			$this->save = !$this->preview && !$this->diff;
+			$this->save = $request->getCheck( 'wpSave' ) && !$this->preview && !$this->diff;
 			if ( !preg_match( '/^\d{14}$/', $this->edittime ) ) {
 				$this->edittime = null;
 			}
@@ -758,6 +763,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgOut, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 
 		wfProfileIn( __METHOD__  );
 		wfProfileIn( __METHOD__ . '-checks' );
@@ -929,7 +935,7 @@ class EditPage {
 		$userid = $wgUser->getId();
 
 		# Suppress edit conflict with self, except for section edits where merging is required.
-		if ( $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
+		if ( $wgSuppressSameUserConflicts && $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
 			wfDebug( __METHOD__ . ": Suppressing edit conflict, same user.\n" );
 			$this->isConflict = false;
 		}
@@ -1121,7 +1127,6 @@ class EditPage {
 	function initialiseForm() {
 		global $wgUser;
 		$this->edittime = $this->mArticle->getTimestamp();
-		$this->textbox1 = $this->getContent( false );
 		// activate checkboxes if user wants them to be always active
 		# Sort out the "watch" checkbox
 		if ( $wgUser->getOption( 'watchdefault' ) ) {
@@ -1136,6 +1141,9 @@ class EditPage {
 		}
 		if ( $wgUser->getOption( 'minordefault' ) ) $this->minoredit = true;
 		if ( $this->textbox1 === false ) return false;
+		if ( !trim( $this->textbox1 ) ) {
+			$this->textbox1 = $this->getContent( false );
+		}
 		wfProxyCheck();
 		return true;
 	}
@@ -1307,6 +1315,12 @@ HTML
 		$this->showTosSummary();
 		$this->showEditTools();
 
+		if ( $this->isConflict )
+			$this->showConflict();
+		
+		$wgOut->addHTML( $this->editFormTextBottom );
+		$wgOut->addHTML( "</form>\n" );
+
 		$wgOut->addHTML( <<<HTML
 {$this->editFormTextAfterTools}
 <div class='templatesUsed'>
@@ -1318,11 +1332,6 @@ HTML
 HTML
 );
 
-		if ( $this->isConflict )
-			$this->showConflict();
-		
-		$wgOut->addHTML( $this->editFormTextBottom );
-		$wgOut->addHTML( "</form>\n" );
 		if ( !$wgUser->getOption( 'previewontop' ) ) {
 			$this->displayPreviewArea( $previewOutput, false );
 		}
@@ -1332,6 +1341,7 @@ HTML
 	
 	protected function showHeader() {
 		global $wgOut, $wgUser, $wgTitle, $wgMaxArticleSize, $wgLang;
+		global $wgWarnArticleSize;
 		if ( $this->isConflict ) {
 			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", $this->mMergeAvailable ? 'explainconflictmerged' : 'explainconflict' );
 			$this->edittime = $this->mArticle->getTimestamp();
@@ -1453,9 +1463,9 @@ HTML
 			$wgOut->addHTML( "<div class='error' id='mw-edit-longpageerror'>\n" );
 			$wgOut->addWikiMsg( 'longpageerror', $wgLang->formatNum( $this->kblength ), $wgLang->formatNum( $wgMaxArticleSize ) );
 			$wgOut->addHTML( "</div>\n" );
-		} elseif ( $this->kblength > 29 ) {
+		} elseif ( $wgWarnArticleSize !== NULL && $this->kblength > $wgWarnArticleSize ) {
 			$wgOut->addHTML( "<div id='mw-edit-longpagewarning'>\n" );
-			$wgOut->addWikiMsg( 'longpagewarning', $wgLang->formatNum( $this->kblength ) );
+			$wgOut->addWikiMsg( 'longpagewarning', $wgLang->formatNum( $this->kblength ), $wgLang->formatNum( $wgWarnArticleSize ) );
 			$wgOut->addHTML( "</div>\n" );
 		}
 	}
@@ -1724,7 +1734,9 @@ INPUTS
 	}
 	
 	protected function getCopywarn() {
-		global $wgRightsText;
+		global $wgRightsText, $wgNoCopyrightWarnings;
+		if ( $wgNoCopyrightWarnings )
+			return '';
 		if ( $wgRightsText ) {
 			$copywarnMsg = array( 'copyrightwarning',
 				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]',
@@ -2036,14 +2048,9 @@ INPUTS
 		$currentText = $currentRevision->getText();
 
 		$result = '';
-		if ( wfMerge( $baseText, $editText, $currentText, $result ) ) {
-			$editText = $result;
-			wfProfileOut( __METHOD__ );
-			return true;
-		} else {
-			wfProfileOut( __METHOD__ );
-			return false;
-		}
+		$conflict = wfMerge( $baseText, $editText, $currentText, $editText );
+		wfProfileOut( __METHOD__ );
+		return $conflict;
 	}
 
 	/**
@@ -2176,8 +2183,8 @@ INPUTS
 			array(
 				'image'  => $wgLang->getImageFile( 'button-math' ),
 				'id'     => 'mw-editbutton-math',
-				'open'   => "<math>",
-				'close'  => "</math>",
+				'open'   => "<m>",
+				'close'  => "</m>",
 				'sample' => wfMsg( 'math_sample' ),
 				'tip'    => wfMsg( 'math_tip' ),
 				'key'    => 'C'
@@ -2194,7 +2201,7 @@ INPUTS
 			array(
 				'image'  => $wgLang->getImageFile( 'button-sig' ),
 				'id'     => 'mw-editbutton-signature',
-				'open'   => '--~~~~',
+				'open'   => '~~~~',
 				'close'  => '',
 				'sample' => '',
 				'tip'    => wfMsg( 'sig_tip' ),
