@@ -21,6 +21,7 @@ To look at the commands which would be run, but do not run them:
 /* URL config */
 
 $SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2';
+$SVN_WIKIMEDIA_17 = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_17_0';
 $SVN_WIKIMEDIA_TRUNK = 'http://svn.wikimedia.org/svnroot/mediawiki/trunk';
 $SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 
@@ -33,18 +34,61 @@ $FILES_WIKIMEDIA = explode(' ',
     ' opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch');
+$EXT_WIKIMEDIA_17 = explode(' ', "Interwiki");
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'Interwiki googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit');
-$EXT_OUR = explode(' ',
-    'BatchEditor CustisScripts DocExport mediawikiquizzer Polls MarkupBabel AnyWikiDraw'.
-    ' SphinxSearch SimpleTable CategoryTemplate EnotifDiff Drafts'.
-    ' SVNIntegration Workflow FlvHandler MMHandler SpecialForm MagicNumberedHeadings'.
-    ' AllowGetParamsInWikilinks WikiBookmarks SWFUpload UserMagic UserMessage CharInsertList'.
-    ' IntraACL ListFeed OpenID Calendar Wikilog GlobalAuth PlantUML TemplatedPageList HttpAuth'.
-    ' MultiCategorySearch SimpleForms BugzillaBuglist SVGEdit RegexParserFunctions MergeConflicts Dia'.
-    ' AllNsSuggest NewPagesEx PdfHandler');
-$SKINS_OUR = explode(' ',
-    'custis custisru dumphtml ichick');
+    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit');
+$EXT_OUR = array_map('trim', explode("\n",
+    "AllNsSuggest
+    AllowGetParamsInWikilinks
+    AnyWikiDraw
+    BatchEditor
+    BugzillaBuglist
+    Calendar
+    CategoryPageFeed
+    CategoryTemplate
+    CharInsertList
+    CustisScripts
+    Dia
+    DocExport
+    Drafts
+    EnotifDiff
+    FlvHandler
+    GlobalAuth
+    HttpAuth
+    IntraACL
+    ListFeed
+    MMHandler
+    MagicNumberedHeadings
+    MarkupBabel
+    MergeConflicts
+    NewPagesEx
+    OpenID
+    PdfHandler
+    PlantUML
+    Polls
+    RegexParserFunctions
+    RemoveConfidential
+    S5SlideShow
+    SVGEdit
+    SVNIntegration
+    SWFUpload
+    Shortcuts
+    ShowHide
+    SimpleForms
+    SimpleTable
+    SiteExport
+    SpecialForm
+    SphinxSearch
+    SphinxSearchEngine
+    TemplatedPageList
+    UserMagic
+    UserMessage
+    WikiBookmarks
+    Wikilog
+    Workflow
+    mediawikiquizzer"
+));
+$SKINS_OUR = explode(' ', 'custis custisru dumphtml ichick');
 
 /* The install script */
 
@@ -74,6 +118,7 @@ if ($UPGRADE)
     cmd("echo Upgrading into $DIR");
     switch_dirs("$SVN_WIKIMEDIA/phase3", $DIR, $DIRS_WIKIMEDIA);
     switch_dirs("$SVN_WIKIMEDIA/extensions", "$DIR/extensions", $EXT_WIKIMEDIA);
+    switch_dirs("$SVN_WIKIMEDIA_17/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_17);
     switch_dirs("$SVN_WIKIMEDIA_TRUNK/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_TRUNK);
 }
 else
@@ -81,6 +126,7 @@ else
     cmd("echo Installing into $DIR");
     get_dirs("$SVN_WIKIMEDIA/phase3", $DIR, $DIRS_WIKIMEDIA);
     get_dirs("$SVN_WIKIMEDIA/extensions", "$DIR/extensions", $EXT_WIKIMEDIA);
+    get_dirs("$SVN_WIKIMEDIA_17/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_17);
     get_dirs("$SVN_WIKIMEDIA_TRUNK/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_TRUNK);
 }
 
