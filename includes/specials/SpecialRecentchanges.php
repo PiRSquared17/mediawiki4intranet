@@ -69,8 +69,10 @@ class SpecialRecentChanges extends SpecialPage {
 	public function feedSetup() {
 		global $wgFeedLimit, $wgRequest;
 		$opts = $this->getDefaultOptions();
-		# Feed is cached on limit,hideminor,namespace; other params would randomly not work
-		$opts->fetchValuesFromRequest( $wgRequest, array( 'limit', 'hideminor', 'namespace' ) );
+		$opts->fetchValuesFromRequest( $wgRequest, array(
+			'days', 'limit', 'from', 'hideminor', 'hidebots', 'hideanons', 'hideliu',
+			'hidepatrolled', 'hidemyself', 'namespace', 'invert', 'categories',
+			'categories_any', 'tagfilter' ) );
 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
@@ -240,7 +242,6 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$conds[] = 'rc_timestamp >= ' . $dbr->addQuotes( $cutoff );
 
-
 		$hidePatrol = $wgUser->useRCPatrol() && $opts['hidepatrolled'];
 		$hideLoggedInUsers = $opts['hideliu'] && !$forcebot;
 		$hideAnonymousUsers = $opts['hideanons'] && !$forcebot;
@@ -281,6 +282,7 @@ class SpecialRecentChanges extends SpecialPage {
 	 */
 	public function doMainQuery( $conds, $opts ) {
 		global $wgUser;
+		global $wgAllowCategorizedRecentChanges;
 
 		$tables = array( 'recentchanges' );
 		$join_conds = array();
@@ -292,13 +294,34 @@ class SpecialRecentChanges extends SpecialPage {
 		$namespace = $opts['namespace'];
 		$invert = $opts['invert'];
 
+		$categories = trim( $opts['categories'], " \t\n\r\0\x0B|" );
+		// JOIN on categories
+		if( $wgAllowCategorizedRecentChanges && $categories &&
+		    ( $categories = preg_split( '/[\s\|]*\|[\s\|]*/', $categories ) ) )
+		{
+			foreach( $categories as &$cat )
+				$cat = str_replace( ' ', '_', $cat );
+			$tables[] = 'page';
+			$join_conds['page'] = array( 'INNER JOIN', array( 'page_title=rc_title', 'page_namespace=rc_namespace' ) );
+			if( $opts['categories_any'] )
+				$conds[] = "EXISTS (".$dbr->selectSQLText( 'categorylinks', '*', array( 'cl_from=page_id', 'cl_to' => $categories ) ).")";
+			else
+			{
+				foreach( $categories as $i => $cat )
+				{
+					$tables[] = "`categorylinks` cl$i";
+					$join_conds["`categorylinks` cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
+				}
+			}
+		}
+
 		// JOIN on watchlist for users
 		if( $uid ) {
 			$tables[] = 'watchlist';
 			$join_conds['watchlist'] = array('LEFT JOIN',
-				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace");
+				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
 		}
-		if ($wgUser->isAllowed("rollback")) {
+		if ( $wgUser->isAllowed("rollback") && empty( $join_conds['page'] ) ) {
 			$tables[] = 'page';
 			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
 		}
@@ -359,7 +382,6 @@ class SpecialRecentChanges extends SpecialPage {
 	 */
 	public function webOutput( $rows, $opts ) {
 		global $wgOut, $wgUser, $wgRCShowWatchingUsers, $wgShowUpdatedMarker;
-		global $wgAllowCategorizedRecentChanges;
 
 		$limit = $opts['limit'];
 
@@ -371,7 +393,7 @@ class SpecialRecentChanges extends SpecialPage {
 		// And now for the content
 		$wgOut->setFeedAppendQuery( $this->getFeedQuery() );
 
-		if( $wgAllowCategorizedRecentChanges ) {
+		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
 			$this->filterByCategories( $rows, $opts );
 		}
 
@@ -385,6 +407,13 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$s = $list->beginRecentChangesList();
 		foreach( $rows as $obj ) {
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			$rc = RecentChange::newFromRow( $obj );
+			if (!$rc->getTitle()->userCanReadEx()) {
+				continue;
+			}
+/*op-patch|TS|2009-06-19|end*/  
+
 			if( $limit == 0 ) break;
 			$rc = RecentChange::newFromRow( $obj );
 			$rc->counter = $counter++;
@@ -437,7 +466,7 @@ class SpecialRecentChanges extends SpecialPage {
 
 		$defaults = $opts->getAllValues();
 		$nondefaults = $opts->getChangedValues();
-		$opts->consumeValues( array( 'namespace', 'invert', 'tagfilter' ) );
+		$opts->consumeValues( array( 'namespace', 'invert', 'tagfilter', 'categories', 'categories_any' ) );
 
 		$panel = array();
 		$panel[] = $this->optionsPanel( $defaults, $nondefaults );
@@ -580,6 +609,7 @@ class SpecialRecentChanges extends SpecialPage {
 		# Filter articles
 		$articles = array();
 		$a2r = array();
+		$newrows = array();
 		foreach( $rows AS $k => $r ) {
 			$nt = Title::makeTitle( $r->rc_namespace, $r->rc_title );
 			$id = $nt->getArticleID();
@@ -590,8 +620,10 @@ class SpecialRecentChanges extends SpecialPage {
 			if( !isset($a2r[$id]) ) {
 				$a2r[$id] = array();
 			}
+			$newrows[$k] = $r;
 			$a2r[$id][] = $k;
 		}
+		$rows = $newrows;
 
 		# Shortcut?
 		if( !count($articles) || !count($cats) )
