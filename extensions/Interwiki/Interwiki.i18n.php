@@ -46,12 +46,11 @@ $messages['en'] = array(
 	'interwiki_trans_intro' => 'If wikitext syntax <code>{<nowiki />{prefix:<i>pagename</i>}}</code> is used, then:',
 	'interwiki_trans_1_intro' => 'allow transclusion from the foreign wiki, if interwiki transclusions are generally permitted in this wiki,',
 	'interwiki_trans_0_intro' => 'do not allow it, rather look for a page in the template namespace.',
-	'interwiki_intro_footer' => 'See [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] for more information about the interwiki table.
+	'interwiki_intro_footer' => 'See [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] for more information about the interwiki table.
 There is a [[Special:Log/interwiki|log of changes]] to the interwiki table.',
 	'interwiki_1' => 'yes',
 	'interwiki_0' => 'no',
 	'interwiki_error' => 'Error: The interwiki table is empty, or something else went wrong.',
-	'interwiki-cached' => 'The interwiki data is cached. Modifying the cache is not possible.',
 
 	# modifying permitted
 	'interwiki_edit' => 'Edit',
@@ -71,25 +70,24 @@ Remember that it cannot contain spaces ( ), colons (:), ampersands (&), or equal
 	'interwiki_added' => 'Prefix "$1" was successfully added to the interwiki table.',
 	'interwiki_addfailed' => 'Prefix "$1" could not be added to the interwiki table.
 Possibly it already exists in the interwiki table.',
-	'interwiki-defaulturl' => 'http://www.example.com/$1', # do not translate or duplicate this message to other languages
+	'interwiki_defaulturl' => 'http://www.example.com/$1', # do not translate or duplicate this message to other languages
 
 	# editing a prefix
 	'interwiki_edittext' => 'Editing an interwiki prefix',
 	'interwiki_editintro' => 'You are editing an interwiki prefix.
 Remember that this can break existing links.',
 	'interwiki_edited' => 'Prefix "$1" was successfully modified in the interwiki table.',
-	'interwiki_editerror' => 'Prefix "$1" could not be modified in the interwiki table.
+	'interwiki_editerror' => 'Prefix "$1" can not be modified in the interwiki table.
 Possibly it does not exist.',
 	'interwiki-badprefix' => 'Specified interwiki prefix "$1" contains invalid characters',
-	'interwiki-submit-empty' => 'The prefix and URL cannot be empty.',
 
 	# interwiki log
 	'interwiki_logpagename' => 'Interwiki table log',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|added}} prefix "$4" ($5) (trans: $6; local: $7) to the interwiki table',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|modified}} prefix "$4" ($5) (trans: $6; local: $7) in the interwiki table',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|removed}} prefix "$4" from the interwiki table',
+	'interwiki_log_added' => 'added prefix "$2" ($3) (trans: $4) (local: $5) to the interwiki table',
+	'interwiki_log_edited' => 'modified prefix "$2" : ($3) (trans: $4) (local: $5) in the interwiki table',
+	'interwiki_log_deleted' => 'removed prefix "$2" from the interwiki table',
 	'interwiki_logpagetext' => 'This is a log of changes to the [[Special:Interwiki|interwiki table]].',
-	'logentry-interwiki-interwiki' => '', # do not translate this message
+	'interwiki_logentry' => '', # do not translate this message
 
 	# rights
 	'right-interwiki' => 'Edit interwiki data',
@@ -102,10 +100,8 @@ Possibly it does not exist.',
  * @author Meno25
  * @author Mormegil
  * @author Purodha
- * @author Raymond
  * @author SPQRobin
  * @author Siebrand
- * @author Umherirrender
  */
 $messages['qqq'] = array(
 	'interwiki' => 'This message is the title of the special page [[Special:Interwiki]].',
@@ -134,7 +130,7 @@ $1 is being rendered verbatim. It rerfers to the syntax of the values listed in 
 	'interwiki_trans_0_intro' => 'Used on [[Special:Interwiki]] so as to describe the meaning of the value 0 in the {{msg-mw|interwiki_trans}} column of the table.',
 	'interwiki_intro_footer' => 'Part of the interwiki extension.
 Shown as last pice of the introductory text on [[Special:Interwiki]].
-Parameter $1 contains the following (a link): [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org]',
+Parameter $1 contains the following (a link): [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org]',
 	'interwiki_1' => "'''Yes'''-value to be inserted into the columns headed by {{msg-mw|interwiki_local}} and {{msg-mw|interwiki_trans}}.
 
 {{Identical|Yes}}",
@@ -154,25 +150,12 @@ Parameter $1 contains the following (a link): [http://www.mediawiki.org/wiki/Man
 {{Identical|Add}}',
 	'interwiki_editerror' => 'Error message when modifying a prefix has failed.',
 	'interwiki_logpagename' => 'Part of the interwiki extension. This message is shown as page title on Special:Log/interwiki.',
-	'logentry-interwiki-iw_add' => 'Shows up in "[[Special:Log/interwiki]]" when someone has added a prefix. Leave parameters and text between brackets exactly as it is.
-* $1 is the username of the user who added it
-* $2 is the username usable for GENDER
-* $4 is the prefix
-* $5 is the URL
-* $6 and $7 is 0 or 1',
-	'logentry-interwiki-iw_edit' => 'Shows up in "[[Special:Log/interwiki]]" when someone has modified a prefix. Leave parameters and text between brackets exactly as it is.
-* $1 is the username of the user who added it
-* $2 is the username usable for GENDER
-* $4 is the prefix
-* $5 is the URL
-* $6 and $7 is 0 or 1',
-	'logentry-interwiki-iw_delete' => 'Shows up in "[[Special:Log/interwiki]]" when someone removed a prefix.
-* $1 is the username of the user who deleted it.
-* $2 is the username usable for GENDER
-* $4 is the prefix',
+	'interwiki_log_added' => 'Shows up in "Special:Log/interwiki" when someone has added a prefix. Leave parameters and text between brackets exactly as it is.',
+	'interwiki_log_edited' => 'Shows up in "Special:Log/interwiki" when someone has modified a prefix. Leave parameters and text between brackets exactly as it is.',
+	'interwiki_log_deleted' => 'Shows up in "Special:Log/interwiki" when someone removed a prefix.',
 	'interwiki_logpagetext' => 'Part of the interwiki extension. Summary shown on Special:Log/interwiki.',
-	'right-interwiki' => '{{doc-right|interwiki}}',
-	'action-interwiki' => '{{doc-action|interwiki}}',
+	'right-interwiki' => '{{doc-right}}',
+	'action-interwiki' => '{{doc-action}}',
 );
 
 /** Niuean (ko e vagahau Niuē)
@@ -206,7 +189,7 @@ Betekenis van die inligting en kolomme:",
 	'interwiki_trans_intro' => 'Indien die wikiteks-sintaks <code>{<nowiki />{voorvoegsel:<i>bladsynaam</i>}}</code> gebruik word, dan:',
 	'interwiki_trans_1_intro' => "laat transklusie van ander wiki's toe as interwiki-transklusies wel in hierdie wiki toegelaat word.",
 	'interwiki_trans_0_intro' => "nie toegelaat nie, soek eerder na 'n bladsy in die sjabloonnaamruimte.",
-	'interwiki_intro_footer' => "Sien [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] vir meer inligting oor die interwiki-tabel.
+	'interwiki_intro_footer' => "Sien [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] vir meer inligting oor die interwiki-tabel.
 Daar is 'n [[Special:Log/interwiki|logboek van veranderings]] vir die interwiki-tabel.",
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nee',
@@ -278,7 +261,7 @@ $messages['ar'] = array(
 	'interwiki_trans_intro' => 'لو أن صياغة نص الويكي <code>{<nowiki />{prefix:<i>pagename</i>}}</code> تم استخدامها، إذا:',
 	'interwiki_trans_1_intro' => 'يسمح بالتضمين من الويكي الأجنبي، لو أن تضمينات الإنترويكي مسموح بها عموما في هذا الويكي،',
 	'interwiki_trans_0_intro' => 'لا تسمح به، ولكن ابحث عن صفحة في نطاق القوالب.',
-	'interwiki_intro_footer' => 'انظر [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] للمزيد من المعلومات حول جدول الإنترويكي.
+	'interwiki_intro_footer' => 'انظر [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] للمزيد من المعلومات حول جدول الإنترويكي.
 هناك [[Special:Log/interwiki|سجل بالتغييرات]] لجدول الإنترويكي.',
 	'interwiki_1' => 'نعم',
 	'interwiki_0' => 'لا',
@@ -348,7 +331,7 @@ $messages['arz'] = array(
 	'interwiki_trans_intro' => 'لو أن صياغة نص الويكى <code>{<nowiki />{prefix:<i>pagename</i>}}</code> تم استخدامها، إذا:',
 	'interwiki_trans_1_intro' => 'يسمح بالتضمين من الويكى الأجنبى، لو أن تضمينات الإنترويكى مسموح بها عموما فى هذا الويكى،',
 	'interwiki_trans_0_intro' => 'لا تسمح به، ولكن ابحث عن صفحة فى نطاق القوالب.',
-	'interwiki_intro_footer' => 'انظر [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] للمزيد من المعلومات حول جدول الإنترويكى.
+	'interwiki_intro_footer' => 'انظر [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] للمزيد من المعلومات حول جدول الإنترويكى.
 هناك [[Special:Log/interwiki|سجل بالتغييرات]] لجدول الإنترويكى.',
 	'interwiki_1' => 'نعم',
 	'interwiki_0' => 'لا',
@@ -419,28 +402,6 @@ Rotir koeon me krulder.',
 	'interwiki_logpagetext' => "Batcoba tir 'log' dem betaks va [[Special:Interwiki|'interwiki' origak]].",
 );
 
-/** Azerbaijani (Azərbaycanca)
- * @author Wertuose
- */
-$messages['az'] = array(
-	'interwiki' => 'İnterviki məlumatlarına bax və redaktə et',
-	'interwiki-title-norights' => 'İnterviki məlumatlarına bax',
-	'interwiki-desc' => 'İnterviki cədvəlinə baxmaq və redaktə etmək üçün [[Special:Interwiki|xüsusi səhifə]] əlavə edir',
-	'interwiki_prefix' => 'Prefiks',
-	'interwiki-prefix-label' => 'Prefiks:',
-	'interwiki_local' => 'Yönləndir',
-	'interwiki-local-label' => 'Yönləndir:',
-	'interwiki_trans' => 'Göstər',
-	'interwiki-trans-label' => 'Göstər:',
-	'interwiki_1' => 'bəli',
-	'interwiki_0' => 'xeyr',
-	'interwiki_edit' => 'Redaktə et',
-	'interwiki_reasonfield' => 'Səbəb:',
-	'interwiki_delquestion' => '"$1" silinir',
-	'interwiki_addbutton' => 'Əlavə et',
-	'right-interwiki' => 'İntervikilərin redaktə edilməsi',
-);
-
 /** Belarusian (Беларуская)
  * @author Тест
  */
@@ -449,7 +410,7 @@ $messages['be'] = array(
 	'interwiki_addbutton' => 'Дадаць',
 );
 
-/** Belarusian (Taraškievica orthography) (‪Беларуская (тарашкевіца)‬)
+/** Belarusian (Taraškievica orthography) (Беларуская (тарашкевіца))
  * @author EugeneZelenko
  * @author Jim-by
  * @author Red Winged Duck
@@ -473,12 +434,11 @@ $messages['be-tarask'] = array(
 	'interwiki_trans_intro' => 'Калі выкарыстоўваецца сынтаксіс вікі-тэксту <code>{<nowiki />{prefix:<i>назва старонкі</i>}}</code>, тады:',
 	'interwiki_trans_1_intro' => 'дазваляе трансклюзію зь іншай вікі, калі трансклюзія інтэрвікі дазволена ў гэтай вікі,',
 	'interwiki_trans_0_intro' => 'не дазваляе гэта, замест шукаць старонку ў прасторы назваў шаблёнаў.',
-	'interwiki_intro_footer' => 'Для дадатковай інфармацыі пра табліцу інтэрвікі глядзіце [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => 'Для дадатковай інфармацыі пра табліцу інтэрвікі глядзіце [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Тут знаходзіцца [[Special:Log/interwiki|журнал зьменаў]] табліцы інтэрвікі.',
 	'interwiki_1' => 'так',
 	'interwiki_0' => 'не',
 	'interwiki_error' => 'Памылка: табліца інтэрвікі пустая альбо ўзьніклі іншыя праблемы.',
-	'interwiki-cached' => 'Зьвесткі пра інтэрвікі знаходзяцца ў кэшы. Зьмяніць кэш немагчыма.',
 	'interwiki_edit' => 'Рэдагаваць',
 	'interwiki_reasonfield' => 'Прычына:',
 	'interwiki_delquestion' => 'Выдаленьне «$1»',
@@ -499,7 +459,6 @@ $messages['be-tarask'] = array(
 	'interwiki_editerror' => 'Прэфікс «$1» ня можа быць зьменены ў табліцы інтэрвікі.
 Верагодна ён не існуе.',
 	'interwiki-badprefix' => 'Пазначаны прэфікс інтэрвікі «$1» утрымлівае няслушныя сымбалі',
-	'interwiki-submit-empty' => 'Прэфікс і URL-адрас ня могуць быць пустымі.',
 	'interwiki_logpagename' => 'Журнал зьменаў табліцы інтэрвікі',
 	'interwiki_log_added' => 'прэфікс «$2» ($3) (trans: $4) (local: $5) дададзены ў табліцу інтэрвікі',
 	'interwiki_log_edited' => 'зьменены прэфікс «$2» : ($3) (trans: $4) (local: $5) у табліцы інтэрвікі',
@@ -516,13 +475,11 @@ $messages['bg'] = array(
 	'interwiki' => 'Преглед и управление на междууикитата',
 	'interwiki-title-norights' => 'Преглед на данните за междууикита',
 	'interwiki-desc' => 'Добавя [[Special:Interwiki|специална страница]] за преглед и управление на таблицата с междууикита',
-	'interwiki_intro' => 'Това е общ преглед на таблицата с междууикита. Значения на данните в колоните:',
+	'interwiki_intro' => 'Вижте [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] за повече информация относно таблицата с междууикита. Съществува [[Special:Log/interwiki|дневник на промените]] в таблицата с междууикита.',
 	'interwiki_prefix' => 'Представка:',
 	'interwiki-prefix-label' => 'Представка:',
 	'interwiki_local' => 'Локално',
 	'interwiki-local-label' => 'Локално:',
-	'interwiki_intro_footer' => 'Вижте [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] за повече информация относно таблицата с междууикита.
-Съществува и [[Special:Log/interwiki|дневник на промените]] в таблицата с междууикита.',
 	'interwiki_1' => 'да',
 	'interwiki_0' => 'не',
 	'interwiki_error' => 'ГРЕШКА: Таблицата с междууикита е празна или е възникнала друга грешка.',
@@ -541,25 +498,9 @@ $messages['bg'] = array(
 	'interwiki_edited' => 'Представката „$1“ беше успешно променена в таблицата с междууикита.',
 	'interwiki_logpagename' => 'Дневник на междууикитата',
 	'interwiki_log_added' => 'добави „$2“ ($3) (trans: $4) (локално: $5) в таблицата с междууикита',
-	'interwiki_log_deleted' => 'премахна представката „$2“ от таблицата с междууикитата',
+	'interwiki_log_deleted' => 'Премахна представката „$2“ от таблицата с междууикитата',
 	'interwiki_logpagetext' => 'Тази страница съдържа дневник на промените в [[Special:Interwiki|таблицата с междууикита]].',
 	'right-interwiki' => 'Редактиране на междууикитата',
-);
-
-/** Bengali (বাংলা)
- * @author Wikitanvir
- */
-$messages['bn'] = array(
-	'interwiki_prefix' => 'উপসর্গ',
-	'interwiki-prefix-label' => 'উপসর্গ:',
-	'interwiki_1' => 'হ্যাঁ',
-	'interwiki_0' => 'না',
-	'interwiki_edit' => 'সম্পাদনা',
-	'interwiki_reasonfield' => 'কারণ:',
-	'interwiki_delquestion' => '"$1" অপসারণ',
-	'interwiki_deleting' => 'আপনি উপসর্গ "$1" অপসারণ করছেন।',
-	'interwiki_addtext' => 'একটি আন্তঃউইকি উপসর্গ যোগ',
-	'interwiki_addbutton' => 'যোগ',
 );
 
 /** Breton (Brezhoneg)
@@ -586,7 +527,7 @@ $messages['br'] = array(
 	'interwiki_trans_intro' => 'Ma vez implijet an ereadur wikitestenn <code>{<nowiki />{prefix:<i>anv ar bajenn</i>}}</code>, neuze :',
 	'interwiki_trans_1_intro' => 'Aotren an treuzkludañ adalek ar wiki estren, ma vez aotreet treuzkludañ er wiki-mañ dre-vras,',
 	'interwiki_trans_0_intro' => "na aotren an treuzkludañ, kentoc'h klask ur bajenn en esaouenn anv ar patrom.",
-	'interwiki_intro_footer' => "Gwelet [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] evit gouzout hiroc'h diwar-benn taolenn an etrewiki.
+	'interwiki_intro_footer' => "Gwelet [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] evit gouzout hiroc'h diwar-benn taolenn an etrewiki.
 Ur [[Special:Log/interwiki|marilh ar c'hemmoù]] zo e taolenn an etrewiki.",
 	'interwiki_1' => 'ya',
 	'interwiki_0' => 'ket',
@@ -645,7 +586,7 @@ $messages['bs'] = array(
 	'interwiki_trans_intro' => 'Ako se koristi wikitekst sintaksa <code>{<nowiki />{prefix:<i>pagename</i>}}</code>, onda:',
 	'interwiki_trans_1_intro' => 'dopuštena uključenja iz inostrane wiki, ako su međuwiki uključenja općenito dopuštena u ovoj wiki,',
 	'interwiki_trans_0_intro' => 'nisu dopuštena, radije treba tražiti stranice u imenskom prostoru šablona.',
-	'interwiki_intro_footer' => 'Pogledaje [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] za više informacija o interwiki tabeli.
+	'interwiki_intro_footer' => 'Pogledaje [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] za više informacija o interwiki tabeli.
 Postoji [[Special:Log/interwiki|zapisnik izmjena]] na interwiki tabeli.',
 	'interwiki_1' => 'da',
 	'interwiki_0' => 'ne',
@@ -670,7 +611,6 @@ Zapamtite da ovo može poremetiti postojeće linkove.',
 	'interwiki_editerror' => 'Prefiks "$1" ne može biti izmijenjen u interwiki tabeli.
 Moguće je da uopće ne postoji.',
 	'interwiki-badprefix' => 'Navedeni interwiki prefiks "$1" sadrži nevaljane znakove',
-	'interwiki-submit-empty' => 'Prefiks i URL ne mogu biti prazni.',
 	'interwiki_logpagename' => 'Zapisnik tabele interwikija',
 	'interwiki_log_added' => 'dodat prefiks "$2" ($3) (trans: $4) (local: $5) u interwiki tabelu',
 	'interwiki_log_edited' => 'izmijenjen prefiks "$2" : ($3) (trans: $4) (local: $5) u interwiki tabeli',
@@ -681,64 +621,17 @@ Moguće je da uopće ne postoji.',
 );
 
 /** Catalan (Català)
- * @author BroOk
  * @author Paucabot
  * @author SMP
  * @author Solde
  * @author Ssola
  */
 $messages['ca'] = array(
-	'interwiki' => 'Veure i editar dades interwiki',
-	'interwiki-title-norights' => 'Veure dades interwiki',
-	'interwiki-desc' => 'Afegeix una [[Special:Interwiki|pàgina especial]] per veure i editar la taula interwiki',
-	'interwiki_intro' => 'Aquesta és una visió general de la taula de interwiki. Significats de les dades a les columnes:',
-	'interwiki_prefix' => 'Prefix',
-	'interwiki-prefix-label' => 'Prefix:',
-	'interwiki_prefix_intro' => 'Prefix de interwiki és utilitzat en <code>[<nowiki />[prefix:<i>pagename</i>]]</code> sintaxi wikitext.',
-	'interwiki_url_intro' => "Plantilla per a URLs. El marcador $1 serà substituït per <i>pagename</i> del wikitext, quan s'utilitza la sintaxi de wikitext esmentats.",
-	'interwiki_local' => 'Endavant',
-	'interwiki-local-label' => 'Endavant:',
-	'interwiki_local_intro' => "Una petició HTTP al wiki local amb aquest prefix interwiki en l'URL és:",
-	'interwiki_local_0_intro' => 'no honrat, generalment bloquejat per "pàgina no trobada",',
-	'interwiki_local_1_intro' => "s'ha redirigit a l'URL de destinació donada a les definicions d'enllaç d'interwiki (és a dir, tractats com a referències a pàgines locals)",
-	'interwiki_trans' => 'Transclude',
-	'interwiki-trans-label' => 'Transclude:',
-	'interwiki_trans_intro' => "Si la sintaxi wikitext <code>{<nowiki />{prefix:<i>pagename</i>}}</code> s'utilitza, llavors:",
-	'interwiki_trans_1_intro' => 'permetre transclusion des del wiki estranger, si aquest wiki, generalment admet interwiki transclusions',
-	'interwiki_trans_0_intro' => "no es permet, busca una pàgina en l'espai de nom de la plantilla.",
-	'interwiki_intro_footer' => 'Veure [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] per obtenir més informació sobre la taula de interwiki.
-Hi ha un [[Special:Log/interwiki|registre de canvis]] a la taula de interwiki.',
 	'interwiki_1' => 'sí',
 	'interwiki_0' => 'no',
-	'interwiki_error' => 'Error: La taula interwiki és buida, o alguna cosa ha sortit malament.',
 	'interwiki_edit' => 'Modifica',
 	'interwiki_reasonfield' => 'Raó:',
 	'interwiki_delquestion' => "S'està eliminant «$1»",
-	'interwiki_deleting' => 'Estàs eliminant el prefix "$1".',
-	'interwiki_deleted' => 'Prefix "$1" s\'ha suprimit amb èxit  de la taula de interwiki.',
-	'interwiki_delfailed' => 'Prefix " $1 "no pot ser eliminat de la taula interwiki.',
-	'interwiki_addtext' => 'Afegir un prefix interwiki',
-	'interwiki_addintro' => "Estàs afegint un prefix nou interwiki.
-Recorda que no pot contenir espais ( ), dos punts (:), ampersands (&) o signes d'igual (=)",
-	'interwiki_addbutton' => 'Afegeix',
-	'interwiki_added' => 'Prefix " $1 "s\'ha afegit correctament a la taula interwiki.',
-	'interwiki_addfailed' => 'Prefix "$1" no es pot afegir a la taula de interwiki.
-Possiblement ja existeix a la taula de interwiki.',
-	'interwiki_edittext' => 'Edita un prefix de interwiki',
-	'interwiki_editintro' => 'Estàs editant un prefix interwiki.
-Recorda que això pot trencar vincles existents.',
-	'interwiki_edited' => 'Prefix "$1" s\'ha modificat amb èxit en la taula de interwiki.',
-	'interwiki_editerror' => 'Prefix "$1" no pot ser modificat en la taula de interwiki.
-Possiblement no existeix.',
-	'interwiki-badprefix' => 'El prefix interwiki especificat "$1" conté caràcters no vàlids',
-	'interwiki-submit-empty' => "El prefix i l'URL no pot estar buit.",
-	'interwiki_logpagename' => 'Registre de taula interwiki',
-	'interwiki_log_added' => 'El prefix "$2" ($3) (trans: $4) (local: $5) ha estat afegit a la taula de interwiki',
-	'interwiki_log_edited' => 'El prefix "$2" ($3) (trans: $4) (local: $5) ha estat modificat a la taula de interwiki',
-	'interwiki_log_deleted' => 'El prefix "$2" s\'ha tret de la taula interwiki',
-	'interwiki_logpagetext' => 'Això és un registre de canvis a la[[Special:Interwiki|interwiki taula]].',
-	'right-interwiki' => 'Editar les dades interwiki',
-	'action-interwiki' => "canviar aquesta entrada d'interwiki",
 );
 
 /** Chechen (Нохчийн)
@@ -749,17 +642,9 @@ $messages['ce'] = array(
 	'interwiki_addbutton' => 'Тlетоха',
 );
 
-/** Sorani (کوردی)
- * @author Asoxor
- */
+/** Sorani (کوردی) */
 $messages['ckb'] = array(
 	'interwiki_reasonfield' => 'هۆکار:',
-	'interwiki_deleted' => 'پێشگری «$1» سەرکەوتووانە لە خشتەی نێوانویکی لابرا.',
-);
-
-/** Corsican (Corsu) */
-$messages['co'] = array(
-	'interwiki_reasonfield' => 'Mutivu:',
 );
 
 /** Czech (Česky)
@@ -785,7 +670,7 @@ $messages['cs'] = array(
 	'interwiki_trans_intro' => 'Při použití syntaxe wikitextu <code>{<nowiki />{prefix:<i>stránka</i>}}</code>:',
 	'interwiki_trans_1_intro' => 'umožnit vložení z druhé wiki, pokud je interwiki transkluze na této wiki obecně povolena,',
 	'interwiki_trans_0_intro' => 'to nedovolit, místo toho použít stránku ve jmenném prostoru šablon.',
-	'interwiki_intro_footer' => 'Více informací o tabulce interwiki najdete na [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => 'Více informací o tabulce interwiki najdete na [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Existuje také [[Special:Log/interwiki|protokol změn]] tabulky interwiki.',
 	'interwiki_1' => 'ano',
 	'interwiki_0' => 'ne',
@@ -838,7 +723,7 @@ $messages['cy'] = array(
 	'interwiki-local-label' => 'Anfon ymlaen:',
 	'interwiki_trans' => 'Trawsgynnwys',
 	'interwiki-trans-label' => 'Trawsgynnwys:',
-	'interwiki_intro_footer' => "Cewch ragor o wybodaeth am y tabl rhyngwici ar [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => "Cewch ragor o wybodaeth am y tabl rhyngwici ar [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Cofnodir newidiadau i'r tabl rhyngwici ar y [[Special:Log/interwiki|lòg newidiadau]].",
 	'interwiki_1' => 'gellir',
 	'interwiki_0' => 'ni ellir',
@@ -851,8 +736,6 @@ Cofiwch na all gynnwys bwlch ( ), gorwahannod (:), ampersand (&), na hafalnod (=
 	'interwiki_added' => 'Llwyddwyd i ychwanegu\'r rhagddodiad "$1" at y tabl rhyngwici.',
 	'interwiki_addfailed' => 'Methwyd ychwanegu\'r rhagddodiad "$1" at y tabl rhyngwici.
 Efallai ei fod eisoes yn y tabl rhyngwici.',
-	'interwiki_logpagename' => 'Lòg y tabl rhyngwici',
-	'interwiki_logpagetext' => "Dyma lòg y newidiadau i'r [[Special:Interwiki|tabl rhyngwici]].",
 	'right-interwiki' => 'Golygu data rhyngwici',
 	'action-interwiki' => 'newid yr eitem rhyngwici hwn',
 );
@@ -860,30 +743,16 @@ Efallai ei fod eisoes yn y tabl rhyngwici.',
 /** Danish (Dansk)
  * @author Byrial
  * @author Jon Harald Søby
- * @author Peter Alberti
  * @author Purodha
  */
 $messages['da'] = array(
-	'interwiki' => 'Vis og rediger interwikidata',
-	'interwiki-title-norights' => 'Vis interwikidata',
-	'interwiki_prefix' => 'Præfiks',
-	'interwiki-prefix-label' => 'Præfiks:',
-	'interwiki_local' => 'Videresend',
-	'interwiki-local-label' => 'Videresend:',
-	'interwiki_trans' => 'Transkluder',
-	'interwiki-trans-label' => 'Transkluder:',
+	'interwiki_local' => '(local)',
+	'interwiki-local-label' => '(local):',
+	'interwiki_trans' => '(trans)',
+	'interwiki-trans-label' => '(trans):',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nej',
-	'interwiki_error' => 'Fejl: Interwikitabellen er tom eller noget andet gik galt.',
-	'interwiki_edit' => 'Redigér',
 	'interwiki_reasonfield' => 'Begrundelse:',
-	'interwiki_delquestion' => 'Sletter "$1"',
-	'interwiki_deleting' => 'Du er ved at slette præfikset "$1".',
-	'interwiki_addtext' => 'Tilføj et interwikipræfiks',
-	'interwiki_addintro' => 'Du er ved at tilføje et nyt interwikipræfiks.
-Husk at det ikke kan indeholde mellemrum ( ), kolon (:), &-tegn eller lighedstegn (=).',
-	'interwiki_addbutton' => 'Tilføj',
-	'right-interwiki' => 'Redigere interwikidata',
 	'action-interwiki' => 'ændre dette interwiki-element',
 );
 
@@ -898,65 +767,62 @@ Husk at det ikke kan indeholde mellemrum ( ), kolon (:), &-tegn eller lighedsteg
  * @author Umherirrender
  */
 $messages['de'] = array(
-	'interwiki' => 'Interwikidaten ansehen und bearbeiten',
-	'interwiki-title-norights' => 'Interwikidaten ansehen',
-	'interwiki-desc' => 'Ergänzt eine [[Special:Interwiki|Spezialseite]] zur Pflege der Interwikitabelle',
-	'interwiki_intro' => 'Dies ist ein Überblick des Inhalts der Interwikitabelle.
+	'interwiki' => 'Interwikidaten betrachten und bearbeiten',
+	'interwiki-title-norights' => 'Interwikidaten betrachten',
+	'interwiki-desc' => 'Ergänzt eine [[Special:Interwiki|Spezialseite]] zur Pflege der Interwiki-Tabelle',
+	'interwiki_intro' => 'Dies ist ein Überblick des Inhalts der Interwiki-Tabelle.
 Die Daten in den einzelnen Spalten haben die folgende Bedeutung:',
 	'interwiki_prefix' => 'Präfix',
 	'interwiki-prefix-label' => 'Präfix:',
-	'interwiki_prefix_intro' => 'Interwikipräfix zur Verwendung in der Form <code>[<nowiki />[präfix:<i>Seitenname</i>]]</code> im Wikitext.',
+	'interwiki_prefix_intro' => 'Interwiki-Präfix zur Verwendung in der Form <code>[<nowiki />[präfix:<i>Seitenname</i>]]</code> im Wikitext.',
 	'interwiki_url_intro' => 'Muster für URLs. Der Platzhalter $1 wird bei der Verwendung durch <i>Seitenname</i> aus der oben genannten Syntax im Wikitext ersetzt.',
 	'interwiki_local' => 'Als lokales Wiki definiert',
 	'interwiki-local-label' => 'Als lokales Wiki definiert:',
-	'interwiki_local_intro' => 'Eine HTTP-Anfrage an das lokale Wiki mit diesem Interwikipräfix in der URL wird:',
+	'interwiki_local_intro' => 'Eine HTTP-Anfrage an das lokale Wiki mit diesem Interwiki-Präfix in der URL wird:',
 	'interwiki_local_0_intro' => 'nicht erfüllt, sondern normalerweise mit „Seite nicht gefunden“ blockiert',
-	'interwiki_local_1_intro' => 'automatisch auf die Ziel-URL der in den Definitionen angegebenen Interwikilinks weitergeleitet, d. h. sie werden wie ein Wikilink innerhalb lokaler Wikiseiten behandelt.',
-	'interwiki_trans' => 'Einbinden',
-	'interwiki-trans-label' => 'Einbinden:',
+	'interwiki_local_1_intro' => 'automatisch auf die Ziel-URL in der Interwikilink-Definitionen weitergeleitet (d. h. behandelt wie ein Interwikilink innerhalb einer lokalen Seite)',
+	'interwiki_trans' => 'Interwiki-Einbindung',
+	'interwiki-trans-label' => 'Interwiki-Einbindung:',
 	'interwiki_trans_intro' => 'Wenn Vorlagensyntax <code>{<nowiki />{präfix:<i>Seitenname</i>}}</code> verwendet wird, dann:',
-	'interwiki_trans_1_intro' => 'erlaube Einbindungen von fremden Wikis, sofern Einbindungen in diesem Wiki allgemein zulässig sind,',
+	'interwiki_trans_1_intro' => 'erlaube Einbindung von anderen Wikis, wenn Interwiki-Einbindungen in diesem Wiki allgemein zulässig sind,',
 	'interwiki_trans_0_intro' => 'erlaube es nicht, und nimm eine Seite aus dem Vorlagennamensraum.',
-	'interwiki_intro_footer' => 'Siehe [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] für weitere Informationen zur Interwikitabelle. Das [[Special:Log/interwiki|Logbuch]] zeigt ein Protokoll aller Änderungen an der Interwikitabelle.',
+	'interwiki_intro_footer' => 'Siehe [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org], um weitere Informationen über die Interwiki-Tabelle zu erhalten. Das [[Special:Log/interwiki|Logbuch]] zeigt ein Protokoll aller Änderungen an der Interwiki-Tabelle.',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nein',
-	'interwiki_error' => 'Fehler: Die Interwikitabelle ist leer.',
-	'interwiki-cached' => 'Die Interwikidaten wurden gecached. Die Daten im Cache zu ändern ist nicht möglich.',
+	'interwiki_error' => 'Fehler: Die Interwiki-Tabelle ist leer.',
 	'interwiki_edit' => 'Bearbeiten',
 	'interwiki_reasonfield' => 'Grund:',
 	'interwiki_delquestion' => 'Löscht „$1“',
 	'interwiki_deleting' => 'Du bist dabei das Präfix „$1“ zu löschen.',
-	'interwiki_deleted' => '„$1“ wurde erfolgreich aus der Interwikitabelle entfernt.',
-	'interwiki_delfailed' => '„$1“ konnte nicht aus der Interwikitabelle gelöscht werden.',
-	'interwiki_addtext' => 'Interwikipräfix hinzufügen',
-	'interwiki_addintro' => 'Du fügst ein neues Interwikipräfix hinzu. Beachte, dass es kein Leerzeichen ( ), Kaufmännisches Und (&), Gleichheitszeichen (=) und keinen Doppelpunkt (:) enthalten darf.',
+	'interwiki_deleted' => '„$1“ wurde erfolgreich aus der Interwiki-Tabelle entfernt.',
+	'interwiki_delfailed' => '„$1“ konnte nicht aus der Interwiki-Tabelle gelöscht werden.',
+	'interwiki_addtext' => 'Interwiki-Präfix hinzufügen',
+	'interwiki_addintro' => 'Du fügst ein neues Interwiki-Präfix hinzu. Beachte, dass es kein Leerzeichen ( ), Kaufmännisches Und (&), Gleichheitszeichen (=) und keinen Doppelpunkt (:) enthalten darf.',
 	'interwiki_addbutton' => 'Hinzufügen',
-	'interwiki_added' => 'Das Präfix „$1“ wurde erfolgreich der Interwikitabelle hinzugefügt.',
-	'interwiki_addfailed' => '„$1“ konnte nicht der Interwikitabelle hinzugefügt werden.',
-	'interwiki_edittext' => 'Interwikipräfix bearbeiten',
+	'interwiki_added' => '„$1“ wurde erfolgreich der Interwiki-Tabelle hinzugefügt.',
+	'interwiki_addfailed' => '„$1“ konnte nicht der Interwiki-Tabelle hinzugefügt werden.',
+	'interwiki_edittext' => 'Interwiki-Präfix bearbeiten',
 	'interwiki_editintro' => 'Du bist dabei ein Präfix zu ändern.
 Beachte, dass dies bereits vorhandene Links ungültig machen kann.',
-	'interwiki_edited' => 'Das Präfix „$1“ wurde erfolgreich in der Interwikitabelle geändert.',
-	'interwiki_editerror' => 'Das Präfix „$1“ kann in der Interwikitabelle nicht geändert werden.
-Möglicherweise ist es nicht vorhanden.',
-	'interwiki-badprefix' => 'Das festgelegte Interwikipräfix „$1“ beinhaltet ungültige Zeichen.',
-	'interwiki-submit-empty' => 'Das Präfix und die URL dürfen nicht leer sein.',
+	'interwiki_edited' => 'Das Präfix „$1“ wurde erfolgreich in der Interwiki-Tabelle geändert.',
+	'interwiki_editerror' => 'Das Präfix „$1“ kann in der Interwiki-Tabelle nicht geändert werden.
+Möglicherweise existiert es nicht.',
+	'interwiki-badprefix' => 'Festgelegtes Interwikipräfix „$1“ beinhaltet ungültige Zeichen',
 	'interwiki_logpagename' => 'Interwikitabelle-Logbuch',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|fügte}} das Präfix „$4“ ($5) (trans: $6; local: $7) der Interwikitabelle hinzu',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|änderte}} das Präfix „$4“ ($5) (trans: $6; local: $7) in der Interwikitabelle',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|entfernte}} das Präfix „$4“ aus der Interwikitabelle',
-	'interwiki_logpagetext' => 'In diesem Logbuch werden Änderungen an der [[Special:Interwiki|Interwikitabelle]] protokolliert.',
-	'right-interwiki' => 'Interwikitabelle bearbeiten',
-	'action-interwiki' => 'Diesen Interwikieintrag ändern',
+	'interwiki_log_added' => 'hat „$2“ ($3) (trans: $4) (lokal: $5) der Interwiki-Tabelle hinzugefügt',
+	'interwiki_log_edited' => 'veränderte Präfix „$2“: ($3) (trans: $4) (lokal: $5) in der Interwiki-Tabelle',
+	'interwiki_log_deleted' => 'hat „$2“ aus der Interwiki-Tabelle entfernt',
+	'interwiki_logpagetext' => 'In diesem Logbuch werden Änderungen an der [[Special:Interwiki|Interwiki-Tabelle]] protokolliert.',
+	'right-interwiki' => 'Interwiki-Tabelle bearbeiten',
+	'action-interwiki' => 'Diesen Interwiki-Eintrag ändern',
 );
 
-/** German (formal address) (‪Deutsch (Sie-Form)‬)
- * @author Kghbln
+/** German (formal address) (Deutsch (Sie-Form))
  * @author MichaelFrey
  */
 $messages['de-formal'] = array(
 	'interwiki_deleting' => 'Sie sind dabei das Präfix „$1“ zu löschen.',
-	'interwiki_addintro' => 'Sie fügen ein neues Interwikipräfix hinzu. Beachten Sie, dass es kein Leerzeichen ( ), Kaufmännisches Und (&), Gleichheitszeichen (=) und keinen Doppelpunkt (:) enthalten darf.',
+	'interwiki_addintro' => 'Sie fügen ein neues Interwiki-Präfix hinzu. Beachten Sie, dass es kein Leerzeichen ( ), Kaufmännisches Und (&), Gleichheitszeichen (=) und keinen Doppelpunkt (:) enthalten darf.',
 	'interwiki_editintro' => 'Sie sind dabei ein Präfix zu ändern.
 Beachten Sie, dass dies bereits vorhandene Links ungültig machen kann.',
 );
@@ -984,7 +850,7 @@ $messages['dsb'] = array(
 	'interwiki_trans_intro' => 'Jolic se wikitekstowa syntaksa <code>{<nowiki />{prefix:<i>pagename</i>}}</code> wužywa, ga:',
 	'interwiki_trans_1_intro' => 'zapśěgnjenje z cuzego wikija dowóliś, jolic zapśěgnjenja interwiki su powšyknje w toś tom wikiju dopušćone,',
 	'interwiki_trans_0_intro' => 'jo njedowóliś, lubjej wuwoglěduj se za bokom w mjenjowem rumje Pśedłoga',
-	'interwiki_intro_footer' => 'Glědaj [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] za dalšne informacije wó tabeli interwikijow.
+	'interwiki_intro_footer' => 'Glědaj [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] za dalšne informacije wó tabeli interwikijow.
 Jo [[Special:Log/interwiki|protokol změnow]] tabele interwikijow.',
 	'interwiki_1' => 'jo',
 	'interwiki_0' => 'ně',
@@ -1027,14 +893,12 @@ $messages['ee'] = array(
  * @author Consta
  * @author Crazymadlover
  * @author Dead3y3
- * @author Evropi
  * @author Omnipaedista
  * @author ZaDiak
  */
 $messages['el'] = array(
 	'interwiki' => 'Εμφάνιση και επεξεργασία των δεδομένων ιντερβίκι',
 	'interwiki-title-norights' => 'Εμφάνιση δεδομένων ιντερβίκι',
-	'interwiki-desc' => 'Προσθέτει μια [[Special:Interwikilist|ειδική σελίδα]] για την προβολή και επεξεργασία των διαθέσιμων συνδέσμων interwiki',
 	'interwiki_prefix' => 'Πρόθεμα',
 	'interwiki-prefix-label' => 'Πρόθεμα:',
 	'interwiki_local' => 'Προώθηση',
@@ -1135,7 +999,7 @@ $messages['es'] = array(
 	'interwiki_trans_intro' => 'Si se utiliza la sintaxis de wikitexto <code>{<nowiki />{prefix:<i>pagename</i>}}</code>, entonces:',
 	'interwiki_trans_1_intro' => 'permitir la transclusión desde la wiki foránea, si las transclusiones de interwiki son por lo general permitidas en esta wiki,',
 	'interwiki_trans_0_intro' => 'no permitirlo. En su lugar, buscar una página en el espacio de nombre de la plantilla.',
-	'interwiki_intro_footer' => 'Para más información consulte [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] acerca de la tabla de interwiki.
+	'interwiki_intro_footer' => 'Para más información consulte [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] acerca de la tabla de interwiki.
 Hay un [[Special:Log/interwiki|registro de cambios]] a esta tabla de interwiki.',
 	'interwiki_1' => 'Sí',
 	'interwiki_0' => 'no',
@@ -1192,15 +1056,13 @@ $messages['eu'] = array(
 	'interwiki_reasonfield' => 'Arrazoia:',
 	'interwiki_delquestion' => '"$1" ezabatzen',
 	'interwiki_deleting' => '"$1" aurrizkia ezabatzen ari zara.',
-	'interwiki_addbutton' => 'Gehitu',
+	'interwiki_addbutton' => 'Erantsi',
 	'interwiki_edittext' => 'Interwiki aurrizkia editatzen',
 );
 
 /** Persian (فارسی)
  * @author Ebraminio
- * @author Hamid rostami
  * @author Huji
- * @author Mjbmr
  */
 $messages['fa'] = array(
 	'interwiki' => 'نمایش و ویرایش اطلاعات میان‌ویکی',
@@ -1213,8 +1075,6 @@ $messages['fa'] = array(
 	'interwiki-local-label' => 'مشخص کردن به عنوان یک ویکی محلی:',
 	'interwiki_trans' => 'اجازهٔ گنجاندن میان‌ویکی را بده',
 	'interwiki-trans-label' => 'اجازهٔ گنجاندن میان‌ویکی را بده:',
-	'interwiki_intro_footer' => 'برای اطلاعات بیشتر در مورد Interwiki به [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] مراحعه نمائید.
-همچنین می‌توانید [[Special:Log/interwiki|تاریخچهٔ تغییرات]] چدول Interwiki را مشاهده کنید.',
 	'interwiki_1' => 'بله',
 	'interwiki_0' => 'خیر',
 	'interwiki_error' => 'خطا: جدول میان‌ویکی خالی است، یا چیز دیگری مشکل دارد.',
@@ -1238,14 +1098,10 @@ $messages['fa'] = array(
 	'interwiki_editerror' => 'پیشوند «$1» را نمی‌توان در جدول میان‌ویکی تغییر داد.
 احتمالاً این پیشوند وجود ندارد.',
 	'interwiki-badprefix' => 'پیشوند میان‌ویکی «$1» حاوی نویسه‌های غیر مجاز است',
-	'interwiki-submit-empty' => 'پیشوند و آدرس URL نمی‌توانند خالی باشند.',
-	'interwiki_logpagename' => 'سیاههٔ جدول میان‌ویکی',
 	'interwiki_log_added' => 'پیشوند «$2» ($3) (میانی: $4) (محلی: $5) را به جدول میان‌ویکی افزود',
 	'interwiki_log_edited' => 'پیشوند «$2» : ($3) (میانی: $4) (محلی: $5) را در جدول میان‌ویکی تغییر داد',
 	'interwiki_log_deleted' => 'پیشوند «$2» را از جدول میان‌ویکی حذف کرد',
-	'interwiki_logpagetext' => 'این یک تاریخچه از تغییرات [[Special:Interwiki|interwiki table]] است.',
 	'right-interwiki' => 'ویرایش اطلاعات میان‌ویکی',
-	'action-interwiki' => 'تغییر این مدخل میان‌ویکی',
 );
 
 /** Finnish (Suomi)
@@ -1295,7 +1151,6 @@ $messages['fi'] = array(
 
 /** French (Français)
  * @author Crochet.david
- * @author Gomoko
  * @author Grondin
  * @author IAlex
  * @author Jean-Frédéric
@@ -1325,12 +1180,11 @@ $messages['fr'] = array(
 	'interwiki_trans_intro' => 'Si la syntaxe <code>{<nowiki />{préfixe:<i>nom de la page</i>}}</code> est utilisée, alors :',
 	'interwiki_trans_1_intro' => "l'inclusion à partir du wiki sera autorisée, si les inclusion interwiki sont autorisées dans ce wiki,",
 	'interwiki_trans_0_intro' => "l'inclusion sera rejetée, et la page correspondante sera recherchée dans l'espace de noms « Modèle ».",
-	'interwiki_intro_footer' => "Voyez [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] pour obtenir plus d'informations en ce qui concerne la table interwiki.
+	'interwiki_intro_footer' => "Voyez [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] pour obtenir plus d'informations en ce qui concerne la table interwiki.
 Il existe un [[Special:Log/interwiki|journal des modifications]] de la table interwiki.",
 	'interwiki_1' => 'oui',
 	'interwiki_0' => 'non',
 	'interwiki_error' => "Erreur : la table des interwikis est vide ou un processus s'est mal déroulé.",
-	'interwiki-cached' => 'Les données interwiki sont mis en cache. Il n’est pas possible de modifier le cache.',
 	'interwiki_edit' => 'Modifier',
 	'interwiki_reasonfield' => 'Motif :',
 	'interwiki_delquestion' => 'Suppression de « $1 »',
@@ -1347,11 +1201,10 @@ Il existe un [[Special:Log/interwiki|journal des modifications]] de la table int
 	'interwiki_edited' => 'Le préfixe « $1 » a été modifié avec succès dans la table interwiki.',
 	'interwiki_editerror' => "Le préfixe « $1 » ne peut pas être modifié. Il se peut qu'il n'existe pas.",
 	'interwiki-badprefix' => 'Le préfixe interwiki spécifié « $1 » contient des caractères invalides',
-	'interwiki-submit-empty' => "Le préfixe et l'URL ne peuvent être vides.",
 	'interwiki_logpagename' => 'Journal de la table interwiki',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|a ajouté}} le préfixe "$4" ($5) (trans: $6; local: $7) à la table interwiki',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|a modifié}} le préfixe "$4" ($5) (trans: $6; local: $7) dans la table interwiki',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|a supprimé}} le préfixe "$4" de la table interwiki',
+	'interwiki_log_added' => 'a ajouté « $2 » ($3) (trans: $4) (local: $5) dans la table interwiki',
+	'interwiki_log_edited' => 'a modifié le préfixe « $2 » : ($3) (trans: $4) (local: $5) dans la table interwiki',
+	'interwiki_log_deleted' => 'a supprimé le préfixe « $2 » de la table interwiki',
 	'interwiki_logpagetext' => 'Ceci est le journal des changements dans la [[Special:Interwiki|table interwiki]].',
 	'right-interwiki' => 'Modifier les données interwiki',
 	'action-interwiki' => 'modifier cette entrée interwiki',
@@ -1362,26 +1215,11 @@ Il existe un [[Special:Log/interwiki|journal des modifications]] de la table int
  * @author ChrisPtDe
  */
 $messages['frp'] = array(
-	'interwiki' => 'Vêre et changiér les balyês entèrvouiqui',
-	'interwiki-title-norights' => 'Vêre les balyês entèrvouiqui',
-	'interwiki_prefix' => 'Prèfixo',
-	'interwiki-prefix-label' => 'Prèfixo :',
-	'interwiki_local' => 'Fâre siuvre',
-	'interwiki-local-label' => 'Fâre siuvre :',
-	'interwiki_trans' => 'Encllure',
-	'interwiki-trans-label' => 'Encllure :',
 	'interwiki_1' => 'ouè',
 	'interwiki_0' => 'nan',
 	'interwiki_edit' => 'Changiér',
 	'interwiki_reasonfield' => 'Rêson :',
-	'interwiki_delquestion' => 'Suprèssion de « $1 »',
-	'interwiki_deleting' => 'Vos éte aprés suprimar lo prèfixo « $1 ».',
-	'interwiki_addtext' => 'Apondre un prèfixo entèrvouiqui',
 	'interwiki_addbutton' => 'Apondre',
-	'interwiki_edittext' => 'Changiér un prèfixo entèrvouiqui',
-	'interwiki_logpagename' => 'Jornal de la trâbla entèrvouiqui',
-	'right-interwiki' => 'Changiér les balyês entèrvouiqui',
-	'action-interwiki' => 'changiér ceta entrâ entèrvouiqui',
 );
 
 /** Western Frisian (Frysk)
@@ -1399,16 +1237,16 @@ $messages['fy'] = array(
 $messages['gl'] = array(
 	'interwiki' => 'Ver e manipular datos interwiki',
 	'interwiki-title-norights' => 'Ver os datos do interwiki',
-	'interwiki-desc' => 'Engade unha [[Special:Interwiki|páxina especial]] para ver e editar a táboa de interwikis',
-	'interwiki_intro' => 'Esta é unha vista xeral da táboa de interwikis. Os significados dos datos aparecen nas columnas:',
+	'interwiki-desc' => 'Engade unha [[Special:Interwiki|páxina especial]] para ver e editar a táboa interwiki',
+	'interwiki_intro' => 'Esta é unha vista xeral da táboa interwiki. Os significados dos datos aparecen nas columnas:',
 	'interwiki_prefix' => 'Prefixo',
 	'interwiki-prefix-label' => 'Prefixo:',
 	'interwiki_prefix_intro' => 'Prefixo interwiki a ser usado coa sintaxe do texto wiki <code>[<nowiki />[prefixo:<i>nome da páxina</i>]]</code>.',
 	'interwiki_url' => 'URL',
 	'interwiki-url-label' => 'URL:',
-	'interwiki_url_intro' => 'Modelo para os enderezos URL. O espazo reservado $1 será substituído polo <i>nome da páxina</i> do texto wiki, cando se usa a sintaxe do devantito texto wiki.',
-	'interwiki_local' => 'Avanzar',
-	'interwiki-local-label' => 'Avanzar:',
+	'interwiki_url_intro' => 'Modelo para os enderezos URL. O espazo reservado $1 será substituído polo <i>nome da páxina</i> do texto wiki, cando a sintaxe do devantito texto wiki é usada.',
+	'interwiki_local' => 'Cara adiante',
+	'interwiki-local-label' => 'Cara adiante:',
 	'interwiki_local_intro' => 'Unha solicitude HTTP ao wiki local con este prefixo interwiki no URL é:',
 	'interwiki_local_0_intro' => 'ignoradas, normalmente bloqueadas, dando unha mensaxe de "a páxina non foi atopada",',
 	'interwiki_local_1_intro' => 'redirixidas cara ao enderezo URL de destino indicado na ligazón interwiki das definicións (ou sexa, serán tratadas como referencias nas páxinas)',
@@ -1416,35 +1254,33 @@ $messages['gl'] = array(
 	'interwiki-trans-label' => 'Transcluír:',
 	'interwiki_trans_intro' => 'Se a sintaxe do texto wiki <code>{<nowiki />{prefixo:<i>nome da páxina</i>}}</code> é usado, entón:',
 	'interwiki_trans_1_intro' => 'permitir as transclusións a partir do wiki estranxeiro, se estas transclusións interwiki están xeralmente permitidas neste wiki,',
-	'interwiki_trans_0_intro' => 'non permitilas, e procurar a páxina no espazo de nomes "Modelo".',
-	'interwiki_intro_footer' => 'Consulte [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] para obter máis información acerca da táboa de interwikis.
-Ademais, existe un [[Special:Log/interwiki|rexistro dos cambios]] realizados á táboa de interwikis.',
+	'interwiki_trans_0_intro' => 'non permitilas, e procurar a páxina no espazo de nomes Modelo.',
+	'interwiki_intro_footer' => 'Consulte [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] para obter máis información acerca da táboa interwiki.
+Ademais, existe un [[Special:Log/interwiki|rexistro dos cambios]] realizados á táboa interwiki.',
 	'interwiki_1' => 'si',
 	'interwiki_0' => 'non',
-	'interwiki_error' => 'Erro: A táboa de interwikis está baleira, ou algo máis saíu mal.',
-	'interwiki-cached' => 'Os datos sobre os interwikis almacénanse na caché. Non é posible modificar a caché.',
+	'interwiki_error' => 'ERRO: A táboa interwiki está baleira, ou algo máis saíu mal.',
 	'interwiki_edit' => 'Editar',
 	'interwiki_reasonfield' => 'Motivo:',
 	'interwiki_delquestion' => 'Eliminando "$1"',
 	'interwiki_deleting' => 'Vai eliminar o prefixo "$1".',
-	'interwiki_deleted' => 'Eliminouse sen problemas o prefixo "$1" da táboa de interwikis.',
-	'interwiki_delfailed' => 'Non se puido eliminar o prefixo "$1" da táboa de interwikis.',
+	'interwiki_deleted' => 'Eliminouse sen problemas o prefixo "$1" da táboa interwiki.',
+	'interwiki_delfailed' => 'Non se puido eliminar o prefixo "$1" da táboa interwiki.',
 	'interwiki_addtext' => 'Engadir un prefixo interwiki',
-	'interwiki_addintro' => 'Está engadindo un novo prefixo interwiki. Recorde que non pode conter espazos ( ), dous puntos (:), símbolos de unión (&) ou signos de igual (=).',
+	'interwiki_addintro' => 'Vostede está engadindo un novo prefixo interwiki. Recorde que non pode conter espazos ( ), dous puntos (:), o símbolo de unión (&), ou signos de igual (=).',
 	'interwiki_addbutton' => 'Engadir',
-	'interwiki_added' => 'Engadiuse sen problemas o prefixo "$1" á táboa de interwikis.',
-	'interwiki_addfailed' => 'Non se puido engadir o prefixo "$1" á táboa de interwikis. Posibelmente xa existe na táboa de interwikis.',
+	'interwiki_added' => 'Engadiuse sen problemas o prefixo "$1" á táboa interwiki.',
+	'interwiki_addfailed' => 'Non se puido engadir o prefixo "$1" á táboa interwiki. Posibelmente xa existe na táboa interwiki.',
 	'interwiki_edittext' => 'Editando un prefixo interwiki',
 	'interwiki_editintro' => 'Está editando un prefixo interwiki. Lembre que isto pode quebrar ligazóns existentes.',
-	'interwiki_edited' => 'O prefixo "$1" foi modificado con éxito na táboa de interwikis.',
-	'interwiki_editerror' => 'O prefixo "$1" non se puido modificar na táboa de interwikis. Posiblemente non existe.',
+	'interwiki_edited' => 'O prefixo "$1" foi modificado con éxito na táboa do interwiki.',
+	'interwiki_editerror' => 'O prefixo "$1" non pode ser modificado na táboa do interwiki. Posiblemente non existe.',
 	'interwiki-badprefix' => 'O prefixo interwiki especificado "$1" contén caracteres inválidos',
-	'interwiki-submit-empty' => 'O prefixo e o enderezo URL non poden quedar baleiros.',
-	'interwiki_logpagename' => 'Rexistro da táboa de interwikis',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|engadiu}} o prefixo "$4" ($5) (trans: $6; local: $7) á táboa de interwikis',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|modificou}} o prefixo "$4" ($5) (trans: $6; local: $7) na táboa de interwikis',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|eliminou}} o prefixo "$4" da táboa de interwikis',
-	'interwiki_logpagetext' => 'Este é un rexistro dos cambios feitos na [[Special:Interwiki|táboa de interwikis]].',
+	'interwiki_logpagename' => 'Rexistro de táboas interwiki',
+	'interwiki_log_added' => 'engadiu o prefixo "$2" ($3) (trans: $4) (local: $5) á táboa interwiki',
+	'interwiki_log_edited' => 'modificou o prefixo "$2": ($3) (trans: $4) (local: $5) na táboa do interwiki',
+	'interwiki_log_deleted' => 'eliminou o prefixo "$2" da táboa interwiki',
+	'interwiki_logpagetext' => 'Este é un rexistro dos cambios feitos á [[Special:Interwiki|táboa interwiki]].',
 	'right-interwiki' => 'Editar os datos do interwiki',
 	'action-interwiki' => 'cambiar esta entrada de interwiki',
 );
@@ -1497,7 +1333,6 @@ $messages['grc'] = array(
 );
 
 /** Swiss German (Alemannisch)
- * @author Als-Chlämens
  * @author Als-Holder
  */
 $messages['gsw'] = array(
@@ -1519,11 +1354,10 @@ $messages['gsw'] = array(
 	'interwiki_trans_intro' => 'Wänn Vorlagesyntax <code>{<nowiki />{präfix:<i>Sytename</i>}}</code> bruucht wird, derno:',
 	'interwiki_trans_1_intro' => 'erlaub Yybindige vu andere Wiki, wänn Interwiki-Yybindigen in däm Wiki allgmein zuelässig sin,',
 	'interwiki_trans_0_intro' => 'erlaub s nit, un nimm e Syte us em Vorlagenamensruum.',
-	'interwiki_intro_footer' => 'Lueg [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] fir meh Informationen iber d Interwiki-Tabälle. S [[Special:Log/interwiki|Logbuech]] zeigt e Protokoll vu allene Änderigen an dr Interwiki-Tabälle.',
+	'interwiki_intro_footer' => 'Lueg [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] fir meh Informationen iber d Interwiki-Tabälle. S [[Special:Log/interwiki|Logbuech]] zeigt e Protokoll vu allene Änderigen an dr Interwiki-Tabälle.',
 	'interwiki_1' => 'jo',
 	'interwiki_0' => 'nei',
 	'interwiki_error' => 'Fähler: D Interwiki-Tabälle isch läär.',
-	'interwiki-cached' => 'D Interwikidatenwurden im Cache uffgno worde. D Date im Cache z ändre isch nit mögli.',
 	'interwiki_edit' => 'Bearbeite',
 	'interwiki_reasonfield' => 'Grund:',
 	'interwiki_delquestion' => 'Lescht „$1“',
@@ -1542,11 +1376,10 @@ Gib Acht, ass des Gleicher cha uugiltig mache, wu s scho git.',
 	'interwiki_editerror' => 'S Präfix „$1“ cha in dr Interwiki-Tabälle nit gänderet wäre.
 Villicht git s es nit.',
 	'interwiki-badprefix' => 'Im feschtgleite Interwikipräfix „$1“ het s nit giltigi Zeiche din',
-	'interwiki-submit-empty' => 'S Präfix un d URL dürfe nit läär sy.',
 	'interwiki_logpagename' => 'Interwikitabälle-Logbuech',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|het}} s Präfix „$4“ ($5) (trans: $6; local: $7) uff de Interwikitabelle dezuegfiegt',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|het}} s Präfix „$4“ ($5) (trans: $6; local: $7) uff de Interwikitabelle gänderet',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|het}} s Präfix „$4“ uss dr Interwikitabelle ussegno',
+	'interwiki_log_added' => 'het „$2“ ($3) (trans: $4) (lokal: $5) dr Interwiki-Tabälle zuegfiegt',
+	'interwiki_log_edited' => 'gändereti Präfix „$2“: ($3) (trans: $4) (lokal: $5) in dr Interwiki-Tabälle',
+	'interwiki_log_deleted' => 'het „$2“ us dr Interwiki-Tabälle usegnuh',
 	'interwiki_logpagetext' => 'In däm Logbuech wäre Änderige an dr [[Special:Interwiki|Interwiki-Tabälle]] protokolliert.',
 	'right-interwiki' => 'Interwiki-Tabälle bearbeite',
 	'action-interwiki' => 'Där Interwiki-Yytrag ändere',
@@ -1607,12 +1440,11 @@ $messages['he'] = array(
 	'interwiki_trans_intro' => 'אם נעשה שימוש בתחביר <code>{<nowiki />{prefix:<i>שם_הדף</i>}}</code>,אז:',
 	'interwiki_trans_1_intro' => 'תינתן האפשרות להכללת מקטעים חיצוניים מאתר ויקי זר, אם הכללות מקטעי ויקי חיצוניים מורשים באופן כללי באתר ויקי זה,',
 	'interwiki_trans_0_intro' => 'אין לאפשר זאת, במקום זאת יש לחפש דף במרחב השם תבנית.',
-	'interwiki_intro_footer' => 'עיינו ב־[http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] למידע נוסף אודות טבלת הבינוויקי.
+	'interwiki_intro_footer' => 'עיינו ב־[http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] למידע נוסף אודות טבלת הבינוויקי.
 ישנו [[Special:Log/interwiki|יומן שינויים]] לטבלת הבינוויקי.',
 	'interwiki_1' => 'כן',
 	'interwiki_0' => 'לא',
 	'interwiki_error' => 'שגיאה: טבלת הבינוויקי ריקה, או שיש שגיאה אחרת.',
-	'interwiki-cached' => 'מידע בינוויקי מוטמן. שינוי המטמון אינו אפשרי.',
 	'interwiki_edit' => 'עריכה',
 	'interwiki_reasonfield' => 'סיבה:',
 	'interwiki_delquestion' => 'מחיקת "$1"',
@@ -1633,7 +1465,6 @@ $messages['he'] = array(
 	'interwiki_editerror' => 'לא ניתן לשנות את הקידומת "$1" בטבלת הבינוויקי.
 ייתכן שהיא אינה קיימת.',
 	'interwiki-badprefix' => 'קידומת הבינוויקי שצוינה, "$1", כוללת תווים בלתי תקינים',
-	'interwiki-submit-empty' => 'הקידומת והכתובת אינן יכולות להיות ריקות.',
 	'interwiki_logpagename' => 'יומן טבלת הבינוויקי',
 	'interwiki_log_added' => 'הקידומת "$2" ($3) (הכללה: $4) (מקומית: $5) נוספה לטבלת הבינוויקי',
 	'interwiki_log_edited' => 'הקידומת "$2" : ($3) (הכללה: $4) (מקומית: $5) שונתה בטבלת הבינוויקי',
@@ -1752,7 +1583,7 @@ $messages['hsb'] = array(
 	'interwiki_trans_intro' => 'Jeli je so wikijowa syntaksa <code>{<nowiki />{prefix:<i>pagename</i>}}</code> wužiwa, to:',
 	'interwiki_trans_1_intro' => 'Zapřijeće z cuzeho wikija dowolić, jeli zapřijeća interwiki so powšitkownje w tutym wikiju dopušćeja,',
 	'interwiki_trans_0_intro' => 'je njedowolić, pohladaj skerje za stronu w mjenowym rumje Předłoha',
-	'interwiki_intro_footer' => 'Hlej [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] za dalše informacije wo tabeli interwikijow.
+	'interwiki_intro_footer' => 'Hlej [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] za dalše informacije wo tabeli interwikijow.
 Je [[Special:Log/interwiki|protokol změnow]] tabele interwikijow.',
 	'interwiki_1' => 'haj',
 	'interwiki_0' => 'ně',
@@ -1785,46 +1616,44 @@ Snano njeeksistuje.',
 );
 
 /** Haitian (Kreyòl ayisyen)
- * @author Boukman
  * @author Jvm
  * @author Masterches
  */
 $messages['ht'] = array(
-	'interwiki' => 'Wè epi modifye enfòmasyon entèwiki yo',
-	'interwiki-title-norights' => 'Wè enfòmasyon entèwiki',
-	'interwiki-desc' => 'Ajoute yon [[Special:Interwiki|paj espesyal]] pou wè ak modifye tablo entèwiki a',
-	'interwiki_intro' => 'Sa se yon kout je sou tablo entèwiki a.
-Men sa dòne nan kolòn yo vle di:',
-	'interwiki_prefix' => 'Prefiks',
-	'interwiki-prefix-label' => 'Prefiks:',
-	'interwiki_error' => 'ERÈ:  Tablo entèwiki a vid, oubyen yon lòt bagay pa t mache.',
+	'interwiki' => 'Wè epi edite enfòmasyon entèwiki yo',
+	'interwiki-title-norights' => 'Wè enfòmasyon interwiki',
+	'interwiki-desc' => 'Ajoute yon [[Special:Interwiki|paj espesial]] pou wè ak edite tab interwiki-a',
+	'interwiki_intro' => 'Wè [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] pou plis enfòmasyon sou tab interwiki-a.
+Geyen yon [[Special:Log/interwiki|jounal pou chanjman yo]] nan tab interwiki-a.',
+	'interwiki_prefix' => 'Prefix',
+	'interwiki-prefix-label' => 'Prefix:',
+	'interwiki_error' => 'ERÈ:  Tab interwiki-a vid, oubien yon lòt bagay mal mache.',
 	'interwiki_reasonfield' => 'Rezon:',
-	'interwiki_delquestion' => 'Efase "$1"',
-	'interwiki_deleting' => 'W ap efase prefiks "$1".',
-	'interwiki_deleted' => 'Prefiks "$1" te reyisi retire nan tablo entèwiki a.',
-	'interwiki_delfailed' => 'Prefiks "$1" pa t kapab retire nan tablo entèwiki a.',
-	'interwiki_addtext' => 'Ajoute yon prefiks entèwiki',
-	'interwiki_addintro' => 'W ap ajoute yon nouvo prefiks entèwiki.
+	'interwiki_delquestion' => 'Delete "$1"',
+	'interwiki_deleting' => 'W’ap delete prefix "$1".',
+	'interwiki_deleted' => 'Prefix "$1" te retire nan tab interwiki-a avèk siksès.',
+	'interwiki_delfailed' => 'Prefix "$1" pa t\' kapab sòti nan tab interwiki-a.',
+	'interwiki_addtext' => 'Mete yon prefix interwiki',
+	'interwiki_addintro' => 'W’ap mete yon nouvo prefix interwiki.
 Sonje ke li pa ka genyen ladan li espace ( ), de pwen (:), anmpèsand (&), ou sign egalite (=).',
 	'interwiki_addbutton' => 'Ajoute',
-	'interwiki_added' => 'Prefiks "$1" te reyisi ajoute nan tablo entèwiki a.',
-	'interwiki_addfailed' => 'Prefiks "$1" pa t kapab ajoute nan tablo entèwiki a.
-Gendwa se paske li deja ekziste nan tablo entèwiki a.',
-	'interwiki_edittext' => 'Modifye yon prefiks entèwiki',
-	'interwiki_editintro' => 'W ap modifye yon prefiks entèwiki.
-Sonje ke sa gendwa kraze lyen ki deja ekziste yo.',
-	'interwiki_edited' => 'Prefiks "$1" te reyisi modifye nan tablo entèwiki a.',
-	'interwiki_editerror' => 'Prefiks "$1" pa ka modifye nan tablo entèwiki a.
-Petèt li pa ekziste.',
-	'interwiki_logpagename' => 'Jounal tablo entèwiki a',
-	'interwiki_log_added' => 'te ajoute prefiks "$2" ($3) (trans: $4) (local: $5) nan tablo entèwiki a',
-	'interwiki_log_edited' => 'te modifye prefiks "$2" : ($3) (trans: $4) (local: $5) nan tablo entèwiki a',
-	'interwiki_log_deleted' => 'te retire prefiks "$2" nan tablo entèwiki a',
-	'interwiki_logpagetext' => 'Sa se yon jounal pou chanjman yo nan [[Special:Interwiki|tablo entèwiki a]].',
+	'interwiki_added' => 'Prefix "$1" te ajoute sou tab interwiki-a avèk siksès.',
+	'interwiki_addfailed' => 'Prefix "$1" pa t’ kapab ajoute sou tab interwiki-a.
+Posibleman paske li deja ekziste nan tab interwiki-a.',
+	'interwiki_edittext' => 'Edite yon prefix interwiki',
+	'interwiki_editintro' => 'W’ap edite yon prefix interwiki.
+Sonje ke sa ka kase chèn ki deja ekziste.',
+	'interwiki_edited' => 'Prefix "$1" te modifye nan tab interwiki-a avèk siksès.',
+	'interwiki_editerror' => 'Prefix "$1" pa ka modifye nan tab interwiki-a.
+Posibleman li pa ekziste.',
+	'interwiki_logpagename' => 'Jounal tab interwiki-a',
+	'interwiki_log_added' => 'te ajoute prefix "$2" ($3) (trans: $4) (local: $5) nan tab interwiki-a',
+	'interwiki_log_edited' => 'prefix ki te modifye "$2" : ($3) (trans: $4) (local: $5) nan tab interwiki-a',
+	'interwiki_log_deleted' => 'prefix ki te retire "$2" nan tab interwiki-a',
+	'interwiki_logpagetext' => 'Sa se yon jounal chanjman nan [[Special:Interwiki|tab interwiki-a]].',
 );
 
 /** Hungarian (Magyar)
- * @author BáthoryPéter
  * @author Dani
  * @author Glanthor Reviol
  * @author Gondnok
@@ -1848,11 +1677,11 @@ $messages['hu'] = array(
 	'interwiki_trans_intro' => 'Ha az <code>{<nowiki />{előtag:<i>lapnév</i>}}</code> wikiszöveg szintaxist használjuk, akkor:',
 	'interwiki_trans_1_intro' => 'engedd a beillesztést az idegen wikiről, ha a wikiközi beillesztések általában megengedettek ezen a wikin,',
 	'interwiki_trans_0_intro' => 'ne engedd, inkább keress egy lapot a sablon névtérben.',
-	'interwiki_intro_footer' => 'Az interwiki-táblázattal kapcsolatban további információkat a [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org]-on olvashatsz. Az interwiki-táblázat módosításai [[Special:Log/interwiki|naplózva]] vannak.',
+	'interwiki_intro_footer' => 'Az interwiki táblázattal kapcsolatos további információkért lásd a [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org]-on.
+A táblázat változásait [[Special:Log/interwiki|a naplóban megnézheted]].',
 	'interwiki_1' => 'igen',
 	'interwiki_0' => 'nem',
 	'interwiki_error' => 'Hiba: A wikiközi hivatkozások táblája üres, vagy valami más romlott el.',
-	'interwiki-cached' => 'Az interwiki adatok gyorsítótárazva vannak. A gyorsítótár módosítása nem lehetséges.',
 	'interwiki_edit' => 'Szerkesztés',
 	'interwiki_reasonfield' => 'Indoklás:',
 	'interwiki_delquestion' => '„$1” törlése',
@@ -1871,11 +1700,10 @@ Ne feledd, hogy ez működésképtelenné teheti a már létező hivatkozásokat
 	'interwiki_editerror' => 'A(z) „$1” előtagot nem lehet módosítani a wikiközi hivatkozások táblájában.
 Valószínűleg nem létezik ilyen előtag.',
 	'interwiki-badprefix' => 'A wikiközi hivatkozásnak megadott „$1” előtag érvénytelen karaktereket tartalmaz',
-	'interwiki-submit-empty' => 'Az előtag és az URL nem lehet üres.',
 	'interwiki_logpagename' => 'Interwiki tábla-napló',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|hozzáadta}} a(z) "$4" előtagot ($5) (trans: $6; helyi: $7) az interwiki táblához',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|módosította}} a(z) "$4" előtagot ($5) (trans: $6; helyi: $7) az interwiki táblában',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|törölte}} a(z) "$4" előtagot az interwiki táblából',
+	'interwiki_log_added' => 'hozzáadta a(z) „$2” előtagot ($3) (trans: $4) (local: $5) a wikiközi hivatkozások táblájához',
+	'interwiki_log_edited' => 'módosította a(z) „$2” előtagot : ($3) (trans: $4) (local: $5) a wikiközi hivatkozások táblájában',
+	'interwiki_log_deleted' => 'eltávolította a(z) „$2” előtagot a wikiközi hivatkozások táblájából',
 	'interwiki_logpagetext' => 'Ez az [[Special:Interwiki|interwiki táblában]] történt változások naplója.',
 	'right-interwiki' => 'wikiközi hivatkozások módosítása',
 	'action-interwiki' => 'eme wikiközi bejegyzés megváltoztatása',
@@ -1904,12 +1732,11 @@ $messages['ia'] = array(
 	'interwiki_trans_intro' => 'Si le syntaxe de wikitexto <code>{<nowiki />{prefixo:<i>nomine de pagina</i>}}</code> es usate, alora:',
 	'interwiki_trans_1_intro' => 'permitte le transclusion ab le wiki externe, si le transclusiones interwiki es generalmente permittite in iste wiki,',
 	'interwiki_trans_0_intro' => 'non permitte lo, ma cerca un pagina in le spatio de nomines "Patrono".',
-	'interwiki_intro_footer' => 'Vide [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] pro plus informationes super le tabella interwiki.
+	'interwiki_intro_footer' => 'Vide [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] pro plus informationes super le tabella interwiki.
 Existe un [[Special:Log/interwiki|registro de modificationes]] al tabella interwiki.',
 	'interwiki_1' => 'si',
 	'interwiki_0' => 'no',
 	'interwiki_error' => 'Error: Le tabella interwiki es vacue, o un altere cosa faceva falta.',
-	'interwiki-cached' => 'Le datos interwiki es in cache. Non es possibile modificar le cache.',
 	'interwiki_edit' => 'Modificar',
 	'interwiki_reasonfield' => 'Motivo:',
 	'interwiki_delquestion' => 'Deletion de "$1"',
@@ -1930,11 +1757,10 @@ Memora que isto pote rumper ligamines existente.',
 	'interwiki_editerror' => 'Le prefixo "$1" non pote esser modificate in le tabella interwiki.
 Es possibile que illo non existe.',
 	'interwiki-badprefix' => 'Le prefixo interwiki specificate "$1" contine characteres invalide',
-	'interwiki-submit-empty' => 'Le prefixo e le URL non pote esser vacue.',
 	'interwiki_logpagename' => 'Registro del tabella interwiki',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|addeva}} le prefixo "$4" ($5) (trans: $6; local: $7) al tabella interwiki',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|modificava}} le prefixo "$4" ($5) (trans: $6; local: $7) in le tabella interwiki',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|removeva}} le prefixo "$4" del tabella interwiki',
+	'interwiki_log_added' => 'addeva le prefixo "$2" ($3) (trans: $4) (local: $5) al tabella interwiki',
+	'interwiki_log_edited' => 'modificava le prefixo "$2" : ($3) (trans: $4) (local: $5) in le tabella interwiki',
+	'interwiki_log_deleted' => 'removeva le prefixo "$2" del tabella interwiki',
 	'interwiki_logpagetext' => 'Isto es un registro de modificationes in le [[Special:Interwiki|tabella interwiki]].',
 	'right-interwiki' => 'Modificar datos interwiki',
 	'action-interwiki' => 'alterar iste entrata interwiki',
@@ -1965,7 +1791,7 @@ $messages['id'] = array(
 	'interwiki_trans_intro' => 'Jika sintak tekswiki <code>{<nowiki />{prefix:<i>pagename</i>}}</code> digunakan, maka:',
 	'interwiki_trans_1_intro' => 'memperbolehkan transklusi dari wiki lain, jika transklusi interwiki diizinkan di wiki ini,',
 	'interwiki_trans_0_intro' => 'tidak mengizinkan hal itu, lebih baik mencari halaman pada ruang nama templat.',
-	'interwiki_intro_footer' => 'Lihat [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] untuk informasi lebih lanjut tentang tabel interwiki.
+	'interwiki_intro_footer' => 'Lihat [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] untuk informasi lebih lanjut tentang tabel interwiki.
 Ada [[Special:Log/interwiki|log perubahan]] ke tabel interwiki.',
 	'interwiki_1' => 'ya',
 	'interwiki_0' => 'tidak',
@@ -2002,13 +1828,8 @@ Kemungkinan karena prefiks ini tidak ada.',
  * @author Ukabia
  */
 $messages['ig'] = array(
-	'interwiki_edit' => 'Mèzi',
+	'interwiki_edit' => 'Rüwa',
 	'interwiki_reasonfield' => 'Mgbághapụtà:',
-);
-
-/** Eastern Canadian (Latin script) (inuktitut) */
-$messages['ike-latn'] = array(
-	'interwiki_edit' => 'Suqusiqpaa',
 );
 
 /** Ido (Ido)
@@ -2022,11 +1843,7 @@ $messages['io'] = array(
  * @author S.Örvarr.S
  */
 $messages['is'] = array(
-	'interwiki_1' => 'já',
-	'interwiki_0' => 'nei',
-	'interwiki_edit' => 'Breyta',
 	'interwiki_reasonfield' => 'Ástæða:',
-	'interwiki_addbutton' => 'Bæta við',
 );
 
 /** Italian (Italiano)
@@ -2056,7 +1873,7 @@ $messages['it'] = array(
 	'interwiki_trans_intro' => 'Se la sintassi <code>{<nowiki />{prefisso:<i>nomepagina</i>}}</code> è usata, allora:',
 	'interwiki_trans_1_intro' => "permette l'inclusione da siti esterni, se le inclusioni interwiki sono generalmente permesse in questo sito,",
 	'interwiki_trans_0_intro' => 'non la permette, invece cerca una pagina nel namespace template.',
-	'interwiki_intro_footer' => 'Consultare [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] per maggiori informazioni sulle tabelle degli interwiki. Esiste un [[Special:Log/interwiki|registro delle modifiche]] alla tabella degli interwiki.',
+	'interwiki_intro_footer' => 'Consultare [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] per maggiori informazioni sulle tabelle degli interwiki. Esiste un [[Special:Log/interwiki|registro delle modifiche]] alla tabella degli interwiki.',
 	'interwiki_1' => 'sì',
 	'interwiki_0' => 'no',
 	'interwiki_error' => "ERRORE: La tabella degli interwiki è vuota, o c'è qualche altro errore.",
@@ -2094,7 +1911,6 @@ Il prefisso potrebbe essere inesistente.',
  * @author Fievarsty
  * @author Fryed-peach
  * @author Mzm5zbC3
- * @author Schu
  * @author 青子守歌
  */
 $messages['ja'] = array(
@@ -2116,11 +1932,10 @@ $messages['ja'] = array(
 	'interwiki_trans_intro' => '<code>{<nowiki />{接頭辞:<i>ページ名</i>}}</code> というウィキテキストの構文が使われた場合、',
 	'interwiki_trans_1_intro' => 'ウィキ間トランスクルージョンがこのウィキで（一般的に）許可されているならば、この外部ウィキからのトランスクルージョンを許可します。',
 	'interwiki_trans_0_intro' => '許可せず、テンプレート名前空間でページを探します。',
-	'interwiki_intro_footer' => 'インターウィキテーブルについて、より詳しくは [http://www.mediawiki.org/wiki/Manual:Interwiki_table/ja MediaWiki.org] を参照してください。また、インターウィキテーブルの[[Special:Log/interwiki|変更記録]]があります。',
+	'interwiki_intro_footer' => 'インターウィキテーブルについて、より詳しくは [http://www.mediawiki.org/wiki/Interwiki_table/ja MediaWiki.org] を参照してください。また、インターウィキテーブルの[[Special:Log/interwiki|変更記録]]があります。',
 	'interwiki_1' => 'はい',
 	'interwiki_0' => 'いいえ',
 	'interwiki_error' => 'エラー: インターウィキテーブルが空か、他の理由でうまくいきませんでした。',
-	'interwiki-cached' => 'インターウィキデータはキャッシュされています。キャッシュを変更することは不可能です。',
 	'interwiki_edit' => '編集',
 	'interwiki_reasonfield' => '理由：',
 	'interwiki_delquestion' => '"$1"を削除',
@@ -2137,7 +1952,6 @@ $messages['ja'] = array(
 	'interwiki_edited' => '接頭辞 "$1" はインターウィキテーブル内で正常に変更されました。',
 	'interwiki_editerror' => 'インターウィキテーブル内で接頭辞 "$1" を変更できませんでした。存在していない可能性があります。',
 	'interwiki-badprefix' => '指定されたインターウィキ接頭辞 "$1" は無効な文字を含んでいます',
-	'interwiki-submit-empty' => '接頭辞とURLを空にすることはできません。',
 	'interwiki_logpagename' => 'インターウィキ編集記録',
 	'interwiki_log_added' => 'インターウィキテーブルに接頭辞 "$2" ($3) (trans: $4) (local: $5) を追加しました',
 	'interwiki_log_edited' => 'インターウィキテーブル内の接頭辞 "$2" を ($3) (trans: $4) (local: $5) に変更しました',
@@ -2204,7 +2018,7 @@ $messages['km'] = array(
 	'interwiki-desc' => 'បន្ថែម[[Special:Interwiki|ទំព័រពិសេស]]ដើម្បីមើលនិងកែប្រែតារាងអន្តរវិគី',
 	'interwiki_intro' => 'នេះ​គឺជា​ទិដ្ឋភាពទូទៅ​នៃ​តារាង​អន្តរវិគី​។ ដែល​ជា​អត្ថន័យ​នៃ​ទិន្នន័យ​នៅ​ក្នុង​ជួរឈរ:',
 	'interwiki_prefix' => 'បុព្វបទ',
-	'interwiki-prefix-label' => 'បុព្វបទ៖',
+	'interwiki-prefix-label' => 'បុព្វបទ:',
 	'interwiki_1' => 'បាទ/ចាស៎',
 	'interwiki_0' => 'ទេ',
 	'interwiki_error' => 'កំហុស:តារាងអន្តរវិគីគឺទទេ ឬក៏មានអ្វីផ្សេងទៀតមានបញ្ហា។',
@@ -2267,7 +2081,7 @@ $messages['ko'] = array(
 	'interwiki-local-label' => '전달',
 	'interwiki_trans' => '인터위키 포함',
 	'interwiki-trans-label' => '인터위키 포함:',
-	'interwiki_intro_footer' => '인터위키 테이블에 대한 자세한 내용을 [http://www.mediawiki.org/wiki/Manual:Interwiki_table/ko MediaWiki.org]에서 보세요
+	'interwiki_intro_footer' => '인터위키 테이블에 대한 자세한 내용을 [http://www.mediawiki.org/wiki/Interwiki_table/ko MediaWiki.org]에서 보세요
 인터위키 테이블의 [[Special:Log/interwiki|바뀜 기록]]이 존재합니다.',
 	'interwiki_1' => '예',
 	'interwiki_0' => '아니오',
@@ -2322,12 +2136,11 @@ De Daate en de einzel Shpallde bedügge:',
 	'interwiki_trans_intro' => 'Wann em Wikitex en ener Sigg de Syntax <code>{<nowiki />{<i>{{lc:{{int:Interwiki_prefix}}}}</i>:<i>Siggename</i>}}</code> jebruch weed, dann:',
 	'interwiki_trans_1_intro' => 'lohß et zoh — wann dat en hee dämm Wiki övverhoup zohjelohße es — dat en Sigg uß däm andere Wiki hee enjeföösh weed,',
 	'interwiki_trans_0_intro' => 'dunn dat nit, un sök hee em Wiki noh ene {{ns:template}} met dämm komplätte Name.',
-	'interwiki_intro_footer' => 'Op dä Sigg [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] fingk mer mieh do dröver, wat et met dä Tabäll met de Engerwiki Date op sich hät.
+	'interwiki_intro_footer' => 'Op dä Sigg [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] fingk mer mieh do dröver, wat et met dä Tabäll met de Engerwiki Date op sich hät.
 Et [[Special:Log/interwiki|{{int:interwiki_logpagename}}]] zeichnet all de Änderunge aan de Engerwiki Date op.',
 	'interwiki_1' => 'Jo',
 	'interwiki_0' => 'Nä',
 	'interwiki_error' => "'''Fähler:''' de Tabäll met de Engerwiki Date is leddisch.",
-	'interwiki-cached' => 'Heh di Daate kumme us enem Zweschespeischer. Dodren jät ze ändere es nit müjjelesch.',
 	'interwiki_edit' => 'Beärbeide',
 	'interwiki_reasonfield' => 'Aanlass:',
 	'interwiki_delquestion' => '„$1“ weed fottjeschmeße',
@@ -2348,7 +2161,6 @@ Denk draan, domet könnts De Links em Wiki kapott maache, die velleich do drop o
 	'interwiki_editerror' => 'Dä Försaz „$1“ konnt en de Engerwiki Date nit beärrbeidt wäde.
 Maach sin, dat et inn nit jitt.',
 	'interwiki-badprefix' => 'Dä aanjejovve Engerwiki-Försatz „$1“ änthäld onjöltijje Zeiche',
-	'interwiki-submit-empty' => 'Der Engerwiki-Försatz un der URL künne nit läddesch jelohße wääde.',
 	'interwiki_logpagename' => 'Logboch fun de Engerwiki Tabäll',
 	'interwiki_log_added' => 'hät dä Försaz „$2“ ($3) (Trans: $4) (Lokal: $5) en de Engerwiki Date eren jedonn',
 	'interwiki_log_edited' => 'hät dä Försaz „$2“ ($3) (Trans: $4) (Lokal: $5) en de Engerwiki Date ömjemodelt',
@@ -2356,14 +2168,6 @@ Maach sin, dat et inn nit jitt.',
 	'interwiki_logpagetext' => 'Hee is dat Logboch met de Änderonge aan de [[Special:Interwiki|Engerwiki Date]].',
 	'right-interwiki' => 'Engerwiki Date ändere',
 	'action-interwiki' => 'Donn hee dä Engerwiki Enndraach ändere',
-);
-
-/** Kurdish (Latin) (Kurdî (Latin))
- * @author George Animal
- */
-$messages['ku-latn'] = array(
-	'interwiki_1' => 'erê',
-	'interwiki_reasonfield' => 'Sedem:',
 );
 
 /** Latin (Latina)
@@ -2428,11 +2232,10 @@ D'Bedeitung vun den Informatiounen an de Kolonnen:",
 	'interwiki_trans_intro' => "Wann d'Wiki-Syntax <code>{<nowiki />{prefix:<i>Numm vun der Säit</i>}}</code> benotzt gëtt, dann:",
 	'interwiki_trans_1_intro' => "erlaabt Abannunge vun anere Wikien, wann d'Interwiki-Abannungen an dëser Wiki allgemeng zoulässeg sinn,",
 	'interwiki_trans_0_intro' => 'erlaabt et net, an huelt éischter eng Säit aus dem Nummraum:Schabloun.',
-	'interwiki_intro_footer' => "Kuckt [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org], fir weider Informatiounen iwwer d'Interwiki-Tabell ze kréien. D'[[Special:Log/interwiki|Logbuch]] weist e Protokoll vun allen Ännerungen an der Interwiki-Tabell.",
+	'interwiki_intro_footer' => "Kuckt [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org], fir weider Informatiounen iwwer d'Interwiki-Tabell ze kréien. D'[[Special:Log/interwiki|Logbuch]] weist e Protokoll vun allen Ännerungen an der Interwiki-Tabell.",
 	'interwiki_1' => 'jo',
 	'interwiki_0' => 'neen',
 	'interwiki_error' => "Feeler: D'Interwiki-Tabell ass eidel.",
-	'interwiki-cached' => "D'Interwiki-Informatioune kommen aus dem Tëschespäicher. Et ass net méiglech den Tëschespäicher z'änneren.",
 	'interwiki_edit' => 'Änneren',
 	'interwiki_reasonfield' => 'Grond:',
 	'interwiki_delquestion' => 'Läscht "$1"',
@@ -2453,11 +2256,10 @@ Denkt drun, datt dat kann dozou féieren datt Linken déi et scho gëtt net méi
 	'interwiki_editerror' => 'De Prefix "$1" kann an der Interwiki-Tabell net geännert ginn.
 Méiglecherweis gëtt et en net.',
 	'interwiki-badprefix' => 'Den Interwiki-Prefix "$1" huet net valabel Buchstawen',
-	'interwiki-submit-empty' => "De Prefix an d'URL kënnen net eidel sinn.",
 	'interwiki_logpagename' => 'Lëscht mat der Interwikitabell',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|huet}} de Prefix "$4" ($5) (trans: $6; local: $7) an d\'Interwikitabell derbäigesat',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|huet}} de Prefix „$4“ ($5) (trans: $6; local: $7) an der Interwikitabell geännert',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|huet}} de Präfix "$4" aus der Interwikitabell erausgeholl',
+	'interwiki_log_added' => 'huet de Prefix "$2" ($3) (trans: $4) (lokal: $5) an d\'Interwiki-Tabell derbäigesat',
+	'interwiki_log_edited' => 'huet de Prefix "$2": ($3) (trans: $4) (lokal: $5) an der Interwiki-Tabell geännert',
+	'interwiki_log_deleted' => 'huet de Prefix "$2" aus der Interwiki-Tabell erausgeholl',
 	'interwiki_logpagetext' => 'Dëst ass eng Lëscht mat den Ännerunge vun der [[Special:Interwiki|Interwikitabell]].',
 	'right-interwiki' => 'Interwiki-Daten änneren',
 	'action-interwiki' => "dës Interwiki-Informatioun z'änneren",
@@ -2551,31 +2353,28 @@ $messages['mhr'] = array(
  */
 $messages['mk'] = array(
 	'interwiki' => 'Преглед и уредување на интервики податоци',
-	'interwiki-title-norights' => 'Податоци за меѓувики',
+	'interwiki-title-norights' => 'Види интервики податоци',
 	'interwiki-desc' => 'Додава [[Special:Interwiki|специјална страница]] за преглед и уредување на интервики-табелата',
 	'interwiki_intro' => 'Ова е преглед на интервики-табелата. Значења на податоците во колоните:',
 	'interwiki_prefix' => 'Префикс',
 	'interwiki-prefix-label' => 'Префикс:',
 	'interwiki_prefix_intro' => 'Интервики префикс за користење во викитекст-синтаксата <code>[<nowiki />[префикс:<i>име на страница</i>]]</code>.',
-	'interwiki_url' => 'URL',
-	'interwiki-url-label' => 'URL:',
 	'interwiki_url_intro' => 'Шаблон за URL-адреси. Наместо $1 ќе биде поставено <i>име на страницата</i> на викитекстот, кога се користи гореспоменатата виктекст-синтакса.',
 	'interwiki_local' => 'Препратка',
 	'interwiki-local-label' => 'Препратка:',
 	'interwiki_local_intro' => 'HTTP-барање до локалното вики со овој интервики префикс во URL-адресата:',
 	'interwiki_local_0_intro' => 'не се почитува, туку обично се блокира со пораката „страницата не е пронајдена“,',
 	'interwiki_local_1_intro' => 'се пренасочува кон целната URL-адреса посочена во дефинициите на интервики-врските (т.е. се третира како референтните врски на локалните страници)',
-	'interwiki_trans' => 'Превметнување',
-	'interwiki-trans-label' => 'Превметнување:',
+	'interwiki_trans' => 'Вклучување',
+	'interwiki-trans-label' => 'Вклучување:',
 	'interwiki_trans_intro' => 'Ако се користи викитекст-синтаксата <code>{<nowiki />{префикс:<i>име на страница</i>}}</code>, тогаш:',
-	'interwiki_trans_1_intro' => 'дозволи превметнување од други викија, ако тоа е начелно дозволено на ова вики,',
-	'interwiki_trans_0_intro' => 'не дозволувај, туку барај страница во шаблонскиот именски простор.',
-	'interwiki_intro_footer' => 'Погледајте ја страницата [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] за повеќе информации за интервики-табелата.
+	'interwiki_trans_1_intro' => 'дозволи вклучување од други викија, ако тоа е начелно дозволено на ова вики,',
+	'interwiki_trans_0_intro' => 'не дозволувак, туку барај страница во шаблонскиот именски простор.',
+	'interwiki_intro_footer' => 'Погледајте ја страницата [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] за повеќе информации за интервики-табелата.
 Постои [[Special:Log/interwiki|дневник на промени]] во интервики-табелата.',
 	'interwiki_1' => 'да',
 	'interwiki_0' => 'не',
 	'interwiki_error' => 'Грешка: Интервики-табелата е празна, или нешто друго не е во ред.',
-	'interwiki-cached' => 'Податоците за меѓувики се кеширани. Кешот не може да се измени.',
 	'interwiki_edit' => 'Уреди',
 	'interwiki_reasonfield' => 'Причина:',
 	'interwiki_delquestion' => 'Бришење на „$1“',
@@ -2595,11 +2394,10 @@ $messages['mk'] = array(
 	'interwiki_editerror' => 'Префиксот „$1“ не може да се менува во интервики-табелата.
 Можеби тој не постои.',
 	'interwiki-badprefix' => 'Назначениот интервики префикс „$1“ содржи неважечки знаци',
-	'interwiki-submit-empty' => 'Префиксот и URL-адресата не можат да бидат празни.',
 	'interwiki_logpagename' => 'Дневник на измени во интервики-табелата',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|го додаде}} префиксот „$4“ ($5) (trans: $6; local: $7) во табелата со меѓувики',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|го измени}} префиксот „$4“ ($5) (trans: $6; local: $7) во табелата со меѓувики',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|го отстрани}} префиксот „$4“ од табелата со меѓувики',
+	'interwiki_log_added' => 'го додаде префиксот „$2“ ($3) (меѓ: $4) (лок: $5) во интервики-табелата',
+	'interwiki_log_edited' => 'го измени префиксот „$2“ : ($3) (меѓ: $4) (лок: $5) во интервики-табелата',
+	'interwiki_log_deleted' => 'го додаде префиксот „$2“ во интервики-табелата',
 	'interwiki_logpagetext' => 'Ова е дневник на промени во [[Special:Interwiki|интервики-табелата]].',
 	'right-interwiki' => 'Уреди интервики',
 	'action-interwiki' => 'менување на овој интервики-запис',
@@ -2663,7 +2461,6 @@ $messages['mr'] = array(
 );
 
 /** Malay (Bahasa Melayu)
- * @author Anakmalaysia
  * @author Aurora
  * @author Aviator
  * @author Diagramma Della Verita
@@ -2671,28 +2468,16 @@ $messages['mr'] = array(
 $messages['ms'] = array(
 	'interwiki' => 'Lihat dan ubah data interwiki',
 	'interwiki-title-norights' => 'Lihat data interwiki',
-	'interwiki-desc' => 'Menambahkan [[Special:Interwiki|laman khas]] untuk melihat dan menyunting jadual interwiki',
-	'interwiki_intro' => 'Ini merupakan gambaran keseluruhan jadual interwiki. Erti-erti data dalam lajur:',
+	'interwiki_intro' => 'Lihat [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] untuk maklumat lanjut mengenai jadual interwiki. Terdapat sebuah [[Special:Log/interwiki|log untuk perubahan-perubahan]] pada jadual interwiki.',
 	'interwiki_prefix' => 'Awalan',
 	'interwiki-prefix-label' => 'Awalan:',
-	'interwiki_prefix_intro' => 'Awalan interwiki yang hendak digunakan dalam sintaks teks wiki <code>[<nowiki />[awalan:<i>nama laman</i>]]</code>.',
-	'interwiki_url_intro' => 'Templat untuk URL. Pemegang tempat $1 akan diganti dengan <i>nama laman</i> wikiteks, apabila sintaks teks wiki yang dinyatakan di atas digunakan.',
-	'interwiki_local' => 'Kirim semula',
-	'interwiki-local-label' => 'Kirim semula:',
-	'interwiki_local_intro' => 'Permohonan HTTP kepada wiki tempatan dengan awalan interwiki ini dalam URL ialah:',
-	'interwiki_local_0_intro' => 'tidak dilunaskan, biasanya disekat oleh "laman tidak dijumpai",',
-	'interwiki_local_1_intro' => 'dilencongkan ke URL sasaran yang diberikan dalam takrifan pautan interwiki (iaitu dilayan seperti rujukan dalam laman tempatan)',
-	'interwiki_trans' => 'Transklusi',
-	'interwiki-trans-label' => 'Transklusi:',
-	'interwiki_trans_intro' => 'Jika sintaks teks wiki <code>{<nowiki />{awalan:<i>nama laman</i>}}</code> digunakan, maka:',
-	'interwiki_trans_1_intro' => 'benarkan transklusi dari wiki luar, jika transklusi interwiki pada umumnya dibenarkan dalam wiki ini,',
-	'interwiki_trans_0_intro' => 'jangan benarkan, sebaliknya cari suatu laman dalam ruang nama templat.',
-	'interwiki_intro_footer' => 'Lihat [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] untuk maklumat lanjut mengenai jadual interwiki.
-Terdapat [[Special:Log/interwiki|log perubahan]] pada jadual interwiki.',
+	'interwiki_local' => 'Kiriman',
+	'interwiki-local-label' => 'Kiriman:',
+	'interwiki_trans' => 'Benarkan penyertaan interwiki',
+	'interwiki-trans-label' => 'Benarkan penyertaan interwiki:',
 	'interwiki_1' => 'ya',
 	'interwiki_0' => 'tidak',
 	'interwiki_error' => 'Ralat: Jadual interwiki kosong atau sesuatu yang tidak kena berlaku.',
-	'interwiki-cached' => 'Data interwiki sudah dicachekan. Cache tidak boleh diubah suai.',
 	'interwiki_edit' => 'Sunting',
 	'interwiki_reasonfield' => 'Sebab:',
 	'interwiki_delquestion' => 'Menghapuskan "$1"',
@@ -2701,21 +2486,18 @@ Terdapat [[Special:Log/interwiki|log perubahan]] pada jadual interwiki.',
 	'interwiki_delfailed' => 'Awalan "$1" tidak dapat dibuang daripada jadual interwiki.',
 	'interwiki_addtext' => 'Tambah awalan interwiki',
 	'interwiki_addintro' => 'Anda sedang menambah awalan interwiki baru. Sila ingat bahawa awalan interwiki tidak boleh mangandungi jarak ( ), noktah bertindih (:), ampersan (&), atau tanda sama (=).',
-	'interwiki_addbutton' => 'Tambahkan',
+	'interwiki_addbutton' => 'Tambah',
 	'interwiki_added' => 'Awalan "$1" telah ditambah ke dalam jadual interwiki.',
 	'interwiki_addfailed' => 'Awalan "$1" tidak dapat ditambah ke dalam jadual interwiki. Barangkali awalan ini telah pun wujud dalam jadual interwiki.',
 	'interwiki_edittext' => 'Mengubah awalan interwiki',
 	'interwiki_editintro' => 'Anda sedang mengubah suatu awalan interwiki. Sila ingat bahawa perbuatan ini boleh merosakkan pautan-pautan yang sudah ada.',
 	'interwiki_edited' => 'Awalan "$1" telah diubah dalam jadual interwiki.',
 	'interwiki_editerror' => 'Awalan "$1" tidak boleh diubah dalam jadual interwiki. Barangkali awalan ini tidak wujud.',
-	'interwiki-badprefix' => 'Awalan interwiki yang dinyatakan, "$1" mengandungi aksara yang tidak sah',
-	'interwiki-submit-empty' => 'Awalan dan URL tidak boleh dibiarkan kosong.',
 	'interwiki_logpagename' => 'Log maklumat Interwiki',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|membubuh}} awalan "$4" ($5) (trans: $6; setempat: $7) pada jadual interwiki',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|mengubah suai}} awalan "$4" ($5) (trans: $6; setempat: $7) pada jadual interwiki',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|membuang}} awalan "$4" daripada jadual interwiki',
-	'interwiki_logpagetext' => 'Ini ialah log perubahan kepada [[Special:Interwiki|jadual interwiki]].',
-	'right-interwiki' => 'Menyunting data interwiki',
+	'interwiki_log_added' => 'menampah awalan "$2" ($3) (penyertaan: $4) (tempatan: $5) ke dalam jadual interwiki',
+	'interwiki_log_edited' => 'mengubah awalan "$2" : ($3) (penyertaan: $4) (tempatan: $5) in the interwiki table',
+	'interwiki_log_deleted' => 'membuang awalan "$2" daripada jadual interwiki',
+	'right-interwiki' => 'Ubah data interwiki',
 	'action-interwiki' => 'tukar data interwiki berikut',
 );
 
@@ -2737,13 +2519,6 @@ $messages['myv'] = array(
 	'interwiki_edit' => 'Витнеме-петнеме',
 	'interwiki_reasonfield' => 'Тувталось:',
 	'interwiki_addbutton' => 'Поладомс',
-);
-
-/** Mazanderani (مازِرونی)
- * @author محک
- */
-$messages['mzn'] = array(
-	'interwiki_edit' => 'دچی‌ین',
 );
 
 /** Nahuatl (Nāhuatl)
@@ -2783,7 +2558,7 @@ $messages['nds'] = array(
  * @author Servien
  */
 $messages['nds-nl'] = array(
-	'interwiki_addbutton' => 'Derbie doon',
+	'interwiki_addbutton' => 'Toevoegen',
 );
 
 /** Dutch (Nederlands)
@@ -2811,12 +2586,11 @@ Betekenis van de gegevens en kolommen:',
 	'interwiki_trans_intro' => 'Indien de wikitextsyntaxis <code>{<nowiki />{voorvoegsel:<i>paginanaam</i>}}</code> gebruikt wordt, dan:',
 	'interwiki_trans_1_intro' => 'transclusie toestaan van de andere wiki indien interwikitransclusies toegestaan zijn in deze wiki.',
 	'interwiki_trans_0_intro' => 'niet toestaan, zoeken naar een pagina in de sjabloonnaamruimte.',
-	'interwiki_intro_footer' => 'Zie [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] voor meer informatie over de interwikitabel.
+	'interwiki_intro_footer' => 'Zie [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] voor meer informatie over de interwikitabel.
 Er is een [[Special:Log/interwiki|veranderingslogboek]] voor de interwikitabel.',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nee',
 	'interwiki_error' => 'Fout: De interwikitabel is leeg, of iets anders ging verkeerd.',
-	'interwiki-cached' => 'De interwiki-gegevens staan in de cache. De cache wijzigen is niet mogelijk.',
 	'interwiki_edit' => 'Bewerken',
 	'interwiki_reasonfield' => 'Reden:',
 	'interwiki_delquestion' => '"$1" aan het verwijderen',
@@ -2833,11 +2607,10 @@ Er is een [[Special:Log/interwiki|veranderingslogboek]] voor de interwikitabel.'
 	'interwiki_edited' => 'Voorvoegsel "$1" is gewijzigd in de interwikitabel.',
 	'interwiki_editerror' => 'Voorvoegsel "$1" kan niet worden gewijzigd in de interwikitabel. Mogelijk bestaat hij niet.',
 	'interwiki-badprefix' => 'Het interwikivoorvoegsel "$1" bevat ongeldige karakters',
-	'interwiki-submit-empty' => 'Het voorvoegsel en de URL mogen niet leeg zijn.',
 	'interwiki_logpagename' => 'Logboek interwikitabel',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|voegde}} voorvoegsel "$4" toe ($5) (trans: $6; local: $7) aan de interwikitabel',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|wijzigde}} voorvoegsel "$4" ($5) (trans: $6; local: $7) in de interwikitabel',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|verwijderde}} voorvoegsel "$4" van de interwikitabel',
+	'interwiki_log_added' => 'Voegde "$2" ($3) (trans: $4) (local: $5) toe aan de interwikitabel',
+	'interwiki_log_edited' => 'wijzigde voorvoegsel "$2": ($3) (trans: $4) (local: $5) in de interwikitabel',
+	'interwiki_log_deleted' => 'Verwijderde voorvoegsel "$2" van de interwikitabel',
 	'interwiki_logpagetext' => 'Dit is een logboek van wijzigingen aan de [[Special:Interwiki|interwikitabel]].',
 	'right-interwiki' => 'Interwikigegevens bewerken',
 	'action-interwiki' => 'deze interwikiverwijzing te wijzigen',
@@ -2868,7 +2641,7 @@ $messages['nn'] = array(
 	'interwiki_trans_intro' => 'Om wikitekstsyntakset <code>{<nowiki />{prefix:<i>pagename</i>}}</code> er nytta, so:',
 	'interwiki_trans_1_intro' => 'tillat inkludering frå ein framand wiki, om interwikiinkluderingar generelt sett er tillatne på denne wikien,',
 	'interwiki_trans_0_intro' => 'ikkje tillat det, sjå heller etter ei sida i malnamnerommet.',
-	'interwiki_intro_footer' => 'Sjå [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] for meir informasjon om interwikitabellen.
+	'interwiki_intro_footer' => 'Sjå [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] for meir informasjon om interwikitabellen.
 Det finst ein [[Special:Log/interwiki|logg over endringar]] i interwikitabellen.',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nei',
@@ -2926,7 +2699,7 @@ $messages['no'] = array(
 	'interwiki_trans_intro' => 'Dersom wikisyntaksen <code>{<nowiki />{prefiks:<i>sidenavn</i>}}</code> blir brukt, så:',
 	'interwiki_trans_1_intro' => 'tillat transklusjon fra en fremmed wiki, om interwikitranskluderinger generellt er tillatt på denne wikien,',
 	'interwiki_trans_0_intro' => 'ikke tillat det, se heller etter en side i malnavnerommet.',
-	'interwiki_intro_footer' => 'Se [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] for mer informasjon om interwikitabellen.
+	'interwiki_intro_footer' => 'Se [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] for mer informasjon om interwikitabellen.
 Det finnes en [[Special:Log/interwiki|endringslogg]] for interwikitabellen.',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nei',
@@ -2994,7 +2767,7 @@ $messages['oc'] = array(
 	'interwiki_trans_intro' => 'Se la sintaxi <code>{<nowiki />{prefix :<i>nom de la pagina</i>}}</code> es utilizada, alara :',
 	'interwiki_trans_1_intro' => "l'inclusion a partir del wiki serà autorizada, se las inclusions interwiki son autorizadas dins aqueste wiki,",
 	'interwiki_trans_0_intro' => "l'inclusion serà regetada, e la pagina correspondenta serà recercada dins l'espaci de noms « Modèl ».",
-	'interwiki_intro_footer' => "Vejatz [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] per obténer mai d'entresenhas a prepaus de la taula interwiki.
+	'interwiki_intro_footer' => "Vejatz [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] per obténer mai d'entresenhas a prepaus de la taula interwiki.
 Existís un [[Special:Log/interwiki|jornal de las modificacions]] de la taula interwiki.",
 	'interwiki_1' => 'òc',
 	'interwiki_0' => 'non',
@@ -3025,7 +2798,7 @@ Benlèu i existís ja.',
 	'action-interwiki' => 'modificar aquesta entrada interwiki',
 );
 
-/** Ossetic (Ирон)
+/** Ossetic (Иронау)
  * @author Amikeco
  */
 $messages['os'] = array(
@@ -3044,7 +2817,7 @@ $messages['pdc'] = array(
 	'interwiki_addbutton' => 'Dezu duh',
 );
 
-/** Pälzisch (Pälzisch)
+/** Pfälzisch (Pfälzisch)
  * @author Xqt
  */
 $messages['pfl'] = array(
@@ -3076,12 +2849,11 @@ $messages['pl'] = array(
 	'interwiki_trans_intro' => 'Jeśli składnia wiki <code>{<nowiki />{przedrostek:<i>nazwastrony</i>}}</code> została użyta, to:',
 	'interwiki_trans_1_intro' => 'pozwala na transkluzję z innych wiki, jeśli transkluzja interwiki jest w ogóle dozwolona na tej wiki,',
 	'interwiki_trans_0_intro' => 'nie pozwalaj na nią, raczej szukaj strony w przestrzeni szablonów.',
-	'interwiki_intro_footer' => 'Na [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] odnajdziesz więcej informacji na temat tabeli interwiki.
+	'interwiki_intro_footer' => 'Na [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] odnajdziesz więcej informacji na temat tabeli interwiki.
 Tutaj znajduje się [[Special:Log/interwiki|rejestr zmian]] tabeli interwiki.',
 	'interwiki_1' => 'tak',
 	'interwiki_0' => 'nie',
 	'interwiki_error' => 'BŁĄD: Tabela interwiki jest pusta lub wystąpił jakiś inny problem.',
-	'interwiki-cached' => 'Dane interwiki są buforowane. Zmiany zawartości pamięci podręcznej nie są możliwe.',
 	'interwiki_edit' => 'Edytuj',
 	'interwiki_reasonfield' => 'Powód',
 	'interwiki_delquestion' => 'Czy usunąć „$1”',
@@ -3100,7 +2872,6 @@ Prawdopodobnie ten prefiks już jest w tableli.',
 	'interwiki_edited' => 'Prefiks „$1” został z powodzeniem poprawiony w tableli interwiki.',
 	'interwiki_editerror' => 'Prefiks „$1” nie może zostać poprawiony w tabeli interwiki. Prawdopodobnie nie ma go w tabeli.',
 	'interwiki-badprefix' => 'Podany przedrostek interwiki „$1” zawiera nieprawidłowe znaki',
-	'interwiki-submit-empty' => 'Przedrostek i adres URL nie mogą być puste.',
 	'interwiki_logpagename' => 'Rejestr tablicy interwiki',
 	'interwiki_log_added' => 'dodał przedrostek „$2” ($3) (trans: $4) (local: $5) do tabeli interwiki',
 	'interwiki_log_edited' => 'zmienił przedrostek „$2” : ($3) (trans: $4) (local: $5) w tabeli interwiki',
@@ -3133,12 +2904,11 @@ $messages['pms'] = array(
 	'interwiki_trans_intro' => "Se la sintassi wikitest <code>{<nowiki />{prefix:<i>nòmpàgina</i>}}</code> a l'é dovrà, antlora:",
 	'interwiki_trans_1_intro' => "a përmet anseriment da la wiki strangera, se j'anseriment antërwiki a son generalment përmëttù an sta wiki-sì,",
 	'interwiki_trans_0_intro' => 'a përmet pa lòn, nopà a sërca na pàgina ant lë spassi nominal dlë stamp.',
-	'interwiki_intro_footer' => 'Varda [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] për savèjne ëd pi an sla tàula antërwiki.
+	'interwiki_intro_footer' => 'Varda [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] për savèjne ëd pi an sla tàula antërwiki.
 A-i é un [[Special:Log/interwiki|registr dij cambi]] për la tàula antërwiki.',
 	'interwiki_1' => 'é!',
 	'interwiki_0' => 'nò',
 	'interwiki_error' => "Eror: La tàula antërwiki a l'é veuida, o cheicòs d'àutr a l'é andàit mal.",
-	'interwiki-cached' => "Ij dat interwiki a son memorisà an local. A l'é nen possìbil modifiché la memòria local.",
 	'interwiki_edit' => 'Modìfica',
 	'interwiki_reasonfield' => 'Rason:',
 	'interwiki_delquestion' => 'Scancelassion ëd "$1"',
@@ -3159,7 +2929,6 @@ Ch'as visa che sòn a peul rompe un colegament esistent.",
 	'interwiki_editerror' => 'Ël prefiss "$1" a peul pa esse modificà ant la tàula antërwiki.
 A peul esse che a esista pa.',
 	'interwiki-badprefix' => 'Ël prefiss antërwiki specificà "$1" a conten caràter pa bon.',
-	'interwiki-submit-empty' => "Ël prefiss e l'anliura a peulo pa esse veuid.",
 	'interwiki_logpagename' => 'Registr tàula antërwiki',
 	'interwiki_log_added' => 'giontà ël prefiss "$2" ($3) (trans: $4) (local: $5) a la tàula antërwiki',
 	'interwiki_log_edited' => 'modificà ël prefiss "$2" : ($3) (trans: $4) (local: $5) ant la tàula antërwiki',
@@ -3213,8 +2982,8 @@ $messages['pt'] = array(
 	'interwiki_intro' => 'Isto é um resumo da tabela de interwikis. Significado dos dados nas colunas:',
 	'interwiki_prefix' => 'Prefixo',
 	'interwiki-prefix-label' => 'Prefixo:',
-	'interwiki_prefix_intro' => 'Sintaxe dos prefixos dos links interwikis, na notação wiki <code>[<nowiki />[prefixo:<i>nome da página</i>]]</code>.',
-	'interwiki_url_intro' => 'Modelo para URLs. O espaço reservado por $1 será substituído pelo <i>nome da página</i> da notação wiki, quando for usada a sintaxe mencionada acima.',
+	'interwiki_prefix_intro' => 'Prefixo de interwikis a ser usado na sintaxe de texto wiki <code>[<nowiki />[prefix:<i>nome_página</i>]]</code>.',
+	'interwiki_url_intro' => 'Modelo para URL. O espaço reservado por $1 será substituído pelo <i>nome_página</i> do texto wiki, quando for usada a sintaxe de texto wiki mencionada acima.',
 	'interwiki_local' => 'Encaminhar',
 	'interwiki-local-label' => 'Encaminhar:',
 	'interwiki_local_intro' => 'Um pedido http para a wiki local, com este prefixo de interwikis na URL, é:',
@@ -3225,12 +2994,11 @@ $messages['pt'] = array(
 	'interwiki_trans_intro' => 'Se for usada a sintaxe de texto wiki <code>{<nowiki />{prefix:<i>nome_página</i>}}</code>, então:',
 	'interwiki_trans_1_intro' => 'permite transclusão da wiki externa, se transclusões interwikis forem permitidas de forma geral nesta wiki,',
 	'interwiki_trans_0_intro' => 'não o permite; ao invés, procura uma página no espaço nominal de predefinições.',
-	'interwiki_intro_footer' => 'Veja [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] para mais informações sobre a tabela de interwikis.
+	'interwiki_intro_footer' => 'Veja [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] para mais informações sobre a tabela de interwikis.
 Existe um [[Special:Log/interwiki|registo de modificações]] à tabela de interwikis.',
 	'interwiki_1' => 'sim',
 	'interwiki_0' => 'não',
 	'interwiki_error' => 'ERRO: A tabela de interwikis está vazia, ou alguma outra coisa não correu bem.',
-	'interwiki-cached' => 'Os dados de interwikis são armazenados na cache. Não é possível modificar a cache.',
 	'interwiki_edit' => 'Editar',
 	'interwiki_reasonfield' => 'Motivo:',
 	'interwiki_delquestion' => 'A apagar "$1"',
@@ -3248,7 +3016,6 @@ Lembre-se que este não pode conter espaços ( ), dois-pontos (:), conjunções 
 	'interwiki_edited' => 'O prefixo "$1" foi modificado com sucesso na tabela de interwikis.',
 	'interwiki_editerror' => 'Não foi possível modificar o prefixo "$1" na tabela de interwikis. Possivelmente, não existe.',
 	'interwiki-badprefix' => 'O prefixo de interwikis "$1" contém caracteres inválidos',
-	'interwiki-submit-empty' => 'O prefixo e a URL não podem estar vazios.',
 	'interwiki_logpagename' => 'Registo da tabela de interwikis',
 	'interwiki_log_added' => 'adicionou o prefixo "$2" ($3) (trans: $4) (local: $5) à tabela de interwikis',
 	'interwiki_log_edited' => 'modificou o prefixo "$2": ($3) (trans: $4) (local: $5) na tabela de interwikis',
@@ -3282,7 +3049,7 @@ $messages['pt-br'] = array(
 	'interwiki_trans_intro' => 'Se a sintaxe de wikitexto <code>{<nowiki />{prefix:<i>nome_página</i>}}</code> for usada, então:',
 	'interwiki_trans_1_intro' => 'permite transclusão do wiki externo, se transclusões interwiki forem permitidas de forma geral neste wiki,',
 	'interwiki_trans_0_intro' => 'não o permite; ao invés, procura uma página no espaço nominal de predefinições.',
-	'interwiki_intro_footer' => 'Veja [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] para mais informações sobre a tabela de interwikis.
+	'interwiki_intro_footer' => 'Veja [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] para mais informações sobre a tabela de interwikis.
 Existe um [[Special:Log/interwiki|registro de modificações]] à tabela de interwikis.',
 	'interwiki_1' => 'sim',
 	'interwiki_0' => 'não',
@@ -3373,12 +3140,11 @@ $messages['ru'] = array(
 	'interwiki_trans_intro' => 'Если используется синтаксис вики-текста вида <code>{<nowiki />{приставка:<i>название страницы</i>}}</code>:',
 	'interwiki_trans_1_intro' => 'позволяет включения из других вики, если интервики-включения разрешены в этой вики,',
 	'interwiki_trans_0_intro' => 'включения не разрешены, ищется страница в пространстве имён шаблонов.',
-	'interwiki_intro_footer' => 'Более подробную информацию о таблице интервики можно найти на [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => 'Более подробную информацию о таблице интервики можно найти на [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Существует [[Special:Log/interwiki|журнал изменений]] таблицы интервики.',
 	'interwiki_1' => 'да',
 	'interwiki_0' => 'нет',
 	'interwiki_error' => 'ОШИБКА: таблица интервики пуста или что-то другое работает ошибочно.',
-	'interwiki-cached' => 'Сведения об интервики взяты из кэша. Измененить кэш не представляется возможным.',
 	'interwiki_edit' => 'Править',
 	'interwiki_reasonfield' => 'Причина:',
 	'interwiki_delquestion' => 'Удаление «$1»',
@@ -3395,11 +3161,10 @@ $messages['ru'] = array(
 	'interwiki_edited' => 'Приставка «$1» успешно изменена в интервики-таблице.',
 	'interwiki_editerror' => 'Приставка «$1» не может быть изменена в интервики-таблице. Возможно, она не существует.',
 	'interwiki-badprefix' => 'Указанная интервики-приставка «$1» содержит недопустимые символы',
-	'interwiki-submit-empty' => 'Префикс и URL не могут быть пустыми.',
 	'interwiki_logpagename' => 'Журнал изменений таблицы интервики',
-	'logentry-interwiki-iw_add' => '$1 {{GENDER:$2|добавил|добавила}} префикс «$4» ($5) (trans: $6; local: $7) в интервики-таблицу',
-	'logentry-interwiki-iw_edit' => '$1 {{GENDER:$2|изменил|изменила}} префикс «$4» ($5) (trans: $6; local: $7) в интервики-таблице',
-	'logentry-interwiki-iw_delete' => '$1 {{GENDER:$2|удалил|удалила}} префикс «$4» из интервики-таблицы',
+	'interwiki_log_added' => 'добавил приставку «$2» ($3) (меж.: $4) (лок.: $5) в таблицу интервики',
+	'interwiki_log_edited' => 'изменил приставку «$2»: ($3) (меж.: $4) (лок.: $5) в интервики-таблице',
+	'interwiki_log_deleted' => 'удалил приставку «$2» из таблицы интервики',
 	'interwiki_logpagetext' => 'Это журнал изменений [[Special:Interwiki|таблицы интервики]].',
 	'right-interwiki' => 'правка интервики',
 	'action-interwiki' => 'изменение записи интервики',
@@ -3416,7 +3181,7 @@ $messages['rue'] = array(
 	'interwiki_addbutton' => 'Придати',
 );
 
-/** Sakha (Саха тыла)
+/** Yakut (Саха тыла)
  * @author HalanTul
  */
 $messages['sah'] = array(
@@ -3542,7 +3307,7 @@ $messages['sk'] = array(
 	'interwiki_trans_intro' => 'Ak je použitá syntax wikitextu <code>{<nowiki />{predpona:<i>názov_stránky</i>}}</code>,',
 	'interwiki_trans_1_intro' => 'povoliť transklúzie z cudzej wiki ak sú na tejto wiki všeobecne povolené transklúzie interwiki,',
 	'interwiki_trans_0_intro' => 'nepovoliť ju, namiesto toho hľadať stránku v mennom priestore šablón.',
-	'interwiki_intro_footer' => 'Ďalšie informácie o tabuľke interwiki nájdete na [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => 'Ďalšie informácie o tabuľke interwiki nájdete na [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Obsahuje [[Special:Log/interwiki|záznam zmien]] tabuľky interwiki.',
 	'interwiki_1' => 'áno',
 	'interwiki_0' => 'nie',
@@ -3576,73 +3341,31 @@ Obsahuje [[Special:Log/interwiki|záznam zmien]] tabuľky interwiki.',
  * @author Dbc334
  */
 $messages['sl'] = array(
-	'interwiki' => 'Ogled in urejanje podatkov interwiki',
-	'interwiki-title-norights' => 'Ogled podatkov interwiki',
-	'interwiki-desc' => 'Doda [[Special:Interwiki|posebno stran]] za ogled in urejanje tabele interwiki',
-	'interwiki_intro' => 'To je pregled tabele interwiki. Pomeni podatkov v stolpcih:',
-	'interwiki_prefix' => 'Predpona',
-	'interwiki-prefix-label' => 'Predpona:',
-	'interwiki_prefix_intro' => 'Predpona interwiki, uporabljena v skladnji wikibesedila <code>[<nowiki />[predpona:<i>imestrani</i>]]</code>.',
-	'interwiki_local' => 'Posredovano',
-	'interwiki-local-label' => 'Posredovano:',
-	'interwiki_trans' => 'Vključeno',
-	'interwiki-trans-label' => 'Vključeno:',
-	'interwiki_trans_intro' => 'Če je uporabljena skladnja wikibesedila <code>{<nowiki />{predpona:<i>imestrani</i>}}</code>, potem:',
 	'interwiki_1' => 'da',
 	'interwiki_0' => 'ne',
-	'interwiki_error' => 'Napaka: Tabela interwiki je prazna ali pa je kaj drugega šlo narobe.',
-	'interwiki-cached' => 'Podatki interwiki so predpomnjeni. Spreminjanje predpomnilnika ni mogoče.',
-	'interwiki_edit' => 'Uredi',
-	'interwiki_reasonfield' => 'Razlog:',
-	'interwiki_delquestion' => 'Brisanje »$1«',
-	'interwiki_deleting' => 'Brišete predpono »$1«.',
-	'interwiki_deleted' => 'Predpona »$1« je bila uspešno odstranjena iz tabele interwiki.',
-	'interwiki_delfailed' => 'Predpone »$1« ni bilo mogoče odstraniti iz tabele interwiki.',
-	'interwiki_addtext' => 'Dodaj predpono interwiki',
 	'interwiki_addbutton' => 'Dodaj',
-	'interwiki_added' => 'Predpona »$1« je bila uspešno dodana v tabelo interwiki.',
-	'interwiki_addfailed' => 'Predpone »$1« ni mogoče dodati tabeli interwiki.
-Morda že obstaja v tabeli interwiki.',
-	'interwiki_edittext' => 'Urejanje predpone interwiki',
-	'interwiki_editintro' => 'Urejate predpono interwiki.
-Ne pozabite, da lahko to prekine obstoječe povezave.',
-	'interwiki_edited' => 'Predpona »$1« je bila uspešno spremenjena v tabeli interwiki.',
-	'interwiki_editerror' => 'Predpone »$1« ni mogoče spremeniti v tabeli interwiki.
-Morda ne obstaja.',
-	'interwiki-badprefix' => 'Navedena predpona interwiki »$1« vsebuje neveljavne znake.',
-	'interwiki-submit-empty' => 'Predpona in URL ne smeta biti prazna.',
-	'interwiki_logpagename' => 'Dnevnik tabele interwiki',
-	'interwiki_log_added' => 'je dodal(-a) predpono »$2« ($3) (trans: $4) (local: $5) v tabelo interwiki',
-	'interwiki_log_edited' => 'je spremenil(-a) predpono »$2«: ($3) (trans: $4) (local: $5) v tabeli interwiki',
-	'interwiki_log_deleted' => 'je odstranil(-a) predpono »$2« iz tabele interwiki',
-	'interwiki_logpagetext' => 'To je dnevnik sprememb [[Special:Interwiki|tabele interwiki]].',
-	'right-interwiki' => 'Urejanje podatkov interwiki',
-	'action-interwiki' => 'spreminjanje tega vnosa interwikija',
 );
 
-/** Serbian (Cyrillic script) (‪Српски (ћирилица)‬)
- * @author Rancher
+/** Serbian Cyrillic ekavian (Српски (ћирилица))
  * @author Sasa Stefanovic
  * @author Жељко Тодоровић
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
 	'interwiki' => 'Прегледај и измени податке о међувикију',
-	'interwiki-title-norights' => 'Међувики',
-	'interwiki-desc' => 'Додаје посебну страницу за преглед и измену [[Special:Interwiki|табеле међувикија]]',
+	'interwiki-title-norights' => 'Прегледај податке о међувикију',
+	'interwiki-desc' => 'Додаје [[Special:Interwiki|специјалну страну]] за преглед и измену табеле међувикија',
 	'interwiki_intro' => 'Ово је преглед табеле међувикија. Значења података у колонама:',
 	'interwiki_prefix' => 'Префикс',
 	'interwiki-prefix-label' => 'Префикс:',
 	'interwiki_prefix_intro' => 'Међувики префикс који ће бити коришћен у <code>[<nowiki />[prefix:<i>pagename</i>]]</code> викитекст синтакси.',
-	'interwiki_url' => 'Адреса',
-	'interwiki-url-label' => 'Адреса:',
 	'interwiki_local' => 'Напред',
 	'interwiki-local-label' => 'Напред:',
 	'interwiki_trans_intro' => 'Ако је коришћена викитекст синтакса <code>{<nowiki />{prefix:<i>pagename</i>}}</code>, онда:',
 	'interwiki_1' => 'да',
 	'interwiki_0' => 'не',
 	'interwiki_error' => 'Грешка: табела међувикија је празна, или нешто друго није у реду.',
-	'interwiki_edit' => 'Уреди',
+	'interwiki_edit' => 'Измени',
 	'interwiki_reasonfield' => 'Разлог:',
 	'interwiki_delquestion' => 'Бришем „$1”',
 	'interwiki_deleting' => 'Ви бришете префикс "$1".',
@@ -3663,11 +3386,14 @@ $messages['sr-ec'] = array(
 Вероватно затшо што не постоји.',
 	'interwiki-badprefix' => 'Задати међувики префикс "$1" садржи недозвољене знакове',
 	'interwiki_logpagename' => 'Историја табеле међувикија',
+	'interwiki_log_added' => 'додат префикс "$2" ($3) (транс: $4) (локално: $5) табели међувикија',
+	'interwiki_log_edited' => 'измењен је префикс "$2" : ($3) (транс: $4) (локално: $5) у табели међувикија',
+	'interwiki_log_deleted' => 'префикс "$2" је избрисан из табеле међувикија',
 	'interwiki_logpagetext' => 'Ово је историја измена [[Special:Interwiki|табеле међувикија]].',
-	'right-interwiki' => 'уређивање међувикија',
+	'right-interwiki' => 'Измени међувики',
 );
 
-/** Serbian Latin ekavian (‪Srpski (latinica)‬)
+/** Serbian Latin ekavian (Srpski (latinica))
  * @author Michaello
  * @author Жељко Тодоровић
  */
@@ -3757,7 +3483,6 @@ $messages['su'] = array(
  * @author Per
  * @author Purodha
  * @author Sertion
- * @author WikiPhoenix
  */
 $messages['sv'] = array(
 	'interwiki' => 'Visa och redigera interwiki-data',
@@ -3772,7 +3497,7 @@ $messages['sv'] = array(
 	'interwiki_local_intro' => 'En HTTP-förfrågan till den lokala wikin med denna interwiki-prefix i webbadressen är:',
 	'interwiki_trans' => 'Transkludera',
 	'interwiki-trans-label' => 'Transkludera:',
-	'interwiki_intro_footer' => 'Se [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] för mer information om interwikitabellen.
+	'interwiki_intro_footer' => 'Se [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] för mer information om interwikitabellen.
 Det finns en [[Special:Log/interwiki|logg över ändringar]] i interwikitabellen.',
 	'interwiki_1' => 'ja',
 	'interwiki_0' => 'nej',
@@ -3795,7 +3520,6 @@ Det är möjligt att prefixet redan finns i tabellen.',
 	'interwiki_edited' => 'Prefixet "$1" har ändrats i interwikitabellen.',
 	'interwiki_editerror' => 'Prefixet "$1" kan inte ändras i interwikitabellen. Det är möjligt att det inte finns.',
 	'interwiki-badprefix' => 'Specificerat interwikiprefix "$1" innehåller ogiltiga tecken',
-	'interwiki-submit-empty' => 'Prefix och URL-adressen kan inte vara tomma.',
 	'interwiki_logpagename' => 'Interwikitabellogg',
 	'interwiki_log_added' => 'lade till prefixet "$2" ($3) (trans: $4) (lokal: $5) i interwikitabellen',
 	'interwiki_log_edited' => 'ändrade prefixet "$2" ($3) (trans: $4) (lokal: $5) i interwikitabellen',
@@ -3820,14 +3544,6 @@ $messages['szl'] = array(
 	'interwiki_addbutton' => 'Dodej',
 );
 
-/** Tamil (தமிழ்)
- * @author செல்வா
- */
-$messages['ta'] = array(
-	'interwiki_addbutton' => 'சேர்',
-	'right-interwiki' => 'விக்கியிடைப் பரிமாற்றத் தரவுகளைத் தொகு',
-);
-
 /** Telugu (తెలుగు)
  * @author Kiranmayee
  * @author Veeven
@@ -3840,7 +3556,7 @@ $messages['te'] = array(
 	'interwiki-prefix-label' => 'ఉపసర్గ:',
 	'interwiki_local' => 'ముందుకు',
 	'interwiki-local-label' => 'ముందుకు:',
-	'interwiki_intro_footer' => 'అంతర్వికీ పట్టిక గురించిన మరింత సమాచారాన్ని [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org]లో చూడండి.
+	'interwiki_intro_footer' => 'అంతర్వికీ పట్టిక గురించిన మరింత సమాచారాన్ని [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org]లో చూడండి.
 అంతర్వికీ పట్టికకి జరిగిన [[Special:Log/interwiki|మార్పుల యొక్క చిట్టా]] కూడా ఉంది.',
 	'interwiki_1' => 'అవును',
 	'interwiki_0' => 'కాదు',
@@ -3862,9 +3578,6 @@ $messages['te'] = array(
  * @author MF-Warburg
  */
 $messages['tet'] = array(
-	'interwiki_1' => 'sin',
-	'interwiki_0' => 'lae',
-	'interwiki_edit' => 'Edita',
 	'interwiki_reasonfield' => 'Motivu:',
 	'interwiki_delquestion' => 'Halakon $1',
 	'interwiki_addbutton' => 'Tau tan',
@@ -3935,7 +3648,7 @@ $messages['tl'] = array(
 	'interwiki_trans_intro' => 'Kapag ginamit ang palaugnayang <code>{<nowiki />{prefix:<i>pagename</i>}}</code> ng teksto ng wiki, kung gayon:',
 	'interwiki_trans_1_intro' => 'pahintulutan ang paglilipat-sama mula sa dayuhang wiki, kung pangkalahatang pinapayagan sa wiking ito ang paglilipat-sama',
 	'interwiki_trans_0_intro' => 'huwag itong pahintulutan, sa halip maghanap ng isang pahinang nasa loob ng espasyo ng pangalan ng suleras.',
-	'interwiki_intro_footer' => 'Tingnan ang [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org] para sa mas marami pang mga kabatiran hinggil sa tabla ng ugnayang-wiki.
+	'interwiki_intro_footer' => 'Tingnan ang [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org] para sa mas marami pang mga kabatiran hinggil sa tabla ng ugnayang-wiki.
 Mayroong isang [[Special:Log/interwiki|talaan ng mga pagbabago]] sa tabla ng ugnayang-wiki.',
 	'interwiki_1' => 'oo',
 	'interwiki_0' => 'hindi',
@@ -4000,16 +3713,9 @@ $messages['tr'] = array(
 );
 
 /** Tatar (Cyrillic) (Татарча/Tatarça (Cyrillic))
- * @author Ajdar
  * @author Ильнар
  */
 $messages['tt-cyrl'] = array(
-	'interwiki' => 'Интервики көйләнмәләрен карау һәм үзгәртү',
-	'interwiki-title-norights' => 'Интервики турында мәгълүматларны үзгәртү',
-	'interwiki-desc' => 'Интервики сылтамаларны карау һәм үзгәртү өчен [[Special:Interwiki|махсус]] бит өсти',
-	'interwiki_intro' => 'Бу интервики җәдвәленә манзара. Баганалардагы мәгълүматларның аңлатмалары:',
-	'interwiki_prefix' => 'Өстәлмә',
-	'interwiki-prefix-label' => 'Өстәлмә',
 	'interwiki_1' => 'әйе',
 	'interwiki_0' => 'юк',
 	'interwiki_reasonfield' => 'Сәбәп:',
@@ -4041,7 +3747,7 @@ $messages['uk'] = array(
 	'interwiki_trans_intro' => 'Якщо використовується синтаксис вікітексту <code>{<nowiki />{префікс:<i>назва сторінки</i>}}</code>, то:',
 	'interwiki_trans_1_intro' => 'дозволяє включення з інших вікі, якщо інтервікі-включення дозволені в цій вікі,',
 	'interwiki_trans_0_intro' => 'не дозволяє включення, натомість шукається сторінка у просторі імен шаблонів.',
-	'interwiki_intro_footer' => 'Докладніше про таблицю інтервікі можна подивитись на [http://www.mediawiki.org/wiki/Manual:Interwiki_table MediaWiki.org].
+	'interwiki_intro_footer' => 'Докладніше про таблицю інтервікі можна подивитись на [http://www.mediawiki.org/wiki/Interwiki_table MediaWiki.org].
 Існує також [[Special:Log/interwiki|журнал змін]] таблиці інтервікі.',
 	'interwiki_1' => 'так',
 	'interwiki_0' => 'ні',
@@ -4161,7 +3867,7 @@ $messages['vi'] = array(
 	'interwiki_trans_intro' => 'Khi nào sử dụng cú pháp wiki <code>{<nowiki />{tiền tố:<i>tên trang</i>}}</code>:',
 	'interwiki_trans_1_intro' => 'cho phép nhúng trang từ wiki bên ngoài, nếu wiki này cho phép nhúng trang liên wiki nói chung',
 	'interwiki_trans_0_intro' => 'thay vì cho phép nhúng liên wiki, tìm kiếm trang trong không gian tên bản mẫu địa phương.',
-	'interwiki_intro_footer' => 'Xem [http://www.mediawiki.org/wiki/Manual:Interwiki_table?uselang=vi MediaWiki.org] để biết thêm thông tin về bảng liên wiki.
+	'interwiki_intro_footer' => 'Xem [http://www.mediawiki.org/wiki/Interwiki_table?uselang=vi MediaWiki.org] để biết thêm thông tin về bảng liên wiki.
 Có [[Special:Log/interwiki|nhật trình các thay đổi]] tại bảng liên wiki.',
 	'interwiki_1' => 'có',
 	'interwiki_0' => 'không',
@@ -4235,11 +3941,6 @@ Ba no dabinon.',
 	'action-interwiki' => 'votükön pati vüvükik at',
 );
 
-/** Walloon (Walon) */
-$messages['wa'] = array(
-	'interwiki_reasonfield' => 'Råjhon:',
-);
-
 /** Wu (吴语) */
 $messages['wuu'] = array(
 	'interwiki_reasonfield' => '理由：',
@@ -4298,11 +3999,9 @@ $messages['yue'] = array(
 /** Simplified Chinese (‪中文(简体)‬)
  * @author Gaoxuewei
  * @author Liangent
- * @author Mark85296341
  * @author PhiLiP
  * @author Vina
  * @author Wmr89502270
- * @author Xiaomingyan
  */
 $messages['zh-hans'] = array(
 	'interwiki' => '查看并编辑跨维基连结表',
@@ -4313,9 +4012,9 @@ $messages['zh-hans'] = array(
 	'interwiki-prefix-label' => '前缀:',
 	'interwiki_prefix_intro' => '跨网站的前缀，用于<code>[ [prefix: <i>pagename</i> ]]</code> <nowiki /> <code>[ [prefix: <i>pagename</i> ]]</code>。',
 	'interwiki_local' => '转发',
-	'interwiki-local-label' => '转发：',
+	'interwiki-local-label' => '转发:',
 	'interwiki_trans' => '包含',
-	'interwiki-trans-label' => '包含：',
+	'interwiki-trans-label' => '包含:',
 	'interwiki_1' => '是',
 	'interwiki_0' => '否',
 	'interwiki_error' => '错误: 跨维基连结表为空，或是发生其它错误。',
@@ -4328,7 +4027,7 @@ $messages['zh-hans'] = array(
 	'interwiki_addtext' => '新增一个跨维基前缀',
 	'interwiki_addintro' => '您现在加入一个新的跨维基连结前缀。
 要记住它不可以包含空格 （ ）、冒号 （:）、连字号 （&），或者是等号 （=）。',
-	'interwiki_addbutton' => '添加',
+	'interwiki_addbutton' => '加入',
 	'interwiki_added' => '前缀 "$1" 已经成功地加入到跨维基连结表。',
 	'interwiki_addfailed' => '前缀 "$1" 不能加入到跨维基连结表。
 可能已经在跨维基连结表中存在。',
@@ -4352,8 +4051,6 @@ $messages['zh-hans'] = array(
  * @author Alexsh
  * @author Horacewai2
  * @author Liangent
- * @author Mark85296341
- * @author Waihorace
  * @author Wrightbus
  */
 $messages['zh-hant'] = array(
@@ -4362,41 +4059,41 @@ $messages['zh-hant'] = array(
 	'interwiki-desc' => '新增[[Special:Interwiki|特殊頁面]]以檢視或編輯跨語言連結表',
 	'interwiki_intro' => '這是跨維基連結表的概覽。列中的數據的含義：',
 	'interwiki_prefix' => '前綴',
-	'interwiki-prefix-label' => '前綴：',
+	'interwiki-prefix-label' => '前綴:',
 	'interwiki_prefix_intro' => '跨網站的前綴，用於<code>[ [prefix: <i>pagename</i> ]]</code> <nowiki /> <code>[ [prefix: <i>pagename</i> ]]</code>。',
 	'interwiki_local' => '轉發',
-	'interwiki-local-label' => '定義這個為一個本地 wiki：',
+	'interwiki-local-label' => '定義這個為一個本地wiki:',
 	'interwiki_trans' => '包含',
-	'interwiki-trans-label' => '容許跨維基包含：',
+	'interwiki-trans-label' => '容許跨維基包含:',
 	'interwiki_1' => '是',
 	'interwiki_0' => '否',
-	'interwiki_error' => '錯誤：跨維基連結表為空，或是發生其它錯誤。',
+	'interwiki_error' => '錯誤: 跨維基連結表為空，或是發生其它錯誤。',
 	'interwiki_edit' => '編輯',
 	'interwiki_reasonfield' => '原因：',
-	'interwiki_delquestion' => '正在刪除「$1」',
-	'interwiki_deleting' => '您正在刪除前綴「$1」。',
-	'interwiki_deleted' => '已成功地從連結表中刪除前綴「$1」。',
-	'interwiki_delfailed' => '無法從連結表刪除前綴「$1」。',
+	'interwiki_delquestion' => '正在刪除"$1"',
+	'interwiki_deleting' => '您正在刪除前綴"$1"。',
+	'interwiki_deleted' => '已成功地從連結表中刪除前綴"$1"。',
+	'interwiki_delfailed' => '無法從連結表刪除前綴"$1"。',
 	'interwiki_addtext' => '新增一個跨維基前綴',
 	'interwiki_addintro' => '您現在加入一個新的跨維基連結前綴。
 要記住它不可以包含空格 （ ）、冒號 （:）、連字號 （&），或者是等號 （=）。',
 	'interwiki_addbutton' => '加入',
-	'interwiki_added' => '前綴「$1」已經成功地加入到跨維基連結表。',
-	'interwiki_addfailed' => '前綴「$1」不能加入到跨維基連結表。
+	'interwiki_added' => '前綴 "$1" 已經成功地加入到跨維基連結表。',
+	'interwiki_addfailed' => '前綴 "$1" 不能加入到跨維基連結表。
 可能已經在跨維基連結表中存在。',
 	'interwiki_edittext' => '修改一個跨維基連結前綴',
 	'interwiki_editintro' => '您現正修改跨維基連結前綴。
 記住這動作可以中斷現有的連結。',
-	'interwiki_edited' => '前綴「$1」已經在跨維基連結表中修改。',
-	'interwiki_editerror' => '前綴「$1」不能在跨維基連結表中修改。
+	'interwiki_edited' => '前綴 "$1" 已經在跨維基連結表中修改。',
+	'interwiki_editerror' => '前綴 "$1" 不能在跨維基連結表中修改。
 可能它並不存在。',
-	'interwiki-badprefix' => '所指定的跨維基前綴「$1」含有無效的字母',
+	'interwiki-badprefix' => '所指定的跨維基前綴 "$1" 含有無效的字母',
 	'interwiki_logpagename' => '跨維基連結修改日誌',
-	'interwiki_log_added' => '加入了連結前綴「$2」（$3） （含：$4） （本：$5） 到跨維基連結表中',
-	'interwiki_log_edited' => '在跨維基連結表中修改了連結前綴「$1」：（$3） （含：$4） （本：$5）',
-	'interwiki_log_deleted' => '在跨維基連結表中已刪除「$2」',
+	'interwiki_log_added' => '加入了連結前綴 "$2" （$3） （含: $4） （本: $5） 到跨維基連結表中',
+	'interwiki_log_edited' => '在跨維基連結表中修改了連結前綴 "$2" : （$3） （含: $4） （本: $5）',
+	'interwiki_log_deleted' => '在跨維基連結表中已刪除 "$2"',
 	'interwiki_logpagetext' => '這是一個[[Special:Interwiki|跨維基連結]]修改的日誌。',
 	'right-interwiki' => '修改跨維基資料',
-	'action-interwiki' => '修正這個跨語言連結',
+	'action-interwiki' => '修正這個跨語言鏈接',
 );
 
