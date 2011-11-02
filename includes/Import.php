@@ -23,19 +23,15 @@
  * @ingroup SpecialPage
  */
 
-class FakeUser
-{
+class FakeUser {
 	var $name = "";
-	function __construct( $name )
-	{
+	function __construct( $name ) {
 		$this->name = $name;
 	}
-	function getId()
-	{
+	function getId() {
 		return 0;
 	}
-	function getName()
-	{
+	function getName() {
 		return $this->name;
 	}
 }
@@ -184,8 +180,7 @@ class WikiRevision {
 	function importOldRevision() {
 		# Check edit permission
 		global $wgUser;
-		if( !$this->getTitle()->userCan( 'edit' ) )
-		{
+		if ( !$this->getTitle()->userCan( 'edit' ) ) {
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
 			return false;
 		}
@@ -194,7 +189,7 @@ class WikiRevision {
 
 		# Sneak a single revision into place
 		$user = User::newFromName( $this->getUser() );
-		if( $user ) {
+		if ( $user ) {
 			$userId = intval( $user->getId() );
 			$userText = $user->getName();
 		} else {
@@ -285,14 +280,14 @@ class WikiRevision {
 		$tempTitle = $GLOBALS['wgTitle'];
 		$GLOBALS['wgTitle'] = $this->title;
 
-		if( $created ) {
+		if ( $created ) {
 			wfDebug( __METHOD__ . ": running onArticleCreate\n" );
 			Article::onArticleCreate( $this->title );
 
 			wfDebug( __METHOD__ . ": running create updates\n" );
 			$article->createUpdates( $revision );
 
-		} elseif( $changed ) {
+		} elseif ( $changed ) {
 			wfDebug( __METHOD__ . ": running onArticleEdit\n" );
 			Article::onArticleEdit( $this->title );
 
@@ -314,14 +309,13 @@ class WikiRevision {
 	function importLogItem() {
 		$dbw = wfGetDB( DB_MASTER );
 		# FIXME: this will not record autoblocks
-		if( !$this->getTitle() ) {
+		if ( !$this->getTitle() ) {
 			wfDebug( __METHOD__ . ": skipping invalid {$this->type}/{$this->action} log time, timestamp " . 
 				$this->timestamp . "\n" );
 			return;
 		}
 		# Check edit permission
-		if( !$this->getTitle()->userCan('edit') )
-		{
+		if ( !$this->getTitle()->userCan( 'edit' ) ) {
 			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
 			return false;
@@ -340,7 +334,7 @@ class WikiRevision {
 			__METHOD__
 		);
 		// FIXME: this could fail slightly for multiple matches :P
-		if( $prior ) {
+		if ( $prior ) {
 			wfDebug( __METHOD__ . ": skipping existing item for Log:{$this->type}/{$this->action}, timestamp " . 
 				$this->timestamp . "\n" );
 			return false;
@@ -352,7 +346,7 @@ class WikiRevision {
 			'log_action' => $this->action,
 			'log_timestamp' => $dbw->timestamp( $this->timestamp ),
 			'log_user' => User::idFromName( $this->user_text ),
-			#'log_user_text' => $this->user_text,
+			'log_user_text' => $this->user_text,
 			'log_namespace' => $this->getTitle()->getNamespace(),
 			'log_title' => $this->getTitle()->getDBkey(),
 			'log_comment' => $this->getComment(),
@@ -363,8 +357,7 @@ class WikiRevision {
 
 	function importUpload() {
 		# Check edit permission
-		if( !$this->getTitle()->userCan('edit') )
-		{
+		if ( !$this->getTitle()->userCan( 'edit' ) ) {
 			global $wgUser;
 			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
 			return false;
@@ -375,7 +368,7 @@ class WikiRevision {
 		// and, it will record a *current* upload, but we might want an archive version here
 
 		$file = wfLocalFile( $this->getTitle() );
-		if( !$file ) {
+		if ( !$file ) {
 			var_dump( $file );
 			wfDebug( "IMPORT: Bad file. :(\n" );
 			return false;
@@ -385,14 +378,13 @@ class WikiRevision {
 		if ( $file->exists() ) {
 			// Backwards-compatibility: support export files without sha1
 			if ( $this->getSha1() && $file->getSha1() == $this->getSha1() ||
-				!$this->getSha1() && $file->getTimestamp() == $this->getTimestamp() )
-			{
+				!$this->getSha1() && $file->getTimestamp() == $this->getTimestamp() ) {
 				wfDebug( "IMPORT: File already exists and is equal to imported (".$this->getTimestamp().").\n" );
 				return false;
 			}
 			$history = $file->getHistory( NULL, $this->getTimestamp(), $this->getTimestamp() );
 			foreach ( $history as $oldfile ) {
-				if (!$this->getSha1() || $oldfile->getSha1() == $this->getSha1()) {
+				if ( !$this->getSha1() || $oldfile->getSha1() == $this->getSha1() ) {
 					wfDebug( "IMPORT: File revision already exists at its timestamp (".$this->getTimestamp().") and is equal to imported.\n" );
 					return false;
 				}
@@ -401,7 +393,7 @@ class WikiRevision {
 
 		/* Get file source into a temporary file */
 		$source = $this->downloadSource();
-		if( !$source ) {
+		if ( !$source ) {
 			wfDebug( "IMPORT: Could not fetch remote file. :(\n" );
 			return false;
 		}
@@ -429,7 +421,7 @@ class WikiRevision {
 				$this->getTimestamp() );
 		}
 
-		if( $status->isGood() ) {
+		if ( $status->isGood() ) {
 			// yay?
 			wfDebug( "IMPORT: file imported OK\n" );
 			return true;
@@ -442,7 +434,7 @@ class WikiRevision {
 
 	function downloadSource() {
 		global $wgEnableUploads;
-		if( !$wgEnableUploads ) {
+		if ( !$wgEnableUploads ) {
 			return false;
 		}
 
@@ -458,14 +450,14 @@ class WikiRevision {
 		// Try to download file over HTTP
 		$this->tempfile = tempnam( wfTempDir(), 'download' );
 		$f = fopen( $this->tempfile, 'wb' );
-		if( !$f ) {
+		if ( !$f ) {
 			wfDebug( "IMPORT: couldn't write to temp file ".$this->tempfile."\n" );
 			return false;
 		}
 
 		// @todo Fixme!
 		$data = Http::get( $src );
-		if( !$data ) {
+		if ( !$data ) {
 			wfDebug( "IMPORT: couldn't fetch source $src\n" );
 			fclose( $f );
 			unlink( $this->tempfile );
@@ -520,7 +512,7 @@ class WikiImporter {
 		if( preg_match( '/www.mediawiki.org/',$prefix ) ) {
 			$prefix = str_replace( '/','\/',$prefix );
 			$this->mXmlNamespace='/^'.$prefix.':/';
-		 }
+		}
 	}
 
 	function stripXmlNamespace($name) {
@@ -1099,8 +1091,9 @@ class WikiImporter {
 		case "text":
 		case "filename":
 		case "src":
-			if ($this->workRevision && $attribs['sha1'])
+			if ( $name == "src" && $this->workRevision && isset( $attribs['sha1'] ) ) {
 				$this->workRevision->setSha1( $attribs['sha1'] );
+			}
 		case "size":
 			$this->appendfield = $name;
 			xml_set_element_handler( $parser, "in_nothing", "out_append" );
