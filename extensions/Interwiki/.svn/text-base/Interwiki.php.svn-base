@@ -7,11 +7,11 @@
  *
  * @file
  * @ingroup Extensions
- * @version 2.0
+ * @version 1.3
  * @author Stephanie Amanda Stevens <phroziac@gmail.com>
- * @author Robin Pepermans (SPQRobin) <robinp.1273@gmail.com>
+ * @author SPQRobin <robin_1273@hotmail.com>
  * @copyright Copyright © 2005-2007 Stephanie Amanda Stevens
- * @copyright Copyright © 2007-2011 Robin Pepermans (SPQRobin)
+ * @copyright Copyright © 2007 SPQRobin
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  * @link http://www.mediawiki.org/wiki/Extension:SpecialInterwiki Documentation
  * Formatting improvements Stephen Kennedy, 2006.
@@ -25,16 +25,10 @@ if( !defined( 'MEDIAWIKI' ) ){
 $wgExtensionCredits['specialpage'][] = array(
 	'path' => __FILE__,
 	'name' => 'SpecialInterwiki',
-	'author' => array( 'Stephanie Amanda Stevens', 'SPQRobin', '...' ),
-	'version' => '2.0',
+	'author' => array( 'Stephanie Amanda Stevens', 'SPQRobin', 'others' ),
+	'version' => '1.3.1',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:SpecialInterwiki',
 	'descriptionmsg' => 'interwiki-desc',
-);
-
-$wgResourceModules['SpecialInterwiki'] = array(
-		'styles' => 'Interwiki.css',
-		'localBasePath' => dirname( __FILE__ ),
-		'remoteExtPath' => 'Interwiki',
 );
 
 // Set up the new special page
@@ -52,6 +46,7 @@ $wgAvailableRights[] = 'interwiki';
 $wgLogTypes[] = 'interwiki';
 $wgLogNames['interwiki'] = 'interwiki_logpagename';
 $wgLogHeaders['interwiki'] = 'interwiki_logpagetext';
-$wgAutoloadClasses['InterwikiLogFormatter'] = $dir . 'Interwiki_body.php';
-# interwiki, iw_add, iw_delete, iw_edit
-$wgLogActionsHandlers['interwiki/*']  = 'InterwikiLogFormatter';
+$wgLogActions['interwiki/interwiki'] = 'interwiki_logentry';
+$wgLogActions['interwiki/iw_add'] = 'interwiki_log_added';
+$wgLogActions['interwiki/iw_delete'] = 'interwiki_log_deleted';
+$wgLogActions['interwiki/iw_edit'] = 'interwiki_log_edited';
