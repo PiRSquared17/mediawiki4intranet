@@ -145,7 +145,8 @@ class StubDumpArchive
 		if ( $this->files )
 		{
 			foreach ( $this->files as $file => $true )
-				unlink( $file );
+				if ( file_exists( $file ) )
+					unlink( $file );
 			$this->files = array();
 		}
 		if ( $this->tempdir )
@@ -239,7 +240,7 @@ class DumpArchive extends StubDumpArchive
 		// Strip out archive:// prefix
 		if ( substr( $url, 0, 10 ) != 'archive://' )
 			return false;
-		$url = substr( $url, 10 );
+		$name = substr( $url, 10 );
 		if ( isset( $this->files[ $this->tempdir.'/'.$name ] ) )
 			return $this->tempdir.'/'.$name;
 		return false;
