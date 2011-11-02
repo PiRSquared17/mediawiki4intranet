@@ -22,8 +22,7 @@
  * Stub dump archive class, does not support binary parts,
  * just passes through the XML part.
  */
-class StubDumpArchive
-{
+class StubDumpArchive {
 	var $fp = NULL, $buffer = '', $files = array(), $tempdir = '';
 	var $mimetype = '', $extension = '', $mainFile = false;
 	const BUFSIZE = 0x10000;
@@ -31,18 +30,16 @@ class StubDumpArchive
 	 * Open an existing archive (for importing)
 	 * Returns the path of main part temporary file, or false in a case of failure
 	 */
-	function open( $archive )
-	{
+	function open( $archive ) {
 		global $wgExportFormats;
 		$p = strrpos( $archive, '.' );
-		if ( $p !== false )
+		if ( $p !== false ) {
 			$extension = substr( $archive, $p );
-		else
+		} else {
 			$extension = '';
-		foreach( $wgExportFormats as $format )
-		{
-			if( $format['extension'] == $extension || !$extension && !empty( $format['default'] ) )
-			{
+		}
+		foreach ( $wgExportFormats as $format ) {
+			if ( $format['extension'] == $extension || !$extension && !empty( $format['default'] ) ) {
 				$this->mainFile = $archive;
 				$class = $format['reader'];
 				return new $class( $this );
@@ -53,22 +50,19 @@ class StubDumpArchive
 	/**
 	 * Get temporary filename for the main part
 	 */
-	function getMainPart()
-	{
+	function getMainPart() {
 		return $this->mainFile;
 	}
 	/**
 	 * Get temporary file name for a binary part
 	 */
-	function getBinary( $url )
-	{
+	function getBinary( $url ) {
 		return false;
 	}
 	/**
 	 * Create archive for writing, main file extension is $mainExt
 	 */
-	function create( $mainMimetype, $mainExtension )
-	{
+	function create( $mainMimetype, $mainExtension ) {
 		$this->mimetype = $mainMimetype;
 		$this->extension = $mainExtension;
 		$f = tempnam( wfTempDir(), 'exs' );
@@ -78,14 +72,13 @@ class StubDumpArchive
 	/**
 	 * Write part of main ("index") stream (buffered)
 	 */
-	function write( $string )
-	{
-		if ( !$this->fp )
+	function write( $string ) {
+		if ( !$this->fp ) {
 			return;
-		if ( strlen( $this->buffer ) + strlen( $string ) < self::BUFSIZE )
+		}
+		if ( strlen( $this->buffer ) + strlen( $string ) < self::BUFSIZE ) {
 			$this->buffer .= $string;
-		else
-		{
+		} else {
 			fwrite( $this->fp, $this->buffer );
 			fwrite( $this->fp, $string );
 			$this->buffer = '';
@@ -94,26 +87,23 @@ class StubDumpArchive
 	/**
 	 * Get the pseudo-URL for embedded file (object $file)
 	 */
-	function binUrl( File $file )
-	{
+	function binUrl( File $file ) {
 		return $file->getFullUrl();
 	}
 	/**
 	 * Write binary file (object $file)
 	 */
-	function writeBinary( File $file )
-	{
+	function writeBinary( File $file ) {
 		return false;
 	}
 	/**
 	 * Finish writing
 	 */
-	function close()
-	{
-		if ( $this->fp )
-		{
-			if ( $this->buffer !== '' )
+	function close() {
+		if ( $this->fp ) {
+			if ( $this->buffer !== '' ) {
 				fwrite( $this->fp, $this->buffer );
+			}
 			fclose( $this->fp );
 			$this->fp = NULL;
 		}
@@ -122,8 +112,7 @@ class StubDumpArchive
 	 * Pack all files into an archive,
 	 * return its name in $outFilename and MIME type in $outMimetype
 	 */
-	function getArchive( &$outFilename, &$outMimetype, &$outExtension )
-	{
+	function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
 		$f = array_keys( $this->files );
 		$outFilename = $f[0];
 		$outMimetype = $this->mimetype;
@@ -133,8 +122,7 @@ class StubDumpArchive
 	/**
 	 * Destructor
 	 */
-	function __destruct()
-	{
+	function __destruct() {
 		$this->cleanup();
 	}
 	/**
@@ -142,14 +130,15 @@ class StubDumpArchive
 	 */
 	function cleanup()
 	{
-		if ( $this->files )
-		{
-			foreach ( $this->files as $file => $true )
-				unlink( $file );
+		if ( $this->files ) {
+			foreach ( $this->files as $file => $true ) {
+				if ( file_exists( $file ) ) {
+					unlink( $file );
+				}
+			}
 			$this->files = array();
 		}
-		if ( $this->tempdir )
-		{
+		if ( $this->tempdir ) {
 			rmdir( $this->tempdir );
 			$this->tempdir = '';
 		}
@@ -174,26 +163,28 @@ class DumpArchive extends StubDumpArchive
 	{
 		global $wgDumpArchiveByExt;
 		$ext = '';
-		if ( !$name )
+		if ( !$name ) {
 			$name = $file;
-		if ( ( $p = strrpos( $name, '.' ) ) !== false )
-			$ext = strtolower( substr( $name, $p+1 ) );
-		if ( !isset( $wgDumpArchiveByExt[ $ext ] ) )
+		}
+		if ( ( $p = strrpos( $name, '.' ) ) !== false ) {
+			$ext = strtolower( substr( $name, $p + 1 ) );
+		}
+		if ( !isset( $wgDumpArchiveByExt[ $ext ] ) ) {
 			$ext = '';
-		foreach ( $wgDumpArchiveByExt[ $ext ] as $class )
-		{
+		}
+		foreach ( $wgDumpArchiveByExt[ $ext ] as $class ) {
 			$archive = new $class();
 			$importer = $archive->open( $file );
-			if ( $importer )
+			if ( $importer ) {
 				return $importer;
+			}
 		}
 		return NULL;
 	}
 	/**
 	 * Constructor, generates an empty temporary directory
 	 */
-	function __construct()
-	{
+	function __construct() {
 		$this->tempdir = tempnam( wfTempDir(), 'exp' );
 		unlink( $this->tempdir );
 		mkdir( $this->tempdir );
@@ -202,22 +193,22 @@ class DumpArchive extends StubDumpArchive
 	 * Open an existing archive (for importing)
 	 * Returns the proper import reader, or false in a case of failure
 	 */
-	function open( $archive )
-	{
+	function open( $archive ) {
 		global $wgExportFormats;
-		if( !$this->tryUnpack( $archive ) )
+		if ( !$this->tryUnpack( $archive ) ) {
 			return false;
+		}
 		$dir = opendir( $this->tempdir );
-		while( $file = readdir( $dir ) )
-			if( $file != '.' && $file != '..' )
-				$this->files[ $this->tempdir.'/'.$file ] = true;
+		while ( $file = readdir( $dir ) ) {
+			if ( $file != '.' && $file != '..' ) {
+				$this->files[ $this->tempdir . '/' . $file ] = true;
+			}
+		}
 		closedir( $dir );
-		foreach( $wgExportFormats as $format )
-		{
-			$f = $this->tempdir.'/Revisions.'.$format['extension'];
-			if( isset( $this->files[ $f ] ) )
-			{
-				$this->mainFile = $this->tempdir.'/Revisions.'.$format['extension'];
+		foreach ( $wgExportFormats as $format ) {
+			$f = $this->tempdir . '/Revisions.' . $format['extension'];
+			if ( isset( $this->files[ $f ] ) ) {
+				$this->mainFile = $this->tempdir . '/Revisions.' . $format['extension'];
 				$class = $format['reader'];
 				return new $class( $this );
 			}
@@ -227,31 +218,28 @@ class DumpArchive extends StubDumpArchive
 	/**
 	 * Unpack the archive
 	 */
-	function tryUnpack( $archive )
-	{
+	function tryUnpack( $archive ) {
 		return false;
 	}
 	/**
 	 * Get temporary file name for a binary part
 	 */
-	function getBinary( $url )
-	{
+	function getBinary( $url ) {
 		// Strip out archive:// prefix
 		if ( substr( $url, 0, 10 ) != 'archive://' )
 			return false;
-		$url = substr( $url, 10 );
-		if ( isset( $this->files[ $this->tempdir.'/'.$name ] ) )
-			return $this->tempdir.'/'.$name;
+		$name = substr( $url, 10 );
+		if ( isset( $this->files[ $this->tempdir . '/' . $name ] ) )
+			return $this->tempdir . '/' . $name;
 		return false;
 	}
 	/**
 	 * Create archive for writing, main file extension is $mainExt
 	 */
-	function create( $mainMimetype, $mainExtension )
-	{
+	function create( $mainMimetype, $mainExtension ) {
 		$this->mainMimetype = $mainMimetype;
 		$this->mainExtension = $mainExtension;
-		$f = $this->tempdir.'/Revisions.'.$this->mainExtension;
+		$f = $this->tempdir . '/Revisions.' . $this->mainExtension;
 		$this->fp = fopen( $f, 'wb' );
 		$this->files[ $f ] = true;
 	}
@@ -260,26 +248,22 @@ class DumpArchive extends StubDumpArchive
 	 * By default $SHA1.bin
 	 * Other archivers may desire to preserve original filenames
 	 */
-	function binName( File $file )
-	{
+	function binName( File $file ) {
 		return $file->getSha1() . '.bin';
 	}
 	/**
 	 * Get the pseudo-URL for embedded file (object $file)
 	 * By default, it's archive://$binName
 	 */
-	function binUrl( File $file )
-	{
+	function binUrl( File $file ) {
 		return 'archive://' . $this->binName( $file );
 	}
 	/**
 	 * Write binary file (object $file)
 	 */
-	function writeBinary( File $file )
-	{
-		$name = $this->tempdir.'/'.$this->binName( $file );
-		if ( copy( $file->getPath(), $name ) )
-		{
+	function writeBinary( File $file ) {
+		$name = $this->tempdir . '/' . $this->binName( $file );
+		if ( copy( $file->getPath(), $name ) ) {
 			$this->files[ $name ] = true;
 			return true;
 		}
@@ -289,11 +273,11 @@ class DumpArchive extends StubDumpArchive
 	 * Pack all files into an archive,
 	 * return its name in $outFilename and MIME type in $outMimetype
 	 */
-	function getArchive( &$outFilename, &$outMimetype, &$outExtension )
-	{
-		$name = $this->tempdir.'/archive.'.$this->extension;
-		if ( !$this->archive( $name ) )
+	function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
+		$name = $this->tempdir . '/archive.' . $this->extension;
+		if ( !$this->archive( $name ) ) {
 			return false;
+		}
 		$this->files[ $name ] = true;
 		$outFilename = $name;
 		$outMimetype = $this->mimetype;
@@ -303,8 +287,7 @@ class DumpArchive extends StubDumpArchive
 	/**
 	 * Pack all files into an archive file with name $arcfn
 	 */
-	function archive( $arcfn )
-	{
+	function archive( $arcfn ) {
 		return false;
 	}
 }
@@ -320,24 +303,23 @@ class OldMultipartDumpArchive extends DumpArchive
 	/**
 	 * Get temporary file name for a binary part
 	 */
-	function getBinary( $url )
-	{
+	function getBinary( $url ) {
 		// Strip out multipart:// prefix
-		if ( substr( $url, 0, 12 ) != 'multipart://' )
+		if ( substr( $url, 0, 12 ) != 'multipart://' ) {
 			return false;
+		}
 		$url = substr( $url, 12 );
-		if ( isset( $this->parts[ $url ] ) )
+		if ( isset( $this->parts[ $url ] ) ) {
 			return $this->parts[ $url ];
+		}
 		return false;
 	}
 	/**
 	 * Write binary file (object $file)
 	 */
-	function writeBinary( File $file )
-	{
+	function writeBinary( File $file ) {
 		$name = tempnam( $this->tempdir, 'part' );
-		if ( copy( $file->getPath(), $name ) )
-		{
+		if ( copy( $file->getPath(), $name ) ) {
 			$this->parts[ $this->binName( $file ) ] = $name;
 			return true;
 		}
@@ -346,102 +328,87 @@ class OldMultipartDumpArchive extends DumpArchive
 	/**
 	 * Generate a name for embedded file (object $file)
 	 */
-	function binName( File $file )
-	{
+	function binName( File $file ) {
 		return $file->isOld ? $file->getArchiveName() : $file->getName();
 	}
 	/**
 	 * Get the pseudo-URL for embedded file (object $file)
 	 * Here it's multipart://$binName
 	 */
-	function binUrl( File $file )
-	{
+	function binUrl( File $file ) {
 		return 'multipart://' . $this->binName( $file );
 	}
 	/**
 	 * Unpack the archive
 	 */
-	function tryUnpack( $archive )
-	{
+	function tryUnpack( $archive ) {
 		$fp = fopen( $archive, "rb" );
-		if ( !$fp )
+		if ( !$fp ) {
 			return false;
+		}
 		$s = fgets( $fp );
-		if ( preg_match( "/Content-Type:\s*multipart\/related; boundary=(\S+)\s*\n/s", $s, $m ) )
+		if ( preg_match( "/Content-Type:\s*multipart\/related; boundary=(\S+)\s*\n/s", $s, $m ) ) {
 			$boundary = $m[1];
-		else
-		{
+		} else {
 			fclose( $fp );
 			return false;
 		}
 		// Loop over parts
-		while ( !feof( $fp ) )
-		{
+		while ( !feof( $fp ) ) {
 			$s = trim( fgets( $fp ) );
-			if ( $s != $boundary )
+			if ( $s != $boundary ) {
 				break;
+			}
 			$part = array();
 			// Read headers
-			while ( $s != "\n" && $s != "\r\n" )
-			{
+			while ( $s != "\n" && $s != "\r\n" ) {
 				$s = fgets( $fp );
-				if ( preg_match( '/([a-z0-9\-\_]+):\s*(.*?)\s*$/is', $s, $m ) )
+				if ( preg_match( '/([a-z0-9\-\_]+):\s*(.*?)\s*$/is', $s, $m ) ) {
 					$part[ str_replace( '-', '_', strtolower( $m[1] ) ) ] = $m[2];
+				}
 			}
 			// Skip parts without Content-ID header
-			if ( empty( $part['content_id'] ) )
-			{
-				if (!empty( $part['content_length'] ) &&
-					$part['content_length'] > 0 )
-				{
+			if ( empty( $part['content_id'] ) ) {
+				if ( !empty( $part['content_length'] ) &&
+					$part['content_length'] > 0 ) {
 					fseek( $fp, ftell( $fp ) + $part['content_length'], 0 );
 				}
 				continue;
 			}
 			// Preserve only main part's filename when unpacking for safety
-			if ( $part['content_id'] == 'Revisions' )
+			if ( $part['content_id'] == 'Revisions' ) {
 				$tempfile = $this->tempdir . '/Revisions';
-			else
+			} else {
 				$tempfile = tempnam( $this->tempdir, 'part' );
+			}
 			$tempfp = fopen( $tempfile, "wb" );
-			if ( !$tempfp )
-			{
+			if ( !$tempfp ) {
 				// Error creating temporary file, skip it
 				fseek( $fp, ftell( $fp ) + $part['content_length'], 0 );
 				continue;
 			}
 			$this->parts[ $part['content_id'] ] = $tempfile;
 			// Copy stream
-			if ( isset( $part['content_length'] ) )
-			{
+			if ( isset( $part['content_length'] ) ) {
 				$done = 0;
 				$buf = true;
-				while ( $done < $part['content_length'] && $buf )
-				{
+				while ( $done < $part['content_length'] && $buf ) {
 					$buf = fread( $fp, min( self::BUFSIZE, $part['content_length'] - $done ) );
 					fwrite( $tempfp, $buf );
 					$done += strlen( $buf );
 				}
-			}
-			else
-			{
+			} else {
 				// Main part was archived without Content-Length in old dumps :(
 				$buf = fread( $fp, self::BUFSIZE );
-				while( $buf !== '' )
-				{
-					if ( ( $p = strpos( $buf, "\n$boundary" ) ) !== false )
-					{
-						fseek( $fp, $p+1 - strlen( $buf ), 1 );
+				while ( $buf !== '' ) {
+					if ( ( $p = strpos( $buf, "\n$boundary" ) ) !== false ) {
+						fseek( $fp, $p + 1 - strlen( $buf ), 1 );
 						fwrite( $tempfp, substr( $buf, 0, $p ) );
 						$buf = '';
-					}
-					elseif ( strlen( $buf ) == self::BUFSIZE )
-					{
-						fwrite( $tempfp, substr( $buf, 0, -1-strlen( $boundary ) ) );
-						$buf = substr( $buf, -1-strlen( $boundary ) ) . fread( $fp, self::BUFSIZE );
-					}
-					else
-					{
+					} elseif ( strlen( $buf ) == self::BUFSIZE ) {
+						fwrite( $tempfp, substr( $buf, 0, -1 -strlen( $boundary ) ) );
+						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE );
+					} else {
 						fwrite( $tempfp, $buf );
 						$buf = '';
 					}
@@ -455,25 +422,26 @@ class OldMultipartDumpArchive extends DumpArchive
 	/**
 	 * Pack all files into an archive file with name $arcfn
 	 */
-	function archive( $arcfn )
-	{
+	function archive( $arcfn ) {
 		$fp = fopen( $arcfn, "wb" );
-		if ( !$fp )
+		if ( !$fp ) {
 			return false;
-		$boundary = "--".time();
+		}
+		$boundary = "--" . time();
 		fwrite( $fp, "Content-Type: multipart/related; boundary=$boundary\n$boundary\n" );
-		fwrite( $fp, "Content-Type: text/xml\nContent-ID: Revisions\n".
-			"Content-Length: ".filesize( $this->tempdir.'/Revisions' )."\n\n" );
-		$tempfp = fopen( $this->tempdir.'/Revisions', "rb" );
-		while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' )
+		fwrite( $fp, "Content-Type: text/xml\nContent-ID: Revisions\n" .
+			"Content-Length: " . filesize( $this->tempdir . '/Revisions' ) . "\n\n" );
+		$tempfp = fopen( $this->tempdir . '/Revisions', "rb" );
+		while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' ) {
 			fwrite( $fp, $buf );
+		}
 		fclose( $tempfp );
-		foreach( $this->parts as $name => $file )
-		{
-			fwrite( $fp, "$boundary\nContent-ID: $name\nContent-Length: ".filesize( $file )."\n\n" );
+		foreach ( $this->parts as $name => $file ) {
+			fwrite( $fp, "$boundary\nContent-ID: $name\nContent-Length: " . filesize( $file ) . "\n\n" );
 			$tempfp = fopen( $file, "rb" );
-			while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' )
+			while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' ) {
 				fwrite( $fp, $buf );
+			}
 			fclose( $tempfp );
 		}
 		fclose( $fp );
@@ -481,6 +449,9 @@ class OldMultipartDumpArchive extends DumpArchive
 	}
 }
 
+/**
+ * ZIPped dump archives without preserved file names support
+ */
 class ZipDumpArchive extends DumpArchive {
 	var $mimetype = 'application/zip', $extension = 'zip';
 	/**
@@ -491,7 +462,7 @@ class ZipDumpArchive extends DumpArchive {
 		$retval = 0;
 		$out = wfShellExec( wfEscapeShellArg( $wgUnzip, $archive, '-d', $this->tempdir ) . ' 2>&1', $retval );
 		if ( $retval != 0 ) {
-			wfDebug( __CLASS__.": unzip failed: $out\n" );
+			wfDebug( __CLASS__ . ": unzip failed: $out\n" );
 		}
 		return true;
 	}
@@ -504,7 +475,7 @@ class ZipDumpArchive extends DumpArchive {
 		$retval = 0;
 		$out = wfShellExec( call_user_func_array( 'wfEscapeShellArg', $args ) . ' 2>&1', $retval );
 		if ( $retval != 0 ) {
-			wfDebug( __CLASS__.": zip failed: $out\n" );
+			wfDebug( __CLASS__ . ": zip failed: $out\n" );
 		}
 		return true;
 	}

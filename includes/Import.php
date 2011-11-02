@@ -1099,8 +1099,9 @@ class WikiImporter {
 		case "text":
 		case "filename":
 		case "src":
-			if ($this->workRevision && $attribs['sha1'])
+			if ( $name == "src" && $this->workRevision && isset( $attribs['sha1'] ) ) {
 				$this->workRevision->setSha1( $attribs['sha1'] );
+			}
 		case "size":
 			$this->appendfield = $name;
 			xml_set_element_handler( $parser, "in_nothing", "out_append" );
