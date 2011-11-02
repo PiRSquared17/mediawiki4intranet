@@ -830,7 +830,9 @@ class LoginForm {
 			$this->displaySuccessfulLogin( 'loginsuccess', $injected_html );
 		} else {
 			$titleObj = Title::newFromText( $this->mReturnTo );
-			if ( !$titleObj instanceof Title ) {
+/*patch|2011-04-05|IntraACL|start*/
+			if ( !$titleObj instanceof Title || method_exists( $titleObj, 'userCanReadEx' ) && !$titleObj->userCanReadEx() ) {
+/*patch|2011-04-05|IntraACL|end*/
 				$titleObj = Title::newMainPage();
 			}
 			$wgOut->redirect( $titleObj->getFullURL( $this->mReturnToQuery ) );

@@ -262,7 +262,10 @@ class ErrorPageError extends MWException {
 	function __construct( $title, $msg ) {
 		$this->title = $title;
 		$this->msg = $msg;
-		parent::__construct( wfMsg( $msg ) );
+		if( is_array( $msg ) )
+			parent::__construct( call_user_func_array( 'wfMsgExt', $msg ) );
+		else
+			parent::__construct( wfMsg( $msg ) );
 	}
 
 	function report() {
