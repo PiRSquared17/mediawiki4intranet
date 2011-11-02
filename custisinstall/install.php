@@ -118,6 +118,7 @@ if ($UPGRADE)
     cmd("echo Upgrading into $DIR");
     switch_dirs("$SVN_WIKIMEDIA/phase3", $DIR, $DIRS_WIKIMEDIA);
     switch_dirs("$SVN_WIKIMEDIA/extensions", "$DIR/extensions", $EXT_WIKIMEDIA);
+    switch_dirs("$SVN_WIKIMEDIA_17/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_17);
     switch_dirs("$SVN_WIKIMEDIA_TRUNK/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_TRUNK);
 }
 else
