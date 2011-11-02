@@ -1,0 +1,16 @@
+Depends on: Y-000-translit-upload-filenames.diff
+
+Totally improved MediaWiki Import and Export engine with conflict detection,
+advanced page selection for export and support for exporting file data over
+HTTP or inside the export file.
+
+Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+installation.
+
+Bug 47362 - Include images into export files
+Bug 54531 - Conflict detection
+Bug 80201 - NOT-in-category filter for export
+MediaWikiBug 22881 - Greatly improved Export and Import
+https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
+
+Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>

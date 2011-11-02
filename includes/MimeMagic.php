@@ -11,6 +11,18 @@
 define('MM_WELL_KNOWN_MIME_TYPES',<<<END_STRING
 application/ogg ogg ogm ogv
 application/pdf pdf
+application/vnd.ms-word.document.macroEnabled.12 docm
+application/vnd.openxmlformats-officedocument.wordprocessingml.document docx
+application/vnd.ms-word.template.macroEnabled.12 dotm
+application/vnd.openxmlformats-officedocument.wordprocessingml.template dotx
+application/vnd.ms-powerpoint.slideshow.macroEnabled.12 ppsm
+application/vnd.openxmlformats-officedocument.presentationml.slideshow ppsx
+application/vnd.ms-powerpoint.presentation.macroEnabled.12 pptm
+application/vnd.openxmlformats-officedocument.presentationml.presentation pptx
+application/vnd.ms-excel.sheet.binary.macroEnabled.12 xlsb
+application/vnd.ms-excel.sheet.macroEnabled.12 xlsm
+application/vnd.openxmlformats-officedocument.spreadsheetml.sheet xlsx
+application/vnd.ms-xpsdocument xps
 application/vnd.oasis.opendocument.chart odc
 application/vnd.oasis.opendocument.chart-template otc
 application/vnd.oasis.opendocument.formula odf
@@ -399,7 +411,7 @@ class MimeMagic {
 			'djvu', 'ogg', 'ogv', 'mid', 'pdf', 'wmf', 'xcf',
 
 			// XML formats we sure hope we recognize reliably
-			'svg',
+			'svg', 'svgz',
 		);
 		return in_array( strtolower( $extension ), $types );
 	}
@@ -497,11 +509,16 @@ class MimeMagic {
 		 */
 		$xml = new XmlTypeCheck( $file );
 		if( $xml->wellFormed ) {
-			global $wgXMLMimeTypes;
-			if( isset( $wgXMLMimeTypes[$xml->getRootElement()] ) ) {
-				return $wgXMLMimeTypes[$xml->getRootElement()];
-			} else {
-				return 'application/xml';
+			global $wgXMLMimeTypes, $wgXMLMayBeCompressed;
+			$t = $wgXMLMimeTypes[$xml->getRootElement()];
+			if( !$xml->compressed ) {
+				if( $t ) {
+					return $t;
+				} else {
+					return 'application/xml';
+				}
+			} elseif( $wgXMLMayBeCompressed[$t] ) {
+				return $t;
 			}
 		}
 
@@ -548,6 +565,8 @@ class MimeMagic {
 		// Check for ZIP (before getimagesize)
 		if ( strpos( $tail, "PK\x05\x06" ) !== false ) {
 			wfDebug( __METHOD__.": ZIP header present at end of $file\n" );
+			if ( function_exists( 'zip_open' ) )
+				return $this->detectZipTypeWithUncompress( $file );
 			return $this->detectZipType( $head );
 		}
 
@@ -569,6 +588,37 @@ class MimeMagic {
 		}
 
 		return false;
+	}
+	
+	function detectZipTypeWithUncompress( $filename )
+	{
+		if ( !is_resource( $zip = zip_open( $filename ) ) )
+		{
+			// Allow external type detection
+			return false;
+		}
+		// Check for OpenDocument and OOXML formats
+		do
+		{
+			$entry = zip_read( $zip );
+			if ( $entry )
+				$fn = strtolower( zip_entry_name( $entry ) );
+		} while( $entry && $fn != 'mimetype' && $fn != '[content_types].xml');
+		if ( $entry && zip_entry_open( $zip, $entry, 'r' ) )
+		{
+			$n = zip_entry_filesize( $entry );
+			$type = zip_entry_read( $entry, $n > 0x10000 ? 0x10000 : $n );
+			if ( $fn == 'mimetype' )
+				$type = $fn.$type;
+			zip_entry_close( $entry );
+		}
+		zip_close( $zip );
+		if ( !$type )
+		{
+			// Allow external type detection
+			return false;
+		}
+		return $this->detectZipType( $type );
 	}
 	
 	/**
@@ -600,16 +650,31 @@ class MimeMagic {
 
 		// http://lists.oasis-open.org/archives/office/200505/msg00006.html
 		$types = '(?:' . implode( '|', $opendocTypes ) . ')';
-		$opendocRegex = "/^mimetype(application\/vnd\.oasis\.opendocument\.$types)/";
+		$openxmlRegex =
+			'application\/vnd\.ms-word\.document\.macroEnabled\.12|'.
+			'application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.document|'.
+			'application\/vnd\.ms-word\.template\.macroEnabled\.12|'.
+			'application\/vnd\.openxmlformats-officedocument\.wordprocessingml\.template|'.
+			'application\/vnd\.ms-powerpoint\.slideshow\.macroEnabled\.12|'.
+			'application\/vnd\.openxmlformats-officedocument\.presentationml\.slideshow|'.
+			'application\/vnd\.ms-powerpoint\.presentation\.macroEnabled\.12|'.
+			'application\/vnd\.openxmlformats-officedocument\.presentationml\.presentation|'.
+			'application\/vnd\.ms-excel\.sheet\.binary\.macroEnabled\.12|'.
+			'application\/vnd\.ms-excel\.sheet\.macroEnabled\.12|'.
+			'application\/vnd\.openxmlformats-officedocument\.spreadsheetml\.sheet|'.
+			'application\/vnd\.ms-xpsdocument';
+		$opendocRegex = "/^mimetype(application\/vnd\.oasis\.opendocument\.$types)|ContentType=[\"\']?($openxmlRegex)/";
 		wfDebug( __METHOD__.": $opendocRegex\n" );
 		
-		if( preg_match( $opendocRegex, substr( $header, 30 ), $matches ) ) {
+		if( preg_match( $opendocRegex, $header, $matches ) ) {
 			$mime = $matches[1];
+			if ( !$mime )
+				$mime = $matches[2];
 			wfDebug( __METHOD__.": detected $mime from ZIP archive\n" );
 			return $mime;
 		} else {
 			wfDebug( __METHOD__.": unable to identify type of ZIP archive\n" );
-			return 'application/zip';
+			return false;
 		}
 	}
 
