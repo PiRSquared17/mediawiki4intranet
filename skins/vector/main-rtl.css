@@ -697,7 +697,16 @@ p {
 	margin: .4em 0 .5em 0;
 	line-height: 1.5em;
 }
+
+div.paragraph {
+	margin: .4em 0 .5em 0;
+	line-height: 1.5em;
+}
 	p img {
+		margin: 0;
+	}
+
+	div.paragraph img {
 		margin: 0;
 	}
 abbr,
@@ -842,6 +851,8 @@ div.floatright, table.floatright {
 	border: 0;
 }
 div.floatright p { font-style: italic; }
+
+div.floatright div.paragraph { font-style: italic; }
 div.floatleft, table.floatleft {
 	float: right;
 	clear: right;
@@ -850,6 +861,8 @@ div.floatleft, table.floatleft {
 	border: 0;
 }
 div.floatleft p { font-style: italic; }
+
+div.floatleft div.paragraph { font-style: italic; }
 /* Thumbnails */
 div.thumb {
 	margin-bottom: .5em;
@@ -927,6 +940,12 @@ img.thumbborder {
 }
 	#siteNotice div,
 	#siteNotice p {
+		margin: 0;
+		padding: 0;
+		margin-bottom: 0.9em;
+	}
+
+	#siteNotice div.paragraph {
 		margin: 0;
 		padding: 0;
 		margin-bottom: 0.9em;
