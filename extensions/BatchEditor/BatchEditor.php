@@ -150,7 +150,7 @@ function wfSpecialBatchEditor($par = null)
         if ($f)
         {
             if ($a_regexp)
-                $f = '#'.str_replace('#', "\\#", $f).'#';
+                $f = '#'.str_replace('#', "\\#", $f).'#'.($a_one ? 's' : '');
             $a_find[] = array($f, $a_regexp ? trim($ar[$a]) : $ar[$a]);
         }
     }
