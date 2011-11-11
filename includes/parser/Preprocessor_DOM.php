@@ -263,10 +263,9 @@ class Preprocessor_DOM implements Preprocessor {
 					continue;
 				}
 
-				if (strtolower(substr($text, $i, strlen('<enableheadshift>'))) == '<enableheadshift>')
-				{
+				if ( strtolower( substr( $text, $i, strlen( '<enableheadshift>' ) ) ) == '<enableheadshift>' ) {
 					$accum .= '<enableHeadShift><ignore>&lt;enableheadshift&gt;</ignore></enableHeadShift>';
-					$i += strlen('<enableheadshift>');
+					$i += strlen( '<enableheadshift>' );
 					continue;
 				}
 
@@ -826,7 +825,6 @@ class PPFrame_DOM implements PPFrame {
 	 */
 	var $depth;
 
-
 	/**
 	 * Construct a new preprocessor frame.
 	 * @param Preprocessor $preprocessor The parent preprocessor
@@ -954,23 +952,27 @@ class PPFrame_DOM implements PPFrame {
 			} elseif ( $contextNode instanceof DOMNode ) {
 				if ( $contextNode->nodeName == 'h' ) {
 					# Remember heading levels
-					if ($mn = $contextNode->attributes->getNamedItem('level'))
-					{
-						if ($headshift > 0 && $headshift_enabled)
-						{
+					$mn = $contextNode->attributes->getNamedItem( 'level' );
+					if ( $mn ) {
+						if ( $headshift > 0 && $headshift_enabled ) {
 							$mn->value = 0+$headshift+$mn->value;
 							$headshiftlocal = $headshift;
-							if ($mn->value > 6)
-							{
+							if ( $mn->value > 6 ) {
 								$headshiftlocal = $headshift-$mn->value+6;
 								$mn->value = 6;
 							}
-							if ($contextNode->childNodes->length <= 1)
-								$contextNode->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->nodeValue) . str_repeat('=', $headshiftlocal);
-							else
-							{
-								$contextNode->childNodes->item(0)->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->childNodes->item(0)->nodeValue);
-								$contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue = trim($contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue) . str_repeat('=', $headshiftlocal);
+							if ( $contextNode->childNodes->length <= 1 ) {
+								$contextNode->nodeValue =
+									str_repeat( '=', $headshiftlocal ) .
+									trim( $contextNode->nodeValue ) .
+									str_repeat( '=', $headshiftlocal );
+							} else {
+								$contextNode->childNodes->item( 0 )->nodeValue =
+									str_repeat( '=', $headshiftlocal ) .
+									trim( $contextNode->childNodes->item( 0 )->nodeValue );
+								$contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue =
+									trim( $contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue ) .
+									str_repeat( '=', $headshiftlocal );
 							}
 						}
 						$headlevel = 0+$mn->value;
