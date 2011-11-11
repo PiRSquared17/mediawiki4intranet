@@ -903,7 +903,7 @@ class PPFrame_DOM implements PPFrame {
 		$outStack = array( '', '' );
 		$iteratorStack = array( false, $root );
 		$indexStack = array( 0, 0 );
-		$headlevel = 0;
+		$headlevel = $headshift;
 		$headshift_enabled = false;
 
 		while ( count( $iteratorStack ) > 1 ) {
