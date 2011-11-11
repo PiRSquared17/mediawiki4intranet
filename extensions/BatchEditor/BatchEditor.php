@@ -7,15 +7,16 @@
  * (at your option) any later version.
  *
  * @author Stas Fomin <stas-fomin@yandex.ru>
+ * @author Vitaliy Filippov <vitalif@mail.ru>
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
-if (!defined('MEDIAWIKI')) die();
-
-require_once('LinksUpdate.php');
+if (!defined('MEDIAWIKI'))
+    die('Not an entry point');
 
 $wgExtensionFunctions[] = "wfInitBatchEditor";
 $wgExtensionMessagesFiles['BatchEditor'] = dirname(__FILE__) . '/BatchEditor.i18n.php';
+$wgSpecialPageGroups['BatchEditor'] = 'pagetools';
 
 function wfInitBatchEditor()
 {
@@ -95,8 +96,12 @@ function wfSpecialBatchEditor($par = null)
     <th><?=wfMsgExt('batcheditor-replace', array('parseinline'))?></th>
 </tr>
 <tr>
-    <td><textarea name="a_find"    rows="5" cols="45"><?=htmlspecialchars($a_find)?></textarea></td>
-    <td><textarea name="a_replace" rows="5" cols="45"><?=htmlspecialchars($a_replace)?></textarea></td>
+    <td><textarea name="a_find" rows="5" cols="45">
+<?=htmlspecialchars($a_find)?>
+</textarea></td>
+    <td><textarea name="a_replace" rows="5" cols="45">
+<?=htmlspecialchars($a_replace)?>
+</textarea></td>
 </tr>
 <tr>
     <td colspan="2" align="right">
@@ -153,7 +158,7 @@ function wfSpecialBatchEditor($par = null)
         {
             if ($a_regexp)
                 $f = '#'.str_replace('#', "\\#", $f).'#'.($a_one ? 's' : '');
-            $a_find[] = array($f, $a_regexp ? trim($ar[$a]) : $ar[$a]);
+            $a_find[] = array($f, $ar[$a]);
         }
     }
     # Regexps for deleting whole lines
