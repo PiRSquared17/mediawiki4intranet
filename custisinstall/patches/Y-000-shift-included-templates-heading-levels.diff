@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1302180602 -14400
+# Date 1321011394 -10800
 Bug 53818 - Allow optional shifting of included template/article heading levels
 Bug 75714 - Remove \n\n before special page inclusion
 
-diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Parser.php
+diff -r 025d3c6531d8 -r 3041c058098b includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -2780,6 +2780,7 @@
@@ -61,24 +61,31 @@ diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Parser.php
  		}
  		# Escape nowiki-style return values
  		elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
-diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Preprocessor_DOM.php
+diff -r 025d3c6531d8 -r 3041c058098b includes/parser/Preprocessor_DOM.php
 --- includes/parser/Preprocessor_DOM.php
 +++ includes/parser/Preprocessor_DOM.php
-@@ -263,6 +263,13 @@
+@@ -263,6 +263,12 @@
  					continue;
  				}
  
-+				if (strtolower(substr($text, $i, strlen('<enableheadshift>'))) == '<enableheadshift>')
-+				{
++				if ( strtolower( substr( $text, $i, strlen( '<enableheadshift>' ) ) ) == '<enableheadshift>' ) {
 +					$accum .= '<enableHeadShift><ignore>&lt;enableheadshift&gt;</ignore></enableHeadShift>';
-+					$i += strlen('<enableheadshift>');
++					$i += strlen( '<enableheadshift>' );
 +					continue;
 +				}
 +
  				// Determine element name
  				if ( !preg_match( $elementsRegex, $text, $matches, 0, $i + 1 ) ) {
  					// Element name missing or not listed
-@@ -871,7 +878,7 @@
+@@ -819,7 +825,6 @@
+ 	 */
+ 	var $depth;
+ 
+-
+ 	/**
+ 	 * Construct a new preprocessor frame.
+ 	 * @param Preprocessor $preprocessor The parent preprocessor
+@@ -871,7 +876,7 @@
  		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title );
  	}
  
@@ -87,7 +94,7 @@ diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Preprocessor_DOM.php
  		static $expansionDepth = 0;
  		if ( is_string( $root ) ) {
  			return $root;
-@@ -898,6 +905,8 @@
+@@ -898,6 +903,8 @@
  		$outStack = array( '', '' );
  		$iteratorStack = array( false, $root );
  		$indexStack = array( 0, 0 );
@@ -96,29 +103,33 @@ diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -943,8 +952,36 @@
+@@ -943,8 +950,40 @@
  			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
  				$newIterator = $contextNode;
  			} elseif ( $contextNode instanceof DOMNode ) {
 +				if ( $contextNode->nodeName == 'h' ) {
 +					# Remember heading levels
-+					if ($mn = $contextNode->attributes->getNamedItem('level'))
-+					{
-+						if ($headshift > 0 && $headshift_enabled)
-+						{
++					$mn = $contextNode->attributes->getNamedItem( 'level' );
++					if ( $mn ) {
++						if ( $headshift > 0 && $headshift_enabled ) {
 +							$mn->value = 0+$headshift+$mn->value;
 +							$headshiftlocal = $headshift;
-+							if ($mn->value > 6)
-+							{
++							if ( $mn->value > 6 ) {
 +								$headshiftlocal = $headshift-$mn->value+6;
 +								$mn->value = 6;
 +							}
-+							if ($contextNode->childNodes->length <= 1)
-+								$contextNode->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->nodeValue) . str_repeat('=', $headshiftlocal);
-+							else
-+							{
-+								$contextNode->childNodes->item(0)->nodeValue = str_repeat('=', $headshiftlocal) . trim($contextNode->childNodes->item(0)->nodeValue);
-+								$contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue = trim($contextNode->childNodes->item($contextNode->childNodes->length-1)->nodeValue) . str_repeat('=', $headshiftlocal);
++							if ( $contextNode->childNodes->length <= 1 ) {
++								$contextNode->nodeValue =
++									str_repeat( '=', $headshiftlocal ) .
++									trim( $contextNode->nodeValue ) .
++									str_repeat( '=', $headshiftlocal );
++							} else {
++								$contextNode->childNodes->item( 0 )->nodeValue =
++									str_repeat( '=', $headshiftlocal ) .
++									trim( $contextNode->childNodes->item( 0 )->nodeValue );
++								$contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue =
++									trim( $contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue ) .
++									str_repeat( '=', $headshiftlocal );
 +							}
 +						}
 +						$headlevel = 0+$mn->value;
@@ -133,7 +144,7 @@ diff -r 9cc4b1960d33 -r 00ce7d522015 includes/parser/Preprocessor_DOM.php
  				} elseif ( $contextNode->nodeName == 'template' ) {
  					# Double-brace expansion
  					$xpath = new DOMXPath( $contextNode->ownerDocument );
-@@ -956,6 +993,7 @@
+@@ -956,6 +995,7 @@
  					} else {
  						$lineStart = $contextNode->getAttribute( 'lineStart' );
  						$params = array(
