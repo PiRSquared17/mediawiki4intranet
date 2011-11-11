@@ -1,15 +1,15 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1314889765 -10800
+# Date 1321011367 -10800
 Bug 62054 -
   __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
   enable/disable "tag-like" page grouping based on their other categories,
   __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryPageSubclass.php
+diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
-@@ -61,4 +61,182 @@
+@@ -61,4 +61,184 @@
  		}
  		parent::finaliseCategoryState();
  	}
@@ -27,7 +27,7 @@ diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryPageSubclas
 +    function formatList($articles, $articles_start_char, $cutoff = 6)
 +    {
 +        global $wgOut;
-+        if (!$wgOut->noCategoryColumns && count($articles) > $cutoff)
++        if (!isset($wgOut->noCategoryColumns) && count($articles) > $cutoff)
 +            return $this->columnList($articles, $articles_start_char);
 +        elseif ($articles)
 +        {
@@ -109,6 +109,8 @@ diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryPageSubclas
 +        global $wgCategorySubcategorizedList;
 +        global $wgSubcategorizedAlwaysExclude;
 +        global $wgOut;
++        if (!isset($wgOut->useSubcategorizedList))
++            $wgOut->useSubcategorizedList = false;
 +        /* If there is no articles, or if we are forced to show normal list - show it */
 +        if (!$this->articles || !$wgCategorySubcategorizedList && !$wgOut->useSubcategorizedList ||
 +            $wgCategorySubcategorizedList && !is_null($wgOut->useSubcategorizedList) &&
@@ -192,7 +194,7 @@ diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryTree.php
+diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
 @@ -377,3 +377,36 @@
@@ -232,7 +234,7 @@ diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r 45da8fc662c9 -r 73ef85274f8c extensions/CategoryTree/SubcatCat.i18n.php
+diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,9 @@
