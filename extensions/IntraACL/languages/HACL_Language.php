@@ -26,15 +26,14 @@
 /**
  * HACLLanguage is the class where all shared constants and important
  * language-specific names live.
- * All properties are public, but you getters instead to get a runtime error
+ * All properties are public, but use getters instead to get a runtime error
  * when trying to access non-existing property.
  */
 
 /**
  * Security descriptors protect different types of elements i.e. pages,
- * instances of categories and namespaces and properties. The name of a
- * security descriptor has a prefix that matches this type. The prefix
- * depends on the language.
+ * instances of categories and namespaces. The name of a security descriptor
+ * has a prefix that matches this type. The prefix depends on the language.
  *
  * Example: ACL:Page/X is the security descriptor for page X. The prefix is
  *          "Page".
@@ -51,7 +50,6 @@ abstract class HACLLanguage
     const PF_MANAGE_RIGHTS      = 2;
     const PF_MANAGE_GROUP       = 3;
     const PF_PREDEFINED_RIGHT   = 4;
-    const PF_PROPERTY_ACCESS    = 5;
     const PF_MEMBER             = 7;
 
     //--- IDs of parser function parameters ---
@@ -80,7 +78,6 @@ abstract class HACLLanguage
     const PET_PAGE      = 'page';       // Protect pages
     const PET_CATEGORY  = 'category';   // Protect instances of a category
     const PET_NAMESPACE = 'namespace';  // Protect instances of a namespace
-    const PET_PROPERTY  = 'property';   // Protect values of a property
     const PET_RIGHT     = 'right';      // Not an actual SD but a right template equal to SD by structure
 
     //////////////////////////////////
@@ -100,7 +97,6 @@ abstract class HACLLanguage
         self::PF_MANAGE_RIGHTS      => 'manage rights',
         self::PF_MANAGE_GROUP       => 'manage group',
         self::PF_PREDEFINED_RIGHT   => 'predefined right',
-        self::PF_PROPERTY_ACCESS    => 'property access',
         self::PF_MEMBER             => 'member'
     );
 
@@ -154,7 +150,6 @@ abstract class HACLLanguage
         self::PET_PAGE      => 'Page',
         self::PET_CATEGORY  => 'Category',
         self::PET_NAMESPACE => 'Namespace',
-        self::PET_PROPERTY  => 'Property',
         self::PET_RIGHT     => 'Right',
     );
 
@@ -184,10 +179,25 @@ abstract class HACLLanguage
     // GETTERS //
     /////////////
 
-    public function getNamespaces() { return $this->mNamespaces; }
-    public function getNamespaceAliases() { return $this->mNamespaceAliases; }
-    public function getPermissionDeniedPage() { return $this->mPermissionDeniedPage; }
-    public function getPermissionDeniedPageContent() { return $this->mPermissionDeniedPageContent; }
+    public function getNamespaces()
+    {
+        return $this->mNamespaces;
+    }
+
+    public function getNamespaceAliases()
+    {
+        return $this->mNamespaceAliases;
+    }
+
+    public function getPermissionDeniedPage()
+    {
+        return $this->mPermissionDeniedPage;
+    }
+
+    public function getPermissionDeniedPageContent()
+    {
+        return $this->mPermissionDeniedPageContent;
+    }
 
     /**
      * This method returns the language dependent name of a parser function.
@@ -198,7 +208,8 @@ abstract class HACLLanguage
      * @return string
      *         The language dependent name of the parser function.
      */
-    public function getParserFunction($parserFunctionID) {
+    public function getParserFunction($parserFunctionID)
+    {
         return $this->mParserFunctions[$parserFunctionID];
     }
 
@@ -212,7 +223,8 @@ abstract class HACLLanguage
      * @return string
      *         The language dependent name of the parser function.
      */
-    public function getParserFunctionParameter($parserFunctionParameterID) {
+    public function getParserFunctionParameter($parserFunctionParameterID)
+    {
         return $this->mParserFunctionsParameters[$parserFunctionParameterID];
     }
 
@@ -224,16 +236,53 @@ abstract class HACLLanguage
      *         A mapping from action IDs to action names.
      *         The possible IDs are HACLLanguage::RIGHT_*
      */
-    public function getActionNames()    { return $this->mActionNames; }
+    public function getActionNames()
+    {
+        return $this->mActionNames;
+    }
 
     // Get self::RIGHT_* action ID by action name $name
-    public function getActionId($name)  { return $this->mActionAliases[mb_strtolower($name)]; }
+    public function getActionId($name)
+    {
+        return $this->mActionAliases[mb_strtolower($name)];
+    }
 
-    public function getPetPrefix($type) { return $this->mPetPrefixes[$type]; }
-    public function getPetPrefixes()    { return $this->mPetPrefixes; }
-    public function getPrefix($prefix)  { return $this->mPrefixes[mb_strtolower($prefix)]; }
-    public function getPrefixes()       { return $this->mPrefixes; }
-    public function getPetAlias($alias) { return $this->mPetAliases[mb_strtolower($alias)]; }
-    public function getPetAliases()     { return $this->mPetAliases; }
-    public function getGroupPrefix()    { return $this->mGroupPrefix; }
+    public function getPetPrefix($type)
+    {
+        return $this->mPetPrefixes[$type];
+    }
+
+    public function getPetPrefixes()
+    {
+        return $this->mPetPrefixes;
+    }
+
+    public function getPrefix($prefix)
+    {
+        if (isset($this->mPrefixes[mb_strtolower($prefix)]))
+            return $this->mPrefixes[mb_strtolower($prefix)];
+        return false;
+    }
+
+    public function getPrefixes()
+    {
+        return $this->mPrefixes;
+    }
+
+    public function getPetAlias($alias)
+    {
+        if (isset($this->mPetAliases[mb_strtolower($alias)]))
+            return $this->mPetAliases[mb_strtolower($alias)];
+        return false;
+    }
+
+    public function getPetAliases()
+    {
+        return $this->mPetAliases;
+    }
+
+    public function getGroupPrefix()
+    {
+        return $this->mGroupPrefix;
+    }
 }

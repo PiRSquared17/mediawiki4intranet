@@ -224,7 +224,7 @@ class SpecialTemplatedPageList extends SpecialPage
 
 class TemplatedPageList
 {
-    var $oldParser, $parser, $title;
+    var $oldParser, $parser, $parserOptions, $outputType, $title;
 
     var $options = array();
     var $total = 0;
@@ -254,10 +254,11 @@ class TemplatedPageList
     /* Constructor. $input is tag text, $args is tag arguments, $parser is parser object */
     function __construct($input, $args, $parser)
     {
+        global $wgTitle;
         wfLoadExtensionMessages('TemplatedPageList');
         $this->oldParser = $parser;
         $this->parser = clone $parser;
-        $this->title = $parser->mTitle;
+        $this->title = $parser->mTitle ? $parser->mTitle : $wgTitle;
         $this->input = $input;
         $this->options = $this->parseOptions($input);
     }
@@ -266,18 +267,17 @@ class TemplatedPageList
     {
         $args = func_get_args();
         $msg = array_shift($args);
-        $this->errors[] = htmlspecialchars(wfMsg($msg, $args));
+        $this->errors[] = wfMsgNoTrans($msg, $args);
     }
 
-    function getErrors()
+    function getErrors($outputType)
     {
         if (!$this->errors)
             return '';
-        $html = "<p><strong>".wfMsg('spl-errors')."</strong></p><ul>";
-        foreach ($this->errors as $e)
-            $html .= "<li>$e</li>";
-        $html .= "</ul>";
-        return $html;
+        $text = wfMsg('spl-errors')."\n* ".implode("\n* ", $this->errors)."\n\n";
+        if ($outputType == 'html')
+            $text = $this->parse($text);
+        return $text;
     }
 
     /**
@@ -420,7 +420,8 @@ class TemplatedPageList
                     $options['prefix'] = $t;
                 break;
             case 'ignore':
-                $options['ignore'] = array_merge($options['ignore'], $value);
+                foreach (preg_split('/[\|\s]*\|[\|\s]*/u', $value) as $ign)
+                    $options['ignore'][] = $ign;
                 break;
             case 'redirect':
                 $options['redirect'] = $value == 'yes' || $value == 'true' || $value === '1';
@@ -480,7 +481,7 @@ class TemplatedPageList
                 break;
             case 'template':
                 $tpl = Title::newFromText($value, NS_TEMPLATE);
-                if ($tpl->exists() && $tpl->userCanRead())
+                if ($tpl && $tpl->exists() && $tpl->userCanRead())
                 {
                     if (!$options['output'])
                         $options['output'] = 'template';
@@ -499,7 +500,8 @@ class TemplatedPageList
             }
         }
 
-        if (!$options['output'] || $options['output'] == 'template' && !$options['template'])
+        if (!$options['output'] || $options['output'] == 'template' &&
+            empty($options['template']))
             $options['output'] = 'simple';
         if (!$options['order'])
             $options['order'] = array(array('title', $options['defaultorder']));
@@ -511,7 +513,7 @@ class TemplatedPageList
      * Render page list
      * @return string html output
      */
-    function render()
+    function render($outputType = 'html')
     {
         global $egInSubpageList;
         if (!isset($egInSubpageList))
@@ -521,28 +523,32 @@ class TemplatedPageList
             return '';
         $egInSubpageList[$this->input] = 1;
         wfProfileIn(__METHOD__);
+        $this->outputType = $outputType;
         $this->oldParser->disableCache();
         $pages = $this->getPages();
         if (count($pages) > 0)
         {
             if ($this->options['output'] == 'template')
             {
-                $list = $this->makeTemplatedList($pages);
-                $html = $this->parse($list);
-                $html = preg_replace('#^<p>(.*)</p>$#is', '\1', $html);
+                $text = $this->makeTemplatedList($pages);
+                if ($outputType == 'html')
+                {
+                    $text = $this->parse($text);
+                    $text = preg_replace('#^<p>(.*)</p>$#is', '\1', $text);
+                }
             }
-            elseif ($this->options['output'] == 'column')
-                $html = $this->makeColumnList($pages);
+            elseif ($this->options['output'] == 'column' && $outputType == 'html')
+                $text = $this->makeColumnList($pages);
             else
-                $html = $this->makeSimpleList($pages);
+                $text = $this->makeSimpleList($pages, $outputType);
         }
         else
-            $html = '';
+            $text = '';
         if (empty($this->options['silent']))
-            $html = $this->getErrors() . $html;
+            $text = $this->getErrors($outputType) . $text;
         wfProfileOut(__METHOD__);
         unset($egInSubpageList[$this->input]);
-        return $html;
+        return $text;
     }
 
     /**
@@ -661,20 +667,32 @@ class TemplatedPageList
     }
 
     /**
+     * Adds a templatelinks dependency
+     */
+    function addDep($title)
+    {
+        $rev = Revision::newFromTitle($title);
+        $id = $rev ? $rev->getPage() : 0;
+        $this->oldParser->mOutput->addTemplate($title, $id, $rev ? $rev->getId() : 0);
+    }
+
+    /**
      * Process $template using each article in $pages as params
      * and return concatenated output.
      * @param Array $pages Article objects
-     * @param string $template Standard MediaWiki template-like source
      * @return string the parsed output
      */
     function makeTemplatedList($pages)
     {
         $text = '';
         $tpl = $this->options['template']->getPrefixedText();
+        $this->addDep($this->options['template']);
         foreach ($pages as $i => $article)
         {
             $args = array();
-            $t = $article->getTitle()->getPrefixedText();
+            $t = $article->getTitle();
+            $this->addDep($t);
+            $t = $t->getPrefixedText();
             $args['index']         = $i;
             $args['number']        = $i+1;
             $args['odd']           = $i&1 ? 0 : 1;
@@ -724,13 +742,25 @@ class TemplatedPageList
      */
     function makeSimpleList($pages)
     {
-        global $wgUser;
-        $skin = $wgUser->getSkin();
-        $html = '<ul>';
-        foreach ($pages as $i => $article)
-            $html .= '<li>'.$skin->link($article->getTitle()).'</li>';
-        $html .= '</ul>';
-        return $html;
+        if ($this->outputType == 'html')
+        {
+            global $wgUser;
+            $skin = $wgUser->getSkin();
+            $text = '<ul>';
+            foreach ($pages as $i => $article)
+                $text .= '<li>'.$skin->link($article->getTitle()).'</li>';
+            $text .= '</ul>';
+        }
+        else
+        {
+            $text = '';
+            foreach ($pages as $i => $article)
+            {
+                $t = $article->getTitle()->getPrefixedText();
+                $text .= "* [[$t]]\n";
+            }
+        }
+        return $text;
     }
 
     /**
@@ -741,8 +771,13 @@ class TemplatedPageList
     function parse($text)
     {
         wfProfileIn(__METHOD__);
-        $options = $this->oldParser->mOptions;
-        $output = $this->parser->parse($text, $this->title, $options, true, false);
+        if (!$this->parserOptions)
+        {
+            $this->parserOptions = clone $this->oldParser->mOptions;
+            $this->parserOptions->setEditSection(false);
+        }
+        $text = "__NOTOC__$text";
+        $output = $this->parser->parse($text, $this->title, $this->parserOptions, true, false);
         wfProfileOut(__METHOD__);
         return $output->getText();
     }

@@ -7,15 +7,16 @@
  * (at your option) any later version.
  *
  * @author Stas Fomin <stas-fomin@yandex.ru>
+ * @author Vitaliy Filippov <vitalif@mail.ru>
  * @license http://www.gnu.org/copyleft/gpl.html GNU General Public License 2.0 or later
  */
 
-if (!defined('MEDIAWIKI')) die();
-
-require_once('LinksUpdate.php');
+if (!defined('MEDIAWIKI'))
+    die('Not an entry point');
 
 $wgExtensionFunctions[] = "wfInitBatchEditor";
 $wgExtensionMessagesFiles['BatchEditor'] = dirname(__FILE__) . '/BatchEditor.i18n.php';
+$wgSpecialPageGroups['BatchEditor'] = 'pagetools';
 
 function wfInitBatchEditor()
 {
@@ -39,6 +40,7 @@ function wfSpecialBatchEditor($par = null)
     $a_run     = $wgRequest->getVal('a_run');
     $a_preview = $wgRequest->getVal('a_preview');
 
+    $a_create = $wgRequest->getCheck('a_create') ? ' checked="checked" ' : false;
     $a_minor  = $wgRequest->getCheck('a_minor') ? ' checked="checked" ' : false;
     $a_regexp = $wgRequest->getCheck('a_regexp') ? ' checked="checked" ' : false;
     $a_one    = $wgRequest->getCheck('a_one') ? ' checked="checked" ' : false;
@@ -80,21 +82,26 @@ function wfSpecialBatchEditor($par = null)
 <tr valign="top">
     <td><?=wfMsgExt('batcheditor-comment-title', array('parseinline'))?></td>
     <td>
-        <input name="a_comment" size="80" value="<?=htmlspecialchars($a_comment)?>" />
+        <input name="a_comment" style="width: 100%" value="<?=htmlspecialchars($a_comment)?>" /><br />
         <input type="checkbox" name="a_minor" id="a_minor" <?=$a_minor?> value="1"/><label for="a_minor"><?=wfMsg('minoredit')?></label>
+        <input type="checkbox" name="a_create" id="a_create" <?=$a_create?> value="1"/><label for="a_create"><?=wfMsg('batcheditor-create')?></label>
     </td>
 </tr>
 <tr>
     <td colspan="2">
 
-<table cellspacing="8">
+<table cellspacing="8" style="border-collapse: separate">
 <tr>
     <th><?=wfMsgExt('batcheditor-find', array('parseinline'))?></th>
     <th><?=wfMsgExt('batcheditor-replace', array('parseinline'))?></th>
 </tr>
 <tr>
-    <td><textarea name="a_find"    rows="5" cols="45"><?=htmlspecialchars($a_find)?></textarea></td>
-    <td><textarea name="a_replace" rows="5" cols="45"><?=htmlspecialchars($a_replace)?></textarea></td>
+    <td><textarea name="a_find" rows="5" cols="45">
+<?=htmlspecialchars($a_find)?>
+</textarea></td>
+    <td><textarea name="a_replace" rows="5" cols="45">
+<?=htmlspecialchars($a_replace)?>
+</textarea></td>
 </tr>
 <tr>
     <td colspan="2" align="right">
@@ -150,8 +157,8 @@ function wfSpecialBatchEditor($par = null)
         if ($f)
         {
             if ($a_regexp)
-                $f = '#'.str_replace('#', "\\#", $f).'#';
-            $a_find[] = array($f, $a_regexp ? trim($ar[$a]) : $ar[$a]);
+                $f = '#'.str_replace('#', "\\#", $f).'#'.($a_one ? 's' : '');
+            $a_find[] = array($f, $ar[$a]);
         }
     }
     # Regexps for deleting whole lines
@@ -169,7 +176,7 @@ function wfSpecialBatchEditor($par = null)
     if (trim($a_titles) != '' && ($a_run || $a_preview))
     {
         $wgOut->addWikiText(wfMsg('batcheditor-'.($a_run?'results':'preview').'-page'));
-        $arr_titles = split("\n", $a_titles);
+        $arr_titles = explode("\n", $a_titles);
         foreach($arr_titles as $s_title)
         {
             $s_title = trim($s_title);
@@ -177,61 +184,67 @@ function wfSpecialBatchEditor($par = null)
             if (!$title)
                 continue;
 /*patch|2011-03-01|IntraACL|start*/
-            if (!$title->userCan('edit') || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
+            if (method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
                 continue;
 /*patch|2011-03-01|IntraACL|end*/
             $article = new Article($title);
-            if ($article->mTitle->getArticleID() == 0)
-                $wgOut->addWikiText("== [[$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
-            else
+            $oldtext = '';
+            if ($article->exists())
             {
                 $article->loadContent(false);
                 $oldtext = $article->mContent;
-                $newtext = $oldtext;
-                if (count($a_find))
+            }
+            elseif (!$a_create)
+            {
+                $wgOut->addWikiText("== [[$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
+                continue;
+            }
+            $newtext = $oldtext;
+            if (count($a_find))
+            {
+                $cb = $a_regexp ? 'preg_replace' : 'str_replace';
+                foreach ($a_find as $f)
+                    $newtext = call_user_func($cb, $f[0], $f[1], $newtext);
+            }
+            if (count($a_delete))
+                foreach ($a_delete as $s)
+                    $newtext = preg_replace($s, "", $newtext);
+            if (@trim($a_add))
+                $newtext .= "\n" . $a_add;
+            # Preview or run only if new text differs
+            if ($newtext != $oldtext)
+            {
+                $oldrev = wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true));
+                $newrev = wfMsg('yourtext');
+                $wgOut->addStyle('common/diff.css');
+                $wgOut->addWikiText("== [[$s_title]] ==");
+                $canedit = $article->getTitle()->userCan('edit');
+                if (!$canedit)
+                    $wgOut->addWikiText('<div style="color:red">\'\'\''.wfMsg('batcheditor-edit-denied').'\'\'\'</div>');
+                elseif ($a_run)
                 {
-                    $cb = $a_regexp ? 'preg_replace' : 'str_replace';
-                    foreach ($a_find as $f)
-                        $newtext = call_user_func($cb, $f[0], $f[1], $newtext);
-                }
-                if (count($a_delete))
-                    foreach ($a_delete as $s)
-                        $newtext = preg_replace($s, "", $newtext);
-                if (@trim($a_add))
-                    $newtext .= "\n" . $a_add;
-                # Preview or run only if new text differs
-                if ($newtext != $oldtext)
-                {
-                    $oldrev = wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true));
-                    $newrev = wfMsg('yourtext');
-                    $wgOut->addStyle('common/diff.css');
-                    $wgOut->addWikiText("== [[$s_title]] ==");
-                    if (!($canedit = $article->getTitle()->userCan('edit')))
-                        $wgOut->addWikiText('<div style="color:red">\'\'\''.wfMsg('batcheditor-edit-denied').'\'\'\'</div>');
-                    else if ($a_run)
+                    $flags = EDIT_DEFER_UPDATES | EDIT_AUTOSUMMARY;
+                    if ($a_minor)
+                        $flags |= EDIT_MINOR;
+                    $st = false;
+                    if (($st = $article->doEdit($newtext, $a_comment, $flags)) && $st->isGood())
+                        $newrev = wfMsgHTML('currentrev-asof', $wgLang->timeanddate($st->value['revision']->getTimestamp(), true));
+                    else
                     {
-                        $flags = EDIT_UPDATE | EDIT_DEFER_UPDATES | EDIT_AUTOSUMMARY;
-                        if ($a_minor)
-                            $flags |= EDIT_MINOR;
-                        $st = false;
-                        if (($st = $article->doEdit($newtext, $a_comment, $flags)) && $st->isGood())
-                            $newrev = wfMsgHTML('currentrev-asof', $wgLang->timeanddate($st->value['revision']->getTimestamp(), true));
+                        $msg = wfMsg('batcheditor-edit-error');
+                        if ($st)
+                            $msg .= ': ' . $st->getWikiText();
                         else
-                        {
-                            $msg = wfMsg('batcheditor-edit-error');
-                            if ($st)
-                                $msg .= ': ' . $st->getWikiText();
-                            else
-                                $msg .= '.';
-                            $wgOut->addWikiText('<div style="color:red">\'\'\'' . $msg . '\'\'\'</div>');
-                        }
+                            $msg .= '.';
+                        $wgOut->addWikiText('<div style="color:red">\'\'\'' . $msg . '\'\'\'</div>');
                     }
-                    if (!$a_run || $canedit)
-                    {
-                        $de = new DifferenceEngine();
-                        $de->setText($oldtext, $newtext);
-                        $res = $de->getDiffBody();
-                        $res = "
+                }
+                if (!$a_run || $canedit)
+                {
+                    $de = new DifferenceEngine();
+                    $de->setText($oldtext, $newtext);
+                    $res = $de->getDiffBody();
+                    $res = "
 <table class='diff'>
     <col class='diff-marker' />
     <col class='diff-content' />
@@ -242,8 +255,7 @@ function wfSpecialBatchEditor($par = null)
         <td colspan='2' width='50%' align='center' class='diff-ntitle'>$newrev</td>
     </tr>
 " . $res . "</table>";
-                        $wgOut->addHTML($res);
-                    }
+                    $wgOut->addHTML($res);
                 }
             }
         }
