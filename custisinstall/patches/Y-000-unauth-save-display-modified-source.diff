@@ -1,0 +1,24 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297451170 -10800
+Bug 50009 - Show their modified text instead of latest saved on Save click to users who can't modify the page
+
+diff -r b11befdd7427 -r 7ef6e9beec21 includes/EditPage.php
+--- includes/EditPage.php
++++ includes/EditPage.php
+@@ -321,8 +321,13 @@
+ 
+ 		$permErrors = $this->getEditPermissionErrors();
+ 		if ( $permErrors ) {
+-			wfDebug( __METHOD__ . ": User can't edit\n" );
+-			$this->readOnlyPage( $this->getContent( false ), true, $permErrors, 'edit' );
++			wfDebug( __METHOD__.": User can't edit\n" );
++			$this->readOnlyPage(
++			    $this->textbox2 ? $this->textbox2 :
++			    $this->textbox1 ? $this->textbox1 :
++			                      $this->getContent( false ),
++			    true, $permErrors, 'edit'
++			);
+ 			wfProfileOut( __METHOD__ );
+ 			return;
+ 		} else {

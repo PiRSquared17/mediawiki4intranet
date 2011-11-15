@@ -1,0 +1,62 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1308054349 -14400
+Bug 73938 - YMD HMS date format
+
+diff -r 45da8fc662c9 -r 2e5c09bbbaf6 includes/OutputPage.php
+--- includes/OutputPage.php
++++ includes/OutputPage.php
+@@ -437,18 +437,9 @@
+ 
+ 	/**
+ 	 * "HTML title" means the contents of <title>.
+-	 * It is stored as plain, unescaped text and will be run through htmlspecialchars in the skin file.
+-	 * If $name is from page title, it can only override names which are also from page title,
+-	 * but if it is not from page title, it can override all other names.
+ 	 */
+ 	public function setHTMLTitle( $name, $frompagetitle = false ) {
+-		if ( $frompagetitle && $this->mHTMLtitleFromPagetitle ) {
+-			$this->mHTMLtitle = $name;
+-		}
+-		elseif ( $this->mHTMLtitleFromPagetitle ) {
+-			$this->mHTMLtitle = $name;
+-			$this->mHTMLtitleFromPagetitle = false;
+-		}
++		$this->mHTMLtitle = $name;
+ 	}
+ 
+ 	/**
+diff -r 45da8fc662c9 -r 2e5c09bbbaf6 includes/specials/SpecialUserlogin.php
+--- includes/specials/SpecialUserlogin.php
++++ includes/specials/SpecialUserlogin.php
+@@ -977,7 +977,7 @@
+ 			$linkq .= '&uselang=' . $this->mLanguage;
+ 
+ 		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
+-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
++		$link .= wfMsgExt( $linkmsg . 'link', array( 'parseinline' ) ); # Calling either 'gotaccountlink' or 'nologinlink'
+ 		$link .= '</a>';
+ 
+ 		# Don't show a "create account" link if the user can't
+diff -r 45da8fc662c9 -r 2e5c09bbbaf6 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -137,6 +137,7 @@
+ 	'mdy',
+ 	'dmy',
+ 	'ymd',
++	'ymd hms',
+ 	'ISO 8601',
+ );
+ 
+@@ -183,6 +184,10 @@
+ 	'ISO 8601 time' => 'xnH:xni:xns',
+ 	'ISO 8601 date' => 'xnY-xnm-xnd',
+ 	'ISO 8601 both' => 'xnY-xnm-xnd"T"xnH:xni:xns',
++
++	'ymd hms time' => 'xnH:xni:xns',
++	'ymd hms date' => 'xnY-xnm-xnd',
++	'ymd hms both' => 'xnY-xnm-xnd" "xnH:xni:xns',
+ );
+ 
+ /**
