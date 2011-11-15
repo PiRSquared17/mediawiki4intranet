@@ -75,7 +75,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
     function formatList($articles, $articles_start_char, $cutoff = 6)
     {
         global $wgOut;
-        if (!$wgOut->noCategoryColumns && count($articles) > $cutoff)
+        if (!isset($wgOut->noCategoryColumns) && count($articles) > $cutoff)
             return $this->columnList($articles, $articles_start_char);
         elseif ($articles)
         {
@@ -157,6 +157,8 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         global $wgCategorySubcategorizedList;
         global $wgSubcategorizedAlwaysExclude;
         global $wgOut;
+        if (!isset($wgOut->useSubcategorizedList))
+            $wgOut->useSubcategorizedList = false;
         /* If there is no articles, or if we are forced to show normal list - show it */
         if (!$this->articles || !$wgCategorySubcategorizedList && !$wgOut->useSubcategorizedList ||
             $wgCategorySubcategorizedList && !is_null($wgOut->useSubcategorizedList) &&
