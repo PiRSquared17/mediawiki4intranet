@@ -127,6 +127,8 @@ $wgForbiddenTagsInUploads = array('<object', '<param', '<embed', '<script');
 require_once($IP.'/extensions/PagedTiffHandler/PagedTiffHandler.php');
 unset($wgAutoloadClasses['PagedTiffHandlerSeleniumTestSuite']);
 
+require_once($IP.'/extensions/Mp3Handler/Mp3Handler.php');
+
 require_once($IP.'/extensions/Dia/Dia.php');
 
 $wgAllowCategorizedRecentChanges = true;
