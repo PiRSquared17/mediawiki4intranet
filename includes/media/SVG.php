@@ -6,29 +6,25 @@
 
 class SvgThumbnailImage extends ThumbnailImage
 {
-	function SvgThumbnailImage( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false )
-	{
+	function SvgThumbnailImage( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false ) {
 		$this->svgurl = $svgurl;
 		$this->later = $later;
 		$this->ThumbnailImage( $file, $url, $width, $height, $path, $page );
 	}
-	static function scaleParam( $name, $value, $sw, $sh )
-	{
-		if ( $name == 'viewBox' )
-		{
+	static function scaleParam( $name, $value, $sw, $sh ) {
+		if ( $name == 'viewBox' ) {
 			$value = preg_split( '/\s+/', $value );
 			$value[0] *= $sw; $value[1] *= $sh;
 			$value[2] *= $sw; $value[3] *= $sh;
 			$value = implode( ' ', $value );
-		}
-		elseif ( $name == 'width' )
+		} elseif ( $name == 'width' ) {
 			$value *= $sw;
-		else
+		} else {
 			$value *= $sh;
+		}
 		return "$name=\"$value\"";
 	}
-	function toHtml( $options = array() )
-	{
+	function toHtml( $options = array() ) {
 		if ( count( func_get_args() ) == 2 ) {
 			throw new MWException( __METHOD__ .' called in the old style' );
 		}
@@ -72,18 +68,20 @@ class SvgThumbnailImage extends ThumbnailImage
 
 		if ( !empty( $linkAttribs['href'] ) ||
 			$this->width != $this->file->getWidth() ||
-			$this->height != $this->file->getHeight() )
-		{
-			if ( empty( $linkAttribs['href'] ) )
+			$this->height != $this->file->getHeight() ) {
+			if ( empty( $linkAttribs['href'] ) ) {
 				$linkAttribs['href'] = '';
-			if ( empty( $linkAttribs['title'] ) )
+			}
+			if ( empty( $linkAttribs['title'] ) ) {
 				$linkAttribs['title'] = '';
+			}
 			// :-( The only cross-browser way to link from SVG
 			// is to add an <a xlink:href> into SVG image itself
 			global $wgServer;
 			$href = $linkAttribs['href'];
-			if ( $href{0} == '/' )
+			if ( $href{0} == '/' ) {
 				$href = $wgServer . $href;
+			}
 			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
 			$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
 				$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
@@ -91,16 +89,15 @@ class SvgThumbnailImage extends ThumbnailImage
 			$linkurl = $this->file->getThumbUrl() . $hash;
 
 			// Cache changed SVGs only when TRANSFORM_LATER is on
-			if ( $this->later )
+			if ( $this->later ) {
 				$mtime = @filemtime( $linkfn );
-			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
-			{
+			}
+			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) ) {
 				// Load original SVG or SVGZ and extract opening element
 				$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
 				preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
-				$closepos = strpos( $svg, '</svg' );
-				if ( $m && $closepos !== false )
-				{
+				$closepos = strrpos( $svg, '</svg' );
+				if ( $m && $closepos !== false ) {
 					$open = $m[0][0];
 					$openpos = $m[0][1];
 					$openlen = strlen( $m[0][0] );
@@ -111,17 +108,16 @@ class SvgThumbnailImage extends ThumbnailImage
 					$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
 						create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
 					// Add xlink namespace, if not yet
-					if ( !strpos( $open, 'xmlns:xlink' ) )
+					if ( !strpos( $open, 'xmlns:xlink' ) ) {
 						$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
-					if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
-					{
+					}
+					if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 ) {
 						// Wrap contents into a scaled layer
 						$open .= "<g transform='scale($sw $sh)'>";
 						$close = "</g>$close";
 					}
 					// Wrap contents into a hyperlink
-					if ( $href )
-					{
+					if ( $href ) {
 						$open .= '<a xlink:href="'.htmlspecialchars( $href ).
 							'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
 						$close = "</a>$close";
@@ -132,8 +128,9 @@ class SvgThumbnailImage extends ThumbnailImage
 						ltrim( substr( $svg, $closepos ), ">\t\r\n" );
 					file_put_contents( $linkfn, $svg );
 				}
-				else
+				else {
 					$linkurl = $this->file->getUrl();
+				}
 			}
 		}
 
