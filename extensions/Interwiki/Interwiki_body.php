@@ -176,7 +176,7 @@ class SpecialInterwiki extends SpecialPage {
 	}
 
 	function doSubmit() {
-		global $wgRequest, $wgOut;
+		global $wgRequest, $wgOut, $wgContLang;
 		$prefix = $wgRequest->getVal( 'wpInterwikiPrefix' );
 		$do = $wgRequest->getVal( 'wpInterwikiAction' );
 		if( preg_match( '/[\s:&=]/', $prefix ) ) {
@@ -201,8 +201,9 @@ class SpecialInterwiki extends SpecialPage {
 				$log->addEntry( 'iw_delete', $selfTitle, $reason, array( $prefix ) );
 			}
 			break;
-		case 'edit':
 		case 'add':
+			$prefix = $wgContLang->lc( $prefix );
+		case 'edit':
 			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
 			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
 			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
