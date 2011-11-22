@@ -5336,7 +5336,7 @@ Special page transclusion
 !! input
 {{Special:Prefixindex/Xyzzyx}}
 !! result
-<p><br /></p><table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
+<table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
 
 !! end
 
@@ -5347,8 +5347,8 @@ Special page transclusion twice (bug 5021)
 {{Special:Prefixindex/Xyzzyx}}
 {{Special:Prefixindex/Xyzzyx}}
 !! result
-<p><br /></p><table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
-<p><br /></p><table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
+<table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
+<table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
 
 !! end
 
@@ -6510,8 +6510,8 @@ rawhtml
 !! input
 <html><script>alert(1);</script></html>
 !! result
-<p><script>alert(1);</script>
-</p>
+<div class="paragraph"><script>alert(1);</script>
+</div>
 !! end
 
 !! test
