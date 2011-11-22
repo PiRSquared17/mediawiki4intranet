@@ -1137,6 +1137,11 @@ $wgWarnArticleSize	= 128;  # Article size in kilobytes to show MediaWiki:Longpag
 # script ./maintenancecheckUsernames.php once you have changed this value
 $wgMaxNameChars		= 255;
 
+# Maximum number of bytes in titles. 255 by default, but even in MySQL,
+# you can change page.page_title to VARBINARY(767) and raise this value to 767.
+# (767 is the maximum size for an index key in InnoDB)
+$wgMaxTitleBytes	= 255;
+
 $wgMaxPPNodeCount = 1000000;  # A complexity limit on template expansion
 
 /**
