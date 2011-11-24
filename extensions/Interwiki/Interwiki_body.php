@@ -176,7 +176,7 @@ class SpecialInterwiki extends SpecialPage {
 	}
 
 	function doSubmit() {
-		global $wgRequest, $wgOut;
+		global $wgRequest, $wgOut, $wgContLang;
 		$prefix = $wgRequest->getVal( 'wpInterwikiPrefix' );
 		$do = $wgRequest->getVal( 'wpInterwikiAction' );
 		if( preg_match( '/[\s:&=]/', $prefix ) ) {
@@ -202,7 +202,7 @@ class SpecialInterwiki extends SpecialPage {
 			}
 			break;
 		case 'add':
-			$prefix = mb_strtolower( $prefix );
+			$prefix = $wgContLang->lc( $prefix );
 		case 'edit':
 			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
 			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
