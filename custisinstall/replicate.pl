@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-# TODO (Bug 71834) rewrite into PHP and possibly use API for import
+# OBSOLETE: better use PHP version "replicate.php".
 
 # A script for MediaWiki4Intranet page replication, automatically
 # replicating used images and templates, and supporting incremental
