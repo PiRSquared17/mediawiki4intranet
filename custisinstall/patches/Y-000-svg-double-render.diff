@@ -1,0 +1,273 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1316609491 -10800
+Bug 80684 - SVG double-render
+Bug 63356 - SVGZ and generic XML-GZIP mime-types support
+
+diff -r 45da8fc662c9 -r 4664ad1568df includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -419,6 +419,11 @@
+ 		'html'                              			=> 'text/html', // application/xhtml+xml?
+ );
+ 
++$wgXMLMayBeCompressed = array(
++	'image/svg+xml' => true,
++	'application/x-dia-diagram' => true,
++);
++
+ /**
+  * To set 'pretty' URL paths for actions other than
+  * plain page views, add to this array. For instance:
+diff -r 45da8fc662c9 -r 4664ad1568df includes/MimeMagic.php
+--- includes/MimeMagic.php
++++ includes/MimeMagic.php
+@@ -399,7 +399,7 @@
+ 			'djvu', 'ogg', 'ogv', 'mid', 'pdf', 'wmf', 'xcf',
+ 
+ 			// XML formats we sure hope we recognize reliably
+-			'svg',
++			'svg', 'svgz',
+ 		);
+ 		return in_array( strtolower( $extension ), $types );
+ 	}
+@@ -497,11 +497,16 @@
+ 		 */
+ 		$xml = new XmlTypeCheck( $file );
+ 		if( $xml->wellFormed ) {
+-			global $wgXMLMimeTypes;
+-			if( isset( $wgXMLMimeTypes[$xml->getRootElement()] ) ) {
+-				return $wgXMLMimeTypes[$xml->getRootElement()];
+-			} else {
+-				return 'application/xml';
++			global $wgXMLMimeTypes, $wgXMLMayBeCompressed;
++			$t = $wgXMLMimeTypes[$xml->getRootElement()];
++			if( !$xml->compressed ) {
++				if( $t ) {
++					return $t;
++				} else {
++					return 'application/xml';
++				}
++			} elseif( $wgXMLMayBeCompressed[$t] ) {
++				return $t;
+ 			}
+ 		}
+ 
+diff -r 45da8fc662c9 -r 4664ad1568df includes/XmlTypeCheck.php
+--- includes/XmlTypeCheck.php
++++ includes/XmlTypeCheck.php
+@@ -20,6 +20,12 @@
+ 	public $rootElement = '';
+ 
+ 	/**
++	 * Name of file compression type (can be only 'gzip' by now),
++	 * or FALSE if the file is uncompressed.
++	 */
++	public $compressed = false;
++
++	/**
+ 	 * @param $file string filename
+ 	 * @param $filterCallback callable (optional)
+ 	 *        Function to call to do additional custom validity checks from the
+@@ -48,6 +54,18 @@
+ 		xml_set_element_handler( $parser, array( $this, 'rootElementOpen' ), false );
+ 
+ 		$file = fopen( $fname, "rb" );
++		$gz = fread( $file, 2 );
++		if ( $gz == "\x1F\x8B" ) {
++			if ( function_exists( 'gzopen' ) ) {
++				fclose( $file );
++				$this->compressed = 'gzip';
++				$file = gzopen( $fname, "rb" );
++			} else {
++				return;
++			}
++		} else {
++			fseek( $file, 0, SEEK_SET );
++		}
+ 		do {
+ 			$chunk = fread( $file, 32768 );
+ 			$ret = xml_parse( $parser, $chunk, feof( $file ) );
+diff -r 45da8fc662c9 -r 4664ad1568df includes/media/SVG.php
+--- includes/media/SVG.php
++++ includes/media/SVG.php
+@@ -4,6 +4,152 @@
+  * @ingroup Media
+  */
+ 
++class SvgThumbnailImage extends ThumbnailImage
++{
++	function SvgThumbnailImage( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false )
++	{
++		$this->svgurl = $svgurl;
++		$this->later = $later;
++		$this->ThumbnailImage( $file, $url, $width, $height, $path, $page );
++	}
++	static function scaleParam( $name, $value, $sw, $sh )
++	{
++		if ( $name == 'viewBox' )
++		{
++			$value = preg_split( '/\s+/', $value );
++			$value[0] *= $sw; $value[1] *= $sh;
++			$value[2] *= $sw; $value[3] *= $sh;
++			$value = implode( ' ', $value );
++		}
++		elseif ( $name == 'width' )
++			$value *= $sw;
++		else
++			$value *= $sh;
++		return "$name=\"$value\"";
++	}
++	function toHtml( $options = array() )
++	{
++		if ( count( func_get_args() ) == 2 ) {
++			throw new MWException( __METHOD__ .' called in the old style' );
++		}
++
++		$alt = empty( $options['alt'] ) ? '' : $options['alt'];
++		$query = empty( $options['desc-query'] )  ? '' : $options['desc-query'];
++
++		if ( !empty( $options['custom-url-link'] ) ) {
++			$linkAttribs = array( 'href' => $options['custom-url-link'] );
++			if ( !empty( $options['title'] ) ) {
++				$linkAttribs['title'] = $options['title'];
++			}
++		} elseif ( !empty( $options['custom-title-link'] ) ) {
++			$title = $options['custom-title-link'];
++			$linkAttribs = array(
++				'href' => $title->getLinkUrl(),
++				'title' => empty( $options['title'] ) ? $title->getFullText() : $options['title']
++			);
++		} elseif ( !empty( $options['desc-link'] ) ) {
++			$linkAttribs = $this->getDescLinkAttribs( empty( $options['title'] ) ? null : $options['title'], $query );
++		} elseif ( !empty( $options['file-link'] ) ) {
++			$linkAttribs = array( 'href' => $this->file->getURL() );
++		} else {
++			$linkAttribs = array( 'href' => '' );
++		}
++
++		$attribs = array(
++			'alt' => $alt,
++			'src' => $this->url,
++			'width' => $this->width,
++			'height' => $this->height,
++		);
++		if ( !empty( $options['valign'] ) ) {
++			$attribs['style'] = "vertical-align: {$options['valign']}";
++		}
++		if ( !empty( $options['img-class'] ) ) {
++			$attribs['class'] = $options['img-class'];
++		}
++
++		$linkurl = $this->file->getUrl();
++
++		if ( !empty( $linkAttribs['href'] ) ||
++			$this->width != $this->file->getWidth() ||
++			$this->height != $this->file->getHeight() )
++		{
++			if ( empty( $linkAttribs['href'] ) )
++				$linkAttribs['href'] = '';
++			if ( empty( $linkAttribs['title'] ) )
++				$linkAttribs['title'] = '';
++			// :-( The only cross-browser way to link from SVG
++			// is to add an <a xlink:href> into SVG image itself
++			global $wgServer;
++			$href = $linkAttribs['href'];
++			if ( $href{0} == '/' )
++				$href = $wgServer . $href;
++			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
++			$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
++				$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
++			$linkfn = $this->file->getThumbPath() . $hash;
++			$linkurl = $this->file->getThumbUrl() . $hash;
++
++			// Cache changed SVGs only when TRANSFORM_LATER is on
++			if ( $this->later )
++				$mtime = @filemtime( $linkfn );
++			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) )
++			{
++				// Load original SVG or SVGZ and extract opening element
++				$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
++				preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
++				$closepos = strpos( $svg, '</svg' );
++				if ( $m && $closepos !== false )
++				{
++					$open = $m[0][0];
++					$openpos = $m[0][1];
++					$openlen = strlen( $m[0][0] );
++					$sw = $this->width / $this->file->getWidth();
++					$sh = $this->height / $this->file->getHeight();
++					$close = '';
++					// Scale width, height and viewBox
++					$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
++						create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
++					// Add xlink namespace, if not yet
++					if ( !strpos( $open, 'xmlns:xlink' ) )
++						$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
++					if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 )
++					{
++						// Wrap contents into a scaled layer
++						$open .= "<g transform='scale($sw $sh)'>";
++						$close = "</g>$close";
++					}
++					// Wrap contents into a hyperlink
++					if ( $href )
++					{
++						$open .= '<a xlink:href="'.htmlspecialchars( $href ).
++							'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
++						$close = "</a>$close";
++					}
++					// Write modified SVG
++					$svg = substr( $svg, 0, $openpos ) . $open .
++						substr( $svg, $openpos+$openlen, $closepos-$openpos-$openlen ) . $close .
++						ltrim( substr( $svg, $closepos ), ">\t\r\n" );
++					file_put_contents( $linkfn, $svg );
++				}
++				else
++					$linkurl = $this->file->getUrl();
++			}
++		}
++
++		// Output PNG <img> wrapped into SVG <object>
++		$html = $this->linkWrap( $linkAttribs, Xml::element( 'img', $attribs ) );
++		$html = Xml::tags( 'object', array(
++			'type' => 'image/svg+xml',
++			'data' => $linkurl,
++			'style' => 'overflow: hidden',
++			'width' => $this->width,
++			'height' => $this->height,
++		), $html );
++		return $html;
++	}
++}
++
+ /**
+  * @ingroup Media
+  */
+@@ -27,7 +173,7 @@
+ 		if ( !parent::normaliseParams( $image, $params ) ) {
+ 			return false;
+ 		}
+-		# Don't make an image bigger than wgMaxSVGSize
++		// Don't make an image bigger than wgMaxSVGSize
+ 		$params['physicalWidth'] = $params['width'];
+ 		$params['physicalHeight'] = $params['height'];
+ 		if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
+@@ -50,7 +196,7 @@
+ 		$srcPath = $image->getPath();
+ 
+ 		if ( $flags & self::TRANSFORM_LATER ) {
+-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
++			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath, false, true );
+ 		}
+ 
+ 		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
+@@ -60,7 +206,7 @@
+ 		
+ 		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
+ 		if( $status === true ) {
+-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
++			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath );
+ 		} else {
+ 			return $status; // MediaTransformError
+ 		}

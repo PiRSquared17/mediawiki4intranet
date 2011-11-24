@@ -1,0 +1,18 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   $Id$
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+
+.autocomment {color: gray;}
+#pagehistory span.user {margin-left: 1.4em; margin-right: 0.4em;}
+#pagehistory span.minor {font-weight: bold;}
+#pagehistory input {margin: 0.2em;}
+#pagehistory li {border: 1px solid #ffffff; margin-top: 1px; margin-bottom: 1px;}
+#pagehistory li.selected {
+	background-color: #CBDDFF; /* light blue */
+	border:1px dashed #FDA32F; /* orange */
+}

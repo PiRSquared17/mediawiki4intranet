@@ -1,0 +1,50 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1311089666 -14400
+Bug 76186 - (optional) Allow any content type for action=raw
+
+diff -r 45da8fc662c9 -r 2b20f90428f8 includes/RawPage.php
+--- includes/RawPage.php
++++ includes/RawPage.php
+@@ -21,9 +21,12 @@
+ 	var $mContentType, $mExpandTemplates;
+ 
+ 	function __construct( &$article, $request = false ) {
+-		global $wgRequest, $wgInputEncoding, $wgSquidMaxage, $wgJsMimeType, $wgGroupPermissions;
++		global $wgRequest, $wgInputEncoding, $wgSquidMaxage,
++			$wgJsMimeType, $wgGroupPermissions, $wgAllowedRawCTypes;
+ 
+-		$allowedCTypes = array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
++		$allowedCTypes = $wgAllowedRawCTypes
++			? $wgAllowedRawCTypes
++			: array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
+ 		$this->mArticle =& $article;
+ 		$this->mTitle =& $article->mTitle;
+ 
+@@ -101,7 +104,8 @@
+ 			$this->mPrivateCache = false;
+ 		}
+ 
+-		if( $ctype == '' or ! in_array( $ctype, $allowedCTypes ) ) {
++		// Allow any content type for action=raw when $wgAllowedRawCTypes === true
++		if( $ctype == '' || $allowedCTypes !== true && ! in_array( $ctype, $allowedCTypes ) ) {
+ 			$this->mContentType = 'text/x-wiki';
+ 		} else {
+ 			$this->mContentType = $ctype;
+@@ -109,7 +113,7 @@
+ 	}
+ 
+ 	function view() {
+-		global $wgOut, $wgScript, $wgRequest;
++		global $wgOut, $wgScript, $wgRequest, $wgTitle;
+ 
+ 		if( $wgRequest->isPathInfoBad() ) {
+ 			# Internet Explorer will ignore the Content-Type header if it
+@@ -131,6 +135,7 @@
+ 		}
+ 
+ 		header( "Content-type: ".$this->mContentType.'; charset='.$this->mCharset );
++		header( "Content-disposition: attachment; filename=".$wgTitle->getText() );
+ 		# allow the client to cache this for 24 hours
+ 		$mode = $this->mPrivateCache ? 'private' : 'public';
+ 		header( 'Cache-Control: '.$mode.', s-maxage='.$this->mSmaxage.', max-age='.$this->mMaxage );
