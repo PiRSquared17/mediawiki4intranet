@@ -48,6 +48,18 @@ class UploadFromSupa extends UploadBase {
 class SupaMW {
     static function uploadForm( &$descriptor, &$radio, $selectedSourceType ) {
         global $wgLang;
+        // Determine file size limit
+        // Since we are uploading a file through an <input type=hidden>,
+        // suhosin limits are also applied in addition to post_max_size.
+        $limit1 = wfShorthandToInteger( ini_get( 'suhosin.request.max_value_length' ) );
+        $limit2 = wfShorthandToInteger( ini_get( 'suhosin.post.max_value_length' ) );
+        $limit3 = wfShorthandToInteger( ini_get( 'post_max_size' ) );
+        if ( $limit1 > 0 && $limit1 < $limit3 ) {
+            $limit3 = $limit1;
+        }
+        if ( $limit2 > 0 && $limit2 < $limit3 ) {
+            $limit3 = $limit2;
+        }
         $descriptor['UploadFileSUPA'] = array(
             'class' => 'SUPAField',
             'section' => 'source',
@@ -57,7 +69,7 @@ class SupaMW {
             'radio' => &$radio,
             'help' => wfMsgExt( 'upload-maxfilesize',
                     array( 'parseinline', 'escapenoentities' ),
-                    $wgLang->formatSize( wfShorthandToInteger( ini_get( 'post_max_size' ) ) / 1.37 )
+                    $wgLang->formatSize( $limit3 / 1.37 )
                 ),
             'checked' => $selectedSourceType == 'url',
         );

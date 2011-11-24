@@ -27,7 +27,7 @@
 // This extension adds an extra "Clipboard" option to the normal file upload page,
 // so you can upload images to MediaWiki directly from the clipboard.
 // SUPA applet is used for that (http://supa.sourceforge.net/)
-// REQUIREMENTS: PHP 5, MediaWiki 1.16 or newer, Java on client machines.
+// REQUIREMENTS: PHP 5, MediaWiki 1.16, Java on client machines.
 // INSTALLATION:
 // 1) Make sure that you either don't have PHP Suhosin extension installed,
 //    or that suhosin.post.max_value_length AND suhosin.request.max_value_length
