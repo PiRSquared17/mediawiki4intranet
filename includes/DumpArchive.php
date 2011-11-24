@@ -27,22 +27,17 @@ class StubDumpArchive {
 	var $mimetype = '', $extension = '', $mainFile = false;
 	const BUFSIZE = 0x10000;
 	/**
-	 * Open an existing archive (for importing)
-	 * Returns the path of main part temporary file, or false in a case of failure
+	 * Open an existing archive for importing
+	 * Returns the constructed reader, or false in a case of failure
 	 */
 	function open( $archive ) {
 		global $wgExportFormats;
-		$p = strrpos( $archive, '.' );
-		if ( $p !== false ) {
-			$extension = substr( $archive, $p );
-		} else {
-			$extension = '';
-		}
+		$this->mainFile = $archive;
 		foreach ( $wgExportFormats as $format ) {
-			if ( $format['extension'] == $extension || !$extension && !empty( $format['default'] ) ) {
-				$this->mainFile = $archive;
+			try {
 				$class = $format['reader'];
 				return new $class( $this );
+			} catch(Exception $e) {
 			}
 		}
 		return false;
@@ -128,8 +123,7 @@ class StubDumpArchive {
 	/**
 	 * Remove all temporary files and directory
 	 */
-	function cleanup()
-	{
+	function cleanup() {
 		if ( $this->files ) {
 			foreach ( $this->files as $file => $true ) {
 				if ( file_exists( $file ) ) {
@@ -159,8 +153,7 @@ class DumpArchive extends StubDumpArchive
 	/**
 	 * Static method - constructs the importer with appropriate DumpArchive from file
 	 */
-	static function newFromFile( $file, $name = NULL )
-	{
+	static function newFromFile( $file, $name = NULL ) {
 		global $wgDumpArchiveByExt;
 		$ext = '';
 		if ( !$name ) {
