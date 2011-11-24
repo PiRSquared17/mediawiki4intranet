@@ -29,11 +29,14 @@
 // SUPA applet is used for that (http://supa.sourceforge.net/)
 // REQUIREMENTS: PHP 5, MediaWiki 1.16 or newer, Java on client machines.
 // INSTALLATION:
-// 1) Make sure that your PHP is either built without Suhosin (Debian's one is built with it)
-//    or has suhosin.post.max_value_length AND suhosin.request.max_value_length
-//    settings be enough to pass screenshots. They are 65000 by default on stock Suhosin,
+// 1) Make sure that you either don't have PHP Suhosin extension installed,
+//    or that suhosin.post.max_value_length AND suhosin.request.max_value_length
+//    settings are enough to pass screenshots. They are 65000 by default on stock Suhosin,
 //    and 1000000 (i.e. 1 decimal megabyte) on Debian's Suhosin, which is too low to pass
 //    through large images.
+//    This is required because SUPA images are uploaded not as "file" parts, but as
+//    "normal" POST values. This is a sort of the hack, but other ways to integrate
+//    SUPA with normal MediaWiki file upload form are much more tricky.
 // 2) Put the following into your LocalSettings.php:
 //    require_once "$IP/extensions/SupaMW/SupaMW.php";
 
