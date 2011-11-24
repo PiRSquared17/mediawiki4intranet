@@ -4,7 +4,7 @@
  * This tool is a part of MediaWiki4Intranet Import-Export patch.
  * http://wiki.4intra.net/MW_Import&Export
  * http://wiki.4intra.net/Mediawiki4Intranet
- * Copyright (c) 2010, Vitaliy Filippov
+ * Copyright (c) 2010+, Vitaliy Filippov
  *
  * Maintenance tool updating archived image revision filenames to:
  * 1) match the revision date, not the NEXT revision date as in the
@@ -140,7 +140,7 @@ This script does 2 things:
 revision in file names. This script renames them to contain **their own** timestamp
 in file names.
 
-2) With CustIS patch, if \$wgTransliterateUploadFilenames is true, all upload file
+2) With MediaWiki4Intranet patch, if \$wgTransliterateUploadFilenames is true, all upload file
 names are transliterated during upload. So MediaWiki expects that filenames of
 already uploaded files are also transliterated. This script automatically checks
 them and transliterates if needed.

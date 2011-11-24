@@ -2143,7 +2143,7 @@ class Parser
 				$lastPrefix = $prefix2;
 
 				// Reset linestart to false to ignore heading space
-				$linestart = false;
+				$linestart = !$prefixLength;
 				$emptyLines = 0;
 			}
 
