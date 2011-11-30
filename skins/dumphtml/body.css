@@ -1,0 +1,263 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   main.css
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+
+/* Typography & Colors -----------------------------------------------*/
+body {
+	background-color: #ffffff; /* white */
+	color: #333; /* dark grey */
+	font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;
+	font-size: 110%;
+  line-height: 110%;  	
+}
+
+blockquote {
+	padding: 3px;
+	border: 1px dotted #FFC000;
+}
+
+#content {
+	line-height: 1.4em;
+}
+
+code {
+	font: 1.1em 'Lucida Console','Courier New', Courier, Fixed;
+}
+
+acronym, abbr, span.caps {
+	font-size: 0.9em;
+	letter-spacing: .07em;
+	}
+
+/* Links -------------------------------------------------------------*/
+a {color: #2153B0;} /* blue */
+a:hover {color: #173A7B;} /* dark blue */
+
+p a:visited {color: #FD9A26;}
+
+div.paragraph a:visited {color: #FD9A26;} /* orange */
+#content a.new {color: green;} /* green */
+
+#column-one a:hover {color: #173A7B;} /* dark blue */
+#column-one .selected a {
+	color: #FD9A26; /* orange */
+	font-weight: bolder;
+}
+
+#toc a {color: #808080;} /* blue */
+#toc a:hover {color: #173A7B;} /* dark blue */
+#toc p a:visited {color: #2153B0;}
+
+#toc div.paragraph a:visited {color: #2153B0;} /* blue */
+
+#footer a {color: #999999;}
+#footer a:hover {color: #173A7B;} /* dark blue */
+
+/* LINK ICONS
+** keep the whitespace in front of the ^=, hides rule from konqueror
+** this is css3, the validator doesn't like it when validating as css2
+*/
+#bodyContent a[href ^="http://"], #bodyContent a[href ^="gopher://"] {
+    background: url(external.png) center right no-repeat;
+    padding-right: 13px;
+	}
+
+#bodyContent a[href ^="https://"], .link-https {
+    background: url("lock_icon.gif") center right no-repeat;
+    padding-right: 16px;
+	}
+
+#bodyContent a[href ^="mailto:"], .link-mailto {
+    background: url("mail_icon.gif") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="news://"] {
+    background: url("news_icon.png") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="ftp://"], .link-ftp {
+    background: url("file_icon.gif") center right no-repeat;
+    padding-right: 18px;
+	}
+
+#bodyContent a[href ^="irc://"], .link-irc {
+    background: url("discussionitem_icon.gif")  center right no-repeat;
+    padding-right: 18px;
+}
+
+
+
+
+
+/* Headers -----------------------------------------------------------*/
+/*h1, h2, h3, h4 {font-family: 'Trebuchet MS', 'Lucida Grande', Verdana, Arial, Sans-Serif;}*/
+/*h1, h2, h3, h4 {font-family: Verdana, Arial, Sans-Serif;}*/
+h1, h2 {border-bottom: 1px dotted #333333;  line-height: 1.1em; padding-bottom: 0.2em;}
+
+.firstHeading {border-bottom-style: solid; border-bottom-color: #d5d5d5; font-size: 1.8em; color: #1860AC}
+
+/* Lists -------------------------------------------------------------*/
+
+ul {
+	margin: 10px;
+	padding-left: 15px;
+}
+
+html>body li {
+	margin-left: 10px;;
+  margin-top: .2em;
+}
+
+dt {
+font-weight: bold;
+margin-bottom: .1em;
+}
+dl {
+margin-top: .2em;
+margin-bottom: .5em;
+}
+dd {
+line-height: 1.5em;
+margin-left: 2em;
+margin-bottom: .1em;
+}
+
+/* images */
+div.floatright, table.floatright {
+    clear: right;
+    float: right;
+    position: relative;
+    margin: 0 0 0.5em 0.5em;
+    border: 0
+/*
+    border: 0.5em solid White;
+    border-width: 0.5em 0 0.8em 1.4em;
+*/
+}
+div.floatright p { font-style: italic; }
+
+div.floatright div.paragraph { font-style: italic; }
+div.floatleft, table.floatleft {
+    float: left;
+    position: relative;
+    margin: 0 0.5em 0.5em 0;
+    border: 0
+/*
+    margin: 0.3em 0.5em 0.5em 0;
+    border: 0.5em solid White;
+    border-width: 0.5em 1.4em 0.8em 0;
+*/
+}
+div.floatleft p { font-style: italic; }
+
+div.floatleft div.paragraph { font-style: italic; }
+/* thumbnails */
+div.thumb {
+    margin-bottom: 0.5em;
+    border-style: solid; border-color: White;
+    width: auto;
+}
+div.thumb div {
+    border:1px solid #cccccc;
+    padding: 3px !important;
+    background-color:#f9f9f9;
+    font-size: 94%;
+    text-align: center;
+    overflow: hidden;
+}
+div.thumb div a img {
+    /*border:1px solid #cccccc;*/
+}
+div.thumb div div.thumbcaption {
+    border: none;
+    text-align: left;
+    line-height: 1.4em;
+    padding: 0.3em 0 0.1em 0;
+}
+div.magnify {
+    float: right;
+    border: none !important;
+    background: none !important;
+}
+div.magnify a, div.magnify img {
+    display: block;
+    border: none !important;
+    background: none !important;
+}
+div.tright {
+    clear: right;
+    float: right;
+    border-width: 0.5em 0 0.8em 1.4em;
+}
+div.tleft {
+    float: left;
+    margin-right:0.5em;
+    border-width: 0.5em 1.4em 0.8em 0;
+}
+.urlexpansion,
+.hiddenStructure {
+    display: none;
+}
+img.tex { vertical-align: middle; }
+span.texhtml { font-family: serif; }
+
+img {
+	border: 0px solid #333;
+	}
+
+pre {
+        border: 1px dashed #808080;
+        padding: 3px;
+	margin: auto;
+        background-color: #ffffef;
+        color: #000;
+        font-size: 1.0em;
+	word-wrap: break-word;
+	}
+tt {
+	font-size: 1.1em;
+	color: #0000ff;
+	}
+
+
+/* Content -----------------------------------------------------------*/
+/* BEGIN Table of Contents */
+#toc {
+	float: right;
+	margin: 0 0 1em 1em;
+	}
+#toc td {padding: 0.5em;}
+#toc .tocindent {margin-left: 1em;}
+#toc .tocline {margin-bottom: 0px;}
+#toc p {margin: 0}
+
+#toc div.paragraph {margin: 0}
+#toc .editsection {margin-top: 0.7em;}
+/* END Table of Contents */
+
+
+#catlinks-top {
+    background-color: #F2F6FF; /* very light blue */
+    border: 1px solid #CBDDFF; /* light blue */
+    clear: both;
+    margin: 0.5em 0;
+    font-size: 75%;
+}
+
+#catlinks {
+    background-color: #F2F6FF; /* very light blue */
+    border: 1px solid #CBDDFF; /* light blue */
+    clear: both;
+    margin: 1em 0;
+	}
+
+#catlinks p {margin: 0.5em;}
+
+#catlinks div.paragraph {margin: 0.5em;}

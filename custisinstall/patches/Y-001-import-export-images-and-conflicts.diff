@@ -1,0 +1,3253 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1321878592 -10800
+Depends on: Y-000-translit-upload-filenames.diff
+
+Totally improved MediaWiki Import and Export engine with conflict detection,
+advanced page selection for export and support for exporting file data over
+HTTP or inside the export file.
+
+Requires running archive-image-renamer.php when applied to a non-empty MediaWiki
+installation.
+
+Bug 47362 - Include images into export files
+Bug 54531 - Conflict detection
+Bug 80201 - NOT-in-category filter for export
+MediaWikiBug 22881 - Greatly improved Export and Import
+https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
+
+Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
+
+diff -r 5ad71cf1db7a -r a47b5463550e includes/AutoLoader.php
+--- includes/AutoLoader.php
++++ includes/AutoLoader.php
+@@ -51,17 +51,7 @@
+ 	'DoubleReplacer' => 'includes/StringUtils.php',
+ 	'DoubleRedirectJob' => 'includes/DoubleRedirectJob.php',
+ 	'DublinCoreRdf' => 'includes/Metadata.php',
+-	'Dump7ZipOutput' => 'includes/Export.php',
+-	'DumpBZip2Output' => 'includes/Export.php',
+-	'DumpFileOutput' => 'includes/Export.php',
+-	'DumpFilter' => 'includes/Export.php',
+-	'DumpGZipOutput' => 'includes/Export.php',
+-	'DumpLatestFilter' => 'includes/Export.php',
+-	'DumpMultiWriter' => 'includes/Export.php',
+-	'DumpNamespaceFilter' => 'includes/Export.php',
+-	'DumpNotalkFilter' => 'includes/Export.php',
+-	'DumpOutput' => 'includes/Export.php',
+-	'DumpPipeOutput' => 'includes/Export.php',
++	'DumpArchive' => 'includes/DumpArchive.php',
+ 	'eAccelBagOStuff' => 'includes/BagOStuff.php',
+ 	'EditPage' => 'includes/EditPage.php',
+ 	'EmaillingJob' => 'includes/EmaillingJob.php',
+@@ -218,6 +208,7 @@
+ 	'SquidPurgeClientPool' => 'includes/SquidPurgeClient.php',
+ 	'Status' => 'includes/Status.php',
+ 	'StubContLang' => 'includes/StubObject.php',
++	'StubDumpArchive' => 'includes/DumpArchive.php',
+ 	'StubUser' => 'includes/StubObject.php',
+ 	'StubUserLang' => 'includes/StubObject.php',
+ 	'StubObject' => 'includes/StubObject.php',
+@@ -258,6 +249,7 @@
+ 	'XmlSelect' => 'includes/Xml.php',
+ 	'XmlTypeCheck' => 'includes/XmlTypeCheck.php',
+ 	'ZhClient' => 'includes/ZhClient.php',
++	'ZipDumpArchive' => 'includes/DumpArchive.php',
+ 
+ 	# includes/api
+ 	'ApiBase' => 'includes/api/ApiBase.php',
+@@ -518,8 +510,7 @@
+ 	'IPBlocklistPager' => 'includes/specials/SpecialIpblocklist.php',
+ 	'IPUnblockForm' => 'includes/specials/SpecialIpblocklist.php',
+ 	'ImportReporter' => 'includes/specials/SpecialImport.php',
+-	'ImportStreamSource' => 'includes/Import.php',
+-	'ImportStringSource' => 'includes/Import.php',
++	'ImportSource' => 'includes/specials/SpecialImport.php',
+ 	'LinkSearchPage' => 'includes/specials/SpecialLinkSearch.php',
+ 	'ListredirectsPage' => 'includes/specials/SpecialListredirects.php',
+ 	'LoginForm' => 'includes/specials/SpecialUserlogin.php',
+diff -r 5ad71cf1db7a -r a47b5463550e includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -2152,6 +2152,12 @@
+ $wgDiff = '/usr/bin/diff';
+ 
+ /**
++ * Paths to zip/unzip utilities.
++ */
++$wgZip = '/usr/bin/zip';
++$wgUnzip = '/usr/bin/unzip';
++
++/**
+  * We can also compress text stored in the 'text' table. If this is set on, new
+  * revisions will be compressed on page save if zlib support is available. Any
+  * compressed revisions will be decompressed on load regardless of this setting
+@@ -2609,6 +2615,28 @@
+ $wgExportFromNamespaces = false;
+ 
+ /**
++ * Import/export formats
++ */
++$wgExportFormats = array(
++	array(
++		'extension' => 'xml',
++		'mimetype' => 'application/xml',
++		'reader' => 'WikiImporter',
++		'writer' => 'XmlDumpWriter',
++	),
++);
++
++/**
++ * Archive classes for import
++ */
++$wgDumpArchiveByExt = array(
++	'xml' => array( 'OldMultipartDumpArchive', 'StubDumpArchive' ),
++	'multipart' => array( 'OldMultipartDumpArchive' ),
++	'zip' => array( 'ZipDumpArchive' ),
++	'' => array( 'ZipDumpArchive', 'StubDumpArchive' ),
++);
++
++/**
+  * Edits matching these regular expressions in body text
+  * will be recognised as spam and rejected automatically.
+  *
+diff -r 5ad71cf1db7a -r a47b5463550e includes/DumpArchive.php
+--- /dev/null
++++ includes/DumpArchive.php
+@@ -0,0 +1,475 @@
++<?php
++
++# Copyright (C) 2011 Vitaliy Filippov <vitalif@mail.ru>
++# http://www.mediawiki.org/
++#
++# This program is free software; you can redistribute it and/or modify
++# it under the terms of the GNU General Public License as published by
++# the Free Software Foundation; either version 2 of the License, or
++# (at your option) any later version.
++#
++# This program is distributed in the hope that it will be useful,
++# but WITHOUT ANY WARRANTY; without even the implied warranty of
++# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
++# GNU General Public License for more details.
++#
++# You should have received a copy of the GNU General Public License along
++# with this program; if not, write to the Free Software Foundation, Inc.,
++# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
++# http://www.gnu.org/copyleft/gpl.html
++
++/**
++ * Stub dump archive class, does not support binary parts,
++ * just passes through the XML part.
++ */
++class StubDumpArchive {
++	var $fp = NULL, $buffer = '', $files = array(), $tempdir = '';
++	var $mimetype = '', $extension = '', $mainFile = false;
++	const BUFSIZE = 0x10000;
++	/**
++	 * Open an existing archive for importing
++	 * Returns the constructed reader, or false in a case of failure
++	 */
++	function open( $archive ) {
++		global $wgExportFormats;
++		$this->mainFile = $archive;
++		foreach ( $wgExportFormats as $format ) {
++			try {
++				$class = $format['reader'];
++				return new $class( $this );
++			} catch(Exception $e) {
++			}
++		}
++		return false;
++	}
++	/**
++	 * Get temporary filename for the main part
++	 */
++	function getMainPart() {
++		return $this->mainFile;
++	}
++	/**
++	 * Get temporary file name for a binary part
++	 */
++	function getBinary( $url ) {
++		return false;
++	}
++	/**
++	 * Create archive for writing, main file extension is $mainExt
++	 */
++	function create( $mainMimetype, $mainExtension ) {
++		$this->mimetype = $mainMimetype;
++		$this->extension = $mainExtension;
++		$f = tempnam( wfTempDir(), 'exs' );
++		$this->fp = fopen( $f, 'wb' );
++		$this->files[ $f ] = true;
++	}
++	/**
++	 * Write part of main ("index") stream (buffered)
++	 */
++	function write( $string ) {
++		if ( !$this->fp ) {
++			return;
++		}
++		if ( strlen( $this->buffer ) + strlen( $string ) < self::BUFSIZE ) {
++			$this->buffer .= $string;
++		} else {
++			fwrite( $this->fp, $this->buffer );
++			fwrite( $this->fp, $string );
++			$this->buffer = '';
++		}
++	}
++	/**
++	 * Get the pseudo-URL for embedded file (object $file)
++	 */
++	function binUrl( File $file ) {
++		return $file->getFullUrl();
++	}
++	/**
++	 * Write binary file (object $file)
++	 */
++	function writeBinary( File $file ) {
++		return false;
++	}
++	/**
++	 * Finish writing
++	 */
++	function close() {
++		if ( $this->fp ) {
++			if ( $this->buffer !== '' ) {
++				fwrite( $this->fp, $this->buffer );
++			}
++			fclose( $this->fp );
++			$this->fp = NULL;
++		}
++	}
++	/**
++	 * Pack all files into an archive,
++	 * return its name in $outFilename and MIME type in $outMimetype
++	 */
++	function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
++		$f = array_keys( $this->files );
++		$outFilename = $f[0];
++		$outMimetype = $this->mimetype;
++		$outExtension = $this->extension;
++		return true;
++	}
++	/**
++	 * Destructor
++	 */
++	function __destruct() {
++		$this->cleanup();
++	}
++	/**
++	 * Remove all temporary files and directory
++	 */
++	function cleanup() {
++		if ( $this->files ) {
++			foreach ( $this->files as $file => $true ) {
++				if ( file_exists( $file ) ) {
++					unlink( $file );
++				}
++			}
++			$this->files = array();
++		}
++		if ( $this->tempdir ) {
++			rmdir( $this->tempdir );
++			$this->tempdir = '';
++		}
++	}
++}
++
++/**
++ * Base class for dump "archiver", which takes the main stream (usually XML)
++ * and the embedded binaries, and archives them to a single file.
++ * This was multipart/related in old Mediawiki4Intranet versions,
++ * will be ZIP in new ones, and can possibly be any other type of archive.
++ */
++class DumpArchive extends StubDumpArchive
++{
++	var $mimetype = '', $extension = '';
++	var $mainMimetype = '', $mainExtension = '';
++	const BUFSIZE = 0x10000;
++	/**
++	 * Static method - constructs the importer with appropriate DumpArchive from file
++	 */
++	static function newFromFile( $file, $name = NULL ) {
++		global $wgDumpArchiveByExt;
++		$ext = '';
++		if ( !$name ) {
++			$name = $file;
++		}
++		if ( ( $p = strrpos( $name, '.' ) ) !== false ) {
++			$ext = strtolower( substr( $name, $p + 1 ) );
++		}
++		if ( !isset( $wgDumpArchiveByExt[ $ext ] ) ) {
++			$ext = '';
++		}
++		foreach ( $wgDumpArchiveByExt[ $ext ] as $class ) {
++			$archive = new $class();
++			$importer = $archive->open( $file );
++			if ( $importer ) {
++				return $importer;
++			}
++		}
++		return NULL;
++	}
++	/**
++	 * Constructor, generates an empty temporary directory
++	 */
++	function __construct() {
++		$this->tempdir = tempnam( wfTempDir(), 'exp' );
++		unlink( $this->tempdir );
++		mkdir( $this->tempdir );
++	}
++	/**
++	 * Open an existing archive (for importing)
++	 * Returns the proper import reader, or false in a case of failure
++	 */
++	function open( $archive ) {
++		global $wgExportFormats;
++		if ( !$this->tryUnpack( $archive ) ) {
++			return false;
++		}
++		$dir = opendir( $this->tempdir );
++		while ( $file = readdir( $dir ) ) {
++			if ( $file != '.' && $file != '..' ) {
++				$this->files[ $this->tempdir . '/' . $file ] = true;
++			}
++		}
++		closedir( $dir );
++		foreach ( $wgExportFormats as $format ) {
++			$f = $this->tempdir . '/Revisions.' . $format['extension'];
++			if ( isset( $this->files[ $f ] ) ) {
++				$this->mainFile = $this->tempdir . '/Revisions.' . $format['extension'];
++				$class = $format['reader'];
++				return new $class( $this );
++			}
++		}
++		return false;
++	}
++	/**
++	 * Unpack the archive
++	 */
++	function tryUnpack( $archive ) {
++		return false;
++	}
++	/**
++	 * Get temporary file name for a binary part
++	 */
++	function getBinary( $url ) {
++		// Strip out archive:// prefix
++		if ( substr( $url, 0, 10 ) != 'archive://' )
++			return false;
++		$name = substr( $url, 10 );
++		if ( isset( $this->files[ $this->tempdir . '/' . $name ] ) )
++			return $this->tempdir . '/' . $name;
++		return false;
++	}
++	/**
++	 * Create archive for writing, main file extension is $mainExt
++	 */
++	function create( $mainMimetype, $mainExtension ) {
++		$this->mainMimetype = $mainMimetype;
++		$this->mainExtension = $mainExtension;
++		$f = $this->tempdir . '/Revisions.' . $this->mainExtension;
++		$this->fp = fopen( $f, 'wb' );
++		$this->files[ $f ] = true;
++	}
++	/**
++	 * Generate a name for embedded file (object $file)
++	 * By default $SHA1.bin
++	 * Other archivers may desire to preserve original filenames
++	 */
++	function binName( File $file ) {
++		return $file->getSha1() . '.bin';
++	}
++	/**
++	 * Get the pseudo-URL for embedded file (object $file)
++	 * By default, it's archive://$binName
++	 */
++	function binUrl( File $file ) {
++		return 'archive://' . $this->binName( $file );
++	}
++	/**
++	 * Write binary file (object $file)
++	 */
++	function writeBinary( File $file ) {
++		$name = $this->tempdir . '/' . $this->binName( $file );
++		if ( copy( $file->getPath(), $name ) ) {
++			$this->files[ $name ] = true;
++			return true;
++		}
++		return false;
++	}
++	/**
++	 * Pack all files into an archive,
++	 * return its name in $outFilename and MIME type in $outMimetype
++	 */
++	function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
++		$name = $this->tempdir . '/archive.' . $this->extension;
++		if ( !$this->archive( $name ) ) {
++			return false;
++		}
++		$this->files[ $name ] = true;
++		$outFilename = $name;
++		$outMimetype = $this->mimetype;
++		$outExtension = $this->extension;
++		return true;
++	}
++	/**
++	 * Pack all files into an archive file with name $arcfn
++	 */
++	function archive( $arcfn ) {
++		return false;
++	}
++}
++
++/**
++ * Support for "multipart" dump files, used in Mediawiki4Intranet in 2009-2011
++ */
++class OldMultipartDumpArchive extends DumpArchive
++{
++	var $mimetype = 'multipart/related', $extension = 'multipart';
++	var $parts = array();
++	const BUFSIZE = 0x80000;
++	/**
++	 * Get temporary file name for a binary part
++	 */
++	function getBinary( $url ) {
++		// Strip out multipart:// prefix
++		if ( substr( $url, 0, 12 ) != 'multipart://' ) {
++			return false;
++		}
++		$url = substr( $url, 12 );
++		if ( isset( $this->parts[ $url ] ) ) {
++			return $this->parts[ $url ];
++		}
++		return false;
++	}
++	/**
++	 * Write binary file (object $file)
++	 */
++	function writeBinary( File $file ) {
++		$name = tempnam( $this->tempdir, 'part' );
++		if ( copy( $file->getPath(), $name ) ) {
++			$this->parts[ $this->binName( $file ) ] = $name;
++			return true;
++		}
++		return false;
++	}
++	/**
++	 * Generate a name for embedded file (object $file)
++	 */
++	function binName( File $file ) {
++		return $file->isOld ? $file->getArchiveName() : $file->getName();
++	}
++	/**
++	 * Get the pseudo-URL for embedded file (object $file)
++	 * Here it's multipart://$binName
++	 */
++	function binUrl( File $file ) {
++		return 'multipart://' . $this->binName( $file );
++	}
++	/**
++	 * Unpack the archive
++	 */
++	function tryUnpack( $archive ) {
++		$fp = fopen( $archive, "rb" );
++		if ( !$fp ) {
++			return false;
++		}
++		$s = fgets( $fp );
++		if ( preg_match( "/Content-Type:\s*multipart\/related; boundary=(\S+)\s*\n/s", $s, $m ) ) {
++			$boundary = $m[1];
++		} else {
++			fclose( $fp );
++			return false;
++		}
++		// Loop over parts
++		while ( !feof( $fp ) ) {
++			$s = trim( fgets( $fp ) );
++			if ( $s != $boundary ) {
++				break;
++			}
++			$part = array();
++			// Read headers
++			while ( $s != "\n" && $s != "\r\n" ) {
++				$s = fgets( $fp );
++				if ( preg_match( '/([a-z0-9\-\_]+):\s*(.*?)\s*$/is', $s, $m ) ) {
++					$part[ str_replace( '-', '_', strtolower( $m[1] ) ) ] = $m[2];
++				}
++			}
++			// Skip parts without Content-ID header
++			if ( empty( $part['content_id'] ) ) {
++				if ( !empty( $part['content_length'] ) &&
++					$part['content_length'] > 0 ) {
++					fseek( $fp, ftell( $fp ) + $part['content_length'], 0 );
++				}
++				continue;
++			}
++			// Preserve only main part's filename when unpacking for safety
++			if ( $part['content_id'] == 'Revisions' ) {
++				$tempfile = $this->tempdir . '/Revisions';
++			} else {
++				$tempfile = tempnam( $this->tempdir, 'part' );
++			}
++			$tempfp = fopen( $tempfile, "wb" );
++			if ( !$tempfp ) {
++				// Error creating temporary file, skip it
++				fseek( $fp, ftell( $fp ) + $part['content_length'], 0 );
++				continue;
++			}
++			$this->parts[ $part['content_id'] ] = $tempfile;
++			// Copy stream
++			if ( isset( $part['content_length'] ) ) {
++				$done = 0;
++				$buf = true;
++				while ( $done < $part['content_length'] && $buf ) {
++					$buf = fread( $fp, min( self::BUFSIZE, $part['content_length'] - $done ) );
++					fwrite( $tempfp, $buf );
++					$done += strlen( $buf );
++				}
++			} else {
++				// Main part was archived without Content-Length in old dumps :(
++				$buf = fread( $fp, self::BUFSIZE );
++				while ( $buf !== '' ) {
++					if ( ( $p = strpos( $buf, "\n$boundary" ) ) !== false ) {
++						fseek( $fp, $p + 1 - strlen( $buf ), 1 );
++						fwrite( $tempfp, substr( $buf, 0, $p ) );
++						$buf = '';
++					} elseif ( strlen( $buf ) == self::BUFSIZE ) {
++						fwrite( $tempfp, substr( $buf, 0, -1 -strlen( $boundary ) ) );
++						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE );
++					} else {
++						fwrite( $tempfp, $buf );
++						$buf = '';
++					}
++				}
++			}
++			fclose( $tempfp );
++		}
++		fclose( $fp );
++		return true;
++	}
++	/**
++	 * Pack all files into an archive file with name $arcfn
++	 */
++	function archive( $arcfn ) {
++		$fp = fopen( $arcfn, "wb" );
++		if ( !$fp ) {
++			return false;
++		}
++		$boundary = "--" . time();
++		fwrite( $fp, "Content-Type: multipart/related; boundary=$boundary\n$boundary\n" );
++		fwrite( $fp, "Content-Type: text/xml\nContent-ID: Revisions\n" .
++			"Content-Length: " . filesize( $this->tempdir . '/Revisions' ) . "\n\n" );
++		$tempfp = fopen( $this->tempdir . '/Revisions', "rb" );
++		while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' ) {
++			fwrite( $fp, $buf );
++		}
++		fclose( $tempfp );
++		foreach ( $this->parts as $name => $file ) {
++			fwrite( $fp, "$boundary\nContent-ID: $name\nContent-Length: " . filesize( $file ) . "\n\n" );
++			$tempfp = fopen( $file, "rb" );
++			while ( ( $buf = fread( $tempfp, self::BUFSIZE ) ) !== '' ) {
++				fwrite( $fp, $buf );
++			}
++			fclose( $tempfp );
++		}
++		fclose( $fp );
++		return true;
++	}
++}
++
++/**
++ * ZIPped dump archives without preserved file names support
++ */
++class ZipDumpArchive extends DumpArchive {
++	var $mimetype = 'application/zip', $extension = 'zip';
++	/**
++	 * Unpack the archive
++	 */
++	function tryUnpack( $archive ) {
++		global $wgUnzip;
++		$retval = 0;
++		$out = wfShellExec( wfEscapeShellArg( $wgUnzip, $archive, '-d', $this->tempdir ) . ' 2>&1', $retval );
++		if ( $retval != 0 ) {
++			wfDebug( __CLASS__ . ": unzip failed: $out\n" );
++		}
++		return true;
++	}
++	/**
++	 * Pack all files into an archive
++	 */
++	function archive( $arcfn ) {
++		global $wgZip;
++		$args = array_merge( array( $wgZip, '-j', $arcfn ), array_keys( $this->files ) );
++		$retval = 0;
++		$out = wfShellExec( call_user_func_array( 'wfEscapeShellArg', $args ) . ' 2>&1', $retval );
++		if ( $retval != 0 ) {
++			wfDebug( __CLASS__ . ": zip failed: $out\n" );
++		}
++		return true;
++	}
++}
+diff -r 5ad71cf1db7a -r a47b5463550e includes/Export.php
+--- includes/Export.php
++++ includes/Export.php
+@@ -24,11 +24,11 @@
+ /**
+  * @ingroup SpecialPage Dump
+  */
++// FIXME Pages should be bulk-loaded - calling pageByTitle for each page is slower
+ class WikiExporter {
+-	var $list_authors = false ; # Return distinct author list (when not returning full history)
+-	var $author_list = "" ;
+-
+-	var $dumpUploads = false;
++	var $listAuthors = false; # Return distinct author list (when not returning full history)
++	var $dumpUploads = false; # Dump uploaded files into the export file
++	var $selfContained = false; # Archive uploaded file contents into the export file (ZIP)
+ 
+ 	const FULL = 1;
+ 	const CURRENT = 2;
+@@ -57,35 +57,56 @@
+ 	 * @param $buffer Int: one of WikiExporter::BUFFER or WikiExporter::STREAM
+ 	 * @param $text Int: one of WikiExporter::TEXT or WikiExporter::STUB
+ 	 */
+-	function __construct( &$db, $history = WikiExporter::CURRENT,
+-			$buffer = WikiExporter::BUFFER, $text = WikiExporter::TEXT ) {
+-		$this->db =& $db;
++	function __construct( $db, $history = WikiExporter::CURRENT,
++			$buffer = WikiExporter::BUFFER, $text = WikiExporter::TEXT,
++			$listAuthors = false, $dumpUploads = false, $selfContained = false ) {
++		$this->db = $db;
+ 		$this->history = $history;
+-		$this->buffer  = $buffer;
+-		$this->writer  = new XmlDumpWriter();
+-		$this->sink    = new DumpOutput();
+-		$this->text    = $text;
+-	}
++		$this->buffer = $buffer;
++		$this->text = $text;
++		$this->open = true;
++		$this->listAuthors = $listAuthors;
++		$this->dumpUploads = $dumpUploads;
++		$this->selfContained = $dumpUploads && $selfContained;
+ 
+-	/**
+-	 * Set the DumpOutput or DumpFilter object which will receive
+-	 * various row objects and XML output for filtering. Filters
+-	 * can be chained or used as callbacks.
+-	 *
+-	 * @param $sink mixed
+-	 */
+-	public function setOutputSink( &$sink ) {
+-		$this->sink =& $sink;
++		$this->writer = new XmlDumpWriter();
++		$class = $this->selfContained ? 'ZipDumpArchive' : 'StubDumpArchive';
++		$this->sink = new $class();
++		$this->sink->create( $this->writer->mimetype, $this->writer->extension );
+ 	}
+ 
+ 	public function openStream() {
+-		$output = $this->writer->openStream();
+-		$this->sink->writeOpenStream( $output );
++		$this->sink->write( $this->writer->openStream() );
+ 	}
+ 
+ 	public function closeStream() {
+-		$output = $this->writer->closeStream();
+-		$this->sink->writeCloseStream( $output );
++		$this->sink->write( $this->writer->closeStream() );
++		$this->sink->close();
++		$this->open = false;
++	}
++
++	public function getArchive( &$outFilename, &$outMimetype, &$outExtension ) {
++		if ( $this->open )
++			return false;
++		return $this->sink->getArchive( $outFilename, $outMimetype, $outExtension );
++	}
++
++	protected function writeUploads( $row, $limit = null ) {
++		if( $row->page_namespace == NS_IMAGE ) {
++			$img = wfFindFile( $row->page_title );
++			if( $img ) {
++				if ( !$limit || $limit > 1 ) {
++					foreach( $img->getHistory( $limit ? $limit-1 : NULL ) as $ver ) {
++						$this->sink->write( $this->writer->writeUpload(
++							$ver, $this->sink->binUrl( $ver ) ) );
++						$this->sink->writeBinary( $ver );
++					}
++				}
++				$this->sink->write( $this->writer->writeUpload(
++					$img, $this->sink->binUrl( $img ) ) );
++				$this->sink->writeBinary( $img );
++			}
++		}
+ 	}
+ 
+ 	/**
+@@ -149,31 +170,20 @@
+ 	}
+ 
+ 	# Generates the distinct list of authors of an article
+-	# Not called by default (depends on $this->list_authors)
+-	# Can be set by Special:Export when not exporting whole history
+-	protected function do_list_authors( $page , $revision , $cond ) {
+-		$fname = "do_list_authors" ;
+-		wfProfileIn( $fname );
+-		$this->author_list = "<contributors>";
+-		//rev_deleted
+-		$nothidden = '('.$this->db->bitAnd('rev_deleted', Revision::DELETED_USER) . ') = 0';
+-
+-		$sql = "SELECT DISTINCT rev_user_text,rev_user FROM {$page},{$revision} 
+-		WHERE page_id=rev_page AND $nothidden AND " . $cond ;
+-		$result = $this->db->query( $sql, $fname );
+-		$resultset = $this->db->resultObject( $result );
+-		while( $row = $resultset->fetchObject() ) {
+-			$this->author_list .= "<contributor>" .
+-				"<username>" .
+-				htmlentities( $row->rev_user_text )  .
+-				"</username>" .
+-				"<id>" .
+-				$row->rev_user .
+-				"</id>" .
+-				"</contributor>";
+-		}
+-		wfProfileOut( $fname );
+-		$this->author_list .= "</contributors>";
++	# Not called by default (depends on $this->listAuthors)
++	# Allowed when exporting only last revision
++	protected function doListAuthors( $page, $revision, $cond ) {
++		wfProfileIn( __METHOD__ );
++		$nothidden = '('.$this->db->bitAnd( 'rev_deleted', Revision::DELETED_USER ) . ') = 0';
++		$sql = "SELECT DISTINCT rev_user_text,rev_user FROM $page, $revision" .
++			" WHERE page_id=rev_page AND $nothidden AND $cond";
++		$result = $this->db->query( $sql, __METHOD__ );
++		$code = $this->writer->beginContributors();
++		foreach ( $result as $row )
++			$code .= $this->writer->writeContributor( $row->rev_user, $row->rev_user_text );
++		$code .= $this->writer->endContributors();
++		wfProfileOut( __METHOD__ );
++		return $code;
+ 	}
+ 
+ 	protected function dumpFrom( $cond = '' ) {
+@@ -234,9 +244,9 @@
+ 				$join['revision'] = array('INNER JOIN','page_id=rev_page');
+ 			} elseif( $this->history & WikiExporter::CURRENT ) {
+ 				# Latest revision dumps...
+-				if( $this->list_authors && $cond != '' )  { // List authors, if so desired
++				if( $this->listAuthors && $cond != '' )  { // List authors, if so desired
+ 					list($page,$revision) = $this->db->tableNamesN('page','revision');
+-					$this->do_list_authors( $page, $revision, $cond );
++					$authors = $this->doListAuthors( $page, $revision, $cond );
+ 				}
+ 				$join['revision'] = array('INNER JOIN','page_id=rev_page AND page_latest=rev_id');
+ 			} elseif( $this->history & WikiExporter::STABLE ) {
+@@ -275,10 +285,7 @@
+ 			$result = $this->db->select( $tables, '*', $cond, __METHOD__, $opts, $join );
+ 			$wrapper = $this->db->resultObject( $result );
+ 			# Output dump results
+-			$this->outputPageStream( $wrapper );
+-			if( $this->list_authors ) {
+-				$this->outputPageStream( $wrapper );
+-			}
++			$this->outputPageStream( $wrapper, $this->listAuthors ? $authors : NULL );
+ 
+ 			if( $this->buffer == WikiExporter::STREAM ) {
+ 				$this->db->bufferResults( $prev );
+@@ -299,56 +306,55 @@
+ 	 *
+ 	 * @param $resultset ResultWrapper
+ 	 */
+-	protected function outputPageStream( $resultset ) {
++	protected function outputPageStream( $resultset, $authors = '' ) {
+ 		$last = null;
+ 		while( $row = $resultset->fetchObject() ) {
++			// Run text filter
++			wfRunHooks( 'ExportFilterText', array( &$row->old_text ) );
+ 			if( is_null( $last ) ||
+ 				$last->page_namespace != $row->page_namespace ||
+ 				$last->page_title     != $row->page_title ) {
+ 				if( isset( $last ) ) {
+-					$output = '';
+ 					if( $this->dumpUploads ) {
+-						$output .= $this->writer->writeUploads( $last );
++						$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
+ 					}
+-					$output .= $this->writer->closePage();
+-					$this->sink->writeClosePage( $output );
++					$this->sink->write( $this->writer->closePage() );
+ 				}
+-				$output = $this->writer->openPage( $row );
+-				$this->sink->writeOpenPage( $row, $output );
++				$this->sink->write( $this->writer->openPage( $row ) );
+ 				$last = $row;
+ 			}
+-			$output = $this->writer->writeRevision( $row );
+-			$this->sink->writeRevision( $row, $output );
++			$this->sink->write( $this->writer->writeRevision( $row ) );
+ 		}
+ 		if( isset( $last ) ) {
+-			$output = '';
+ 			if( $this->dumpUploads ) {
+-				$output .= $this->writer->writeUploads( $last );
++				$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
+ 			}
+-			$output .= $this->author_list;
+-			$output .= $this->writer->closePage();
+-			$this->sink->writeClosePage( $output );
++			$this->sink->write( $authors );
++			$this->sink->write( $this->writer->closePage() );
+ 		}
+ 	}
+ 	
+ 	protected function outputLogStream( $resultset ) {
+ 		while( $row = $resultset->fetchObject() ) {
+-			$output = $this->writer->writeLogItem( $row );
+-			$this->sink->writeLogItem( $row, $output );
++			$this->sink->writeLogItem( $this->writer->writeLogItem( $row ) );
+ 		}
+ 	}
+ }
+ 
+ /**
++ * The purpose of this class is to encapsulate main dump file output.
++ * I.e. now it's XML, but other DumpWriter may produce some other format.
+  * @ingroup Dump
+  */
+ class XmlDumpWriter {
+ 
++	var $mimetype = 'application/xml; charset=utf-8', $extension = 'xml';
++
+ 	/**
+ 	 * Returns the export schema version.
+ 	 * @return string
+ 	 */
+-	function schemaVersion() {
++	protected function schemaVersion() {
+ 		return "0.4";
+ 	}
+ 
+@@ -362,10 +368,12 @@
+ 	 *
+ 	 * @return string
+ 	 */
+-	function openStream() {
++	public function openStream() {
+ 		global $wgContLanguageCode;
+ 		$ver = $this->schemaVersion();
+-		return Xml::element( 'mediawiki', array(
++		$mp = '';
++		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
++			Xml::element( 'mediawiki', array(
+ 			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
+ 			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
+ 			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
+@@ -377,7 +385,7 @@
+ 			$this->siteInfo();
+ 	}
+ 
+-	function siteInfo() {
++	protected function siteInfo() {
+ 		$info = array(
+ 			$this->sitename(),
+ 			$this->homelink(),
+@@ -389,28 +397,28 @@
+ 			"\n  </siteinfo>\n";
+ 	}
+ 
+-	function sitename() {
++	protected function sitename() {
+ 		global $wgSitename;
+ 		return Xml::element( 'sitename', array(), $wgSitename );
+ 	}
+ 
+-	function generator() {
++	protected function generator() {
+ 		global $wgVersion;
+ 		return Xml::element( 'generator', array(), "MediaWiki $wgVersion" );
+ 	}
+ 
+-	function homelink() {
++	protected function homelink() {
+ 		return Xml::element( 'base', array(), Title::newMainPage()->getFullUrl() );
+ 	}
+ 
+-	function caseSetting() {
++	protected function caseSetting() {
+ 		global $wgCapitalLinks;
+ 		// "case-insensitive" option is reserved for future
+ 		$sensitivity = $wgCapitalLinks ? 'first-letter' : 'case-sensitive';
+ 		return Xml::element( 'case', array(), $sensitivity );
+ 	}
+ 
+-	function namespaces() {
++	protected function namespaces() {
+ 		global $wgContLang;
+ 		$spaces = "<namespaces>\n";
+ 		foreach( $wgContLang->getFormattedNamespaces() as $ns => $title ) {
+@@ -428,11 +436,10 @@
+ 	 * Closes the output stream with the closing root element.
+ 	 * Call when finished dumping things.
+ 	 */
+-	function closeStream() {
++	public function closeStream() {
+ 		return "</mediawiki>\n";
+ 	}
+ 
+-
+ 	/**
+ 	 * Opens a <page> section on the output stream, with data
+ 	 * from the given database row.
+@@ -441,10 +448,19 @@
+ 	 * @return string
+ 	 * @access private
+ 	 */
+-	function openPage( $row ) {
++	public function openPage( $row ) {
++		global $wgContLang;
+ 		$out = "  <page>\n";
+ 		$title = Title::makeTitle( $row->page_namespace, $row->page_title );
+-		$out .= '    ' . Xml::elementClean( 'title', array(), $title->getPrefixedText() ) . "\n";
++		// Use english namespace names
++		$ns = $title->getNamespace();
++		if( MWNamespace::exists( $ns ) )
++			$ns = MWNamespace::getCanonicalName( $ns );
++		else
++			$ns = $wgContLang->getNsText( $ns );
++		if ( $ns !== '' )
++			$ns .= ':';
++		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.$title->getText() ) . "\n";
+ 		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
+ 		if( $row->page_is_redirect ) {
+ 			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
+@@ -464,7 +480,7 @@
+ 	 *
+ 	 * @access private
+ 	 */
+-	function closePage() {
++	public function closePage() {
+ 		return "  </page>\n";
+ 	}
+ 
+@@ -476,9 +492,8 @@
+ 	 * @return string
+ 	 * @access private
+ 	 */
+-	function writeRevision( $row ) {
+-		$fname = 'WikiExporter::dumpRev';
+-		wfProfileIn( $fname );
++	public function writeRevision( $row ) {
++		wfProfileIn( __METHOD__ );
+ 
+ 		$out  = "    <revision>\n";
+ 		$out .= "      " . Xml::element( 'id', null, strval( $row->rev_id ) ) . "\n";
+@@ -506,7 +521,7 @@
+ 		} elseif( isset( $row->old_text ) ) {
+ 			// Raw text from the database may have invalid chars
+ 			$text = strval( Revision::getRevisionText( $row ) );
+-			$out .= "      " . Xml::elementClean( 'text',
++			$out .= "      " . Xml::ElementClean( 'text',
+ 				array( 'xml:space' => 'preserve' ),
+ 				strval( $text ) ) . "\n";
+ 		} else {
+@@ -520,7 +535,7 @@
+ 
+ 		$out .= "    </revision>\n";
+ 
+-		wfProfileOut( $fname );
++		wfProfileOut( __METHOD__ );
+ 		return $out;
+ 	}
+ 	
+@@ -532,11 +547,9 @@
+ 	 * @return string
+ 	 * @access private
+ 	 */
+-	function writeLogItem( $row ) {
+-		$fname = 'WikiExporter::writeLogItem';
+-		wfProfileIn( $fname );
++	public function writeLogItem( $row ) {
++		wfProfileIn( __METHOD__ );
+ 
+-		$out  = "    <logitem>\n";
+ 		$out .= "      " . Xml::element( 'id', null, strval( $row->log_id ) ) . "\n";
+ 
+ 		$out .= $this->writeTimestamp( $row->log_timestamp );
+@@ -566,18 +579,26 @@
+ 				strval( $row->log_params ) ) . "\n";
+ 		}
+ 
+-		$out .= "    </logitem>\n";
++		$out  = "    <logitem>\n$out    </logitem>\n";
+ 
+-		wfProfileOut( $fname );
++		wfProfileOut( __METHOD__ );
+ 		return $out;
+ 	}
+ 
+-	function writeTimestamp( $timestamp ) {
++	protected function writeTimestamp( $timestamp ) {
+ 		$ts = wfTimestamp( TS_ISO_8601, $timestamp );
+ 		return "      " . Xml::element( 'timestamp', null, $ts ) . "\n";
+ 	}
+ 
+-	function writeContributor( $id, $text ) {
++	public function beginContributors() {
++		return "    <contributors>\n";
++	}
++
++	public function endContributors() {
++		return "    </contributors>\n";
++	}
++
++	public function writeContributor( $id, $text ) {
+ 		$out = "      <contributor>\n";
+ 		if( $id ) {
+ 			$out .= "        " . Xml::elementClean( 'username', null, strval( $text ) ) . "\n";
+@@ -589,338 +610,27 @@
+ 		return $out;
+ 	}
+ 
+-	/**
+-	 * Warning! This data is potentially inconsistent. :(
+-	 */
+-	function writeUploads( $row ) {
+-		if( $row->page_namespace == NS_IMAGE ) {
+-			$img = wfFindFile( $row->page_title );
+-			if( $img ) {
+-				$out = '';
+-				foreach( array_reverse( $img->getHistory() ) as $ver ) {
+-					$out .= $this->writeUpload( $ver );
+-				}
+-				$out .= $this->writeUpload( $img );
+-				return $out;
+-			}
+-		}
+-		return '';
+-	}
+-
+-	function writeUpload( $file ) {
++	public function writeUpload( $file, $url ) {
++		if ( !$file->exists() )
++			return "";
+ 		return "    <upload>\n" .
+ 			$this->writeTimestamp( $file->getTimestamp() ) .
+ 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
+-			"      " . Xml::elementClean( 'comment', null, $file->getDescription() ) . "\n" .
+-			"      " . Xml::element( 'filename', null, $file->getName() ) . "\n" .
+-			"      " . Xml::element( 'src', null, $file->getFullUrl() ) . "\n" .
+-			"      " . Xml::element( 'size', null, $file->getSize() ) . "\n" .
++			"      " . Xml::ElementClean( 'comment', null, $file->getDescription() ) . "\n" .
++			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
++			"      " . Xml::Element( 'src', array( 'sha1' => $file->getSha1() ), $url ) . "\n" .
++			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
+ 			"    </upload>\n";
+ 	}
+ 
+ }
+ 
+-
+-/**
+- * Base class for output stream; prints to stdout or buffer or whereever.
+- * @ingroup Dump
+- */
+-class DumpOutput {
+-	function writeOpenStream( $string ) {
+-		$this->write( $string );
+-	}
+-
+-	function writeCloseStream( $string ) {
+-		$this->write( $string );
+-	}
+-
+-	function writeOpenPage( $page, $string ) {
+-		$this->write( $string );
+-	}
+-
+-	function writeClosePage( $string ) {
+-		$this->write( $string );
+-	}
+-
+-	function writeRevision( $rev, $string ) {
+-		$this->write( $string );
+-	}
+-	
+-	function writeLogItem( $rev, $string ) {
+-		$this->write( $string );
+-	}
+-
+-	/**
+-	 * Override to write to a different stream type.
+-	 * @return bool
+-	 */
+-	function write( $string ) {
+-		print $string;
+-	}
+-}
+-
+-/**
+- * Stream outputter to send data to a file.
+- * @ingroup Dump
+- */
+-class DumpFileOutput extends DumpOutput {
+-	var $handle;
+-
+-	function DumpFileOutput( $file ) {
+-		$this->handle = fopen( $file, "wt" );
+-	}
+-
+-	function write( $string ) {
+-		fputs( $this->handle, $string );
+-	}
+-}
+-
+-/**
+- * Stream outputter to send data to a file via some filter program.
+- * Even if compression is available in a library, using a separate
+- * program can allow us to make use of a multi-processor system.
+- * @ingroup Dump
+- */
+-class DumpPipeOutput extends DumpFileOutput {
+-	function DumpPipeOutput( $command, $file = null ) {
+-		if( !is_null( $file ) ) {
+-			$command .=  " > " . wfEscapeShellArg( $file );
+-		}
+-		$this->handle = popen( $command, "w" );
+-	}
+-}
+-
+-/**
+- * Sends dump output via the gzip compressor.
+- * @ingroup Dump
+- */
+-class DumpGZipOutput extends DumpPipeOutput {
+-	function DumpGZipOutput( $file ) {
+-		parent::DumpPipeOutput( "gzip", $file );
+-	}
+-}
+-
+-/**
+- * Sends dump output via the bgzip2 compressor.
+- * @ingroup Dump
+- */
+-class DumpBZip2Output extends DumpPipeOutput {
+-	function DumpBZip2Output( $file ) {
+-		parent::DumpPipeOutput( "bzip2", $file );
+-	}
+-}
+-
+-/**
+- * Sends dump output via the p7zip compressor.
+- * @ingroup Dump
+- */
+-class Dump7ZipOutput extends DumpPipeOutput {
+-	function Dump7ZipOutput( $file ) {
+-		$command = "7za a -bd -si " . wfEscapeShellArg( $file );
+-		// Suppress annoying useless crap from p7zip
+-		// Unfortunately this could suppress real error messages too
+-		$command .= ' >' . wfGetNull() . ' 2>&1';
+-		parent::DumpPipeOutput( $command );
+-	}
+-}
+-
+-
+-
+-/**
+- * Dump output filter class.
+- * This just does output filtering and streaming; XML formatting is done
+- * higher up, so be careful in what you do.
+- * @ingroup Dump
+- */
+-class DumpFilter {
+-	function DumpFilter( &$sink ) {
+-		$this->sink =& $sink;
+-	}
+-
+-	function writeOpenStream( $string ) {
+-		$this->sink->writeOpenStream( $string );
+-	}
+-
+-	function writeCloseStream( $string ) {
+-		$this->sink->writeCloseStream( $string );
+-	}
+-
+-	function writeOpenPage( $page, $string ) {
+-		$this->sendingThisPage = $this->pass( $page, $string );
+-		if( $this->sendingThisPage ) {
+-			$this->sink->writeOpenPage( $page, $string );
+-		}
+-	}
+-
+-	function writeClosePage( $string ) {
+-		if( $this->sendingThisPage ) {
+-			$this->sink->writeClosePage( $string );
+-			$this->sendingThisPage = false;
+-		}
+-	}
+-
+-	function writeRevision( $rev, $string ) {
+-		if( $this->sendingThisPage ) {
+-			$this->sink->writeRevision( $rev, $string );
+-		}
+-	}
+-	
+-	function writeLogItem( $rev, $string ) {
+-		$this->sink->writeRevision( $rev, $string );
+-	}	
+-
+-	/**
+-	 * Override for page-based filter types.
+-	 * @return bool
+-	 */
+-	function pass( $page ) {
+-		return true;
+-	}
+-}
+-
+-/**
+- * Simple dump output filter to exclude all talk pages.
+- * @ingroup Dump
+- */
+-class DumpNotalkFilter extends DumpFilter {
+-	function pass( $page ) {
+-		return !MWNamespace::isTalk( $page->page_namespace );
+-	}
+-}
+-
+-/**
+- * Dump output filter to include or exclude pages in a given set of namespaces.
+- * @ingroup Dump
+- */
+-class DumpNamespaceFilter extends DumpFilter {
+-	var $invert = false;
+-	var $namespaces = array();
+-
+-	function DumpNamespaceFilter( &$sink, $param ) {
+-		parent::DumpFilter( $sink );
+-
+-		$constants = array(
+-			"NS_MAIN"           => NS_MAIN,
+-			"NS_TALK"           => NS_TALK,
+-			"NS_USER"           => NS_USER,
+-			"NS_USER_TALK"      => NS_USER_TALK,
+-			"NS_PROJECT"        => NS_PROJECT,
+-			"NS_PROJECT_TALK"   => NS_PROJECT_TALK,
+-			"NS_FILE"           => NS_FILE,
+-			"NS_FILE_TALK"      => NS_FILE_TALK,
+-			"NS_IMAGE"          => NS_IMAGE,  // NS_IMAGE is an alias for NS_FILE
+-			"NS_IMAGE_TALK"     => NS_IMAGE_TALK,
+-			"NS_MEDIAWIKI"      => NS_MEDIAWIKI,
+-			"NS_MEDIAWIKI_TALK" => NS_MEDIAWIKI_TALK,
+-			"NS_TEMPLATE"       => NS_TEMPLATE,
+-			"NS_TEMPLATE_TALK"  => NS_TEMPLATE_TALK,
+-			"NS_HELP"           => NS_HELP,
+-			"NS_HELP_TALK"      => NS_HELP_TALK,
+-			"NS_CATEGORY"       => NS_CATEGORY,
+-			"NS_CATEGORY_TALK"  => NS_CATEGORY_TALK );
+-
+-		if( $param{0} == '!' ) {
+-			$this->invert = true;
+-			$param = substr( $param, 1 );
+-		}
+-
+-		foreach( explode( ',', $param ) as $key ) {
+-			$key = trim( $key );
+-			if( isset( $constants[$key] ) ) {
+-				$ns = $constants[$key];
+-				$this->namespaces[$ns] = true;
+-			} elseif( is_numeric( $key ) ) {
+-				$ns = intval( $key );
+-				$this->namespaces[$ns] = true;
+-			} else {
+-				throw new MWException( "Unrecognized namespace key '$key'\n" );
+-			}
+-		}
+-	}
+-
+-	function pass( $page ) {
+-		$match = isset( $this->namespaces[$page->page_namespace] );
+-		return $this->invert xor $match;
+-	}
+-}
+-
+-
+-/**
+- * Dump output filter to include only the last revision in each page sequence.
+- * @ingroup Dump
+- */
+-class DumpLatestFilter extends DumpFilter {
+-	var $page, $pageString, $rev, $revString;
+-
+-	function writeOpenPage( $page, $string ) {
+-		$this->page = $page;
+-		$this->pageString = $string;
+-	}
+-
+-	function writeClosePage( $string ) {
+-		if( $this->rev ) {
+-			$this->sink->writeOpenPage( $this->page, $this->pageString );
+-			$this->sink->writeRevision( $this->rev, $this->revString );
+-			$this->sink->writeClosePage( $string );
+-		}
+-		$this->rev = null;
+-		$this->revString = null;
+-		$this->page = null;
+-		$this->pageString = null;
+-	}
+-
+-	function writeRevision( $rev, $string ) {
+-		if( $rev->rev_id == $this->page->page_latest ) {
+-			$this->rev = $rev;
+-			$this->revString = $string;
+-		}
+-	}
+-}
+-
+-/**
+- * Base class for output stream; prints to stdout or buffer or whereever.
+- * @ingroup Dump
+- */
+-class DumpMultiWriter {
+-	function DumpMultiWriter( $sinks ) {
+-		$this->sinks = $sinks;
+-		$this->count = count( $sinks );
+-	}
+-
+-	function writeOpenStream( $string ) {
+-		for( $i = 0; $i < $this->count; $i++ ) {
+-			$this->sinks[$i]->writeOpenStream( $string );
+-		}
+-	}
+-
+-	function writeCloseStream( $string ) {
+-		for( $i = 0; $i < $this->count; $i++ ) {
+-			$this->sinks[$i]->writeCloseStream( $string );
+-		}
+-	}
+-
+-	function writeOpenPage( $page, $string ) {
+-		for( $i = 0; $i < $this->count; $i++ ) {
+-			$this->sinks[$i]->writeOpenPage( $page, $string );
+-		}
+-	}
+-
+-	function writeClosePage( $string ) {
+-		for( $i = 0; $i < $this->count; $i++ ) {
+-			$this->sinks[$i]->writeClosePage( $string );
+-		}
+-	}
+-
+-	function writeRevision( $rev, $string ) {
+-		for( $i = 0; $i < $this->count; $i++ ) {
+-			$this->sinks[$i]->writeRevision( $rev, $string );
+-		}
+-	}
+-}
++# -- Vitaliy Filippov 2011-10-13:
++# Implementing additional "dump filter" layer is a very silly idea.
++# Page selection must be done OUTSIDE any dumper classes. It's much faster.
+ 
+ function xmlsafe( $string ) {
+-	$fname = 'xmlsafe';
+-	wfProfileIn( $fname );
++	wfProfileIn( __METHOD__ );
+ 
+ 	/**
+ 	 * The page may contain old data which has not been properly normalized.
+@@ -930,6 +640,6 @@
+ 	$string = UtfNormal::cleanUp( $string );
+ 
+ 	$string = htmlspecialchars( $string );
+-	wfProfileOut( $fname );
++	wfProfileOut( __METHOD__ );
+ 	return $string;
+ }
+diff -r 5ad71cf1db7a -r a47b5463550e includes/Import.php
+--- includes/Import.php
++++ includes/Import.php
+@@ -23,6 +23,19 @@
+  * @ingroup SpecialPage
+  */
+ 
++class FakeUser {
++	var $name = "";
++	function __construct( $name ) {
++		$this->name = $name;
++	}
++	function getId() {
++		return 0;
++	}
++	function getName() {
++		return $this->name;
++	}
++}
++
+ /**
+  *
+  * @ingroup SpecialPage
+@@ -39,6 +52,7 @@
+ 	var $type = "";
+ 	var $action = "";
+ 	var $params = "";
++	var $tempfile = NULL;
+ 
+ 	function setTitle( $title ) {
+ 		if( is_object( $title ) ) {
+@@ -87,6 +101,10 @@
+ 		$this->filename = $filename;
+ 	}
+ 
++	function setSha1( $sha1 ) {
++		$this->sha1 = trim( $sha1 );
++	}
++
+ 	function setSize( $size ) {
+ 		$this->size = intval( $size );
+ 	}
+@@ -139,6 +157,10 @@
+ 		return $this->filename;
+ 	}
+ 
++	function getSha1() {
++		return $this->sha1;
++	}
++
+ 	function getSize() {
+ 		return $this->size;
+ 	}
+@@ -156,14 +178,22 @@
+ 	}
+ 
+ 	function importOldRevision() {
++		# Check edit permission
++		global $wgUser;
++		if ( !$this->getTitle()->userCan( 'edit' ) ) {
++			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
++			return false;
++		}
++
+ 		$dbw = wfGetDB( DB_MASTER );
+ 
+ 		# Sneak a single revision into place
+ 		$user = User::newFromName( $this->getUser() );
+-		if( $user ) {
++		if ( $user ) {
+ 			$userId = intval( $user->getId() );
+ 			$userText = $user->getName();
+ 		} else {
++			$user = new FakeUser( $this->getUser() );
+ 			$userId = 0;
+ 			$userText = $this->getUser();
+ 		}
+@@ -174,6 +204,7 @@
+ 
+ 		$article = new Article( $this->title );
+ 		$pageId = $article->getId();
++		$dbTimestamp = $dbw->timestamp( $this->timestamp );
+ 		if( $pageId == 0 ) {
+ 			# must create the page...
+ 			$pageId = $article->insertOn( $dbw );
+@@ -181,18 +212,19 @@
+ 		} else {
+ 			$created = false;
+ 
+-			$prior = $dbw->selectField( 'revision', '1',
++			$prior = $dbw->selectField( 'revision', 'rev_id',
+ 				array( 'rev_page' => $pageId,
+-					'rev_timestamp' => $dbw->timestamp( $this->timestamp ),
++					'rev_timestamp' => $dbTimestamp,
+ 					'rev_user_text' => $userText,
+ 					'rev_comment'   => $this->getComment() ),
+ 				__METHOD__
+ 			);
+ 			if( $prior ) {
++				$prior = Revision::newFromId( $prior );
+ 				// FIXME: this could fail slightly for multiple matches :P
+ 				wfDebug( __METHOD__ . ": skipping existing revision for [[" .
+ 					$this->title->getPrefixedText() . "]], timestamp " . $this->timestamp . "\n" );
+-				return false;
++				return $prior;
+ 			}
+ 		}
+ 
+@@ -209,19 +241,53 @@
+ 			) );
+ 		$revId = $revision->insertOn( $dbw );
+ 		$changed = $article->updateIfNewerOn( $dbw, $revision );
+-		
++
++		# Restore edit/create recent changes entry
++		global $wgUseRCPatrol, $wgUseNPPatrol;
++		# Mark as patrolled if importing user can do so
++		$patrolled = ( $wgUseRCPatrol || $wgUseNPPatrol ) && $this->title->userCan( 'autopatrol' );
++		$prevRev = $dbw->selectRow( 'revision', '*',
++			array( 'rev_page' => $pageId, "rev_timestamp < $dbTimestamp" ), __METHOD__,
++			array( 'LIMIT' => '1', 'ORDER BY' => 'rev_timestamp DESC' ) );
++		if ( $prevRev ) {
++			$rc = RecentChange::notifyEdit( $this->timestamp, $this->title, $this->minor,
++				$user, $this->getComment(), $prevRev->rev_id, $prevRev->rev_timestamp, $wgUser->isAllowed( 'bot' ),
++				'', $prevRev->rev_len, strlen( $this->getText() ), $revId, $patrolled );
++		} else {
++			$rc = RecentChange::notifyNew( $this->timestamp, $this->title, $this->minor,
++				$user, $this->getComment(), $wgUser->isAllowed( 'bot' ), '',
++				strlen( $this->getText() ), $revId, $patrolled );
++			if ( !$created ) {
++				# If we are importing the first revision, but the page already exists,
++				# that means there was another first revision. Mark it as non-first,
++				# so that import does not depend on revision sequence.
++				$dbw->update( 'recentchanges',
++					array( 'rc_type' => RC_EDIT ),
++					array(
++						'rc_namespace' => $this->title->getNamespace(),
++						'rc_title' => $this->title->getDBkey(),
++						'rc_type' => RC_NEW,
++					),
++					__METHOD__ );
++			}
++		}
++		# Log auto-patrolled edits
++		if ( $patrolled ) {
++			PatrolLog::record( $rc, true );
++		}
++
+ 		# To be on the safe side...
+ 		$tempTitle = $GLOBALS['wgTitle'];
+ 		$GLOBALS['wgTitle'] = $this->title;
+ 
+-		if( $created ) {
++		if ( $created ) {
+ 			wfDebug( __METHOD__ . ": running onArticleCreate\n" );
+ 			Article::onArticleCreate( $this->title );
+ 
+ 			wfDebug( __METHOD__ . ": running create updates\n" );
+ 			$article->createUpdates( $revision );
+ 
+-		} elseif( $changed ) {
++		} elseif ( $changed ) {
+ 			wfDebug( __METHOD__ . ": running onArticleEdit\n" );
+ 			Article::onArticleEdit( $this->title );
+ 
+@@ -235,17 +301,25 @@
+ 		}
+ 		$GLOBALS['wgTitle'] = $tempTitle;
+ 
+-		return true;
++		# A hack. TOdo it better?
++		$revision->_imported = true;
++		return $revision;
+ 	}
+ 	
+ 	function importLogItem() {
+ 		$dbw = wfGetDB( DB_MASTER );
+ 		# FIXME: this will not record autoblocks
+-		if( !$this->getTitle() ) {
++		if ( !$this->getTitle() ) {
+ 			wfDebug( __METHOD__ . ": skipping invalid {$this->type}/{$this->action} log time, timestamp " . 
+ 				$this->timestamp . "\n" );
+ 			return;
+ 		}
++		# Check edit permission
++		if ( !$this->getTitle()->userCan( 'edit' ) ) {
++			global $wgUser;
++			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
++			return false;
++		}
+ 		# Check if it exists already
+ 		// FIXME: use original log ID (better for backups)
+ 		$prior = $dbw->selectField( 'logging', '1',
+@@ -260,7 +334,7 @@
+ 			__METHOD__
+ 		);
+ 		// FIXME: this could fail slightly for multiple matches :P
+-		if( $prior ) {
++		if ( $prior ) {
+ 			wfDebug( __METHOD__ . ": skipping existing item for Log:{$this->type}/{$this->action}, timestamp " . 
+ 				$this->timestamp . "\n" );
+ 			return false;
+@@ -272,7 +346,7 @@
+ 			'log_action' => $this->action,
+ 			'log_timestamp' => $dbw->timestamp( $this->timestamp ),
+ 			'log_user' => User::idFromName( $this->user_text ),
+-			#'log_user_text' => $this->user_text,
++			'log_user_text' => $this->user_text,
+ 			'log_namespace' => $this->getTitle()->getNamespace(),
+ 			'log_title' => $this->getTitle()->getDBkey(),
+ 			'log_comment' => $this->getComment(),
+@@ -282,92 +356,125 @@
+ 	}
+ 
+ 	function importUpload() {
+-		wfDebug( __METHOD__ . ": STUB\n" );
+-
+-		/**
+-			// from file revert...
+-			$source = $this->file->getArchiveVirtualUrl( $this->oldimage );
+-			$comment = $wgRequest->getText( 'wpComment' );
+-			// TODO: Preserve file properties from database instead of reloading from file
+-			$status = $this->file->upload( $source, $comment, $comment );
+-			if( $status->isGood() ) {
+-		*/
+-
+-		/**
+-			// from file upload...
+-		$this->mLocalFile = wfLocalFile( $nt );
+-		$this->mDestName = $this->mLocalFile->getName();
+-		//....
+-			$status = $this->mLocalFile->upload( $this->mTempPath, $this->mComment, $pageText,
+-			File::DELETE_SOURCE, $this->mFileProps );
+-			if ( !$status->isGood() ) {
+-				$resultDetails = array( 'internal' => $status->getWikiText() );
+-		*/
++		# Check edit permission
++		if ( !$this->getTitle()->userCan( 'edit' ) ) {
++			global $wgUser;
++			wfDebug( __METHOD__ . ": edit permission denied for [[" . $this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
++			return false;
++		}
+ 
+ 		// @todo Fixme: upload() uses $wgUser, which is wrong here
+ 		// it may also create a page without our desire, also wrong potentially.
+ 		// and, it will record a *current* upload, but we might want an archive version here
+ 
+ 		$file = wfLocalFile( $this->getTitle() );
+-		if( !$file ) {
++		if ( !$file ) {
+ 			var_dump( $file );
+ 			wfDebug( "IMPORT: Bad file. :(\n" );
+ 			return false;
+ 		}
+ 
++		// First check if file already exists
++		if ( $file->exists() ) {
++			// Backwards-compatibility: support export files without sha1
++			if ( $this->getSha1() && $file->getSha1() == $this->getSha1() ||
++				!$this->getSha1() && $file->getTimestamp() == $this->getTimestamp() ) {
++				wfDebug( "IMPORT: File already exists and is equal to imported (".$this->getTimestamp().").\n" );
++				return false;
++			}
++			$history = $file->getHistory( NULL, $this->getTimestamp(), $this->getTimestamp() );
++			foreach ( $history as $oldfile ) {
++				if ( !$this->getSha1() || $oldfile->getSha1() == $this->getSha1() ) {
++					wfDebug( "IMPORT: File revision already exists at its timestamp (".$this->getTimestamp().") and is equal to imported.\n" );
++					return false;
++				}
++			}
++		}
++
++		/* Get file source into a temporary file */
+ 		$source = $this->downloadSource();
+-		if( !$source ) {
++		if ( !$source ) {
+ 			wfDebug( "IMPORT: Could not fetch remote file. :(\n" );
+ 			return false;
+ 		}
+ 
+-		$status = $file->upload( $source,
+-			$this->getComment(),
+-			$this->getComment(), // Initial page, if none present...
+-			File::DELETE_SOURCE,
+-			false, // props...
+-			$this->getTimestamp() );
++		// @fixme upload() uses $wgUser, which is wrong here
++		// it may also create a page without our desire, also wrong potentially.
+ 
+-		if( $status->isGood() ) {
++		if ( $file->exists() && $file->getTimestamp() > $this->getTimestamp() ) {
++			// Upload an *archive* version
++			wfDebug( "Importing an archive $arch version of file (".$this->getTimestamp().")\n" );
++			$status = $file->uploadIntoArchive( $source,
++				$this->getComment(),
++				$this->getComment(), // Initial page, if none present...
++				File::DELETE_SOURCE,
++				false, // props...
++				$this->getTimestamp() );
++		} else {
++			wfDebug( "Importing a new current version of file (".$this->getTimestamp().")\n" );
++			// Upload a *current* version
++			$status = $file->upload( $source,
++				$this->getComment(),
++				$this->getComment(), // Initial page, if none present...
++				File::DELETE_SOURCE,
++				false, // props...
++				$this->getTimestamp() );
++		}
++
++		if ( $status->isGood() ) {
+ 			// yay?
+-			wfDebug( "IMPORT: is ok?\n" );
++			wfDebug( "IMPORT: file imported OK\n" );
+ 			return true;
+ 		}
+ 
+-		wfDebug( "IMPORT: is bad? " . $status->getXml() . "\n" );
++		wfDebug( "IMPORT: file import FAILED: " . $status->getXml() . "\n" );
+ 		return false;
+ 
+ 	}
+ 
+ 	function downloadSource() {
+ 		global $wgEnableUploads;
+-		if( !$wgEnableUploads ) {
++		if ( !$wgEnableUploads ) {
+ 			return false;
+ 		}
+ 
+-		$tempo = tempnam( wfTempDir(), 'download' );
+-		$f = fopen( $tempo, 'wb' );
+-		if( !$f ) {
+-			wfDebug( "IMPORT: couldn't write to temp file $tempo\n" );
++		$src = $this->getSrc();
++		if ( !$src ) {
++			return false;
++		}
++		if ( is_file( $src ) ) {
++			// The file is already downloaded (as a part of dump archive)
++			return $src;
++		}
++
++		// Try to download file over HTTP
++		$this->tempfile = tempnam( wfTempDir(), 'download' );
++		$f = fopen( $this->tempfile, 'wb' );
++		if ( !$f ) {
++			wfDebug( "IMPORT: couldn't write to temp file ".$this->tempfile."\n" );
+ 			return false;
+ 		}
+ 
+ 		// @todo Fixme!
+-		$src = $this->getSrc();
+ 		$data = Http::get( $src );
+-		if( !$data ) {
++		if ( !$data ) {
+ 			wfDebug( "IMPORT: couldn't fetch source $src\n" );
+ 			fclose( $f );
+-			unlink( $tempo );
++			unlink( $this->tempfile );
+ 			return false;
+ 		}
+ 
+ 		fwrite( $f, $data );
+ 		fclose( $f );
+ 
+-		return $tempo;
++		return $this->tempfile;
+ 	}
+ 
++	function __destruct() {
++		if ( $this->tempfile && is_file( $this->tempfile ) ) {
++			unlink( $this->tempfile );
++		}
++	}
+ }
+ 
+ /**
+@@ -376,7 +483,6 @@
+  */
+ class WikiImporter {
+ 	var $mDebug = false;
+-	var $mSource = null;
+ 	var $mPageCallback = null;
+ 	var $mPageOutCallback = null;
+ 	var $mRevisionCallback = null;
+@@ -387,11 +493,14 @@
+ 	var $lastfield;
+ 	var $tagStack = array();
+ 
+-	function __construct( $source ) {
++	var $mArchive = null;
++
++	function __construct( $archive ) {
+ 		$this->setRevisionCallback( array( $this, "importRevision" ) );
+ 		$this->setUploadCallback( array( $this, "importUpload" ) );
++		$this->setPageCallback( array( $this, "beginPage" ) );
+ 		$this->setLogItemCallback( array( $this, "importLogItem" ) );
+-		$this->mSource = $source;
++		$this->mArchive = $archive;
+ 	}
+ 
+ 	function throwXmlError( $err ) {
+@@ -403,22 +512,19 @@
+ 		if( preg_match( '/www.mediawiki.org/',$prefix ) ) {
+ 			$prefix = str_replace( '/','\/',$prefix );
+ 			$this->mXmlNamespace='/^'.$prefix.':/';
+-		 }
++		}
+ 	}
+ 
+ 	function stripXmlNamespace($name) {
+ 		if( $this->mXmlNamespace ) {
+-			return(preg_replace($this->mXmlNamespace,'',$name,1));
+-		}
+-		else {
+-			return($name);
++			return preg_replace( $this->mXmlNamespace, '', $name, 1 );
++		} else {
++			return $name;
+ 		}
+ 	}
+ 
+-	# --------------
+-
+ 	function doImport() {
+-		if( empty( $this->mSource ) ) {
++		if( empty( $this->mArchive ) ) {
+ 			return new WikiErrorMsg( "importnotext" );
+ 		}
+ 
+@@ -431,16 +537,18 @@
+ 		xml_set_element_handler( $parser, "in_start", "" );
+ 		xml_set_start_namespace_decl_handler( $parser, "handleXmlNamespace" );
+ 
++		$fp = fopen( $this->mArchive->getMainPart(), 'rb' );
+ 		$offset = 0; // for context extraction on error reporting
+ 		do {
+-			$chunk = $this->mSource->readChunk();
+-			if( !xml_parse( $parser, $chunk, $this->mSource->atEnd() ) ) {
++			$chunk = fread( $fp, 0x10000 );
++			if( !xml_parse( $parser, $chunk, feof( $fp ) ) ) {
+ 				wfDebug( "WikiImporter::doImport encountered XML parsing error\n" );
+ 				return new WikiXmlError( $parser, wfMsgHtml( 'import-parse-failure' ), $chunk, $offset );
+ 			}
+ 			$offset += strlen( $chunk );
+-		} while( $chunk !== false && !$this->mSource->atEnd() );
++		} while( $chunk !== false && !feof( $fp ) );
+ 		xml_parser_free( $parser );
++		fclose( $fp );
+ 
+ 		return true;
+ 	}
+@@ -563,12 +671,13 @@
+ 	}
+ 
+ 	/**
+-	 * Dummy for now...
++	 * Per-revision file import callback, performs the upload.
++	 * @param $revision WikiRevision
++	 * @private
+ 	 */
+ 	function importUpload( $revision ) {
+-		//$dbw = wfGetDB( DB_MASTER );
+-		//return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
+-		return false;
++		$dbw = wfGetDB( DB_MASTER );
++		return $dbw->deadlockLoop( array( $revision, 'importUpload' ) );
+ 	}
+ 
+ 	/**
+@@ -606,12 +715,15 @@
+ 	 * @param $origTitle Title
+ 	 * @param $revisionCount int
+ 	 * @param $successCount Int: number of revisions for which callback returned true
++	 * @param $lastExistingRevision Revision
++	 * @param $lastLocalRevision Revision
++	 * @param $lastRevision Revision
+ 	 * @private
+ 	 */
+-	function pageOutCallback( $title, $origTitle, $revisionCount, $successCount ) {
++	function pageOutCallback() {
+ 		if( is_callable( $this->mPageOutCallback ) ) {
+-			call_user_func( $this->mPageOutCallback, $title, $origTitle,
+-				$revisionCount, $successCount );
++			$args = func_get_args();
++			call_user_func_array( $this->mPageOutCallback, $args );
+ 		}
+ 	}
+ 
+@@ -640,6 +752,9 @@
+ 			$this->workSuccessCount = 0;
+ 			$this->uploadCount = 0;
+ 			$this->uploadSuccessCount = 0;
++			$this->lastRevision = NULL;
++			$this->lastLocalRevision = NULL;
++			$this->lastExistingRevision = NULL;
+ 			xml_set_element_handler( $parser, "in_page", "out_page" );
+ 		} elseif( $name == 'logitem' ) {
+ 			$this->push( $name );
+@@ -649,6 +764,7 @@
+ 			return $this->throwXMLerror( "Expected <page>, got <$name>" );
+ 		}
+ 	}
++
+ 	function out_mediawiki( $parser, $name ) {
+ 		$name = $this->stripXmlNamespace($name);
+ 		$this->debug( "out_mediawiki $name" );
+@@ -658,7 +774,6 @@
+ 		xml_set_element_handler( $parser, "donothing", "donothing" );
+ 	}
+ 
+-
+ 	function in_siteinfo( $parser, $name, $attribs ) {
+ 		// no-ops for now
+ 		$name = $this->stripXmlNamespace($name);
+@@ -683,6 +798,28 @@
+ 		}
+ 	}
+ 
++	function beginPage( $title ) {
++		$fields = Revision::selectFields();
++		$fields[] = 'page_namespace';
++		$fields[] = 'page_title';
++		$fields[] = 'page_latest';
++		$dbr = wfGetDB( DB_MASTER );
++		$res = $dbr->select(
++			array( 'page', 'revision' ),
++			$fields,
++			array( 'page_id=rev_page',
++			       'page_namespace' => $this->pageTitle->getNamespace(),
++			       'page_title'     => $this->pageTitle->getDBkey(),
++			       'rev_len IS NOT NULL' ),
++			'Revision::fetchRow',
++			array( 'LIMIT' => 1,
++			       'ORDER BY' => 'rev_timestamp DESC' ) );
++		$row = $res->fetchObject();
++		$res->free();
++		if ( $row ) {
++			$this->lastLocalRevision = new Revision( $row );
++		}
++	}
+ 
+ 	function in_page( $parser, $name, $attribs ) {
+ 		$name = $this->stripXmlNamespace($name);
+@@ -736,7 +873,9 @@
+ 		xml_set_element_handler( $parser, "in_mediawiki", "out_mediawiki" );
+ 
+ 		$this->pageOutCallback( $this->pageTitle, $this->origTitle,
+-			$this->workRevisionCount, $this->workSuccessCount );
++			$this->workRevisionCount, $this->workSuccessCount,
++			$this->lastExistingRevision, $this->lastLocalRevision,
++			$this->lastRevision );
+ 
+ 		$this->workTitle = null;
+ 		$this->workRevision = null;
+@@ -835,8 +974,13 @@
+ 				$this->workRevision->setFilename( $this->appenddata );
+ 			break;
+ 		case "src":
+-			if( $this->workRevision )
+-				$this->workRevision->setSrc( $this->appenddata );
++			if( $this->workRevision ) {
++				$path = $this->mArchive->getBinary( $this->appenddata );
++				if ( !$path ) {
++					$path = $this->appenddata;
++				}
++				$this->workRevision->setSrc( $path );
++			}
+ 			break;
+ 		case "size":
+ 			if( $this->workRevision )
+@@ -887,9 +1031,12 @@
+ 		if( $this->workRevision ) {
+ 			$ok = call_user_func_array( $this->mRevisionCallback,
+ 				array( $this->workRevision, $this ) );
+-			if( $ok ) {
++			if( is_object( $ok ) && !empty( $ok->_imported ) ) {
++				$this->lastRevision = $ok;
+ 				$this->workSuccessCount++;
+-			}
++			} else if ( is_object( $ok ) && ( !$this->lastExistingRevision ||
++				$ok->getTimestamp() > $this->lastExistingRevision->getTimestamp() ) )
++				$this->lastExistingRevision = $ok;
+ 		}
+ 	}
+ 
+@@ -944,6 +1091,9 @@
+ 		case "text":
+ 		case "filename":
+ 		case "src":
++			if ( $name == "src" && $this->workRevision && isset( $attribs['sha1'] ) ) {
++				$this->workRevision->setSha1( $attribs['sha1'] );
++			}
+ 		case "size":
+ 			$this->appendfield = $name;
+ 			xml_set_element_handler( $parser, "in_nothing", "out_append" );
+@@ -1021,117 +1171,3 @@
+ 	}
+ 
+ }
+-
+-/**
+- * @todo document (e.g. one-sentence class description).
+- * @ingroup SpecialPage
+- */
+-class ImportStringSource {
+-	function __construct( $string ) {
+-		$this->mString = $string;
+-		$this->mRead = false;
+-	}
+-
+-	function atEnd() {
+-		return $this->mRead;
+-	}
+-
+-	function readChunk() {
+-		if( $this->atEnd() ) {
+-			return false;
+-		} else {
+-			$this->mRead = true;
+-			return $this->mString;
+-		}
+-	}
+-}
+-
+-/**
+- * @todo document (e.g. one-sentence class description).
+- * @ingroup SpecialPage
+- */
+-class ImportStreamSource {
+-	function __construct( $handle ) {
+-		$this->mHandle = $handle;
+-	}
+-
+-	function atEnd() {
+-		return feof( $this->mHandle );
+-	}
+-
+-	function readChunk() {
+-		return fread( $this->mHandle, 32768 );
+-	}
+-
+-	static function newFromFile( $filename ) {
+-		$file = @fopen( $filename, 'rt' );
+-		if( !$file ) {
+-			return new WikiErrorMsg( "importcantopen" );
+-		}
+-		return new ImportStreamSource( $file );
+-	}
+-
+-	static function newFromUpload( $fieldname = "xmlimport" ) {
+-		$upload =& $_FILES[$fieldname];
+-
+-		if( !isset( $upload ) || !$upload['name'] ) {
+-			return new WikiErrorMsg( 'importnofile' );
+-		}
+-		if( !empty( $upload['error'] ) ) {
+-			switch($upload['error']){
+-				case 1: # The uploaded file exceeds the upload_max_filesize directive in php.ini.
+-					return new WikiErrorMsg( 'importuploaderrorsize' );
+-				case 2: # The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.
+-					return new WikiErrorMsg( 'importuploaderrorsize' );
+-				case 3: # The uploaded file was only partially uploaded
+-					return new WikiErrorMsg( 'importuploaderrorpartial' );
+-				case 6: #Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3.
+-					return new WikiErrorMsg( 'importuploaderrortemp' );
+-				# case else: # Currently impossible
+-			}
+-
+-		}
+-		$fname = $upload['tmp_name'];
+-		if( is_uploaded_file( $fname ) ) {
+-			return ImportStreamSource::newFromFile( $fname );
+-		} else {
+-			return new WikiErrorMsg( 'importnofile' );
+-		}
+-	}
+-
+-	static function newFromURL( $url, $method = 'GET' ) {
+-		wfDebug( __METHOD__ . ": opening $url\n" );
+-		# Use the standard HTTP fetch function; it times out
+-		# quicker and sorts out user-agent problems which might
+-		# otherwise prevent importing from large sites, such
+-		# as the Wikimedia cluster, etc.
+-		$data = Http::request( $method, $url );
+-		if( $data !== false ) {
+-			$file = tmpfile();
+-			fwrite( $file, $data );
+-			fflush( $file );
+-			fseek( $file, 0 );
+-			return new ImportStreamSource( $file );
+-		} else {
+-			return new WikiErrorMsg( 'importcantopen' );
+-		}
+-	}
+-
+-	public static function newFromInterwiki( $interwiki, $page, $history = false, $templates = false, $pageLinkDepth = 0 ) {
+-		if( $page == '' ) {
+-			return new WikiErrorMsg( 'import-noarticle' );
+-		}
+-		$link = Title::newFromText( "$interwiki:Special:Export/$page" );
+-		if( is_null( $link ) || $link->getInterwiki() == '' ) {
+-			return new WikiErrorMsg( 'importbadinterwiki' );
+-		} else {
+-			$params = array();
+-			if ( $history ) $params['history'] = 1;
+-			if ( $templates ) $params['templates'] = 1;
+-			if ( $pageLinkDepth ) $params['pagelink-depth'] = $pageLinkDepth;
+-			$url = $link->getFullUrl( $params );
+-			# For interwikis, use POST to avoid redirects.
+-			return ImportStreamSource::newFromURL( $url, "POST" );
+-		}
+-	}
+-}
+diff -r 5ad71cf1db7a -r a47b5463550e includes/filerepo/LocalFile.php
+--- includes/filerepo/LocalFile.php
++++ includes/filerepo/LocalFile.php
+@@ -783,6 +783,66 @@
+ 	}
+ 
+ 	/**
++	 * Upload a file directly into archive. Generally for Special:Import
++	 */
++	function uploadIntoArchive( $srcPath, $comment, $pageText, $flags = 0, $props = false, $timestamp = false )
++	{
++		$this->lock();
++		$dstName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $timestamp ) ) . '!' . $this->getPhys();
++		$status = $this->publish( $srcPath, $flags, $dstName );
++		if ( $status->ok ) {
++			if ( !$this->recordOldUpload( $dstName, $comment, $pageText, $props, $timestamp ) ) {
++				$status->fatal( 'filenotfound', $srcPath );
++			}
++		}
++		$this->unlock();
++		return $status;
++	}
++
++	/**
++	 * Record a file upload in the upload log and the oldimage table
++	 */
++	function recordOldUpload( $dstName, $comment, $pageText, $props = false, $timestamp = false )
++	{
++		global $wgUser;
++
++		$dbw = $this->repo->getMasterDB();
++
++		$dstPath = $this->repo->getZonePath('public') . '/archive/' . $this->getHashPath() . $dstName;
++		$props = self::getPropsFromPath( $dstPath );
++		if (!$props['fileExists'])
++			return false;
++
++		$props['timestamp'] = wfTimestamp( TS_MW, $timestamp );
++		list($props['major_mime'], $props['minor_mime']) =
++			self::splitMime( "{$props['major_mime']}/{$props['minor_mime']}" );
++
++		$dbw->insert( 'oldimage',
++			array(
++				'oi_name'         => $this->getName(),
++				'oi_archive_name' => $dstName,
++				'oi_size'         => $props['size'],
++				'oi_width'        => intval($props['width']),
++				'oi_height'       => intval($props['height']),
++				'oi_bits'         => $props['bits'],
++				'oi_timestamp'    => $props['timestamp'],
++				'oi_description'  => $comment,
++				'oi_user'         => $wgUser->getId(),
++				'oi_user_text'    => $wgUser->getName(),
++				'oi_metadata'     => $props['metadata'],
++				'oi_media_type'   => $props['media_type'],
++				'oi_major_mime'   => $props['major_mime'],
++				'oi_minor_mime'   => $props['minor_mime'],
++				'oi_sha1'         => $props['sha1'],
++			), __METHOD__
++		);
++
++		$dbw->immediateCommit();
++
++		return true;
++	}
++
++	/**
+ 	 * Record a file upload in the upload log and the image table
+ 	 */
+ 	function recordUpload2( $oldver, $comment, $pageText, $props = false, $timestamp = false, $user = null )
+@@ -955,15 +1015,21 @@
+ 	 *
+ 	 * @param string $sourcePath Local filesystem path to the source image
+ 	 * @param integer $flags A bitwise combination of:
+-	 *     File::DELETE_SOURCE    Delete the source file, i.e. move
+-	 *         rather than copy
++	 *     File::DELETE_SOURCE       Delete the source file, i.e. move rather than copy
++	 * @param string $dstName Local wanted path (for example some archive
++	 *        path to publish image into the archive directly)
+ 	 * @return FileRepoStatus object. On success, the value member contains the
+ 	 *     archive name, or an empty string if it was a new file.
+ 	 */
+-	function publish( $srcPath, $flags = 0 ) {
++	function publish( $srcPath, $flags = 0, $dstName = NULL ) {
+ 		$this->lock();
++		if (!$dstName)
+ 		$dstRel = $this->getRel();
+-		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
++		else
++			$dstRel = 'archive/' . $this->getHashPath() . $dstName;
++		# Изначальное gmdate( 'YmdHis' ) - это НИФИГА не правильно!
++		# Получается, что в имени файла один timestamp, а в базе другой...
++		$archiveName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $this->getTimestamp() ) ) . '!'. $this->getPhys();
+ 		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
+ 		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
+ 		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
+diff -r 5ad71cf1db7a -r a47b5463550e includes/specials/SpecialExport.php
+--- includes/specials/SpecialExport.php
++++ includes/specials/SpecialExport.php
+@@ -1,6 +1,8 @@
+ <?php
+ # Copyright (C) 2003-2008 Brion Vibber <brion@pobox.com>
++#           (C) 2010-2011 Vitaliy Filippov <vitalif@mail.ru>
+ # http://www.mediawiki.org/
++# http://wiki.4intra.net/MW_Import_Export
+ #
+ # This program is free software; you can redistribute it and/or modify
+ # it under the terms of the GNU General Public License as published by
+@@ -16,20 +18,21 @@
+ # with this program; if not, write to the Free Software Foundation, Inc.,
+ # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ # http://www.gnu.org/copyleft/gpl.html
++
+ /**
+  * @file
+  * @ingroup SpecialPage
+  */
+ 
+ class SpecialExport extends SpecialPage {
+-	
+-	private $curonly, $doExport, $pageLinkDepth, $templates;
++
++	private $curonly, $doExport, $templates;
+ 	private $images;
+-	
++
+ 	public function __construct() {
+ 		parent::__construct( 'Export' );
+ 	}
+-	
++
+ 	public function execute( $par ) {
+ 		global $wgOut, $wgRequest, $wgSitename, $wgExportAllowListContributors;
+ 		global $wgExportAllowHistory, $wgExportMaxHistory, $wgExportMaxLinkDepth;
+@@ -43,40 +46,16 @@
+ 		$this->doExport = false;
+ 		$this->templates = $wgRequest->getCheck( 'templates' );
+ 		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
+-		$this->pageLinkDepth = $this->validateLinkDepth(
+-			$wgRequest->getIntOrNull( 'pagelink-depth' ) );
+ 		$nsindex = '';
+ 		
+-		if ( $wgRequest->getCheck( 'addcat' ) ) {
+-			$page = $wgRequest->getText( 'pages' );
+-			$catname = $wgRequest->getText( 'catname' );
+-			
+-			if ( $catname !== '' && $catname !== null && $catname !== false ) {
+-				$t = Title::makeTitleSafe( NS_MAIN, $catname );
+-				if ( $t ) {
+-					/**
+-					 * @todo Fixme: this can lead to hitting memory limit for very large
+-					 * categories. Ideally we would do the lookup synchronously
+-					 * during the export in a single query.
+-					 */
+-					$catpages = $this->getPagesFromCategory( $t );
+-					if ( $catpages ) $page .= "\n" . implode( "\n", $catpages );
+-				}
+-			}
++		$state = $wgRequest->getValues();
++		$state['errors'] = array();
++		if ( !empty( $state['addcat'] ) )
++		{
++			self::addPagesExec( $state );
++			$page = $state['pages'];
+ 		}
+-		else if( $wgRequest->getCheck( 'addns' ) && $wgExportFromNamespaces ) {
+-			$page = $wgRequest->getText( 'pages' );
+-			$nsindex = $wgRequest->getText( 'nsindex', '' );
+-			
+-			if ( strval( $nsindex ) !== ''  ) {
+-				/**
+-				 * Same implementation as above, so same @todo
+-				 */
+-				$nspages = $this->getPagesFromNamespace( $nsindex );
+-				if ( $nspages ) $page .= "\n" . implode( "\n", $nspages );
+-			}
+-		}
+-		else if( $wgRequest->wasPosted() && $par == '' ) {
++		elseif ( $wgRequest->wasPosted() && $par == '' ) {
+ 			$page = $wgRequest->getText( 'pages' );
+ 			$this->curonly = $wgRequest->getCheck( 'curonly' );
+ 			$rawOffset = $wgRequest->getVal( 'offset' );
+@@ -130,16 +109,6 @@
+ 		if ( !$this->curonly || !$wgExportAllowListContributors ) $list_authors = false ;
+ 		
+ 		if ( $this->doExport ) {
+-			$wgOut->disable();
+-			// Cancel output buffering and gzipping if set
+-			// This should provide safer streaming for pages with history
+-			wfResetOutputBuffers();
+-			header( "Content-type: application/xml; charset=utf-8" );
+-			if( $wgRequest->getCheck( 'wpDownload' ) ) {
+-				// Provide a sane filename suggestion
+-				$filename = urlencode( $wgSitename . '-' . wfTimestampNow() . '.xml' );
+-				$wgRequest->response()->header( "Content-disposition: attachment;filename={$filename}" );
+-			}
+ 			$this->doExport( $page, $history, $list_authors );
+ 			return;
+ 		}
+@@ -148,88 +117,58 @@
+ 		
+ 		$form = Xml::openElement( 'form', array( 'method' => 'post',
+ 			'action' => $this->getTitle()->getLocalUrl( 'action=submit' ) ) );
+-		$form .= Xml::inputLabel( wfMsg( 'export-addcattext' )    , 'catname', 'catname', 40 ) . '&nbsp;';
+-		$form .= Xml::submitButton( wfMsg( 'export-addcat' ), array( 'name' => 'addcat' ) ) . '<br />';
++		foreach ( $state['errors'] as $e )
++			$form .= wfMsgExt( $e[0], array('parse'), $e[1] );
+ 		
+-		if ( $wgExportFromNamespaces ) {
+-			$form .= Xml::namespaceSelector( $nsindex, null, 'nsindex', wfMsg( 'export-addnstext' ) ) . '&nbsp;';
+-			$form .= Xml::submitButton( wfMsg( 'export-addns' ), array( 'name' => 'addns' ) ) . '<br />';
+-		}
++		$form .= self::addPagesForm($state);
+ 		
+ 		$form .= Xml::element( 'textarea', array( 'name' => 'pages', 'cols' => 40, 'rows' => 10 ), $page, false );
+ 		$form .= '<br />';
+ 		
+ 		if( $wgExportAllowHistory ) {
+-			$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', true ) . '<br />';
++			$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', $wgRequest->getCheck('curonly') ? true : false ) . '<br />';
+ 		} else {
+ 			$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
+ 		}
+-		$form .= Xml::checkLabel( wfMsg( 'export-templates' ), 'templates', 'wpExportTemplates', false ) . '<br />';
+-		if( $wgExportMaxLinkDepth || $this->userCanOverrideExportDepth() ) {
+-			$form .= Xml::inputLabel( wfMsg( 'export-pagelinks' ), 'pagelink-depth', 'pagelink-depth', 20, 0 ) . '<br />';
+-		}
+-		// Enable this when we can do something useful exporting/importing image information. :)
+-		//$form .= Xml::checkLabel( wfMsg( 'export-images' ), 'images', 'wpExportImages', false ) . '<br />';
++		$form .= Xml::checkLabel( wfMsg( 'export-include-images' ), 'images', 'wpExportImages', $wgRequest->getCheck('images') ? true : false ) . '<br />';
+ 		$form .= Xml::checkLabel( wfMsg( 'export-download' ), 'wpDownload', 'wpDownload', true ) . '<br />';
++		$form .= Xml::checkLabel( wfMsg( 'export-selfcontained' ), 'selfcontained', 'wpSelfContained', $wgRequest->getCheck('selfcontained') ? true : false ) . '<br />';
++		wfRunHooks( 'ExportAfterChecks', array( $this, &$form ) );
+ 		
+ 		$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
+ 		$form .= Xml::closeElement( 'form' );
+ 		$wgOut->addHTML( $form );
+ 	}
+-	
+-	private function userCanOverrideExportDepth() {
+-		global $wgUser;   
+ 
++	public static function userCanOverrideExportDepth() {
++		global $wgUser;
++		
+ 		return $wgUser->isAllowed( 'override-export-depth' );
+ 	}
+-	
++
+ 	/**
+ 	 * Do the actual page exporting
+ 	 * @param string $page User input on what page(s) to export
+ 	 * @param mixed  $history one of the WikiExporter history export constants
+ 	 */
+ 	private function doExport( $page, $history, $list_authors ) {
+-		global $wgExportMaxHistory;
+-		
+-		$pageSet = array(); // Inverted index of all pages to look up
++		global $wgExportMaxHistory, $wgRequest, $wgOut, $wgSitename;
+ 		
+ 		// Split up and normalize input
+-		foreach( explode( "\n", $page ) as $pageName ) {
++		$pages = array();
++		foreach( explode( "\n", $page ) as $pageName )
++		{
+ 			$pageName = trim( $pageName );
+ 			$title = Title::newFromText( $pageName );
+-			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
++			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' &&
++			    $title->userCanRead() )
++			{
+ 				// Only record each page once!
+-				$pageSet[$title->getPrefixedText()] = true;
++				$pages[ $title->getPrefixedText() ] = $title;
+ 			}
+ 		}
++		$pages = array_values( $pages );
+ 		
+-		// Set of original pages to pass on to further manipulation...
+-		$inputPages = array_keys( $pageSet );
+-		
+-		// Look up any linked pages if asked...
+-		if( $this->templates ) {
+-			$pageSet = $this->getTemplates( $inputPages, $pageSet );
+-		}
+-		
+-		if( $linkDepth = $this->pageLinkDepth ) {
+-			$pageSet = $this->getPageLinks( $inputPages, $pageSet, $linkDepth );
+-		}
+-		
+-		/*
+-		 // Enable this when we can do something useful exporting/importing image information. :)
+-		 if( $this->images ) ) {
+-		 $pageSet = $this->getImages( $inputPages, $pageSet );
+-		 }
+-		 */
+-		
+-		$pages = array_keys( $pageSet );
+-
+-		// Normalize titles to the same format and remove dupes, see bug 17374
+-		foreach( $pages as $k => $v ) {
+-			$pages[$k] = str_replace( " ", "_", $v );
+-		}
+-		$pages = array_unique( $pages );
+-
+ 		/* Ok, let's get to it... */
+ 		if( $history == WikiExporter::CURRENT ) {
+ 			$lb = false;
+@@ -246,169 +185,347 @@
+ 			set_time_limit(0);
+ 			wfRestoreWarnings();
+ 		}
+-		$exporter = new WikiExporter( $db, $history, $buffer );
+-		$exporter->list_authors = $list_authors;
++
++		$exporter = new WikiExporter( $db, $history, $buffer, WikiExporter::TEXT,
++			$list_authors, $wgRequest->getCheck( 'images' ), $wgRequest->getCheck( 'selfcontained' ) );
+ 		$exporter->openStream();
+-		foreach( $pages as $page ) {
+-			/*
+-			 if( $wgExportMaxHistory && !$this->curonly ) {
+-			 $title = Title::newFromText( $page );
+-			 if( $title ) {
+-			 $count = Revision::countByTitle( $db, $title );
+-			 if( $count > $wgExportMaxHistory ) {
+-			 wfDebug( __FUNCTION__ .
+-			 ": Skipped $page, $count revisions too big\n" );
+-			 continue;
+-			 }
+-			 }
+-			 }*/
+-			#Bug 8824: Only export pages the user can read
+-			$title = Title::newFromText( $page );
+-			if( is_null( $title ) ) continue; #TODO: perhaps output an <error> tag or something.
+-			if( !$title->userCanRead() ) continue; #TODO: perhaps output an <error> tag or something.
+-			
++		foreach( $pages as $title ) {
+ 			$exporter->pageByTitle( $title );
+ 		}
+-		
+ 		$exporter->closeStream();
++		$archive = $mimetype = $extension = '';
++		if ( !$exporter->getArchive( $archive, $mimetype, $extension ) ) {
++			die();
++		}
++
++		$wgOut->disable();
++		// Cancel output buffering and gzipping if set
++		// This should provide safer streaming for pages with history
++		wfResetOutputBuffers();
++		header( "Content-type: $mimetype" );
++		if( $wgRequest->getCheck( 'wpDownload' ) ) {
++			// Provide a sane filename suggestion
++			$filename = urlencode( $wgSitename . '-' . wfTimestampNow() . '.' . $extension );
++			header( "Content-disposition: attachment;filename={$filename}" );
++		}
++		readfile( $archive );
++
+ 		if( $lb ) {
+ 			$lb->closeAll();
+ 		}
+ 	}
+ 
+-	private function getPagesFromCategory( $title ) {
+-		global $wgContLang;
+-		
+-		$name = $title->getDBkey();
+-		
++	// Execute page selection form, save page list to $state['pages'] and errors to $state['errors']
++	static function addPagesExec( &$state ) {
++		// Split up and normalize input
++		$pageSet = array();
++		foreach( explode( "\n", $state['pages'] ) as $pageName ) {
++			$pageName = trim( $pageName );
++			$title = Title::newFromText( $pageName );
++			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' ) {
++				// Only record each page once!
++				$pageSet[ $title->getPrefixedText() ] = $title;
++			}
++		}
++
++		// Validate parameter values
++		$catname     = isset( $state['catname'] )     ? $state['catname']     : '';
++		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
++		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
++		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
++		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) ) {
++			$modifydate = NULL;
++		}
++		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
++			$catname->getNamespace() != NS_CATEGORY ) {
++			$catname = NULL;
++		}
++		if ( !strlen( $notcategory ) || !( $notcategory = Title::newFromText( $notcategory, NS_CATEGORY ) ) ||
++			$notcategory->getNamespace() != NS_CATEGORY ) {
++			$notcategory = NULL;
++		}
++		if ( $namespace === 'Main' || $namespace == '(Main)' || $namespace === wfMsg( 'blanknamespace' ) ) {
++			$namespace = 0;
++		} elseif ( $namespace === '' || !( $namespace = Title::newFromText( "$namespace:Dummy", NS_MAIN ) ) ) {
++			$namespace = NULL;
++		} else {
++			$namespace = $namespace->getNamespace();
++		}
++
++		// Add pages from requested category and/or namespace
++		if ( $modifydate !== NULL || $namespace !== NULL || $catname !== NULL ) {
++			$catpages = self::getPagesFromCategory( $catname, !empty( $state['closure'] ), $namespace, $modifydate );
++			foreach ( $catpages as $title ) {
++				$pageSet[ $title->getPrefixedText() ] = $title;
++			}
++		}
++
++		// Look up any linked pages if asked...
++		$linkDepth = self::validateLinkDepth( !empty( $state['link-depth'] ) ? $state['link-depth'] : 0 );
++		$t = !empty( $state[ 'templates' ] );
++		$p = !empty( $state[ 'pagelinks' ] );
++		$i = !empty( $state[ 'images' ] );
++		$s = !empty( $state[ 'subpages' ] );
++		$step = 0;
++		do {
++			// Loop as there may be more than one closure type
++			$added = 0;
++			if( $t ) $added += self::getTemplates( $pageSet );
++			if( $p ) $added += self::getPagelinks( $pageSet );
++			if( $i ) $added += self::getImages( $pageSet );
++			if( $s ) $added += self::getSubpages( $pageSet );
++			$step++;
++		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
++
++		// Filter user-readable pages (also MW Bug 8824)
++		foreach ( $pageSet as $key => $title )
++			if ( !$title->userCanRead() )
++				unset( $pageSet[ $key ] );
++
++		// Filter pages by $modifydate
++		if ( $modifydate !== NULL && $pageSet ) {
++			$ids = array();
++			foreach ( $pageSet as $key => $title ) {
++				$ids[ $title->getArticleId() ] = $title;
++			}
++			$dbr = wfGetDB( DB_SLAVE );
++			$res = $dbr->select( array( 'page', 'revision' ), 'page_id',
++				array(
++					'page_latest=rev_id',
++					'page_id' => array_keys( $ids ),
++					'rev_timestamp > '.$dbr->timestamp( $modifydate )
++				), __METHOD__ );
++			foreach ( $res as $row ) {
++				unset( $ids[ $row->page_id ] );
++			}
++			foreach ( $ids as $title ) {
++				unset( $pageSet[ $title->getPrefixedText() ] );
++			}
++		}
++
++		// Filter pages from requested NOT-category
++		if ( $notcategory !== NULL ) {
++			$notlist = self::getPagesFromCategory( $notcategory );
++			foreach ( $notlist as $title ) {
++				unset( $pageSet[ $title->getPrefixedText() ] );
++			}
++		}
++
++		// Save resulting page list
++		$pages = array_keys( $pageSet );
++		sort( $pages );
++		$state['pages'] = implode( "\n", $pages );
++
++		// Save errors
++		$state['errors'] = array();
++		if ( !$catname && isset( $state['catname'] ) && $state['catname'] !== '' ) {
++			$state['errors'][] = array( 'export-invalid-catname', $state['catname'] );
++		}
++		if ( !$notcategory && isset( $state['notcategory'] ) && $state['notcategory'] !== '' ) {
++			$state['errors'][] = array( 'export-invalid-notcategory', $state['notcategory'] );
++		}
++		if ( $modifydate ) {
++			$state['modifydate'] = wfTimestamp( TS_DB, $modifydate );
++		} elseif ( isset( $state['modifydate'] ) && $state['modifydate'] !== '' ) {
++			$state['errors'][] = array( 'export-invalid-modifydate', $state['modifydate'] );
++		}
++		if ( !$namespace && isset( $state['namespace'] ) && $state['namespace'] !== '' ) {
++			$state['errors'][] = array( 'export-invalid-namespace', $state['namespace'] );
++		}
++	}
++
++	// Display page selection form, enclosed into a <fieldset>
++	static function addPagesForm( $state ) {
++		global $wgExportMaxLinkDepth;
++		$form = '<fieldset class="addpages">';
++		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
++		$textboxes = array(
++			'catname'     => 20,
++			'namespace'   => 20,
++			'modifydate'  => 18,
++			'notcategory' => 20,
++		);
++		// Textboxes:
++		foreach ( $textboxes as $k => $size ) {
++			$form .= '<div class="ap_'.$k.'">' .
++				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
++		}
++		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
++			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
++		}
++		// Checkboxes:
++		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k ) {
++			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
++				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
++				array( 'style' => 'vertical-align: middle' )
++			) . '</div>';
++		}
++		// Submit button:
++		$form .= '<div class="ap_submit">' . Xml::submitButton( wfMsg( 'export-addcat' ), array( 'name' => 'addcat' ) ) . '</div>';
++		$form .= '</fieldset>';
++		return $form;
++	}
++
++	// Get pages from ((category possibly with subcategories) and/or namespace), or (modified after $modifydate)
++	static function getPagesFromCategory( $categories, $closure = false, $namespace = NULL, $modifydate = NULL ) {
+ 		$dbr = wfGetDB( DB_SLAVE );
+-		$res = $dbr->select( array('page', 'categorylinks' ),
+-							array( 'page_namespace', 'page_title' ),
+-							array('cl_from=page_id', 'cl_to' => $name ),
+-							__METHOD__, array('LIMIT' => '5000'));
+-		
++
++		if ( $categories ) {
++			if ( is_object( $categories ) ) {
++				$categories = $categories->getDBkey();
++			}
++			$cats = array();
++			foreach ( ( is_array( $categories ) ? $categories : array( $categories ) ) as $c ) {
++				$cats[ $c ] = true;
++			}
++			// Get subcategories
++			while ( $categories && $closure ) {
++				$res = $dbr->select( array( 'page', 'categorylinks' ), 'page_title',
++					array( 'cl_from=page_id', 'cl_to' => $categories, 'page_namespace' => NS_CATEGORY ),
++					__METHOD__ );
++				$categories = array();
++				foreach ( $res as $row ) {
++					if ( !$cats[ $row->page_title ] ) {
++						$categories[] = $row->page_title;
++						$cats[ $row->page_title ] = $row;
++					}
++				}
++			}
++			$categories = array_keys( $cats );
++		}
++
++		// Get pages
++		$tables = array( 'page' );
++		$fields = 'page.*';
++		$where = array();
++		if ( $categories ) {
++			$tables[] = 'categorylinks';
++			$where[] = 'cl_from=page_id';
++			$where['cl_to'] = $categories;
++		}
++		if ( $namespace !== NULL ) {
++			$where['page_namespace'] = $namespace;
++		} elseif ( $categories === NULL && $modifydate !== NULL ) {
++			$where[] = 'page_touched >= '.$dbr->timestamp( $modifydate );
++		}
++		$res = $dbr->select( $tables, $fields, $where, __METHOD__ );
+ 		$pages = array();
+-		while ( $row = $dbr->fetchObject( $res ) ) {
+-			$n = $row->page_title;
+-			if ($row->page_namespace) {
+-				$ns = $wgContLang->getNsText( $row->page_namespace );
+-				$n = $ns . ':' . $n;
+-			}
+-			
+-			$pages[] = $n;
++		foreach ( $res as $row ) {
++			$pages[] = Title::newFromRow( $row );
+ 		}
+-		$dbr->freeResult($res);
+-		
+-		return $pages;
++
++		return array_values( $pages );
+ 	}
+-	
+-	private function getPagesFromNamespace( $nsindex ) {
+-		global $wgContLang;
+-		
+-		$dbr = wfGetDB( DB_SLAVE );
+-		$res = $dbr->select( 'page', array('page_namespace', 'page_title'),
+-							array('page_namespace' => $nsindex),
+-							__METHOD__, array('LIMIT' => '5000') );
+-		
+-		$pages = array();
+-		while ( $row = $dbr->fetchObject( $res ) ) {
+-			$n = $row->page_title;
+-			if ($row->page_namespace) {
+-				$ns = $wgContLang->getNsText( $row->page_namespace );
+-				$n = $ns . ':' . $n;
+-			}
+-			
+-			$pages[] = $n;
++
++	/**
++	 * Validate link depth setting, if available.
++	 */
++	public static function validateLinkDepth( $depth ) {
++		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
++		if( $depth <= 0 ) {
++			return 0;
+ 		}
+-		$dbr->freeResult($res);
+-		
+-		return $pages;
++		if ( !self::userCanOverrideExportDepth() &&
++			$depth > $wgExportMaxLinkDepth ) {
++			return $wgExportMaxLinkDepth;
++		}
++		return $depth;
+ 	}
++
+ 	/**
+ 	 * Expand a list of pages to include templates used in those pages.
+ 	 * @param $inputPages array, list of titles to look up
+ 	 * @param $pageSet array, associative array indexed by titles for output
+ 	 * @return array associative array index by titles
+ 	 */
+-	private function getTemplates( $inputPages, $pageSet ) {
+-		return $this->getLinks( $inputPages, $pageSet,
+-							   'templatelinks',
+-							   array( 'tl_namespace AS namespace', 'tl_title AS title' ),
+-							   array( 'page_id=tl_from' ) );
++	public static function getTemplates( &$pageSet ) {
++		return self::getLinks(
++			$pageSet, 'templatelinks', 'tl_from',
++			array( 'page_namespace=tl_namespace', 'page_title=tl_title' )
++		);
+ 	}
+-	
++
+ 	/**
+-	 * Validate link depth setting, if available.
++	 * Expand a list of pages to include pages linked to from that page.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
+ 	 */
+-	private function validateLinkDepth( $depth ) {
+-		global $wgExportMaxLinkDepth, $wgExportMaxLinkDepthLimit;
+-		if( $depth < 0 ) {
+-			return 0;
++	public static function getPageLinks( &$pageSet ) {
++		return self::getLinks(
++			$pageSet, 'pagelinks', 'pl_from',
++			array( 'page_namespace=pl_namespace', 'page_title=pl_title' )
++		);
++	}
++
++	/**
++	 * Expand a list of pages to include images used in those pages.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
++	 */
++	public static function getImages( &$pageSet ) {
++		return self::getLinks(
++			$pageSet, 'imagelinks', 'il_from',
++			array( 'page_namespace='.NS_FILE, 'page_title=il_to' )
++		);
++	}
++
++	/**
++	 * Expand a list of pages to include all their subpages.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
++	 */
++	public static function getSubpages( &$pageSet ) {
++		$dbr = wfGetDB( DB_SLAVE );
++		$where = array();
++		$ids = array();
++		foreach ( $pageSet as $title ) {
++			$ids[ $title->getArticleId() ] = true;
++			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
+ 		}
+-		if ( !$this->userCanOverrideExportDepth() ) {
+-			if( $depth > $wgExportMaxLinkDepth ) {
+-				return $wgExportMaxLinkDepth;
++		$nsx = $where;
++		foreach ( $where as $ns => &$w ) {
++			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
++		}
++		$where = '('.implode( ' OR ', $where ).')';
++		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
++		$added = 0;
++		foreach( $result as $row ) {
++			if( empty( $ids[ $row->page_id ] ) ) {
++				$add = Title::newFromRow( $row );
++				$pageSet[ $add->getPrefixedText() ] = $add;
++				$added++;
+ 			}
+ 		}
+-		/*
+-		 * There's a HARD CODED limit of 5 levels of recursion here to prevent a
+-		 * crazy-big export from being done by someone setting the depth
+-		 * number too high. In other words, last resort safety net.
+-		 */
+-		return intval( min( $depth, 5 ) );
++		return $added;
+ 	}
+-	
+-	/** Expand a list of pages to include pages linked to from that page. */
+-	private function getPageLinks( $inputPages, $pageSet, $depth ) {
+-		for( $depth=$depth; $depth>0; --$depth ) {
+-			$pageSet = $this->getLinks( $inputPages, $pageSet, 'pagelinks',
+-									   array( 'pl_namespace AS namespace', 'pl_title AS title' ),
+-									   array( 'page_id=pl_from' ) );
+-			$inputPages = array_keys( $pageSet );
+-		}
+-		return $pageSet;
+-	}
+-	
+-	/**
+-	 * Expand a list of pages to include images used in those pages.
+-	 * @param $inputPages array, list of titles to look up
+-	 * @param $pageSet array, associative array indexed by titles for output
+-	 * @return array associative array index by titles
+-	 */
+-	private function getImages( $inputPages, $pageSet ) {
+-		return $this->getLinks( $inputPages, $pageSet,
+-							   'imagelinks',
+-							   array( NS_FILE . ' AS namespace', 'il_to AS title' ),
+-							   array( 'page_id=il_from' ) );
+-	}
+-	
++
+ 	/**
+ 	 * Expand a list of pages to include items used in those pages.
+ 	 * @private
+ 	 */
+-	private function getLinks( $inputPages, $pageSet, $table, $fields, $join ) {
++	private static function getLinks( &$pageSet, $table, $id_field, $join ) {
++		if ( !$pageSet ) {
++			return 0;
++		}
+ 		$dbr = wfGetDB( DB_SLAVE );
+-		foreach( $inputPages as $page ) {
+-			$title = Title::newFromText( $page );
+-			if( $title ) {
+-				$pageSet[$title->getPrefixedText()] = true;
+-				/// @todo Fixme: May or may not be more efficient to batch these
+-				///        by namespace when given multiple input pages.
+-				$result = $dbr->select(
+-									   array( 'page', $table ),
+-									   $fields,
+-									   array_merge( $join,
+-												   array(
+-														 'page_namespace' => $title->getNamespace(),
+-														 'page_title' => $title->getDBkey() ) ),
+-									   __METHOD__ );
+-				foreach( $result as $row ) {
+-					$template = Title::makeTitle( $row->namespace, $row->title );
+-					$pageSet[$template->getPrefixedText()] = true;
+-				}
++		$ids = array();
++		foreach( $pageSet as $title ) {
++			$ids[ $title->getArticleId() ] = true;
++		}
++		$result = $dbr->select(
++			array( 'page', $table ), 'page.*',
++			$join + array( $id_field => array_keys( $ids ) ),
++			__METHOD__,
++			array( 'GROUP BY' => 'page_id' )
++		);
++		$added = 0;
++		foreach( $result as $row ) {
++			if( empty( $ids[ $row->page_id ] ) ) {
++				$add = Title::newFromRow( $row );
++				$pageSet[ $add->getPrefixedText() ] = $add;
++				$added++;
+ 			}
+ 		}
+-		return $pageSet;
++		return $added;
+ 	}
+ }
+-
+diff -r 5ad71cf1db7a -r a47b5463550e includes/specials/SpecialImport.php
+--- includes/specials/SpecialImport.php
++++ includes/specials/SpecialImport.php
+@@ -23,6 +23,74 @@
+  * @ingroup SpecialPage
+  */
+ 
++class ImportSource {
++
++	static function newFromUpload( $fieldname = "xmlimport" ) {
++		$upload =& $_FILES[$fieldname];
++
++		if( !isset( $upload ) || !$upload['name'] ) {
++			return new WikiErrorMsg( 'importnofile' );
++		}
++		if( !empty( $upload['error'] ) ) {
++			switch($upload['error']){
++				case 1: # The uploaded file exceeds the upload_max_filesize directive in php.ini.
++					return new WikiErrorMsg( 'importuploaderrorsize' );
++				case 2: # The uploaded file exceeds the MAX_FILE_SIZE directive that was specified in the HTML form.
++					return new WikiErrorMsg( 'importuploaderrorsize' );
++				case 3: # The uploaded file was only partially uploaded
++					return new WikiErrorMsg( 'importuploaderrorpartial' );
++				case 6: #Missing a temporary folder. Introduced in PHP 4.3.10 and PHP 5.0.3.
++					return new WikiErrorMsg( 'importuploaderrortemp' );
++				# case else: # Currently impossible
++			}
++
++		}
++		$fname = $upload['tmp_name'];
++		if( is_uploaded_file( $fname ) ) {
++			return DumpArchive::newFromFile( $fname, $upload['name'] );
++		} else {
++			return new WikiErrorMsg( 'importnofile' );
++		}
++	}
++
++	static function newFromURL( $url, $method = 'GET' ) {
++		wfDebug( __METHOD__ . ": opening $url\n" );
++		# Use the standard HTTP fetch function; it times out
++		# quicker and sorts out user-agent problems which might
++		# otherwise prevent importing from large sites, such
++		# as the Wikimedia cluster, etc.
++		$data = Http::request( $method, $url );
++		if( $data !== false ) {
++			$file = tmpfile();
++			fwrite( $file, $data );
++			fflush( $file );
++			fseek( $file, 0 );
++			return DumpArchive::newFromFile( $file );
++		} else {
++			return new WikiErrorMsg( 'importcantopen' );
++		}
++	}
++
++	public static function newFromInterwiki( $interwiki, $page, $history = false, $templates = false, $pageLinkDepth = 0 ) {
++		if( $page == '' ) {
++			return new WikiErrorMsg( 'import-noarticle' );
++		}
++		$link = Title::newFromText( "$interwiki:Special:Export/$page" );
++		if( is_null( $link ) || $link->getInterwiki() == '' ) {
++			return new WikiErrorMsg( 'importbadinterwiki' );
++		} else {
++			$params = array();
++			if ( $history ) $params['history'] = 1;
++			if ( $templates ) $params['templates'] = 1;
++			if ( $pageLinkDepth ) $params['pagelink-depth'] = $pageLinkDepth;
++			$url = $link->getFullUrl( $params );
++			# For interwikis, use POST to avoid redirects.
++			return self::newFromURL( $url, "POST" );
++		}
++	}
++
++}
++
+ class SpecialImport extends SpecialPage {
+ 	
+ 	private $interwiki = false;
+@@ -75,23 +143,23 @@
+ 		$this->pageLinkDepth = $wgExportMaxLinkDepth == 0 ? 0 : $wgRequest->getIntOrNull( 'pagelink-depth' );
+ 
+ 		if ( !$wgUser->matchEditToken( $wgRequest->getVal( 'editToken' ) ) ) {
+-			$source = new WikiErrorMsg( 'import-token-mismatch' );
++			$importer = new WikiErrorMsg( 'import-token-mismatch' );
+ 		} elseif ( $sourceName == 'upload' ) {
+ 			$isUpload = true;
+ 			if( $wgUser->isAllowed( 'importupload' ) ) {
+-				$source = ImportStreamSource::newFromUpload( "xmlimport" );
++				$importer = ImportSource::newFromUpload( "xmlimport" );
+ 			} else {
+ 				return $wgOut->permissionRequired( 'importupload' );
+ 			}
+ 		} elseif ( $sourceName == "interwiki" ) {
+ 			$this->interwiki = $wgRequest->getVal( 'interwiki' );
+ 			if ( !in_array( $this->interwiki, $wgImportSources ) ) {
+-				$source = new WikiErrorMsg( "import-invalid-interwiki" );
++				$importer = new WikiErrorMsg( "import-invalid-interwiki" );
+ 			} else {
+ 				$this->history = $wgRequest->getCheck( 'interwikiHistory' );
+ 				$this->frompage = $wgRequest->getText( "frompage" );
+ 				$this->includeTemplates = $wgRequest->getCheck( 'interwikiTemplates' );
+-				$source = ImportStreamSource::newFromInterwiki(
++				$importer = ImportSource::newFromInterwiki(
+ 					$this->interwiki,
+ 					$this->frompage,
+ 					$this->history,
+@@ -99,19 +167,21 @@
+ 					$this->pageLinkDepth );
+ 			}
+ 		} else {
+-			$source = new WikiErrorMsg( "importunknownsource" );
++			$importer = new WikiErrorMsg( "importunknownsource" );
++		}
++		if( !$importer ) {
++			$importer = new WikiErrorMsg( "importunknownformat" );
+ 		}
+ 
+-		if( WikiError::isError( $source ) ) {
+-			$wgOut->wrapWikiMsg( '<p class="error">$1</p>', array( 'importfailed', $source->getMessage() ) );
++		if( WikiError::isError( $importer ) ) {
++			$wgOut->wrapWikiMsg( '<p class="error">$1</p>', array( 'importfailed', $importer->getMessage() ) );
+ 		} else {
+ 			$wgOut->addWikiMsg( "importstart" );
+ 
+-			$importer = new WikiImporter( $source );
+ 			if( !is_null( $this->namespace ) ) {
+ 				$importer->setTargetNamespace( $this->namespace );
+ 			}
+-			$reporter = new ImportReporter( $importer, $isUpload, $this->interwiki , $this->logcomment);
++			$reporter = new ImportReporter( $importer, $isUpload, $this->interwiki, $this->logcomment );
+ 
+ 			$reporter->open();
+ 			$result = $importer->doImport();
+@@ -273,9 +343,9 @@
+  * @ingroup SpecialPage
+  */
+ class ImportReporter {
+-	private $reason=false;
++	private $reason = false;
+ 
+-	function __construct( $importer, $upload, $interwiki , $reason=false ) {
++	function __construct( $importer, $upload, $interwiki, $reason = false ) {
+ 		$importer->setPageOutCallback( array( $this, 'reportPage' ) );
+ 		$this->mPageCount = 0;
+ 		$this->mIsUpload = $upload;
+@@ -288,7 +358,8 @@
+ 		$wgOut->addHTML( "<ul>\n" );
+ 	}
+ 
+-	function reportPage( $title, $origTitle, $revisionCount, $successCount ) {
++	function reportPage( $title, $origTitle, $revisionCount, $successCount,
++		$lastExistingRevision, $lastLocalRevision, $lastRevision ) {
+ 		global $wgOut, $wgUser, $wgLang, $wgContLang;
+ 
+ 		$skin = $wgUser->getSkin();
+@@ -298,12 +369,50 @@
+ 		$localCount = $wgLang->formatNum( $successCount );
+ 		$contentCount = $wgContLang->formatNum( $successCount );
+ 
++		/* No revisions in import */
++		if ( !$lastExistingRevision && $successCount == 0 ) {
++			$msg = wfMsgHtml('import-norevisions');
++		} elseif ( !$lastLocalRevision && $successCount > 0 ) {
++			// New page imported
++			$msg = wfMsgExt('import-revision-count-newpage', array('parsemag', 'escape'), $localCount);
++		} else {
++			$newer = !$lastExistingRevision ||
++				$lastLocalRevision->getTimestamp() > $lastExistingRevision->getTimestamp();
++			if ( $successCount > 0 ) {
++				if ( $newer ) {
++					// "Conflict"
++					$linktext = wfMsgExt( 'import-conflict-difflink',
++						array( 'parsemag', 'escape' ),
++						$lastRevision->getId(),
++						$lastLocalRevision->getId() );
++					$link = $skin->makeKnownLinkObj(
++						$title, $linktext,
++						'diff=' . $lastRevision->getId() .
++						"&oldid=" . $lastLocalRevision->getId() );
++					$msg = wfMsgExt( 'import-conflict',
++						array( 'parsemag' ),
++						$localCount,
++						$link );
++				} else {
++					// Page history continued with new revisions
++					$msg = wfMsgExt('import-revision-count', array('parsemag', 'escape'), $localCount);
++				}
++			} else {
++				if ( $newer ) {
++					// Local revision is newer
++					$msg = wfMsgHtml('import-nonewrevisions-localnewer');
++				} else {
++					// No changes nowhere
++					$msg = wfMsgHtml('import-nonewrevisions');
++				}
++			}
++		}
++
++		$msg = $skin->makeKnownLinkObj( $title ) . ': ' . $msg;
++
++		$wgOut->addHtml( "<li>$msg</li>" );
++
+ 		if( $successCount > 0 ) {
+-			$wgOut->addHTML( "<li>" . $skin->linkKnown( $title ) . " " .
+-				wfMsgExt( 'import-revision-count', array( 'parsemag', 'escape' ), $localCount ) .
+-				"</li>\n"
+-			);
+-
+ 			$log = new LogPage( 'import' );
+ 			if( $this->mIsUpload ) {
+ 				$detail = wfMsgExt( 'import-logentry-upload-detail', array( 'content', 'parsemag' ),
+@@ -322,19 +431,9 @@
+ 				}
+ 				$log->addEntry( 'interwiki', $title, $detail );
+ 			}
+-
+-			$comment = $detail; // quick
+-			$dbw = wfGetDB( DB_MASTER );
+-			$latest = $title->getLatestRevID();
+-			$nullRevision = Revision::newNullRevision( $dbw, $title->getArticleId(), $comment, true );
+-			$nullRevision->insertOn( $dbw );
+-			$article = new Article( $title );
+-			# Update page record
+-			$article->updateRevisionOn( $dbw, $nullRevision );
+-			wfRunHooks( 'NewRevisionFromEditComplete', array($article, $nullRevision, $latest, $wgUser) );
+-		} else {
+-			$wgOut->addHTML( "<li>" . $skin->linkKnown( $title ) . " " .
+-				wfMsgHtml( 'import-nonewrevisions' ) . "</li>\n" );
++			// [MediaWiki4Intranet] do not insert any empty revisions because it leads
++			// to fancy bugs (infinitely multiplicated revisions) in the case of cross
++			// (2-way) import-export.
+ 		}
+ 	}
+ 
+diff -r 5ad71cf1db7a -r a47b5463550e languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -3113,18 +3113,30 @@
+ 
+ To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
+ 
+-In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".',
++In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".
++
++Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' filter full page list from the textbox, \'\'not only added pages\'\'.',
+ 'exportcuronly'     => 'Include only the current revision, not the full history',
+ 'exportnohistory'   => "----
+ '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
+ 'export-submit'     => 'Export',
+-'export-addcattext' => 'Add pages from category:',
++'export-addpages'   => "'''Add pages:'''",
+ 'export-addcat'     => 'Add',
+-'export-addnstext'  => 'Add pages from namespace:',
+-'export-addns'      => 'Add',
++'export-catname'    => 'From category:',
++'export-notcategory' => 'Not from category:',
++'export-modifydate' => 'Changed after:',
++'export-namespace'  => 'Namespace:',
++'export-invalid-catname' => '<font color=red>\'\'\'Unknown category ignored: \'$1\'\'\'\'.</font>',
++'export-invalid-namespace' => '<font color=red>\'\'\'Unknown namespace ignored: \'$1\'\'\'\'.</font>',
++'export-invalid-modifydate' => '<font color=red>\'\'\'Incorrect timestamp ignored (use format <u>YYYY-MM-DD HH:MM:SS</u>): \'$1\'\'\'\'.</font>',
++'export-include-images' => 'Export images',
++'export-selfcontained' => 'Include image contents into the export file',
+ 'export-download'   => 'Save as file',
++'export-images'     => 'Include images',
+ 'export-templates'  => 'Include templates',
+-'export-pagelinks'  => 'Include linked pages to a depth of:',
++'export-pagelinks'  => 'Include linked articles',
++'export-subpages'   => 'Include subpages',
++'export-closure'    => 'Include articles from subcategories',
+ 
+ # Namespace 8 related
+ 'allmessages'                   => 'System messages',
+@@ -3171,10 +3183,10 @@
+ 'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
+ Save it to your computer and upload it here.',
+ 'importstart'                => 'Importing pages...',
+-'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
+ 'importnopages'              => 'No pages to import.',
+ 'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
+ 'importunknownsource'        => 'Unknown import source type',
++'importunknownformat'        => 'Unknown import file format',
+ 'importcantopen'             => 'Could not open import file',
+ 'importbadinterwiki'         => 'Bad interwiki link',
+ 'importnotext'               => 'Empty or no text',
+@@ -3190,11 +3202,16 @@
+ A temporary folder is missing.',
+ 'import-parse-failure'       => 'XML import parse failure',
+ 'import-noarticle'           => 'No page to import!',
+-'import-nonewrevisions'      => 'All revisions were previously imported.',
+ 'xml-error-string'           => '$1 at line $2, col $3 (byte $4): $5',
+ 'import-upload'              => 'Upload XML data',
+-'import-token-mismatch'      => 'Loss of session data.
+-Please try again.',
++'import-norevisions'         => 'No revisions to import.',
++'import-nonewrevisions-localnewer' => 'All revisions were previously imported. Page changed locally.',
++'import-nonewrevisions'      => 'All revisions were previously imported. No local changes.',
++'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
++'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
++'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
++'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
++'import-token-mismatch'      => 'Loss of session data. Please try again.',
+ 'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
+ 
+ # Import log
+diff -r 5ad71cf1db7a -r a47b5463550e languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -2568,18 +2568,30 @@
+ 
+ Чтобы экспортировать статьи, введите их наименования в поле редактирования, одно название на строку, и выберите хотите ли вы экспортировать всю историю изменений статей или только последние версии статей.
+ 
+-Вы также можете использовать специальный адрес для экспорта только последней версии. Например для страницы [[{{MediaWiki:Mainpage}}]] это будет адрес [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]].',
++Вы также можете использовать специальный адрес для экспорта только последней версии. Например для страницы [[{{MediaWiki:Mainpage}}]] это будет адрес [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]].
++
++Обратите внимание, что фильтры \'\'\'Изменённые после:\'\'\' и \'\'\'Не в категории:\'\'\' применяются ко всему списку страниц, а \'\'не только к добавляемым\'\'.',
+ 'exportcuronly'     => 'Включать только текущую версию, без полной предыстории',
+ 'exportnohistory'   => "----
+ '''Замечание:''' экспорт полной истории изменений страниц отключён из-за проблем с производительностью.",
+ 'export-submit'     => 'Экспортировать',
+-'export-addcattext' => 'Добавить страницы из категории:',
++'export-addpages'   => "'''Добавить страницы:'''",
+ 'export-addcat'     => 'Добавить',
+-'export-addnstext'  => 'Добавить страницы из пространства имён:',
+-'export-addns'      => 'Добавить',
++'export-catname'    => 'В категории:',
++'export-notcategory' => 'Не в категории:',
++'export-modifydate' => 'Изменённые после:',
++'export-namespace'  => 'Пространство имён:',
++'export-invalid-catname' => '<font color=red>\'\'\'Некорректное имя категории проигнорировано: \'$1\'\'\'\'.</font>',
++'export-invalid-namespace' => '<font color=red>\'\'\'Неизвестное пространство имён проигнорировано: \'$1\'\'\'\'.</font>',
++'export-invalid-modifydate' => '<font color=red>\'\'\'Некорректные дата и время проигнорированы (используйте формат <u>YYYY-MM-DD HH:MM:SS</u>): \'$1\'\'\'\'.</font>',
++'export-include-images' => 'Экспортировать файлы',
++'export-images'     => 'Включить изображения',
++'export-selfcontained' => 'Включать содержимое изображений в экспортный файл',
+ 'export-download'   => 'Предложить сохранить как файл',
+ 'export-templates'  => 'Включить шаблоны',
+-'export-pagelinks'  => 'Включить связанные страницы глубиной:',
++'export-pagelinks'  => 'Включить статьи, связанные ссылками',
++'export-subpages'   => 'Включить подстатьи',
++'export-closure'    => 'Включить статьи из подкатегорий',
+ 
+ # Namespace 8 related
+ 'allmessages'                   => 'Системные сообщения',
+@@ -2625,10 +2637,10 @@
+ 'import-comment'             => 'Примечание:',
+ 'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
+ 'importstart'                => 'Импортирование страниц…',
+-'import-revision-count'      => '$1 {{PLURAL:$1|версия|версии|версий}}',
+ 'importnopages'              => 'Нет страниц для импортирования.',
+ 'importfailed'               => 'Не удалось импортировать: $1',
+ 'importunknownsource'        => 'Неизвестный тип импортируемой страницы',
++'importunknownformat'        => 'Неизвестный формат импортируемого файла',
+ 'importcantopen'             => 'Невозможно открыть импортируемый файл',
+ 'importbadinterwiki'         => 'Неправильная интервики-ссылка',
+ 'importnotext'               => 'Текст отсутствует',
+@@ -2641,9 +2653,15 @@
+ 'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
+ 'import-parse-failure'       => 'Ошибка разбора XML при импорте',
+ 'import-noarticle'           => 'Нет страницы для импортирования!',
+-'import-nonewrevisions'      => 'Все редакции были ранее импортированы.',
+ 'xml-error-string'           => '$1 в строке $2, позиции $3 (байт $4): $5',
+ 'import-upload'              => 'Загрузить XML-данные',
++'import-norevisions'         => 'Нет редакций для импортирования.',
++'import-nonewrevisions-localnewer' => 'Все редакции были ранее импортированы. Страница изменена локально.',
++'import-nonewrevisions'      => 'Все редакции были ранее импортированы. Локальных изменений нет.',
++'import-revision-count'      => '$1 {{PLURAL:$1|версия|версии|версий}}.',
++'import-revision-count-newpage' => '$1 {{PLURAL:$1|версия|версии|версий}} (новая страница).',
++'import-conflict'            => '$1 {{PLURAL:$1|версия|версии|версий}} (конфликт: $2).',
++'import-conflict-difflink'   => '$1 (импорт) и $2 (локальная)',
+ 'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
+ 'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
+ 
+diff -r 5ad71cf1db7a -r a47b5463550e skins/common/shared.css
+--- skins/common/shared.css
++++ skins/common/shared.css
+@@ -829,3 +829,9 @@
+ a.sortheader {
+ 	margin: 0 0.3em;
+ }
++
++fieldset.addpages { display: inline-block; margin-top: 0; }
++.addpages div { float: left; text-align: right; vertical-align: top; padding-right: 8px; margin-bottom: 2px; }
++div.ap_closure { clear: left; }
++div.ap_submit { float: right; }
++div.ap_submit input { font-weight: bold; padding: 0 1em; }

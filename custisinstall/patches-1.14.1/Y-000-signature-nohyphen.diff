@@ -1,0 +1,29 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1270823052 -14400
+Bug 44402 - Remove '--' in signatures
+Bug 62536 - Change <math></math> to <m></m>
+
+diff -r 2f012c39365a -r a3503907576f includes/EditPage.php
+--- includes/EditPage.php
++++ includes/EditPage.php
+@@ -1982,8 +1982,8 @@
+ 			array(
+ 				'image'  => $wgLang->getImageFile('button-math'),
+ 				'id'     => 'mw-editbutton-math',
+-				'open'   => "<math>",
+-				'close'  => "</math>",
++				'open'   => "<m>",
++				'close'  => "</m>",
+ 				'sample' => wfMsg('math_sample'),
+ 				'tip'    => wfMsg('math_tip'),
+ 				'key'    => 'C'
+@@ -2000,7 +2000,7 @@
+ 			array(
+ 				'image'  => $wgLang->getImageFile('button-sig'),
+ 				'id'     => 'mw-editbutton-signature',
+-				'open'   => '--~~~~',
++				'open'   => '~~~~',
+ 				'close'  => '',
+ 				'sample' => '',
+ 				'tip'    => wfMsg('sig_tip'),
