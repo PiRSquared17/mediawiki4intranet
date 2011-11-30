@@ -139,7 +139,7 @@ class SvgThumbnailImage extends ThumbnailImage
 		$html = Xml::tags( 'object', array(
 			'type' => 'image/svg+xml',
 			'data' => $linkurl,
-			'style' => 'overflow: hidden',
+			'style' => 'overflow: hidden; vertical-align: middle',
 			'width' => $this->width,
 			'height' => $this->height,
 		), $html );
