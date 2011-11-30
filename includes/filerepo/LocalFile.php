@@ -783,6 +783,66 @@ class LocalFile extends File {
 	}
 
 	/**
+	 * Upload a file directly into archive. Generally for Special:Import
+	 */
+	function uploadIntoArchive( $srcPath, $comment, $pageText, $flags = 0, $props = false, $timestamp = false )
+	{
+		$this->lock();
+		$dstName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $timestamp ) ) . '!' . $this->getPhys();
+		$status = $this->publish( $srcPath, $flags, $dstName );
+		if ( $status->ok ) {
+			if ( !$this->recordOldUpload( $dstName, $comment, $pageText, $props, $timestamp ) ) {
+				$status->fatal( 'filenotfound', $srcPath );
+			}
+		}
+		$this->unlock();
+		return $status;
+	}
+
+	/**
+	 * Record a file upload in the upload log and the oldimage table
+	 */
+	function recordOldUpload( $dstName, $comment, $pageText, $props = false, $timestamp = false )
+	{
+		global $wgUser;
+
+		$dbw = $this->repo->getMasterDB();
+
+		$dstPath = $this->repo->getZonePath('public') . '/archive/' . $this->getHashPath() . $dstName;
+		$props = self::getPropsFromPath( $dstPath );
+		if (!$props['fileExists'])
+			return false;
+
+		$props['timestamp'] = wfTimestamp( TS_MW, $timestamp );
+		list($props['major_mime'], $props['minor_mime']) =
+			self::splitMime( "{$props['major_mime']}/{$props['minor_mime']}" );
+
+		$dbw->insert( 'oldimage',
+			array(
+				'oi_name'         => $this->getName(),
+				'oi_archive_name' => $dstName,
+				'oi_size'         => $props['size'],
+				'oi_width'        => intval($props['width']),
+				'oi_height'       => intval($props['height']),
+				'oi_bits'         => $props['bits'],
+				'oi_timestamp'    => $props['timestamp'],
+				'oi_description'  => $comment,
+				'oi_user'         => $wgUser->getId(),
+				'oi_user_text'    => $wgUser->getName(),
+				'oi_metadata'     => $props['metadata'],
+				'oi_media_type'   => $props['media_type'],
+				'oi_major_mime'   => $props['major_mime'],
+				'oi_minor_mime'   => $props['minor_mime'],
+				'oi_sha1'         => $props['sha1'],
+			), __METHOD__
+		);
+
+		$dbw->immediateCommit();
+
+		return true;
+	}
+
+	/**
 	 * Record a file upload in the upload log and the image table
 	 */
 	function recordUpload2( $oldver, $comment, $pageText, $props = false, $timestamp = false, $user = null )
@@ -955,15 +1015,21 @@ class LocalFile extends File {
 	 *
 	 * @param string $sourcePath Local filesystem path to the source image
 	 * @param integer $flags A bitwise combination of:
-	 *     File::DELETE_SOURCE    Delete the source file, i.e. move
-	 *         rather than copy
+	 *     File::DELETE_SOURCE       Delete the source file, i.e. move rather than copy
+	 * @param string $dstName Local wanted path (for example some archive
+	 *        path to publish image into the archive directly)
 	 * @return FileRepoStatus object. On success, the value member contains the
 	 *     archive name, or an empty string if it was a new file.
 	 */
-	function publish( $srcPath, $flags = 0 ) {
+	function publish( $srcPath, $flags = 0, $dstName = NULL ) {
 		$this->lock();
+		if (!$dstName)
 		$dstRel = $this->getRel();
-		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getName();
+		else
+			$dstRel = 'archive/' . $this->getHashPath() . $dstName;
+		# Изначальное gmdate( 'YmdHis' ) - это НИФИГА не правильно!
+		# Получается, что в имени файла один timestamp, а в базе другой...
+		$archiveName = gmdate( 'YmdHis', wfTimestamp( TS_UNIX, $this->getTimestamp() ) ) . '!'. $this->getPhys();
 		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
 		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
 		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
@@ -1792,8 +1858,9 @@ class LocalFileMoveBatch {
 		$this->file = $file;
 		$this->target = $target;
 		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );
-		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBkey() );
-		$this->oldName = $this->file->getName();
+		$this->newHash = $this->file->repo->getHashPath( $this->target->getDBKey() );
+		$this->oldName = $this->file->getPhys();
+		/* FIXME getPhysFromTitle is needed */
 		$this->newName = $this->file->repo->getNameFromTitle( $this->target );
 		$this->oldRel = $this->oldHash . $this->oldName;
 		$this->newRel = $this->newHash . $this->newName;
