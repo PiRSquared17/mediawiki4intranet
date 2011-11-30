@@ -1,0 +1,1 @@
+Do not explicitly call destructor of mLinkHolders as it causes errors in some cases
