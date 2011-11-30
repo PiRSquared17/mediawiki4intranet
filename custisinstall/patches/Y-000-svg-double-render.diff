@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1321614797 -10800
+# Date 1322655792 -10800
 Bug 80684 - SVG double-render
 Bug 63356 - SVGZ and generic XML-GZIP mime-types support
 
-diff -r 025d3c6531d8 -r 2ab3f678db60 includes/DefaultSettings.php
+diff -r 025d3c6531d8 -r 0fb3995a0aed includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -419,6 +419,11 @@
@@ -19,7 +19,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/DefaultSettings.php
  /**
   * To set 'pretty' URL paths for actions other than
   * plain page views, add to this array. For instance:
-diff -r 025d3c6531d8 -r 2ab3f678db60 includes/MimeMagic.php
+diff -r 025d3c6531d8 -r 0fb3995a0aed includes/MimeMagic.php
 --- includes/MimeMagic.php
 +++ includes/MimeMagic.php
 @@ -399,7 +399,7 @@
@@ -53,7 +53,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/MimeMagic.php
  			}
  		}
  
-diff -r 025d3c6531d8 -r 2ab3f678db60 includes/XmlTypeCheck.php
+diff -r 025d3c6531d8 -r 0fb3995a0aed includes/XmlTypeCheck.php
 --- includes/XmlTypeCheck.php
 +++ includes/XmlTypeCheck.php
 @@ -20,6 +20,12 @@
@@ -88,10 +88,85 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/XmlTypeCheck.php
  		do {
  			$chunk = fread( $file, 32768 );
  			$ret = xml_parse( $parser, $chunk, feof( $file ) );
-diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
+diff -r 025d3c6531d8 -r 0fb3995a0aed includes/media/.svn/entries
+--- includes/media/.svn/entries
++++ includes/media/.svn/entries
+@@ -32,7 +32,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.663989Z
++2011-11-30T12:22:45.089350Z
+ 7d8757b644acabb9c07749d31892bde5
+ 2011-01-04T06:15:54.403142Z
+ 79562
+@@ -66,7 +66,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.663989Z
++2011-11-30T12:19:34.384815Z
+ d70a0c1b1324f90feb7daa275b1c9a07
+ 2008-11-06T20:59:34.560430Z
+ 43266
+@@ -100,7 +100,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.663989Z
++2011-11-30T12:19:34.384815Z
+ f4720cc155e41b4b3a84d7d6f0e388bb
+ 2010-02-13T17:09:52.710533Z
+ 62446
+@@ -134,7 +134,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.667989Z
++2011-11-30T12:19:34.380815Z
+ f5c9b8bcfef13432b72d937fbcab3964
+ 2008-08-27T18:25:24.906713Z
+ 40095
+@@ -202,7 +202,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.667989Z
++2011-11-30T12:19:34.384815Z
+ 4ad2657d06d62022309f2b0d6402de56
+ 2009-08-23T23:27:32.647440Z
+ 55541
+@@ -236,7 +236,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.667989Z
++2011-11-30T12:19:34.384815Z
+ b573ad3f23fd6d55afa7fc3e9342b58e
+ 2009-08-23T23:27:32.647440Z
+ 55541
+@@ -270,7 +270,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.667989Z
++2011-11-30T12:19:34.384815Z
+ d89a3df8203b223358def9d392f40b37
+ 2009-06-04T09:16:25.639847Z
+ 51458
+@@ -304,7 +304,7 @@
+ 
+ 
+ 
+-2011-02-04T18:14:24.667989Z
++2011-11-30T12:19:34.384815Z
+ aa9cd1861cf85b946b74ccb3fd615926
+ 2009-03-16T22:03:20.983700Z
+ 48462
+diff -r 025d3c6531d8 -r 0fb3995a0aed includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
-@@ -4,6 +4,149 @@
+@@ -4,6 +4,150 @@
   * @ingroup Media
   */
  
@@ -180,6 +255,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
 +			$linkurl = $this->file->getThumbUrl() . $hash;
 +
 +			// Cache changed SVGs only when TRANSFORM_LATER is on
++			$mtime = false;
 +			if ( $this->later ) {
 +				$mtime = @filemtime( $linkfn );
 +			}
@@ -230,7 +306,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
 +		$html = Xml::tags( 'object', array(
 +			'type' => 'image/svg+xml',
 +			'data' => $linkurl,
-+			'style' => 'overflow: hidden',
++			'style' => 'overflow: hidden; vertical-align: middle',
 +			'width' => $this->width,
 +			'height' => $this->height,
 +		), $html );
@@ -241,7 +317,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
  /**
   * @ingroup Media
   */
-@@ -27,7 +170,7 @@
+@@ -27,7 +171,7 @@
  		if ( !parent::normaliseParams( $image, $params ) ) {
  			return false;
  		}
@@ -250,7 +326,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
  		$params['physicalWidth'] = $params['width'];
  		$params['physicalHeight'] = $params['height'];
  		if ( $params['physicalWidth'] > $wgSVGMaxSize ) {
-@@ -50,7 +193,7 @@
+@@ -50,7 +194,7 @@
  		$srcPath = $image->getPath();
  
  		if ( $flags & self::TRANSFORM_LATER ) {
@@ -259,7 +335,7 @@ diff -r 025d3c6531d8 -r 2ab3f678db60 includes/media/SVG.php
  		}
  
  		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
-@@ -60,7 +203,7 @@
+@@ -60,7 +204,7 @@
  		
  		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
  		if( $status === true ) {
