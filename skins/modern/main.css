@@ -281,6 +281,10 @@ p {
 	margin: 1em 0 1em 0;
 }
 
+div.paragraph {
+	margin: 1em 0 1em 0;
+}
+
 hr {
 	height: 1px;
 	color: #aaa;
@@ -470,6 +474,8 @@ div.floatright, table.floatright {
 */
 }
 div.floatright p { font-style: italic; }
+
+div.floatright div.paragraph { font-style: italic; }
 div.floatleft, table.floatleft {
 	float: left;
 	clear: left;
@@ -483,6 +489,8 @@ div.floatleft, table.floatleft {
 */
 }
 div.floatleft p { font-style: italic; }
+
+div.floatleft div.paragraph { font-style: italic; }
 /* thumbnails */
 div.thumb {
 	margin-bottom: .5em;
@@ -659,6 +667,11 @@ span.updatedmarker {
 	padding: 0;
 }
 
+.previewnote div.paragraph {
+	margin: 0;
+	padding: 0;
+}
+
 .editExternally {
 	border: 1px solid gray;
 	background-color: #ffffff;
@@ -715,6 +728,11 @@ tr.revision_tr_first {
 }
 
 p.revision_saved {
+	color: green;
+	font-weight:bold;
+}
+
+div.paragraph.revision_saved {
 	color: green;
 	font-weight:bold;
 }
@@ -885,6 +903,11 @@ pre {
 }
 
 .mw-topbox p {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+}
+
+.mw-topbox div.paragraph {
 	padding: 0 0 0 0;
 	margin: 0 0 0 0;
 }

@@ -1273,6 +1273,27 @@ function wfQuotedPrintable( $string, $charset = '' ) {
 	return $out;
 }
 
+// Uses iconv php extension, calls wfQuotedPrintable if it's unavailable
+function wfMimeBase64( $string, $charset = '' )
+{
+	if( empty( $charset ) )
+	{
+		global $wgInputEncoding;
+		$charset = $wgInputEncoding;
+	}
+	if ( !function_exists( 'iconv_mime_encode' ) )
+	{
+		// Do not split and recode the string when iconv is unavailable
+		return '=?'.$charset.'?B?'.base64_encode( $string ).'?=';
+	}
+	return substr( iconv_mime_encode( '', $string, array(
+		'input-charset' => $charset,
+		'output-charset' => 'utf-8',
+		'line-length' => 76,
+		'line-break-chars' => "\n",
+		'scheme' => 'B'
+	) ), 2 );
+}
 
 /**
  * @todo document
@@ -1487,7 +1508,7 @@ function wfMerge( $old, $mine, $yours, &$result ){
 	# case of broken installations.
 	if( !$wgDiff3 || !file_exists( $wgDiff3 ) ) {
 		wfDebug( "diff3 not found\n" );
-		return false;
+		return NULL;
 	}
 
 	# Make temporary files
@@ -1495,6 +1516,10 @@ function wfMerge( $old, $mine, $yours, &$result ){
 	$oldtextFile = fopen( $oldtextName = tempnam( $td, 'merge-old-' ), 'w' );
 	$mytextFile = fopen( $mytextName = tempnam( $td, 'merge-mine-' ), 'w' );
 	$yourtextFile = fopen( $yourtextName = tempnam( $td, 'merge-your-' ), 'w' );
+
+	if ($old{-1} != "\n") $old .= "\n";
+	if ($mine{-1} != "\n") $mine .= "\n";
+	if ($yours{-1} != "\n") $yours .= "\n";
 
 	fwrite( $oldtextFile, $old ); fclose( $oldtextFile );
 	fwrite( $mytextFile, $mine ); fclose( $mytextFile );
@@ -1515,8 +1540,10 @@ function wfMerge( $old, $mine, $yours, &$result ){
 	pclose( $handle );
 
 	# Merge differences
-	$cmd = $wgDiff3 . ' -a -e --merge ' .
-	  wfEscapeShellArg( $mytextName, $oldtextName, $yourtextName );
+	$cmd = $wgDiff3 . ' -a -A --merge ' . wfEscapeShellArg(
+	  '-L', wfMsg( 'merge-mine' ), '-L', wfMsg( 'merge-old' ),
+	  '-L', wfMsg( 'merge-their' ), $mytextName, $oldtextName, $yourtextName
+	);
 	$handle = popen( $cmd, 'r' );
 	$result = '';
 	do {

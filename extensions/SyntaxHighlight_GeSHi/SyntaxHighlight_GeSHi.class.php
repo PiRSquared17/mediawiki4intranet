@@ -306,7 +306,7 @@ class SyntaxHighlight_GeSHi {
 		if( !self::$initialised ) {
 			wfLoadExtensionMessages( 'SyntaxHighlight_GeSHi' );
 			if( !class_exists( 'GeSHi' ) )
-				require( 'geshi/geshi.php' );
+				require_once( 'geshi/geshi.php' );
 			self::$initialised = true;
 		}
 		return true;
@@ -317,7 +317,8 @@ class SyntaxHighlight_GeSHi {
 	 */
 	public static function hSpecialVersion_GeSHi( &$sp, &$extensionTypes ) {
 		global $wgExtensionCredits;
-		require_once( 'geshi/geshi.php' );
+		if ( !class_exists( 'GeSHi' ) )
+			require_once( 'geshi/geshi.php' );
 		$wgExtensionCredits['parserhook']['SyntaxHighlight_GeSHi']['version'] = GESHI_VERSION;
 		return true;
 	}
