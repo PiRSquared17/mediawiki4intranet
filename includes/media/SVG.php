@@ -89,6 +89,7 @@ class SvgThumbnailImage extends ThumbnailImage
 			$linkurl = $this->file->getThumbUrl() . $hash;
 
 			// Cache changed SVGs only when TRANSFORM_LATER is on
+			$mtime = false;
 			if ( $this->later ) {
 				$mtime = @filemtime( $linkfn );
 			}
@@ -139,7 +140,7 @@ class SvgThumbnailImage extends ThumbnailImage
 		$html = Xml::tags( 'object', array(
 			'type' => 'image/svg+xml',
 			'data' => $linkurl,
-			'style' => 'overflow: hidden',
+			'style' => 'overflow: hidden; vertical-align: middle',
 			'width' => $this->width,
 			'height' => $this->height,
 		), $html );
