@@ -1,0 +1,6 @@
+Depends on: Y-000-debug-wikilog.diff
+
+Patch includes several simple fixes required for MediaWiki to run under
+more restrictive PHP 5.3.x.
+
+Signed-off-by: Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
