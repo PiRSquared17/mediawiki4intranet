@@ -154,6 +154,7 @@ require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/Shortcuts/Shortcuts.php');
 require_once($IP.'/extensions/RemoveConfidential/RemoveConfidential.php');
+require_once($IP.'/extensions/CustomToolbox/CustomToolbox.php');
 
 # Drafts
 require_once($IP.'/extensions/Drafts/Drafts.php');
