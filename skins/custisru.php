@@ -16,6 +16,27 @@ if( !defined( 'MEDIAWIKI' ) )
 
 require_once( dirname( dirname( __FILE__ ) ) . '/includes/SkinTemplate.php');
 
+// Clear floats for ArticleViewHeader {
+if (!function_exists('articleHeaderClearFloats'))
+{
+    global $wgHooks;
+    $wgHooks['ParserFirstCallInit'][] = 'checkHeaderClearFloats';
+    function checkHeaderClearFloats($parser)
+    {
+        global $wgHooks;
+        if (!in_array('articleHeaderClearFloats', $wgHooks['ArticleViewHeader']))
+            $wgHooks['ArticleViewHeader'][] = 'articleHeaderClearFloats';
+        return true;
+    }
+    function articleHeaderClearFloats($article, &$outputDone, &$useParserCache)
+    {
+        global $wgOut;
+        $wgOut->addHTML('<div style="clear:both"></div>');
+        return true;
+    }
+}
+// }
+
 /**
  * Inherit main code from SkinTemplate, set the CSS and template filter.
  * @ingroup Skins
@@ -230,7 +251,7 @@ class CustisRuTemplate extends QuickTemplate {
     <?php if($this->data['newtalk'] ) { ?><div class="usermessage"><?php $this->html('newtalk')  ?></div><?php } ?>
     <?php if($this->data['showjumplinks']) { ?><div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div><?php } ?>
     <!-- start content -->
-    <?php if($this->data['catlinks'] && $wgCatlinksTop) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><div style="clear: left"></div><?php  } ?>
+    <?php if($this->data['catlinks'] && $wgCatlinksTop) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php  } ?>
     <?php $this->html('bodytext') ?>
     <?php if($this->data['catlinks'] && $wgCatlinksTop !== 'only') { $this->html('catlinks'); } ?>
     <!-- end content -->
@@ -370,22 +391,11 @@ class CustisRuTemplate extends QuickTemplate {
                 'text' => $this->translator->translate('printableversion'),
             );
 
-        if(!empty($this->data['nav_urls']['permalink']['href']))
-            $cont[] = array(
-                'href' => $this->data['nav_urls']['permalink']['href'],
-                'id'   => "t-permalink",
-                'text' => $this->translator->translate('permalink'),
-            );
-        else if ($this->data['nav_urls']['permalink']['href'] === '')
-            $cont[] = array(
-                'id'   => "t-ispermalink",
-                'text' => $this->translator->translate('permalink'),
-            );
-
         wfRunHooks('SkinTemplateToolboxLinks', array(&$this, &$cont));
         $this->customBox($bar, $cont);
 
-        // A hack to support extensions which use SkinTemplateToolboxEnd hook
+        // A hack to support extensions which use SkinTemplateToolboxEnd
+        // hook and print ordered lists
         ob_start();
         wfRunHooks('SkinTemplateToolboxEnd', array(&$this));
         $ob = ob_get_contents();
