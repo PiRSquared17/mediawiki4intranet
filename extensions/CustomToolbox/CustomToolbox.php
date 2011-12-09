@@ -57,7 +57,7 @@ function efCustomToolboxSkinTemplateToolboxEnd($tpl)
         $options = ParserOptions::newFromUser($wgUser);
         $clearstate = true;
     }
-    $output = $wgParser->parse($text, $wgTitle, $options, true, $clearstate);
+    $output = $wgParser->parse($text, $wgTitle, $options, false, $clearstate);
     print $output->getText();
     return true;
 }
