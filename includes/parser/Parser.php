@@ -2149,136 +2149,107 @@ class Parser
 			// Go to paragraph mode.
 			wfProfileIn( __METHOD__."-paragraph" );
 			if ( $linestart && $inNoPre <= 0 && ' ' == substr( $t, 0, 1 ) &&
-				( $this->mLastSection === 'pre' || trim($t) != '' ) )
-			{
+				( $this->mLastSection === 'pre' || trim($t) != '' ) ) {
 				// <pre>formatted text
 				$emptyLines = 0;
-				if ( $this->mLastSection !== 'pre' )
-				{
+				if ( $this->mLastSection !== 'pre' ) {
 					$output .= $this->closeParagraph().'<pre>';
 					$this->mLastSection = 'pre';
 				}
 				$output .= substr( $t, 1 ) . "\n";
-			}
-			elseif ( !$this->mInPre && trim( $t ) === '' )
-			{
+			} elseif ( !$this->mInPre && trim( $t ) === '' ) {
 				// close paragraph
 				$output .= $this->closeParagraph();
 				$dontStartParagraph = 0;
 				$emptyLines++;
-				if ( $emptyLines > 1 )
-				{
+				if ( $emptyLines > 1 ) {
 					// start a new paragraph
 					$lastParagraphPos = strlen( $output );
 					$this->mLastSection = 'p';
 					$output .= '<p><br />';
 					$emptyLines = 0;
 				}
-			}
-			else
-			{
+			} else {
 				$emptyLines = 0;
-				while ( strlen( $t ) )
-				{
+				while ( strlen( $t ) ) {
 					// match HTML tag or UNIQ prefix
-					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-(pre|html).*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
-					{
+					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-(pre|html).*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) ) {
 						$textBefore = substr( $t, 0, $m[0][1] );
 						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
-						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) )
-						{
+						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) ) {
 							$textBefore .= $m[0][0];
 							$m[0][0] = '';
 						}
-					}
-					else
-					{
+					} else {
 						$textBefore = $t;
 						$t = '';
 					}
-					if ( $textBefore !== '' )
-					{
+					if ( $textBefore !== '' ) {
 						// Here is the place where the text gets inside <p>aragraphs
-						if ( trim( $textBefore ) !== '' )
-						{
-							if ( !$this->mInPre && !$dontStartParagraph )
-							{
-								if ( $this->mLastSection == 'pre' )
+						if ( trim( $textBefore ) !== '' ) {
+							if ( !$this->mInPre && !$dontStartParagraph ) {
+								if ( $this->mLastSection == 'pre' ) {
 									$output .= $this->closeParagraph();
-								if ( !$this->mLastSection && !$this->mInPre )
-								{
+								}
+								if ( !$this->mLastSection && !$this->mInPre ) {
 									$lastParagraphPos = strlen( $output );
 									$output .= '<p>';
 									$this->mLastSection = 'p';
 								}
-							}
-							elseif ( $dontStartParagraph == 2 )
+							} elseif ( $dontStartParagraph == 2 ) {
 								$dontStartParagraph = 1;
+							}
 						}
 						$output .= $textBefore;
 					}
-					if ( !$m )
+					if ( !$m ) {
 						continue;
+					}
 					$match = $m[0][0];
 					$close = $m[1][0];
 					$tag   = $m[2][0];
 					$empty = $m[3][0];
 					$uniq  = empty( $m[4] ) ? '' : $m[4][0];
 					$uniqt = empty( $m[5] ) ? '' : $m[5][0];
-					if ( $this->mInPre && $close && $tag == 'pre' )
-					{
+					if ( $this->mInPre && $close && $tag == 'pre' ) {
 						// this is </pre> closing tag
 						$this->mInPre = false;
 						$inNoPre--;
-					}
-					elseif ( $uniq )
-					{
+					} elseif ( $uniq ) {
 						// UNIQ <pre> closes paragraph
-						if ( $uniqt == 'pre' )
+						if ( $uniqt == 'pre' ) {
 							$output .= $this->closeParagraph();
+						}
 						// UNIQ <html> turns <p> into a <div class="paragraph">
 						// because it may contain block elements
-						elseif ( $uniqt == 'html' )
-						{
-							if ( $this->mLastSection == 'p' )
-							{
+						elseif ( $uniqt == 'html' ) {
+							if ( $this->mLastSection == 'p' ) {
 								$output =
 									substr( $output, 0, $lastParagraphPos ) .
 									'<div class="paragraph">' .
 									substr( $output, $lastParagraphPos+3 );
 								$this->mLastSection = 'div';
-							}
-							elseif ( !$this->mLastSection && !$dontStartParagraph )
-							{
+							} elseif ( !$this->mLastSection && !$dontStartParagraph ) {
 								$lastParagraphPos = strlen( $output );
 								$output .= '<div class="paragraph">';
 								$this->mLastSection = 'div';
 							}
 						}
-					}
-					elseif ( isset( $closesParagraph[ $tag ] ) )
-					{
+					} elseif ( isset( $closesParagraph[ $tag ] ) ) {
 						// block element closes current paragraph
-						if ( $tag != 'div' )
-						{
+						if ( $tag != 'div' ) {
 							// <div> does not close the paragraph,
 							// but turns it into a <div class="paragraph">
 							$output .= $this->closeParagraph();
-						}
-						elseif ( !$empty )
-						{
+						} elseif ( !$empty ) {
 							// <div> is the only case of nested "paragraphs"
-							if ( $close )
-							{
+							if ( $close ) {
 								// </div> - close current nesting level
 								$output .= $this->closeParagraph();
 								list( $this->mLastSection, $inNoPre ) = array_pop( $nestedSections );
-							}
-							else
-							{
+							} else {
 								// <div> - start a nested level
-								if ( $this->mLastSection == 'p' && $tag == 'div' )
-								{
+								if ( $this->mLastSection == 'p' && $tag == 'div' ) {
 									// <div> can not be used inside <p>
 									// so turn last <p> into a <div class="paragraph">
 									$output =
@@ -2293,40 +2264,39 @@ class Parser
 							}
 						}
 						// if not an enclosed XML element
-						if ( !$empty )
-						{
-							if ( isset( $noPre[ $tag ] ) )
+						if ( !$empty ) {
+							if ( isset( $noPre[ $tag ] ) ) {
 								$inNoPre += $close ? -1 : 1;
-							if ( !$close )
-							{
-								if ( !$this->mLastSection )
-								{
+							}
+							if ( !$close ) {
+								if ( !$this->mLastSection ) {
 									// do not start paragraph right after opening block
 									// element tag on the same line. I.e. <div>A</div> is parsed
 									// into <div>A</div>, and <div>\nA</div> is parsed
 									// into <div><p>A</p></div>
 									$dontStartParagraph = 2;
 								}
-								if ( $tag == 'pre' && !$empty )
+								if ( $tag == 'pre' && !$empty ) {
 									$this->mInPre = true;
-							}
-							elseif ( $dontStartParagraph )
-							{
+								}
+							} elseif ( $dontStartParagraph ) {
 								// Current block element is closed
 								$dontStartParagraph = 2;
 							}
 						}
 					}
-					if ( $match !== '' )
+					if ( $match !== '' ) {
 						$output .= $match;
+					}
 				}
 				$output .= "\n";
 				// If line ended after opening block element tag with no text after it
 				// => allow to start a paragraph from next line
 				// If there was some text (dontStartParagraph == 1)
 				// => do not start a paragraph from next line
-				if ( $dontStartParagraph == 2 )
+				if ( $dontStartParagraph == 2 ) {
 					$dontStartParagraph = 0;
+				}
 			}
 			wfProfileOut( __METHOD__."-paragraph" );
 			$linestart = true;
