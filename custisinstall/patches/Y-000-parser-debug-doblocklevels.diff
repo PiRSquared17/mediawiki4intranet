@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1321977858 -10800
+# Date 1323434135 -10800
 Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
 Bug 68935 - Update for MediaWiki 1.16
 MediaWikiBug 6200 (https://bugzilla.wikimedia.org/show_bug.cgi?id=6200) - Completely rewrite doBlockLevels to correctly handle nested tags
 
-diff -r 025d3c6531d8 -r a0ca67da365e extensions/Cite/citeParserTests.txt
+diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
 --- extensions/Cite/citeParserTests.txt
 +++ extensions/Cite/citeParserTests.txt
 @@ -22,8 +22,7 @@
@@ -178,7 +178,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e extensions/Cite/citeParserTests.txt
  no text was provided for refs named <code>foo</code></strong></li></ol>
  <p><strong class="error">Cite error: <code>&lt;ref&gt;</code> tag with name "unused" defined in <code>&lt;references&gt;</code> is not used in prior text.</strong><br />
  <strong class="error">Cite error: <code>&lt;ref&gt;</code> tag in <code>&lt;references&gt;</code> has conflicting group attribute "1".</strong><br />
-diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
+diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -1888,7 +1888,7 @@
@@ -349,7 +349,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
  
  				// Close all the prefixes which aren't shared.
  				while( $commonPrefixLength < $lastPrefixLength ) {
-@@ -2085,75 +2140,196 @@
+@@ -2085,75 +2140,149 @@
  					++$commonPrefixLength;
  				}
  				$lastPrefix = $prefix2;
@@ -377,56 +377,63 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
 +			// Go to paragraph mode.
 +			wfProfileIn( __METHOD__."-paragraph" );
 +			if ( $linestart && $inNoPre <= 0 && ' ' == substr( $t, 0, 1 ) &&
-+				( $this->mLastSection === 'pre' || trim($t) != '' ) )
-+			{
++				( $this->mLastSection === 'pre' || trim($t) != '' ) ) {
 +				// <pre>formatted text
 +				$emptyLines = 0;
-+				if ( $this->mLastSection !== 'pre' )
-+				{
++				if ( $this->mLastSection !== 'pre' ) {
 +					$output .= $this->closeParagraph().'<pre>';
 +					$this->mLastSection = 'pre';
 +				}
 +				$output .= substr( $t, 1 ) . "\n";
-+			}
-+			elseif ( !$this->mInPre && trim( $t ) === '' )
-+			{
++			} elseif ( !$this->mInPre && trim( $t ) === '' ) {
 +				// close paragraph
 +				$output .= $this->closeParagraph();
 +				$dontStartParagraph = 0;
 +				$emptyLines++;
-+				if ( $emptyLines > 1 )
-+				{
++				if ( $emptyLines > 1 ) {
 +					// start a new paragraph
 +					$lastParagraphPos = strlen( $output );
 +					$this->mLastSection = 'p';
 +					$output .= '<p><br />';
 +					$emptyLines = 0;
 +				}
-+			}
-+			else
-+			{
++			} else {
 +				$emptyLines = 0;
-+				while ( strlen( $t ) )
-+				{
-+					// match HTML tag or UNIQ prefix
-+					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-(pre|html).*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) )
-+					{
++				while ( strlen( $t ) ) {
++					// match html tag or preformatted block hidden by link holder
++					// <html> does not influence on paragraphs in any way, so we don't match it
++					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-pre.*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) ) {
 +						$textBefore = substr( $t, 0, $m[0][1] );
 +						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
-+						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) )
-+						{
++						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) ) {
 +							$textBefore .= $m[0][0];
 +							$m[0][0] = '';
 +						}
++					} else {
++						$textBefore = $t;
++						$t = '';
  					}
 -					if ( $closematch ) {
 -						$inBlockElem = false;
 -					} else {
 -						$inBlockElem = true;
-+					else
-+					{
-+						$textBefore = $t;
-+						$t = '';
++					if ( $textBefore !== '' ) {
++						// Here is the place where the text gets inside <p>aragraphs
++						if ( trim( $textBefore ) !== '' ) {
++							if ( !$this->mInPre && !$dontStartParagraph ) {
++								if ( $this->mLastSection == 'pre' ) {
++									$output .= $this->closeParagraph();
++								}
++								if ( !$this->mLastSection && !$this->mInPre ) {
++									$lastParagraphPos = strlen( $output );
++									$output .= '<p>';
++									$this->mLastSection = 'p';
++								}
++							} elseif ( $dontStartParagraph == 2 ) {
++								$dontStartParagraph = 1;
++							}
++						}
++						$output .= $textBefore;
  					}
 -				} else if ( !$inBlockElem && !$this->mInPre ) {
 -					if ( ' ' == substr( $t, 0, 1 ) and ( $this->mLastSection === 'pre' or trim($t) != '' ) ) {
@@ -435,112 +442,36 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
 -							$paragraphStack = false;
 -							$output .= $this->closeParagraph().'<pre>';
 -							$this->mLastSection = 'pre';
--						}
--						$t = substr( $t, 1 );
--					} else {
--						// paragraph
--						if ( trim($t) == '' ) {
--							if ( $paragraphStack ) {
--								$output .= $paragraphStack.'<br />';
--								$paragraphStack = false;
--								$this->mLastSection = 'p';
--							} else {
--								if ($this->mLastSection !== 'p' ) {
-+					if ( $textBefore !== '' )
-+					{
-+						// Here is the place where the text gets inside <p>aragraphs
-+						if ( trim( $textBefore ) !== '' )
-+						{
-+							if ( !$this->mInPre && !$dontStartParagraph )
-+							{
-+								if ( $this->mLastSection == 'pre' )
- 									$output .= $this->closeParagraph();
--									$this->mLastSection = '';
--									$paragraphStack = '<p>';
--								} else {
--									$paragraphStack = '</p><p>';
-+								if ( !$this->mLastSection && !$this->mInPre )
-+								{
-+									$lastParagraphPos = strlen( $output );
-+									$output .= '<p>';
-+									$this->mLastSection = 'p';
- 								}
- 							}
--						} else {
--							if ( $paragraphStack ) {
--								$output .= $paragraphStack;
--								$paragraphStack = false;
--								$this->mLastSection = 'p';
--							} else if ($this->mLastSection !== 'p') {
--								$output .= $this->closeParagraph().'<p>';
--								$this->mLastSection = 'p';
-+							elseif ( $dontStartParagraph == 2 )
-+								$dontStartParagraph = 1;
-+						}
-+						$output .= $textBefore;
-+					}
-+					if ( !$m )
++					if ( !$m ) {
 +						continue;
++					}
 +					$match = $m[0][0];
 +					$close = $m[1][0];
 +					$tag   = $m[2][0];
 +					$empty = $m[3][0];
 +					$uniq  = empty( $m[4] ) ? '' : $m[4][0];
-+					$uniqt = empty( $m[5] ) ? '' : $m[5][0];
-+					if ( $this->mInPre && $close && $tag == 'pre' )
-+					{
++					if ( $this->mInPre && $close && $tag == 'pre' ) {
 +						// this is </pre> closing tag
 +						$this->mInPre = false;
 +						$inNoPre--;
-+					}
-+					elseif ( $uniq )
-+					{
++					} elseif ( $uniq ) {
 +						// UNIQ <pre> closes paragraph
-+						if ( $uniqt == 'pre' )
-+							$output .= $this->closeParagraph();
-+						// UNIQ <html> turns <p> into a <div class="paragraph">
-+						// because it may contain block elements
-+						elseif ( $uniqt == 'html' )
-+						{
-+							if ( $this->mLastSection == 'p' )
-+							{
-+								$output =
-+									substr( $output, 0, $lastParagraphPos ) .
-+									'<div class="paragraph">' .
-+									substr( $output, $lastParagraphPos+3 );
-+								$this->mLastSection = 'div';
-+							}
-+							elseif ( !$this->mLastSection && !$dontStartParagraph )
-+							{
-+								$lastParagraphPos = strlen( $output );
-+								$output .= '<div class="paragraph">';
-+								$this->mLastSection = 'div';
- 							}
- 						}
- 					}
-+					elseif ( isset( $closesParagraph[ $tag ] ) )
-+					{
++						$output .= $this->closeParagraph();
++					} elseif ( isset( $closesParagraph[ $tag ] ) ) {
 +						// block element closes current paragraph
-+						if ( $tag != 'div' )
-+						{
++						if ( $tag != 'div' ) {
 +							// <div> does not close the paragraph,
 +							// but turns it into a <div class="paragraph">
 +							$output .= $this->closeParagraph();
-+						}
-+						elseif ( !$empty )
-+						{
++						} elseif ( !$empty ) {
 +							// <div> is the only case of nested "paragraphs"
-+							if ( $close )
-+							{
++							if ( $close ) {
 +								// </div> - close current nesting level
 +								$output .= $this->closeParagraph();
 +								list( $this->mLastSection, $inNoPre ) = array_pop( $nestedSections );
-+							}
-+							else
-+							{
++							} else {
 +								// <div> - start a nested level
-+								if ( $this->mLastSection == 'p' && $tag == 'div' )
-+								{
++								if ( $this->mLastSection == 'p' && $tag == 'div' ) {
 +									// <div> can not be used inside <p>
 +									// so turn last <p> into a <div class="paragraph">
 +									$output =
@@ -553,34 +484,56 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
 +								$this->mLastSection = '';
 +								$inNoPre = 0;
 +							}
-+						}
+ 						}
+-						$t = substr( $t, 1 );
+-					} else {
+-						// paragraph
+-						if ( trim($t) == '' ) {
+-							if ( $paragraphStack ) {
+-								$output .= $paragraphStack.'<br />';
+-								$paragraphStack = false;
+-								$this->mLastSection = 'p';
+-							} else {
+-								if ($this->mLastSection !== 'p' ) {
+-									$output .= $this->closeParagraph();
+-									$this->mLastSection = '';
+-									$paragraphStack = '<p>';
+-								} else {
+-									$paragraphStack = '</p><p>';
 +						// if not an enclosed XML element
-+						if ( !$empty )
-+						{
-+							if ( isset( $noPre[ $tag ] ) )
++						if ( !$empty ) {
++							if ( isset( $noPre[ $tag ] ) ) {
 +								$inNoPre += $close ? -1 : 1;
-+							if ( !$close )
-+							{
-+								if ( !$this->mLastSection )
-+								{
++							}
++							if ( !$close ) {
++								if ( !$this->mLastSection ) {
 +									// do not start paragraph right after opening block
 +									// element tag on the same line. I.e. <div>A</div> is parsed
 +									// into <div>A</div>, and <div>\nA</div> is parsed
 +									// into <div><p>A</p></div>
 +									$dontStartParagraph = 2;
-+								}
-+								if ( $tag == 'pre' && !$empty )
+ 								}
+-							}
+-						} else {
+-							if ( $paragraphStack ) {
+-								$output .= $paragraphStack;
+-								$paragraphStack = false;
+-								$this->mLastSection = 'p';
+-							} else if ($this->mLastSection !== 'p') {
+-								$output .= $this->closeParagraph().'<p>';
+-								$this->mLastSection = 'p';
++								if ( $tag == 'pre' && !$empty ) {
 +									$this->mInPre = true;
-+							}
-+							elseif ( $dontStartParagraph )
-+							{
++								}
++							} elseif ( $dontStartParagraph ) {
 +								// Current block element is closed
 +								$dontStartParagraph = 2;
-+							}
-+						}
-+					}
-+					if ( $match !== '' )
+ 							}
+ 						}
+ 					}
++					if ( $match !== '' ) {
 +						$output .= $match;
++					}
  				}
 -				wfProfileOut( __METHOD__."-paragraph" );
 +				$output .= "\n";
@@ -588,8 +541,9 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
 +				// => allow to start a paragraph from next line
 +				// If there was some text (dontStartParagraph == 1)
 +				// => do not start a paragraph from next line
-+				if ( $dontStartParagraph == 2 )
++				if ( $dontStartParagraph == 2 ) {
 +					$dontStartParagraph = 0;
++				}
  			}
 -			// somewhere above we forget to get out of pre block (bug 785)
 -			if($preCloseMatch && $this->mInPre) {
@@ -603,7 +557,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e includes/parser/Parser.php
  		}
  		while ( $prefixLength ) {
  			$output .= $this->closeList( $prefix2[$prefixLength-1] );
-diff -r 025d3c6531d8 -r a0ca67da365e maintenance/parserTests.txt
+diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
 --- maintenance/parserTests.txt
 +++ maintenance/parserTests.txt
 @@ -192,7 +192,6 @@
@@ -1086,7 +1040,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e maintenance/parserTests.txt
  
  !! end
  
-diff -r 025d3c6531d8 -r a0ca67da365e skins/chick/main.css
+diff -r 025d3c6531d8 -r 08636134487b skins/chick/main.css
 --- skins/chick/main.css
 +++ skins/chick/main.css
 @@ -32,8 +32,15 @@
@@ -1132,7 +1086,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/chick/main.css
  /* thumbnails */
  div.thumb {
  	margin-bottom: 0.5em;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/cologneblue.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/cologneblue.css
 --- skins/common/cologneblue.css
 +++ skins/common/cologneblue.css
 @@ -17,11 +17,23 @@
@@ -1171,7 +1125,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/cologneblue.css
  a { color: #223366; }
  a.external { color: #336644; }
  a:visited { color: #8D0749; }
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/commonPrint.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/commonPrint.css
 --- skins/common/commonPrint.css
 +++ skins/common/commonPrint.css
 @@ -32,7 +32,9 @@
@@ -1216,7 +1170,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/commonPrint.css
  pre {
      border: 1pt dashed black;
      white-space: pre;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/common_rtl.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/common_rtl.css
 --- skins/common/common_rtl.css
 +++ skins/common/common_rtl.css
 @@ -35,6 +35,12 @@
@@ -1232,7 +1186,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/common_rtl.css
  table.filehistory th {
  	text-align: right;
  }
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/nostalgia.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/nostalgia.css
 --- skins/common/nostalgia.css
 +++ skins/common/nostalgia.css
 @@ -14,4 +14,6 @@
@@ -1242,7 +1196,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/nostalgia.css
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  
 +
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/oldshared.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/oldshared.css
 --- skins/common/oldshared.css
 +++ skins/common/oldshared.css
 @@ -30,9 +30,13 @@
@@ -1259,7 +1213,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/oldshared.css
  
  /* Print-specific things to hide */
  .printfooter {
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/shared.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -132,6 +132,13 @@
@@ -1302,7 +1256,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/shared.css
  table.mw-allpages-table-form tr  {
  	vertical-align: top;
  }
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/wikiprintable.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/wikiprintable.css
 --- skins/common/wikiprintable.css
 +++ skins/common/wikiprintable.css
 @@ -43,4 +43,6 @@
@@ -1312,7 +1266,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/wikiprintable.css
 +
 +div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
  */
-diff -r 025d3c6531d8 -r a0ca67da365e skins/common/wikistandard.css
+diff -r 025d3c6531d8 -r 08636134487b skins/common/wikistandard.css
 --- skins/common/wikistandard.css
 +++ skins/common/wikistandard.css
 @@ -41,7 +41,11 @@
@@ -1327,7 +1281,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/common/wikistandard.css
  .catlinks { font-size:small; margin-top:0; text-align:right;}
  td { empty-cells:show; }
  td.bottom { border-top: 1px solid gray; }
-diff -r 025d3c6531d8 -r a0ca67da365e skins/modern/main.css
+diff -r 025d3c6531d8 -r 08636134487b skins/modern/main.css
 --- skins/modern/main.css
 +++ skins/modern/main.css
 @@ -281,6 +281,10 @@
@@ -1395,7 +1349,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/modern/main.css
  .mw-topbox {
          color: black;
          font-weight: bold;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/modern/rtl.css
+diff -r 025d3c6531d8 -r 08636134487b skins/modern/rtl.css
 --- skins/modern/rtl.css
 +++ skins/modern/rtl.css
 @@ -87,6 +87,11 @@
@@ -1421,7 +1375,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/modern/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/monobook/main.css
+diff -r 025d3c6531d8 -r 08636134487b skins/monobook/main.css
 --- skins/monobook/main.css
 +++ skins/monobook/main.css
 @@ -100,10 +100,19 @@
@@ -1509,7 +1463,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/monobook/main.css
  div.multipageimagenavbox {
     border: solid 1px silver;
     padding: 4px;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/monobook/rtl.css
+diff -r 025d3c6531d8 -r 08636134487b skins/monobook/rtl.css
 --- skins/monobook/rtl.css
 +++ skins/monobook/rtl.css
 @@ -219,6 +219,11 @@
@@ -1535,7 +1489,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/monobook/rtl.css
  /* Special:Prefixindex styling */
  td#mw-prefixindex-nav-form  {
  	text-align: left;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/simple/main.css
+diff -r 025d3c6531d8 -r 08636134487b skins/simple/main.css
 --- skins/simple/main.css
 +++ skins/simple/main.css
 @@ -84,8 +84,15 @@
@@ -1572,7 +1526,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/simple/main.css
  /* thumbnails */
  div.thumb {
      margin-bottom: 0.5em;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/simple/rtl.css
+diff -r 025d3c6531d8 -r 08636134487b skins/simple/rtl.css
 --- skins/simple/rtl.css
 +++ skins/simple/rtl.css
 @@ -156,6 +156,11 @@
@@ -1599,7 +1553,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/simple/rtl.css
 +	text-align: left;
 +}
 +
-diff -r 025d3c6531d8 -r a0ca67da365e skins/vector/main-ltr.css
+diff -r 025d3c6531d8 -r 08636134487b skins/vector/main-ltr.css
 --- skins/vector/main-ltr.css
 +++ skins/vector/main-ltr.css
 @@ -697,9 +697,18 @@
@@ -1652,7 +1606,7 @@ diff -r 025d3c6531d8 -r a0ca67da365e skins/vector/main-ltr.css
  /* Categories */
  .catlinks {
  	border: 1px solid #aaa;
-diff -r 025d3c6531d8 -r a0ca67da365e skins/vector/main-rtl.css
+diff -r 025d3c6531d8 -r 08636134487b skins/vector/main-rtl.css
 --- skins/vector/main-rtl.css
 +++ skins/vector/main-rtl.css
 @@ -697,9 +697,18 @@
