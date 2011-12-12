@@ -125,6 +125,7 @@ $wgAutoloadLocalClasses = array(
 	'IP' => 'includes/IP.php',
 	'Job' => 'includes/JobQueue.php',
 	'JSMin' => 'includes/JSMin.php',
+	'LCStore_Accel' => 'includes/LocalisationCache.php',
 	'LCStore_DB' => 'includes/LocalisationCache.php',
 	'LCStore_CDB' => 'includes/LocalisationCache.php',
 	'LCStore_Null' => 'includes/LocalisationCache.php',

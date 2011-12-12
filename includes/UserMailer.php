@@ -55,7 +55,7 @@ class MailAddress {
 		if( $this->name != '' && !wfIsWindows() ) {
 			global $wgEnotifUseRealName;
 			$name = ( $wgEnotifUseRealName && $this->realName ) ? $this->realName : $this->name;
-			$quoted = wfQuotedPrintable( $name );
+			$quoted = wfMimeBase64( $name );
 			if( strpos( $quoted, '.' ) !== false || strpos( $quoted, ',' ) !== false ) {
 				$quoted = '"' . $quoted . '"';
 			}
@@ -106,8 +106,10 @@ class UserMailer {
 	 * @return mixed True on success, a WikiError object on failure.
 	 */
 	static function send( $to, $from, $subject, $body, $replyto=null, $contentType=null ) {
-		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal;
+		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal, $wgEmailContentType;
 		global $wgEnotifMaxRecips;
+		if (!$wgEmailContentType)
+			$wgEmailContentType = 'text/plain';
 
 		if ( is_array( $to ) ) {
 			wfDebug( __METHOD__.': sending mail to ' . implode( ',', $to ) . "\n" );
@@ -141,11 +143,11 @@ class UserMailer {
 			if ( $replyto ) {
 				$headers['Reply-To'] = $replyto->toString();
 			}
-			$headers['Subject'] = wfQuotedPrintable( $subject );
+			$headers['Subject'] = wfMimeBase64( $subject );
 			$headers['Date'] = date( 'r' );
 			$headers['MIME-Version'] = '1.0';
 			$headers['Content-type'] = (is_null($contentType) ?
-					'text/plain; charset='.$wgOutputEncoding : $contentType);
+					$wgEmailContentType.'; charset='.$wgOutputEncoding : $contentType);
 			$headers['Content-transfer-encoding'] = '8bit';
 			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>'; // FIXME
 			$headers['X-Mailer'] = 'MediaWiki mailer';
@@ -177,7 +179,7 @@ class UserMailer {
 				$endl = "\n";
 			}
 			$ctype = (is_null($contentType) ? 
-					'text/plain; charset='.$wgOutputEncoding : $contentType);
+					$wgEmailContentType . '; charset='.$wgOutputEncoding : $contentType);
 			$headers =
 				"MIME-Version: 1.0$endl" .
 				"Content-type: $ctype$endl" .
@@ -198,10 +200,10 @@ class UserMailer {
 			if (function_exists('mail')) {
 				if (is_array($to)) {
 					foreach ($to as $recip) {
-						$sent = mail( $recip->toString(), wfQuotedPrintable( $subject ), $body, $headers );
+						$sent = mail( $recip->toString(), wfMimeBase64( $subject ), $body, $headers );
 					}
 				} else {
-					$sent = mail( $to->toString(), wfQuotedPrintable( $subject ), $body, $headers );
+					$sent = mail( $to->toString(), wfMimeBase64( $subject ), $body, $headers );
 				}
 			} else {
 				$wgErrorString = 'PHP is not configured to send mail';
@@ -291,14 +293,17 @@ class EmailNotification {
 		$watchers = array();
 		if ($wgEnotifWatchlist || $wgShowUpdatedMarker) {
 			$dbw = wfGetDB( DB_MASTER );
-			$res = $dbw->select( array( 'watchlist' ),
+			$userCondition = array(
+				'user_id=wl_user',
+				'wl_title' => $title->getDBkey(),
+				'wl_namespace' => $title->getNamespace(),
+				'wl_user != ' . intval( $editor->getID() ),
+				'wl_notificationtimestamp IS NULL',
+			);
+			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
+			$res = $dbw->select( array( 'watchlist', 'user' ),
 				array( 'wl_user' ),
-				array(
-					'wl_title' => $title->getDBkey(),
-					'wl_namespace' => $title->getNamespace(),
-					'wl_user != ' . intval( $editor->getID() ),
-					'wl_notificationtimestamp IS NULL',
-				), __METHOD__
+				$userCondition, __METHOD__
 			);
 			while ($row = $dbw->fetchObject( $res ) ) {
 				$watchers[] = intval( $row->wl_user );
@@ -415,7 +420,12 @@ class EmailNotification {
 		global $wgUsersNotifiedOnAllChanges;
 		foreach ( $wgUsersNotifiedOnAllChanges as $name ) {
 			$user = User::newFromName( $name );
-			$this->compose( $user );
+/*op-patch|TS|2011-02-09|IntraACL|start*/
+			if ( !method_exists( $title, 'userCanReadEx' ) || $title->userCanReadEx( $user ) ) {
+				// Check IntraACL read access
+				$this->compose( $user );
+			}
+/*op-patch|TS|2011-02-09|end*/
 		}
 
 		$this->sendMails();
@@ -469,11 +479,13 @@ class EmailNotification {
 		$pagetitle = $this->title->getPrefixedText();
 		$keys['$PAGETITLE']          = $pagetitle;
 		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
+		$keys['$PAGETITLE_URL_NOENC']= urldecode($this->title->getFullUrl());
 
 		$keys['$PAGEMINOREDIT']      = $medit;
 		$keys['$PAGESUMMARY']        = $summary;
 		$keys['$UNWATCHURL']         = $this->title->getFullUrl( 'action=unwatch' );
 
+		wfRunHooks('EnotifComposeCommonMailtext', array(&$this, &$keys));
 		$subject = strtr( $subject, $keys );
 
 		# Reveal the page editor's address as REPLY-TO address only if
@@ -582,6 +594,8 @@ class EmailNotification {
 				$wgContLang->date( $this->timestamp, true, false, $timecorrection ),
 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
 			$body);
+
+		wfRunHooks('EnotifPersonalizeMailtext', array(&$this, &$watchingUser, &$body));
 
 		return UserMailer::send($to, $this->from, $this->subject, $body, $this->replyto);
 	}
