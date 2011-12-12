@@ -35,6 +35,12 @@ p.mw-filedelete-editreasons, p.mw-delete-editreasons,
 p.mw-revdel-editreasons {
 	float: left;
 }
+
+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
+p.mw-filedelete-editreasons, p.mw-delete-editreasons,
+p.mw-revdel-editreasons {
+	float: left;
+}
 table.filehistory th {
 	text-align: right;
 }
