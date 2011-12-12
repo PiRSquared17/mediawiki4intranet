@@ -233,6 +233,10 @@ class SpecialExport extends SpecialPage {
 		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
 		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
 		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
+		if ( preg_match( '/^\s*\d{4,}-\d{2}-\d{2}\s*$/s', $modifydate ) ) {
+			// Allow to specify just date without the timestamp
+			$modifydate .= ' 00:00:00';
+		}
 		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) ) {
 			$modifydate = NULL;
 		}
