@@ -253,7 +253,6 @@ $wgShellLocale = 'ru_RU.UTF-8';
 
 $wgNoCopyrightWarnings = true;
 
-$wgCookieHttpOnly      = false;
 $wgEnableMWSuggest     = true;
 $wgOpenSearchTemplate  = true;
 
