@@ -40,6 +40,7 @@ class IntraACLSpecial extends SpecialPage
         'quickaccess' => 1,
         'grouplist'   => 1,
         'group'       => 1,
+        'rightgraph'  => 1,
     );
 
     var $aclTargetTypes = array(
@@ -74,7 +75,11 @@ class IntraACLSpecial extends SpecialPage
         {
             wfLoadExtensionMessages('IntraACL');
             $wgOut->setPageTitle(wfMsg('hacl_special_page'));
-            if (!isset($q['action']) || !isset(self::$actions[$q['action']]))
+            $groups = $wgUser->getGroups();
+            $admin = in_array('bureaucrat', $groups) || in_array('sysop', $groups);
+            if (!isset($q['action']) ||
+                !isset(self::$actions[$q['action']]) ||
+                $q['action'] == 'rightgraph' && !$admin)
                 $q['action'] = 'acllist';
             $f = 'html_'.$q['action'];
             $wgOut->addLink(array(
@@ -85,7 +90,7 @@ class IntraACLSpecial extends SpecialPage
             ));
             if ($f == 'html_acllist')
                 $wgOut->addHTML('<p style="margin-top: -8px">'.wfMsgExt('hacl_acllist_hello', 'parseinline').'</p>');
-            $this->_actions($q);
+            $this->_actions($q, $admin);
             $this->$f($q);
         }
         else
@@ -102,7 +107,261 @@ class IntraACLSpecial extends SpecialPage
         }
     }
 
-    /* View list of all ACL definitions, filtered and loaded using AJAX */
+    // key="value", key="value", ...
+    public static function attrstring($attr)
+    {
+        $a = array();
+        foreach ($attr as $k => $v)
+            $a[] = "$k=\"".str_replace('"', '\\"', $v)."\"";
+        return implode(', ', $a);
+    }
+
+    // Displays full graph of IntraACL rights using Graphviz, in SVG format
+    // Does not reflect the right override method - just displays which rights apply
+    // to different protected elements and which users have these rights
+    // SD -> (namespace = page cluster)
+    // SD -> page
+    // SD -> category -> subcategory -> subcluster of a namespace
+    // SD -> included SD
+    // User -> group -> SD
+    // User -> SD
+    public function html_rightgraph(&$q)
+    {
+        global $wgOut, $wgContLang;
+        $patch = haclfDisableTitlePatch();
+        $st = HACLStorage::getDatabase();
+        // Group members
+        $groups = $st->getGroupsByIds(NULL);
+        $ids = array();
+        foreach ($groups as $g)
+            $ids[] = $g->group_id;
+        $members = $st->getMembersOfGroups($ids);
+        // Security descriptors
+        $sds = $st->getSDs2(NULL, NULL, NULL, false);
+        $ids = array();
+        foreach ($sds as $r)
+        {
+            if ($r->type == 'page' || $r->type == 'category')
+                $ids[] = $r->pe_id;
+            $ids[] = $r->sd_id;
+        }
+        $titles = $st->getTitles($ids, true);
+        // Inline rights
+        $rights = $st->getAllRights();
+        // Fetch categories and subcategories
+        $cattitles = array();
+        foreach ($sds as $r)
+            if ($r->type == 'category' && isset($titles[$r->pe_id]))
+                $cattitles[] = $titles[$r->pe_id];
+        $cattitles = $st->getAllChildrenCategories($cattitles);
+        $catkeys = array();
+        foreach ($cattitles as $t)
+        {
+            $catkeys[$t->getArticleId()] = $t->getDBkey();
+            $titles[$t->getArticleId()] = $t;
+        }
+        $catlinks = $st->getCategoryLinks($catkeys);
+        $catkeys = array_flip($catkeys);
+        // Filter inconsistent SDs
+        $newsds = array();
+        foreach ($sds as $r)
+            if ($r->type != 'template' &&
+                ($r->type != 'page' && $r->type != 'category' || isset($titles[$r->pe_id])))
+                $newsds[] = $r;
+        $sds = $newsds;
+        // Draw security descriptors
+        $nodes = array();
+        $ns_first = array();
+        $cat_cluster = array();
+        $cat_cluster[NS_CATEGORY][''] = array();
+        foreach ($sds as $r)
+        {
+            $nodes['sd'.$r->sd_id] = $r;
+            if ($r->type == 'page')
+            {
+                $nodes['pg'.$r->pe_id] = true;
+                $edges['sd'.$r->sd_id]['pg'.$r->pe_id] = true;
+                if (!isset($ns_first[$titles[$r->pe_id]->getNamespace()]))
+                    $ns_first[$titles[$r->pe_id]->getNamespace()] = 'pg'.$r->pe_id;
+            }
+            elseif ($r->type == 'category')
+            {
+                $edges['sd'.$r->sd_id]['cat'.$r->pe_id] = true;
+                $nodes['cat'.$r->pe_id] = true;
+                $cluster['sd'.$r->sd_id] = "clusterns".NS_CATEGORY;
+            }
+        }
+        // Group pages in category clusters within namespaces
+        foreach ($catlinks as $catkey => $cattitles)
+        {
+            $cattitle = $titles[$catkeys[$catkey]];
+            $catid = $cattitle->getArticleId();
+            foreach ($cattitles as $t)
+            {
+                $tns = $t->getNamespace();
+                $tid = $t->getArticleId();
+                if ($tns == NS_CATEGORY)
+                {
+                    $edges["cat$catid"]["cat$tid"] = true;
+                    if (!isset($nodes["cat$tid"]))
+                        $nodes["cat$tid"] = true;
+                }
+                elseif (isset($nodes["pg$tid"]))
+                {
+                    if (!isset($cluster["pg$tid"]))
+                    {
+                        $cluster["pg$tid"] = 'clustercat'.$tns.'_'.$catid;
+                        if (!isset($cat_cluster[$tns][$catid]))
+                        {
+                            $cat_cluster[$tns][$catid] = array();
+                            $edges["cat$catid"]["pg$tid"] = 'lhead=clustercat'.$tns.'_'.$catid;
+                        }
+                    }
+                    else
+                        $edges["cat$catid"]["pg$tid"] = true;
+                }
+            }
+        }
+        // Set namespace clusters for non-grouped nodes
+        foreach ($nodes as $n => &$attr)
+        {
+            if (substr($n, 0, 2) == 'pg' && !isset($cluster[$n]))
+                $cluster[$n] = 'clusterns'.$titles[substr($n, 2)]->getNamespace();
+            elseif (substr($n, 0, 3) == 'cat')
+            {
+                $cluster[$n] = 'clusterns'.NS_CATEGORY;
+                if (!isset($ns_first[NS_CATEGORY]))
+                    $ns_first[NS_CATEGORY] = $n;
+            }
+        }
+        unset($attr);
+        // Group SDs in the same clusters as their PEs and draw namespace SD edges
+        foreach ($sds as $r)
+        {
+            if ($r->type == 'page')
+                $cluster['sd'.$r->sd_id] = $cluster['pg'.$r->pe_id];
+            elseif ($r->type == 'namespace')
+            {
+                $cluster['sd'.$r->sd_id] = '';
+                if (isset($ns_first[$r->pe_id]))
+                    $k = $ns_first[$r->pe_id];
+                else
+                {
+                    $k = 'etc'.$r->pe_id;
+                    $nodes[$k] = array(
+                        'label'   => '...',
+                        'shape'   => 'circle',
+                        'href'    => Title::newFromText('Special:Allpages')->getFullUrl(array('namespace' => $r->pe_id)),
+                        'tooltip' => "Click to see all pages in namespace ".$wgContLang->getNsText($r->pe_id),
+                    );
+                    $cluster[$k] = "clusterns".$r->pe_id;
+                    $ns_first[$r->pe_id] = $k;
+                }
+                $edges['sd'.$r->sd_id][$k] = "lhead=clusterns".$r->pe_id;
+            }
+            elseif ($r->type == 'right')
+                $cluster['sd'.$r->sd_id] = '';
+        }
+        foreach ($cluster as $k => $cl)
+        {
+            if (preg_match('/clustercat(\d+)_(\d+)/', $cl, $m))
+                $cat_cluster[$m[1]][$m[2]][] = $k;
+            elseif (preg_match('/clusterns(\d+)/', $cl, $m))
+                $cat_cluster[$m[1]][''][] = $k;
+            elseif ($cl === '')
+                $cat_cluster[''][''][] = $k;
+        }
+        // Draw right hierarchy
+        $hier = $st->getFullSDHierarchy();
+        foreach ($hier as $row)
+            if (isset($nodes['sd'.$row->child_id]) &&
+                isset($nodes['sd'.$row->parent_right_id]))
+                $edges['sd'.$row->child_id]['sd'.$row->parent_right_id] = true;
+        // Set node attributes
+        $shapes = array(
+            'sd' => 'note',
+            'pg' => 'ellipse',
+            'cat' => 'folder',
+        );
+        $colors = array(
+            'sd_page'      => '#ffd0d0',
+            'sd_category'  => '#ffff80',
+            'sd_right'     => '#90ff90',
+            'sd_namespace' => '#c0c0ff',
+            'cat'          => '#ffe0c0',
+        );
+        foreach ($nodes as $n => $r)
+        {
+            if (is_array($r))
+                continue;
+            preg_match('/([a-z]+)(\d+)/', $n, $m);
+            $type = $m[1];
+            $id = $m[2];
+            $nodes[$n] = array(
+                'shape' => $shapes[$type],
+                'label' => $titles[$id]->getPrefixedText(),
+                'href'  => $titles[$id]->getFullUrl(),
+            );
+            if ($type != 'pg')
+            {
+                $type2 = $type;
+                if ($type2 == 'sd')
+                    $type2 .= '_'.$r->type;
+                $nodes[$n]['fillcolor'] = $colors[$type2];
+                $nodes[$n]['style'] = 'filled';
+            }
+        }
+        // Draw clusters
+        $graph = '';
+        $ns_first[''] = '';
+        foreach ($ns_first as $ns => $first)
+        {
+            if ($ns !== '')
+            {
+                $graph .= "subgraph clusterns$ns {\n";
+                $graph .= "graph [label=\"Namespace ".($ns ? $wgContLang->getNsText($ns) : 'Main').
+                    "\", href=\"".Title::newFromText('Special:Allpages')->getFullUrl(array('namespace' => $ns)).
+                    "\"];\n";
+            }
+            foreach ($cat_cluster[$ns] as $cat => $ks)
+            {
+                if ($cat !== '')
+                {
+                    $graph .= "subgraph clustercat${ns}_$cat {\n";
+                    $graph .= 'graph [label="'.$titles[$cat]->getPrefixedText().'", href="'.$titles[$cat]->getFullUrl().'"];'."\n";
+                }
+                foreach ($ks as $nodename)
+                    $graph .= "$nodename [".self::attrstring($nodes[$nodename])."];\n";
+                if ($cat !== '')
+                    $graph .= "}\n";
+            }
+            if ($ns !== '')
+                $graph .= "}\n";
+        }
+        // Draw edges
+        foreach ($edges as $from => $to)
+        {
+            foreach ($to as $id => $attr)
+            {
+                if ($attr !== true)
+                    $attr .= ', ';
+                else
+                    $attr = '';
+                $attr .= self::attrstring(array(
+                    'href' => $nodes[$from]['href'],
+                    'tooltip' => $nodes[$from]['label'],
+                ));
+                $graph .= "$from -> $id [$attr];\n";
+            }
+        }
+        // Render the graph
+        $graph = "<graph>\ndigraph G {\nedge [penwidth=2];\nsplines=polyline;\noverlap=false;\nranksep=2;\nrankdir=LR;\ncompound=true;\n$graph\n}\n</graph>\n";
+        $wgOut->addWikiText($graph);
+        $wgOut->addHTML("<pre>$graph</pre>");
+        haclfRestoreTitlePatch($patch);
+    }
+
+    /* Displays list of all ACL definitions, filtered and loaded using AJAX */
     public function html_acllist(&$q)
     {
         global $wgOut, $wgUser, $wgScript, $haclgHaloScriptPath, $haclgContLang;
@@ -217,7 +476,7 @@ class IntraACLSpecial extends SpecialPage
     }
 
     /* Add header with available actions */
-    public function _actions(&$q)
+    public function _actions(&$q, $admin)
     {
         global $wgScript, $wgOut, $wgUser;
         $act = $q['action'];
@@ -226,7 +485,10 @@ class IntraACLSpecial extends SpecialPage
         elseif ($act == 'group' && !empty($q['group']))
             $act = 'groupedit';
         $html = array();
-        foreach (array('acllist', 'acl', 'quickaccess', 'grouplist', 'group') as $action)
+        $actions = array('acllist', 'acl', 'quickaccess', 'grouplist', 'group');
+        if ($admin)
+            $actions[] = 'rightgraph';
+        foreach ($actions as $action)
         {
             $a = '<b>'.wfMsg("hacl_action_$action").'</b>';
             if ($act != $action)
@@ -319,12 +581,10 @@ class IntraACLSpecial extends SpecialPage
             /* get groups closure */
             $memberids = $st->getGroupMembersRecursive(array_keys($memberids['group']), $memberids);
             $members = array();
-            /* get user names */
-            foreach ($st->getUserNames(array_keys($memberids['user'])) as $u)
-                $members[] = 'User:'.$u['user_name'];
-            /* get group names */
-            foreach ($st->getGroupNames(array_keys($memberids['group'])) as $g)
-                $members[] = $g['group_name'];
+            foreach ($st->getUsers(array_keys($memberids['user'])) as $u)
+                $members[] = 'User:'.$u->user_name;
+            foreach ($st->getGroupsByIds(array_keys($memberids['group'])) as $g)
+                $members[] = $g->group_name;
             /* merge into result */
             foreach ($members as $m)
                 foreach ($actions as $a)
