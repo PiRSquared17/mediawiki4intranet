@@ -7,7 +7,7 @@
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
+ * the Free Software Foundation; either version 3 of the License, or
  * (at your option) any later version.
  *
  * This program is distributed in the hope that it will be useful,
@@ -45,6 +45,13 @@ function efMatchByPrefixMaybeRedirect(&$title, &$request, &$ignoreRedirect, &$ta
         {
             $row = $dbr->fetchObject($res);
             $target = Title::newFromRow($row);
+            if ($target->isRedirect())
+            {
+                $article = new Article($target);
+                $nt = $article->followRedirect();
+                if ($nt)
+                    $target = $nt;
+            }
             return false;
         }
     }
