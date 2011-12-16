@@ -1,0 +1,15 @@
+K 13
+svn:eol-style
+V 6
+native
+K 12
+svn:keywords
+V 23
+Author Date Id Revision
+K 13
+svn:mergeinfo
+V 213
+/branches/REL1_15/phase3/includes/OutputPage.php:51646
+/branches/wmf-deployment/includes/OutputPage.php:53381,57468
+/trunk/phase3/includes/OutputPage.php:63549,63764,63897-63901,64881,64892,64918,64948,69771,79561
+END
