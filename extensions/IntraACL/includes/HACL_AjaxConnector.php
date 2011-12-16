@@ -195,7 +195,7 @@ function haclAutocomplete($t, $n, $limit = 11, $checkbox_prefix = false)
         foreach ($a as $item)
         {
             $i++;
-            $html .= '<div id="'.$ip.$i.'" class="hacl_ti" title="'.
+            $html .= '<div id="item'.$i.'" class="hacl_ti" title="'.
                 htmlspecialchars($item[1]).'">'.
                 htmlspecialchars($item[0]).'</div>';
         }
@@ -230,10 +230,10 @@ function haclGroupClosure($groups, $predefined = '')
         {
             $m = $st->getGroupMembersRecursive($i);
             $members[$k] = array();
-            foreach ($st->getUserNames(@array_keys($m['user'])) as $u)
-                $members[$k][] = 'User:'.$u['user_name'];
-            foreach ($st->getGroupNames(@array_keys($m['group'])) as $g)
-                $members[$k][] = $g['group_name'];
+            foreach ($st->getUsers(@array_keys($m['user'])) as $u)
+                $members[$k][] = 'User:'.$u->user_name;
+            foreach ($st->getGroupsByIds(@array_keys($m['group'])) as $g)
+                $members[$k][] = $g->group_name;
             sort($members[$k]);
         }
     }

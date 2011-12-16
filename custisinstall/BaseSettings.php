@@ -154,6 +154,7 @@ require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/Shortcuts/Shortcuts.php');
 require_once($IP.'/extensions/RemoveConfidential/RemoveConfidential.php');
+require_once($IP.'/extensions/CustomToolbox/CustomToolbox.php');
 
 # Drafts
 require_once($IP.'/extensions/Drafts/Drafts.php');
@@ -173,8 +174,8 @@ if (!isset($egDisableIntraACL))
 }
 
 # MWQuizzer
-$egMWQuizzerIntraACLAdminGroup = 'Group/QuizAdmin';
 require_once($IP.'/extensions/mediawikiquizzer/mediawikiquizzer.php');
+$egMWQuizzerIntraACLAdminGroup = 'Group/QuizAdmin';
 MediawikiQuizzer::setupNamespace(104);
 
 # Wikilog
@@ -252,7 +253,6 @@ $wgShellLocale = 'ru_RU.UTF-8';
 
 $wgNoCopyrightWarnings = true;
 
-$wgCookieHttpOnly      = false;
 $wgEnableMWSuggest     = true;
 $wgOpenSearchTemplate  = true;
 

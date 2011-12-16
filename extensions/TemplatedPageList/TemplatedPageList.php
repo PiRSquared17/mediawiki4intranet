@@ -70,6 +70,7 @@
  *   count|limit = N                 show at most N pages
  *   offset = M                      skip first M pages
  *
+ *   showtotal = yes|no              show total count of found pages
  *   output = simple|column|template
  *     Select output method. Simple is just a bullet-list with page titles and links.
  *     Column is a 3-column grouped view, just as on MediaWiki category pages.
@@ -122,6 +123,27 @@ function efTemplatedPageList()
     if ($egSubpagelistAjaxNamespaces)
         $wgHooks['ArticleViewHeader'][] = 'efSubpageListAddLister';
 }
+
+// Clear floats for ArticleViewHeader {
+if (!function_exists('articleHeaderClearFloats'))
+{
+    global $wgHooks;
+    $wgHooks['ParserFirstCallInit'][] = 'checkHeaderClearFloats';
+    function checkHeaderClearFloats($parser)
+    {
+        global $wgHooks;
+        if (!in_array('articleHeaderClearFloats', $wgHooks['ArticleViewHeader']))
+            $wgHooks['ArticleViewHeader'][] = 'articleHeaderClearFloats';
+        return true;
+    }
+    function articleHeaderClearFloats($article, &$outputDone, &$useParserCache)
+    {
+        global $wgOut;
+        $wgOut->addHTML('<div style="clear:both"></div>');
+        return true;
+    }
+}
+// }
 
 /**
  * Parser initialisation code
@@ -300,7 +322,7 @@ function efSubpageListAddLister($article, &$outputDone, &$useParserCache)
         global $wgOut;
         wfLoadExtensionMessages('TemplatedPageList');
         $wgOut->addHTML(
-            '<div id="subpagelist_ajax" class="catlinks" style="margin-top: 0">'.
+            '<div id="subpagelist_ajax" class="catlinks" style="margin: 0 0 0 2px; clear: none; float: left">'.
             efAjaxSubpageReopenText($subpagecount).'</div>'
         );
     }
