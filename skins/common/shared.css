@@ -854,3 +854,4 @@ fieldset.addpages { display: inline-block; margin-top: 0; }
 div.ap_closure { clear: left; }
 div.ap_submit { float: right; }
 div.ap_submit input { font-weight: bold; padding: 0 1em; }
+.addpages div.help label { cursor: help; border-bottom: 1px dashed gray; }
