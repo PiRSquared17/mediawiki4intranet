@@ -1,0 +1,95 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage
+END
+fixBug20757.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/fixBug20757.php
+END
+compressOld.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/compressOld.php
+END
+resolveStubs.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/resolveStubs.php
+END
+testCompression.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/testCompression.php
+END
+checkStorage.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/checkStorage.php
+END
+orphanStats.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/orphanStats.php
+END
+blob_tracking.sql
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/blob_tracking.sql
+END
+blobs.sql
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/blobs.sql
+END
+moveToExternal.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/moveToExternal.php
+END
+compressOld.inc
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/compressOld.inc
+END
+recompressTracked.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/recompressTracked.php
+END
+dumpRev.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/dumpRev.php
+END
+storageTypeStats.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/storageTypeStats.php
+END
+trackBlobs.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/trackBlobs.php
+END
+make-blobs
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/storage/make-blobs
+END

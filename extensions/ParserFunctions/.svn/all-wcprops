@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions
+END
+exprTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/exprTests.txt
+END
+Expr.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/Expr.php
+END
+testExpr.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/testExpr.php
+END
+COPYING
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/COPYING
+END
+ParserFunctions.i18n.magic.php
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/ParserFunctions.i18n.magic.php
+END
+ParserFunctions_body.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/ParserFunctions_body.php
+END
+ParserFunctions.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/ParserFunctions.i18n.php
+END
+ParserFunctions.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/ParserFunctions.php
+END
+funcsParserTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/funcsParserTests.txt
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/README
+END
+SprintfDateCompat.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/ParserFunctions/SprintfDateCompat.php
+END
