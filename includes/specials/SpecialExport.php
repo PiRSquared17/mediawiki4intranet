@@ -233,8 +233,14 @@ class SpecialExport extends SpecialPage {
 		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
 		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
 		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
-		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) ) {
+		if ( preg_match( '/^\s*\d{4,}-\d{2}-\d{2}\s*$/s', $modifydate ) ) {
+			// Allow to specify just date without the timestamp
+			$modifydate .= ' 00:00:00';
+		}
+		if ( !preg_match( '/^\s*\d{4,}-\d{2}-\d{2}\s*\d\d?:\d\d?:\d\d?\s*$/s', $modifydate ) ) {
 			$modifydate = NULL;
+		} else {
+			$modifydate = wfTimestamp( TS_MW, $modifydate );
 		}
 		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
 			$catname->getNamespace() != NS_CATEGORY ) {
@@ -347,8 +353,16 @@ class SpecialExport extends SpecialPage {
 		);
 		// Textboxes:
 		foreach ( $textboxes as $k => $size ) {
-			$form .= '<div class="ap_'.$k.'">' .
-				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
+			$value = !empty( $state[ $k ] ) ? $state[ $k ] : '';
+			if ( $k == 'modifydate' ) {
+				$form .= "<div class=\"ap_$k help\">" .
+					"<label for=\"ap-$k\" title=\"".htmlspecialchars( wfMsg( "export-$k-tooltip" ) )."\">" .
+					wfMsg( "export-$k" ) . "</label>&nbsp;" .
+					Xml::input( $k, $size, $value, array( 'id' => "ap-$k" ) ) . '</div>';
+			} else {
+				$form .= "<div class=\"ap_$k\">" .
+					Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, $value ) . '</div>';
+			}
 		}
 		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
 			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';

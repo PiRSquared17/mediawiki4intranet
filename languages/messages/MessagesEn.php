@@ -3148,6 +3148,7 @@ Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' fil
 'export-catname'    => 'From category:',
 'export-notcategory' => 'Not from category:',
 'export-modifydate' => 'Changed after:',
+'export-modifydate-tooltip' => 'Filters the page list (not just the added pages) by modification date. Date format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.',
 'export-namespace'  => 'Namespace:',
 'export-invalid-catname' => '<font color=red>\'\'\'Unknown category ignored: \'$1\'\'\'\'.</font>',
 'export-invalid-namespace' => '<font color=red>\'\'\'Unknown namespace ignored: \'$1\'\'\'\'.</font>',
