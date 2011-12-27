@@ -353,7 +353,7 @@ class VectorTemplate extends QuickTemplate {
 	 * Outputs the entire contents of the XHTML page
 	 */
 	public function execute() {
-		global $wgRequest, $wgOut, $wgContLang;
+		global $wgRequest, $wgOut, $wgContLang, $wgCatlinksTop;
 
 		$this->skin = $this->data['skin'];
 		$action = $wgRequest->getText( 'action' );
@@ -488,10 +488,15 @@ class VectorTemplate extends QuickTemplate {
 				</div>
 				<!-- /jumpto -->
 				<?php endif; ?>
+				<?php if ( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ): ?>
+				<!-- catlinks-top -->
+				<div id="catlinks-top"><?php $this->html( 'catlinks' ); ?></div>
+				<!-- /catlinks-top -->
+				<?php endif; ?>
 				<!-- bodytext -->
 				<?php $this->html( 'bodytext' ) ?>
 				<!-- /bodytext -->
-				<?php if ( $this->data['catlinks'] ): ?>
+				<?php if ( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ): ?>
 				<!-- catlinks -->
 				<?php $this->html( 'catlinks' ); ?>
 				<!-- /catlinks -->
