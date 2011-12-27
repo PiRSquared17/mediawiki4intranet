@@ -2,10 +2,10 @@
 /**
  * MediaWiki camouflaged like custis.ru
  * Configuration:
- *  $wgCatlinksTop =
- *   false (default): Show category links below article content
- *   true: Show category links below and above article content
- *   'only': Show category links above article content only
+ *   $wgCatlinksTop =
+ *     false:  (default) Show category links below article content
+ *     true:   Show category links below and above article content
+ *     'only': Show category links above article content only
  *
  * @file
  * @ingroup Skins
@@ -251,9 +251,9 @@ class CustisRuTemplate extends QuickTemplate {
     <?php if($this->data['newtalk'] ) { ?><div class="usermessage"><?php $this->html('newtalk')  ?></div><?php } ?>
     <?php if($this->data['showjumplinks']) { ?><div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div><?php } ?>
     <!-- start content -->
-    <?php if($this->data['catlinks'] && $wgCatlinksTop) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php  } ?>
+    <?php if( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php } ?>
     <?php $this->html('bodytext') ?>
-    <?php if($this->data['catlinks'] && $wgCatlinksTop !== 'only') { $this->html('catlinks'); } ?>
+    <?php if( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ) { $this->html('catlinks'); } ?>
     <!-- end content -->
     <?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
     <div class="visualClear"></div>
