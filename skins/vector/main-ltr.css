@@ -1183,3 +1183,8 @@ div.vectorTabs ul {
 	background-position:right bottom;
 	background-repeat:no-repeat;
 }
+/* Categories above the content */
+#catlinks-top div {
+	float: left;
+	margin: 0;
+}
