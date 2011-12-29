@@ -263,6 +263,7 @@ sub test_search
         $u =~ s/\{OFFSET\}/uri_escape(($page-1)*20)/gsoe;
         $u = "$url/index.php$u";
         $text = make_request($ua, GET($u), "get search page", 200)->content;
+        Encode::_utf8_on($text);
         @found = $text =~ /<li>(.*?)<\/li>/giso;
         decode_entities($_) for @found;
         push @all_found, @found;
