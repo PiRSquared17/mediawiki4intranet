@@ -237,10 +237,6 @@ $wgGroupPermissions['*']['edit'] = false;
 
 $wgSphinxTopSearchableCategory = "Root";
 
-// Bug (Bug 43343), because detect VSD-files as application/msword, 
-// or incorrect define of .mm files
-$wgVerifyMimeType = false;
-
 $wgNamespacesToBeSearchedDefault = array(
     NS_MAIN => 1,
     NS_USER => 1,
@@ -276,3 +272,6 @@ $wgMaxImageArea = 5000*5000;
 
 // Allow all ?action=raw content types
 $wgAllowedRawCTypes = true;
+
+// Also display categories on the top of page
+$wgCatlinksTop = true;

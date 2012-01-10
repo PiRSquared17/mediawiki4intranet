@@ -1,9 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1303910303 -14400
+# Date 1326210032 -14400
 Bug 79501 - Determine OOXML types correctly, allow external mime magic for invalid zip files
+Bug 43343 - Add application/vnd.ms-office and application/vnd.visio MIME types for Visio
 
-diff -r 45da8fc662c9 -r 5a6d9d0b43f8 includes/MimeMagic.php
+diff -r 025d3c6531d8 -r fa523070e0a0 includes/MimeMagic.php
 --- includes/MimeMagic.php
 +++ includes/MimeMagic.php
 @@ -11,6 +11,18 @@
@@ -107,3 +108,15 @@ diff -r 45da8fc662c9 -r 5a6d9d0b43f8 includes/MimeMagic.php
  		}
  	}
  
+diff -r 025d3c6531d8 -r fa523070e0a0 includes/mime.types
+--- includes/mime.types
++++ includes/mime.types
+@@ -15,6 +15,8 @@
+ application/vnd.mif mif
+ application/vnd.ms-excel xls xlsx xlsb xlam xltx xltm
+ application/vnd.ms-powerpoint ppt pptm pptx pot potx potm ppsm ppam
++application/vnd.ms-office vsd
++application/vnd.visio vsd
+ application/vnd.wap.wbxml wbxml
+ application/vnd.wap.wmlc wmlc
+ application/vnd.wap.wmlscriptc wmlsc
