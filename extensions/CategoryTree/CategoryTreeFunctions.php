@@ -310,7 +310,9 @@ class CategoryTree {
 		global $wgDBname;
 		$title = self::makeTitle( $category );
 
-		if ( ! $title ) return false; #TODO: error message?
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+		if ( ! $title || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx() ) return false; #TODO: error message?
+/*op-patch|TS|2010-04-27|end*/
 
 		# Retrieve page_touched for the category
 		$dbkey = $title->getDBkey();
@@ -362,7 +364,9 @@ class CategoryTree {
 		}
 		$title = self::makeTitle( $category );
 
-		if ( $title === false || $title === null ) return false;
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+		if ( $title === false || $title === NULL || method_exists($title, 'userCanReadEx') && !$title->userCanReadEx() ) return false;
+/*op-patch|TS|2010-04-27|end*/
 
 		if ( isset( $attr['class'] ) ) $attr['class'] .= ' CategoryTreeTag';
 		else $attr['class'] = ' CategoryTreeTag';
@@ -493,6 +497,10 @@ class CategoryTree {
 				#TODO: translation support; ideally added to Title object
 				$t = Title::newFromRow( $row );
 			}
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if ( method_exists($t, 'userCanReadEx') && !$t->userCanReadEx() )
+				continue;
+/*op-patch|TS|2010-04-27|end*/
 
 			$cat = null;
 
@@ -545,6 +553,10 @@ class CategoryTree {
 		while ( $row = $dbr->fetchObject( $res ) ) {
 			#TODO: translation support; ideally added to Title object
 			$t = Title::newFromRow( $row );
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if ( method_exists($t, 'userCanReadEx') && !$t->userCanReadEx() )
+				continue;
+/*op-patch|TS|2010-04-27|end*/
 
 			#$trans = $title->getLocalizedText();
 			$trans = ''; #place holder for when translated titles are available
@@ -664,25 +676,25 @@ class CategoryTree {
 			$linkattr[ 'class' ] = "CategoryTreeToggle";
 			$linkattr['style'] = 'display: none;'; // Unhidden by JS
 
-			/*if ( $count === 0 ) {
+			if ( !$count ) {
 				$tag = 'span';
 				$txt = wfMsgNoTrans( 'categorytree-empty-bullet' );
 			}
-			else*/ 
-			if ( $children == 0 || $loadchildren ) {
+			else if ( $children == 0 || $loadchildren ) {
 				$tag = 'span';
 				if ( $count === 0 ) $txt = wfMsgNoTrans( 'categorytree-empty-bullet' );
 				else $txt = wfMsgNoTrans( 'categorytree-expand-bullet' );
 				$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeExpandNode('".Xml::escapeJsString($key)."',".$this->getOptionsAsJsStructure().",this);";
 				# Don't load this message for ajax requests, so that we don't have to initialise $wgLang
 				$linkattr[ 'title' ] = $this->mIsAjaxRequest ? '##LOAD##' : wfMsgNoTrans('categorytree-expand');
+				$linkattr[ 'class' ] .= ' CategoryTreeClickable';
 			}
 			else {
 				$tag = 'span';
 				$txt = wfMsgNoTrans( 'categorytree-collapse-bullet' );
 				$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeCollapseNode('".Xml::escapeJsString($key)."',".$this->getOptionsAsJsStructure().",this);";
 				$linkattr[ 'title' ] = wfMsgNoTrans('categorytree-collapse');
-				$linkattr[ 'class' ] .= ' CategoryTreeLoaded';
+				$linkattr[ 'class' ] .= ' CategoryTreeClickable CategoryTreeLoaded';
 			}
 
 			if ( $tag == 'a' ) $linkattr[ 'href' ] = $wikiLink;
