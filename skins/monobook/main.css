@@ -1338,3 +1338,9 @@ div.mw-lag-warn-high {
 .no-text-transform {
 	text-transform: none;
 }
+
+/* Categories above the content */
+#catlinks-top div {
+	float: left;
+	margin: 0;
+}
