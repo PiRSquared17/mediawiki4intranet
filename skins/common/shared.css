@@ -132,11 +132,24 @@ p.mw-revdel-editreasons {
 	float: right;
 }
 
+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
+p.mw-filedelete-editreasons, p.mw-delete-editreasons,
+p.mw-revdel-editreasons {
+	font-size: 90%;
+	float: right;
+}
+
 /* Search results */
 .searchresults {
 }
 
 .searchresults p {
+	margin-left: 0.4em;
+	margin-top: 1em;
+	margin-bottom: 1.2em;
+}
+
+.searchresults div.paragraph {
 	margin-left: 0.4em;
 	margin-top: 1em;
 	margin-bottom: 1.2em;
@@ -508,6 +521,12 @@ td.mw-allpages-nav, p.mw-allpages-nav {
 	font-size: smaller;
 	margin-bottom: 1em;
 }
+
+td.mw-allpages-nav, div.paragraph.mw-allpages-nav {
+	text-align: right;
+	font-size: smaller;
+	margin-bottom: 1em;
+}
 table.mw-allpages-table-form tr  {
 	vertical-align: top;
 }
@@ -829,3 +848,10 @@ td.mw-enhanced-rc {
 a.sortheader {
 	margin: 0 0.3em;
 }
+
+fieldset.addpages { display: inline-block; margin-top: 0; }
+.addpages div { float: left; text-align: right; vertical-align: top; padding-right: 8px; margin-bottom: 2px; }
+div.ap_closure { clear: left; }
+div.ap_submit { float: right; }
+div.ap_submit input { font-weight: bold; padding: 0 1em; }
+.addpages div.help label { cursor: help; border-bottom: 1px dashed gray; }
