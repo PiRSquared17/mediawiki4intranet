@@ -1,0 +1,11 @@
+K 13
+svn:eol-style
+V 6
+native
+K 13
+svn:mergeinfo
+V 192
+/branches/REL1_15/phase3/maintenance/cleanupTable.inc:51646
+/branches/wmf-deployment/maintenance/cleanupTable.inc:56715
+/trunk/phase3/maintenance/cleanupTable.inc:63549,63764,63897-63901,79561
+END
