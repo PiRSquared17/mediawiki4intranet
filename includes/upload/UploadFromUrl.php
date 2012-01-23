@@ -68,7 +68,7 @@ class UploadFromUrl extends UploadBase {
 
 	public static function isValidUrl( $url ) {
 		// Only allow HTTP or FTP for now
-		return (bool)preg_match( '!^(http://|ftp://)!', $url );
+		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
 	}
 
 	/**
@@ -78,60 +78,47 @@ class UploadFromUrl extends UploadBase {
 		if( !self::isValidUrl( $this->mUrl ) ) {
 			return Status::newFatal( 'upload-proto-error' );
 		}
-		$res = $this->curlCopy();
-		if( $res !== true ) {
-			return Status::newFatal( $res );
-		}
-		return Status::newGood();
+		return $this->httpCopy();
 	}
 
 	/**
 	 * Safe copy from URL
 	 * Returns true if there was an error, false otherwise
 	 */
-	private function curlCopy() {
+	private function httpCopy() {
 		global $wgOut;
 
 		# Open temporary file
-		$this->mCurlDestHandle = @fopen( $this->mTempPath, "wb" );
-		if( $this->mCurlDestHandle === false ) {
+		$this->mDestHandle = @fopen( $this->mTempPath, "wb" );
+		if( $this->mDestHandle === false ) {
 			# Could not open temporary file to write in
 			return 'upload-file-error';
 		}
 
-		$ch = curl_init();
-		curl_setopt( $ch, CURLOPT_HTTP_VERSION, 1.0); # Probably not needed, but apparently can work around some bug
-		curl_setopt( $ch, CURLOPT_TIMEOUT, 10); # 10 seconds timeout
-		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
-		curl_setopt( $ch, CURLOPT_URL, $this->mUrl);
-		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
-		curl_exec( $ch );
-		$error =  curl_errno( $ch );
-		curl_close( $ch );
+		$request = HttpRequest::factory( $this->mUrl, array( 'timeout' => 10 ) );
+		$request->setCallback( array( $this, 'uploadCallback' ) );
+		$status = $request->execute();
 
-		fclose( $this->mCurlDestHandle );
-		unset( $this->mCurlDestHandle );
+		fclose( $this->mDestHandle );
+		unset( $this->mDestHandle );
 
-		if( $error )
-			return "upload-curl-error$errornum";
-
-		return true;
+		return $status;
 	}
 
 	/**
-	 * Callback function for CURL-based web transfer
+	 * Callback function for web transfer
 	 * Write data to file unless we've passed the length limit;
 	 * if so, abort immediately.
 	 * @access private
 	 */
-	function uploadCurlCallback( $ch, $data ) {
+	function uploadCallback( $ch, $data ) {
 		global $wgMaxUploadSize;
 		$length = strlen( $data );
 		$this->mFileSize += $length;
 		if( $this->mFileSize > $wgMaxUploadSize ) {
 			return 0;
 		}
-		fwrite( $this->mCurlDestHandle, $data );
+		fwrite( $this->mDestHandle, $data );
 		return $length;
 	}
 }

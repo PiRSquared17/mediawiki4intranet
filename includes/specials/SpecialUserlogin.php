@@ -979,7 +979,7 @@ class LoginForm {
 			$linkq .= '&uselang=' . $this->mLanguage;
 
 		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
+		$link .= wfMsgExt( $linkmsg . 'link', array( 'parseinline' ) ); # Calling either 'gotaccountlink' or 'nologinlink'
 		$link .= '</a>';
 
 		# Don't show a "create account" link if the user can't
