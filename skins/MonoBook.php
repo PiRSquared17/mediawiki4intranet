@@ -5,6 +5,12 @@
  * Translated from gwicke's previous TAL template version to remove
  * dependency on PHPTAL.
  *
+ * Configuration:
+ *   $wgCatlinksTop =
+ *     false:  (default) Show category links below article content
+ *     true:   Show category links below and above article content
+ *     'only': Show category links above article content only
+ *
  * @todo document
  * @file
  * @ingroup Skins
@@ -60,7 +66,7 @@ class MonoBookTemplate extends QuickTemplate {
 	 * @access private
 	 */
 	function execute() {
-		global $wgRequest;
+		global $wgRequest, $wgCatlinksTop;
 
 		$this->skin = $skin = $this->data['skin'];
 		$action = $wgRequest->getText( 'action' );
@@ -86,8 +92,9 @@ class MonoBookTemplate extends QuickTemplate {
 		<div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div>
 <?php } ?>
 		<!-- start content -->
+		<?php if( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php } ?>
 <?php $this->html('bodytext') ?>
-		<?php if($this->data['catlinks']) { $this->html('catlinks'); } ?>
+		<?php if( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ) { $this->html('catlinks'); } ?>
 		<!-- end content -->
 		<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
 		<div class="visualClear"></div>

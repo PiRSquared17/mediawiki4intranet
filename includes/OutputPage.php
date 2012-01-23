@@ -437,18 +437,9 @@ class OutputPage {
 
 	/**
 	 * "HTML title" means the contents of <title>.
-	 * It is stored as plain, unescaped text and will be run through htmlspecialchars in the skin file.
-	 * If $name is from page title, it can only override names which are also from page title,
-	 * but if it is not from page title, it can override all other names.
 	 */
 	public function setHTMLTitle( $name, $frompagetitle = false ) {
-		if ( $frompagetitle && $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-		}
-		elseif ( $this->mHTMLtitleFromPagetitle ) {
-			$this->mHTMLtitle = $name;
-			$this->mHTMLtitleFromPagetitle = false;
-		}
+		$this->mHTMLtitle = $name;
 	}
 
 	/**
@@ -1738,7 +1729,7 @@ class OutputPage {
 		if ( $this->getTitle() ) {
 			$this->mDebugtext .= 'Original title: ' . $this->getTitle()->getPrefixedText() . "\n";
 		}
-		$this->setPageTitle( wfMsg( $title ) );
+		$this->setPageTitle( is_array( $title ) ? strip_tags( call_user_func_array( 'wfMsgExt', $title ) ) : wfMsg( $title ) );
 		$this->setHTMLTitle( wfMsg( 'errorpagetitle' ) );
 		$this->setRobotPolicy( 'noindex,nofollow' );
 		$this->setArticleRelated( false );
@@ -1746,8 +1737,12 @@ class OutputPage {
 		$this->mRedirect = '';
 		$this->mBodytext = '';
 
-		array_unshift( $params, 'parse' );
-		array_unshift( $params, $msg );
+		if ( is_array( $msg ) )
+			$params = $msg;
+		else {
+			array_unshift( $params, 'parse' );
+			array_unshift( $params, $msg );
+		}
 		$this->addHTML( call_user_func_array( 'wfMsgExt', $params ) );
 
 		$this->returnToMain();
