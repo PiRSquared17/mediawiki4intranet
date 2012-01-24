@@ -27,7 +27,14 @@ if (!defined('MEDIAWIKI'))
 
 /* INSTALLATION:
 
+1. Include the extension to your LocalSettings.php:
 require_once("$IP/extensions/FavRate/FavRate.php");
+
+2. Add the following line to MediaWiki:Sidebar:
+* favratebar
+(including *)
+
+3. (Optional) Override some configuration variables:
 
 // Enable collecting of unique visitor logs for each page (false by default)
 $egFavRateLogVisitors = true;
