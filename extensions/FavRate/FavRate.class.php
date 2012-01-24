@@ -107,6 +107,7 @@ class FavRate
     {
         global $wgTitle, $wgArticle, $wgUser, $wgRequest, $wgScriptPath, $wgOut;
         global $egFavRateMaxHits, $egFavRateMaxFav, $egFavRateMaxLinks, $egFavRatePublicLogs;
+        global $egFavRateHitsColor, $egFavRateFavColor, $egFavRateLinksColor;
         if (($page_id = $wgTitle->getArticleID()) && array_key_exists('favratebar', $bar))
         {
             $dbr = wfGetDB(DB_SLAVE);
@@ -160,16 +161,16 @@ class FavRate
                 "<img id='favtogglebtn' class='fav$myfav' onclick='favRateToggleFav()'".
                 " title='".wfMsg('favrate-addfav')."' alt=' ' src='$blank' /></div>";
             // Rating bars
-            $html .= self::bar($counter, $egFavRateMaxHits, '#0C0', wfMsg('favrate-hits'));
-            $html .= self::bar($fav, $egFavRateMaxFav, '#C00', wfMsg('favrate-fav'));
-            $html .= self::bar($links, $egFavRateMaxLinks, '#00C', wfMsg('favrate-links'));
-            $html .= '<div style="margin: 0; text-align: center">';
+            $html .= self::bar($counter, $egFavRateMaxHits, $egFavRateHitsColor, wfMsg('favrate-hits'));
+            $html .= self::bar($fav, $egFavRateMaxFav, $egFavRateFavColor, wfMsg('favrate-fav'));
+            $html .= self::bar($links, $egFavRateMaxLinks, $egFavRateLinksColor, wfMsg('favrate-links'));
+            $html .= '<div class="favlinks">';
             if ($egFavRatePublicLogs)
             {
                 // Link to page logs
                 $html .= '<a rel="nofollow" href="'.htmlspecialchars(
                     Title::newFromText("Special:FavRate/log/$wgTitle")->getLocalUrl()
-                ).'">'.wfMsg('favrate-viewlogs').'</a> &nbsp; ';
+                ).'">'.wfMsg('favrate-viewlogs').'</a> ';
             }
             // Links to "My Favorites"
             $html .= '<a rel="nofollow" href="'.htmlspecialchars(
@@ -187,13 +188,12 @@ class FavRate
     {
         global $wgScriptPath;
         $text .= ": $n/$max";
-        $contstyle = "height: 7px; border: 1px outset gray; margin: 2px 0 0 0";
         $imgstyle = "vertical-align: top; height: 7px; margin: 0; border-width: 0";
         $blank = "$wgScriptPath/extensions/FavRate/blank.gif";
         $text = htmlspecialchars($text);
         $bar = sprintf("%.2f", 100*log(1+min($n,$max))/log(1+$max));
         $rest = 100-$bar;
-        $html = "<div style='$contstyle; width: 100%; background-color: gray'>".
+        $html = "<div class='favbar'>".
             ($bar > 0   ? "<img style='background-color: $color; width: $bar%; $imgstyle' alt=' ' title='$text' src='$blank' />" : '').
             ($bar < 100 ? "<img style='background-color: gray; width: $rest%; $imgstyle' alt=' ' title='$text' src='$blank' />" : '').
             "</div>";
