@@ -34,7 +34,7 @@ class FavRate
     static function LoadExtensionSchemaUpdates()
     {
         $dbw = wfGetDB(DB_MASTER);
-        if (!$dbw->tableExists('fr_page_aggr'))
+        if (!$dbw->tableExists('fr_page_stats'))
             $dbw->sourceFile(dirname(__FILE__) . '/FavRate.sql');
         return true;
     }
@@ -44,7 +44,7 @@ class FavRate
     {
         global $wgUser, $egFavRateLogVisitors;
         // Only track authorized users
-        if ($wgUser && $wgUser->getId())
+        if ($egFavRateLogVisitors && $wgUser && $wgUser->getId())
         {
             $dbw = wfGetDB(DB_MASTER);
             $user_id = $wgUser->getId();
