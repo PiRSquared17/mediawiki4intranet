@@ -72,7 +72,6 @@ $wgExtensionCredits['specialpage'][] = array(
 );
 $wgHooks['LoadExtensionSchemaUpdates'][] = 'FavRate::LoadExtensionSchemaUpdates';
 $wgHooks['ArticleViewHeader'][] = 'FavRate::ArticleViewHeader';
-$wgHooks['UnknownAction'][] = 'FavRate::UnknownAction';
 $wgHooks['SkinBuildSidebar'][] = 'FavRate::SkinBuildSidebar';
 $wgExtensionMessagesFiles['FavRate'] = dirname(__FILE__) . '/FavRate.i18n.php';
 $wgAutoloadClasses['FavRate'] = dirname(__FILE__) . '/FavRate.class.php';
