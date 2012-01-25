@@ -113,7 +113,7 @@ class RawPage {
 	}
 
 	function view() {
-		global $wgOut, $wgScript, $wgRequest;
+		global $wgOut, $wgScript, $wgRequest, $wgTitle, $wgContLanguageCode;
 
 		if( $wgRequest->isPathInfoBad() ) {
 			# Internet Explorer will ignore the Content-Type header if it
@@ -135,6 +135,7 @@ class RawPage {
 		}
 
 		header( "Content-type: ".$this->mContentType.'; charset='.$this->mCharset );
+		header( "Content-disposition: attachment; filename*=utf-8'$wgContLanguageCode'".urlencode( $wgTitle->getSubpageText() ) );
 		# allow the client to cache this for 24 hours
 		$mode = $this->mPrivateCache ? 'private' : 'public';
 		header( 'Cache-Control: '.$mode.', s-maxage='.$this->mSmaxage.', max-age='.$this->mMaxage );
