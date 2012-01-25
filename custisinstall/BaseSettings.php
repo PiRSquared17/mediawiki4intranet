@@ -156,6 +156,7 @@ require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/Shortcuts/Shortcuts.php');
 require_once($IP.'/extensions/RemoveConfidential/RemoveConfidential.php');
 require_once($IP.'/extensions/CustomToolbox/CustomToolbox.php');
+require_once($IP.'/extensions/FavRate/FavRate.php');
 
 # Drafts
 require_once($IP.'/extensions/Drafts/Drafts.php');
