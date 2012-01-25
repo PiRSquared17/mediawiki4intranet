@@ -44,23 +44,26 @@ $EXT_OUR = array_map('trim', explode("\n",
     BatchEditor
     BugzillaBuglist
     Calendar
-    CategoryPageFeed
     CategoryTemplate
     CharInsertList
     CustisScripts
+    CustomToolbox
     Dia
     DocExport
     Drafts
     EnotifDiff
+    FavRate
     FlvHandler
     GlobalAuth
     HttpAuth
     IntraACL
     ListFeed
-    MMHandler
     MagicNumberedHeadings
     MarkupBabel
+    MatchByPrefix
     MergeConflicts
+    MMHandler
+    Mp3Handler
     NewPagesEx
     OpenID
     PdfHandler
@@ -69,17 +72,17 @@ $EXT_OUR = array_map('trim', explode("\n",
     RegexParserFunctions
     RemoveConfidential
     S5SlideShow
-    SVGEdit
-    SVNIntegration
-    SWFUpload
     Shortcuts
-    ShowHide
     SimpleForms
     SimpleTable
     SiteExport
     SpecialForm
     SphinxSearch
     SphinxSearchEngine
+    SupaMW
+    SVGEdit
+    SVNIntegration
+    SWFUpload
     TemplatedPageList
     UserMagic
     UserMessage
