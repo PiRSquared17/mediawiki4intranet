@@ -40,9 +40,10 @@ class QuestyCaptcha extends SimpleCaptcha {
 		}
 		$index = $this->storeCaptcha( $captcha );
 		return "<p><label for=\"wpCaptchaWord\">{$captcha['question']}</label> " .
-			Xml::element( 'input', array(
+			Html::element( 'input', array(
 				'name' => 'wpCaptchaWord',
 				'id'   => 'wpCaptchaWord',
+				'required',
 				'tabindex' => 1 ) ) . // tab in before the edit textarea
 			"</p>\n" .
 			Xml::element( 'input', array(
@@ -64,7 +65,7 @@ class QuestyCaptcha extends SimpleCaptcha {
 		global $wgOut;
 		$wgOut->setPageTitle( wfMsg( 'captchahelp-title' ) );
 		$wgOut->addWikiText( wfMsg( 'questycaptchahelp-text' ) );
-		if ( $this->storage->cookiesNeeded() ) {
+		if ( CaptchaStore::get()->cookiesNeeded() ) {
 			$wgOut->addWikiText( wfMsg( 'captchahelp-cookies-needed' ) );
 		}
 	}

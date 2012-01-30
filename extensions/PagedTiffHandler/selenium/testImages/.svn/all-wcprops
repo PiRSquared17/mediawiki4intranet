@@ -1,13 +1,13 @@
 K 25
 svn:wc:ra_dav:version-url
 V 87
-/svnroot/mediawiki/!svn/ver/62136/trunk/extensions/PagedTiffHandler/selenium/testImages
+/svnroot/mediawiki/!svn/ver/84100/trunk/extensions/PagedTiffHandler/selenium/testImages
 END
 caspian.tif
 K 25
 svn:wc:ra_dav:version-url
 V 99
-/svnroot/mediawiki/!svn/ver/62021/trunk/extensions/PagedTiffHandler/selenium/testImages/caspian.tif
+/svnroot/mediawiki/!svn/ver/84100/trunk/extensions/PagedTiffHandler/selenium/testImages/caspian.tif
 END
 SOURCES.txt
 K 25
@@ -19,11 +19,11 @@ pc260001.tif
 K 25
 svn:wc:ra_dav:version-url
 V 100
-/svnroot/mediawiki/!svn/ver/62025/trunk/extensions/PagedTiffHandler/selenium/testImages/pc260001.tif
+/svnroot/mediawiki/!svn/ver/84100/trunk/extensions/PagedTiffHandler/selenium/testImages/pc260001.tif
 END
 multipage.tiff
 K 25
 svn:wc:ra_dav:version-url
 V 102
-/svnroot/mediawiki/!svn/ver/62021/trunk/extensions/PagedTiffHandler/selenium/testImages/multipage.tiff
+/svnroot/mediawiki/!svn/ver/84100/trunk/extensions/PagedTiffHandler/selenium/testImages/multipage.tiff
 END
