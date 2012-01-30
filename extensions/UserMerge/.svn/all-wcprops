@@ -1,25 +1,25 @@
 K 25
 svn:wc:ra_dav:version-url
-V 60
-/svnroot/mediawiki/!svn/ver/81606/trunk/extensions/UserMerge
+V 61
+/svnroot/mediawiki/!svn/ver/108998/trunk/extensions/UserMerge
 END
 UserMerge_body.php
 K 25
 svn:wc:ra_dav:version-url
 V 79
-/svnroot/mediawiki/!svn/ver/78123/trunk/extensions/UserMerge/UserMerge_body.php
+/svnroot/mediawiki/!svn/ver/93843/trunk/extensions/UserMerge/UserMerge_body.php
 END
 UserMerge.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81606/trunk/extensions/UserMerge/UserMerge.i18n.php
+V 80
+/svnroot/mediawiki/!svn/ver/108998/trunk/extensions/UserMerge/UserMerge.i18n.php
 END
 UserMerge.php
 K 25
 svn:wc:ra_dav:version-url
-V 74
-/svnroot/mediawiki/!svn/ver/62858/trunk/extensions/UserMerge/UserMerge.php
+V 75
+/svnroot/mediawiki/!svn/ver/107299/trunk/extensions/UserMerge/UserMerge.php
 END
 install.settings
 K 25
@@ -30,6 +30,6 @@ END
 UserMerge.alias.php
 K 25
 svn:wc:ra_dav:version-url
-V 80
-/svnroot/mediawiki/!svn/ver/75726/trunk/extensions/UserMerge/UserMerge.alias.php
+V 81
+/svnroot/mediawiki/!svn/ver/107294/trunk/extensions/UserMerge/UserMerge.alias.php
 END

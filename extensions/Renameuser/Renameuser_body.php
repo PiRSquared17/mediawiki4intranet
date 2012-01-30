@@ -22,7 +22,7 @@ class SpecialRenameuser extends SpecialPage {
 	 * @param mixed $par Parameter passed to the page
 	 */
 	public function execute( $par ) {
-		global $wgOut, $wgUser, $wgRequest, $wgContLang, $wgLang;
+		global $wgOut, $wgUser, $wgRequest, $wgContLang;
 		global $wgCapitalLinks;
 
 		$this->setHeaders();
@@ -32,9 +32,14 @@ class SpecialRenameuser extends SpecialPage {
 			$wgOut->permissionRequired( 'renameuser' );
 			return;
 		}
+
 		if ( wfReadOnly() ) {
 			$wgOut->readOnlyPage();
 			return;
+		}
+
+		if( $wgUser->isBlocked() ){
+			$wgOut->blockedPage();
 		}
 
 		$showBlockLog = $wgRequest->getBool( 'submit-showBlockLog' );
@@ -47,7 +52,7 @@ class SpecialRenameuser extends SpecialPage {
 		$token = $wgUser->editToken();
 		$reason = $wgRequest->getText( 'reason' );
 
-		$move_checked = $wgRequest->getCheck( 'movepages' );
+		$move_checked = $wgRequest->getBool( 'movepages', !$wgRequest->wasPosted());
 		$suppress_checked = $wgRequest->getCheck( 'suppressredirect' );
 
 		$warnings = array();
@@ -55,8 +60,7 @@ class SpecialRenameuser extends SpecialPage {
 			wfRunHooks( 'RenameUserWarning', array( $oun, $nun, &$warnings ) );
 		}
 
-		$wgOut->addHTML( "
-			<!-- Current contributions limit is " . RENAMEUSER_CONTRIBLIMIT . " -->" .
+		$wgOut->addHTML(
 			Xml::openElement( 'form', array( 'method' => 'post', 'action' => $this->getTitle()->getLocalUrl(), 'id' => 'renameuser' ) ) .
 			Xml::openElement( 'fieldset' ) .
 			Xml::element( 'legend', null, wfMsg( 'renameuser' ) ) .
@@ -97,7 +101,7 @@ class SpecialRenameuser extends SpecialPage {
 					"</td>
 				</tr>"
 			);
-			
+
 			if ( $wgUser->isAllowed( 'suppressredirect' ) ) {
 				$wgOut->addHTML( "
 					<tr>
@@ -237,18 +241,6 @@ class SpecialRenameuser extends SpecialPage {
 		// Always get the edits count, it will be used for the log message
 		$contribs = User::edits( $uid );
 
-		// Check edit count
-		if ( !$wgUser->isAllowed( 'siteadmin' ) ) {
-			if ( RENAMEUSER_CONTRIBLIMIT != 0 && $contribs > RENAMEUSER_CONTRIBLIMIT ) {
-				$wgOut->wrapWikiMsg( "<div class=\"errorbox\">$1</div>",
-					array( 'renameusererrortoomany', $oldusername->getText(),
-						$wgLang->formatNum( $contribs ),
-						$wgLang->formatNum( RENAMEUSER_CONTRIBLIMIT )
-				) );
-				return;
-			}
-		}
-
 		// Give other affected extensions a chance to validate or abort
 		if ( !wfRunHooks( 'RenameUserAbort', array( $uid, $oldusername->getText(), $newusername->getText() ) ) ) {
 			return;
@@ -274,7 +266,7 @@ class SpecialRenameuser extends SpecialPage {
 		// Move any user pages
 		if ( $wgRequest->getCheck( 'movepages' ) && $wgUser->isAllowed( 'move' ) ) {
 			$dbr = wfGetDB( DB_SLAVE );
-			$oldkey = $oldusername->getDBkey();
+
 			$pages = $dbr->select(
 				'page',
 				array( 'page_namespace', 'page_title' ),
@@ -285,39 +277,61 @@ class SpecialRenameuser extends SpecialPage {
 				),
 				__METHOD__
 			);
-			
+
 			$suppressRedirect = false;
-			
-			if ( $wgRequest->getCheck( 'suppressredirect' ) && $wgUser->isAllowed( 'suppressredirect' ) ) {	
+
+			if ( $wgRequest->getCheck( 'suppressredirect' ) && $wgUser->isAllowed( 'suppressredirect' ) ) {
 				$suppressRedirect = true;
 			}
 
 			$output = '';
-			$skin = $wgUser->getSkin();
 			foreach ( $pages as $row ) {
 				$oldPage = Title::makeTitleSafe( $row->page_namespace, $row->page_title );
 				$newPage = Title::makeTitleSafe( $row->page_namespace,
 					preg_replace( '!^[^/]+!', $newusername->getDBkey(), $row->page_title ) );
 				# Do not autodelete or anything, title must not exist
 				if ( $newPage->exists() && !$oldPage->isValidMoveTarget( $newPage ) ) {
-					$link = $skin->makeKnownLinkObj( $newPage );
-					$output .= '<li class="mw-renameuser-pe">' . wfMsgHtml( 'renameuser-page-exists', $link ) . '</li>';
+					$link = Linker::linkKnown( $newPage );
+					$output .= Html::rawElement(
+								'li',
+								array( 'class' => 'mw-renameuser-pe' ),
+								wfMessage( 'renameuser-page-exists' )->rawParams( $link )->escaped()
+							);
 				} else {
-					$success = $oldPage->moveTo( $newPage, false, wfMsgForContent( 'renameuser-move-log',
-						$oldusername->getText(), $newusername->getText() ), !$suppressRedirect );
+					$success = $oldPage->moveTo(
+								$newPage,
+								false, 
+								wfMessage(
+									'renameuser-move-log',
+									$oldusername->getText(),
+									$newusername->getText() )->inContentLanguage()->text(),
+								!$suppressRedirect
+							);
 					if ( $success === true ) {
-						$oldLink = $skin->makeKnownLinkObj( $oldPage, '', 'redirect=no' );
-						$newLink = $skin->makeKnownLinkObj( $newPage );
-						$output .= '<li class="mw-renameuser-pm">' . wfMsgHtml( 'renameuser-page-moved', $oldLink, $newLink ) . '</li>';
+						# oldPage is not known in case of redirect suppression
+						$oldLink = Linker::link( $oldPage, null, array(), array( 'redirect' => 'no' ) );
+
+						# newPage is always known because the move was successful
+						$newLink = Linker::linkKnown( $newPage );
+
+						$output .= Html::rawElement(
+									'li',
+									array( 'class' => 'mw-renameuser-pm' ),
+									wfMessage( 'renameuser-page-moved' )->rawParams( $oldLink, $newLink )->escaped()
+								);
 					} else {
-						$oldLink = $skin->makeKnownLinkObj( $oldPage );
-						$newLink = $skin->makeLinkObj( $newPage );
-						$output .= '<li class="mw-renameuser-pu">' . wfMsgHtml( 'renameuser-page-unmoved', $oldLink, $newLink ) . '</li>';
+						$oldLink = Linker::linkKnown( $oldPage );
+						$newLink = Linker::link( $newPage );
+						$output .= Html::rawElement(
+									'li', array( 'class' => 'mw-renameuser-pu' ),
+									wfMessage( 'renameuser-page-unmoved' )->rawParams( $oldLink, $newLink )->escaped()
+								);
 					}
 				}
 			}
-			if ( $output )
-				$wgOut->addHTML( '<ul>' . $output . '</ul>' );
+			if ( $output ) {
+				$wgOut->addHTML( Html::rawElement( 'ul', array(), $output ) );
+			}
 		}
 
 		// Output success message stuff :)
@@ -325,6 +339,11 @@ class SpecialRenameuser extends SpecialPage {
 			array( 'renameusersuccess', $oldusername->getText(), $newusername->getText() ) );
 	}
 
+	/**
+	 * @param $username Title
+	 * @param $type
+	 * @param $out OutputPage
+	 */
 	function showLogExtract( $username, $type, &$out ) {
 		# Show relevant lines from the logs:
 		$out->addHTML( Xml::element( 'h2', null, LogPage::logName( $type ) ) . "\n" );
@@ -368,8 +387,9 @@ class RenameuserSQL {
 	/**
 	 * Constructor
 	 *
-	 * @param string $old The old username
-	 * @param string $new The new username
+	 * @param $old string The old username
+	 * @param $new string The new username
+	 * @param $uid
 	 */
 	function __construct( $old, $new, $uid ) {
 		$this->old = $old;
@@ -422,6 +442,7 @@ class RenameuserSQL {
 			__METHOD__
 		);
 		if ( !$dbw->affectedRows() ) {
+			$dbw->rollback();
 			return false;
 		}
 		// Reset token to break login with central auth systems.
@@ -458,14 +479,14 @@ class RenameuserSQL {
 				__METHOD__
 			);
 		}
-		
+
 		// Increase time limit (like CheckUser); this can take a while...
 		if ( $this->tablesJob ) {
 			wfSuppressWarnings();
 			set_time_limit( 120 );
 			wfRestoreWarnings();
 		}
-		
+
 		$jobs = array(); // jobs for all tables
 		// Construct jobqueue updates...
 		// FIXME: if a bureaucrat renames a user in error, he/she
@@ -528,13 +549,12 @@ class RenameuserSQL {
 			}
 			$dbw->freeResult( $res );
 		}
-		// @FIXME: batchInsert() commits per 50 jobs,
-		// which sucks if the DB is rolled-back...
+
 		if ( count( $jobs ) > 0 ) {
-			Job::batchInsert( $jobs );
+			Job::safeBatchInsert( $jobs ); // don't commit yet
 		}
 
-		// Commit the transaction (though batchInsert() above commits)
+		// Commit the transaction
 		$dbw->commit();
 
 		// Delete from memcached again to make sure
