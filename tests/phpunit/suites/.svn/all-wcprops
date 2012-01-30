@@ -1,0 +1,17 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/suites
+END
+ExtensionsTestSuite.php
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/suites/ExtensionsTestSuite.php
+END
+UploadFromUrlTestSuite.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/suites/UploadFromUrlTestSuite.php
+END
