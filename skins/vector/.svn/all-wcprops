@@ -1,41 +1,29 @@
 K 25
 svn:wc:ra_dav:version-url
-V 68
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector
+V 69
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/vector
 END
-wiki-indexed.png
+screen.css
 K 25
 svn:wc:ra_dav:version-url
-V 85
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/wiki-indexed.png
-END
-wiki.png
-K 25
-svn:wc:ra_dav:version-url
-V 77
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/wiki.png
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/vector/screen.css
 END
 csshover.htc
 K 25
 svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/csshover.htc
+V 82
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/vector/csshover.htc
 END
-main-ltr.css
+csshover.min.htc
 K 25
 svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/main-ltr.css
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/vector/csshover.min.htc
 END
-main-rtl.css
+vector.js
 K 25
 svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/main-rtl.css
-END
-Makefile
-K 25
-svn:wc:ra_dav:version-url
-V 77
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/vector/Makefile
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/vector/vector.js
 END
