@@ -1,35 +1,11 @@
 K 25
 svn:wc:ra_dav:version-url
-V 73
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib
-END
-example.php
-K 25
-svn:wc:ra_dav:version-url
-V 85
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib/example.php
+V 74
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/contrib
 END
 langcheck.php
 K 25
 svn:wc:ra_dav:version-url
-V 87
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib/langcheck.php
-END
-aliased.php
-K 25
-svn:wc:ra_dav:version-url
-V 85
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib/aliased.php
-END
-cssgen.php
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib/cssgen.php
-END
-cssgen2.php
-K 25
-svn:wc:ra_dav:version-url
-V 85
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/contrib/cssgen2.php
+V 88
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/contrib/langcheck.php
 END

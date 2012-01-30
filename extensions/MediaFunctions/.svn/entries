@@ -1,14 +1,14 @@
 10
 
 dir
-83020
+110002
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/MediaFunctions
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-22T20:08:34.818499Z
-80761
+2012-01-11T00:23:47.507188Z
+108574
 siebrand
 
 
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:17:26.228515Z
-e48e77e03a26a3c4b4c508d4a12097b5
-2010-11-05T16:30:21.791886Z
-76112
-simetrical
+2012-01-25T15:31:27.413440Z
+074be85b8537c9f29a9bbb276fd9d607
+2011-09-10T01:09:45.921778Z
+96709
+bawolff
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-4562
+4934
 
 MediaFunctions.i18n.magic.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2011-02-04T18:17:26.228515Z
-53260e823cb16015f2816ee80cee4235
-2010-10-31T17:55:47.642542Z
-75726
+2012-01-25T15:31:27.413440Z
+946d1141ee5f662f406993b5ebc7015e
+2011-12-25T22:19:29.996502Z
+107294
 siebrand
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-4731
+5858
 
 MediaFunctions.i18n.php
 file
@@ -134,10 +134,10 @@ file
 
 
 
-2011-02-04T18:17:26.228515Z
-f2e871a41d64c4699ff0363f7b93efc8
-2011-01-22T20:08:34.818499Z
-80761
+2012-01-25T15:31:27.413440Z
+7bc63a873e47ae2c6efc65d308019e72
+2012-01-11T00:23:47.507188Z
+108574
 siebrand
 has-props
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-20873
+22013
 
 MediaFunctions.php
 file
@@ -168,11 +168,11 @@ file
 
 
 
-2011-02-04T18:17:26.232515Z
-6fdd438c508b7a0d6bce51f1e5fa4536
-2010-06-06T15:12:22.807498Z
-67467
-ialex
+2012-01-25T15:31:27.417440Z
+4f6c1c14f5f677846accb7acf38b9c4d
+2012-01-11T00:23:47.507188Z
+108574
+siebrand
 has-props
 
 
@@ -194,5 +194,5 @@ has-props
 
 
 
-1483
+1575
 

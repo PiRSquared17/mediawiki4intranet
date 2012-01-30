@@ -1,16 +1,16 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/vector
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/skins/vector
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
-has-props
+2011-11-24T16:33:03.595435Z
+104183
+reedy
+
 
 
 
@@ -26,57 +26,20 @@ has-props
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
-experiments
-dir
-
-wiki-indexed.png
-file
-
-
-
-
-2011-02-04T18:15:07.932114Z
-7c20496edcc154b19f09d6214b32ae4b
-2009-09-08T19:28:56.788130Z
-56060
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8205
-
 images
 dir
 
-wiki.png
+screen.css
 file
 
 
 
 
-2011-02-04T18:15:07.936114Z
-63ced69f6a0ef5e15d867ba3ef29a885
-2009-09-08T19:28:56.788130Z
-56060
-ialex
+2012-01-25T15:35:44.278290Z
+51807436a3e5ecdedb43783a8cf21e15
+2011-11-24T16:33:03.595435Z
+104183
+reedy
 has-props
 
 
@@ -98,10 +61,7 @@ has-props
 
 
 
-22987
-
-cssjanus
-dir
+24418
 
 csshover.htc
 file
@@ -109,44 +69,10 @@ file
 
 
 
-2011-02-04T18:15:07.936114Z
-246a4d2789bea029a64f675af697ceed
-2009-06-25T14:58:08.740236Z
-52399
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-9047
-
-main-ltr.css
-file
-
-
-
-
-2011-02-04T18:15:07.936114Z
-befbf2875099e3684bc3075f23909001
-2010-06-16T14:06:05.641320Z
-68122
+2012-01-25T15:35:44.278290Z
+464e18f02a2f51a3f5a72aa8ac385585
+2010-08-12T17:56:42.718133Z
+70975
 platonides
 has-props
 
@@ -169,19 +95,19 @@ has-props
 
 
 
-21879
+9711
 
-main-rtl.css
+csshover.min.htc
 file
 
 
 
 
-2011-02-04T18:15:07.936114Z
-296b9c941eb3fdf211e4a7a05059617e
-2010-06-16T14:06:05.641320Z
-68122
-platonides
+2012-01-25T15:35:44.278290Z
+ec9033ac5d0c79e73c81f19ac729834b
+2011-01-12T21:01:04.370780Z
+80120
+catrope
 has-props
 
 
@@ -203,19 +129,19 @@ has-props
 
 
 
-21897
+2883
 
-Makefile
+vector.js
 file
 
 
 
 
-2011-02-04T18:15:07.936114Z
-cda821ce12ea4904bede4d1cb71916af
-2009-08-22T22:44:44.251564Z
-55510
-brion
+2012-01-25T15:35:44.278290Z
+56d26b5d3c07c57191e6d58da3fbfa92
+2011-04-26T18:18:29.443225Z
+86963
+krinkle
 has-props
 
 
@@ -237,5 +163,5 @@ has-props
 
 
 
-404
+572
 
