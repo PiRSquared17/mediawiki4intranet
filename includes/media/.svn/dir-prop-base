@@ -1,8 +1,0 @@
-K 13
-svn:mergeinfo
-V 236
-/branches/REL1_15/phase3/includes/media:51646
-/branches/sqlite/includes/media:58211-58321
-/branches/wmf-deployment/includes/media:53381
-/trunk/phase3/includes/media:63549,63764,63897-63901,64876,64881,64935-64936,64947-64948,65467,79561
-END

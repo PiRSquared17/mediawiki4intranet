@@ -6,11 +6,4 @@ K 12
 svn:keywords
 V 23
 Author Date Id Revision
-K 13
-svn:mergeinfo
-V 254
-/branches/REL1_15/phase3/includes/WebRequest.php:51646
-/branches/sqlite/includes/WebRequest.php:58211-58321
-/branches/wmf-deployment/includes/WebRequest.php:53381
-/trunk/phase3/includes/WebRequest.php:63549,63764,63897-63901,64876,64881,64948,67828,79561
 END
