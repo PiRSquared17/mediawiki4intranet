@@ -1,16 +1,16 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/media
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/media
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
-has-props
+2011-12-26T00:04:09.435919Z
+107310
+mah
+
 
 
 
@@ -26,17 +26,17 @@ has-props
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
-Bitmap.php
+FormatMetadata.php
 file
 
 
 
 
-2011-02-04T18:14:24.663989Z
-7d8757b644acabb9c07749d31892bde5
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2012-01-25T15:32:02.161555Z
+19aa4fa85e3cd6b844d79b16f09acf09
+2011-06-19T21:38:58.957416Z
+90421
+btongminh
 has-props
 
 
@@ -58,86 +58,18 @@ has-props
 
 
 
-14713
+35987
 
-Bitmap_ClientOnly.php
+Exif.php
 file
 
 
 
 
-2011-02-04T18:14:24.663989Z
-d70a0c1b1324f90feb7daa275b1c9a07
-2008-11-06T20:59:34.560430Z
-43266
-tstarling
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-477
-
-Generic.php
-file
-
-
-
-
-2011-02-04T18:14:24.663989Z
-f4720cc155e41b4b3a84d7d6f0e388bb
-2010-02-13T17:09:52.710533Z
-62446
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-13168
-
-BMP.php
-file
-
-
-
-
-2011-02-04T18:14:24.667989Z
-f5c9b8bcfef13432b72d937fbcab3964
-2008-08-27T18:25:24.906713Z
-40095
+2012-01-25T15:32:02.161555Z
+6c7bb9eed3f56e30adc41c8e1dc2881e
+2011-09-02T10:53:50.276925Z
+96088
 hashar
 has-props
 
@@ -160,7 +92,109 @@ has-props
 
 
 
-879
+29573
+
+MediaTransformOutput.php
+file
+
+
+
+
+2012-01-25T15:32:02.165555Z
+69a57ca5db015f59c1be60374bbe8247
+2011-05-28T18:59:42.108197Z
+89062
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7415
+
+SVGMetadataExtractor.php
+file
+
+
+
+
+2012-01-25T15:32:02.161555Z
+4647712ca5b57eb4a1685f995702d1c6
+2011-08-28T17:57:11.262048Z
+95632
+hashar
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+9885
+
+IPTC.php
+file
+
+
+
+
+2012-01-25T15:32:02.165555Z
+cd345ded0f7e6a85212838b6faadda1a
+2011-05-28T17:18:50.675885Z
+89047
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17686
 
 SVG.php
 file
@@ -168,11 +202,11 @@ file
 
 
 
-2011-02-04T18:14:24.667989Z
-65a07409d49a04c0178646d14b0d18a7
-2010-01-03T04:10:26.146353Z
-60575
-aaron
+2012-01-25T15:32:02.165555Z
+4e21d017b3cdd63c8391a70228628b53
+2011-08-02T14:16:11.579337Z
+93747
+brion
 has-props
 
 
@@ -194,7 +228,7 @@ has-props
 
 
 
-3640
+8208
 
 GIFMetadataExtractor.php
 file
@@ -202,11 +236,11 @@ file
 
 
 
-2011-02-04T18:14:24.667989Z
-4ad2657d06d62022309f2b0d6402de56
-2009-08-23T23:27:32.647440Z
-55541
-brion
+2012-01-25T15:32:02.165555Z
+2a42455dac243e2e959a842e303e599d
+2011-10-25T21:51:50.580179Z
+100750
+reedy
 has-props
 
 
@@ -228,7 +262,41 @@ has-props
 
 
 
-4395
+8516
+
+XMP.php
+file
+
+
+
+
+2012-01-25T15:32:02.165555Z
+02de154a8c214b5f1b0e15e81571b12e
+2011-06-17T16:05:05.734015Z
+90281
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+38335
 
 GIF.php
 file
@@ -236,11 +304,11 @@ file
 
 
 
-2011-02-04T18:14:24.667989Z
-b573ad3f23fd6d55afa7fc3e9342b58e
-2009-08-23T23:27:32.647440Z
-55541
-brion
+2012-01-25T15:32:02.165555Z
+c19395f19f056bb7f05bdd23e789f0ea
+2011-12-25T23:57:33.002334Z
+107308
+mah
 has-props
 
 
@@ -262,7 +330,7 @@ has-props
 
 
 
-1575
+3190
 
 DjVu.php
 file
@@ -270,11 +338,11 @@ file
 
 
 
-2011-02-04T18:14:24.667989Z
-d89a3df8203b223358def9d392f40b37
-2009-06-04T09:16:25.639847Z
-51458
-thomasv
+2012-01-25T15:32:02.165555Z
+ff5ee73811e0419c8b3583efe5262227
+2011-07-15T19:03:40.196861Z
+92279
+btongminh
 has-props
 
 
@@ -296,7 +364,381 @@ has-props
 
 
 
-6436
+7273
+
+BitmapMetadataHandler.php
+file
+
+
+
+
+2012-01-25T15:32:02.165555Z
+b8a9cc4c5f6f2307864505f980528ef9
+2011-09-02T10:53:50.276925Z
+96088
+hashar
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7951
+
+Generic.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+5a40c2fc60190207899ed9fb98e69b6f
+2011-12-25T23:57:33.002334Z
+107308
+mah
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+21348
+
+Bitmap_ClientOnly.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+8365b41fc73c0414551dd522bc2f0358
+2011-02-18T23:34:24.498111Z
+82423
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1006
+
+Bitmap.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+e20f11ef757724722a6084c8fc73e2c9
+2011-12-26T00:04:09.435919Z
+107310
+mah
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+24784
+
+BMP.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+887548eb69b13b58f93c37ecacbd9783
+2011-10-25T21:51:50.580179Z
+100750
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1166
+
+XMPValidate.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+074e6fdf21d9c462e710cbed609eb71e
+2011-04-18T13:08:20.536616Z
+86307
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+10116
+
+XMPInfo.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+b4382306da918a83ab507b58edec7616
+2011-10-26T18:47:09.650680Z
+100840
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+34972
+
+PNGMetadataExtractor.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+c6a01d0b902754071e56eb35a9139c16
+2011-10-25T21:51:50.580179Z
+100750
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+12577
+
+JpegMetadataExtractor.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+83d9387aef735ba814862c83b3963d68
+2011-11-09T16:06:53.038008Z
+102525
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8541
+
+PNG.php
+file
+
+
+
+
+2012-01-25T15:32:02.169555Z
+8d94b66963883be44e7ed479ae209664
+2011-05-26T20:26:51.380371Z
+88926
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2901
+
+Jpeg.php
+file
+
+
+
+
+2012-01-25T15:32:02.173555Z
+eaafada47384ae1710a747b38df9dc22
+2011-06-17T03:37:59.619575Z
+90256
+bawolff
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1509
 
 Tiff.php
 file
@@ -304,11 +746,11 @@ file
 
 
 
-2011-02-04T18:14:24.667989Z
-aa9cd1861cf85b946b74ccb3fd615926
-2009-03-16T22:03:20.983700Z
-48462
-brion
+2012-01-25T15:32:02.173555Z
+4b6f8e773dc50d32d7f22553ecf621a2
+2011-10-16T22:24:58.607633Z
+99989
+reedy
 has-props
 
 
@@ -330,5 +772,39 @@ has-props
 
 
 
-636
+1878
+
+ExifBitmap.php
+file
+
+
+
+
+2012-01-25T15:32:02.173555Z
+ea895d2a80094ad2dc00ebe2964f17ce
+2011-11-14T20:58:30.050108Z
+103029
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+5594
 
