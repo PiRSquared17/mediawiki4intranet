@@ -51,6 +51,13 @@ $messages['arz'] = array(
 	'googleanalytics-desc' => 'يضيف سكريبت جوجل التحليلى (ga.js) إلى صفحات الميدياويكى للتتبع',
 );
 
+/** Asturian (Asturianu)
+ * @author Xuacu
+ */
+$messages['ast'] = array(
+	'googleanalytics-desc' => 'Inxerta el script de Google Analytics (ga.js) nes páxines de MediaWiki pal so siguimientu',
+);
+
 /** Belarusian (Taraškievica orthography) (‪Беларуская (тарашкевіца)‬)
  * @author EugeneZelenko
  */
@@ -304,7 +311,7 @@ $messages['nn'] = array(
  * @author Harald Khan
  * @author Jon Harald Søby
  */
-$messages['no'] = array(
+$messages['nb'] = array(
 	'googleanalytics-desc' => 'Setter inn Google Analytics-skript (ga.js) på MediaWiki-sider for sporing',
 );
 
@@ -315,7 +322,7 @@ $messages['oc'] = array(
 	'googleanalytics-desc' => 'Apond un escript Google Analitic (ga.js) dins las paginas MediaWiki per las recèrcas.',
 );
 
-/** Ossetic (Иронау)
+/** Ossetic (Ирон)
  * @author Amikeco
  */
 $messages['os'] = array(
@@ -378,6 +385,13 @@ $messages['sk'] = array(
 	'googleanalytics-desc' => 'Vkladá sledovací skript Google Analytics (ga.js) do stránok MediaWiki',
 );
 
+/** Slovenian (Slovenščina)
+ * @author Dbc334
+ */
+$messages['sl'] = array(
+	'googleanalytics-desc' => 'Vstavi skript Google Analytics (ga.js) na strani MediaWiki za sledenje',
+);
+
 /** Albanian (Shqip)
  * @author Puntori
  */
@@ -385,14 +399,14 @@ $messages['sq'] = array(
 	'googleanalytics-desc' => 'Vendosë skriptën e  Google Analytics (ga.js) në faqet për përcjellje të MediaWiki',
 );
 
-/** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
+/** Serbian (Cyrillic script) (‪Српски (ћирилица)‬)
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
 	'googleanalytics-desc' => 'Убацује Гуглову Аналитичку скрипту (ga-js) у стране вашег МедијаВикија, зарад праћења',
 );
 
-/** Serbian Latin ekavian (‪Srpski (latinica)‬)
+/** Serbian (Latin script) (‪Srpski (latinica)‬)
  * @author Michaello
  */
 $messages['sr-el'] = array(
@@ -449,7 +463,7 @@ $messages['tr'] = array(
 	'googleanalytics-desc' => 'MedyaViki sayfalarını izlemek için Google Analytics scriptini (ga.js) ekler',
 );
 
-/** Tatar (Cyrillic) (Татарча/Tatarça (Cyrillic))
+/** Tatar (Cyrillic script) (Татарча)
  * @author Ильнар
  */
 $messages['tt-cyrl'] = array(
