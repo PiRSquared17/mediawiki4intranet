@@ -49,6 +49,11 @@ class SkinCustisRu extends SkinTemplate {
         $this->template  = 'CustisRuTemplate';
     }
 
+    // Tooltip and accesskey
+    function tooltipAndAccesskey( $xmlid ) {
+        return Xml::expandAttributes( Linker::tooltipAndAccesskeyAttribs( $xmlid ) );
+    }
+
     function setupSkinUserCss( OutputPage $out ) {
         global $wgHandheldStyle;
 
