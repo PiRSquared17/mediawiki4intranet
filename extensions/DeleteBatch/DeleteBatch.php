@@ -19,7 +19,6 @@ $wgExtensionCredits['specialpage'][] = array(
 	'version' => '1.3',
 	'author' => 'Bartek Łapiński',
 	'url' => 'http://www.mediawiki.org/wiki/Extension:DeleteBatch',
-	'description' => 'Deletes a batch of pages',
 	'descriptionmsg' => 'deletebatch-desc',
 );
 
@@ -31,8 +30,10 @@ $wgGroupPermissions['bureaucrat']['deletebatch'] = true;
 $dir = dirname( __FILE__ ) . '/';
 $wgExtensionMessagesFiles['DeleteBatch'] = $dir . 'DeleteBatch.i18n.php';
 $wgExtensionAliasesFiles['DeleteBatch'] = $dir . 'DeleteBatch.alias.php';
-$wgAutoloadClasses['DeleteBatch'] = $dir . 'DeleteBatch.body.php';
-$wgSpecialPages['DeleteBatch'] = 'DeleteBatch';
+$wgAutoloadClasses['SpecialDeleteBatch'] = $dir . 'DeleteBatch.body.php';
+$wgSpecialPages['DeleteBatch'] = 'SpecialDeleteBatch';
 // Special page group for MW 1.13+
 $wgSpecialPageGroups['DeleteBatch'] = 'pagetools';
 
+// Hooks
+$wgHooks['AdminLinks'][] = 'SpecialDeleteBatch::addToAdminLinks'; // Admin Links extension
