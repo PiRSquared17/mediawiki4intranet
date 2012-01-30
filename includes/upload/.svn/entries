@@ -1,16 +1,16 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/upload
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/upload
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
-has-props
+2011-11-09T14:31:53.305474Z
+102514
+reedy
+
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:22.563983Z
-90effde3696dcaf409d66f139c2e4568
-2010-03-12T18:12:46.137500Z
-63636
-btongminh
+2012-01-25T15:31:56.713537Z
+c23025604d4d36d1dd4d1962b1515580
+2011-07-14T23:01:00.721989Z
+92213
+raindrift
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-2212
+3307
 
 UploadFromUrl.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:22.563983Z
-a308a1df15e180e5e2114db1c42701c3
-2010-02-09T03:54:59.682222Z
-62164
-mah
+2012-01-25T15:31:56.713537Z
+d5d82c7ec45af3ecfb3b2e45f2d906ff
+2011-10-03T13:10:53.684384Z
+98754
+reedy
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-3518
+6216
 
 UploadBase.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:22.563983Z
-0dc5c7d612592f52d1565fa7bd1648e2
-2010-02-22T03:07:28.388125Z
-62809
-mah
+2012-01-25T15:31:56.717537Z
+11d33c76d684544c13d1df2684e9b01b
+2011-08-27T19:28:13.495653Z
+95607
+hashar
 has-props
 
 
@@ -126,7 +126,41 @@ has-props
 
 
 
-32560
+40792
+
+UploadStash.php
+file
+
+
+
+
+2012-01-25T15:31:56.717537Z
+6ffb819665f47bb960a1e1439ec5e512
+2011-11-09T14:31:53.305474Z
+102514
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+23738
 
 UploadFromFile.php
 file
@@ -134,11 +168,11 @@ file
 
 
 
-2011-02-04T18:14:22.563983Z
-b9d48b2336a80b8c532288b78c5e0357
-2010-05-28T04:52:27.392706Z
-66989
-tstarling
+2012-01-25T15:31:56.717537Z
+64442e1aed1bf8f53c92d4adbcf3fb9a
+2011-08-27T19:28:13.495653Z
+95607
+hashar
 has-props
 
 
@@ -160,5 +194,5 @@ has-props
 
 
 
-786
+1970
 
