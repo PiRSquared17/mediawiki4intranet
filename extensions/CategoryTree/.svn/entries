@@ -1,15 +1,15 @@
 10
 
 dir
-83020
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/CategoryTree
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/CategoryTree
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2011-10-20T21:36:55.682026Z
+100383
+reedy
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:16:07.576287Z
-8a4370e668be330f8612a43b7402b873
-2009-02-09T19:28:03.942899Z
-47049
-siebrand
+2012-01-25T15:29:57.169142Z
+4fbb71f6826cf9043d158887316c48b5
+2010-09-09T22:35:32.959121Z
+72689
+platonides
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-1669
+1305
 
 CategoryTree.i18n.magic.php
 file
@@ -66,10 +66,10 @@ file
 
 
 
-2011-02-04T18:16:07.576287Z
-21a49c9e82a1cf24bdd3a23761408fb6
-2010-02-16T23:50:05.211893Z
-62623
+2012-01-25T15:29:57.169142Z
+f070d23e81222a01f2ce2d64e43ec4f1
+2011-05-14T00:23:17.694340Z
+88029
 siebrand
 has-props
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-2193
+4243
 
 CategoryTreePage.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2011-02-04T18:16:07.576287Z
-c7623f4d058dcf43082fbc84f2501420
-2010-01-06T21:24:10.854996Z
-60747
+2012-01-25T15:29:57.169142Z
+64b7cccd6a94fc6ec672cdb88f778267
+2010-11-26T19:09:35.528149Z
+77340
 reedy
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-4608
+4573
 
 CategoryTree.i18n.php
 file
@@ -134,10 +134,10 @@ file
 
 
 
-2011-02-04T18:16:07.580287Z
-012a3ecab4cac62d15427694a171eaa2
-2010-02-13T19:20:32.343411Z
-62447
+2012-01-25T15:29:57.173142Z
+d46f403208d5f8fd7de2a648edefdb11
+2011-07-17T19:50:15.922351Z
+92408
 raymond
 has-props
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-224713
+255828
 
 CategoryTreeIE.css
 file
@@ -202,10 +202,10 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-ffa94b0e786e0694517c87fd72d3d409
-2010-01-06T21:24:10.854996Z
-60747
+2012-01-25T15:29:57.173142Z
+0fe2829eff9d418ba25974dff459ff6b
+2011-10-20T21:36:55.682026Z
+100383
 reedy
 has-props
 
@@ -228,7 +228,7 @@ has-props
 
 
 
-14362
+13910
 
 CategoryTree.css
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-7e394dcb3e2e6c310ca6076b8e7ac625
-2008-11-14T12:47:54.545184Z
-43492
-daniel
+2012-01-25T15:29:57.173142Z
+493bf8931985681a0b064fec04c98a1f
+2011-06-25T00:09:24.669348Z
+90744
+robin
 has-props
 
 
@@ -262,7 +262,7 @@ has-props
 
 
 
-1345
+1410
 
 CategoryTree.rtl.css
 file
@@ -270,11 +270,11 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-1091ca299f337c4e56c396f07e6630a6
-2006-09-02T11:11:20.929525Z
-16338
-rotem
+2012-01-25T15:29:57.173142Z
+a3dda52bc6178204d772bd25ea37ff19
+2011-06-25T00:09:24.669348Z
+90744
+robin
 has-props
 
 
@@ -296,7 +296,7 @@ has-props
 
 
 
-131
+173
 
 install.settings
 file
@@ -338,11 +338,11 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-99658b6efe171f3e43338d59af9cdedb
-2009-06-13T07:37:34.718284Z
-51817
-daniel
+2012-01-25T15:29:57.177142Z
+8781add707959f53b9e61b0837bdfde4
+2011-01-20T22:37:34.730768Z
+80660
+reedy
 has-props
 
 
@@ -364,7 +364,7 @@ has-props
 
 
 
-5711
+4550
 
 CategoryTree.alias.php
 file
@@ -372,11 +372,11 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-9ea8887e3b4ca53978424a2c974159b4
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2012-01-25T15:29:57.177142Z
+4a8e44fd36af9b9051a1ef053c44f7d7
+2011-05-14T00:11:22.365603Z
+88028
+siebrand
 has-props
 
 
@@ -398,7 +398,7 @@ has-props
 
 
 
-8601
+10244
 
 CategoryTreeFunctions.php
 file
@@ -406,11 +406,11 @@ file
 
 
 
-2011-02-04T18:16:07.584287Z
-f5afd135ddb4b6738e4355d89cd9168e
-2010-02-13T23:03:40.012129Z
-62451
-demon
+2012-01-25T15:29:57.177142Z
+1682ad83cdcef9942273c408eb4afa82
+2011-09-09T21:12:07.828724Z
+96694
+brion
 has-props
 
 
@@ -432,7 +432,7 @@ has-props
 
 
 
-25884
+25323
 
 README
 file
@@ -440,11 +440,11 @@ file
 
 
 
-2011-02-04T18:16:07.588287Z
-bd87c18a73dc02c91559d9e34d4db57f
-2008-06-28T20:13:20.748563Z
-36772
-daniel
+2012-01-25T15:29:57.177142Z
+aadc48b57681625b6f0437177facb250
+2010-04-20T22:00:34.044949Z
+65346
+siebrand
 has-props
 
 
@@ -466,5 +466,5 @@ has-props
 
 
 
-906
+905
 
