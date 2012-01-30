@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery
+END
+jquery.colorUtil.js
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.colorUtil.js
+END
+jquery.mwPrototypes.js
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.mwPrototypes.js
+END
+jquery.autoEllipsis.js
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.autoEllipsis.js
+END
+jquery.getAttrs.js
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.getAttrs.js
+END
+jquery.client.js
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.client.js
+END
+jquery.tabIndex.js
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.tabIndex.js
+END
+jquery.byteLimit.js
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.byteLimit.js
+END
+jquery.delayedBind.test.js
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.delayedBind.test.js
+END
+jquery.localize.js
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.localize.js
+END
+jquery.tablesorter.test.js
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.tablesorter.test.js
+END
+jquery.byteLength.js
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/jquery/jquery.byteLength.js
+END

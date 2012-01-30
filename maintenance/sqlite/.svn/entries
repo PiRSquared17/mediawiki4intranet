@@ -1,14 +1,14 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/maintenance/sqlite
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/maintenance/sqlite
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-01-17T13:35:26.545742Z
-61164
+2011-06-05T19:46:08.447332Z
+89527
 maxsem
 
 
@@ -28,38 +28,4 @@ dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
 archives
 dir
-
-README
-file
-
-
-
-
-2011-02-04T18:14:59.152089Z
-c7d249230f7def1c8d952ea13ca27a8b
-2009-01-15T06:56:58.173343Z
-45764
-tstarling
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-534
 
