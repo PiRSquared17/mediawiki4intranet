@@ -1,28 +1,34 @@
 <?php
 /**
- * @file
- * @ingroup upload
- *
  * Implements uploading from a HTTP resource.
  *
+ * @file
+ * @ingroup upload
  * @author Bryan Tong Minh
  * @author Michael Dale
  */
+
 class UploadFromUrl extends UploadBase {
-	protected $mTempDownloadPath;
+	protected $mAsync, $mUrl;
+	protected $mIgnoreWarnings = true;
+
+	protected $mTempPath;
 
 	/**
 	 * Checks if the user is allowed to use the upload-by-URL feature. If the
 	 * user is allowed, pass on permissions checking to the parent.
+	 *
+	 * @param $user User
 	 */
 	public static function isAllowed( $user ) {
-		if( !$user->isAllowed( 'upload_by_url' ) )
+		if ( !$user->isAllowed( 'upload_by_url' ) )
 			return 'upload_by_url';
 		return parent::isAllowed( $user );
 	}
 
 	/**
 	 * Checks if the upload from URL feature is enabled
+	 * @return bool
 	 */
 	public static function isEnabled() {
 		global $wgAllowCopyUploads;
@@ -31,94 +37,209 @@ class UploadFromUrl extends UploadBase {
 
 	/**
 	 * Entry point for API upload
+	 *
+	 * @param $name string
+	 * @param $url string
+	 * @param $async mixed Whether the download should be performed
+	 * asynchronous. False for synchronous, async or async-leavemessage for
+	 * asynchronous download.
 	 */
-	public function initialize( $name, $url, $na, $nb = false ) {
-		global $wgTmpDirectory;
+	public function initialize( $name, $url, $async = false ) {
+		global $wgAllowAsyncCopyUploads;
 
-		$localFile = tempnam( $wgTmpDirectory, 'WEBUPLOAD' );
-		$this->initializePathInfo( $name, $localFile, 0, true );
+		$this->mUrl = $url;
+		$this->mAsync = $wgAllowAsyncCopyUploads ? $async : false;
+		if ( $async ) {
+			throw new MWException( 'Asynchronous copy uploads are no longer possible as of r81612.' );
+		}
 
-		$this->mUrl = trim( $url );
+		$tempPath = $this->mAsync ? null : $this->makeTemporaryFile();
+		# File size and removeTempFile will be filled in later
+		$this->initializePathInfo( $name, $tempPath, 0, false );
 	}
 
 	/**
 	 * Entry point for SpecialUpload
-	 * @param $request Object: WebRequest object
+	 * @param $request WebRequest object
 	 */
 	public function initializeFromRequest( &$request ) {
 		$desiredDestName = $request->getText( 'wpDestFile' );
-		if( !$desiredDestName )
+		if ( !$desiredDestName )
 			$desiredDestName = $request->getText( 'wpUploadFileURL' );
 		return $this->initialize(
 			$desiredDestName,
-			$request->getVal( 'wpUploadFileURL' ),
+			trim( $request->getVal( 'wpUploadFileURL' ) ),
 			false
 		);
 	}
 
 	/**
-	 * @param $request Object: WebRequest object
+	 * @param $request WebRequest object
 	 */
-	public static function isValidRequest( $request ){
-		if( !$request->getVal( 'wpUploadFileURL' ) )
-			return false;
-		// check that is a valid url:
-		return self::isValidUrl( $request->getVal( 'wpUploadFileURL' ) );
+	public static function isValidRequest( $request ) {
+		global $wgUser;
+
+		$url = $request->getVal( 'wpUploadFileURL' );
+		return !empty( $url )
+			&& Http::isValidURI( $url )
+			&& $wgUser->isAllowed( 'upload_by_url' );
 	}
 
-	public static function isValidUrl( $url ) {
-		// Only allow HTTP or FTP for now
-		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
+	public function getSourceType() { return 'url'; }
+
+	public function fetchFile() {
+		if ( !Http::isValidURI( $this->mUrl ) ) {
+			return Status::newFatal( 'http-invalid-url' );
+		}
+
+		if ( !$this->mAsync ) {
+			return $this->reallyFetchFile();
+		}
+		return Status::newGood();
+	}
+	/**
+	 * Create a new temporary file in the URL subdirectory of wfTempDir().
+	 *
+	 * @return string Path to the file
+	 */
+	protected function makeTemporaryFile() {
+		return tempnam( wfTempDir(), 'URL' );
 	}
 
 	/**
-	 * Do the real fetching stuff
+	 * Callback: save a chunk of the result of a HTTP request to the temporary file
+	 *
+	 * @param $req mixed
+	 * @param $buffer string
+	 * @return int number of bytes handled
 	 */
-	function fetchFile() {
-		if( !self::isValidUrl( $this->mUrl ) ) {
-			return Status::newFatal( 'upload-proto-error' );
+	public function saveTempFileChunk( $req, $buffer ) {
+		$nbytes = fwrite( $this->mTmpHandle, $buffer );
+
+		if ( $nbytes == strlen( $buffer ) ) {
+			$this->mFileSize += $nbytes;
+		} else {
+			// Well... that's not good!
+			fclose( $this->mTmpHandle );
+			$this->mTmpHandle = false;
 		}
-		return $this->httpCopy();
+
+		return $nbytes;
 	}
 
 	/**
-	 * Safe copy from URL
-	 * Returns true if there was an error, false otherwise
+	 * Download the file, save it to the temporary file and update the file
+	 * size and set $mRemoveTempFile to true.
 	 */
-	private function httpCopy() {
-		global $wgOut;
-
-		# Open temporary file
-		$this->mDestHandle = @fopen( $this->mTempPath, "wb" );
-		if( $this->mDestHandle === false ) {
-			# Could not open temporary file to write in
-			return 'upload-file-error';
+	protected function reallyFetchFile() {
+		if ( $this->mTempPath === false ) {
+			return Status::newFatal( 'tmp-create-error' );
 		}
 
-		$request = HttpRequest::factory( $this->mUrl, array( 'timeout' => 10 ) );
-		$request->setCallback( array( $this, 'uploadCallback' ) );
-		$status = $request->execute();
+		// Note the temporary file should already be created by makeTemporaryFile()
+		$this->mTmpHandle = fopen( $this->mTempPath, 'wb' );
+		if ( !$this->mTmpHandle ) {
+			return Status::newFatal( 'tmp-create-error' );
+		}
 
-		fclose( $this->mDestHandle );
-		unset( $this->mDestHandle );
+		$this->mRemoveTempFile = true;
+		$this->mFileSize = 0;
+
+		$req = MWHttpRequest::factory( $this->mUrl, array(
+			'followRedirects' => true
+		) );
+		$req->setCallback( array( $this, 'saveTempFileChunk' ) );
+		$status = $req->execute();
+
+		if ( $this->mTmpHandle ) {
+			// File got written ok...
+			fclose( $this->mTmpHandle );
+			$this->mTmpHandle = null;
+		} else {
+			// We encountered a write error during the download...
+			return Status::newFatal( 'tmp-write-error' );
+		}
+
+		if ( !$status->isOk() ) {
+			return $status;
+		}
 
 		return $status;
 	}
 
 	/**
-	 * Callback function for web transfer
-	 * Write data to file unless we've passed the length limit;
-	 * if so, abort immediately.
-	 * @access private
+	 * Wrapper around the parent function in order to defer verifying the
+	 * upload until the file really has been fetched.
 	 */
-	function uploadCallback( $ch, $data ) {
-		global $wgMaxUploadSize;
-		$length = strlen( $data );
-		$this->mFileSize += $length;
-		if( $this->mFileSize > $wgMaxUploadSize ) {
-			return 0;
+	public function verifyUpload() {
+		if ( $this->mAsync ) {
+			return array( 'status' => UploadBase::OK );
 		}
-		fwrite( $this->mDestHandle, $data );
-		return $length;
+		return parent::verifyUpload();
 	}
+
+	/**
+	 * Wrapper around the parent function in order to defer checking warnings
+	 * until the file really has been fetched.
+	 */
+	public function checkWarnings() {
+		if ( $this->mAsync ) {
+			$this->mIgnoreWarnings = false;
+			return array();
+		}
+		return parent::checkWarnings();
+	}
+
+	/**
+	 * Wrapper around the parent function in order to defer checking protection
+	 * until we are sure that the file can actually be uploaded
+	 */
+	public function verifyTitlePermissions( $user ) {
+		if ( $this->mAsync ) {
+			return true;
+		}
+		return parent::verifyTitlePermissions( $user );
+	}
+
+	/**
+	 * Wrapper around the parent function in order to defer uploading to the
+	 * job queue for asynchronous uploads
+	 */
+	public function performUpload( $comment, $pageText, $watch, $user ) {
+		if ( $this->mAsync ) {
+			$sessionKey = $this->insertJob( $comment, $pageText, $watch, $user );
+
+			$status = new Status;
+			$status->error( 'async', $sessionKey );
+			return $status;
+		}
+
+		return parent::performUpload( $comment, $pageText, $watch, $user );
+	}
+
+	/**
+	 * @param  $comment
+	 * @param  $pageText
+	 * @param  $watch
+	 * @param  $user User
+	 * @return
+	 */
+	protected function insertJob( $comment, $pageText, $watch, $user ) {
+		$sessionKey = $this->stashSession();
+		$job = new UploadFromUrlJob( $this->getTitle(), array(
+			'url' => $this->mUrl,
+			'comment' => $comment,
+			'pageText' => $pageText,
+			'watch' => $watch,
+			'userName' => $user->getName(),
+			'leaveMessage' => $this->mAsync == 'async-leavemessage',
+			'ignoreWarnings' => $this->mIgnoreWarnings,
+			'sessionId' => session_id(),
+			'sessionKey' => $sessionKey,
+		) );
+		$job->initializeSessionData();
+		$job->insert();
+		return $sessionKey;
+	}
+
 }
