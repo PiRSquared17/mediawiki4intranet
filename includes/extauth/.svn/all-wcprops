@@ -1,23 +1,23 @@
 K 25
 svn:wc:ra_dav:version-url
-V 72
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/extauth
+V 73
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/extauth
 END
 Hardcoded.php
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/extauth/Hardcoded.php
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/extauth/Hardcoded.php
 END
 MediaWiki.php
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/extauth/MediaWiki.php
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/extauth/MediaWiki.php
 END
 vB.php
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/extauth/vB.php
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/extauth/vB.php
 END

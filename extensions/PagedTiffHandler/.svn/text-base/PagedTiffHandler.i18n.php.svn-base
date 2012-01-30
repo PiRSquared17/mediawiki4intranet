@@ -28,7 +28,7 @@ ImageMagick is not available.',
 	'tiff_size_error' => 'The reported file size does not match the actual file size.',
 	'tiff_script_detected' => 'The uploaded file contains scripts.',
 	'tiff_bad_file' => 'The uploaded file contains errors: $1',
-	'tiff-file-info-size' => 'page $5, $1 × $2 pixels, file size: $3, MIME type: $4',
+	'tiff-file-info-size' => '$1 × $2 pixels, file size: $3, MIME type: $4, $5 {{PLURAL:$5|page|pages}}',
  );
 
 /** Message documentation (Message documentation)
@@ -132,7 +132,7 @@ $messages['be-tarask'] = array(
 	'tiff_size_error' => 'Пададзены памер файла не супадае з фактычным памерам файла.',
 	'tiff_script_detected' => 'Загружаны файл утрымлівае скрыпты.',
 	'tiff_bad_file' => 'Загружаны файл утрымлівае памылкі: $1',
-	'tiff-file-info-size' => 'старонка $5, $1 × $2 піксэляў, памер файла: $3, тып MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 піксэляў, памер файла: $3, тып MIME: $4, $5 {{PLURAL:$5|старонка|старонкі|старонак}}',
 );
 
 /** Breton (Brezhoneg)
@@ -177,15 +177,40 @@ ImageMagick nije dostupan.',
 	'tiff_size_error' => 'Prijavljena veličina datoteke ne odgovara njenoj stvarnoj veličini.',
 	'tiff_script_detected' => 'Poslana datoteka sadrži skripte.',
 	'tiff_bad_file' => 'Poslana datoteka sadrži greške: $1',
-	'tiff-file-info-size' => 'stranica $5, $1 × $2 piksela, veličina datoteke: $3, MIME tip: $4',
+	'tiff-file-info-size' => '$1 × $2 piksela, veličina datoteka: $3, MIME vrsta: $4, $5 {{PLURAL:$5|stranica|stranice|stranica}}',
+);
+
+/** Danish (Dansk)
+ * @author Peter Alberti
+ */
+$messages['da'] = array(
+	'tiff-desc' => 'Håndtering af TIFF-visning i billedtilstand',
+	'tiff_no_metadata' => 'Kan ikke hente metadata fra TIFF',
+	'tiff_page_error' => 'Sidetallet er større end antallet af sider i dokumentet',
+	'tiff_too_many_embed_files' => 'Billedet indeholder for mange indlejrede filer.',
+	'tiff_sourcefile_too_large' => 'Opløsningen af kildefilen er for stor.
+Der vil ikke blive dannet miniaturebilleder.',
+	'tiff_targetfile_too_large' => 'Opløsningen af destinationsfilen er for stor.
+Der vil ikke blive dannet miniaturebilleder.',
+	'tiff_file_too_large' => 'Den overførte fil er for stor og blev afvist.',
+	'tiff_out_of_service' => 'Den overførte fil kunne ikke behandles.
+ImageMagick er ikke tilgængelig.',
+	'tiff_too_much_meta' => 'Metadata bruger for meget plads.',
+	'tiff_error_cached' => 'Denne fil kan kun gengives påny efter mellemlagringen udløber.',
+	'tiff_size_error' => 'Den rapporterede filstørrelse svarer ikke til den aktuelle filstørrelse.',
+	'tiff_script_detected' => 'Den overførte fil indeholder scripts.',
+	'tiff_bad_file' => 'Den overførte fil indeholder fejl: $1',
+	'tiff-file-info-size' => '$1 × $2 punkter, filstørrelse: $3, MIME-type: $4, $5 {{PLURAL:$5|side|sider}}',
 );
 
 /** German (Deutsch)
  * @author Als-Holder
  * @author Hallo Welt! - Medienwerkstatt GmbH
+ * @author Kghbln
+ * @author Purodha
  */
 $messages['de'] = array(
-	'tiff-desc' => 'Schnittstelle für die Ansicht von TIFF-Dateien im Bilder-Modus',
+	'tiff-desc' => 'Stellt eine Schnittstelle zur Ansicht von TIFF-Dateien im Bildermodus bereit',
 	'tiff_no_metadata' => 'Keine Metadaten im TIFF vorhanden.',
 	'tiff_page_error' => 'Seitenzahl außerhalb des Dokumentes.',
 	'tiff_too_many_embed_files' => 'Die Datei enthält zu viele eingebettete Dateien.',
@@ -195,10 +220,10 @@ $messages['de'] = array(
 	'tiff_out_of_service' => 'Die hochgeladene Datei konnte nicht verarbeitet werden. ImageMagick ist nicht verfügbar.',
 	'tiff_too_much_meta' => 'Die Metadaten benötigen zu viel Speicherplatz.',
 	'tiff_error_cached' => 'Diese Datei kann erst nach Ablauf der Caching-Periode neu gerendert werden.',
-	'tiff_size_error' => 'Die errechnete Größe der Datei stimmt nicht mit der tatsächlichen überein.',
+	'tiff_size_error' => 'Die übergebene Größe der Datei stimmt nicht mit der tatsächlichen überein.',
 	'tiff_script_detected' => 'Die hochgeladene Datei enthält Skripte.',
 	'tiff_bad_file' => 'Die hochgeladene Datei ist fehlerhaft: $1',
-	'tiff-file-info-size' => 'Seite $5, $1 × $2 Pixel, Dateigröße: $3, MIME-Typ: $4',
+	'tiff-file-info-size' => '$1 × $2 Pixel, Dateigröße: $3, MIME-Typ: $4, Seiten: $5',
 );
 
 /** Lower Sorbian (Dolnoserbski)
@@ -218,7 +243,7 @@ $messages['dsb'] = array(
 	'tiff_size_error' => 'K wěsći dana datajowa wjelikosć njewótpowědujo wopšawdnej datajowej wjelikosći.',
 	'tiff_script_detected' => 'Nagrata dataja wopśimujo skripty.',
 	'tiff_bad_file' => 'Nagrata dataja wopśimujo zmólki: $1',
-	'tiff-file-info-size' => 'bok $5, $1 × $2 pikselow, datajowa wjelikosć: $3, typ MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 pikselow, datajowa wjelikosć: $3, typ MIME: $4, $5 {{PLURAL:$5|bok|boka|boki|bokow}}',
 );
 
 /** Greek (Ελληνικά)
@@ -268,6 +293,7 @@ $messages['fi'] = array(
 );
 
 /** French (Français)
+ * @author Crochet.david
  * @author IAlex
  * @author Jagwar
  * @author Jean-Frédéric
@@ -288,7 +314,14 @@ $messages['fr'] = array(
 	'tiff_size_error' => 'La taille de fichier indiquée ne correspond pas à la taille réelle du fichier.',
 	'tiff_script_detected' => 'Le fichier téléchargé contient des scripts.',
 	'tiff_bad_file' => 'Le fichier importé contient des erreurs : $1',
-	'tiff-file-info-size' => 'page $5, $1 × $2 pixels, taille du fichier : $3, Type MIME : $4',
+	'tiff-file-info-size' => '$1 × $2 pixels, taille du fichier : $3, type MIME: $4, $5 page{{PLURAL:$5||s}}',
+);
+
+/** Franco-Provençal (Arpetan)
+ * @author ChrisPtDe
+ */
+$messages['frp'] = array(
+	'tiff_page_error' => 'Lo numerô de pâge est en defôr de la plage.',
 );
 
 /** Galician (Galego)
@@ -308,10 +341,11 @@ $messages['gl'] = array(
 	'tiff_size_error' => 'O tamaño do ficheiro do que se informou non se corresponde co tamaño real do ficheiro.',
 	'tiff_script_detected' => 'O ficheiro cargado contén escrituras.',
 	'tiff_bad_file' => 'O ficheiro cargado contén erros: $1',
-	'tiff-file-info-size' => 'páxina $5, $1 × $2 píxeles, tamaño do ficheiro: $3, tipo MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 píxeles, tamaño do ficheiro: $3, tipo MIME: $4, $5 {{PLURAL:$5|páxina|páxinas}}',
 );
 
 /** Swiss German (Alemannisch)
+ * @author Als-Chlämens
  * @author Als-Holder
  */
 $messages['gsw'] = array(
@@ -328,7 +362,7 @@ $messages['gsw'] = array(
 	'tiff_size_error' => 'Di brichtet Greßi vu dr Datei stimmt nit zue dr tatsächlige.',
 	'tiff_script_detected' => 'In dr Datei, wu uffeglade woren isch, het s Skript din.',
 	'tiff_bad_file' => 'D Datei, wu uffeglade woren isch, isch fählerhaft: $1',
-	'tiff-file-info-size' => 'Syte $5, $1 × $2 Pixel, Dateigreßi: $3, MIME-Typ: $4',
+	'tiff-file-info-size' => '$1 × $2 Pixel, Dateigrössi: $3, MIME type: $4, $5 {{PLURAL:$5|Syte|Syte}}',
 );
 
 /** Hebrew (עברית)
@@ -351,7 +385,7 @@ $messages['he'] = array(
 	'tiff_size_error' => 'גודל הקובץ שדווח אינו תואם לגדול הקובץ האמתי.',
 	'tiff_script_detected' => 'הקובץ שהועלה מכיל סקריפטים.',
 	'tiff_bad_file' => 'הקובץ שהועלה מכיל שגיאות: $1',
-	'tiff-file-info-size' => 'דף $5&rlm;, $1 × $2 פיקסלים, גודל הקובץ: $3, סוג MIME&rlm;: $4',
+	'tiff-file-info-size' => '$1 × $2 פיקסלים, גודל הקובץ: $3, סוג MIME‏: $4, {{PLURAL:$5|דף אחד|$5 דפים}}',
 );
 
 /** Upper Sorbian (Hornjoserbsce)
@@ -371,7 +405,7 @@ $messages['hsb'] = array(
 	'tiff_size_error' => 'Zdźělena wulkosć dataje njewotpowěduje woprawdźitej wulkosći dataje.',
 	'tiff_script_detected' => 'Nahrata dataja wobsahuje skripty.',
 	'tiff_bad_file' => 'Nahrata dataja wobsahuje zmylki: $1',
-	'tiff-file-info-size' => 'strona $5, $1 × $2 pikselow, wulkosć dataje: $3, MIME-typ: $4',
+	'tiff-file-info-size' => '$1 × $2 pikselow, wulkosć dataje: $3, MIME-typ: $4, $5 {{PLURAL:$5|strona|stronje|strony|stronow}}',
 );
 
 /** Hungarian (Magyar)
@@ -410,7 +444,7 @@ $messages['ia'] = array(
 	'tiff_size_error' => 'Le grandor reportate del file non corresponde al grandor real del file.',
 	'tiff_script_detected' => 'Le file incargate contine scripts.',
 	'tiff_bad_file' => 'Le file incargate contine errores: $1',
-	'tiff-file-info-size' => 'pagina $5, $1 × $2 pixel, grandor del file: $3, typo MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 pixels, dimension del file: $3, typo MIME: $4, $5 {{PLURAL:$5|pagina|paginas}}',
 );
 
 /** Indonesian (Bahasa Indonesia)
@@ -434,12 +468,13 @@ ImageMagick tidak tersedia.',
 	'tiff_size_error' => 'Ukuran berkas yang dilaporkan tidak sama dengan ukuran berkas aslinya.',
 	'tiff_script_detected' => 'Berkas unggahan berisi skrip.',
 	'tiff_bad_file' => 'Berkas unggahan berisi kesalahan: $1',
-	'tiff-file-info-size' => 'halaman $5, $1 × $2 piksel, ukuran berkas: $3, tipe MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 piksel, ukuran berkas: $3, tipe MIME: $4, $5 {{PLURAL:$5|halaman|halaman}}',
 );
 
 /** Japanese (日本語)
  * @author Aotake
  * @author Naohiro19
+ * @author Schu
  * @author Yanajin66
  * @author 青子守歌
  */
@@ -457,7 +492,44 @@ $messages['ja'] = array(
 	'tiff_size_error' => '報告されたファイルサイズが実際のサイズと一致しません。',
 	'tiff_script_detected' => 'アップロードされたファイルに、スクリプトが含まれます。',
 	'tiff_bad_file' => 'アップロードされたファイルは次のエラーを含んでいます: $1',
-	'tiff-file-info-size' => 'ページ $5、$1 × $2ピクセル、ファイルサイズ:$3、MIME:$4',
+	'tiff-file-info-size' => '$1 × $2 ピクセル、ファイルサイズ : $3 、MIMEタイプ : $4 、 $5 {{PLURAL:$5|ページ|ページ}}',
+);
+
+/** Korean (한국어)
+ * @author Kwj2772
+ */
+$messages['ko'] = array(
+	'tiff-desc' => 'TIFF 파일을 이미지 모드에서 볼 수 있도록 하는 핸들러',
+	'tiff_no_metadata' => 'TIFF 파일에서 메타데이터를 가져올 수 없습니다.',
+	'tiff_page_error' => '쪽수가 범위 바깥에 있습니다.',
+	'tiff_too_many_embed_files' => '이 이미지가 너무 많은 임베드 파일을 포함하고 있습니다.',
+	'tiff_sourcefile_too_large' => '원본 파일의 해상도가 너무 큽니다.
+섬네일이 생성되지 않을 것입니다.',
+	'tiff_too_much_meta' => '메타데이터가 너무 많은 공간을 차지합니다.',
+	'tiff-file-info-size' => '$1 × $2 픽셀, 파일 크기: $3, MIME 종류: $4, $5{{PLURAL:$5|페이지}}',
+);
+
+/** Colognian (Ripoarisch)
+ * @author Purodha
+ */
+$messages['ksh'] = array(
+	'tiff-desc' => 'Määt et müjjelesch, <i lang="en">TIFF</i>-Dateie als Bellder ze beloore.',
+	'tiff_no_metadata' => 'Mer künne kein Metta_Daate uß dä TIFF-Dattei krijje',
+	'tiff_page_error' => 'En Sigge-Nommer es ußerhallef',
+	'tiff_too_many_embed_files' => 'En dämm Beld sin zoh vill Datteije dren enthallde.',
+	'tiff_sourcefile_too_large' => 'De Oplühsong vun dää Enjangs_Dattei es esu jruuß,
+dat mer kein Breefmarkebelldsche druß ußrääschne künne.',
+	'tiff_targetfile_too_large' => 'De Oplühsong vun dää Ußjangs_Dattei es esu jruuß,
+dat mer kein Breefmarkebelldsche ußrääschne künne.',
+	'tiff_file_too_large' => 'De huhjelaade Dattei es zoh jruuß un wood zeröckjewiise.',
+	'tiff_out_of_service' => 'De huhjelaade Dattei kunnte mer nit beärbeide.
+<i lang="en">ImageMagick</i> shteiht nit paraat.',
+	'tiff_too_much_meta' => 'De Mettadaate bruche zoh vill Plaz.',
+	'tiff_error_cached' => 'Di Dattei kann eez neu aanjezeisch wääde, wan de Zick för der Zwescheschpeischer (<i lang="en">cache</i>) afjeloufe es.',
+	'tiff_size_error' => 'Der aanjejovve Ömfang vun dä Dattei es nit der verhaftijje Ömfang.',
+	'tiff_script_detected' => 'En dä huhjelaade Dattei sen Skrepte dren.',
+	'tiff_bad_file' => 'De huhjelaade Dattei hät Fähler: $1',
+	'tiff-file-info-size' => '$1&nbsp;×&nbsp;$2&nbsp;Pixelle, Ömfang:&nbsp;$3, de&nbsp;<i lang="en">MIME</i>–Zoot&nbsp;es: $4, {{PLURAL:$5|ein&nbsp;Sigg|$5&nbsp; Sigge|kein&nbsp;Sigg}}',
 );
 
 /** Luxembourgish (Lëtzebuergesch)
@@ -472,7 +544,7 @@ $messages['lb'] = array(
 	'tiff_size_error' => "Déi berechent Gréisst vum Fichier ass net d'selwëscht wéi déi wierklech Gréisst vum Fichier.",
 	'tiff_script_detected' => 'Am eropgeluedene Fichier si Skripten dran.',
 	'tiff_bad_file' => 'Am eropgeluedene Fichier si Feeler: $1',
-	'tiff-file-info-size' => 'Säit $5, $1 × $2 Pixel, Gréisst vum Fichier: $3, MIME-Typ: $4',
+	'tiff-file-info-size' => '$1 × $2 Pixelen, Gréisst vum Fichier: $3, MIME Typ: $4, $5 {{PLURAL:$5|Säit|Säiten}}',
 );
 
 /** Macedonian (Македонски)
@@ -492,14 +564,34 @@ $messages['mk'] = array(
 	'tiff_size_error' => 'Пријавената големина на податотеката не се совпаѓа со фактичката.',
 	'tiff_script_detected' => 'Подигнатата податотека содржи скрипти.',
 	'tiff_bad_file' => 'Подигнатата податотека содржи грешки: $1',
-	'tiff-file-info-size' => 'страница $5, $1 × $2 пиксели, големина на податотеката: $3, MIME-тип: $4',
+	'tiff-file-info-size' => '$1 × $2 пиксели, големина: $3, MIME-тип: $4, $5 {{PLURAL:$5|страница|страници}}',
 );
 
 /** Malayalam (മലയാളം)
  * @author Praveenp
  */
 $messages['ml'] = array(
-	'tiff-desc' => 'ചിത്ര രൂപത്തിൽ ടിഫ് (TIFF) പ്രമാണങ്ങൾ കാണുന്നതിനുള്ള കൈകാര്യോപകരണം',
+	'tiff-desc' => 'ടിഫ് (TIFF) പ്രമാണങ്ങൾ ചിത്രരൂപത്തിൽ കാണുന്നതിനുള്ള കൈകാര്യോപകരണം',
+);
+
+/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
+ * @author Nghtwlkr
+ */
+$messages['nb'] = array(
+	'tiff-desc' => 'Håndterer for visning av TIFF-filer i bildemodus',
+	'tiff_no_metadata' => 'Kan ikke hente metadata fra TIFF',
+	'tiff_page_error' => 'Sidenummer er utenfor sideintervallet',
+	'tiff_too_many_embed_files' => 'Bildet inneholder for mange innebygde filer.',
+	'tiff_sourcefile_too_large' => 'Oppløsningen til kildefilen er for stor. Miniatyrbilde vil ikke bli opprettet.',
+	'tiff_targetfile_too_large' => 'Oppløsningen på målfilen er for stor. Inget miniatyrbilde vil bli generert.',
+	'tiff_file_too_large' => 'Den opplastede filen var for stor og ble avvist.',
+	'tiff_out_of_service' => 'Den opplastede filen kunne ikke behandles. ImageMagick er ikke tilgjengelig.',
+	'tiff_too_much_meta' => 'Metadata bruker for mye plass.',
+	'tiff_error_cached' => 'Filen kan bare gjengis på nytt etter hurtiglagerintervallet.',
+	'tiff_size_error' => 'Den rapporterte filstørrelsen samsvarer ikke med den faktiske filstørrelsen.',
+	'tiff_script_detected' => 'Den opplastede filen inneholder skript.',
+	'tiff_bad_file' => 'Den opplastede filen inneholder feil: $1',
+	'tiff-file-info-size' => 'side $5, $1 x $2 piksler, filstørrelse: $3, MIME-type: $4',
 );
 
 /** Dutch (Nederlands)
@@ -522,27 +614,7 @@ ImageMagick is niet beschikbaar.',
 	'tiff_size_error' => 'De gerapporteerde bestandsgrootte komt niet overeen met de werkelijke bestandsgrootte.',
 	'tiff_script_detected' => 'Het geüploade bestand bevat scripts.',
 	'tiff_bad_file' => 'Het geüploade bestand bevat fouten: $1',
-	'tiff-file-info-size' => 'pagina $5, $1 × $2 pixels, bestandsgrootte: $3, MIME-type: $4',
-);
-
-/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
- * @author Nghtwlkr
- */
-$messages['no'] = array(
-	'tiff-desc' => 'Håndterer for visning av TIFF-filer i bildemodus',
-	'tiff_no_metadata' => 'Kan ikke hente metadata fra TIFF',
-	'tiff_page_error' => 'Sidenummer er utenfor sideintervallet',
-	'tiff_too_many_embed_files' => 'Bildet inneholder for mange innebygde filer.',
-	'tiff_sourcefile_too_large' => 'Oppløsningen til kildefilen er for stor. Miniatyrbilde vil ikke bli opprettet.',
-	'tiff_targetfile_too_large' => 'Oppløsningen på målfilen er for stor. Inget miniatyrbilde vil bli generert.',
-	'tiff_file_too_large' => 'Den opplastede filen var for stor og ble avvist.',
-	'tiff_out_of_service' => 'Den opplastede filen kunne ikke behandles. ImageMagick er ikke tilgjengelig.',
-	'tiff_too_much_meta' => 'Metadata bruker for mye plass.',
-	'tiff_error_cached' => 'Filen kan bare gjengis på nytt etter hurtiglagerintervallet.',
-	'tiff_size_error' => 'Den rapporterte filstørrelsen samsvarer ikke med den faktiske filstørrelsen.',
-	'tiff_script_detected' => 'Den opplastede filen inneholder skript.',
-	'tiff_bad_file' => 'Den opplastede filen inneholder feil: $1',
-	'tiff-file-info-size' => 'side $5, $1 x $2 piksler, filstørrelse: $3, MIME-type: $4',
+	'tiff-file-info-size' => "$1 × $2 pixels, bestandsgrootte: $3, MIME-type: $4, $5 {{PLURAL:$5|pagina|pagina's}}",
 );
 
 /** Polish (Polski)
@@ -564,7 +636,7 @@ ImageMagick nie jest dostępny.',
 	'tiff_size_error' => 'Zgłoszony rozmiar pliku nie przystaje do jego rzeczywistego rozmiaru.',
 	'tiff_script_detected' => 'Przesłany plik zawiera skrypty.',
 	'tiff_bad_file' => 'Przesłany plik zawiera błędy – $1',
-	'tiff-file-info-size' => 'strona $5, $1 × $2 pikseli, rozmiar pliku – $3, typ MIME – $4',
+	'tiff-file-info-size' => '$1 × $2 pikseli, rozmiar pliku – $3, typ MIME – $4, $5 {{PLURAL:$5|strona|strony|stron}}',
 );
 
 /** Piedmontese (Piemontèis)
@@ -585,7 +657,7 @@ $messages['pms'] = array(
 	'tiff_size_error' => "La dimension diciairà dl'archivi a l'é pa l'istessa ëd soa dimension vera.",
 	'tiff_script_detected' => "L'archivi carià a conten ëd senari.",
 	'tiff_bad_file' => "L'archivi carià a conten d'eror: $1",
-	'tiff-file-info-size' => "pàgina $5, $1 x $2 pontin, dimension dl'archivi: $3, sòrt MIME: $4",
+	'tiff-file-info-size' => "$1 x $2 pontin, dimension dl'archivi: $3, sòrt MIME: $4, $5 {{PLURAL:$5|pàgina|pàgine}}",
 );
 
 /** Portuguese (Português)
@@ -605,7 +677,7 @@ $messages['pt'] = array(
 	'tiff_size_error' => 'O tamanho reportado do ficheiro não corresponde ao tamanho real.',
 	'tiff_script_detected' => "O ficheiro transferido tem ''scripts''.",
 	'tiff_bad_file' => 'O ficheiro enviado contém erros: $1',
-	'tiff-file-info-size' => 'página $5, $1 × $2 pixels, tamanho do ficheiro: $3, tipo MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 pixels, tamanho do ficheiro: $3, tipo MIME: $4, $5 {{PLURAL:$5|página|páginas}}',
 );
 
 /** Brazilian Portuguese (Português do Brasil)
@@ -630,7 +702,7 @@ ImageMagick não está disponível.',
 	'tiff_size_error' => 'O tamanho reportado do arquivo não confere com o tamanho real.',
 	'tiff_script_detected' => 'O arquivo enviado contém scripts.',
 	'tiff_bad_file' => 'O arquivo enviado contém erros: $1',
-	'tiff-file-info-size' => 'página $5, $1 × $2 pixeis, tamanho do arquivo: $3, tipo MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 pixels, tamanho do arquivo: $3, tipo MIME: $4, $5 {{PLURAL:$5|página|páginas}}',
 );
 
 /** Russian (Русский)
@@ -650,26 +722,28 @@ $messages['ru'] = array(
 	'tiff_size_error' => 'Указанный размер файла не совпадает с фактическим размером файла.',
 	'tiff_script_detected' => 'Загруженный файл содержит сценарии.',
 	'tiff_bad_file' => 'Загруженный файл содержит ошибки: $1',
-	'tiff-file-info-size' => 'страница $5, $1 × $2 пикселов, размер файла: $3, MIME-тип: $4',
+	'tiff-file-info-size' => '$1 × $2 пикселей, размер файла: $3, MIME-тип: $4, $5 {{PLURAL:$5|страница|страницы|страниц}}',
 );
 
-/** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
+/** Serbian (Cyrillic script) (‪Српски (ћирилица)‬)
+ * @author Rancher
  * @author Михајло Анђелковић
  */
 $messages['sr-ec'] = array(
-	'tiff_no_metadata' => 'Не могу се преузети метаподаци из TIFF-а',
-	'tiff_page_error' => 'Број стране није у опсегу',
-	'tiff_too_many_embed_files' => 'Слика садржи превише уметнутих фајлова.',
-	'tiff_file_too_large' => 'Послати фајл је превелик и одбачен је.',
-	'tiff_out_of_service' => 'Послати фајл није могао бити обраћен. ImageMagick није доступан.',
+	'tiff_no_metadata' => 'Не могу да преузмем метаподатке из TIFF-а',
+	'tiff_page_error' => 'Број страница ван опсега',
+	'tiff_too_many_embed_files' => 'Слика садржи превише уграђених датотека.',
+	'tiff_file_too_large' => 'Послата датотека је превелика и зато је одбачена.',
+	'tiff_out_of_service' => 'Послата датотека се не може обрадити.
+Имиџмеџик није доступан.',
 	'tiff_too_much_meta' => 'Метаподаци користе превише простора.',
-	'tiff_error_cached' => 'Овај фајл може бити рендерован само након кеширања.',
-	'tiff_size_error' => 'Пријављена величина фајла не одговара његовој стварној величини.',
-	'tiff_script_detected' => 'Послати фајл садржи скрипте.',
-	'tiff_bad_file' => 'Послати фајл садржи грешке: $1',
+	'tiff_error_cached' => 'Ова датотека се може поново исцртати само након периода међумеморисања.',
+	'tiff_size_error' => 'Пријављена величина датотеке не одговара њеној стварној величини.',
+	'tiff_script_detected' => 'Послата датотека садржи скриптове.',
+	'tiff_bad_file' => 'Послата датотека садржи грешке: $1',
 );
 
-/** Serbian Latin ekavian (‪Srpski (latinica)‬) */
+/** Serbian (Latin script) (‪Srpski (latinica)‬) */
 $messages['sr-el'] = array(
 	'tiff_no_metadata' => 'Ne mogu se preuzeti metapodaci iz TIFF-a',
 	'tiff_page_error' => 'Broj strane nije u opsegu',
@@ -680,7 +754,7 @@ $messages['sr-el'] = array(
 	'tiff_error_cached' => 'Ovaj fajl može biti renderovan samo nakon keširanja.',
 	'tiff_size_error' => 'Prijavljena veličina fajla ne odgovara njegovoj stvarnoj veličini.',
 	'tiff_script_detected' => 'Poslati fajl sadrži skripte.',
-	'tiff_bad_file' => 'Poslati fajl sadrži greške: $1',
+	'tiff_bad_file' => 'Poslata datoteka sadrži greške: $1',
 );
 
 /** Tagalog (Tagalog)
@@ -707,13 +781,22 @@ $messages['tl'] = array(
  * @author Minh Nguyen
  */
 $messages['vi'] = array(
+	'tiff-desc' => 'Bộ xử lý để xem tập tin TIFF ở dạng hình ảnh',
 	'tiff_no_metadata' => 'Không thể lấy siêu dữ liệu từ TIFF',
 	'tiff_page_error' => 'Số trang không nằm trong giới hạn',
+	'tiff_too_many_embed_files' => 'Hình này có nhúng quá nhiều tập tin.',
+	'tiff_sourcefile_too_large' => 'Tập tin nguồn có độ phân giải quá cao.
+Không thể tạo hình thu nhỏ.',
+	'tiff_targetfile_too_large' => 'Tập tin đích có độ phân giải quá cao.
+Không thể tạo hình thu nhỏ.',
+	'tiff_file_too_large' => 'Tập tin được tải lên bị bác bỏ vì quá lớn.',
 	'tiff_out_of_service' => 'Không thể xử lý tập tin được tải lên vì ImageMagick không có sẵn.',
 	'tiff_too_much_meta' => 'Siêu dữ liệu tốn nhiều không gian quá.',
+	'tiff_error_cached' => 'Chỉ có thể kết xuất lại tập tin sau khi bộ nhớ đệm hết hạn.',
+	'tiff_size_error' => 'Kích thước được ghi vào tập tin không đúng với kích thước thực sự của tập tin.',
 	'tiff_script_detected' => 'Tập tin được tải lên chứa script.',
 	'tiff_bad_file' => 'Tập tin được tải lên có lỗi: $1',
-	'tiff-file-info-size' => 'trang $5, $1×$2 điểm ảnh, kích thước: $3, định dạng MIME: $4',
+	'tiff-file-info-size' => '$1×$2 điểm ảnh, kích thước tập tin: $3, kiểu MIME: $4, $5 trang',
 );
 
 /** Yiddish (ייִדיש)
@@ -721,7 +804,15 @@ $messages['vi'] = array(
  */
 $messages['yi'] = array(
 	'tiff_too_much_meta' => 'מעטאַדאַטן באַניצן צו פֿיל פלאַץ.',
-	'tiff-file-info-size' => 'בלטַט $5, $1 × $2 פיקסעל, טעקע גרייס: $3, טיפ MIME: $4',
+	'tiff-file-info-size' => '$1 × $2 פיקסעלן, טעקע גרייס: $3, MIME טיפ: $4,  $5 {{PLURAL:$5|בלאט|בלעטער}}',
+);
+
+/** Simplified Chinese (‪中文(简体)‬) */
+$messages['zh-hans'] = array(
+	'tiff_too_many_embed_files' => '该图像包含太多嵌入档案。',
+	'tiff_file_too_large' => '上传的档案过大而被拒绝。',
+	'tiff_too_much_meta' => '元数据占用太多的空间。',
+	'tiff_bad_file' => '上传的档案有错误：$1',
 );
 
 /** Traditional Chinese (‪中文(繁體)‬)
