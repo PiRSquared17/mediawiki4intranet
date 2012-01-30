@@ -2,11 +2,4 @@ K 13
 svn:eol-style
 V 6
 native
-K 13
-svn:mergeinfo
-V 286
-/branches/REL1_15/phase3/includes/media/Bitmap.php:51646
-/branches/sqlite/includes/media/Bitmap.php:58211-58321
-/branches/wmf-deployment/includes/media/Bitmap.php:53381
-/trunk/phase3/includes/media/Bitmap.php:63549,63764,63897-63901,64876,64881,64932,64935-64936,64947-64948,65467,79561
 END
