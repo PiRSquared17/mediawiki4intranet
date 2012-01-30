@@ -1,59 +1,23 @@
 K 25
 svn:wc:ra_dav:version-url
-V 70
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs
-END
-BUGS
-K 25
-svn:wc:ra_dav:version-url
-V 75
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/BUGS
-END
-geshi-doc.txt
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/geshi-doc.txt
-END
-TODO
-K 25
-svn:wc:ra_dav:version-url
-V 75
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/TODO
-END
-geshi-doc.html
-K 25
-svn:wc:ra_dav:version-url
-V 85
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/geshi-doc.html
+V 71
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/docs
 END
 CHANGES
 K 25
 svn:wc:ra_dav:version-url
-V 78
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/CHANGES
-END
-COPYING
-K 25
-svn:wc:ra_dav:version-url
-V 78
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/COPYING
+V 79
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/docs/CHANGES
 END
 THANKS
 K 25
 svn:wc:ra_dav:version-url
-V 77
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/THANKS
-END
-phpdoc.ini
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/phpdoc.ini
+V 78
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/docs/THANKS
 END
 README
 K 25
 svn:wc:ra_dav:version-url
-V 77
-/svnroot/geshi/!svn/ver/2235/tags/RELEASE_1_0_8_6/geshi-1.0.X/src/docs/README
+V 78
+/svnroot/geshi/!svn/ver/2432/tags/RELEASE_1_0_8_10/geshi-1.0.X/src/docs/README
 END
