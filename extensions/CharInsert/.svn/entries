@@ -1,15 +1,15 @@
 10
 
 dir
-83020
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/CharInsert
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/CharInsert
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-05-12T02:12:12.083270Z
-66255
-simetrical
+2011-06-28T21:20:29.036868Z
+91005
+raymond
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:15:22.136156Z
-14962de720e184221a4211bf52905245
-2009-12-27T15:13:12.390019Z
-60428
-siebrand
+2012-01-25T15:30:00.465153Z
+2413866635bb03c9aa69e87f4b689fc8
+2011-06-28T21:20:29.036868Z
+91005
+raymond
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-21087
+23498
 
 CharInsert.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:15:22.136156Z
-370942d789f1212b24fdedaac342fd91
-2010-05-12T02:12:12.083270Z
-66255
-simetrical
+2012-01-25T15:30:00.465153Z
+78780ea4aff895484fc8cf4d4c789f35
+2011-05-04T04:22:33.354984Z
+87386
+bawolff
 has-props
 
 
@@ -92,5 +92,5 @@ has-props
 
 
 
-3563
+3398
 
