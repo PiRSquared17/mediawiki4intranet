@@ -1,29 +1,35 @@
 K 25
 svn:wc:ra_dav:version-url
-V 71
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/upload
+V 72
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload
 END
 UploadFromStash.php
 K 25
 svn:wc:ra_dav:version-url
-V 91
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/upload/UploadFromStash.php
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload/UploadFromStash.php
 END
 UploadFromUrl.php
 K 25
 svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/upload/UploadFromUrl.php
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload/UploadFromUrl.php
 END
 UploadBase.php
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/upload/UploadBase.php
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload/UploadBase.php
+END
+UploadStash.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload/UploadStash.php
 END
 UploadFromFile.php
 K 25
 svn:wc:ra_dav:version-url
-V 90
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/upload/UploadFromFile.php
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/upload/UploadFromFile.php
 END

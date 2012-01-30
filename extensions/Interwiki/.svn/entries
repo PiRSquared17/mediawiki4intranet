@@ -1,14 +1,14 @@
 10
 
 dir
-101621
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_17_0/extensions/Interwiki
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/Interwiki
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-12-03T23:09:07.810365Z
-77687
+2011-07-17T19:50:15.922351Z
+92408
 raymond
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2011-11-02T12:52:57.147954Z
-5085365cd57f443195b33b792865723b
-2010-09-19T09:13:18.761017Z
-73309
+2012-01-25T15:30:11.549189Z
+1bff3e52fad65a8303dd046b575fa68e
+2011-05-14T00:11:22.365603Z
+88028
 siebrand
 has-props
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-3629
+4070
 
 Interwiki_body.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-11-02T12:52:57.147954Z
-79dacc25d026a49ea1901e2ef1cac74b
-2010-12-02T17:31:05.135585Z
-77593
-reedy
+2012-01-25T15:30:11.553189Z
+31c073b1a4b02389d0be79a9bc90fac8
+2011-06-21T10:49:52.570442Z
+90519
+robin
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-12467
+12979
 
 Interwiki.i18n.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2011-11-02T12:52:57.151954Z
-dd7957bf315fbb68fdb36bb60e9648cf
-2010-12-03T23:09:07.810365Z
-77687
+2012-01-25T15:30:11.557189Z
+9a2ab3189230052c6a9208bd6c2cc5af
+2011-07-17T19:50:15.922351Z
+92408
 raymond
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-271371
+285194
 
 Interwiki.php
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2011-11-02T12:52:57.155954Z
-44bdcb8be439a1a3f64e0327e5e99eb2
-2010-04-17T22:52:42.463440Z
-65202
-siebrand
+2012-01-25T15:30:11.557189Z
+d8c8d78440f5fa77024a215773f47530
+2011-06-21T10:23:55.764513Z
+90518
+robin
 has-props
 
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-2114
+2111
 
 Interwiki.css
 file
@@ -168,11 +168,11 @@ file
 
 
 
-2011-11-02T12:52:57.155954Z
-7fc12f1b5ae745ba26ef554836daff91
-2010-04-17T22:52:42.463440Z
-65202
-siebrand
+2012-01-25T15:30:11.557189Z
+5bbff88b876a414c670547df9fb2607a
+2011-06-21T10:49:52.570442Z
+90519
+robin
 has-props
 
 
@@ -194,5 +194,5 @@ has-props
 
 
 
-459
+612
 
