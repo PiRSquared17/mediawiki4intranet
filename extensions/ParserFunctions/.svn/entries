@@ -1,16 +1,16 @@
 10
 
 dir
-83020
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/ParserFunctions
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/ParserFunctions
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-19T07:32:11.466302Z
-62695
-tstarling
-
+2011-10-03T14:18:30.541828Z
+98766
+reedy
+has-props
 
 
 
@@ -60,17 +60,17 @@ has-props
 
 454
 
-Expr.php
+convertTests.txt
 file
 
 
 
 
-2011-02-04T18:15:15.256136Z
-c3262508b6b01fd7dce3fdaafda52bbb
-2009-02-18T05:57:38.229088Z
-47428
-werdna
+2012-01-25T15:30:15.761203Z
+910d023baac3c59db1696f9ee6f78259
+2011-09-13T00:36:31.444076Z
+96933
+reedy
 has-props
 
 
@@ -92,7 +92,41 @@ has-props
 
 
 
-16066
+4986
+
+Expr.php
+file
+
+
+
+
+2012-01-25T15:30:15.761203Z
+d79d94f118e31c9d25568f6e3ff2d07a
+2011-01-29T13:54:02.015403Z
+81189
+happy-melon
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+16146
 
 testExpr.php
 file
@@ -100,78 +134,10 @@ file
 
 
 
-2011-02-04T18:15:15.256136Z
-f2f54917de5b40256fa12c9c24e74071
-2009-02-14T14:45:49.014412Z
-47264
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-912
-
-COPYING
-file
-
-
-
-
-2011-02-04T18:15:15.256136Z
-4bb965c1769142d61c36eae756fe8afc
-2009-05-26T00:43:34.538229Z
-50997
-rarohde
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-15270
-
-ParserFunctions.i18n.magic.php
-file
-
-
-
-
-2011-02-04T18:15:15.256136Z
-dde30f3aa8f403fabe67ad2b6636aa25
-2010-02-16T23:50:05.211893Z
-62623
+2012-01-25T15:30:15.761203Z
+97087916564e34bb6fc57fd79e97078b
+2010-10-02T22:36:34.829423Z
+74170
 siebrand
 has-props
 
@@ -194,7 +160,109 @@ has-props
 
 
 
-12839
+938
+
+Convert.php
+file
+
+
+
+
+2012-01-25T15:30:15.761203Z
+7190434d80816b921178fbf58b7e9d2d
+2011-09-13T00:36:31.444076Z
+96933
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+28749
+
+COPYING
+file
+
+
+
+
+2012-01-25T15:30:15.765203Z
+3128aed7c737c1f88a8596d2809d68a3
+2010-10-02T22:36:34.829423Z
+74170
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+15268
+
+ParserFunctions.i18n.magic.php
+file
+
+
+
+
+2012-01-25T15:30:15.765203Z
+fbd6461d13c9e2d241e15a7babc2db95
+2011-05-20T00:11:37.762578Z
+88440
+huji
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+19705
 
 ParserFunctions_body.php
 file
@@ -202,11 +270,11 @@ file
 
 
 
-2011-02-04T18:15:15.256136Z
-91a47ae1e650b9b9cd33549fdbd65b18
-2010-02-19T07:32:11.466302Z
-62695
-tstarling
+2012-01-25T15:30:15.765203Z
+f57c5cbe63cde56723c9019752886532
+2011-10-03T14:18:30.541828Z
+98766
+reedy
 has-props
 
 
@@ -228,7 +296,7 @@ has-props
 
 
 
-22405
+24722
 
 ParserFunctions.i18n.php
 file
@@ -236,11 +304,11 @@ file
 
 
 
-2011-02-04T18:15:15.260136Z
-4ae29e832e76f1b3d690f468b9b762a7
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2012-01-25T15:30:15.773203Z
+53d81fe5a78d5005a4e08011629a8ae7
+2011-09-08T17:11:02.862083Z
+96588
+mah
 has-props
 
 
@@ -262,7 +330,7 @@ has-props
 
 
 
-148597
+312021
 
 ParserFunctions.php
 file
@@ -270,11 +338,11 @@ file
 
 
 
-2011-02-04T18:15:15.260136Z
-79107da330d3ca52dd03b225af2064ad
-2009-09-04T22:22:12.181068Z
-55838
-demon
+2012-01-25T15:30:15.773203Z
+546313f42190f7925706a27970a61d5b
+2011-09-13T00:36:31.444076Z
+96933
+reedy
 has-props
 
 
@@ -296,7 +364,7 @@ has-props
 
 
 
-4721
+5054
 
 funcsParserTests.txt
 file
@@ -304,11 +372,11 @@ file
 
 
 
-2011-02-04T18:15:15.260136Z
-5043be8114c26bf6cb1ce47805133b52
-2010-02-19T07:32:11.466302Z
-62695
-tstarling
+2012-01-25T15:30:15.773203Z
+12721912b1aa3b7a5db95e97d67e17ed
+2010-07-09T21:11:54.575742Z
+69220
+maxsem
 has-props
 
 
@@ -330,7 +398,7 @@ has-props
 
 
 
-2570
+2704
 
 README
 file
@@ -338,11 +406,11 @@ file
 
 
 
-2011-02-04T18:15:15.260136Z
-92134fd1054401eb08d860028557c150
-2009-05-26T00:43:34.538229Z
-50997
-rarohde
+2012-01-25T15:30:15.773203Z
+e718f8ddb9cf18b5b599a90e15b24324
+2011-01-10T05:24:36.085397Z
+79928
+reedy
 has-props
 
 
@@ -364,19 +432,19 @@ has-props
 
 
 
-657
+671
 
-SprintfDateCompat.php
+stringFunctionTests.txt
 file
 
 
 
 
-2011-02-04T18:15:15.260136Z
-4aad60b325d80dc5e599bb0d85982f52
-2009-06-09T01:56:46.407038Z
-51628
-soxred93
+2012-01-25T15:30:15.773203Z
+c9d18f066fe77bcff24c2c8ff6b715f7
+2010-07-09T21:11:54.575742Z
+69220
+maxsem
 has-props
 
 
@@ -398,5 +466,5 @@ has-props
 
 
 
-5461
+397
 

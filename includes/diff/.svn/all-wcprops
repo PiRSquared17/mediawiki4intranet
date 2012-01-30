@@ -1,23 +1,23 @@
 K 25
 svn:wc:ra_dav:version-url
-V 69
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/diff
+V 70
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/diff
 END
-DifferenceInterface.php
+WikiDiff3.php
 K 25
 svn:wc:ra_dav:version-url
-V 93
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/diff/DifferenceInterface.php
+V 84
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/diff/WikiDiff3.php
 END
 DifferenceEngine.php
 K 25
 svn:wc:ra_dav:version-url
-V 90
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/diff/DifferenceEngine.php
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/diff/DifferenceEngine.php
 END
-Diff.php
+DairikiDiff.php
 K 25
 svn:wc:ra_dav:version-url
-V 78
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/diff/Diff.php
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/diff/DairikiDiff.php
 END
