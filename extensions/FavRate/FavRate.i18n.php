@@ -26,7 +26,9 @@ $messages['en'] = array(
     'favrate-nonfavorable'      => 'Invalid page for favorites.',
 
     'favrate-page-log-title'    => 'Page view log',
-    'favrate-page-log'          => '== [[:$1]] — Unique visitors and favorites log ==',
+    'favrate-page-log'          => '== [[:$1]] — Unique visitors and favorites log ==
+
+Total visitors: $2. Total favorites: $3.',
     'favrate-log-view'          => '* $2: [[:$1]] <span style="color: gray">&mdash; last access time.</span>',
     'favrate-log-fav'           => '* $2: [[:$1]] &mdash; added into [[:$3|Favorites]].',
     'favrate-invalid-title'     => 'Unknown or special page selected',
@@ -64,7 +66,9 @@ $messages['ru'] = array(
     'favrate-nonfavorable'      => 'Выбрана несуществующая или некорректная страница.',
 
     'favrate-page-log-title'    => 'Журнал просмотров страницы',
-    'favrate-page-log'          => '== [[:$1]] — Журнал уникальных просмотров и добавления в избранное ==',
+    'favrate-page-log'          => '== [[:$1]] — Журнал уникальных просмотров и добавления в избранное ==
+
+Всего посетителей: $2. Всего добавили в избранное: $3.',
     'favrate-log-view'          => '* $2: [[:$1]] <span style="color: gray">&mdash; последний просмотр.</span>',
     'favrate-log-fav'           => '* $2: [[:$1]] &mdash; добавил в [[:$3|Избранное]].',
     'favrate-invalid-title'     => 'Страница не существует',
