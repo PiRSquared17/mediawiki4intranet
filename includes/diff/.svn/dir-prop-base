@@ -1,8 +1,0 @@
-K 13
-svn:mergeinfo
-V 208
-/branches/REL1_15/phase3/includes/diff:51646
-/branches/sqlite/includes/diff:58211-58321
-/branches/wmf-deployment/includes/diff:53381
-/trunk/phase3/includes/diff:63549,63764,63897-63901,64802,64881,64948,79561
-END
