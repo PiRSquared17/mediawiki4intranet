@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/common/images/cyrl
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/skins/common/images/cyrl
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2010-12-07T21:11:53.311942Z
+78014
+vyznev
 
 
 
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:15:07.344113Z
-326e18801d59e59b64ce0bee8f3c9344
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2012-01-25T15:35:26.850233Z
+3083705850d88cefdf046f358e6a7672
+2010-12-07T21:11:53.311942Z
+78014
+vyznev
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-460
+457
 
 button_link.png
 file

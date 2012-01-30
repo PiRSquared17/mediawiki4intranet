@@ -1,16 +1,16 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/zhtable
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/zhtable
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-19T14:53:20.866596Z
-62705
-philip
-
+2011-10-27T21:40:38.687120Z
+101065
+reedy
+has-props
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:25.555991Z
-5a346b56a74587af77a8248b46dad7bd
-2009-08-10T06:10:08.804925Z
-54697
-philip
+2012-01-25T15:32:04.757564Z
+db75366c57a87dba3f8720f987f96d09
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -58,75 +58,7 @@ has-props
 
 
 
-5768
-
-trad2simp.manual
-file
-
-
-
-
-2011-02-04T18:14:25.555991Z
-55d407e96142a9ed3891f8c9fbb61fa7
-2009-11-14T17:09:22.857210Z
-59068
-philip
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6999
-
-toHK.manual
-file
-
-
-
-
-2011-02-04T18:14:25.555991Z
-16fb0d432a247da65988a0fa24ce0400
-2010-02-19T14:53:20.866596Z
-62705
-philip
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-43408
+5680
 
 simp2trad.manual
 file
@@ -134,10 +66,10 @@ file
 
 
 
-2011-02-04T18:14:25.555991Z
-2696c28f561db06acb538f946d85d149
-2009-11-14T17:09:22.857210Z
-59068
+2012-01-25T15:32:04.757564Z
+22c0e4a3d1e24d36eabc60663c6d1545
+2010-10-02T06:49:52.735378Z
+74129
 philip
 has-props
 
@@ -160,7 +92,75 @@ has-props
 
 
 
-11361
+11385
+
+toHK.manual
+file
+
+
+
+
+2012-01-25T15:32:04.757564Z
+1ada15a36041e70c58ab6a8115e83103
+2011-10-27T21:40:38.687120Z
+101065
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+43422
+
+trad2simp.manual
+file
+
+
+
+
+2012-01-25T15:32:04.757564Z
+b22e2a9d8f3e54a410b51c01f71e2203
+2011-10-27T21:40:38.687120Z
+101065
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3663
 
 simpphrases_exclude.manual
 file
@@ -168,10 +168,10 @@ file
 
 
 
-2011-02-04T18:14:25.555991Z
-f0720db102e1bb2852a25d956dc87ae5
-2009-11-01T09:31:37.236758Z
-58398
+2012-01-25T15:32:04.761564Z
+823b1fb4756081b0801f405e7fd4b854
+2010-04-12T18:04:29.748129Z
+64968
 philip
 has-props
 
@@ -194,7 +194,7 @@ has-props
 
 
 
-115
+122
 
 printutf8.c
 file
@@ -236,10 +236,10 @@ file
 
 
 
-2011-02-04T18:14:25.555991Z
-f92ee9c8d8d7602aa9897502705faf4e
-2010-02-01T18:31:19.727596Z
-61809
+2012-01-25T15:32:04.761564Z
+61e2db5b3bcd8bef3d5adcdb6347653e
+2011-06-19T18:10:24.269164Z
+90409
 philip
 has-props
 
@@ -262,7 +262,7 @@ has-props
 
 
 
-2226
+2686
 
 toSG.manual
 file
@@ -304,11 +304,11 @@ file
 
 
 
-2011-02-04T18:14:25.559991Z
-f8ef88bb13efa40a8179c24361a843d7
-2010-02-19T14:53:20.866596Z
-62705
-philip
+2012-01-25T15:32:04.761564Z
+fcdaa0a106f16e6fc08ce613c3257ce6
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -330,7 +330,7 @@ has-props
 
 
 
-34572
+38449
 
 README
 file
@@ -366,40 +366,6 @@ has-props
 
 1221
 
-simp2trad_supp_set.manual
-file
-
-
-
-
-2011-02-04T18:14:25.559991Z
-81f899b8eb6f6ac943d3497eca539a09
-2009-02-13T19:17:06.171741Z
-47225
-philip
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-15
-
 trad2simp_supp_set.manual
 file
 
@@ -434,16 +400,16 @@ has-props
 
 23
 
-Makefile.py
+simp2trad_supp_set.manual
 file
 
 
 
 
 2011-02-04T18:14:25.559991Z
-2194aea38607f5007f21b5d64332aa3e
-2010-02-01T20:39:17.480123Z
-61815
+81f899b8eb6f6ac943d3497eca539a09
+2009-02-13T19:17:06.171741Z
+47225
 philip
 has-props
 
@@ -466,7 +432,41 @@ has-props
 
 
 
-16086
+15
+
+Makefile.py
+file
+
+
+
+
+2012-01-25T15:32:04.761564Z
+bf8b82c2017b1ea2acdee2901a141173
+2011-10-27T21:40:38.687120Z
+101065
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+13221
 
 tradphrases_exclude.manual
 file
@@ -474,10 +474,10 @@ file
 
 
 
-2011-02-04T18:14:25.559991Z
-073512ec9ba966c04e68b8d1e8e89e8e
-2010-02-01T18:31:19.727596Z
-61809
+2012-01-25T15:32:04.765564Z
+53c59913369ed013e88b7113ef8255dd
+2011-06-12T08:02:04.313702Z
+89920
 philip
 has-props
 
@@ -500,7 +500,7 @@ has-props
 
 
 
-2384
+2460
 
 trad2simp_supp_unset.manual
 file
@@ -542,11 +542,11 @@ file
 
 
 
-2011-02-04T18:14:25.559991Z
-7967d27d18e66cd663faaffb557460f0
-2010-01-11T08:01:56.227273Z
-60925
-philip
+2012-01-25T15:32:04.765564Z
+4837cb50ad698ad6d5b80e7a3708a8f6
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -568,7 +568,7 @@ has-props
 
 
 
-2709
+3588
 
 toTW.manual
 file
@@ -576,11 +576,11 @@ file
 
 
 
-2011-02-04T18:14:25.559991Z
-9f36708ea7838487b7e20a61968332c2
-2010-02-19T14:53:20.866596Z
-62705
-philip
+2012-01-25T15:32:04.765564Z
+93ab1770935044539c19043f4427db7c
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -602,7 +602,7 @@ has-props
 
 
 
-8357
+8305
 
 simpphrases.manual
 file
@@ -610,11 +610,11 @@ file
 
 
 
-2011-02-04T18:14:25.563991Z
-ab958a95822002ff06169a99903bba64
-2010-02-19T14:53:20.866596Z
-62705
-philip
+2012-01-25T15:32:04.765564Z
+416888d61f02ba255eee3418217fce81
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -636,7 +636,7 @@ has-props
 
 
 
-20870
+21026
 
 Makefile
 file
@@ -678,11 +678,11 @@ file
 
 
 
-2011-02-04T18:14:25.563991Z
-c4265e8f02dca18d566f61fd3eca816d
-2008-07-31T01:37:53.269155Z
-38270
-shinjiman
+2012-01-25T15:32:04.765564Z
+10ea0e2c4c499a5e65c0838b57752f3f
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -704,7 +704,7 @@ has-props
 
 
 
-16
+1229
 
 trad2simp_noconvert.manual
 file
@@ -712,11 +712,11 @@ file
 
 
 
-2011-02-04T18:14:25.563991Z
-c8a6d0f165926e0b811f815d29b0b6b8
-2008-07-31T01:37:53.269155Z
-38270
-shinjiman
+2012-01-25T15:32:04.765564Z
+332356a1e90a73538a34e894a46b93d0
+2011-10-27T21:40:38.687120Z
+101065
+reedy
 has-props
 
 
@@ -738,5 +738,5 @@ has-props
 
 
 
-24
+29
 
