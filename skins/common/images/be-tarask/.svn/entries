@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/common/images/be-tarask
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/skins/common/images/be-tarask
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2010-12-07T21:11:53.311942Z
+78014
+vyznev
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:15:07.508113Z
-c40b8ca38f1eed65c56dd8cf8059a477
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2012-01-25T15:35:27.002233Z
+c68015aea3d3a230745273ded0b1e374
+2010-12-07T21:11:53.311942Z
+78014
+vyznev
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-592
+580
 
 button_link.png
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:15:07.508113Z
-c59b342ffb0dff6a021ca504517775fc
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2012-01-25T15:35:27.006233Z
+fb9cab70d2ab097aa242c88ec9e7332e
+2010-12-07T21:11:53.311942Z
+78014
+vyznev
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-466
+459
 
 button_bold.png
 file

@@ -25,7 +25,7 @@ $specialPageAliases['arz'] = array(
 
 /** Assamese (অসমীয়া) */
 $specialPageAliases['as'] = array(
-	'UserMerge' => array( 'সদস্য চামিল কৰক' ),
+	'UserMerge' => array( 'সদস্য_চামিল_কৰক' ),
 );
 
 /** Breton (Brezhoneg) */
@@ -65,12 +65,12 @@ $specialPageAliases['fi'] = array(
 
 /** French (Français) */
 $specialPageAliases['fr'] = array(
-	'UserMerge' => array( 'Fusionner les utilisateurs', 'FusionnerLesUtilisateurs', 'Fusionner utilisateurs', 'FusionnerUtilisateurs', 'Fusionner utilisateur', 'FusionnerUtilisateur' ),
+	'UserMerge' => array( 'Fusionner_les_utilisateurs', 'FusionnerLesUtilisateurs', 'Fusionner_utilisateurs', 'FusionnerUtilisateurs', 'Fusionner_utilisateur', 'FusionnerUtilisateur' ),
 );
 
 /** Franco-Provençal (Arpetan) */
 $specialPageAliases['frp'] = array(
-	'UserMerge' => array( 'Fusionar los utilisators', 'FusionarLosUtilisators' ),
+	'UserMerge' => array( 'Fusionar_los_usanciérs', 'FusionarLosUsanciérs' ),
 );
 
 /** Swiss German (Alemannisch) */
@@ -88,9 +88,14 @@ $specialPageAliases['hsb'] = array(
 	'UserMerge' => array( 'Wužiwarjow zjednoćić' ),
 );
 
+/** Haitian (Kreyòl ayisyen) */
+$specialPageAliases['ht'] = array(
+	'UserMerge' => array( 'FizyonItilizatè' ),
+);
+
 /** Hungarian (Magyar) */
 $specialPageAliases['hu'] = array(
-	'UserMerge' => array( 'Felhasználók egyesítése' ),
+	'UserMerge' => array( 'Felhasználók_egyesítése' ),
 );
 
 /** Interlingua (Interlingua) */
@@ -128,6 +133,11 @@ $specialPageAliases['lb'] = array(
 	'UserMerge' => array( 'Benotzerkonten_zesummeleeën' ),
 );
 
+/** Macedonian (Македонски) */
+$specialPageAliases['mk'] = array(
+	'UserMerge' => array( 'СпојКорисник' ),
+);
+
 /** Malayalam (മലയാളം) */
 $specialPageAliases['ml'] = array(
 	'UserMerge' => array( 'ഉപയോക്തൃലയനം' ),
@@ -136,6 +146,11 @@ $specialPageAliases['ml'] = array(
 /** Marathi (मराठी) */
 $specialPageAliases['mr'] = array(
 	'UserMerge' => array( 'सदस्यविलीनीकरण' ),
+);
+
+/** Norwegian Bokmål (‪Norsk (bokmål)‬) */
+$specialPageAliases['nb'] = array(
+	'UserMerge' => array( 'Slå_sammen_brukere' ),
 );
 
 /** Nedersaksisch (Nedersaksisch) */
@@ -148,11 +163,6 @@ $specialPageAliases['nl'] = array(
 	'UserMerge' => array( 'GebruikersSamenvoegen' ),
 );
 
-/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬) */
-$specialPageAliases['no'] = array(
-	'UserMerge' => array( 'Slå sammen brukere' ),
-);
-
 /** Occitan (Occitan) */
 $specialPageAliases['oc'] = array(
 	'UserMerge' => array( 'Fusionar los utilizaires', 'FusionarLosUtilizaire', 'Fusionar utilizaires', 'FusionarUtilizaires', 'Fusionar utilizaire', 'FusionarUtilizaire' ),
@@ -160,10 +170,10 @@ $specialPageAliases['oc'] = array(
 
 /** Portuguese (Português) */
 $specialPageAliases['pt'] = array(
-	'UserMerge' => array( 'Fundir utilizadores' ),
+	'UserMerge' => array( 'Fundir_utilizadores' ),
 );
 
-/** Sanskrit (संस्कृत) */
+/** Sanskrit (संस्कृतम्) */
 $specialPageAliases['sa'] = array(
 	'UserMerge' => array( 'सदस्यसंयोग' ),
 );
@@ -197,8 +207,3 @@ $specialPageAliases['tr'] = array(
 $specialPageAliases['yi'] = array(
 	'UserMerge' => array( 'צונויפגיסן_באניצער' ),
 );
-
-/**
- * For backwards compatibility with MediaWiki 1.15 and earlier.
- */
-$aliases =& $specialPageAliases;
