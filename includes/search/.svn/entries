@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/search
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/search
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2011-11-30T00:41:04.876236Z
+104637
+brion
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:22.931984Z
-ea7abab18a64fe45a6140d3aa81c2bae
-2010-03-12T18:22:38.298506Z
-63637
-tstarling
+2012-01-25T15:31:57.165539Z
+be706103d611593d6e4dfa8c036eb0ac
+2011-09-07T19:37:56.103588Z
+96475
+catrope
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-32565
+36031
 
 SearchMySQL.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:22.931984Z
-99f821df411896a8ce58e5332f58bf34
-2010-03-12T18:22:38.298506Z
-63637
-tstarling
+2012-01-25T15:31:57.169539Z
+e785b882eec24825e765a7ca9ee7ded2
+2011-06-02T19:32:45.928131Z
+89356
+mah
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-12045
+12731
 
 SearchOracle.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:22.935984Z
-80775b34974b4df371c28f5fa5a663e2
-2010-02-02T15:09:01.535248Z
-61856
-philip
+2012-01-25T15:31:57.169539Z
+d5a3c957e11c8bd33d98681b5b18f9d5
+2011-05-28T19:00:01.573923Z
+89063
+reedy
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-7283
+7845
 
 SearchPostgres.php
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2011-02-04T18:14:22.935984Z
-ba7265043d120dd08d4d29d14ac026cc
-2010-01-09T14:30:55.602453Z
-60860
-maxsem
+2012-01-25T15:31:57.169539Z
+080b98d40fb701de61736892697969ec
+2011-07-09T03:49:25.446036Z
+91779
+reedy
 has-props
 
 
@@ -160,41 +160,7 @@ has-props
 
 
 
-7383
-
-SearchMySQL4.php
-file
-
-
-
-
-2011-02-04T18:14:22.935984Z
-525be3d19177d652eda33fb4a6146f12
-2009-07-30T22:45:38.511135Z
-54056
-demon
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1127
+7335
 
 SearchIBM_DB2.php
 file
@@ -202,11 +168,11 @@ file
 
 
 
-2011-02-04T18:14:22.935984Z
-722b0a0e0d3a8617803e40e9a7ff54de
-2010-02-02T15:09:01.535248Z
-61856
-philip
+2012-01-25T15:31:57.169539Z
+b86750dc2470d1c7be5578563b6510ea
+2011-05-28T19:00:01.573923Z
+89063
+reedy
 has-props
 
 
@@ -228,7 +194,41 @@ has-props
 
 
 
-6184
+6322
+
+SearchMssql.php
+file
+
+
+
+
+2012-01-25T15:31:57.169539Z
+ea012530823e9f9dc8dc81fdc5afac94
+2011-05-28T19:00:01.573923Z
+89063
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7102
 
 SearchSqlite.php
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2011-02-04T18:14:22.935984Z
-5befc01e7939f8c3dc69c95a46d5d3ac
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2012-01-25T15:31:57.169539Z
+1b09de88073273cb383cbecb3e15f3d2
+2011-05-29T14:25:20.258175Z
+89105
+reedy
 has-props
 
 
@@ -262,7 +262,7 @@ has-props
 
 
 
-9775
+9557
 
 SearchUpdate.php
 file
@@ -270,11 +270,11 @@ file
 
 
 
-2011-02-04T18:14:22.935984Z
-c67312e9e54b998d12dc805aa653ae8b
-2010-03-12T18:22:38.298506Z
-63637
-tstarling
+2012-01-25T15:31:57.173539Z
+4746a38c98de58a6d6ebd076f22ca81f
+2011-11-30T00:41:04.876236Z
+104637
+brion
 has-props
 
 
@@ -296,5 +296,5 @@ has-props
 
 
 
-3550
+3716
 

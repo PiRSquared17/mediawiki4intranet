@@ -32,7 +32,7 @@ require_once("$IP/extensions/PagedTiffHandler/PagedTiffHandler.php");
 $wgUseImageMagick = true;
 $wgImageMagickConvertCommand = "C:\Program Files\ImageMagick-6.5.6-Q8\convert";
 $wgImageMagickIdentifyCommand = "C:\Program Files\ImageMagick-6.5.6-Q8\identify";
-$wgTiffExivCommand = "C:\Program Files\Exiv2\exiv2";
+$wgExiv2Command = "C:\Program Files\Exiv2\exiv2";
 $wgMaxUploadSize = 1073741824;
 $wgShowEXIF = true;
 */
@@ -48,7 +48,7 @@ $wgExtensionCredits['media'][] = array(
 		'Markus Glaser for Wikimedia Deutschland'
 	),
 	'descriptionmsg' => 'tiff-desc',
-	'url' => 'http://www.mediawiki.org/wiki/Extension:PagedTiffHandler',
+	'url' => 'https://www.mediawiki.org/wiki/Extension:PagedTiffHandler',
 );
 
 $wgTiffIdentifyRejectMessages = array(
@@ -89,8 +89,6 @@ $wgTiffReaderCheckEofForJS = 4; // check the last 4MB for JS
 
 // Path to identify
 $wgImageMagickIdentifyCommand = '/usr/bin/identify';
-// Path to exiv2
-$wgTiffExivCommand = '/usr/bin/exiv2';
 // Use exiv2? if false, MediaWiki's internal EXIF parser will be used
 $wgTiffUseExiv = false;
 //path to tiffinfo
@@ -115,13 +113,13 @@ $wgFileExtensions[] = 'tif';
 
 $dir = dirname( __FILE__ ) . '/';
 $wgExtensionMessagesFiles['PagedTiffHandler'] = $dir . 'PagedTiffHandler.i18n.php';
+$wgExtensionMessagesFiles['PagedTiffHandlerMagic'] = $dir . 'PagedTiffHandler.i18n.magic.php';
 $wgAutoloadClasses['PagedTiffImage'] = $dir . 'PagedTiffHandler.image.php';
 $wgAutoloadClasses['PagedTiffHandler'] = $dir . 'PagedTiffHandler_body.php';
 $wgAutoloadClasses['TiffReader'] = $dir . 'TiffReader.php';
 $wgAutoloadClasses['PagedTiffHandlerSeleniumTestSuite'] = $dir . 'selenium/PagedTiffHandlerTestSuite.php';
 
 $wgMediaHandlers['image/tiff'] = 'PagedTiffHandler';
-$wgHooks['LanguageGetMagic'][] = 'PagedTiffHandler::addTiffLossyMagicWordLang';
 
 define('TIFF_METADATA_VERSION', '1.4');
 # 1.0: initial

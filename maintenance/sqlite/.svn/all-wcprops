@@ -1,11 +1,5 @@
 K 25
 svn:wc:ra_dav:version-url
-V 74
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/sqlite
-END
-README
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/sqlite/README
+V 75
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite
 END
