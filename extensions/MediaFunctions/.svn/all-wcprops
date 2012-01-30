@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
-V 65
-/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/MediaFunctions
+V 66
+/svnroot/mediawiki/!svn/ver/108574/trunk/extensions/MediaFunctions
 END
 LICENCE
 K 25
@@ -13,23 +13,23 @@ MediaFunctions.class.php
 K 25
 svn:wc:ra_dav:version-url
 V 90
-/svnroot/mediawiki/!svn/ver/76112/trunk/extensions/MediaFunctions/MediaFunctions.class.php
+/svnroot/mediawiki/!svn/ver/96709/trunk/extensions/MediaFunctions/MediaFunctions.class.php
 END
 MediaFunctions.i18n.magic.php
 K 25
 svn:wc:ra_dav:version-url
-V 95
-/svnroot/mediawiki/!svn/ver/75726/trunk/extensions/MediaFunctions/MediaFunctions.i18n.magic.php
+V 96
+/svnroot/mediawiki/!svn/ver/107294/trunk/extensions/MediaFunctions/MediaFunctions.i18n.magic.php
 END
 MediaFunctions.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/80761/trunk/extensions/MediaFunctions/MediaFunctions.i18n.php
+V 90
+/svnroot/mediawiki/!svn/ver/108574/trunk/extensions/MediaFunctions/MediaFunctions.i18n.php
 END
 MediaFunctions.php
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/67467/trunk/extensions/MediaFunctions/MediaFunctions.php
+V 85
+/svnroot/mediawiki/!svn/ver/108574/trunk/extensions/MediaFunctions/MediaFunctions.php
 END

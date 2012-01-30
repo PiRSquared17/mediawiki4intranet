@@ -1,29 +1,29 @@
 K 25
 svn:wc:ra_dav:version-url
-V 71
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/DeleteBatch
+V 72
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/DeleteBatch
 END
 DeleteBatch.alias.php
 K 25
 svn:wc:ra_dav:version-url
-V 93
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/DeleteBatch/DeleteBatch.alias.php
+V 94
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/DeleteBatch/DeleteBatch.alias.php
 END
 DeleteBatch.body.php
 K 25
 svn:wc:ra_dav:version-url
-V 92
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/DeleteBatch/DeleteBatch.body.php
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/DeleteBatch/DeleteBatch.body.php
 END
 DeleteBatch.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 92
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/DeleteBatch/DeleteBatch.i18n.php
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/DeleteBatch/DeleteBatch.i18n.php
 END
 DeleteBatch.php
 K 25
 svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/extensions/DeleteBatch/DeleteBatch.php
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/DeleteBatch/DeleteBatch.php
 END
