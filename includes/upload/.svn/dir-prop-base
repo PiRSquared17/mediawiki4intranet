@@ -1,8 +1,0 @@
-K 13
-svn:mergeinfo
-V 222
-/branches/REL1_15/phase3/includes/upload:51646
-/branches/sqlite/includes/upload:58211-58321
-/branches/wmf-deployment/includes/upload:53381
-/trunk/phase3/includes/upload:63549,63764,63897-63901,64876,64881,64948,66944,79561
-END

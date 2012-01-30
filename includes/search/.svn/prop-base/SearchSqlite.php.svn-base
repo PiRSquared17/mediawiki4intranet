@@ -2,11 +2,4 @@ K 13
 svn:eol-style
 V 6
 native
-K 13
-svn:mergeinfo
-V 290
-/branches/REL1_15/phase3/includes/search/SearchSqlite.php:51646
-/branches/sqlite/includes/search/SearchSqlite.php:58211-58321
-/branches/wmf-deployment/includes/search/SearchSqlite.php:53381
-/trunk/phase3/includes/search/SearchSqlite.php:63549,63764,63897-63901,64876,64881,64948,68629,79561
 END

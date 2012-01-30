@@ -31,14 +31,12 @@ p {
 	margin: 0.4em 0em 0.5em 0em;
 	line-height: 1.5em;
 }
-
 div.paragraph {
 	margin: 0.4em 0em 0.5em 0em;
 	line-height: 1.5em;
 }
 
 p img { margin: 0; }
-
 div.paragraph img { margin: 0; }
 
 hr {
@@ -54,6 +52,7 @@ h1, h2, h3, h4, h5, h6 {
 	background: none;
 	font-weight: normal;
 	margin: 0;
+	overflow: hidden;
 	padding-top: 0.5em;
 	padding-bottom: 0.17em;
 	border-bottom: 1px solid #aaaaaa;
@@ -152,12 +151,6 @@ select {
 	color: black;
 	vertical-align: top;
 }
-abbr, acronym, .explain {
-	border-bottom: 1px dotted black;
-	color: black;
-	background: none;
-	cursor: help;
-}
 q {
 	font-family: Times, "Times New Roman", serif;
 	font-style: italic;
@@ -202,7 +195,6 @@ span.subpages { display: block; }
 	padding: 0 0.9em 0 0.9em;
 }
 #siteNotice p { margin: 0; padding: 0; }
-
 #siteNotice div.paragraph { margin: 0; padding: 0; }
 .error {
 	color: red;
@@ -245,7 +237,7 @@ in the bottom-right corner of the content area */
 	margin-right: auto;
 }
 /* small for tables and similar */
-.small, .small * { font-size: 94%; }
+.small { font-size: 94%; }
 table.small { font-size: 100% }
 
 /*
@@ -259,7 +251,7 @@ table.small { font-size: 100% }
 	padding:5px;
 	font-size: 95%;
 }
-#toc ul { margin-left: 2em; }
+#toc ul { margin: 0 2em; }
 #toc .toctoggle { font-size: 94%; }
 #toc .editsection {
 	margin-top: 0.7em;
@@ -267,32 +259,23 @@ table.small { font-size: 100% }
 }
 
 /* images */
-div.floatright, table.floatright {
-	clear: right;
-	float: right;
+/* @noflip */div.floatright, table.floatright {
 	margin: 0;
-	position: relative;
 	border: 0.5em solid white;
 	border-width: 0.5em 0 0.8em 1.4em;
 }
 div.floatright p { font-style: italic; }
-
 div.floatright div.paragraph { font-style: italic; }
-div.floatleft, table.floatleft {
-	float: left;
-	clear: left;
+/* @noflip */div.floatleft, table.floatleft {
 	margin: 0.3em 0.5em 0.5em 0;
-	position: relative;
 	border: 0.5em solid white;
 	border-width: 0.5em 1.4em 0.8em 0;
 }
 div.floatleft p { font-style: italic; }
-
 div.floatleft div.paragraph { font-style: italic; }
 /* thumbnails */
 div.thumb {
 	margin-bottom: 0.5em;
-	border-style: solid; border-color: white;
 	width: auto;
 }
 div.thumbinner {
@@ -322,23 +305,14 @@ div.magnify a, div.magnify img {
 	border: none !important;
 	background: none !important;
 }
-div.tright {
-	clear: right;
-	float: right;
-	border-width: 0.5em 0 0.8em 1.4em;
+/* @noflip */div.tright {
+	margin: 0.5em 0 1.3em 1.4em;
 }
-div.tleft {
-	float: left;
-	clear: left;
-	margin-right:0.5em;
-	border-width: 0.5em 1.4em 0.8em 0;
+/* @noflip */div.tleft {
+	margin: 0.5em 1.4em 1.3em 0;
 }
 img.thumbborder {
 	border: 1px solid #dddddd;
-}
-
-.hiddenStructure {
-	display: none;
 }
 
 /*
