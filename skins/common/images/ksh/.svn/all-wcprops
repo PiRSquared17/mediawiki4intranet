@@ -1,17 +1,11 @@
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/common/images/ksh
-END
-LICENSE
-K 25
-svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/common/images/ksh/LICENSE
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/common/images/ksh
 END
 button_S_italic.png
 K 25
 svn:wc:ra_dav:version-url
-V 99
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/common/images/ksh/button_S_italic.png
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/common/images/ksh/button_S_italic.png
 END
