@@ -1,16 +1,16 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/diff
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/diff
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
-has-props
+2011-09-07T20:14:20.887716Z
+96485
+catrope
+
 
 
 
@@ -26,17 +26,17 @@ has-props
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
-DifferenceInterface.php
+WikiDiff3.php
 file
 
 
 
 
-2011-02-04T18:14:23.083984Z
-446b3f007d28b679e153e81c6e86f9bb
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2012-01-25T15:31:57.241539Z
+41abbece831513e9fa8eb5384e3bb687
+2011-06-17T16:03:52.586733Z
+90280
+reedy
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-31658
+16560
 
 DifferenceEngine.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:23.087984Z
-f50a7a1b149d853d60f25dbe831cef3d
-2010-05-12T02:12:12.083270Z
-66255
-simetrical
+2012-01-25T15:31:57.241539Z
+74701c3f0b52e5dc61fdb00878cf5dd4
+2011-09-07T20:14:20.887716Z
+96485
+catrope
 has-props
 
 
@@ -92,19 +92,19 @@ has-props
 
 
 
-31417
+35542
 
-Diff.php
+DairikiDiff.php
 file
 
 
 
 
-2011-02-04T18:14:23.087984Z
-7eb5b2f22ebb3e1d98e3a44af26e45df
-2008-08-25T20:19:00.835480Z
-39969
-demon
+2012-01-25T15:31:57.241539Z
+001493a2065839d5bf13adb47a586e68
+2011-07-05T11:08:05.169889Z
+91450
+ialex
 has-props
 
 
@@ -126,5 +126,5 @@ has-props
 
 
 
-16153
+32597
 
