@@ -1,17 +1,17 @@
 K 25
 svn:wc:ra_dav:version-url
-V 66
-/svnroot/mediawiki/!svn/ver/81481/trunk/extensions/googleAnalytics
+V 67
+/svnroot/mediawiki/!svn/ver/107261/trunk/extensions/googleAnalytics
 END
 googleAnalytics.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 91
-/svnroot/mediawiki/!svn/ver/81481/trunk/extensions/googleAnalytics/googleAnalytics.i18n.php
+V 92
+/svnroot/mediawiki/!svn/ver/107261/trunk/extensions/googleAnalytics/googleAnalytics.i18n.php
 END
 googleAnalytics.php
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/69424/trunk/extensions/googleAnalytics/googleAnalytics.php
+V 87
+/svnroot/mediawiki/!svn/ver/106136/trunk/extensions/googleAnalytics/googleAnalytics.php
 END

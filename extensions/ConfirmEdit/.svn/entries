@@ -1,15 +1,15 @@
 10
 
 dir
-100031
+110002
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/ConfirmEdit
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-10-14T23:09:19.535813Z
-99827
-bachsau
+2012-01-17T22:10:16.887856Z
+109231
+raymond
 
 
 
@@ -32,44 +32,10 @@ file
 
 
 
-2011-10-17T14:32:52.648384Z
-778d0921cd8c8d96b12ab729d6326d29
-2011-10-14T23:09:19.535813Z
-99827
-bachsau
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3955
-
-ConfirmEdit.alias.php
-file
-
-
-
-
-2011-10-17T14:32:52.648384Z
-a58f4b74f3ef42d74e43a04531f2db2e
-2011-09-13T13:33:40.865763Z
-96961
+2012-01-25T15:31:22.493424Z
+d90159f29ac10e2137d3e73df4c224c3
+2012-01-12T08:58:40.146979Z
+108711
 siebrand
 has-props
 
@@ -92,19 +58,19 @@ has-props
 
 
 
-1951
+1706
 
-QuestyCaptcha.i18n.php
+ConfirmEdit.alias.php
 file
 
 
 
 
-2011-10-17T14:32:52.652384Z
-f0a5dbcd2dd576cae58cf0e2051e77a5
-2011-10-09T20:04:54.574238Z
-99373
-raymond
+2012-01-25T15:31:22.493424Z
+90ab93ac02a9d490effb019bbf3fef2f
+2011-12-25T22:19:29.996502Z
+107294
+siebrand
 has-props
 
 
@@ -126,7 +92,7 @@ has-props
 
 
 
-103940
+1943
 
 HTMLCaptchaField.php
 file
@@ -134,11 +100,11 @@ file
 
 
 
-2011-10-17T14:32:52.648384Z
-6ae778af26f10c64bfd681ea7f58fb94
-2011-04-24T11:47:03.516007Z
-86814
-happy-melon
+2012-01-25T15:31:22.497424Z
+b5c3795cb7dbd3cb37e53d782859abde
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -160,18 +126,18 @@ has-props
 
 
 
-2426
+2434
 
-FancyCaptcha.i18n.php
+QuestyCaptcha.i18n.php
 file
 
 
 
 
-2011-10-17T14:32:52.652384Z
-06afd173ab6df55bd8805bc401065e0a
-2011-10-09T20:04:54.574238Z
-99373
+2012-01-25T15:31:22.497424Z
+05cd964ac93aded31ac510a7a45118f4
+2011-12-30T21:17:13.418870Z
+107655
 raymond
 has-props
 
@@ -194,19 +160,19 @@ has-props
 
 
 
-140801
+108159
 
-ConfirmEdit.php
+ReCaptcha.class.php
 file
 
 
 
 
-2011-10-17T14:32:52.656384Z
-07da066bd92353412f8b306dd574be7c
-2011-09-01T16:54:59.061096Z
-96011
-platonides
+2012-01-25T15:31:22.497424Z
+e88b10536694b7d736ec0b15262967ed
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -228,7 +194,75 @@ has-props
 
 
 
-8667
+2492
+
+Asirra.i18n.php
+file
+
+
+
+
+2012-01-25T15:31:22.497424Z
+1e5702349c70149645076ca61536ca3d
+2012-01-17T22:10:16.887856Z
+109231
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+17163
+
+FancyCaptcha.i18n.php
+file
+
+
+
+
+2012-01-25T15:31:22.501424Z
+b7da90068da65c582c71d73b853ec963
+2012-01-11T20:17:10.626016Z
+108669
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+143401
 
 Captcha.php
 file
@@ -236,11 +270,11 @@ file
 
 
 
-2011-10-17T14:32:52.652384Z
-8ceeccf109254b7d5c93afc7e3073c86
-2011-04-24T17:33:41.763823Z
-86825
-happy-melon
+2012-01-25T15:31:22.501424Z
+fc6823809e7f9514bf9e6c399e872f12
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -262,7 +296,41 @@ has-props
 
 
 
-25909
+20439
+
+ConfirmEdit.php
+file
+
+
+
+
+2012-01-25T15:31:22.501424Z
+fa6dac396a21f1b74bd2a35c8ade61fa
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8374
 
 captcha.py
 file
@@ -298,6 +366,40 @@ has-props
 
 7848
 
+ConfirmEditHooks.php
+file
+
+
+
+
+2012-01-25T15:31:22.501424Z
+72a61bc5990123636782cf012a0316d4
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2228
+
 README
 file
 
@@ -332,17 +434,17 @@ has-props
 
 1413
 
-ConfirmEditHooks.php
+ext.confirmedit.asirra.js
 file
 
 
 
 
-2011-10-17T14:32:52.656384Z
-99929429f452bdbdf31b2a3e67acf35f
-2011-04-24T11:41:49.175119Z
-86813
-happy-melon
+2012-01-25T15:31:22.501424Z
+ba025a6467c9bfe2da6399de4dc4023d
+2011-12-09T16:10:27.656568Z
+105675
+nikerabbit
 has-props
 
 
@@ -364,7 +466,7 @@ has-props
 
 
 
-2051
+1696
 
 ReCaptcha.i18n.php
 file
@@ -372,10 +474,10 @@ file
 
 
 
-2011-10-17T14:32:52.656384Z
-2e04ec375634d0e1caba81ffb20a964d
-2011-10-14T20:06:14.036368Z
-99798
+2012-01-25T15:31:22.501424Z
+2a94f578996143ed77312b09d253f777
+2012-01-07T21:50:32.760363Z
+108328
 raymond
 has-props
 
@@ -398,7 +500,7 @@ has-props
 
 
 
-35125
+37304
 
 MathCaptcha.php
 file
@@ -474,11 +576,11 @@ file
 
 
 
-2011-10-17T14:32:52.656384Z
-6a56268f4d5671ef49b999e56243ea69
-2011-04-24T16:49:49.427375Z
-86820
-happy-melon
+2012-01-25T15:31:22.501424Z
+aba3560645a843cd63641f327bc2e4e7
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -500,7 +602,7 @@ has-props
 
 
 
-2344
+2348
 
 ConfirmEdit.i18n.php
 file
@@ -508,10 +610,10 @@ file
 
 
 
-2011-10-17T14:32:52.660384Z
-f67496f199b282a6204169d4672d9661
-2011-10-14T20:06:14.036368Z
-99798
+2012-01-25T15:31:22.509424Z
+5bea8ff854e2712c3071f7e8c3f91921
+2012-01-16T21:47:30.800331Z
+109064
 raymond
 has-props
 
@@ -534,7 +636,7 @@ has-props
 
 
 
-403384
+410225
 
 MathCaptcha.class.php
 file
@@ -542,11 +644,11 @@ file
 
 
 
-2011-10-17T14:32:52.660384Z
-4a61920d8ad8e8176aa5a7ef85e927b3
-2011-07-22T21:51:06.835885Z
-92901
-demon
+2012-01-25T15:31:22.501424Z
+bdf98d5147ea4a886d0b572e11d9732b
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -568,7 +670,7 @@ has-props
 
 
 
-1553
+1568
 
 recaptchalib.php
 file
@@ -576,11 +678,11 @@ file
 
 
 
-2011-10-17T14:32:52.660384Z
-420c659aff3e5c3012b143ba333353bc
-2011-10-14T21:30:16.924942Z
-99815
-reedy
+2012-01-25T15:31:22.509424Z
+e6d4dc5ab125f11c9a65b17808013950
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -602,7 +704,41 @@ has-props
 
 
 
-9902
+10063
+
+Asirra.php
+file
+
+
+
+
+2012-01-25T15:31:22.509424Z
+d20c4e84442f6c2273b3d3e3eb37d92d
+2011-12-09T16:10:27.656568Z
+105675
+nikerabbit
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1163
 
 QuestyCaptcha.class.php
 file
@@ -610,11 +746,11 @@ file
 
 
 
-2011-10-17T14:32:52.664384Z
-2adfbcb227f6a612020d38e7956431f6
-2011-02-08T23:39:17.933261Z
-81795
-platonides
+2012-01-25T15:31:22.509424Z
+5414658249a80de76a63cda7bf863ff5
+2011-12-01T16:24:49.489742Z
+104867
+mah
 has-props
 
 
@@ -636,7 +772,7 @@ has-props
 
 
 
-2091
+2113
 
 FancyCaptcha.php
 file
@@ -644,11 +780,11 @@ file
 
 
 
-2011-10-17T14:32:52.664384Z
-7c244323d590109bc3411eaf578819ac
-2011-10-14T23:09:19.535813Z
-99827
-bachsau
+2012-01-25T15:31:22.509424Z
+cd564c105acb620258b9dcda29a5b327
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
 has-props
 
 
@@ -670,7 +806,41 @@ has-props
 
 
 
-1882
+1880
+
+Asirra.class.php
+file
+
+
+
+
+2012-01-25T15:31:22.509424Z
+a736b11833c2a1e2629c29cdcf9471ef
+2012-01-12T08:58:40.146979Z
+108711
+siebrand
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1379
 
 FancyCaptcha.class.php
 file
@@ -678,11 +848,11 @@ file
 
 
 
-2011-10-17T14:32:52.664384Z
-190162d862f56f09f09ee40dcc864609
-2011-04-24T11:41:49.175119Z
-86813
-happy-melon
+2012-01-25T15:31:22.509424Z
+b2fb8d330a554b3b090c9d0f19ba80db
+2011-12-26T19:50:20.436943Z
+107337
+brion
 has-props
 
 
@@ -704,5 +874,5 @@ has-props
 
 
 
-6718
+6794
 
