@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/upload
+END
+UploadFromUrlTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/upload/UploadFromUrlTest.php
+END
+UploadTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/upload/UploadTest.php
+END
+UploadStashTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/upload/UploadStashTest.php
+END
