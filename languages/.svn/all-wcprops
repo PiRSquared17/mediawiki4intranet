@@ -1,29 +1,23 @@
 K 25
 svn:wc:ra_dav:version-url
-V 65
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/languages
+V 66
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/languages
 END
 LanguageConverter.php
 K 25
 svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/languages/LanguageConverter.php
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/languages/LanguageConverter.php
 END
 Language.php
 K 25
 svn:wc:ra_dav:version-url
-V 78
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/languages/Language.php
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/languages/Language.php
 END
 Names.php
 K 25
 svn:wc:ra_dav:version-url
-V 75
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/languages/Names.php
-END
-.htaccess
-K 25
-svn:wc:ra_dav:version-url
-V 75
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/languages/.htaccess
+V 76
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/languages/Names.php
 END

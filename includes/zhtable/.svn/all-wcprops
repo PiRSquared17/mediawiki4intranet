@@ -1,131 +1,89 @@
 K 25
 svn:wc:ra_dav:version-url
-V 72
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable
+V 73
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable
 END
 toCN.manual
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toCN.manual
-END
-trad2simp.manual
-K 25
-svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/trad2simp.manual
-END
-toHK.manual
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toHK.manual
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/toCN.manual
 END
 simp2trad.manual
 K 25
 svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/simp2trad.manual
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/simp2trad.manual
+END
+toHK.manual
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/toHK.manual
+END
+trad2simp.manual
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/trad2simp.manual
 END
 simpphrases_exclude.manual
 K 25
 svn:wc:ra_dav:version-url
-V 99
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/simpphrases_exclude.manual
-END
-printutf8.c
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/printutf8.c
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/simpphrases_exclude.manual
 END
 toSimp.manual
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toSimp.manual
-END
-toSG.manual
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toSG.manual
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/toSimp.manual
 END
 tradphrases.manual
 K 25
 svn:wc:ra_dav:version-url
-V 91
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/tradphrases.manual
-END
-README
-K 25
-svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/README
-END
-simp2trad_supp_set.manual
-K 25
-svn:wc:ra_dav:version-url
-V 98
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/simp2trad_supp_set.manual
-END
-trad2simp_supp_set.manual
-K 25
-svn:wc:ra_dav:version-url
-V 98
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/trad2simp_supp_set.manual
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/tradphrases.manual
 END
 Makefile.py
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/Makefile.py
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/Makefile.py
 END
 tradphrases_exclude.manual
 K 25
 svn:wc:ra_dav:version-url
-V 99
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/tradphrases_exclude.manual
-END
-trad2simp_supp_unset.manual
-K 25
-svn:wc:ra_dav:version-url
 V 100
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/trad2simp_supp_unset.manual
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/tradphrases_exclude.manual
 END
 toTrad.manual
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toTrad.manual
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/toTrad.manual
 END
 toTW.manual
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/toTW.manual
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/toTW.manual
 END
 simpphrases.manual
 K 25
 svn:wc:ra_dav:version-url
-V 91
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/simpphrases.manual
-END
-Makefile
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/Makefile
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/simpphrases.manual
 END
 simp2trad_noconvert.manual
 K 25
 svn:wc:ra_dav:version-url
-V 99
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/simp2trad_noconvert.manual
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/simp2trad_noconvert.manual
 END
 trad2simp_noconvert.manual
 K 25
 svn:wc:ra_dav:version-url
-V 99
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/zhtable/trad2simp_noconvert.manual
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/zhtable/trad2simp_noconvert.manual
 END

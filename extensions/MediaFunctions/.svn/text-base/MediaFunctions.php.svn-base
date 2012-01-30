@@ -15,12 +15,13 @@ $wgExtensionCredits['parserhook'][] = array(
 	'name' => 'MediaFunctions',
 	'version' => '1.2.1',
 	'author' => 'Rob Church',
-	'url' => 'http://www.mediawiki.org/wiki/Extension:MediaFunctions',
+	'url' => 'https://www.mediawiki.org/wiki/Extension:MediaFunctions',
 	'descriptionmsg' => 'mediafunctions-desc',
 );
 
 $dir = dirname( __FILE__ ) . '/';
 $wgExtensionMessagesFiles['MediaFunctions'] = $dir . 'MediaFunctions.i18n.php';
+$wgExtensionMessagesFiles['MediaFunctionsMagic'] = $dir . 'MediaFunctions.i18n.magic.php';
 $wgAutoloadClasses['MediaFunctions'] = $dir . 'MediaFunctions.class.php';
 $wgHooks['ParserFirstCallInit'][] = 'efMediaFunctionsSetup';
 
