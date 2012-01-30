@@ -6,11 +6,4 @@ K 12
 svn:keywords
 V 23
 Author Date Id Revision
-K 13
-svn:mergeinfo
-V 250
-/branches/REL1_15/phase3/includes/Sanitizer.php:51646
-/branches/sqlite/includes/Sanitizer.php:58211-58321
-/branches/wmf-deployment/includes/Sanitizer.php:53381
-/trunk/phase3/includes/Sanitizer.php:63549,63764,63897-63901,64876,64881,64948,66990,79561
 END

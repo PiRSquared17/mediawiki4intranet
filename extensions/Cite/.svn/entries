@@ -1,15 +1,15 @@
 10
 
 dir
-83020
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/Cite
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/Cite
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2011-10-03T13:31:37.220449Z
+98759
+reedy
 
 
 
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:15:53.080245Z
-13ffbf4170c8e0a96425d1372a24e5bf
-2009-12-05T14:28:24.341064Z
-59756
-ialex
+2012-01-25T15:30:04.461166Z
+7a5f16d3cb04ba8d25344d7fccfe6675
+2011-05-31T17:51:30.071565Z
+89221
+platonides
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-27614
+33063
 
 Cite.i18n.php
 file
@@ -134,10 +134,10 @@ file
 
 
 
-2011-02-04T18:15:53.084245Z
-737bb76c8a50f544272f4063ce54dd54
-2010-02-12T19:47:22.108064Z
-62374
+2012-01-25T15:30:04.469166Z
+97a4d951174802b0fbab93ab0dfa468d
+2011-07-06T20:03:01.803587Z
+91592
 raymond
 has-props
 
@@ -160,7 +160,7 @@ has-props
 
 
 
-273291
+318336
 
 cite_text
 file
@@ -406,11 +406,11 @@ file
 
 
 
-2011-02-04T18:15:53.088245Z
-02417016666a2880e28dca329b30c1d4
-2010-02-01T21:44:34.666699Z
-61822
-overlordq
+2012-01-25T15:30:04.469166Z
+893123f9fde5e41533e67b54820d0386
+2011-07-06T18:26:51.601085Z
+91578
+kaldari
 has-props
 
 
@@ -432,7 +432,7 @@ has-props
 
 
 
-10619
+11047
 
 cite_text-sq
 file
@@ -474,11 +474,11 @@ file
 
 
 
-2011-02-04T18:15:53.088245Z
-8f010b8ca123057eb78915a2d0efaf8c
-2009-07-10T13:51:26.834059Z
-53050
-avar
+2012-01-25T15:30:04.469166Z
+30557030e7de5736601a3f8c6d0099ae
+2011-05-31T17:49:22.029983Z
+89220
+platonides
 has-props
 
 
@@ -500,7 +500,41 @@ has-props
 
 
 
-1658
+1728
+
+citeCatTreeParserTests.txt
+file
+
+
+
+
+2012-01-25T15:30:04.469166Z
+a0c19096399ec2c7addae16428aa115d
+2011-05-31T17:49:22.029983Z
+89220
+platonides
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1092
 
 SpecialCite.php
 file
@@ -508,11 +542,11 @@ file
 
 
 
-2011-02-04T18:15:53.088245Z
-aca99b75f702b2a9bf9e91457d862099
-2009-09-23T20:54:53.565120Z
-56836
-churchofemacs
+2012-01-25T15:30:04.469166Z
+c452c74e7727eb1c5a94413c82f9f30a
+2011-10-03T13:31:37.220449Z
+98759
+reedy
 has-props
 
 
@@ -534,41 +568,7 @@ has-props
 
 
 
-2256
-
-cite_text-de
-file
-
-
-
-
-2011-02-04T18:15:53.092245Z
-142328df08ea8a69123a78ffb0dee422
-2009-08-18T08:33:14.129974Z
-55226
-siebrand
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2755
+2307
 
 cite_text-kk-tr
 file
@@ -604,17 +604,17 @@ has-props
 
 4131
 
-cite_text-he
+cite_text-de
 file
 
 
 
 
-2011-02-04T18:15:53.076245Z
-f379fe90a9671559366330e08306af48
-2008-06-20T16:42:20.525513Z
-36511
-rotem
+2011-02-04T18:15:53.092245Z
+142328df08ea8a69123a78ffb0dee422
+2009-08-18T08:33:14.129974Z
+55226
+siebrand
 has-props
 
 
@@ -636,7 +636,41 @@ has-props
 
 
 
-3713
+2755
+
+cite_text-ja
+file
+
+
+
+
+2012-01-25T15:30:04.469166Z
+a205056e493c8e95b6adaa4ed0bcbad9
+2010-06-04T21:01:40.911612Z
+67361
+ialex
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4016
 
 cite_text-arz
 file
@@ -671,6 +705,40 @@ has-props
 
 
 3668
+
+cite_text-he
+file
+
+
+
+
+2011-02-04T18:15:53.076245Z
+f379fe90a9671559366330e08306af48
+2008-06-20T16:42:20.525513Z
+36511
+rotem
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3713
 
 cite_text-fi
 file
@@ -746,11 +814,11 @@ file
 
 
 
-2011-02-04T18:15:53.084245Z
-ea50f311628d55da950257ce8c6bf40d
-2008-12-20T09:32:47.100983Z
-44839
-aaron
+2012-01-25T15:30:04.469166Z
+b9820845383c3a6323a4d3817efc9304
+2011-05-28T20:44:24.254941Z
+89068
+reedy
 has-props
 
 
@@ -772,41 +840,7 @@ has-props
 
 
 
-3624
-
-SpecialCite.i18n.php
-file
-
-
-
-
-2011-02-04T18:15:53.084245Z
-e1986dbe3c241de0a0b0681eacc52d05
-2010-02-12T19:47:22.108064Z
-62374
-raymond
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-53592
+3857
 
 cite_text-kk-cn
 file
@@ -841,6 +875,40 @@ has-props
 
 
 4711
+
+SpecialCite.i18n.php
+file
+
+
+
+
+2012-01-25T15:30:04.469166Z
+d9152d1f4950d592ebd4d57c7ca92f2c
+2011-07-12T20:05:07.402786Z
+91995
+raymond
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+62674
 
 cite_text-fr
 file
@@ -950,11 +1018,11 @@ file
 
 
 
-2011-02-04T18:15:53.088245Z
-580aa41a96ec03ce75592f41a0f86969
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2012-01-25T15:30:04.473166Z
+86541ab448b518a7ea38c26d2e00e53f
+2011-05-14T00:11:22.365603Z
+88028
+siebrand
 has-props
 
 
@@ -976,7 +1044,7 @@ has-props
 
 
 
-5940
+7458
 
 cite_text-lt
 file

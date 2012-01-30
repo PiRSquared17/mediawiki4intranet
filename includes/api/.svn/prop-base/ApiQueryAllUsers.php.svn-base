@@ -6,11 +6,4 @@ K 12
 svn:keywords
 V 2
 Id
-K 13
-svn:mergeinfo
-V 360
-/branches/REL1_15/phase3/includes/api/ApiQueryAllUsers.php:51646
-/branches/sqlite/includes/api/ApiQueryAllUsers.php:58211-58321
-/branches/wmf-deployment/includes/api/ApiQueryAllUsers.php:53381,59952
-/trunk/phase3/includes/api/ApiQueryAllUsers.php:63549,63764,63897-63901,64454,64881,64948,66486,69339,69347,69350,69369,69379,69776,69931,71754,74098-74099,79561
 END

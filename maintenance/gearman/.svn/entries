@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/maintenance/gearman
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/maintenance/gearman
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2009-09-14T22:10:10.553153Z
-56345
-brion
+2011-04-20T00:12:06.966746Z
+86447
+platonides
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:59.668090Z
-d694e992e9feb684c08a02e66d175a38
-2009-02-26T08:04:28.173120Z
-47823
-tstarling
+2012-01-25T15:33:14.189794Z
+32e457db466f079c335882a10fbf35df
+2010-05-22T16:50:39.689141Z
+66751
+reedy
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-1063
+1067
 
 gearman.inc
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:59.668090Z
-5290296f06b6b328c299b98d1fcd6c03
-2009-04-30T05:52:25.403629Z
-50068
-tstarling
+2012-01-25T15:33:14.189794Z
+0e3e7ed4685096f7f78059b624e36462
+2010-10-14T20:53:04.640133Z
+74797
+reedy
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-2677
+2676
 
 gearmanWorker.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:59.668090Z
-f1c97c720ab985dc4174d7c6d95117ce
-2009-09-14T22:10:10.553153Z
-56345
-brion
+2012-01-25T15:33:14.189794Z
+3e9baf34cd2304505ca633d588e40ca1
+2011-04-20T00:12:06.966746Z
+86447
+platonides
 has-props
 
 
@@ -126,5 +126,5 @@ has-props
 
 
 
-1034
+1032
 

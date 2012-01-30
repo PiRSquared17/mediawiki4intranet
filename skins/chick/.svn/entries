@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/chick
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/skins/chick
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-24T17:08:29.426689Z
-62928
-simetrical
+2011-09-12T15:03:51.245050Z
+96849
+reedy
 
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2011-02-04T18:15:06.628111Z
+
 4d148c7d8b744d70122081964076b012
-2010-02-24T17:08:29.426689Z
-62928
+2010-02-23T17:46:18.676755Z
+62882
 simetrical
 has-props
 
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:15:06.628111Z
-a24e7ee0c1c3d4b9729c95264f0b1afb
-2010-01-29T20:48:41.908401Z
-61687
-simetrical
+2012-01-25T15:35:22.222217Z
+a0214bab78e9438baf4f976b8d161c8e
+2011-09-12T15:03:51.245050Z
+96849
+reedy
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-7199
+6874
 
 IE55Fixes.css
 file
@@ -134,10 +134,10 @@ file
 
 
 
-2011-02-04T18:15:06.628111Z
+
 1a4f2fb5d65cd15072f48ac7bd371f45
-2010-02-24T17:08:29.426689Z
-62928
+2010-02-23T17:46:18.676755Z
+62882
 simetrical
 has-props
 
