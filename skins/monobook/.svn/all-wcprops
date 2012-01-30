@@ -1,173 +1,83 @@
 K 25
 svn:wc:ra_dav:version-url
-V 70
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook
+V 71
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook
 END
 Opera6Fixes.css
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/Opera6Fixes.css
-END
-user.gif
-K 25
-svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/user.gif
-END
-Opera7Fixes.css
-K 25
-svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/Opera7Fixes.css
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/Opera6Fixes.css
 END
 audio.png
 K 25
 svn:wc:ra_dav:version-url
-V 80
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/audio.png
-END
-required.gif
-K 25
-svn:wc:ra_dav:version-url
-V 83
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/required.gif
-END
-Opera9Fixes.css
-K 25
-svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/Opera9Fixes.css
+V 81
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/audio.png
 END
 wiki.png
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/wiki.png
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/wiki.png
 END
 IE50Fixes.css
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/IE50Fixes.css
-END
-rtl.css
-K 25
-svn:wc:ra_dav:version-url
-V 78
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/rtl.css
-END
-headbg.jpg
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/headbg.jpg
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/IE50Fixes.css
 END
 IE60Fixes.css
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/IE60Fixes.css
-END
-video.png
-K 25
-svn:wc:ra_dav:version-url
-V 80
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/video.png
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/IE60Fixes.css
 END
 IE70Fixes.css
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/IE70Fixes.css
-END
-file_icon.gif
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/file_icon.gif
-END
-bullet.gif
-K 25
-svn:wc:ra_dav:version-url
-V 81
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/bullet.gif
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/IE70Fixes.css
 END
 IE55Fixes.css
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/IE55Fixes.css
-END
-mail_icon.gif
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/mail_icon.gif
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/IE55Fixes.css
 END
 document.png
 K 25
 svn:wc:ra_dav:version-url
-V 83
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/document.png
-END
-magnify-clip.png
-K 25
-svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/magnify-clip.png
-END
-FF2Fixes.css
-K 25
-svn:wc:ra_dav:version-url
-V 83
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/FF2Fixes.css
+V 84
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/document.png
 END
 external-rtl.png
 K 25
 svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/external-rtl.png
-END
-lock_icon.gif
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/lock_icon.gif
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/external-rtl.png
 END
 wiki-indexed.png
 K 25
 svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/wiki-indexed.png
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/wiki-indexed.png
 END
-external.png
+external-ltr.png
 K 25
 svn:wc:ra_dav:version-url
-V 83
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/external.png
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/external-ltr.png
 END
 news_icon.png
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/news_icon.png
-END
-link_icon.gif
-K 25
-svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/link_icon.gif
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/news_icon.png
 END
 main.css
 K 25
 svn:wc:ra_dav:version-url
-V 79
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/main.css
-END
-discussionitem_icon.gif
-K 25
-svn:wc:ra_dav:version-url
-V 94
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/skins/monobook/discussionitem_icon.gif
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/skins/monobook/main.css
 END

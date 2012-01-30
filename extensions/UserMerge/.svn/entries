@@ -1,14 +1,14 @@
 10
 
 dir
-83020
+110002
 http://svn.wikimedia.org/svnroot/mediawiki/trunk/extensions/UserMerge
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-02-06T21:25:59.554289Z
-81606
+2012-01-15T20:22:43.374281Z
+108998
 raymond
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:16:57.756433Z
-50a1c4b1689c6b2ad8d0f376813bbca0
-2010-12-09T11:57:55.339318Z
-78123
-siebrand
+2012-01-25T15:31:36.745471Z
+c895bad1a9d7610e02e464c6fab53b54
+2011-08-03T17:52:08.828589Z
+93843
+ialex
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-8516
+14515
 
 UserMerge.i18n.php
 file
@@ -66,10 +66,10 @@ file
 
 
 
-2011-03-01T16:51:12.649837Z
-bb10949e854a54fb237329b81e0ac062
-2011-02-06T21:25:59.554289Z
-81606
+2012-01-25T15:31:36.745471Z
+a5b3b5bd4a1286127270fe5fec318f7f
+2012-01-15T20:22:43.374281Z
+108998
 raymond
 has-props
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-136362
+149270
 
 UserMerge.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2011-02-04T18:16:57.756433Z
-bf0f67c26f557aa34470040dd9f892b3
-2010-02-22T23:41:51.708198Z
-62858
+2012-01-25T15:31:36.745471Z
+316022cb8a137c2f1b36a3044084d9b4
+2011-12-25T23:09:26.010704Z
+107299
 siebrand
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-1365
+2312
 
 install.settings
 file
@@ -168,10 +168,10 @@ file
 
 
 
-2011-02-04T18:16:57.760433Z
-d85a40ddc9f773dcf56070c4695d4cbd
-2010-10-31T17:55:47.642542Z
-75726
+2012-01-25T15:31:36.745471Z
+7cbcf48bc68d9e16f086051009fc39c3
+2011-12-25T22:19:29.996502Z
+107294
 siebrand
 has-props
 
@@ -194,5 +194,5 @@ has-props
 
 
 
-5242
+5385
 
