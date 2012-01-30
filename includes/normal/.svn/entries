@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/normal
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/normal
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-21T14:28:16.627050Z
-62770
-midom
+2011-06-17T16:05:05.734015Z
+90281
+reedy
 has-props
 
 
@@ -26,17 +26,17 @@ has-props
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
 
-Utf8CaseGenerate.php
+UtfNormalTest2.php
 file
 
 
 
 
-2011-02-04T18:14:25.759992Z
-1709242e1d6bacd4285b53819b9e4c42
-2010-02-16T19:04:09.776602Z
-62586
-maxsem
+2012-01-25T15:32:05.241565Z
+a94c84144e2a00e04d6887f208058953
+2011-06-17T16:05:05.734015Z
+90281
+reedy
 has-props
 
 
@@ -58,7 +58,41 @@ has-props
 
 
 
-3029
+7112
+
+Utf8CaseGenerate.php
+file
+
+
+
+
+2012-01-25T15:32:05.241565Z
+f7e01ef49c55f3e895a33ef421832ced
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3081
 
 UtfNormalDataK.inc
 file
@@ -66,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:25.759992Z
-e421ed5257dab18f23630d142070307c
-2009-11-14T08:12:51.207128Z
-59053
-maxsem
+2012-01-25T15:32:05.241565Z
+04d709f47d16bd984f36ac8436b64caf
+2011-03-27T12:21:45.102230Z
+84842
+happy-melon
 has-props
 
 
@@ -92,41 +126,7 @@ has-props
 
 
 
-112966
-
-UtfNormalUtil.php
-file
-
-
-
-
-2011-02-04T18:14:25.763992Z
-359e7493378691c7d432bd547f3ca6a3
-2008-05-20T17:13:28.824583Z
-35098
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3745
+113790
 
 UtfNormalDefines.php
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2011-02-04T18:14:25.763992Z
-a7f36fb2034b9c91dd0ea48aa5a65afd
-2008-05-09T15:34:47.619008Z
-34519
-ialex
+2012-01-25T15:32:05.241565Z
+1efc9b5e7078ccebdc05dcfcb76c2834
+2011-04-04T12:59:55.272923Z
+85327
+tstarling
 has-props
 
 
@@ -160,19 +160,19 @@ has-props
 
 
 
-2457
+2737
 
-UtfNormalTest.php
+UtfNormalUtil.php
 file
 
 
 
 
-2011-02-04T18:14:25.767992Z
-dac54f4041426eb94adb6fa00d779392
-2008-05-20T17:13:28.824583Z
-35098
-ialex
+2012-01-25T15:32:05.241565Z
+93e88e0db864ad7c38d1472e5c79dc1c
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
 has-props
 
 
@@ -194,75 +194,7 @@ has-props
 
 
 
-8208
-
-UtfNormalBench.php
-file
-
-
-
-
-2011-02-04T18:14:25.767992Z
-9d52c4904e1a570232dbee8e6bdb2918
-2008-05-20T17:13:28.824583Z
-35098
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2908
-
-UtfNormal.php
-file
-
-
-
-
-2011-02-04T18:14:25.767992Z
-b1244a2b2d4a4c1b364f34b1974e5010
-2009-12-11T21:07:27.971924Z
-59969
-demon
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-22167
+3697
 
 README
 file
@@ -298,84 +230,152 @@ has-props
 
 2389
 
+UtfNormal.php
+file
+
+
+
+
+2012-01-25T15:32:05.245565Z
+ace6fb6de4b2e41e6012e358f4ad0056
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+23416
+
+UtfNormalBench.php
+file
+
+
+
+
+2012-01-25T15:32:05.245565Z
+6e2da5666f8bc6fb8782bf0683e20242
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+2929
+
+UtfNormalTest.php
+file
+
+
+
+
+2012-01-25T15:32:05.245565Z
+711e62fa50e71a28d513e6e362df93f3
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+8293
+
+UtfNormalMemStress.php
+file
+
+
+
+
+2012-01-25T15:32:05.245565Z
+a31bf2ab15fa3d62206689c8b7bc60c4
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3116
+
 RandomTest.php
 file
 
 
 
 
-2011-02-04T18:14:25.759992Z
-856dfa800fef7c22b7313c777b41260e
-2010-02-21T14:28:16.627050Z
-62770
-midom
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3038
-
-UtfNormalGenerate.php
-file
-
-
-
-
-2011-02-04T18:14:25.763992Z
-a06d2ddb58400bea6f1d91ed62172d84
-2009-11-14T08:12:51.207128Z
-59053
-maxsem
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-6663
-
-Utf8Case.php
-file
-
-
-
-
-2011-02-04T18:14:25.763992Z
-61b1d417fb503bd836fb28dfb5e82943
-2008-05-20T17:13:28.824583Z
-35098
+2012-01-25T15:32:05.245565Z
+8cd235c37b3460b8787b92a46b6d087b
+2010-08-15T07:47:23.840473Z
+71101
 ialex
 has-props
 
@@ -398,19 +398,19 @@ has-props
 
 
 
-33554
+3047
 
-UtfNormalData.inc
+Utf8Case.php
 file
 
 
 
 
-2011-02-04T18:14:25.763992Z
-37fc7e54269d1936f9d35c5d0d4fb6c2
-2009-11-14T08:12:51.207128Z
-59053
-maxsem
+2012-01-25T15:32:05.245565Z
+87ba74f37f3c5ec5dd7abd8734d2b290
+2011-01-09T12:04:28.849133Z
+79889
+nikerabbit
 has-props
 
 
@@ -432,7 +432,75 @@ has-props
 
 
 
-113468
+34063
+
+UtfNormalGenerate.php
+file
+
+
+
+
+2012-01-25T15:32:05.245565Z
+cf27715d2394bf6b0fd5b45bed6961ba
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+6651
+
+UtfNormalData.inc
+file
+
+
+
+
+2012-01-25T15:32:05.249565Z
+ecd626a6192c2d2022216598b0e16ace
+2011-03-27T12:21:45.102230Z
+84842
+happy-melon
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+113620
 
 Utf8Test.php
 file
@@ -440,10 +508,44 @@ file
 
 
 
-2011-02-04T18:14:25.763992Z
-f57b3a2299b4ac79b0cb11dd284601eb
-2009-12-11T21:07:27.971924Z
-59969
+2012-01-25T15:32:05.249565Z
+85fce071dea7b41c5b633d517a2adbc8
+2011-05-15T13:36:59.247101Z
+88177
+tstarling
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+4038
+
+Makefile
+file
+
+
+
+
+2012-01-25T15:32:05.249565Z
+7df26c57b9eed4729593f756a41ffd8d
+2011-05-25T15:59:30.812815Z
+88798
 demon
 has-props
 
@@ -466,73 +568,5 @@ has-props
 
 
 
-3927
-
-Makefile
-file
-
-
-
-
-2011-02-04T18:14:25.763992Z
-290d83aa232da5eb9cab963753b13675
-2008-05-08T06:28:50.768098Z
-34417
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-3221
-
-CleanUpTest.php
-file
-
-
-
-
-2011-02-04T18:14:25.763992Z
-d01ee8c482fbb57834ac0e2ec44054a9
-2008-05-20T17:13:28.824583Z
-35098
-ialex
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-12031
+3128
 

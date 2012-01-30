@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/extauth
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/extauth
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-01-10T21:39:47.662834Z
-60911
-ialex
+2011-06-20T07:40:07.848594Z
+90435
+tstarling
 
 
 
@@ -32,10 +32,10 @@ file
 
 
 
-2011-02-04T18:14:25.731992Z
-8dc2bcbf27d1d38632c872e59c09cad4
-2010-01-10T21:39:47.662834Z
-60911
+2012-01-25T15:32:05.085565Z
+21c3ea38deaa46657e0654c9a6316d2e
+2010-08-08T11:55:47.440790Z
+70684
 ialex
 has-props
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-2281
+2385
 
 MediaWiki.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:25.731992Z
-c2ab410546a61cf98d4d72fc4310dd45
-2010-01-10T21:39:47.662834Z
-60911
-ialex
+2012-01-25T15:32:05.085565Z
+3271f4763ead33a98976109268955912
+2011-06-20T07:40:07.848594Z
+90435
+tstarling
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-4104
+4537
 
 vB.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:25.735992Z
-232d69c0cca53cc23f02ca7e2ab2fdf1
-2010-01-10T21:39:47.662834Z
-60911
-ialex
+2012-01-25T15:32:05.085565Z
+264d60dad408d3fb00095bca387d05a4
+2011-06-20T07:40:07.848594Z
+90435
+tstarling
 has-props
 
 
@@ -126,5 +126,5 @@ has-props
 
 
 
-3830
+3950
 
