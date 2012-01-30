@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job
+END
+RefreshLinksJob.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/RefreshLinksJob.php
+END
+EmaillingJob.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/EmaillingJob.php
+END
+JobQueue.php
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/JobQueue.php
+END
+UploadFromUrlJob.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/UploadFromUrlJob.php
+END
+DoubleRedirectJob.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/DoubleRedirectJob.php
+END
+EnotifNotifyJob.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/job/EnotifNotifyJob.php
+END
