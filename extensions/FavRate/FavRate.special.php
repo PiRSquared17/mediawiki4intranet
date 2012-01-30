@@ -64,8 +64,10 @@ class SpecialFavRate extends IncludableSpecialPage
             $selected = $dbr->numRows($res);
             $key = array('view', 'fav');
             $text = '';
+            $n = array(0, 0);
             foreach ($res as $row)
             {
+                $n[$row->ps_type]++;
                 $fav = $row->ps_type ? Title::newFromText('Special:FavRate/favorites/'.$row->user_name) : '';
                 $text .= wfMsg(
                     'favrate-log-'.$key[$row->ps_type],
@@ -74,7 +76,7 @@ class SpecialFavRate extends IncludableSpecialPage
                     $fav
                 ) . "\n";
             }
-            $wgOut->addWikiText(wfMsg('favrate-page-log', $title->getPrefixedText()));
+            $wgOut->addWikiText(wfMsg('favrate-page-log', $title->getPrefixedText(), $n[0], $n[1]));
             $wgOut->addWikiText($text);
             $wgOut->setPageTitle(wfMsg('favrate-page-log-title'));
         }
