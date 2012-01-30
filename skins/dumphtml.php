@@ -21,7 +21,7 @@ require_once('includes/SkinTemplate.php');
  */
 class SkinDumpHTML extends SkinTemplate {
 	/** Using DumpHTML. */
-	function initPage( &$out ) {
+	function initPage( OutputPage $out ) {
 		SkinTemplate::initPage( $out );
 		$this->skinname  = 'DumpHTML';
 		$this->stylename = 'DumpHTML';
