@@ -209,6 +209,7 @@ require_once($IP.'/extensions/TemplatedPageList/TemplatedPageList.php');
 $egSubpagelistAjaxDisableRE = '#^Блог:[^/]*$#s';
 
 $wgMaxFilenameLength = 50;
+$wgGalleryOptions['captionLength'] = 50; // 1.18
 
 $wgSVGConverter = "inkscape";
 $wgUseImageMagick = false;
