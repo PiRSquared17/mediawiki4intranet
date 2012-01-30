@@ -33,6 +33,13 @@ Click "{{int:usermerge-submit}}" to accept.',
 	'usermerge-unmergable'		=> 'Unable to merge from user - ID or name has been defined as unmergable.',
 	'usermerge-protectedgroup'	=> 'Unable to merge from user - user is in a protected group.',
 	'right-usermerge'               => 'Merge users',
+	'usermerge-editcount'		=> 'Add edit count?',
+	'usermerge-editcount-success'	=> 'Adding edit count of ($1 and $2)',
+	'usermerge-autopagedelete'	=> 'Automatically deleted when merging users',
+	'usermerge-page-unmoved' 	=> 'The page $1 could not be moved to $2.',
+	'usermerge-page-moved'   	=> 'The page $1 has been moved to $2.',
+	'usermerge-move-log'   		=> 'Automatically moved page while merging the user "[[User:$1|$1]]" to "[[User:$2|$2]]"',
+	'usermerge-page-deleted' 	=> 'Deleted page $1',
 );
 
 /** Message documentation (Message documentation)
@@ -41,6 +48,7 @@ Click "{{int:usermerge-submit}}" to accept.',
  * @author Meno25
  * @author Purodha
  * @author Siebrand
+ * @author Umherirrender
  */
 $messages['qqq'] = array(
 	'usermerge-desc' => '{{desc}}',
@@ -61,7 +69,7 @@ $messages['qqq'] = array(
 * $3 is a user ID of the source user
 * $4 is a user name (not linked) that the other user is merged into
 * $5 is a user ID of the target user',
-	'right-usermerge' => '{{doc-right}}',
+	'right-usermerge' => '{{doc-right|usermerge}}',
 );
 
 /** Afrikaans (Afrikaans)
@@ -126,6 +134,7 @@ $messages['aln'] = array(
 /** Arabic (العربية)
  * @author Meno25
  * @author OsamaK
+ * @author روخو
  */
 $messages['ar'] = array(
 	'usermerge' => 'دمج وحذف المستخدمين',
@@ -152,6 +161,7 @@ $messages['ar'] = array(
 	'usermerge-unmergable' => 'غير قادر على الدمج من مستخدم - الرقم أو الاسم تم تعريفه كغير قابل للدمج.',
 	'usermerge-protectedgroup' => 'غير قادر على الدمج من المستخدم - المستخدم في مجموعة محمية.',
 	'right-usermerge' => 'دمج المستخدمين',
+	'usermerge-page-deleted' => 'صفحة محذوفة $1',
 );
 
 /** Aramaic (ܐܪܡܝܐ)
@@ -199,6 +209,7 @@ $messages['arz'] = array(
  * @author EugeneZelenko
  * @author Jim-by
  * @author Red Winged Duck
+ * @author Renessaince
  */
 $messages['be-tarask'] = array(
 	'usermerge' => "Аб'яднаньне і выдаленьне рахункаў удзельнікаў",
@@ -225,6 +236,13 @@ $messages['be-tarask'] = array(
 	'usermerge-unmergable' => "Немагчыма аб'яднаць рахунак удзельніка — ідэнтыфікатар ці імя былі пазначаны як неаб'яднальныя.",
 	'usermerge-protectedgroup' => "Немагчыма аб'яднаць рахунак удзельніка — удзельнік знаходзіцца ў абароненай групе.",
 	'right-usermerge' => "аб'яднаньне рахункаў удзельнікаў",
+	'usermerge-editcount' => 'Дадаць лічыльнік рэдагаваньняў?',
+	'usermerge-editcount-success' => 'Даданьне лічыльніка рэдагаваньняў ($1 і $2)',
+	'usermerge-autopagedelete' => 'Аўтаматычна выдалены падчас аб’яднаньня рахункаў ўдзельнікаў',
+	'usermerge-page-unmoved' => 'Старонка $1 ня можа быць перанесеная ў $2.',
+	'usermerge-page-moved' => 'Старонка $1 перанесеная ў $2.',
+	'usermerge-move-log' => 'Аўтаматычна перанесеная старонка падчас аб’яднаньня рахунку ўдзельніка «[[User:$1|$1]]» з «[[User:$2|$2]]»',
+	'usermerge-page-deleted' => 'Выдаленая старонка $1',
 );
 
 /** Bulgarian (Български)
@@ -311,6 +329,7 @@ Klikañ war "{{int:usermerge-submit}}" evit asantiñ.',
 	'usermerge-unmergable' => 'Dibosupl kendeuziñ adal un implijer - un niv. anaout pe un anv bet termenet evel digendeuzadus.',
 	'usermerge-protectedgroup' => 'Dibosupl kendeuziñ an implijer - emañ-eñ en ur strollad gwarezet',
 	'right-usermerge' => 'Kendeuziñ implijerien',
+	'usermerge-page-deleted' => 'Pajenn $1 diverket',
 );
 
 /** Bosnian (Bosanski)
@@ -358,6 +377,7 @@ $messages['ca'] = array(
 	'usermerge-submit' => 'Combina els usuaris',
 	'usermerge-userdeleted-log' => 'Usuari eliminat: $2 ($3)',
 	'usermerge-logpage' => "Registre de fusions d'usuaris",
+	'right-usermerge' => 'Fusionar usuaris',
 );
 
 /** Sorani (کوردی)
@@ -399,43 +419,43 @@ Potvrdit můžete kliknutím na „{{int:usermerge-submit}}“.',
 );
 
 /** German (Deutsch)
+ * @author Kghbln
  * @author Lukas9950
  * @author Raimond Spekking
  * @author Umherirrender
  */
 $messages['de'] = array(
 	'usermerge' => 'Benutzerkonten zusammenführen und löschen',
-	'usermerge-desc' => "[[Special:UserMerge|Führt Benutzerkonten in der Wiki-Datenbank zusammen]] - das alte Benutzerkonto wird nach der Zusammenführung gelöscht. Erfordert das ''usermerge''-Recht.",
+	'usermerge-desc' => 'Ergänzt eine [[Special:UserMerge|Spezialseite]] zum Zusammenführen von Benutzerkonten und der anschließenden Löschung des alten Benutzerkontos in der Datenbank des Wikis',
 	'usermerge-badolduser' => 'Ungültiger alter Benutzername',
 	'usermerge-badnewuser' => 'Ungültiger neuer Benutzername',
-	'usermerge-nonewuser' => 'Leerer neuer Benutzername - es wird eine Zusammenführung mit „$1“ vermutet.<br />
-Klicke auf „{{int:usermerge-submit}}“ zum Ausführen.',
-	'usermerge-noolduser' => 'Leerer alter Benutzername',
+	'usermerge-nonewuser' => 'Es wurde kein neuer Benutzername angegeben. Daher wird eine Zusammenführung mit „$1“ angenommen.<br />
+Zum Ausführen auf „{{int:usermerge-submit}}“ klicken.',
+	'usermerge-noolduser' => 'Es wurde kein neuer Benutzername angegeben.',
 	'usermerge-fieldset' => 'Benutzernamen zum Zusammenführen',
 	'usermerge-olduser' => 'Alter Benutzername (zusammenführen von):',
 	'usermerge-newuser' => 'Neuer Benutzername (zusammenführen nach):',
 	'usermerge-deleteolduser' => 'Alten Benutzernamen löschen',
 	'usermerge-submit' => 'Benutzerkonten zusammenführen',
-	'usermerge-badtoken' => 'Ungültiges Bearbeiten-Token',
+	'usermerge-badtoken' => 'Ungültiges Bearbeitungstoken',
 	'usermerge-userdeleted' => '„$1“ ($2) wurde gelöscht.',
 	'usermerge-userdeleted-log' => 'hat „$2“ ($3) gelöscht',
 	'usermerge-updating' => 'Aktualisiere Tabelle $1 ($2 nach $3) …',
 	'usermerge-success' => 'Die Zusammenführung von „$1“ ($2) nach „$3“ ($4) war erfolgreich.',
 	'usermerge-success-log' => 'hat „$2“ ($3) mit „$4“ ($5) zusammengeführt',
-	'usermerge-logpage' => 'Benutzerkonten-Zusammenführungs-Logbuch',
-	'usermerge-logpagetext' => 'Dies ist das Logbuch der Benutzerkonten-Zusammenführungen.',
+	'usermerge-logpage' => 'Benutzerkontenzusammenführungs-Logbuch',
+	'usermerge-logpagetext' => 'Dies ist das Logbuch der Benutzerkontenzusammenführungen.',
 	'usermerge-noselfdelete' => 'Die Zusammenführung mit sich selber ist nicht möglich!',
-	'usermerge-unmergable' => 'Zusammenführung nicht möglich - ID oder Benutzername wurde als nicht zusammenführbar definiert.',
-	'usermerge-protectedgroup' => 'Die Zusammenführung ist nicht möglich - der Benutzer befindet sich in einer geschützen Gruppe.',
-	'right-usermerge' => 'Benutzerkonten vereinen',
-);
-
-/** German (formal address) (‪Deutsch (Sie-Form)‬)
- * @author Imre
- */
-$messages['de-formal'] = array(
-	'usermerge-nonewuser' => 'Leerer neuer Benutzername - es wird eine Zusammenführung mit „$1“ vermutet.<br />
-Klicken Sie auf „{{int:usermerge-submit}}“ zum Ausführen.',
+	'usermerge-unmergable' => 'Die Zusammenführung ist nicht möglich: Benutzerkennung oder Benutzername wurde als nicht zusammenführbar definiert.',
+	'usermerge-protectedgroup' => 'Die Zusammenführung ist nicht möglich: Der Benutzer befindet sich in einer geschützten Gruppe.',
+	'right-usermerge' => 'Benutzerkonten zusammenführen',
+	'usermerge-editcount' => 'Bearbeitungszähler hinzufügen?',
+	'usermerge-editcount-success' => 'Hinzufügen des Bearbeitungszählers ($1 und $2)',
+	'usermerge-autopagedelete' => 'Automatisch während der Benutzerkontenzusammenführung gelöscht',
+	'usermerge-page-unmoved' => 'Die Seite „$1“ konnte nicht nach „$2“ verschoben werden.',
+	'usermerge-page-moved' => 'Die Seite „$1“ wurde nach „$2“ verschoben.',
+	'usermerge-move-log' => 'Seite während der Benutzerkontenzusammenführung von „[[User:$1|$1]]“ nach „[[User:$2|$2]]“ automatisch verschoben',
+	'usermerge-page-deleted' => 'Seite „$1“ gelöscht',
 );
 
 /** Lower Sorbian (Dolnoserbski)
@@ -560,6 +580,9 @@ Haga Click en "{{int:usermerge-submit}}" para aceptar.',
  * @author Pikne
  */
 $messages['et'] = array(
+	'usermerge-badolduser' => 'Vigane vana kasutajanimi',
+	'usermerge-badnewuser' => 'Vigane uus kasutajanimi',
+	'usermerge-userdeleted' => '$1 ($2) on kustutatud.',
 	'usermerge-logpage' => 'Kasutaja ühendamislogi',
 	'usermerge-logpagetext' => 'See on kasutajaühendamistoimingute logi.',
 );
@@ -648,6 +671,7 @@ Napsauta "{{int:usermerge-submit}}" hyväksyäksesi.',
  * @author IAlex
  * @author McDutchie
  * @author PieRRoMaN
+ * @author Seb35
  * @author Sherbrooke
  * @author Urhixidur
  */
@@ -676,33 +700,47 @@ Cliquez sur « {{int:usermerge-submit}} » pour accepter.',
 	'usermerge-unmergable' => 'Impossible de fusionner l’utilisateur : le numéro ou le nom a été défini comme non fusionnable.',
 	'usermerge-protectedgroup' => 'Impossible de fusionner l’utilisateur : l’utilisateur est dans un groupe protégé.',
 	'right-usermerge' => 'Fusionner des utilisateurs',
+	'usermerge-editcount' => 'Ajouter le compteur d’éditions ?',
+	'usermerge-editcount-success' => 'Ajout du compteur d’éditions de ($1 et $2)',
+	'usermerge-autopagedelete' => 'Supprimé automatiquement lors de la fusion de utilisateurs',
+	'usermerge-page-unmoved' => 'Cette page $1 ne peut pas être déplacée vers $2.',
+	'usermerge-page-moved' => 'La page $1 a été déplacée vers $2.',
+	'usermerge-move-log' => 'Page déplacée automatiquement lors de la fusion de l’utilisateur « [[User:$1|$1]] » en « [[User:$2|$2]] »',
+	'usermerge-page-deleted' => 'Page $1 effacée',
 );
 
 /** Franco-Provençal (Arpetan)
  * @author ChrisPtDe
  */
 $messages['frp'] = array(
-	'usermerge' => 'Fusionar et suprimar des utilisators',
-	'usermerge-badolduser' => 'Viely nom d’utilisator envalido',
-	'usermerge-badnewuser' => 'Novél nom d’utilisator envalido',
-	'usermerge-noolduser' => 'Viely nom d’utilisator vouedo',
-	'usermerge-fieldset' => 'Noms d’utilisator a fusionar',
-	'usermerge-olduser' => 'Viely utilisator (fusionar dês) :',
-	'usermerge-newuser' => 'Novél utilisator (fusionar avouéc) :',
-	'usermerge-deleteolduser' => 'Suprimar lo viely utilisator',
-	'usermerge-submit' => 'Fusionar l’utilisator',
+	'usermerge' => 'Fusionar et suprimar des usanciérs',
+	'usermerge-badolduser' => 'Viely nom d’usanciér envalido',
+	'usermerge-badnewuser' => 'Novél nom d’usanciér envalido',
+	'usermerge-noolduser' => 'Viely nom d’usanciér vouedo',
+	'usermerge-fieldset' => 'Noms d’usanciér a fusionar',
+	'usermerge-olduser' => 'Viely usanciér (fusionar dês) :',
+	'usermerge-newuser' => 'Novél usanciér (fusionar avouéc) :',
+	'usermerge-deleteolduser' => 'Suprimar lo viely usanciér',
+	'usermerge-submit' => 'Fusionar l’usanciér',
 	'usermerge-badtoken' => 'Jeton de changement envalido',
 	'usermerge-userdeleted' => '$1 ($2) at étâ suprimâ.',
 	'usermerge-userdeleted-log' => 'Contributor suprimâ : $2 ($3)',
 	'usermerge-updating' => 'Misa a jorn de la trâbla $1 (de $2 a $3)',
 	'usermerge-success' => 'La fusion de $1 ($2) a $3 ($4) est chavonâ.',
-	'usermerge-success-log' => 'Utilisator $2 ($3) fusionâ avouéc $4 ($5)',
-	'usermerge-logpage' => 'Jornal de les fusions d’utilisators',
-	'usermerge-logpagetext' => 'O est un jornal de les accions de fusions d’utilisators.',
+	'usermerge-success-log' => 'Usanciér $2 ($3) fusionâ avouéc $4 ($5)',
+	'usermerge-logpage' => 'Jornal de les fusions d’usanciérs',
+	'usermerge-logpagetext' => 'O est un jornal de les accions de fusions d’usanciérs.',
 	'usermerge-noselfdelete' => 'Vos vos pouede pas suprimar ou ben fusionar vos-mémo !',
-	'usermerge-unmergable' => 'Empossiblo de fusionar l’utilisator : lo numerô ou ben lo nom at étâ dèfeni coment pas fusionâblo.',
-	'usermerge-protectedgroup' => 'Empossiblo de fusionar l’utilisator : l’utilisator est dens una tropa protègiê.',
-	'right-usermerge' => 'Fusionar des utilisators',
+	'usermerge-unmergable' => 'Empossiblo de fusionar l’usanciér : lo numerô ou ben lo nom at étâ dèfeni coment pas fusionâblo.',
+	'usermerge-protectedgroup' => 'Empossiblo de fusionar l’usanciér : l’usanciér est dens una tropa protègiê.',
+	'right-usermerge' => 'Fusionar des usanciérs',
+	'usermerge-editcount' => 'Apondre lo comptor de changements ?',
+	'usermerge-editcount-success' => 'Aponsa du comptor de changements de ($1 et $2)',
+	'usermerge-autopagedelete' => 'Suprimâ ôtomaticament pendent la fusion d’usanciérs',
+	'usermerge-page-unmoved' => 'La pâge $1 pôt pas étre dèplaciê vers $2.',
+	'usermerge-page-moved' => 'La pâge $1 at étâ dèplaciê vers $2.',
+	'usermerge-move-log' => 'Pâge dèplaciê ôtomaticament pendent la fusion de l’usanciér « [[User:$1|$1]] » en « [[User:$2|$2]] »',
+	'usermerge-page-deleted' => 'Pâge suprimâ $1',
 );
 
 /** Irish (Gaeilge)
@@ -741,6 +779,13 @@ Prema en "{{int:usermerge-submit}}" para aceptar.',
 	'usermerge-unmergable' => 'Non se pode fusionar o usuario (o ID ou o nome foron definidos como "non fusionables").',
 	'usermerge-protectedgroup' => 'Non se pode fusionar o usuario (o usuario está nun frupo protexido).',
 	'right-usermerge' => 'Fusionar usuarios',
+	'usermerge-editcount' => 'Quere engadir o contador de edicións?',
+	'usermerge-editcount-success' => 'Engadindo o contador de edicións de ($1 e $2)',
+	'usermerge-autopagedelete' => 'Borrada automaticamente ao fusionar os usuarios',
+	'usermerge-page-unmoved' => 'A páxina "$1" non pode ser movida a "$2".',
+	'usermerge-page-moved' => 'A páxina "$1" foi movida a "$2".',
+	'usermerge-move-log' => 'A páxina moveuse automaticamente cando se fusionou o usuario "[[User:$1|$1]]" con "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'A páxina "$1" foi borrada',
 );
 
 /** Ancient Greek (Ἀρχαία ἑλληνικὴ)
@@ -751,6 +796,7 @@ $messages['grc'] = array(
 );
 
 /** Swiss German (Alemannisch)
+ * @author Als-Chlämens
  * @author Als-Holder
  */
 $messages['gsw'] = array(
@@ -778,6 +824,13 @@ Klick uf "{{int:usermerge-submit}}" go s Uusfiere.',
 	'usermerge-unmergable' => 'Zämmefierig nit megli - ID oder Benutzername isch nit as zämmefierbar definiert.',
 	'usermerge-protectedgroup' => 'Zämmefierig nit megli - Benutzername isch in ere gschitze Gruppe.',
 	'right-usermerge' => 'Benutzerkonte zämmefiere',
+	'usermerge-editcount' => 'Bearbeitigszääler dezuefiege?',
+	'usermerge-editcount-success' => 'Dezuefiege vum Bearbeitigszääler ($1 un $2)',
+	'usermerge-autopagedelete' => 'Derwyylischt de Benutzerchontezämmefierig automatisch glöscht',
+	'usermerge-page-unmoved' => 'D Syte „$1“ het nüt chönne uf „$2“ verschobe werde.',
+	'usermerge-page-moved' => 'D Syte „$1“ isch uff „$2“ verschobe worde.',
+	'usermerge-move-log' => 'Dur d Benutzerchontezämmefierig vu „[[User:$1|$1]]“ noch „[[User:$2|$2]]“ automatisch verschobeni Syte',
+	'usermerge-page-deleted' => 'Gleschti Syte $1',
 );
 
 /** Gujarati (ગુજરાતી)
@@ -794,6 +847,7 @@ $messages['gu'] = array(
 );
 
 /** Hebrew (עברית)
+ * @author Amire80
  * @author Rotemliss
  * @author YaronSh
  */
@@ -822,6 +876,13 @@ $messages['he'] = array(
 	'usermerge-unmergable' => 'לא ניתן למזג ממשתמש זה - מספר המשתמש או השם כבר מוגדר כבלתי ניתן למיזוג.',
 	'usermerge-protectedgroup' => 'לא ניתן למזג ממשתמש זה - המשתמש נמצא בקבוצה מוגנת.',
 	'right-usermerge' => 'מיזוג משתמשים',
+	'usermerge-editcount' => 'להוסיף מונה עריכות?',
+	'usermerge-editcount-success' => 'הוספת מונה עריכות של ($1&rlm;, $2)',
+	'usermerge-autopagedelete' => 'נמחק אוטומטית בזמן מיזוג חשבונות',
+	'usermerge-page-unmoved' => 'לא ניתן להעביר את הדף $1 לשם $2.',
+	'usermerge-page-moved' => 'הדף $1 הועבר לשם $2.',
+	'usermerge-move-log' => 'הדף הועבר אוטומטית בזמן מיזוג חשבון "[[User:$1|$1]]" אל "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'הדף $1 נמחק',
 );
 
 /** Hindi (हिन्दी)
@@ -859,6 +920,13 @@ Klikń na "{{int:usermerge-submit}}", zo by akceptował.',
 	'usermerge-unmergable' => 'Zjednoćenje wužiwarjow njemóžno - ID abo wužiwarske mjeno bu jako njezjednoćujomne definowane.',
 	'usermerge-protectedgroup' => 'Zjednoćenje wužiwarjow njemóžno - wužiwar je w škitanej skupinje',
 	'right-usermerge' => 'Wužiwarjow zjednoćić',
+	'usermerge-editcount' => 'Ličenje změnow přidać?',
+	'usermerge-editcount-success' => 'Přidawanje ličenja změnow ($1 a $2)',
+	'usermerge-autopagedelete' => 'Při zjednoćenju wužiwarjow awtomatisce zhašany',
+	'usermerge-page-unmoved' => 'Strona $1 njeda so do $2 přesunyć.',
+	'usermerge-page-moved' => 'Strona $1 bu do $2 přesunjena.',
+	'usermerge-move-log' => 'Strona za zjednoćenje wužiwarja "[[User:$1|$1]]" z "[[User:$2|$2]]" awtomatisce přesunjena',
+	'usermerge-page-deleted' => 'Zhašana strona $1',
 );
 
 /** Haitian (Kreyòl ayisyen)
@@ -949,6 +1017,13 @@ Clicca "{{int:usermerge-submit}}" pro acceptar.',
 	'usermerge-unmergable' => 'Impossibile fusionar ab iste usator - le ID o nomine ha essite definite como non fusionabile.',
 	'usermerge-protectedgroup' => 'Impossibile fusionar ab iste usator - le usator es membro de un gruppo protegite.',
 	'right-usermerge' => 'Fusionar usatores',
+	'usermerge-editcount' => 'Adder numero de modificationes?',
+	'usermerge-editcount-success' => 'Es addite le numero de modificationes de ($1 e $2)',
+	'usermerge-autopagedelete' => 'Automaticamente delite durante le fusion de usatores',
+	'usermerge-page-unmoved' => 'Le pagina $1 non poteva esser renominate a $2.',
+	'usermerge-page-moved' => 'Le pagina $1 ha essite renominate a $2.',
+	'usermerge-move-log' => 'Le pagina ha essite automaticamente renominate con le fusion del usator "[[User:$1|$1]]" in "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'Pagina $1 delite',
 );
 
 /** Indonesian (Bahasa Indonesia)
@@ -980,6 +1055,34 @@ Klik "{{int:usermerge-submit}}" untuk melanjutkan.',
 	'usermerge-unmergable' => 'Tidak dapat menggabungkan dari pengguna ini - nomor ID atau nama akun ini telah ditandai sebagai akun yang tidak dapat digabungkan.',
 	'usermerge-protectedgroup' => 'Tidak dapat menggabungkan dari pengguna ini - pengguna ini termasuk dalam kelompok terproteksi.',
 	'right-usermerge' => 'Menggabungkan pengguna',
+);
+
+/** Interlingue (Interlingue)
+ * @author Renan
+ */
+$messages['ie'] = array(
+	'usermerge' => 'Fuser se e deleter usatores',
+	'usermerge-desc' => "[[Special:UserMerge|Referenties de fusion de un usator por altri usator]] in li funde de data del wiki - anc va deleter usatores antiqui succedent fusion. Exige avantages de ''fusion de usator''",
+	'usermerge-badolduser' => 'Antiqui nómine de usator ínvalid',
+	'usermerge-badnewuser' => 'Nov nómine de usator ínvalid',
+	'usermerge-nonewuser' => 'Nov nómine de usator vacui - acceptant fusion por "$1".<br />
+Clacca "{{int:usermerge-submit}}" por acceptar.',
+	'usermerge-noolduser' => 'Antiqui nómine de usator vacui',
+	'usermerge-fieldset' => 'Nómines de usator por fusion',
+	'usermerge-olduser' => 'Antiqui usator (fuser se de):',
+	'usermerge-newuser' => 'Nov usator (fuser se por):',
+	'usermerge-deleteolduser' => 'Deleter usator antiqui',
+	'usermerge-submit' => 'Fuser usator',
+	'usermerge-badtoken' => 'Simbol de redaction ínvalid',
+	'usermerge-userdeleted' => '$1 ($2) ha esset deletet.',
+	'usermerge-userdeleted-log' => 'Usator deletet: $2 ($3)',
+	'usermerge-updating' => 'Modernisant tabelle $1 ($2 por $3)',
+	'usermerge-success' => 'Fuser se de $1 ($2) por $3 ($4) es complet.',
+	'usermerge-logpage' => 'Diarium de fusion de usator',
+	'usermerge-logpagetext' => 'Ti es un diarium de actiones de fusion de usator.',
+	'usermerge-noselfdelete' => 'Vu ne posse deleter o fuser se vu self!',
+	'usermerge-unmergable' => 'Ne posse fuser se de ti usator - ID o nómine ha esset definit quam ínfusibil.',
+	'usermerge-protectedgroup' => 'Ne posse fuser de ti usator - usator es in un gruppe protectet.',
 );
 
 /** Italian (Italiano)
@@ -1174,6 +1277,13 @@ Klickt op "{{int:usermerge-submit}}" wann Dir d\'accord sidd.',
 	'usermerge-unmergable' => "Zesammenféierung ass net méiglech - d'ID oder de Benotzernumm gouf als net zesummeféierbar definéiert.",
 	'usermerge-protectedgroup' => "D'Zesammenféierung ass net méiglech - De Benotzer ass an engem geschützte Grupp.",
 	'right-usermerge' => 'Benotzer zesummeféieren',
+	'usermerge-editcount' => 'Compteur vun den Ännerungen derbäisetzen?',
+	'usermerge-editcount-success' => 'De Compteur vun den Ännerungen vun ($1 a(n) $2) gëtt derbäigesat',
+	'usermerge-autopagedelete' => "Automatesch geläscht wéi d'Benotzer zesummegeluecht goufen",
+	'usermerge-page-unmoved' => "D'Säit $1 konnt net op $2 geréckelt ginn.",
+	'usermerge-page-moved' => "D'Säit $1 gouf op $2 geréckelt.",
+	'usermerge-move-log' => 'D\'Säit gouf automatesch geréckelt wéi de Benotzer "[[User:$1|$1]]" mam "[[User:$2|$2]]" zesummegeluecht gouf',
+	'usermerge-page-deleted' => 'Säit $1 ass geläscht',
 );
 
 /** Malagasy (Malagasy)
@@ -1212,6 +1322,13 @@ $messages['mk'] = array(
 	'usermerge-unmergable' => 'Не можам да спојам од корисникот - ид. бр.или името е определено како неспојливо.',
 	'usermerge-protectedgroup' => 'Не можам да спојам од корисникот - корисникот е во заштитена група.',
 	'right-usermerge' => 'Спојување на корисници',
+	'usermerge-editcount' => 'Да го додадам бројот на уредувањата?',
+	'usermerge-editcount-success' => 'Го додавам бројот на уредувања на ($1 и $2)',
+	'usermerge-autopagedelete' => 'Се брише автоматски, при спојување на корисници',
+	'usermerge-page-unmoved' => 'Не моежев да ја преместам страницата $1 на $2.',
+	'usermerge-page-moved' => 'Страницата $1 е преместена на $2.',
+	'usermerge-move-log' => 'Автоматско преместување на страница при припојувањето на корисникот „[[User:$1|$1]]“ кон „[[User:$2|$2]]“',
+	'usermerge-page-deleted' => 'Избришана страница $1',
 );
 
 /** Malayalam (മലയാളം)
@@ -1260,6 +1377,13 @@ $messages['mr'] = array(
 	'right-usermerge' => 'सदस्य एकत्र करा',
 );
 
+/** Malay (Bahasa Melayu)
+ * @author Anakmalaysia
+ */
+$messages['ms'] = array(
+	'right-usermerge' => 'Menggabungkan pengguna',
+);
+
 /** Nahuatl (Nāhuatl)
  * @author Fluence
  */
@@ -1270,18 +1394,57 @@ $messages['nah'] = array(
 	'usermerge-userdeleted-log' => 'Tlapoloc tlatequitiltilīlli: $2 ($3)',
 );
 
+/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
+ * @author Event
+ * @author Jon Harald Søby
+ * @author Nghtwlkr
+ */
+$messages['nb'] = array(
+	'usermerge' => 'Brukersammenslåing og -sletting',
+	'usermerge-desc' => "Gir muligheten til  å [[Special:UserMerge|slå sammen kontoer]] ved at alle referanser til en bruker byttes ut til en annen bruker i databasen, for så å slette den ene kontoen. Trenger rettigheten ''usermerge''.",
+	'usermerge-badolduser' => 'Gammelt brukernavn ugyldig',
+	'usermerge-badnewuser' => 'Nytt brukernavn ugyldig',
+	'usermerge-nonewuser' => 'Nytt brukernavn tomt &ndash; antar sammenslåing til «$1».<br />
+Klikk «{{int:usermerge-submit}}» for å godta.',
+	'usermerge-noolduser' => 'Gammelt brukernavn tomt',
+	'usermerge-fieldset' => 'Brukernavn som skal slås sammen',
+	'usermerge-olduser' => 'Gammelt brukernavn (slå sammen fra):',
+	'usermerge-newuser' => 'Nytt brukernavn (slå sammen til):',
+	'usermerge-deleteolduser' => 'Slett gammel bruker',
+	'usermerge-submit' => 'Slå sammen brukere',
+	'usermerge-badtoken' => 'Ugyldig redigeringstegn',
+	'usermerge-userdeleted' => '$1 ($2) har blitt slettet.',
+	'usermerge-userdeleted-log' => 'Slettet bruker: $2 ($3)',
+	'usermerge-updating' => 'Oppdaterer $1-tabell ($2 til $3)',
+	'usermerge-success' => 'Sammenslåing fra $1 ($2) til $3 ($4) er fullført.',
+	'usermerge-success-log' => 'Brukeren $2 ($3) slått sammen med $4 ($5)',
+	'usermerge-logpage' => 'Brukersammenslåingslogg',
+	'usermerge-logpagetext' => 'Dette er en logg over brukersammenslåinger.',
+	'usermerge-noselfdelete' => 'Du kan ikke slette eller slå sammen din egen konto!',
+	'usermerge-unmergable' => 'Kan ikke slå sammen den gamle kontoen. ID-en eller navnet anses som ikke-sammenslåbart.',
+	'usermerge-protectedgroup' => 'Kan ikke slå sammen den gamle kontoen. Brukeren er medlem i en beskyttet brukergruppe.',
+	'right-usermerge' => 'Slå sammen kontoer',
+	'usermerge-editcount' => 'Legge til antall redigeringer?',
+	'usermerge-editcount-success' => 'Legge til antall redigeringer for ($1 og $2)',
+	'usermerge-autopagedelete' => 'Automatisk slettet ved brukersammenslåing',
+	'usermerge-page-unmoved' => 'Side $1 kunne ikke flyttes til $2.',
+	'usermerge-page-moved' => 'Side $1 er flyttet til $2.',
+	'usermerge-move-log' => 'Flyttet siden automatisk i forbindelse med sammenslåing av bruker "[[User:$1|$1]]" til "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'Slettet side $1',
+);
+
 /** Nedersaksisch (Nedersaksisch)
  * @author Servien
  */
 $messages['nds-nl'] = array(
 	'usermerge' => 'Gebrukers samenvoegen en vortdoon',
-	'usermerge-desc' => "Voeg een [[Special:UserMerge|speciale pagina]] toe um gebrukers samen te voegen en de ouwe gebruker(s) vort te doon (hierveur is 't rech ''usermerge'' neudig)",
+	'usermerge-desc' => "Zet n [[Special:UserMerge|spesiale pagina]] derbie um gebrukers samen te voegen en de ouwe gebruker(s) vort te doon (hierveur is t recht ''usermerge'' neudig)",
 	'usermerge-badolduser' => 'Ongeldige ouwe gebrukersnaam',
 	'usermerge-badnewuser' => 'Ongeldige nieje gebrukersnaam',
-	'usermerge-nonewuser' => 'De nieje gebrukersnaam is neet op-egeven - der wönnen vanuut egaon dat der samengevoeg mut wönnen naor $1.<br />
+	'usermerge-nonewuser' => 'De nieje gebrukersnaam is niet op-egeven - der wörden vanuut egaon dat der samengevoeg mut wörden naor $1.<br />
 Klik "{{int:usermerge-submit}}" um de haandeling uut te voeren.',
-	'usermerge-noolduser' => 'Ouwe gebrukersnaam is neet op-egeven',
-	'usermerge-fieldset' => 'Gebrukersnamen dee samen-evoegen mutten wönnen',
+	'usermerge-noolduser' => 'Ouwe gebrukersnaam is niet op-egeven',
+	'usermerge-fieldset' => 'Gebrukersnamen die samenevoegen mutten wörden',
 	'usermerge-olduser' => 'Ouwe gebruker (samenvoegen van):',
 	'usermerge-newuser' => 'Nieje gebruker (samenvoegen naor):',
 	'usermerge-deleteolduser' => 'Ouwe gebruker vortdoon',
@@ -1289,14 +1452,14 @@ Klik "{{int:usermerge-submit}}" um de haandeling uut te voeren.',
 	'usermerge-badtoken' => 'Ongeldig bewarkingstoken',
 	'usermerge-userdeleted' => '$1 ($2) is vort-edaon.',
 	'usermerge-userdeleted-log' => 'Vort-edaone gebruker: $2 ($3)',
-	'usermerge-updating' => "Tebel $1 an 't biewarken ($2 naor $3)",
-	'usermerge-success' => 'Samenvoegen van $1 ($2) naor $3 ($4) is of-erond.',
-	'usermerge-success-log' => 'Gebruker $2 ($3) samen-evoeg naor $4 ($5)',
+	'usermerge-updating' => 'Tabel $1 an t biewarken ($2 naor $3)',
+	'usermerge-success' => 'Samenvoegen van $1 ($2) naor $3 ($4) is aoferond.',
+	'usermerge-success-log' => 'Gebruker $2 ($3) samenevoeg naor $4 ($5)',
 	'usermerge-logpage' => 'Logboek gebrukerssamenvoegingen',
-	'usermerge-logpagetext' => "Dit is 't logboek van gebrukerssamenvoegingen.",
-	'usermerge-noselfdelete' => 'Je kunnen je eigen neet vortdoon of samenvoegen!',
-	'usermerge-unmergable' => "Disse gebruker kan neet samen-evoeg wönnen. De gebrukersnaam of 't gebrukersnummer is in-esteld as neet samenvoegen.",
-	'usermerge-protectedgroup' => 'Kan de gebrukers neet samenvoegen. De gebruker zit in een bescharmde groep.',
+	'usermerge-logpagetext' => 'Dit is t logboek van gebrukerssamenvoegingen.',
+	'usermerge-noselfdelete' => 'Je kunnen je eigen niet vortdoon of samenvoegen!',
+	'usermerge-unmergable' => 'Disse gebruker kan niet samenevoeg wörden. De gebrukersnaam of t gebrukersnummer is in-esteld as niet samenvoegen.',
+	'usermerge-protectedgroup' => 'Kan de gebrukers niet samenvoegen. De gebruker zit in n bescharmde groep.',
 	'right-usermerge' => 'Gebrukers samenvoegen',
 );
 
@@ -1306,7 +1469,7 @@ Klik "{{int:usermerge-submit}}" um de haandeling uut te voeren.',
  */
 $messages['nl'] = array(
 	'usermerge' => 'Gebruikers samenvoegen en verwijderen',
-	'usermerge-desc' => "Voegt een [[Special:UserMerge|speciale pagina]] toe om gebruikers samen te voegen en de oude gebruiker(s) te verwijderen (hiervoor is het recht ''usermerge'' nodig)",
+	'usermerge-desc' => "Voegt een [[Special:UserMerge|speciale pagina]] toe om gebruikers samen te voegen en de oude gebruiker(s) te verwijderen. Hiervoor is het recht ''usermerge'' nodig.",
 	'usermerge-badolduser' => 'Ongeldige oude gebruiker',
 	'usermerge-badnewuser' => 'Ongeldige nieuwe gebruiker',
 	'usermerge-nonewuser' => 'De nieuwe gebruikersnaam is niet ingegeven - er wordt aangenomen dat er samengevoegd moet worden naar $1.<br />
@@ -1329,6 +1492,13 @@ Klik "{{int:usermerge-submit}}" om de handeling uit te voeren.',
 	'usermerge-unmergable' => 'Deze gebruiker kan niet samengevoegd worden. De gebruikersnaam of het gebruikersnummer is ingesteld als niet samen te voegen.',
 	'usermerge-protectedgroup' => 'Het is niet mogelijk de gebruikers samen te voegen. De gebruiker zit in een beschermde groep.',
 	'right-usermerge' => 'Gebruikers samenvoegen',
+	'usermerge-editcount' => 'Aantal bewerkingen toevoegen?',
+	'usermerge-editcount-success' => 'Bezig met het toevoegen van het aantal bewerkingen voor ($1 en $2)',
+	'usermerge-autopagedelete' => 'Automatisch verwijderd bij het samenvoegen van gebruikers',
+	'usermerge-page-unmoved' => 'De pagina $1 kon niet hernoemd worden naar $2.',
+	'usermerge-page-moved' => 'De pagina $1 is hernoemd naar $2.',
+	'usermerge-move-log' => 'Pagina automatisch hernoemd bij het samenvoegen van gebruiker "[[User:$1|$1]]" naar "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'Verwijderde pagina $1',
 );
 
 /** Norwegian Nynorsk (‪Norsk (nynorsk)‬)
@@ -1360,37 +1530,6 @@ $messages['nn'] = array(
 	'usermerge-unmergable' => 'Kan ikkje slå saman den gamle kontoen. ID-en eller namnet vert ikkje rekna som samanslåbart.',
 	'usermerge-protectedgroup' => 'Kan ikkje slå saman den gamle kontoen. Brukaren er medlem i ei verna brukargruppe.',
 	'right-usermerge' => 'Slå saman kontoar',
-);
-
-/** Norwegian (bokmål)‬ (‪Norsk (bokmål)‬)
- * @author Jon Harald Søby
- * @author Nghtwlkr
- */
-$messages['no'] = array(
-	'usermerge' => 'Brukersammenslåing og -sletting',
-	'usermerge-desc' => "Gir muligheten til  å [[Special:UserMerge|slå sammen kontoer]] ved at alle referanser til en bruker byttes ut til en annen bruker i databasen, for så å slette den ene kontoen. Trenger rettigheten ''usermerge''.",
-	'usermerge-badolduser' => 'Gammelt brukernavn ugyldig',
-	'usermerge-badnewuser' => 'Nytt brukernavn ugyldig',
-	'usermerge-nonewuser' => 'Nytt brukernavn tomt &ndash; antar sammenslåing til «$1».<br />
-Klikk «{{int:usermerge-submit}}» for å godta.',
-	'usermerge-noolduser' => 'Gammelt brukernavn tomt',
-	'usermerge-fieldset' => 'Brukernavn som skal slås sammen',
-	'usermerge-olduser' => 'Gammelt brukernavn (slå sammen fra):',
-	'usermerge-newuser' => 'Nytt brukernavn (slå sammen til):',
-	'usermerge-deleteolduser' => 'Slett gammel bruker',
-	'usermerge-submit' => 'Slå sammen brukere',
-	'usermerge-badtoken' => 'Ugydlgi redigeringstegn',
-	'usermerge-userdeleted' => '$1 ($2) har blitt slettet.',
-	'usermerge-userdeleted-log' => 'Slettet bruker: $2 ($3)',
-	'usermerge-updating' => 'Oppdaterer $1-tabell ($2 til $3)',
-	'usermerge-success' => 'Sammenslåing fra $1 ($2) til $3 ($4) er ferdig.',
-	'usermerge-success-log' => 'Brukeren $2 ($3) slått sammen med $4 ($5)',
-	'usermerge-logpage' => 'Brukersammenslåingslogg',
-	'usermerge-logpagetext' => 'Dette er en logg over brukersammenslåinger.',
-	'usermerge-noselfdelete' => 'Du kan ikke slette eller slå sammen din egen konto!',
-	'usermerge-unmergable' => 'Kan ikke slå sammen den gamle kontoen. ID-en eller navnet anses som ikke-sammenslåbart.',
-	'usermerge-protectedgroup' => 'Kan ikke slå sammen den gamle kontoen. Brukeren er medlem i en beskyttet brukergruppe.',
-	'right-usermerge' => 'Slå sammen kontoer',
 );
 
 /** Occitan (Occitan)
@@ -1457,6 +1596,7 @@ Kliknij „{{int:usermerge-submit}}”, aby zaakceptować.',
 );
 
 /** Piedmontese (Piemontèis)
+ * @author Borichèt
  * @author Bèrto 'd Sèra
  * @author Dragonòt
  */
@@ -1485,6 +1625,13 @@ Sgnaca "{{int:usermerge-submit}}" për asseté.',
 	'usermerge-unmergable' => "As peul pa unì l'utent - l'ID o ël nòm a l'é stàit definì pa unificàbil.",
 	'usermerge-protectedgroup' => "As peul pa unì l'utent - l'utent a l'é ant na partìa protegiùa.",
 	'right-usermerge' => "Uniss j'utent",
+	'usermerge-editcount' => 'Gionté un conteur ëd modìfiche?',
+	'usermerge-editcount-success' => 'Gionté un conteur ëd modìfiche ëd ($1 e $2)',
+	'usermerge-autopagedelete' => "Scancelà automaticament an unificand j'utent",
+	'usermerge-page-unmoved' => 'La pàgina $1 a peul pa esse tramudà a $2.',
+	'usermerge-page-moved' => "La pàgina $1 a l'ha fàit San Martin a $2.",
+	'usermerge-move-log' => 'Pàgina tramudà n\'automàtich damëntrè ch\'as arbatiava "[[User:$1|$1]]" an "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'Scancelà la pagina $1',
 );
 
 /** Pashto (پښتو)
@@ -1506,29 +1653,36 @@ $messages['ps'] = array(
  */
 $messages['pt'] = array(
 	'usermerge' => 'Fusão e eliminação de utilizadores',
-	'usermerge-desc' => "[[Special:UserMerge|Funde referências a um utilizador com as de outro utilizador]] na base de dados da wiki - também apaga o antigo utilizador após a fusão. Requer o privilégio ''usermerge''",
+	'usermerge-desc' => "[[Special:UserMerge|Faz a fusão das referências a um utilizador com as de outro utilizador]] na base de dados da wiki - também apaga o utilizador antigo após a fusão. Requer o privilégio ''usermerge''",
 	'usermerge-badolduser' => 'Nome antigo inválido',
 	'usermerge-badnewuser' => 'Nome novo inválido',
-	'usermerge-nonewuser' => 'Novo nome de utilizador vazio - assumida fusão com $1.<br />
+	'usermerge-nonewuser' => 'O nome de utilizador novo está vazio - será assumida a fusão com $1.<br />
 Clique "{{int:usermerge-submit}}" para aceitar.',
-	'usermerge-noolduser' => 'Limpar nome antigo',
+	'usermerge-noolduser' => 'O nome de utilizador antigo está vazio',
 	'usermerge-fieldset' => 'Nomes de utilizadores a fundir',
 	'usermerge-olduser' => 'Utilizador antigo (fundir de):',
 	'usermerge-newuser' => 'Utilizador novo (fundir para):',
 	'usermerge-deleteolduser' => 'Apagar utilizador antigo',
 	'usermerge-submit' => 'Fundir utilizador',
-	'usermerge-badtoken' => 'Ficha de edição inválida',
+	'usermerge-badtoken' => 'Chave de edição inválida',
 	'usermerge-userdeleted' => '$1 ($2) foi eliminado.',
-	'usermerge-userdeleted-log' => 'Utilizador eliminado: $2 ($3)',
-	'usermerge-updating' => 'Actualizando tabela $1 ($2 para $3)',
-	'usermerge-success' => 'Fusão de $1 ($2) para $3 ($4) está completa.',
+	'usermerge-userdeleted-log' => 'Utilizador apagado: $2 ($3)',
+	'usermerge-updating' => 'A actualizar a tabela $1 ($2 para $3)',
+	'usermerge-success' => 'A fusão de $1 ($2) com $3 ($4) está completa.',
 	'usermerge-success-log' => 'Utilizador $2 ($3) fundido com $4 ($5)',
 	'usermerge-logpage' => 'Registo de fusão de utilizadores',
 	'usermerge-logpagetext' => 'Este é um registo de acções de fusão de utilizadores.',
 	'usermerge-noselfdelete' => 'Não pode apagar ou fundir a partir de si próprio!',
-	'usermerge-unmergable' => 'Não foi possível fundir o utilizador - Nome ou ID foi definido para não ser fundido.',
-	'usermerge-protectedgroup' => 'Não é possível fundir este utilizador - Utilizador está em um grupo protegido',
+	'usermerge-unmergable' => 'Não foi possível fundir o utilizador - o nome ou ID está definido como não podendo ser fundido.',
+	'usermerge-protectedgroup' => 'Não é possível fundir este utilizador - o utilizador está num grupo protegido.',
 	'right-usermerge' => 'Fundir utilizadores',
+	'usermerge-editcount' => 'Adicionar as contagens de edições?',
+	'usermerge-editcount-success' => 'A adicionar as contagens de edições de ($1 e $2)',
+	'usermerge-autopagedelete' => 'Eliminada automaticamente ao fundir utilizadores',
+	'usermerge-page-unmoved' => 'Não foi possível mover a página $1 para $2.',
+	'usermerge-page-moved' => 'A página $1 foi movida para $2.',
+	'usermerge-move-log' => 'Página movida automaticamente ao fundir o utilizador "[[User:$1|$1]]" com "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'A página $1 foi eliminada',
 );
 
 /** Brazilian Portuguese (Português do Brasil)
@@ -1603,6 +1757,7 @@ $messages['roa-tara'] = array(
 );
 
 /** Russian (Русский)
+ * @author Askarmuk
  * @author Ferrer
  * @author Illusion
  * @author Innv
@@ -1633,6 +1788,11 @@ $messages['ru'] = array(
 	'usermerge-unmergable' => 'Невозможно объединить участников — идентификатор или имя было определено как необъединяемое.',
 	'usermerge-protectedgroup' => 'Невозможно объединить участников — участник относится к защищённой группе.',
 	'right-usermerge' => 'объединение участников',
+	'usermerge-autopagedelete' => 'Автоматически удаляются при объединении пользователей',
+	'usermerge-page-unmoved' => 'Страница $1 не может быть переименована в $2.',
+	'usermerge-page-moved' => 'Страница $1 была переименована в $2.',
+	'usermerge-move-log' => 'Автоматически переименовано во время объединения учетной записи "[[User:$1|$1]]" с "[[User:$2|$2]]"',
+	'usermerge-page-deleted' => 'Удалить страницу $1',
 );
 
 /** Rusyn (Русиньскый)
@@ -1734,9 +1894,16 @@ Kliknite »{{int:usermerge-submit}}« za sprejetje.',
 	'usermerge-unmergable' => 'Ne morem združiti uporabnika – ID ali ime je opredeljeno kot nezdružljivo.',
 	'usermerge-protectedgroup' => 'Ne morem združiti uporabnika – uporabnik je v zaščiteni skupini.',
 	'right-usermerge' => 'Spajanje uporabnikov',
+	'usermerge-editcount' => 'Dodam števec urejanj?',
+	'usermerge-editcount-success' => 'Dodajanje števca urejanj ($1 in $2)',
+	'usermerge-autopagedelete' => 'Samodejno izbrisano med združevanjem uporabnikov',
+	'usermerge-page-unmoved' => 'Strani $1 ni bilo mogoče prestaviti na $2.',
+	'usermerge-page-moved' => 'Stran $1 je bila prestavljena na $2.',
+	'usermerge-move-log' => 'Samodejno prestavljena stran med združevanjem uporabnika »[[User:$1|$1]]« z »[[User:$2|$2]]«',
+	'usermerge-page-deleted' => 'Izbrisana stran $1',
 );
 
-/** Serbian Cyrillic ekavian (‪Српски (ћирилица)‬)
+/** Serbian (Cyrillic script) (‪Српски (ћирилица)‬)
  * @author Rancher
  * @author Жељко Тодоровић
  * @author Михајло Анђелковић
@@ -1760,11 +1927,12 @@ $messages['sr-ec'] = array(
 	'usermerge-logpagetext' => 'Ово је историја спајања корисника.',
 	'usermerge-noselfdelete' => 'Не можете да се обришете или спојите са другим налогом!',
 	'usermerge-protectedgroup' => 'Није могуђе спојити овог корисника са другим — налази се у заштићеној групи.',
-	'right-usermerge' => 'Споји кориснике',
+	'right-usermerge' => 'спајање корисника',
 );
 
-/** Serbian Latin ekavian (‪Srpski (latinica)‬)
+/** Serbian (Latin script) (‪Srpski (latinica)‬)
  * @author Michaello
+ * @author Rancher
  */
 $messages['sr-el'] = array(
 	'usermerge' => 'Spaja i briše korisnike',
@@ -1785,7 +1953,7 @@ $messages['sr-el'] = array(
 	'usermerge-logpagetext' => 'Ovo je istorija spajanja korisnika.',
 	'usermerge-noselfdelete' => 'Ne možete da se obrišete ili spojite sa drugim nalogom!',
 	'usermerge-protectedgroup' => 'Nije moguđe spojiti ovog korisnika sa drugim — nalazi se u zaštićenoj grupi.',
-	'right-usermerge' => 'Spoji korisnike',
+	'right-usermerge' => 'spajanje korisnika',
 );
 
 /** Seeltersk (Seeltersk)
@@ -1813,7 +1981,7 @@ Klik ap  „{{int:usermerge-submit}}“ toun Uutfieren.',
 	'usermerge-logpagetext' => 'Dit is dät Logbouk fon do Benutserkonten-Touhoopefierengen.',
 	'usermerge-noselfdelete' => 'Touhoopefierenge mäd aan sälwen is nit muugelk!',
 	'usermerge-unmergable' => 'Touhoopefierenge nit muugelk - ID of Benutsernoome wuud as nit touhoopefierboar definierd.',
-	'usermerge-protectedgroup' => 'Touhoopefierenge nit muugelk - Benutsernoome is in ne schutsede Gruppe.',
+	'usermerge-protectedgroup' => 'Touhoopefierenge nit muugelk - Benutsernoome is in ne skutsede Gruppe.',
 	'right-usermerge' => 'Benutserkonten fereenje',
 );
 
@@ -1907,7 +2075,7 @@ $messages['te'] = array(
 	'right-usermerge' => 'వాడుకరులను విలీనం చేయగలగడం',
 );
 
-/** Tajik (Cyrillic) (Тоҷикӣ (Cyrillic))
+/** Tajik (Cyrillic script) (Тоҷикӣ)
  * @author Ibrahim
  */
 $messages['tg-cyrl'] = array(
@@ -1924,7 +2092,7 @@ $messages['tg-cyrl'] = array(
 	'usermerge-logpagetext' => 'Ин гузориши амалҳои идғоми корбар аст.',
 );
 
-/** Tajik (Latin) (Тоҷикӣ (Latin))
+/** Tajik (Latin script) (tojikī)
  * @author Liangent
  */
 $messages['tg-latn'] = array(
@@ -2118,6 +2286,7 @@ $messages['zh-hans'] = array(
 	'usermerge-badnewuser' => '无效的新用户名',
 	'usermerge-nonewuser' => '清除新用户名 - 假设合并到$1。<br />点击<u>合并用户</u>以接受。',
 	'usermerge-noolduser' => '清除旧用户名',
+	'usermerge-fieldset' => '使用者名称合并',
 	'usermerge-olduser' => '旧用户（合并自）：',
 	'usermerge-newuser' => '新用户（合并到）：',
 	'usermerge-deleteolduser' => '删除旧用户',
