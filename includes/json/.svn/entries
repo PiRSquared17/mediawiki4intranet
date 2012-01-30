@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/includes/json
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/json
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2011-08-27T19:28:13.495653Z
+95607
+hashar
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:23.095984Z
-832711dd6febaf8077d969dc281846da
-2011-01-04T06:15:54.403142Z
-79562
-tstarling
+2012-01-25T15:31:57.289539Z
+d34f9c9b390a9a132e17c73f667a191a
+2011-08-27T19:28:13.495653Z
+95607
+hashar
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-27154
+27229
 
 FormatJson.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:14:23.095984Z
-4e363df578e8237a902709f3d115160e
-2009-09-17T01:19:02.920721Z
-56479
-dale
+2012-01-25T15:31:57.289539Z
+2ec5a0e89ed756395cc842c098cf7a74
+2011-05-17T22:03:20.276886Z
+88355
+siebrand
 has-props
 
 
@@ -92,5 +92,5 @@ has-props
 
 
 
-918
+1998
 
