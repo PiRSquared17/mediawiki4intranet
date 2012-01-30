@@ -1,95 +1,95 @@
 K 25
 svn:wc:ra_dav:version-url
-V 71
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal
+V 72
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal
+END
+UtfNormalTest2.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalTest2.php
 END
 Utf8CaseGenerate.php
 K 25
 svn:wc:ra_dav:version-url
-V 92
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/Utf8CaseGenerate.php
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/Utf8CaseGenerate.php
 END
 UtfNormalDataK.inc
 K 25
 svn:wc:ra_dav:version-url
-V 90
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalDataK.inc
-END
-UtfNormalUtil.php
-K 25
-svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalUtil.php
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalDataK.inc
 END
 UtfNormalDefines.php
 K 25
 svn:wc:ra_dav:version-url
-V 92
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalDefines.php
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalDefines.php
 END
-UtfNormalTest.php
-K 25
-svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalTest.php
-END
-UtfNormalBench.php
+UtfNormalUtil.php
 K 25
 svn:wc:ra_dav:version-url
 V 90
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalBench.php
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalUtil.php
 END
 UtfNormal.php
 K 25
 svn:wc:ra_dav:version-url
-V 85
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormal.php
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormal.php
 END
-README
+UtfNormalBench.php
 K 25
 svn:wc:ra_dav:version-url
-V 78
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/README
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalBench.php
+END
+UtfNormalTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalTest.php
+END
+UtfNormalMemStress.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalMemStress.php
 END
 RandomTest.php
 K 25
 svn:wc:ra_dav:version-url
-V 86
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/RandomTest.php
-END
-UtfNormalGenerate.php
-K 25
-svn:wc:ra_dav:version-url
-V 93
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalGenerate.php
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/RandomTest.php
 END
 Utf8Case.php
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/Utf8Case.php
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/Utf8Case.php
+END
+UtfNormalGenerate.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalGenerate.php
 END
 UtfNormalData.inc
 K 25
 svn:wc:ra_dav:version-url
-V 89
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/UtfNormalData.inc
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/UtfNormalData.inc
 END
 Utf8Test.php
 K 25
 svn:wc:ra_dav:version-url
-V 84
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/Utf8Test.php
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/Utf8Test.php
 END
 Makefile
 K 25
 svn:wc:ra_dav:version-url
-V 80
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/Makefile
-END
-CleanUpTest.php
-K 25
-svn:wc:ra_dav:version-url
-V 87
-/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/normal/CleanUpTest.php
+V 81
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/normal/Makefile
 END

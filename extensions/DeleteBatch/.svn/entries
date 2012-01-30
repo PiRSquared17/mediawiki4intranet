@@ -1,14 +1,14 @@
 10
 
 dir
-83020
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/extensions/DeleteBatch
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/extensions/DeleteBatch
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-18T20:13:15.018905Z
-62678
+2011-07-09T20:12:43.575400Z
+91807
 raymond
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:16:21.684328Z
-97249fe0f83ef7dadbf7c70364444971
-2010-02-18T20:13:15.018905Z
-62678
-raymond
+2012-01-25T15:30:07.937177Z
+b5b63379320367530b71f8d5aa2c31bc
+2011-05-14T00:11:22.365603Z
+88028
+siebrand
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-3736
+4820
 
 DeleteBatch.body.php
 file
@@ -66,11 +66,11 @@ file
 
 
 
-2011-02-04T18:16:21.684328Z
-33ae907a18b07417a5b0e0c84b6da1a0
-2009-07-02T14:12:29.624191Z
-52695
-nikerabbit
+2012-01-25T15:30:07.937177Z
+927df1c2e0e47ed471dab4f607e17cf4
+2011-06-17T16:26:31.329744Z
+90286
+reedy
 has-props
 
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-8241
+8986
 
 DeleteBatch.i18n.php
 file
@@ -100,10 +100,10 @@ file
 
 
 
-2011-02-04T18:16:21.684328Z
-ef7d7622ecf9cabd3cf05e7c3111f0ba
-2010-02-17T20:30:31.052660Z
-62658
+2012-01-25T15:30:07.937177Z
+829f56849cf3f2f7150da47d23e6ffb4
+2011-07-09T20:12:43.575400Z
+91807
 raymond
 has-props
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-79870
+95407
 
 DeleteBatch.php
 file
@@ -134,11 +134,11 @@ file
 
 
 
-2011-02-04T18:16:21.684328Z
-7aa16aecea82d9cf434dca2d0149bde4
-2009-08-04T13:40:56.188965Z
-54359
-raymond
+2012-01-25T15:30:07.937177Z
+e66a00da5aba7cf93f2c84900b4ff720
+2011-05-25T23:51:32.348375Z
+88867
+yaron
 has-props
 
 
@@ -160,5 +160,5 @@ has-props
 
 
 
-1308
+1377
 

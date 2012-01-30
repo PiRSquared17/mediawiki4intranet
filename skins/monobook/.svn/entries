@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/skins/monobook
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/skins/monobook
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-02-24T17:08:29.426689Z
-62928
-simetrical
+2011-11-09T17:10:03.684809Z
+102534
+reedy
 
 
 
@@ -25,40 +25,6 @@ simetrical
 
 
 dd0e9695-b195-4be7-bd10-2dea1a65a6b6
-
-Opera6Fixes.css
-file
-
-
-
-
-2011-02-04T18:15:06.984112Z
-0de1701f51963920ddedb0f8797f723f
-2009-02-22T04:22:46.072043Z
-47648
-alnokta
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-334
 
 user.gif
 file
@@ -94,6 +60,40 @@ has-props
 
 325
 
+Opera6Fixes.css
+file
+
+
+
+
+2012-01-25T15:35:34.222257Z
+3d1da59640541fb1cae3b242b6e19b9b
+2010-06-03T18:07:16.955163Z
+67289
+bawolff
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+337
+
 Opera7Fixes.css
 file
 
@@ -128,40 +128,6 @@ has-props
 
 394
 
-audio.png
-file
-
-
-
-
-2011-02-04T18:15:06.988112Z
-242070aa486c8c317bb435238a4373c3
-2006-11-12T22:35:18.974262Z
-17593
-simetrical
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-312
-
 required.gif
 file
 
@@ -195,6 +161,40 @@ has-props
 
 
 47
+
+audio.png
+file
+
+
+
+
+2012-01-25T15:35:34.222257Z
+4e1ef1bbb709b5df5c0a19b15ade5e82
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+239
 
 Opera9Fixes.css
 file
@@ -236,11 +236,11 @@ file
 
 
 
-2011-02-04T18:15:06.988112Z
-ad04e80be617ea35b08b1398b0ee7be9
-2009-08-09T19:11:53.168946Z
-54679
-greenreaper
+2012-01-25T15:35:34.226257Z
+9c29d15a05155ac2cf47ccaa7795ee30
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -262,7 +262,7 @@ has-props
 
 
 
-22987
+22736
 
 IE50Fixes.css
 file
@@ -270,11 +270,11 @@ file
 
 
 
-2011-02-04T18:15:06.988112Z
-12bbede61a9d8419bf665951023c3201
-2010-02-24T17:08:29.426689Z
-62928
-simetrical
+2012-01-25T15:35:34.226257Z
+aaa44638d85cddef1734b1a6c287260a
+2010-07-05T20:40:09.164552Z
+69071
+ashley
 has-props
 
 
@@ -296,109 +296,7 @@ has-props
 
 
 
-1098
-
-rtl.css
-file
-
-
-
-
-2011-02-04T18:15:06.988112Z
-313273c77de67121d2b88b8d75b67cad
-2009-09-12T17:11:26.200666Z
-56233
-rotem
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-4149
-
-headbg.jpg
-file
-
-
-
-
-2011-02-04T18:15:06.988112Z
-78766da07ddd6856e876fec76fdbbfd7
-2006-04-03T09:22:36.778077Z
-13446
-brion
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-7881
-
-IE60Fixes.css
-file
-
-
-
-
-2011-02-04T18:15:06.988112Z
-4f2c8148b16db437a692845cfb0be7ca
-2009-06-25T21:10:10.774551Z
-52414
-catrope
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-1539
+1108
 
 video.png
 file
@@ -434,17 +332,85 @@ has-props
 
 169
 
+IE60Fixes.css
+file
+
+
+
+
+2012-01-25T15:35:34.226257Z
+d56c85d7620faaa09fbcae3a46cbeb5b
+2011-09-29T21:10:19.035889Z
+98452
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1794
+
+headbg.jpg
+file
+
+
+
+
+2011-02-04T18:15:06.988112Z
+78766da07ddd6856e876fec76fdbbfd7
+2006-04-03T09:22:36.778077Z
+13446
+brion
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+7881
+
 IE70Fixes.css
 file
 
 
 
 
-2011-02-04T18:15:06.988112Z
-106e9c5c72fd49fdc72a5ab41b1af929
-2009-06-25T21:10:10.774551Z
-52414
-catrope
+2012-01-25T15:35:34.226257Z
+d66d7a9c1b9f4f95d8dc0c4cfa98f3cb
+2011-09-20T22:36:23.521521Z
+97673
+reedy
 has-props
 
 
@@ -466,41 +432,7 @@ has-props
 
 
 
-1439
-
-file_icon.gif
-file
-
-
-
-
-2011-02-04T18:15:06.988112Z
-0d916914a51b6e5d3afb4bd9448cf705
-2009-07-31T01:19:00.961673Z
-54065
-rememberthedot
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-323
+1761
 
 bullet.gif
 file
@@ -536,17 +468,17 @@ has-props
 
 50
 
-IE55Fixes.css
+file_icon.gif
 file
 
 
 
 
 2011-02-04T18:15:06.988112Z
-9b868a67017e759debc601abaf94904a
-2010-02-24T17:08:29.426689Z
-62928
-simetrical
+0d916914a51b6e5d3afb4bd9448cf705
+2009-07-31T01:19:00.961673Z
+54065
+rememberthedot
 has-props
 
 
@@ -568,7 +500,41 @@ has-props
 
 
 
-1348
+323
+
+IE55Fixes.css
+file
+
+
+
+
+2012-01-25T15:35:34.226257Z
+e530846f31e374986cabdb98cd8b27b1
+2010-07-05T20:40:09.164552Z
+69071
+ashley
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+1358
 
 mail_icon.gif
 file
@@ -610,11 +576,11 @@ file
 
 
 
-2011-02-04T18:15:06.992112Z
-f6b39b350ab4b2dd6d6efa72fc1c93e3
-2006-11-12T22:35:18.974262Z
-17593
-simetrical
+2012-01-25T15:35:34.226257Z
+032bdbc126f3ef299a8980a8fd5f2912
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -636,7 +602,7 @@ has-props
 
 
 
-270
+213
 
 magnify-clip.png
 file
@@ -712,11 +678,11 @@ file
 
 
 
-2011-02-04T18:15:06.992112Z
-5d7e1b491a9e59a2b91b1a70421eb8f9
-2009-02-21T15:03:54.305993Z
-47615
-alnokta
+2012-01-25T15:35:34.226257Z
+482cac6dc92b15a4b11098ec6a4c360b
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -738,7 +704,7 @@ has-props
 
 
 
-198
+157
 
 lock_icon.gif
 file
@@ -780,11 +746,11 @@ file
 
 
 
-2011-02-04T18:15:06.992112Z
-7c20496edcc154b19f09d6214b32ae4b
-2006-04-03T09:22:36.778077Z
-13446
-brion
+2012-01-25T15:35:34.226257Z
+fe7a8f9a0938d56e7305d59d3b9d81b2
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -806,19 +772,19 @@ has-props
 
 
 
-8205
+8013
 
-external.png
+external-ltr.png
 file
 
 
 
 
-2011-02-04T18:15:06.992112Z
-8ea7563eac773be6a466fd8a9866a411
-2006-04-03T09:22:36.778077Z
-13446
-brion
+2012-01-25T15:35:34.226257Z
+b0b20a97c36f8c4a899b254a8e797f56
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -840,7 +806,7 @@ has-props
 
 
 
-165
+143
 
 news_icon.png
 file
@@ -848,11 +814,11 @@ file
 
 
 
-2011-02-04T18:15:06.992112Z
-00f5b12f05f68baaa5a5d09542aeb80b
-2006-04-03T09:22:36.778077Z
-13446
-brion
+2012-01-25T15:35:34.230257Z
+95f93ac2df39be353414c3c3c02a8bcb
+2010-12-07T21:15:12.660161Z
+78015
+vyznev
 has-props
 
 
@@ -874,7 +840,7 @@ has-props
 
 
 
-297
+294
 
 link_icon.gif
 file
@@ -916,11 +882,11 @@ file
 
 
 
-2011-02-04T18:15:06.992112Z
-ad6d0b09d4a05c7214a07359c1240369
-2009-09-26T00:49:32.583748Z
-56937
-brion
+2012-01-25T15:35:34.230257Z
+1b4c95f677773975a6f2f2a30ddfeee2
+2011-11-09T17:10:03.684809Z
+102534
+reedy
 has-props
 
 
@@ -942,7 +908,7 @@ has-props
 
 
 
-23103
+22259
 
 discussionitem_icon.gif
 file
