@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
-V 67
-/svnroot/mediawiki/!svn/ver/82866/trunk/extensions/PagedTiffHandler
+V 68
+/svnroot/mediawiki/!svn/ver/109517/trunk/extensions/PagedTiffHandler
 END
 TiffReader.php
 K 25
@@ -12,24 +12,30 @@ END
 PagedTiffHandler_body.php
 K 25
 svn:wc:ra_dav:version-url
-V 93
-/svnroot/mediawiki/!svn/ver/76112/trunk/extensions/PagedTiffHandler/PagedTiffHandler_body.php
+V 94
+/svnroot/mediawiki/!svn/ver/109517/trunk/extensions/PagedTiffHandler/PagedTiffHandler_body.php
+END
+PagedTiffHandler.i18n.magic.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/109517/trunk/extensions/PagedTiffHandler/PagedTiffHandler.i18n.magic.php
 END
 PagedTiffHandler.i18n.php
 K 25
 svn:wc:ra_dav:version-url
-V 93
-/svnroot/mediawiki/!svn/ver/82866/trunk/extensions/PagedTiffHandler/PagedTiffHandler.i18n.php
+V 94
+/svnroot/mediawiki/!svn/ver/107412/trunk/extensions/PagedTiffHandler/PagedTiffHandler.i18n.php
 END
 PagedTiffHandler.php
 K 25
 svn:wc:ra_dav:version-url
-V 88
-/svnroot/mediawiki/!svn/ver/72988/trunk/extensions/PagedTiffHandler/PagedTiffHandler.php
+V 89
+/svnroot/mediawiki/!svn/ver/109517/trunk/extensions/PagedTiffHandler/PagedTiffHandler.php
 END
 PagedTiffHandler.image.php
 K 25
 svn:wc:ra_dav:version-url
 V 94
-/svnroot/mediawiki/!svn/ver/80807/trunk/extensions/PagedTiffHandler/PagedTiffHandler.image.php
+/svnroot/mediawiki/!svn/ver/95179/trunk/extensions/PagedTiffHandler/PagedTiffHandler.image.php
 END

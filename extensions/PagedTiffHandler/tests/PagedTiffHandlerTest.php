@@ -255,10 +255,10 @@ class PagedTiffHandlerTest extends PHPUnit_Framework_TestCase {
 
 		// getLongDesc
 		if ( $wgLanguageCode == 'de' ) {
-			$this->assertEquals( $this->handler->getLongDesc( $this->multipage_image ), wfMsg( 'tiff-file-info-size', '1.024', '768', '2,64 MB', 'image/tiff', '1' ) );
+			$this->assertEquals( $this->handler->getLongDesc( $this->multipage_image ), wfMsg( 'tiff-file-info-size', '1.024', '768', '2,64 MB', 'image/tiff', '7' ) );
 		} else {
 			// English
-			$this->assertEquals( $this->handler->getLongDesc( $this->multipage_image ), wfMsg( 'tiff-file-info-size', '1,024', '768', '2.64 MB', 'image/tiff', '1' ) );
+			$this->assertEquals( $this->handler->getLongDesc( $this->multipage_image ), wfMsg( 'tiff-file-info-size', '1,024', '768', '2.64 MB', 'image/tiff', '7' ) );
 		}
 		
 		// pageCount
@@ -283,7 +283,7 @@ class PagedTiffHandlerTest extends PHPUnit_Framework_TestCase {
 
 		// isMultiPage
 		$this->assertTrue( $this->handler->isMultiPage( $this->multipage_image ) );
-		$this->assertFalse( $this->handler->isMultiPage( $this->mhz_image ) );
+		$this->assertTrue( $this->handler->isMultiPage( $this->mhz_image ) );
 
 		// formatMetadata
 		$formattedMetadata = $this->handler->formatMetadata( $this->multipage_image );
