@@ -1,21 +1,27 @@
 <?php
-# Copyright (C) 2003, 2005, 2006 Brion Vibber <brion@pobox.com>
-# http://www.mediawiki.org/
-#
-# This program is free software; you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation; either version 2 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License along
-# with this program; if not, write to the Free Software Foundation, Inc.,
-# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-# http://www.gnu.org/copyleft/gpl.html
+/**
+ * Base classes for dumps and export
+ *
+ * Copyright © 2003, 2005, 2006 Brion Vibber <brion@pobox.com>
+ * http://www.mediawiki.org/
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
+ * http://www.gnu.org/copyleft/gpl.html
+ *
+ * @file
+ */
 
 /**
  * @defgroup Dump Dump
@@ -24,7 +30,7 @@
 /**
  * @ingroup SpecialPage Dump
  */
-// FIXME Pages should be bulk-loaded - calling pageByTitle for each page is slower
+// TODO Pages should be bulk-loaded - calling pageByTitle for each page is slower
 class WikiExporter {
 	var $listAuthors = false; # Return distinct author list (when not returning full history)
 	var $dumpUploads = false; # Dump uploaded files into the export file
@@ -34,6 +40,7 @@ class WikiExporter {
 	const CURRENT = 2;
 	const STABLE = 4; // extension defined
 	const LOGS = 8;
+	const RANGE = 16;
 
 	const BUFFER = 0;
 	const STREAM = 1;
@@ -49,7 +56,8 @@ class WikiExporter {
 	 * main query is still running.
 	 *
 	 * @param $db Database
-	 * @param $history Mixed: one of WikiExporter::FULL or WikiExporter::CURRENT,
+	 * @param $history Mixed: one of WikiExporter::FULL, WikiExporter::CURRENT,
+	 *                 WikiExporter::RANGE or WikiExporter::STABLE,
 	 *                 or an associative array:
 	 *                   offset: non-inclusive offset at which to start the query
 	 *                   limit: maximum number of rows to return
@@ -127,8 +135,23 @@ class WikiExporter {
 	 */
 	public function pagesByRange( $start, $end ) {
 		$condition = 'page_id >= ' . intval( $start );
-		if( $end ) {
+		if ( $end ) {
 			$condition .= ' AND page_id < ' . intval( $end );
+		}
+		return $this->dumpFrom( $condition );
+	}
+
+	/**
+	 * Dumps a series of page and revision records for those pages
+	 * in the database with revisions falling within the rev_id range given.
+	 * @param $start Int: inclusive lower limit (this id is included)
+	 * @param $end   Int: Exclusive upper limit (this id is not included)
+	 *                   If 0, no upper limit.
+	 */
+	public function revsByRange( $start, $end ) {
+		$condition = 'rev_id >= ' . intval( $start );
+		if ( $end ) {
+			$condition .= ' AND rev_id < ' . intval( $end );
 		}
 		return $this->dumpFrom( $condition );
 	}
@@ -144,15 +167,15 @@ class WikiExporter {
 
 	public function pageByName( $name ) {
 		$title = Title::newFromText( $name );
-		if( is_null( $title ) ) {
-			return new WikiError( "Can't export invalid title" );
+		if ( is_null( $title ) ) {
+			throw new MWException( "Can't export invalid title" );
 		} else {
 			return $this->pageByTitle( $title );
 		}
 	}
 
 	public function pagesByName( $names ) {
-		foreach( $names as $name ) {
+		foreach ( $names as $name ) {
 			$this->pageByName( $name );
 		}
 	}
@@ -163,7 +186,7 @@ class WikiExporter {
 
 	public function logsByRange( $start, $end ) {
 		$condition = 'log_id >= ' . intval( $start );
-		if( $end ) {
+		if ( $end ) {
 			$condition .= ' AND log_id < ' . intval( $end );
 		}
 		return $this->dumpFrom( $condition );
@@ -171,17 +194,28 @@ class WikiExporter {
 
 	# Generates the distinct list of authors of an article
 	# Not called by default (depends on $this->listAuthors)
-	# Allowed when exporting only last revision
-	protected function doListAuthors( $page, $revision, $cond ) {
+	# Can be set by Special:Export when not exporting whole history
+	protected function doListAuthors( $cond ) {
 		wfProfileIn( __METHOD__ );
-		$nothidden = '('.$this->db->bitAnd( 'rev_deleted', Revision::DELETED_USER ) . ') = 0';
-		$sql = "SELECT DISTINCT rev_user_text,rev_user FROM $page, $revision" .
-			" WHERE page_id=rev_page AND $nothidden AND $cond";
-		$result = $this->db->query( $sql, __METHOD__ );
+		$this->author_list = "<contributors>";
+		// rev_deleted
+
+		$res = $this->db->select(
+			array( 'page', 'revision' ),
+			array( 'DISTINCT rev_user_text', 'rev_user' ),
+			array(
+				$this->db->bitAnd( 'rev_deleted', Revision::DELETED_USER ) . ' = 0',
+				$cond,
+				'page_id = rev_id',
+			),
+			__METHOD__
+		);
+
 		$code = $this->writer->beginContributors();
-		foreach ( $result as $row )
+		foreach ( $res as $row )
 			$code .= $this->writer->writeContributor( $row->rev_user, $row->rev_user_text );
 		$code .= $this->writer->endContributors();
+
 		wfProfileOut( __METHOD__ );
 		return $code;
 	}
@@ -189,27 +223,27 @@ class WikiExporter {
 	protected function dumpFrom( $cond = '' ) {
 		wfProfileIn( __METHOD__ );
 		# For logging dumps...
-		if( $this->history & self::LOGS ) {
-			if( $this->buffer == WikiExporter::STREAM ) {
+		if ( $this->history & self::LOGS ) {
+			if ( $this->buffer == WikiExporter::STREAM ) {
 				$prev = $this->db->bufferResults( false );
 			}
 			$where = array( 'user_id = log_user' );
 			# Hide private logs
 			$hideLogs = LogEventsList::getExcludeClause( $this->db );
-			if( $hideLogs ) $where[] = $hideLogs;
+			if ( $hideLogs ) $where[] = $hideLogs;
 			# Add on any caller specified conditions
-			if( $cond ) $where[] = $cond;
+			if ( $cond ) $where[] = $cond;
 			# Get logging table name for logging.* clause
-			$logging = $this->db->tableName('logging');
-			$result = $this->db->select( array('logging','user'), 
+			$logging = $this->db->tableName( 'logging' );
+			$result = $this->db->select( array( 'logging', 'user' ),
 				array( "{$logging}.*", 'user_name' ), // grab the user name
 				$where,
 				__METHOD__,
-				array( 'ORDER BY' => 'log_id', 'USE INDEX' => array('logging' => 'PRIMARY') )
+				array( 'ORDER BY' => 'log_id', 'USE INDEX' => array( 'logging' => 'PRIMARY' ) )
 			);
 			$wrapper = $this->db->resultObject( $result );
 			$this->outputLogStream( $wrapper );
-			if( $this->buffer == WikiExporter::STREAM ) {
+			if ( $this->buffer == WikiExporter::STREAM ) {
 				$this->db->bufferResults( $prev );
 			}
 		# For page dumps...
@@ -218,11 +252,11 @@ class WikiExporter {
 			$opts = array( 'ORDER BY' => 'page_id ASC' );
 			$opts['USE INDEX'] = array();
 			$join = array();
-			if( is_array( $this->history ) ) {
+			if ( is_array( $this->history ) ) {
 				# Time offset/limit for all pages/history...
 				$revJoin = 'page_id=rev_page';
 				# Set time order
-				if( $this->history['dir'] == 'asc' ) {
+				if ( $this->history['dir'] == 'asc' ) {
 					$op = '>';
 					$opts['ORDER BY'] = 'rev_timestamp ASC';
 				} else {
@@ -230,54 +264,57 @@ class WikiExporter {
 					$opts['ORDER BY'] = 'rev_timestamp DESC';
 				}
 				# Set offset
-				if( !empty( $this->history['offset'] ) ) {
+				if ( !empty( $this->history['offset'] ) ) {
 					$revJoin .= " AND rev_timestamp $op " .
 						$this->db->addQuotes( $this->db->timestamp( $this->history['offset'] ) );
 				}
-				$join['revision'] = array('INNER JOIN',$revJoin);
+				$join['revision'] = array( 'INNER JOIN', $revJoin );
 				# Set query limit
-				if( !empty( $this->history['limit'] ) ) {
+				if ( !empty( $this->history['limit'] ) ) {
 					$opts['LIMIT'] = intval( $this->history['limit'] );
 				}
-			} elseif( $this->history & WikiExporter::FULL ) {
+			} elseif ( $this->history & WikiExporter::FULL ) {
 				# Full history dumps...
-				$join['revision'] = array('INNER JOIN','page_id=rev_page');
-			} elseif( $this->history & WikiExporter::CURRENT ) {
+				$join['revision'] = array( 'INNER JOIN', 'page_id=rev_page' );
+			} elseif ( $this->history & WikiExporter::CURRENT ) {
 				# Latest revision dumps...
-				if( $this->listAuthors && $cond != '' )  { // List authors, if so desired
-					list($page,$revision) = $this->db->tableNamesN('page','revision');
-					$authors = $this->doListAuthors( $page, $revision, $cond );
+				if ( $this->listAuthors && $cond != '' )  { // List authors, if so desired
+					$authors = $this->doListAuthors( $cond );
 				}
-				$join['revision'] = array('INNER JOIN','page_id=rev_page AND page_latest=rev_id');
-			} elseif( $this->history & WikiExporter::STABLE ) {
+				$join['revision'] = array( 'INNER JOIN', 'page_id=rev_page AND page_latest=rev_id' );
+			} elseif ( $this->history & WikiExporter::STABLE ) {
 				# "Stable" revision dumps...
 				# Default JOIN, to be overridden...
-				$join['revision'] = array('INNER JOIN','page_id=rev_page AND page_latest=rev_id');
+				$join['revision'] = array( 'INNER JOIN', 'page_id=rev_page AND page_latest=rev_id' );
 				# One, and only one hook should set this, and return false
-				if( wfRunHooks( 'WikiExporter::dumpStableQuery', array(&$tables,&$opts,&$join) ) ) {
+				if ( wfRunHooks( 'WikiExporter::dumpStableQuery', array( &$tables, &$opts, &$join ) ) ) {
 					wfProfileOut( __METHOD__ );
-					return new WikiError( __METHOD__." given invalid history dump type." );
+					throw new MWException( __METHOD__ . " given invalid history dump type." );
 				}
+			} elseif ( $this->history & WikiExporter::RANGE ) {
+				# Dump of revisions within a specified range
+				$join['revision'] = array( 'INNER JOIN', 'page_id=rev_page' );
+				$opts['ORDER BY'] = 'rev_page ASC, rev_id ASC';
 			} else {
 				# Uknown history specification parameter?
 				wfProfileOut( __METHOD__ );
-				return new WikiError( __METHOD__." given invalid history dump type." );
+				throw new MWException( __METHOD__ . " given invalid history dump type." );
 			}
 			# Query optimization hacks
-			if( $cond == '' ) {
+			if ( $cond == '' ) {
 				$opts[] = 'STRAIGHT_JOIN';
 				$opts['USE INDEX']['page'] = 'PRIMARY';
 			}
 			# Build text join options
-			if( $this->text != WikiExporter::STUB ) { // 1-pass
+			if ( $this->text != WikiExporter::STUB ) { // 1-pass
 				$tables[] = 'text';
-				$join['text'] = array('INNER JOIN','rev_text_id=old_id');
+				$join['text'] = array( 'INNER JOIN', 'rev_text_id=old_id' );
 			}
 
-			if( $this->buffer == WikiExporter::STREAM ) {
+			if ( $this->buffer == WikiExporter::STREAM ) {
 				$prev = $this->db->bufferResults( false );
 			}
-			
+
 			wfRunHooks( 'ModifyExportQuery',
 						array( $this->db, &$tables, &$cond, &$opts, &$join ) );
 
@@ -287,7 +324,7 @@ class WikiExporter {
 			# Output dump results
 			$this->outputPageStream( $wrapper, $this->listAuthors ? $authors : NULL );
 
-			if( $this->buffer == WikiExporter::STREAM ) {
+			if ( $this->buffer == WikiExporter::STREAM ) {
 				$this->db->bufferResults( $prev );
 			}
 		}
@@ -308,15 +345,16 @@ class WikiExporter {
 	 */
 	protected function outputPageStream( $resultset, $authors = '' ) {
 		$last = null;
-		while( $row = $resultset->fetchObject() ) {
+		foreach ( $resultset as $row ) {
 			// Run text filter
 			wfRunHooks( 'ExportFilterText', array( &$row->old_text ) );
-			if( is_null( $last ) ||
+			if ( is_null( $last ) ||
 				$last->page_namespace != $row->page_namespace ||
 				$last->page_title     != $row->page_title ) {
-				if( isset( $last ) ) {
-					if( $this->dumpUploads ) {
-						$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
+				if ( isset( $last ) ) {
+					if ( $this->dumpUploads ) {
+						$this->writeUploads( $last,
+							$this->history == WikiExporter::CURRENT ? 1 : null );
 					}
 					$this->sink->write( $this->writer->closePage() );
 				}
@@ -325,37 +363,37 @@ class WikiExporter {
 			}
 			$this->sink->write( $this->writer->writeRevision( $row ) );
 		}
-		if( isset( $last ) ) {
-			if( $this->dumpUploads ) {
-				$this->writeUploads( $last, $this->history == WikiExporter::CURRENT ? 1 : null );
+		if ( isset( $last ) ) {
+			if ( $this->dumpUploads ) {
+				$this->writeUploads( $last,
+					$this->history == WikiExporter::CURRENT ? 1 : null );
 			}
 			$this->sink->write( $authors );
 			$this->sink->write( $this->writer->closePage() );
 		}
 	}
-	
+
 	protected function outputLogStream( $resultset ) {
-		while( $row = $resultset->fetchObject() ) {
-			$this->sink->writeLogItem( $this->writer->writeLogItem( $row ) );
+		foreach ( $resultset as $row ) {
+			$this->sink->write( $this->writer->writeLogItem( $row ) );
 		}
 	}
 }
 
 /**
- * The purpose of this class is to encapsulate main dump file output.
- * I.e. now it's XML, but other DumpWriter may produce some other format.
  * @ingroup Dump
  */
 class XmlDumpWriter {
 
-	var $mimetype = 'application/xml; charset=utf-8', $extension = 'xml';
+	var $mimetype = 'application/xml; charset=utf-8';
+	var $extension = 'xml';
 
 	/**
 	 * Returns the export schema version.
 	 * @return string
 	 */
 	protected function schemaVersion() {
-		return "0.4";
+		return "0.6";
 	}
 
 	/**
@@ -369,18 +407,17 @@ class XmlDumpWriter {
 	 * @return string
 	 */
 	public function openStream() {
-		global $wgContLanguageCode;
+		global $wgLanguageCode;
 		$ver = $this->schemaVersion();
-		$mp = '';
-		return $mp . "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
+		return "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n" .
 			Xml::element( 'mediawiki', array(
-			'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
-			'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
-			'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
-			                        "http://www.mediawiki.org/xml/export-$ver.xsd",
-			'version'            => $ver,
-			'xml:lang'           => $wgContLanguageCode ),
-			null ) .
+				'xmlns'              => "http://www.mediawiki.org/xml/export-$ver/",
+				'xmlns:xsi'          => "http://www.w3.org/2001/XMLSchema-instance",
+				'xsi:schemaLocation' => "http://www.mediawiki.org/xml/export-$ver/ " .
+				                        "http://www.mediawiki.org/xml/export-$ver.xsd",
+				'version'            => $ver,
+				'xml:lang'           => $wgLanguageCode ),
+				null ) .
 			"\n" .
 			$this->siteInfo();
 	}
@@ -408,7 +445,7 @@ class XmlDumpWriter {
 	}
 
 	protected function homelink() {
-		return Xml::element( 'base', array(), Title::newMainPage()->getFullUrl() );
+		return Xml::element( 'base', array(), Title::newMainPage()->getCanonicalUrl() );
 	}
 
 	protected function caseSetting() {
@@ -421,9 +458,9 @@ class XmlDumpWriter {
 	protected function namespaces() {
 		global $wgContLang;
 		$spaces = "<namespaces>\n";
-		foreach( $wgContLang->getFormattedNamespaces() as $ns => $title ) {
-			$spaces .= '      ' . 
-				Xml::element( 'namespace', 
+		foreach ( $wgContLang->getFormattedNamespaces() as $ns => $title ) {
+			$spaces .= '      ' .
+				Xml::element( 'namespace',
 					array(	'key' => $ns,
 							'case' => MWNamespace::isCapitalized( $ns ) ? 'first-letter' : 'case-sensitive',
 					), $title ) . "\n";
@@ -435,6 +472,8 @@ class XmlDumpWriter {
 	/**
 	 * Closes the output stream with the closing root element.
 	 * Call when finished dumping things.
+	 *
+	 * @return string
 	 */
 	public function closeStream() {
 		return "</mediawiki>\n";
@@ -452,26 +491,18 @@ class XmlDumpWriter {
 		global $wgContLang;
 		$out = "  <page>\n";
 		$title = Title::makeTitle( $row->page_namespace, $row->page_title );
-		// Use english namespace names
-		$ns = $title->getNamespace();
-		if( MWNamespace::exists( $ns ) )
-			$ns = MWNamespace::getCanonicalName( $ns );
-		else
-			$ns = $wgContLang->getNsText( $ns );
-		if ( $ns !== '' )
-			$ns .= ':';
-		$out .= '    ' . Xml::elementClean( 'title', array(), $ns.$title->getText() ) . "\n";
+		$out .= '    ' . Xml::elementClean( 'title', array(), self::canonicalTitle( $title ) ) . "\n";
 		$out .= '    ' . Xml::element( 'id', array(), strval( $row->page_id ) ) . "\n";
-		if( $row->page_is_redirect ) {
+		if ( $row->page_is_redirect ) {
 			$out .= '    ' . Xml::element( 'redirect', array() ) . "\n";
 		}
-		if( $row->page_restrictions != '' ) {
+		if ( $row->page_restrictions != '' ) {
 			$out .= '    ' . Xml::element( 'restrictions', array(),
 				strval( $row->page_restrictions ) ) . "\n";
 		}
-		
+
 		wfRunHooks( 'XmlDumpWriterOpenPage', array( $this, &$out, $row, $title ) );
-		
+
 		return $out;
 	}
 
@@ -500,34 +531,34 @@ class XmlDumpWriter {
 
 		$out .= $this->writeTimestamp( $row->rev_timestamp );
 
-		if( $row->rev_deleted & Revision::DELETED_USER ) {
+		if ( $row->rev_deleted & Revision::DELETED_USER ) {
 			$out .= "      " . Xml::element( 'contributor', array( 'deleted' => 'deleted' ) ) . "\n";
 		} else {
 			$out .= $this->writeContributor( $row->rev_user, $row->rev_user_text );
 		}
 
-		if( $row->rev_minor_edit ) {
+		if ( $row->rev_minor_edit ) {
 			$out .=  "      <minor/>\n";
 		}
-		if( $row->rev_deleted & Revision::DELETED_COMMENT ) {
+		if ( $row->rev_deleted & Revision::DELETED_COMMENT ) {
 			$out .= "      " . Xml::element( 'comment', array( 'deleted' => 'deleted' ) ) . "\n";
-		} elseif( $row->rev_comment != '' ) {
+		} elseif ( $row->rev_comment != '' ) {
 			$out .= "      " . Xml::elementClean( 'comment', null, strval( $row->rev_comment ) ) . "\n";
 		}
 
 		$text = '';
-		if( $row->rev_deleted & Revision::DELETED_TEXT ) {
+		if ( $row->rev_deleted & Revision::DELETED_TEXT ) {
 			$out .= "      " . Xml::element( 'text', array( 'deleted' => 'deleted' ) ) . "\n";
-		} elseif( isset( $row->old_text ) ) {
+		} elseif ( isset( $row->old_text ) ) {
 			// Raw text from the database may have invalid chars
 			$text = strval( Revision::getRevisionText( $row ) );
-			$out .= "      " . Xml::ElementClean( 'text',
-				array( 'xml:space' => 'preserve' ),
+			$out .= "      " . Xml::elementClean( 'text',
+				array( 'xml:space' => 'preserve', 'bytes' => $row->rev_len ),
 				strval( $text ) ) . "\n";
 		} else {
 			// Stub output
 			$out .= "      " . Xml::element( 'text',
-				array( 'id' => $row->rev_text_id ),
+				array( 'id' => $row->rev_text_id, 'bytes' => $row->rev_len ),
 				"" ) . "\n";
 		}
 
@@ -538,7 +569,7 @@ class XmlDumpWriter {
 		wfProfileOut( __METHOD__ );
 		return $out;
 	}
-	
+
 	/**
 	 * Dumps a <logitem> section on the output stream, with
 	 * data filled in from the given database row.
@@ -550,36 +581,37 @@ class XmlDumpWriter {
 	public function writeLogItem( $row ) {
 		wfProfileIn( __METHOD__ );
 
+		$out  = "    <logitem>\n";
 		$out .= "      " . Xml::element( 'id', null, strval( $row->log_id ) ) . "\n";
 
 		$out .= $this->writeTimestamp( $row->log_timestamp );
 
-		if( $row->log_deleted & LogPage::DELETED_USER ) {
+		if ( $row->log_deleted & LogPage::DELETED_USER ) {
 			$out .= "      " . Xml::element( 'contributor', array( 'deleted' => 'deleted' ) ) . "\n";
 		} else {
 			$out .= $this->writeContributor( $row->log_user, $row->user_name );
 		}
 
-		if( $row->log_deleted & LogPage::DELETED_COMMENT ) {
+		if ( $row->log_deleted & LogPage::DELETED_COMMENT ) {
 			$out .= "      " . Xml::element( 'comment', array( 'deleted' => 'deleted' ) ) . "\n";
-		} elseif( $row->log_comment != '' ) {
+		} elseif ( $row->log_comment != '' ) {
 			$out .= "      " . Xml::elementClean( 'comment', null, strval( $row->log_comment ) ) . "\n";
 		}
-		
+
 		$out .= "      " . Xml::element( 'type', null, strval( $row->log_type ) ) . "\n";
 		$out .= "      " . Xml::element( 'action', null, strval( $row->log_action ) ) . "\n";
 
-		if( $row->log_deleted & LogPage::DELETED_ACTION ) {
+		if ( $row->log_deleted & LogPage::DELETED_ACTION ) {
 			$out .= "      " . Xml::element( 'text', array( 'deleted' => 'deleted' ) ) . "\n";
 		} else {
 			$title = Title::makeTitle( $row->log_namespace, $row->log_title );
-			$out .= "      " . Xml::elementClean( 'logtitle', null, $title->getPrefixedText() ) . "\n";
+			$out .= "      " . Xml::elementClean( 'logtitle', null, self::canonicalTitle( $title ) ) . "\n";
 			$out .= "      " . Xml::elementClean( 'params',
 				array( 'xml:space' => 'preserve' ),
 				strval( $row->log_params ) ) . "\n";
 		}
 
-		$out  = "    <logitem>\n$out    </logitem>\n";
+		$out .= "    </logitem>\n";
 
 		wfProfileOut( __METHOD__ );
 		return $out;
@@ -600,7 +632,7 @@ class XmlDumpWriter {
 
 	public function writeContributor( $id, $text ) {
 		$out = "      <contributor>\n";
-		if( $id ) {
+		if ( $id ) {
 			$out .= "        " . Xml::elementClean( 'username', null, strval( $text ) ) . "\n";
 			$out .= "        " . Xml::element( 'id', null, strval( $id ) ) . "\n";
 		} else {
@@ -610,19 +642,67 @@ class XmlDumpWriter {
 		return $out;
 	}
 
-	public function writeUpload( $file, $url ) {
-		if ( !$file->exists() )
+	/**
+	 * @param $file File
+	 * @param $dumpContents bool
+	 * @return string
+	 */
+	function writeUpload( $file, $url, $dumpContents = false ) {
+		if ( !$file->exists() ) {
 			return "";
+		}
+		if ( $file->isOld() ) {
+			$archiveName = "      " .
+				Xml::element( 'archivename', null, $file->getArchiveName() ) . "\n";
+		} else {
+			$archiveName = '';
+		}
+		if ( $dumpContents ) {
+			# Dump file as base64
+			# Uses only XML-safe characters, so does not need escaping
+			$contents = '      <contents encoding="base64">' .
+				chunk_split( base64_encode( file_get_contents( $file->getPath() ) ) ) .
+				"      </contents>\n";
+		} else {
+			$contents = '';
+		}
 		return "    <upload>\n" .
 			$this->writeTimestamp( $file->getTimestamp() ) .
 			$this->writeContributor( $file->getUser( 'id' ), $file->getUser( 'text' ) ) .
-			"      " . Xml::ElementClean( 'comment', null, $file->getDescription() ) . "\n" .
-			"      " . Xml::Element( 'filename', null, $file->getName() ) . "\n" .
-			"      " . Xml::Element( 'src', array( 'sha1' => $file->getSha1() ), $url ) . "\n" .
-			"      " . Xml::Element( 'size', null, $file->getSize() ) . "\n" .
+			"      " . Xml::elementClean( 'comment', null, $file->getDescription() ) . "\n" .
+			"      " . Xml::element( 'filename', null, $file->getName() ) . "\n" .
+			$archiveName .
+			"      " . Xml::element( 'src', null, $url ) . "\n" .
+			"      " . Xml::element( 'size', null, $file->getSize() ) . "\n" .
+			"      " . Xml::element( 'sha1base36', null, $file->getSha1() ) . "\n" .
+			"      " . Xml::element( 'rel', null, $file->getRel() ) . "\n" .
+			$contents .
 			"    </upload>\n";
 	}
 
+	/**
+	 * Return prefixed text form of title, but using the content language's
+	 * canonical namespace. This skips any special-casing such as gendered
+	 * user namespaces -- which while useful, are not yet listed in the
+	 * XML <siteinfo> data so are unsafe in export.
+	 * 
+	 * @param Title $title
+	 * @return string
+	 */
+	public static function canonicalTitle( Title $title ) {
+		if ( $title->getInterwiki() ) {
+			return $title->getPrefixedText();
+		}
+
+		global $wgContLang;
+		$prefix = str_replace( '_', ' ', $wgContLang->getNsText( $title->getNamespace() ) );
+
+		if ($prefix !== '') {
+			$prefix .= ':';
+		}
+
+		return $prefix . $title->getText();
+	}
 }
 
 # -- Vitaliy Filippov 2011-10-13:
@@ -630,7 +710,7 @@ class XmlDumpWriter {
 # Page selection must be done OUTSIDE any dumper classes. It's much faster.
 
 function xmlsafe( $string ) {
-	wfProfileIn( __METHOD__ );
+	wfProfileIn( __FUNCTION__ );
 
 	/**
 	 * The page may contain old data which has not been properly normalized.
@@ -640,6 +720,6 @@ function xmlsafe( $string ) {
 	$string = UtfNormal::cleanUp( $string );
 
 	$string = htmlspecialchars( $string );
-	wfProfileOut( __METHOD__ );
+	wfProfileOut( __FUNCTION__ );
 	return $string;
 }

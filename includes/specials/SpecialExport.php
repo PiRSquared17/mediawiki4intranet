@@ -37,21 +37,23 @@ class SpecialExport extends SpecialPage {
 		global $wgOut, $wgRequest, $wgSitename, $wgExportAllowListContributors;
 		global $wgExportAllowHistory, $wgExportMaxHistory, $wgExportMaxLinkDepth;
 		global $wgExportFromNamespaces;
-		
+
 		$this->setHeaders();
 		$this->outputHeader();
-		
+
 		// Set some variables
 		$this->curonly = true;
 		$this->doExport = false;
 		$this->templates = $wgRequest->getCheck( 'templates' );
 		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
+		$this->pageLinkDepth = $this->validateLinkDepth(
+			$wgRequest->getIntOrNull( 'pagelink-depth' )
+		);
 		$nsindex = '';
 		
 		$state = $wgRequest->getValues();
 		$state['errors'] = array();
-		if ( !empty( $state['addcat'] ) )
-		{
+		if ( !empty( $state['addcat'] ) ) {
 			self::addPagesExec( $state );
 			$page = $state['pages'];
 		}
@@ -59,11 +61,13 @@ class SpecialExport extends SpecialPage {
 			$page = $wgRequest->getText( 'pages' );
 			$this->curonly = $wgRequest->getCheck( 'curonly' );
 			$rawOffset = $wgRequest->getVal( 'offset' );
+
 			if( $rawOffset ) {
 				$offset = wfTimestamp( TS_MW, $rawOffset );
 			} else {
 				$offset = null;
 			}
+
 			$limit = $wgRequest->getInt( 'limit' );
 			$dir = $wgRequest->getVal( 'dir' );
 			$history = array(
@@ -72,6 +76,7 @@ class SpecialExport extends SpecialPage {
 				'limit' => $wgExportMaxHistory,
 			);
 			$historyCheck = $wgRequest->getCheck( 'history' );
+
 			if ( $this->curonly ) {
 				$history = WikiExporter::CURRENT;
 			} elseif ( !$historyCheck ) {
@@ -85,48 +90,61 @@ class SpecialExport extends SpecialPage {
 					$history['dir'] = 'desc';
 				}
 			}
-			
-			if( $page != '' ) $this->doExport = true;
+
+			if( $page != '' ) {
+				$this->doExport = true;
+			}
 		} else {
-			// Default to current-only for GET requests
+			// Default to current-only for GET requests.
 			$page = $wgRequest->getText( 'pages', $par );
 			$historyCheck = $wgRequest->getCheck( 'history' );
+
 			if( $historyCheck ) {
 				$history = WikiExporter::FULL;
 			} else {
 				$history = WikiExporter::CURRENT;
 			}
-			
-			if( $page != '' ) $this->doExport = true;
+
+			if( $page != '' ) {
+				$this->doExport = true;
+			}
 		}
-		
+
 		if( !$wgExportAllowHistory ) {
 			// Override
 			$history = WikiExporter::CURRENT;
 		}
-		
+
 		$list_authors = $wgRequest->getCheck( 'listauthors' );
-		if ( !$this->curonly || !$wgExportAllowListContributors ) $list_authors = false ;
-		
+		if ( !$this->curonly || !$wgExportAllowListContributors ) {
+			$list_authors = false ;
+		}
+
 		if ( $this->doExport ) {
 			$this->doExport( $page, $history, $list_authors );
 			return;
 		}
-		
+
 		$wgOut->addWikiMsg( 'exporttext' );
-		
+
 		$form = Xml::openElement( 'form', array( 'method' => 'post',
 			'action' => $this->getTitle()->getLocalUrl( 'action=submit' ) ) );
-		foreach ( $state['errors'] as $e )
-			$form .= wfMsgExt( $e[0], array('parse'), $e[1] );
+		foreach ( $state['errors'] as $e ) {
+			$form .= wfMsgExt( $e[0], array( 'parse' ), $e[1] );
+		}
 		
-		$form .= self::addPagesForm($state);
+		$form .= self::addPagesForm( $state );
 		
 		$form .= Xml::element( 'textarea', array( 'name' => 'pages', 'cols' => 40, 'rows' => 10 ), $page, false );
 		$form .= '<br />';
-		
+
 		if( $wgExportAllowHistory ) {
-			$form .= Xml::checkLabel( wfMsg( 'exportcuronly' ), 'curonly', 'curonly', $wgRequest->getCheck('curonly') ? true : false ) . '<br />';
+			$form .= Xml::checkLabel(
+				wfMsg( 'exportcuronly' ),
+				'curonly',
+				'curonly',
+				$wgRequest->getCheck( 'curonly' ) ? true : false
+			) . '<br />';
 		} else {
 			$wgOut->addHTML( wfMsgExt( 'exportnohistory', 'parse' ) );
 		}
@@ -137,32 +155,33 @@ class SpecialExport extends SpecialPage {
 		
 		$form .= Xml::submitButton( wfMsg( 'export-submit' ), array( 'accesskey' => 's' ) );
 		$form .= Xml::closeElement( 'form' );
+
 		$wgOut->addHTML( $form );
 	}
 
 	public static function userCanOverrideExportDepth() {
 		global $wgUser;
-		
 		return $wgUser->isAllowed( 'override-export-depth' );
 	}
 
 	/**
 	 * Do the actual page exporting
-	 * @param string $page User input on what page(s) to export
-	 * @param mixed  $history one of the WikiExporter history export constants
+	 *
+	 * @param $page String: user input on what page(s) to export
+	 * @param $history Mixed: one of the WikiExporter history export constants
+	 * @param $list_authors Boolean: Whether to add distinct author list (when
+	 *                      not returning full history)
 	 */
 	private function doExport( $page, $history, $list_authors ) {
 		global $wgExportMaxHistory, $wgRequest, $wgOut, $wgSitename;
 		
 		// Split up and normalize input
 		$pages = array();
-		foreach( explode( "\n", $page ) as $pageName )
-		{
+		foreach( explode( "\n", $page ) as $pageName ) {
 			$pageName = trim( $pageName );
 			$title = Title::newFromText( $pageName );
 			if( $title && $title->getInterwiki() == '' && $title->getText() !== '' &&
-			    $title->userCanRead() )
-			{
+			    $title->userCanRead() ) {
 				// Only record each page once!
 				$pages[ $title->getPrefixedText() ] = $title;
 			}
@@ -233,14 +252,8 @@ class SpecialExport extends SpecialPage {
 		$notcategory = isset( $state['notcategory'] ) ? $state['notcategory'] : '';
 		$namespace   = isset( $state['namespace'] )   ? $state['namespace']   : '';
 		$modifydate  = isset( $state['modifydate'] )  ? $state['modifydate']  : '';
-		if ( preg_match( '/^\s*\d{4,}-\d{2}-\d{2}\s*$/s', $modifydate ) ) {
-			// Allow to specify just date without the timestamp
-			$modifydate .= ' 00:00:00';
-		}
-		if ( !preg_match( '/^\s*\d{4,}-\d{2}-\d{2}\s*\d\d?:\d\d?:\d\d?\s*$/s', $modifydate ) ) {
+		if ( !strlen( $modifydate ) || !( $modifydate = wfTimestampOrNull( TS_MW, $modifydate ) ) ) {
 			$modifydate = NULL;
-		} else {
-			$modifydate = wfTimestamp( TS_MW, $modifydate );
 		}
 		if ( !strlen( $catname ) || !( $catname = Title::newFromText( $catname, NS_CATEGORY ) ) ||
 			$catname->getNamespace() != NS_CATEGORY ) {
@@ -353,16 +366,8 @@ class SpecialExport extends SpecialPage {
 		);
 		// Textboxes:
 		foreach ( $textboxes as $k => $size ) {
-			$value = !empty( $state[ $k ] ) ? $state[ $k ] : '';
-			if ( $k == 'modifydate' ) {
-				$form .= "<div class=\"ap_$k help\">" .
-					"<label for=\"ap-$k\" title=\"".htmlspecialchars( wfMsg( "export-$k-tooltip" ) )."\">" .
-					wfMsg( "export-$k" ) . "</label>&nbsp;" .
-					Xml::input( $k, $size, $value, array( 'id' => "ap-$k" ) ) . '</div>';
-			} else {
-				$form .= "<div class=\"ap_$k\">" .
-					Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, $value ) . '</div>';
-			}
+			$form .= '<div class="ap_'.$k.'">' .
+				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
 		}
 		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
 			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';

@@ -2,7 +2,7 @@
 if ( !defined( 'MEDIAWIKI' ) ) die();
 /**
  * A Special Page extension to rename users, runnable by users with renameuser
- * righs
+ * rights
  *
  * @file
  * @ingroup Extensions
@@ -18,20 +18,19 @@ $wgExtensionCredits['specialpage'][] = array(
 	'path' => __FILE__,
 	'name' => 'Renameuser',
 	'author'         => array( 'Ævar Arnfjörð Bjarmason', 'Aaron Schulz' ),
-	'url'            => 'http://www.mediawiki.org/wiki/Extension:Renameuser',
+	'url'            => 'https://www.mediawiki.org/wiki/Extension:Renameuser',
 	'descriptionmsg' => 'renameuser-desc',
 );
 
-# Internationalisation file
+# Internationalisation files
 $dir = dirname( __FILE__ ) . '/';
 $wgExtensionMessagesFiles['Renameuser'] = $dir . 'Renameuser.i18n.php';
-$wgExtensionAliasesFiles['Renameuser'] = $dir . 'Renameuser.alias.php';
+$wgExtensionMessagesFiles['RenameuserAliases'] = $dir . 'Renameuser.alias.php';
 
 /**
- * The maximum number of edits a user can have and still be allowed renaming,
- * set it to 0 to disable the limit.
+ * Users with more than this number of edits will have their rename operation
+ * deferred via the job queue.
  */
-define( 'RENAMEUSER_CONTRIBLIMIT', 25000 );
 define( 'RENAMEUSER_CONTRIBJOB', 5000 );
 
 # Add a new log type
@@ -42,15 +41,24 @@ $wgLogHeaders['renameuser']            = 'renameuserlogpagetext';
 # $wgLogActions['renameuser/renameuser'] = 'renameuserlogentry';
 $wgLogActionsHandlers['renameuser/renameuser'] = 'wfRenameUserLogActionText'; // deal with old breakage
 
+/**
+ * @param $type
+ * @param $action
+ * @param $title Title
+ * @param $skin Skin
+ * @param $params array
+ * @param $filterWikilinks bool
+ * @return String
+ */
 function wfRenameUserLogActionText( $type, $action, $title = null, $skin = null, $params = array(), $filterWikilinks = false ) {
 	if ( !$title || $title->getNamespace() !== NS_USER ) {
 		$rv = ''; // handled in comment, the old way
 	} else {
 		$titleLink = $skin ?
-			$skin->makeLinkObj( $title, htmlspecialchars( $title->getPrefixedText() ) ) : $title->getText();
+			$skin->makeLinkObj( $title, htmlspecialchars( $title->getPrefixedText() ) ) : htmlspecialchars( $title->getText() );
 		# Add title to params
 		array_unshift( $params, $titleLink );
-		$rv = wfMsgReal( 'renameuserlogentry', $params );
+		$rv = wfMsg( 'renameuserlogentry', $params );
 	}
 	return $rv;
 }
@@ -83,12 +91,17 @@ function wfRenameUserShowLog( $article ) {
 	return true;
 }
 
+/**
+ * @param $id
+ * @param $nt Title
+ * @param $tools
+ * @return bool
+ */
 function wfRenameuserOnContribsLink( $id, $nt, &$tools ) {
 	global $wgUser;
 
 	if ( $wgUser->isAllowed( 'renameuser' ) && $id ) {
-		$sk = $wgUser->getSkin();
-		$tools[] = $sk->link(
+		$tools[] = Linker::link(
 			SpecialPage::getTitleFor( 'Renameuser' ),
 			wfMsg( 'renameuser-linkoncontribs' ),
 			array( 'title' => wfMsgExt( 'renameuser-linkoncontribs-text', 'parseinline' ) ),
