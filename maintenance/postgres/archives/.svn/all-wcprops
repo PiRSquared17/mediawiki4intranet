@@ -1,0 +1,143 @@
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives
+END
+patch-page_restrictions.sql
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-page_restrictions.sql
+END
+patch-updatelog.sql
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-updatelog.sql
+END
+patch-revision_rev_user_fkey.sql
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-revision_rev_user_fkey.sql
+END
+patch-profiling.sql
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-profiling.sql
+END
+patch-user_properties.sql
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-user_properties.sql
+END
+patch-l10n_cache.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-l10n_cache.sql
+END
+patch-update_sequences.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-update_sequences.sql
+END
+patch-remove-archive2.sql
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-remove-archive2.sql
+END
+patch-rc_cur_id-not-null.sql
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-rc_cur_id-not-null.sql
+END
+patch-page_props.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-page_props.sql
+END
+patch-redirect.sql
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-redirect.sql
+END
+patch-page_deleted.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-page_deleted.sql
+END
+patch-ipb_address_unique.sql
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-ipb_address_unique.sql
+END
+patch-log_search.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-log_search.sql
+END
+patch-pagecontent.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-pagecontent.sql
+END
+patch-ts2pagetitle.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-ts2pagetitle.sql
+END
+patch-mediawiki_version.sql
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-mediawiki_version.sql
+END
+patch-tsearch2funcs.sql
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-tsearch2funcs.sql
+END
+patch-protected_titles.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-protected_titles.sql
+END
+patch-category.sql
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-category.sql
+END
+patch-change_tag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-change_tag.sql
+END
+patch-mwuser.sql
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-mwuser.sql
+END
+patch-querycachetwo.sql
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/maintenance/postgres/archives/patch-querycachetwo.sql
+END

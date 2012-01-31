@@ -1,0 +1,59 @@
+K 25
+svn:wc:ra_dav:version-url
+V 70
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media
+END
+Bitmap.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/Bitmap.php
+END
+Bitmap_ClientOnly.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/Bitmap_ClientOnly.php
+END
+Generic.php
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/Generic.php
+END
+BMP.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/BMP.php
+END
+SVG.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/SVG.php
+END
+GIFMetadataExtractor.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/GIFMetadataExtractor.php
+END
+GIF.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/GIF.php
+END
+DjVu.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/DjVu.php
+END
+Tiff.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/81346/tags/REL1_16_2/phase3/includes/media/Tiff.php
+END

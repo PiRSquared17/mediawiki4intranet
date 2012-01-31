@@ -1,0 +1,1 @@
+Bug 77150 - Check refsNoReferences only when clearState == true
