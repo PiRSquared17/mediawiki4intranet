@@ -2924,6 +2924,7 @@ class Parser {
 	 *  $piece['title']: the title, i.e. the part before the |
 	 *  $piece['parts']: the parameter array
 	 *  $piece['lineStart']: whether the brace was at the start of a line
+	 *  $piece['headLevel']: the shift value for all heading levels
 	 * @param $frame PPFrame The current frame, contains template arguments
 	 * @return String: the text of the template
 	 * @private
@@ -2940,6 +2941,9 @@ class Parser {
 		$forceRawInterwiki = false; # Force interwiki transclusion to be done in raw mode not rendered
 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
+
+		if (!$piece['headLevel'])
+			$piece['headLevel'] = 0;
 
 		# Title object, where $text came from
 		$title = false;
@@ -3101,6 +3105,17 @@ class Parser {
 				$ns = $this->mTitle->getNamespace();
 			}
 			$title = Title::newFromText( $part1, $ns );
+			if ( method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() ) {
+				global $haclgInclusionDeniedMessage;
+				$title = NULL;
+				if ( $haclgInclusionDeniedMessage ) {
+					$found = true;
+					$text = wfMsg( $haclgInclusionDeniedMessage );
+				} elseif ( $haclgInclusionDeniedMessage === '' ) {
+					$found = true;
+					$text = '';
+				}
+			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
 				# Check for language variants if the template is not found
@@ -3187,22 +3202,22 @@ class Parser {
 			$newFrame = $frame->newChild( $args, $title );
 
 			if ( $nowiki ) {
-				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
+				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
 				# Expansion is eligible for the empty-frame cache
 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
 					$text = $this->mTplExpandCache[$titleText];
 				} else {
-					$text = $newFrame->expand( $text );
+					$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 					$this->mTplExpandCache[$titleText] = $text;
 				}
 			} else {
 				# Uncached expansion
-				$text = $newFrame->expand( $text );
+				$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 			}
 		}
 		if ( $isLocalObj && $nowiki ) {
-			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG );
+			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			$isLocalObj = false;
 		}
 
@@ -3210,7 +3225,7 @@ class Parser {
 		# Add a blank line preceding, to prevent it from mucking up
 		# immediately preceding headings
 		if ( $isHTML ) {
-			$text = "\n\n" . $this->insertStripItem( $text );
+			$text = "\n" . $this->insertStripItem( $text );
 		} elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
 			# Escape nowiki-style return values
 			$text = wfEscapeWikiText( $text );
@@ -3260,6 +3275,10 @@ class Parser {
 		$cacheTitle = $title;
 		$titleText = $title->getPrefixedDBkey();
 
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag = $title->getFragment() )
+			$titleText .= '#' . $frag;
+
 		if ( isset( $this->mTplRedirCache[$titleText] ) ) {
 			list( $ns, $dbk ) = $this->mTplRedirCache[$titleText];
 			$title = Title::makeTitle( $ns, $dbk );
@@ -3278,6 +3297,9 @@ class Parser {
 		}
 
 		$dom = $this->preprocessToDom( $text, self::PTD_FOR_INCLUSION );
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag )
+			$dom = $this->tryExtractNamedSection( $dom, $frag );
 		$this->mTplDomCache[ $titleText ] = $dom;
 
 		if ( !$title->equals( $cacheTitle ) ) {
@@ -3286,6 +3308,76 @@ class Parser {
 		}
 
 		return array( $dom, $title );
+	}
+
+	/**
+	 * CustIS Bug 70192 - try to extract a named section from DOM Document
+	 */
+	function tryExtractNamedSection( $dom, $frag )
+	{
+		$stack = array( array( $dom->node, 0 ) );
+		$foundlevel = false;
+		$newchild = NULL;
+		$newroot = NULL;
+		$content_started = false;
+		while( $stack )
+		{
+			$ptr = &$stack[ count( $stack ) - 1 ];
+			if ( $ptr[1] >= $ptr[0]->childNodes->length )
+			{
+				array_pop( $stack );
+				if ( $foundlevel )
+					$newchild = $newchild->parentNode;
+				continue;
+			}
+			$node = $ptr[0]->childNodes->item( $ptr[1] );
+			$ptr[1]++;
+			if ( !$foundlevel )
+			{
+				if ( $node->nodeName == 'h' )
+				{
+					$h = $node->nodeValue;
+					$l = $node->getAttribute( 'level' );
+					$h = trim( substr( $h, $l, -$l ) );
+					if ( $h == $frag )
+					{
+						$foundlevel = $l;
+						foreach ( $stack as $inside )
+						{
+							$el = $inside[0]->cloneNode();
+							if ( $newchild )
+								$newchild->addChild( $el );
+							else
+								$newroot = $el;
+							$newchild = $el;
+						}
+					}
+				}
+				elseif ( $node->childNodes && $node->childNodes->length )
+					$stack[] = array( $node, 0 );
+			}
+			else
+			{
+				if ( $node->nodeName == 'h' && $node->getAttribute( 'level' ) <= $foundlevel )
+					break;
+				if ( !$content_started && $node->nodeType == XML_TEXT_NODE )
+				{
+					// left-trim included section
+					$v = ltrim( $node->nodeValue );
+					if ( !$v )
+						continue;
+					else
+						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
+				}
+				else
+					$newchild->appendChild( $node->cloneNode( true ) );
+				$content_started = true;
+			}
+		}
+		unset( $ptr );
+		if ( $newroot )
+			$dom = new PPNode_DOM( $newroot );
+		return $dom;
 	}
 
 	/**

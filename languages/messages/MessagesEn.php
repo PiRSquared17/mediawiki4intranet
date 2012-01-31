@@ -946,6 +946,24 @@ This might also indicate a bug in the software used by {{SITENAME}}.',
 
 A list of valid special pages can be found at [[Special:SpecialPages|{{int:specialpages}}]].',
 
+# Title errors
+'title-invalid-empty'            => 'Empty page title',
+'title-invalid-utf8'             => 'Bad title',
+'title-invalid-double-interwiki' => 'Double interwiki link in page title',
+'title-invalid-characters'       => 'Bad title',
+'title-invalid-relative'         => 'Bad title',
+'title-invalid-magic-tilde'      => 'Bad title',
+'title-invalid-too-long'         => 'Page title is too long',
+'title-invalid-leading-colon'    => 'Bad title',
+'title-invalid-emptytext'            => 'The requested page title is empty or contains only the name of a namespace.',
+'title-invalid-utf8text'             => 'Page title can not contain UTF-8 sequence "$1".',
+'title-invalid-double-interwikitext' => 'The requested page title contains forbidden double interwiki link.',
+'title-invalid-characterstext'       => 'The requested page title contains forbidden characters: "$1" at position $2.',
+'title-invalid-relativetext'         => 'Relative page titles (./, ../) are forbidden, because they will often be unreachable when handled by user\'s browser.',
+'title-invalid-magic-tildetext'      => 'The requested page title contains forbidden magic tilde sequence (~~~).',
+'title-invalid-too-longtext'         => 'The requested page title is too long. It must be no longer than 255 bytes in UTF-8 encoding. Page title short enough would be "$2".',
+'title-invalid-leading-colontext'    => 'The requested page title contains forbidden colons at the beginning.',
+
 # General errors
 'error'                => 'Error',
 'databaseerror'        => 'Database error',
@@ -2211,7 +2229,7 @@ $1',
 'upload-warning-msg'          => 'There was a problem with your upload from [$2]. You may return to the [[Special:Upload/stash/$1|upload form]] to correct this problem.',
 
 'upload-proto-error'        => 'Incorrect protocol',
-'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
+'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code>, <code>https://</code> or <code>ftp://</code>.',
 'upload-file-error'         => 'Internal error',
 'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
 Please contact an [[Special:ListUsers/sysop|administrator]].',
