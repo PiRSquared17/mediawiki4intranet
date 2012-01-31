@@ -3849,7 +3849,7 @@ class Parser {
 	 * @private
 	 */
 	function formatHeadings( $text, $origText, $isMain=true ) {
-		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds;
+		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
 
 		# Inhibit editsection links if requested in the page
 		if ( isset( $this->mDoubleUnderscores['noeditsection'] ) ) {
@@ -3990,6 +3990,8 @@ class Parser {
 					$dot = 1;
 				}
 			}
+			if ( $wgDotAfterTocnumber )
+				$numbering .= '.';
 
 			# The safe header is a version of the header text safe to use for links
 			# Avoid insertion of weird stuff like <math> by expanding the relevant sections
