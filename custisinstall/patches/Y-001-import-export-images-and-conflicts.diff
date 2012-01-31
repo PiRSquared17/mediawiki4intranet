@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1323697959 -10800
+# Date 1328032521 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/AutoLoader.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -51,17 +51,7 @@
@@ -66,7 +66,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/AutoLoader.php
  	'LinkSearchPage' => 'includes/specials/SpecialLinkSearch.php',
  	'ListredirectsPage' => 'includes/specials/SpecialListredirects.php',
  	'LoginForm' => 'includes/specials/SpecialUserlogin.php',
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DefaultSettings.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -2152,6 +2152,12 @@
@@ -111,7 +111,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DumpArchive.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -487,7 +487,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DumpArchive.php
 +			}
 +			// Preserve only main part's filename when unpacking for safety
 +			if ( $part['content_id'] == 'Revisions' ) {
-+				$tempfile = $this->tempdir . '/Revisions';
++				$tempfile = $this->tempdir . '/Revisions.xml';
 +			} else {
 +				$tempfile = tempnam( $this->tempdir, 'part' );
 +			}
@@ -517,7 +517,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DumpArchive.php
 +						$buf = '';
 +					} elseif ( strlen( $buf ) == self::BUFSIZE ) {
 +						fwrite( $tempfp, substr( $buf, 0, -1 -strlen( $boundary ) ) );
-+						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE );
++						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE - 1 - strlen( $boundary ) );
 +					} else {
 +						fwrite( $tempfp, $buf );
 +						$buf = '';
@@ -590,7 +590,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/Export.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -24,11 +24,11 @@
@@ -1365,7 +1365,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/Export.php
 +	wfProfileOut( __METHOD__ );
  	return $string;
  }
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/Import.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -23,6 +23,19 @@
@@ -2080,7 +2080,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/Import.php
 -		}
 -	}
 -}
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/filerepo/LocalFile.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -783,6 +783,66 @@
@@ -2176,7 +2176,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/specials/SpecialExport.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,6 +1,8 @@
@@ -2879,7 +2879,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/specials/SpecialExport.php
  	}
  }
 -
-diff -r 5ad71cf1db7a -r 73d49a7b93db includes/specials/SpecialImport.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -23,6 +23,74 @@
@@ -3113,7 +3113,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 5ad71cf1db7a -r 73d49a7b93db languages/messages/MessagesEn.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3113,18 +3113,31 @@
@@ -3185,7 +3185,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 5ad71cf1db7a -r 73d49a7b93db languages/messages/MessagesRu.php
+diff -r 5ad71cf1db7a -r 05437480e3a5 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2568,18 +2568,31 @@
@@ -3254,7 +3254,7 @@ diff -r 5ad71cf1db7a -r 73d49a7b93db languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 5ad71cf1db7a -r 73d49a7b93db skins/common/shared.css
+diff -r 5ad71cf1db7a -r 05437480e3a5 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -829,3 +829,10 @@

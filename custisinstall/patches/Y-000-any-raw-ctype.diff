@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1311089666 -14400
+# Date 1327501395 -14400
 Bug 76186 - (optional) Allow any content type for action=raw
 
-diff -r 45da8fc662c9 -r 2b20f90428f8 includes/RawPage.php
+diff -r 025d3c6531d8 -r 48f996fc9d1d includes/RawPage.php
 --- includes/RawPage.php
 +++ includes/RawPage.php
 @@ -21,9 +21,12 @@
@@ -36,7 +36,7 @@ diff -r 45da8fc662c9 -r 2b20f90428f8 includes/RawPage.php
  
  	function view() {
 -		global $wgOut, $wgScript, $wgRequest;
-+		global $wgOut, $wgScript, $wgRequest, $wgTitle;
++		global $wgOut, $wgScript, $wgRequest, $wgTitle, $wgContLanguageCode;
  
  		if( $wgRequest->isPathInfoBad() ) {
  			# Internet Explorer will ignore the Content-Type header if it
@@ -44,7 +44,7 @@ diff -r 45da8fc662c9 -r 2b20f90428f8 includes/RawPage.php
  		}
  
  		header( "Content-type: ".$this->mContentType.'; charset='.$this->mCharset );
-+		header( "Content-disposition: attachment; filename=".$wgTitle->getText() );
++		header( "Content-disposition: attachment; filename*=utf-8'$wgContLanguageCode'".urlencode( $wgTitle->getSubpageText() ) );
  		# allow the client to cache this for 24 hours
  		$mode = $this->mPrivateCache ? 'private' : 'public';
  		header( 'Cache-Control: '.$mode.', s-maxage='.$this->mSmaxage.', max-age='.$this->mMaxage );
