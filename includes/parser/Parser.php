@@ -398,7 +398,7 @@ class Parser {
 
 		$text = $this->mStripState->unstripNoWiki( $text );
 
-		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text ) );
+		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text, $clearState ) );
 
 		$text = $this->replaceTransparentTags( $text );
 		$text = $this->mStripState->unstripGeneral( $text );
@@ -439,7 +439,7 @@ class Parser {
 			$this->limitationWarn( 'expensive-parserfunction', $this->mExpensiveFunctionCount, $wgExpensiveParserFunctionLimit );
 		}
 
-		wfRunHooks( 'ParserAfterTidy', array( &$this, &$text ) );
+		wfRunHooks( 'ParserAfterTidy', array( &$this, &$text, $clearState ) );
 
 		# Information on include size limits, for the benefit of users who try to skirt them
 		if ( $this->mOptions->getEnableLimitReport() ) {
