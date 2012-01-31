@@ -1019,6 +1019,11 @@ $wgEnableEmail = true;
 $wgEnableUserEmail = true;
 
 /**
+ * Default content-type for e-mail. Set to text/html for HTML e-mail.
+ */
+$wgEmailContentType = 'text/plain';
+
+/**
  * Set to true to put the sending user's email in a Reply-To header
  * instead of From. ($wgEmergencyContact will be used as From.)
  *
@@ -1346,6 +1351,12 @@ $wgOldChangeTagsIndex = false;
  * @name   Text storage
  * @{
  */
+
+/**
+ * Paths to zip/unzip utilities.
+ */
+$wgZip = '/usr/bin/zip';
+$wgUnzip = '/usr/bin/unzip';
 
 /**
  * We can also compress text stored in the 'text' table. If this is set on, new
@@ -2854,6 +2865,11 @@ $wgUrlProtocols = array(
 );
 
 /**
+ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
+ */
+$wgDotAfterTocnumber = false;
+
+/**
  * If true, removes (substitutes) templates in "~~~~" signatures.
  */
 $wgCleanSignatures = true;
@@ -3649,6 +3665,28 @@ $wgDeleteRevisionsLimit = 0;
 /** Number of accounts each IP address may create, 0 to disable.
  * Requires memcached */
 $wgAccountCreationThrottle = 0;
+
+/**
+ * Import/export formats
+ */
+$wgExportFormats = array(
+	array(
+		'extension' => 'xml',
+		'mimetype' => 'application/xml',
+		'reader' => 'WikiImporter',
+		'writer' => 'XmlDumpWriter',
+	),
+);
+
+/**
+ * Archive classes for import
+ */
+$wgDumpArchiveByExt = array(
+	'xml' => array( 'OldMultipartDumpArchive', 'StubDumpArchive' ),
+	'multipart' => array( 'OldMultipartDumpArchive' ),
+	'zip' => array( 'ZipDumpArchive' ),
+	'' => array( 'ZipDumpArchive', 'StubDumpArchive' ),
+);
 
 /**
  * Edits matching these regular expressions in body text
@@ -5555,6 +5593,9 @@ $wgSeleniumTestConfigs = array();
 $wgSeleniumConfigFile = null;
 $wgDBtestuser = ''; //db user that has permission to create and drop the test databases only
 $wgDBtestpassword = '';
+
+/** Defines that MergeConflicts extension patch was applied to this MW installation */
+define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );
 
 /**
  * For really cool vim folding this needs to be at the end:
