@@ -490,7 +490,12 @@ class EmailNotification {
 		global $wgUsersNotifiedOnAllChanges;
 		foreach ( $wgUsersNotifiedOnAllChanges as $name ) {
 			$user = User::newFromName( $name );
-			$this->compose( $user );
+/*op-patch|TS|2011-02-09|IntraACL|start*/
+			if ( !method_exists( $title, 'userCanReadEx' ) || $title->userCanReadEx( $user ) ) {
+				// Check IntraACL read access
+				$this->compose( $user );
+			}
+/*op-patch|TS|2011-02-09|end*/
 		}
 
 		$this->sendMails();
