@@ -1521,6 +1521,12 @@ HTML
 		$this->showTosSummary();
 		$this->showEditTools();
 
+		if ( $this->isConflict )
+			$this->showConflict();
+		
+		$wgOut->addHTML( $this->editFormTextBottom );
+		$wgOut->addHTML( "</form>\n" );
+
 		$wgOut->addHTML( <<<HTML
 {$this->editFormTextAfterTools}
 <div class='templatesUsed'>
@@ -1532,11 +1538,6 @@ HTML
 HTML
 );
 
-		if ( $this->isConflict )
-			$this->showConflict();
-
-		$wgOut->addHTML( $this->editFormTextBottom );
-		$wgOut->addHTML( "</form>\n" );
 		if ( !$wgUser->getOption( 'previewontop' ) ) {
 			$this->displayPreviewArea( $previewOutput, false );
 		}
@@ -1952,7 +1953,9 @@ HTML
 	}
 
 	protected function getCopywarn() {
-		global $wgRightsText;
+		global $wgRightsText, $wgNoCopyrightWarnings;
+		if ( $wgNoCopyrightWarnings )
+			return '';
 		if ( $wgRightsText ) {
 			$copywarnMsg = array( 'copyrightwarning',
 				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]',
