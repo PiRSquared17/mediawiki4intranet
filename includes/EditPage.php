@@ -406,7 +406,9 @@ class EditPage {
 			$wgUser->spreadAnyEditBlock();
 
 			wfDebug( __METHOD__ . ": User can't edit\n" );
-			$content = $this->getContent( null );
+			$content = $this->textbox2 ? $this->textbox2 :
+				( $this->textbox1 ? $this->textbox1 : $this->getContent( false ) );
+
 			$content = $content === '' ? null : $content;
 			$this->readOnlyPage( $content, true, $permErrors, 'edit' );
 			wfProfileOut( __METHOD__ );
@@ -649,7 +651,7 @@ class EditPage {
 				# If the form is incomplete, force to preview.
 				wfDebug( __METHOD__ . ": Form data appears to be incomplete\n" );
 				wfDebug( "POST DATA: " . var_export( $_POST, true ) . "\n" );
-				$this->preview = true;
+				$this->preview = $request->getCheck( 'wpPreview' );
 			} else {
 				/* Fallback for live preview */
 				$this->preview = $request->getCheck( 'wpPreview' ) || $request->getCheck( 'wpLivePreview' );
@@ -675,7 +677,7 @@ class EditPage {
 					$this->preview = true;
 				}
 			}
-			$this->save = !$this->preview && !$this->diff;
+			$this->save = $request->getCheck( 'wpSave' ) && !$this->preview && !$this->diff;
 			if ( !preg_match( '/^\d{14}$/', $this->edittime ) ) {
 				$this->edittime = null;
 			}
@@ -868,6 +870,7 @@ class EditPage {
 	function internalAttemptSave( &$result, $bot = false ) {
 		global $wgFilterCallback, $wgUser, $wgParser;
 		global $wgMaxArticleSize;
+		global $wgSuppressSameUserConflicts;
 		
 		$status = Status::newGood();
 
@@ -1077,7 +1080,7 @@ class EditPage {
 			$userid = $wgUser->getId();
 
 			# Suppress edit conflict with self, except for section edits where merging is required.
-			if ( $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
+			if ( $wgSuppressSameUserConflicts && $this->isConflict && $this->section == '' && $this->userWasLastToEdit( $userid, $this->edittime ) ) {
 				wfDebug( __METHOD__ . ": Suppressing edit conflict, same user.\n" );
 				$this->isConflict = false;
 			}
@@ -1096,12 +1099,15 @@ class EditPage {
 				$text = $this->textbox1; // do not try to merge here!
 			} elseif ( $this->isConflict ) {
 				# Attempt merge
-				if ( $this->mergeChangesInto( $text ) ) {
+				if ( $result = $this->mergeChangesInto( $text ) ) {
 					// Successful merge! Maybe we should tell the user the good news?
 					$this->isConflict = false;
 					wfDebug( __METHOD__ . ": Suppressing edit conflict, successful merge.\n" );
 				} else {
 					$this->section = '';
+					// was merging available?
+					$this->mMergeAvailable = $result !== NULL;
+					$this->textbox2 = $this->textbox1;
 					$this->textbox1 = $text;
 					wfDebug( __METHOD__ . ": Keeping edit conflict, failed merge.\n" );
 				}
@@ -1322,7 +1328,6 @@ class EditPage {
 	function initialiseForm() {
 		global $wgUser;
 		$this->edittime = $this->mArticle->getTimestamp();
-		$this->textbox1 = $this->getContent( false );
 		// activate checkboxes if user wants them to be always active
 		# Sort out the "watch" checkbox
 		if ( $wgUser->getOption( 'watchdefault' ) ) {
@@ -1340,6 +1345,9 @@ class EditPage {
 		}
 		if ( $this->textbox1 === false ) {
 			return false;
+		}
+		if ( !trim( $this->textbox1 ) ) {
+			$this->textbox1 = $this->getContent( false );
 		}
 		wfProxyCheck();
 		return true;
@@ -1495,7 +1503,7 @@ HTML
 			// and fallback to the raw wpTextbox1 since editconflicts can't be
 			// resolved between page source edits and custom ui edits using the
 			// custom edit ui.
-			$this->showTextbox1( null, $this->getContent() );
+			$this->showTextbox1( null );
 		} else {
 			$this->showContentForm();
 		}
@@ -1540,7 +1548,8 @@ HTML
 	protected function showHeader() {
 		global $wgOut, $wgUser, $wgMaxArticleSize, $wgLang;
 		if ( $this->isConflict ) {
-			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1\n</div>", 'explainconflict' );
+			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1\n</div>",
+				$this->mMergeAvailable ? 'explainconflictmerged' : 'explainconflict' );
 			$this->edittime = $this->mArticle->getTimestamp();
 		} else {
 			if ( $this->section != '' && !$this->isSectionEditSupported() ) {
@@ -1842,11 +1851,11 @@ HTML
 		$this->showTextbox( isset($textoverride) ? $textoverride : $this->textbox1, 'wpTextbox1', $attribs );
 	}
 
-	protected function showTextbox2() {
+	public function showTextbox2() {
 		$this->showTextbox( $this->textbox2, 'wpTextbox2', array( 'tabindex' => 6, 'readonly' ) );
 	}
 
-	protected function showTextbox( $content, $name, $customAttribs = array() ) {
+	public function showTextbox( $content, $name, $customAttribs = array() ) {
 		global $wgOut, $wgUser;
 
 		$wikitext = $this->safeUnicodeOutput( $content );
@@ -1995,16 +2004,15 @@ HTML
 	 */
 	protected function showConflict() {
 		global $wgOut;
-		$this->textbox2 = $this->textbox1;
-		$this->textbox1 = $this->getContent();
 		if ( wfRunHooks( 'EditPageBeforeConflictDiff', array( &$this, &$wgOut ) ) ) {
+			$this->textbox2 = $this->getContent();
 			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "yourdiff" );
 
 			$de = new DifferenceEngine( $this->mTitle );
-			$de->setText( $this->textbox2, $this->textbox1 );
+			$de->setText( $this->textbox1, $this->getContent() );
 			$de->showDiff( wfMsg( "yourtext" ), wfMsg( "storedversion" ) );
 
-			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "yourtext" );
+			$wgOut->wrapWikiMsg( '<h2>$1</h2>', "storedversion" );
 			$this->showTextbox2();
 		}
 	}
@@ -2326,14 +2334,9 @@ HTML
 		$currentText = $currentRevision->getText();
 
 		$result = '';
-		if ( wfMerge( $baseText, $editText, $currentText, $result ) ) {
-			$editText = $result;
-			wfProfileOut( __METHOD__ );
-			return true;
-		} else {
-			wfProfileOut( __METHOD__ );
-			return false;
-		}
+		$conflict = wfMerge( $baseText, $editText, $currentText, $editText );
+		wfProfileOut( __METHOD__ );
+		return $conflict;
 	}
 
 	/**
