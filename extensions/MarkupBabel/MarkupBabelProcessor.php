@@ -210,7 +210,7 @@ EOT;
             }
             else
             {
-                $res = preg_match('/^\s*(\d[\deEdDqQ\-\.]+)\s+(\d[eEdDqQ\.]*)\s*(#.*)?/', $line);
+                $res = preg_match('/^\s*(\d[\deEdDqQ\-\.]+)\s*(\d[eEdDqQ\.]*)\s*(#.*)?/', $line);
                 if ($res && $activedataset != "")
                     $datasets[$activedataset]['src'] .= $line."\n";
                 else
@@ -226,11 +226,10 @@ EOT;
             $outputpath = str_replace("\\", "/", $outputpath);
         $width = isset($args['width']) && $args['width'] > 0 ? intval($args['width']) : 640;
         $height = isset($args['height']) && $args['height'] > 0 ? intval($args['height']) : $width/4*3;
-        $font = isset($args['font']) ? $args['font'] : 'Arial';
-        $font = '"'.addslashes($font).'"';
+        $font = isset($args['font']) ? ' font "'.addslashes($args['font']).'"' : '';
         $str = <<<EOT
 set encoding utf8
-set terminal png size {$width}, {$height} font {$font}
+set terminal png size {$width}, {$height}{$font}
 set output "{$outputpath}.png"
 {$src_filtered}
 EOT;
@@ -448,7 +447,7 @@ EOT;
         $graph->labelSize = 12;
         $graph->absValuesSize = 12;
         $graph->percValuesSize = 12;
-        $graph->graphBGColor = 'Aquamarine';
+        $graph->graphBGColor = '#c0f0ff';
         $graph->barColors = 'Gold';
         $graph->barBGColor = 'Azure';
         $graph->labelColor = 'black';
@@ -457,6 +456,7 @@ EOT;
         $graph->absValuesBGColor = 'Cornsilk';
         $graph->graphPadding = 15;
         $graph->graphBorder = '1px solid blue';
+        $graph->barBorder = '1px outset #ffea95';
 
         $lines = explode("\n", $this->Content);
         $labels = array();

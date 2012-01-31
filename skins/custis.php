@@ -21,7 +21,7 @@ require_once('includes/SkinTemplate.php');
  */
 class SkinCustis extends SkinTemplate {
 	/** Using Custis. */
-	function initPage( &$out ) {
+	function initPage( OutputPage $out ) {
 		SkinTemplate::initPage( $out );
 		$this->skinname  = 'custis';
 		$this->stylename = 'custis';
