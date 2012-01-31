@@ -370,7 +370,7 @@ class OldMultipartDumpArchive extends DumpArchive
 			}
 			// Preserve only main part's filename when unpacking for safety
 			if ( $part['content_id'] == 'Revisions' ) {
-				$tempfile = $this->tempdir . '/Revisions';
+				$tempfile = $this->tempdir . '/Revisions.xml';
 			} else {
 				$tempfile = tempnam( $this->tempdir, 'part' );
 			}
@@ -400,7 +400,7 @@ class OldMultipartDumpArchive extends DumpArchive
 						$buf = '';
 					} elseif ( strlen( $buf ) == self::BUFSIZE ) {
 						fwrite( $tempfp, substr( $buf, 0, -1 -strlen( $boundary ) ) );
-						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE );
+						$buf = substr( $buf, -1 -strlen( $boundary ) ) . fread( $fp, self::BUFSIZE - 1 - strlen( $boundary ) );
 					} else {
 						fwrite( $tempfp, $buf );
 						$buf = '';
