@@ -419,6 +419,11 @@ $wgXMLMimeTypes = array(
 		'html'                              			=> 'text/html', // application/xhtml+xml?
 );
 
+$wgXMLMayBeCompressed = array(
+	'image/svg+xml' => true,
+	'application/x-dia-diagram' => true,
+);
+
 /**
  * To set 'pretty' URL paths for actions other than
  * plain page views, add to this array. For instance:
@@ -467,6 +472,8 @@ $wgAllowCopyUploads = false;
  * normal uploads is currently to edit php.ini.
  */
 $wgMaxUploadSize = 1024*1024*100; # 100MB
+/** Maximum length for filenames shown in image gallery. */
+$wgMaxFilenameLength = 20;
 
 /**
  * Point the upload navigation link to an external URL
@@ -1125,9 +1132,15 @@ $wgRedirectSources = false;
 $wgShowIPinHeader	= true; # For non-logged in users
 $wgMaxSigChars		= 255;  # Maximum number of Unicode characters in signature
 $wgMaxArticleSize	= 2048; # Maximum article size in kilobytes
+$wgWarnArticleSize	= 128;  # Article size in kilobytes to show MediaWiki:Longpagewarning
 # Maximum number of bytes in username. You want to run the maintenance
 # script ./maintenancecheckUsernames.php once you have changed this value
 $wgMaxNameChars		= 255;
+
+# Maximum number of bytes in titles. 255 by default, but even in MySQL,
+# you can change page.page_title to VARBINARY(767) and raise this value to 767.
+# (767 is the maximum size for an index key in InnoDB)
+$wgMaxTitleBytes	= 255;
 
 $wgMaxPPNodeCount = 1000000;  # A complexity limit on template expansion
 
@@ -1139,6 +1152,11 @@ $wgMaxPPNodeCount = 1000000;  # A complexity limit on template expansion
  */
 $wgMaxTemplateDepth = 40;
 $wgMaxPPExpandDepth = 40;
+
+/**
+ * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
+ */
+$wgDotAfterTocnumber = false;
 
 /**
  * If true, removes (substitutes) templates in "~~~~" signatures.
@@ -4385,3 +4403,5 @@ $wgUploadMaintenance = false;
  */
 $wgOldChangeTagsIndex = false;
 
+/** Defines that MergeConflicts extension patch was applied to this MW installation */
+define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );

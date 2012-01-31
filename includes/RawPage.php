@@ -21,9 +21,12 @@ class RawPage {
 	var $mContentType, $mExpandTemplates;
 
 	function __construct( &$article, $request = false ) {
-		global $wgRequest, $wgInputEncoding, $wgSquidMaxage, $wgJsMimeType, $wgGroupPermissions;
+		global $wgRequest, $wgInputEncoding, $wgSquidMaxage,
+			$wgJsMimeType, $wgGroupPermissions, $wgAllowedRawCTypes;
 
-		$allowedCTypes = array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
+		$allowedCTypes = $wgAllowedRawCTypes
+			? $wgAllowedRawCTypes
+			: array('text/x-wiki', $wgJsMimeType, 'text/css', 'application/x-zope-edit');
 		$this->mArticle =& $article;
 		$this->mTitle =& $article->mTitle;
 
@@ -101,7 +104,8 @@ class RawPage {
 			$this->mPrivateCache = false;
 		}
 
-		if( $ctype == '' or ! in_array( $ctype, $allowedCTypes ) ) {
+		// Allow any content type for action=raw when $wgAllowedRawCTypes === true
+		if( $ctype == '' || $allowedCTypes !== true && ! in_array( $ctype, $allowedCTypes ) ) {
 			$this->mContentType = 'text/x-wiki';
 		} else {
 			$this->mContentType = $ctype;
@@ -109,7 +113,7 @@ class RawPage {
 	}
 
 	function view() {
-		global $wgOut, $wgScript, $wgRequest;
+		global $wgOut, $wgScript, $wgRequest, $wgTitle, $wgContLanguageCode;
 
 		if( $wgRequest->isPathInfoBad() ) {
 			# Internet Explorer will ignore the Content-Type header if it
@@ -131,6 +135,7 @@ class RawPage {
 		}
 
 		header( "Content-type: ".$this->mContentType.'; charset='.$this->mCharset );
+		header( "Content-disposition: attachment; filename*=utf-8'$wgContLanguageCode'".urlencode( $wgTitle->getSubpageText() ) );
 		# allow the client to cache this for 24 hours
 		$mode = $this->mPrivateCache ? 'private' : 'public';
 		header( 'Cache-Control: '.$mode.', s-maxage='.$this->mSmaxage.', max-age='.$this->mMaxage );

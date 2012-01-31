@@ -46,15 +46,16 @@ class ChangesFeed {
 	 */
 	public function execute( $feed, $rows, $lastmod, $opts ) {
 		global $messageMemc, $wgFeedCacheTimeout;
-		global $wgSitename, $wgLang;
+		global $wgSitename, $wgLang, $wgUser;
 
 		if ( !FeedUtils::checkFeedOutput( $this->format ) ) {
 			return;
 		}
 
-		$timekey = wfMemcKey( $this->type, $this->format, 'timestamp' );
+		$userid = $wgUser->getId();
+		$timekey = wfMemcKey( $this->type, $this->format, $userid, 'timestamp' );
 		$optionsHash = md5( serialize( $opts->getAllValues() ) );
-		$key = wfMemcKey( $this->type, $this->format, $wgLang->getCode(), $optionsHash );
+		$key = wfMemcKey( $this->type, $this->format, $userid, $wgLang->getCode(), $optionsHash );
 
 		FeedUtils::checkPurge($timekey, $key);
 
@@ -154,6 +155,10 @@ class ChangesFeed {
 
 		foreach( $sorted as $obj ) {
 			$title = Title::makeTitle( $obj->rc_namespace, $obj->rc_title );
+/*op-patch|TS|2010-04-27|HaloACL|SafeTitle|start*/
+			if( !$title || method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() )
+				continue;
+/*op-patch|TS|2009-04-27|end*/
 			$talkpage = $title->getTalkPage();
 			// Skip items with deleted content (avoids partially complete/inconsistent output)
 			if( $obj->rc_deleted ) continue;

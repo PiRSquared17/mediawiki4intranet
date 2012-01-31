@@ -878,8 +878,8 @@ class Cite {
 	 * Called at the end of page processing to append an error if refs were 
 	 * used without a references tag.
 	 */
-	function checkRefsNoReferences(&$parser, &$text){
-		if ( $parser->getOptions()->getIsSectionPreview() ) return true;
+	function checkRefsNoReferences(&$parser, &$text, $clearState){
+		if ( $parser->getOptions()->getIsSectionPreview() || !$clearState ) return true;
 
 		foreach ( $this->mRefs as $group => $refs ) {
 			if ( count( $refs ) == 0 ) continue;

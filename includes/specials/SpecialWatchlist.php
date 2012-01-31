@@ -340,6 +340,12 @@ function wfSpecialWatchlist( $par ) {
 	while ( $obj = $dbr->fetchObject( $res ) ) {
 		# Make RC entry
 		$rc = RecentChange::newFromRow( $obj );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		if (!$rc->getTitle()->userCanReadEx()) {
+			continue;
+		}
+/*op-patch|TS|2009-06-19|end*/  
+		
 		$rc->counter = $counter++;
 
 		if ( $wgShowUpdatedMarker ) {
