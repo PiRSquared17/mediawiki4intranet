@@ -354,7 +354,7 @@ class SyntaxHighlight_GeSHi {
 	private static function initialise() {
 		if( !self::$initialised ) {
 			if( !class_exists( 'GeSHi' ) ) {
-				require( 'geshi/geshi.php' );
+				require_once( 'geshi/geshi.php' );
 			}
 			self::$initialised = true;
 		}
