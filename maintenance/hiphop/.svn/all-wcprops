@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop
+END
+extra-files
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop/extra-files
+END
+run-server
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop/run-server
+END
+server.conf
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop/server.conf
+END
+make
+K 25
+svn:wc:ra_dav:version-url
+V 80
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop/make
+END
+compiler.conf
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/hiphop/compiler.conf
+END

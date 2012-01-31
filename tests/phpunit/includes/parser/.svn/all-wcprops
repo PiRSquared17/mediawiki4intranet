@@ -1,0 +1,41 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser
+END
+ParserHelpers.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/ParserHelpers.php
+END
+TagHooks.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/TagHooks.php
+END
+MediaWikiParserTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/MediaWikiParserTest.php
+END
+MagicVariableTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/MagicVariableTest.php
+END
+NewParserTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/NewParserTest.php
+END
+PreprocessorTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/parser/PreprocessorTest.php
+END
