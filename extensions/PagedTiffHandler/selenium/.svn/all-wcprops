@@ -1,7 +1,7 @@
 K 25
 svn:wc:ra_dav:version-url
 V 76
-/svnroot/mediawiki/!svn/ver/73502/trunk/extensions/PagedTiffHandler/selenium
+/svnroot/mediawiki/!svn/ver/88072/trunk/extensions/PagedTiffHandler/selenium
 END
 PagedTiffHandler_tests.php
 K 25
@@ -19,5 +19,5 @@ PagedTiffHandlerTestCases.php
 K 25
 svn:wc:ra_dav:version-url
 V 106
-/svnroot/mediawiki/!svn/ver/73502/trunk/extensions/PagedTiffHandler/selenium/PagedTiffHandlerTestCases.php
+/svnroot/mediawiki/!svn/ver/88072/trunk/extensions/PagedTiffHandler/selenium/PagedTiffHandlerTestCases.php
 END

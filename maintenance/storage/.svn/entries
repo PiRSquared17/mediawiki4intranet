@@ -1,15 +1,15 @@
 10
 
 dir
-81532
-http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2/phase3/maintenance/storage
+110002
+http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/maintenance/storage
 http://svn.wikimedia.org/svnroot/mediawiki
 
 
 
-2010-03-23T00:06:22.409181Z
-64049
-tstarling
+2011-07-01T01:42:48.030060Z
+91243
+reedy
 
 
 
@@ -32,11 +32,11 @@ file
 
 
 
-2011-02-04T18:14:58.964088Z
-91cc8ea5ba7c3f5e71d1b7eb69bc5ea9
-2010-02-22T02:33:44.509664Z
-62807
-tstarling
+2012-01-25T15:33:13.125790Z
+57d65346b04adb1d0fc910c6f54f2752
+2011-04-20T00:12:06.966746Z
+86447
+platonides
 has-props
 
 
@@ -58,7 +58,7 @@ has-props
 
 
 
-8124
+9255
 
 compressOld.php
 file
@@ -66,10 +66,10 @@ file
 
 
 
-2011-02-04T18:14:58.964088Z
-6c9af25ef4693af45f197fdb968ede2f
-2009-04-06T14:41:33.290746Z
-49247
+2012-01-25T15:33:13.125790Z
+c9061da19aab10f818445ecd136c9f94
+2011-06-21T21:14:26.378079Z
+90549
 demon
 has-props
 
@@ -92,7 +92,7 @@ has-props
 
 
 
-1991
+12413
 
 resolveStubs.php
 file
@@ -100,11 +100,11 @@ file
 
 
 
-2011-02-04T18:14:58.968088Z
-c6a5c41d0585128d4bb9d99d89dece90
-2010-02-22T02:33:44.509664Z
-62807
-tstarling
+2012-01-25T15:33:13.125790Z
+dbe827c22bea145295cd195e19871cc2
+2011-04-20T00:12:06.966746Z
+86447
+platonides
 has-props
 
 
@@ -126,7 +126,7 @@ has-props
 
 
 
-2370
+3182
 
 testCompression.php
 file
@@ -134,44 +134,10 @@ file
 
 
 
-2011-02-04T18:14:58.968088Z
-04c8be10f57e8c553fc2191e0f3cf4a6
-2008-11-01T12:06:23.498079Z
-42992
-tstarling
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-2144
-
-checkStorage.php
-file
-
-
-
-
-2011-02-04T18:14:58.968088Z
-97c9b8e2043ee81f6cce4a25d7b29bf4
-2008-05-20T17:13:28.824583Z
-35098
+2012-01-25T15:33:13.125790Z
+a309d41c44f8d8bad3f5c8778d0342f1
+2010-12-16T19:15:12.536214Z
+78508
 ialex
 has-props
 
@@ -194,7 +160,41 @@ has-props
 
 
 
-14978
+2974
+
+checkStorage.php
+file
+
+
+
+
+2012-01-25T15:33:13.125790Z
+e7671042e78a8d615d428dc4bd6bc0ed
+2011-07-01T01:42:48.030060Z
+91243
+reedy
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+15610
 
 orphanStats.php
 file
@@ -202,10 +202,10 @@ file
 
 
 
-2011-02-04T18:14:58.972088Z
-7ed2554f896342e7c4373897cd2857c8
-2009-08-21T00:59:11.438691Z
-55403
+2012-01-25T15:33:13.129790Z
+fc27b38b6196650eeea1aa34b76c24f1
+2011-01-13T22:58:55.273524Z
+80205
 demon
 has-props
 
@@ -228,7 +228,7 @@ has-props
 
 
 
-2343
+2328
 
 blob_tracking.sql
 file
@@ -304,11 +304,11 @@ file
 
 
 
-2011-02-04T18:14:58.968088Z
-26e647d056bf125e0f7b1bef16fcca52
-2009-10-21T19:53:03.360634Z
-57989
-maxsem
+2012-01-25T15:33:13.125790Z
+6e68532eeec6162cbb137180a4aad773
+2011-04-20T00:12:06.966746Z
+86447
+platonides
 has-props
 
 
@@ -330,41 +330,7 @@ has-props
 
 
 
-3061
-
-compressOld.inc
-file
-
-
-
-
-2011-02-04T18:14:58.968088Z
-0cf55bebe7edb3dee6e9864d793e9a2b
-2009-12-17T15:39:11.198349Z
-60162
-maxsem
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8355
+3752
 
 recompressTracked.php
 file
@@ -372,11 +338,11 @@ file
 
 
 
-2011-02-04T18:14:58.968088Z
-1a444e80ad0cbb1d1ae38191cc1de7f6
-2010-03-23T00:06:22.409181Z
-64049
-tstarling
+2012-01-25T15:33:13.125790Z
+4f9338a355d859210ffeffa6d8cef38f
+2011-03-30T19:44:39.907002Z
+85040
+reedy
 has-props
 
 
@@ -398,7 +364,7 @@ has-props
 
 
 
-20274
+21201
 
 dumpRev.php
 file
@@ -406,11 +372,11 @@ file
 
 
 
-2011-02-04T18:14:58.972088Z
-d1ba70b7630bba9cb1fd41c6ab921402
-2010-03-23T00:06:22.409181Z
-64049
-tstarling
+2012-01-25T15:33:13.125790Z
+93e32c9c0e017cc9d37f5159f61bb008
+2011-01-13T22:58:55.273524Z
+80205
+demon
 has-props
 
 
@@ -432,7 +398,7 @@ has-props
 
 
 
-2622
+2629
 
 storageTypeStats.php
 file
@@ -440,11 +406,11 @@ file
 
 
 
-2011-02-04T18:14:58.972088Z
-ba9ca814b19ce2bfbaff6e914a9e1e85
-2010-02-18T04:05:00.706791Z
-62671
-tstarling
+2012-01-25T15:33:13.125790Z
+781b0a71724f51a184f4caa82d494904
+2011-01-13T22:58:55.273524Z
+80205
+demon
 has-props
 
 
@@ -466,41 +432,7 @@ has-props
 
 
 
-2414
-
-trackBlobs.php
-file
-
-
-
-
-2011-02-04T18:14:58.972088Z
-c76d130d97402f4f2aee878aa60c2159
-2010-02-22T02:33:44.509664Z
-62807
-tstarling
-has-props
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-8974
+3224
 
 make-blobs
 file
@@ -535,4 +467,38 @@ has-props
 
 
 313
+
+trackBlobs.php
+file
+
+
+
+
+2012-01-25T15:33:13.129790Z
+c69b334754ea471abec8d74918a2d585
+2011-04-20T00:12:06.966746Z
+86447
+platonides
+has-props
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+11387
 
