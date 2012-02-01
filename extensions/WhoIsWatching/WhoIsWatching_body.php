@@ -84,33 +84,33 @@ class WhoIsWatching extends SpecialPage
 			}
 			ksort($users);
 			foreach ($users as $name => $id)
-			$wgOut->addHTML("<option value=\"".$id."\">".$name."</option>");
+				$wgOut->addHTML("<option value=\"".$id."\">".$name."</option>");
 			$wgOut->addHTML('</select></td><td>');
 			$wgOut->addHTML("<input type=\"submit\" value=\"".wfMsg('specialwhoiswatchingaddbtn')."\" />");
 			$wgOut->addHTML("</td></tr></table></div></form>");
 		}
 	}
 }
- 
-function fnShowWatchingCount(&$template, &$tpl)
+
+function fnShowWatchingCount( &$template, &$tpl )
 {
     global $wgLang, $wgPageShowWatchingUsers, $whoiswatching_showifzero, $wgOut;
 
-    if ($wgPageShowWatchingUsers && $whoiswatching_showifzero) {
+    if ( $wgPageShowWatchingUsers && $whoiswatching_showifzero ) {
         $dbr = wfGetDB( DB_SLAVE );
         $watchlist = $dbr->tableName( 'watchlist' );
-        $sql = "SELECT COUNT(*) AS n FROM $watchlist
-                WHERE wl_title='" . $dbr->strencode($template->mTitle->getDBkey()) .
-                "' AND  wl_namespace=" . $template->mTitle->getNamespace() ;
-        $res = $dbr->query( $sql, 'SkinTemplate::outputPage');
+        $t = $template->getTitle();
+        $res = $dbr->select( 'watchlist', 'COUNT(*) n', array(
+            'wl_namespace' => $t->getNamespace(),
+            'wl_title' => $t->getDBkey(),
+        ), 'SkinTemplate::outputPage' );
         $x = $dbr->fetchObject( $res );
         $numberofwatchingusers = $x->n;
-        $tpl->set('numberofwatchingusers',
-                  wfMsgExt('number_of_watching_users_pageview', array('parseinline'),
-                  $wgLang->formatNum($numberofwatchingusers))
-        );
+        $tpl->set( 'numberofwatchingusers', wfMsgExt(
+            'number_of_watching_users_pageview', array( 'parseinline' ),
+            $wgLang->formatNum( $numberofwatchingusers )
+        ) );
     }
 
     return true;
 }
-
