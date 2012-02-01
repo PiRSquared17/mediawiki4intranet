@@ -9,7 +9,6 @@ $options = array('list', 'quick', 'help', 'dry');
 $optionsWithArgs = array('where', 'set', 'values');
 
 require_once(dirname(__FILE__).'/../../maintenance/commandLine.inc');
-require_once(dirname(__FILE__).'/../../maintenance/counter.php');
 
 /**
  * @ingroup Maintenance
@@ -228,12 +227,7 @@ USAGE;
             $i = ", ";
         }
         print ".\n\nAbort with control-c in the next five seconds...";
-        for ($i=6;$i>=1;)
-        {
-            print_c($i, --$i);
-            sleep(1);
-        }
-        print "\n";
+        wfCountDown(5);
         return true;
     }
 }

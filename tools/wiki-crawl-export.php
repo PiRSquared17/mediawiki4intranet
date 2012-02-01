@@ -119,7 +119,7 @@ if ($text{strlen($text)-1} != "\n")
     $text .= "\n";
 
 if (!preg_match('#<namespace[^<>]*key="6"[^<>]*>([^<]+)</namespace>#is', $text, $m))
-    err("Invalid export file: no File namespace defined");
+    err("Invalid export file: no File namespace defined.");
 $NS_FILE = $m[1];
 
 $uploads = array();
@@ -134,7 +134,7 @@ while (($pos = strpos($text, '<page')) !== false)
     }
     $pos = strpos($text, '</page>');
     if ($pos === false)
-        err("Invalid export file: <page> is not closed");
+        err("Invalid export file: <page> is not closed.");
     $page = substr($text, 0, $pos+7);
     $text = substr($text, $pos+7);
     if (($pos = strpos($page, '<title>'.$NS_FILE.':')) !== false)
@@ -226,6 +226,7 @@ exit;
 
 function err($text)
 {
+    global $argv;
     fwrite(STDERR, $text." See usage with php $argv[0] --help.\n");
     exit(-1);
 }

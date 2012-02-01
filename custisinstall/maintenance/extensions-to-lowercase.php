@@ -6,7 +6,6 @@
 
 $dir = dirname($_SERVER['PHP_SELF']);
 require_once "$dir/../../maintenance/commandLine.inc";
-require_once "$dir/../../maintenance/counter.php";
 
 class ExtLowercaser
 {
@@ -64,14 +63,10 @@ END;
 
 print "Going to rename upper or mixed-case uploaded file extensions into lower-case for ".wfWikiID()."\n";
 
-if( !isset( $options['quick'] ) ) {
+if (!isset($options['quick']))
+{
 	print "Abort with control-c in the next five seconds... ";
-
-	for ($i = 6; $i >= 1;) {
-		print_c($i, --$i);
-		sleep(1);
-	}
-	echo "\n";
+	wfCountDown(5);
 }
 
 $app = new ExtLowercaser($options);

@@ -59,11 +59,7 @@ function efAnyWikiDrawParserFunction_Setup() {
 	$wgAnyWikiDrawVersion = '0.11';
 
 	# Setup messages
-	global $wgMessageCache;
-	require( dirname( __FILE__ ) . '/AnyWikiDraw.i18n.php' );
-	foreach ( $messages as $lang => $langMessages ) {
-		$wgMessageCache->addMessages( $langMessages, $lang );
-	}
+	wfLoadExtensionMessages( 'AnyWikiDraw' );
 
 	# Setup extension credits
 	$wgExtensionCredits['parserhook'][] = array(
@@ -77,7 +73,6 @@ function efAnyWikiDrawParserFunction_Setup() {
 	# Setup function hook associating the "drawing" magic word with our function
 	global $wgParser;
 	$wgParser->setFunctionHook( 'drawing', 'efAnyWikiDrawParserFunction_Render' );
-
 }
 
 function efAnyWikiDrawParserFunction_Magic( &$magicWords, $langCode ) {
