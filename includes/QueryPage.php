@@ -562,7 +562,7 @@ abstract class QueryPage extends SpecialPage {
 			for ( $i = 0; $i < $num && $row = $dbr->fetchObject( $res ); $i++ ) {
 // <IntraACL>
 				$title = Title::makeTitleSafe( $row->namespace, $row->title );
-				if ( !$title->userCanReadEx() ) {
+				if ( !$title || !$title->userCanReadEx() ) {
 					continue;
 				}
 // </IntraACL>
