@@ -1226,3 +1226,9 @@ div.vectorTabs ul {
 .tipsy {
 	font-size: 0.8em;
 }
+
+/* Categories above the content */
+#catlinks-top div {
+	float: left;
+	margin: 0;
+}
