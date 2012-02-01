@@ -62,7 +62,8 @@ $wgImageMagickConvertCommand = "convert";
 # When you make changes to this configuration file, this will make
 # sure that cached pages are cleared.
 $wgCacheEpoch = max( $wgCacheEpoch, gmdate( 'YmdHis', @filemtime( __FILE__ ) ) );
-$wgMainCacheType = CACHE_ACCEL;
+$wgMainCacheType = empty( $_SERVER['SERVER_NAME'] ) ? CACHE_NONE : CACHE_ACCEL;
+$wgParserCacheType = $wgMessageCacheType = $wgMainCacheType;
 $wgMemCachedServers = array();
 
 $wgRawHtml = true;
@@ -151,7 +152,7 @@ require_once($IP.'/extensions/UserMessage/UserMessage.php');
 require_once($IP.'/extensions/PlantUML/PlantUML.php');
 require_once($IP.'/extensions/HttpAuth/HttpAuth.php');
 require_once($IP.'/extensions/SimpleForms/SimpleForms.php'); /* useful at least for {{#request:...}} */
-require_once($IP.'/extensions/WhoIsWatching/SpecialWhoIsWatching.php');
+require_once($IP.'/extensions/WhoIsWatching/WhoIsWatching.php');
 require_once($IP.'/extensions/Polls/poll.php');
 require_once($IP.'/extensions/Shortcuts/Shortcuts.php');
 require_once($IP.'/extensions/RemoveConfidential/RemoveConfidential.php');

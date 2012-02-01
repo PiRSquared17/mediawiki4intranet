@@ -21,17 +21,20 @@
 
 $dir = dirname($_SERVER['PHP_SELF']);
 require_once "$dir/../../maintenance/commandLine.inc";
-require_once "$dir/../../maintenance/counter.php";
 
 class OldImageRenamer
 {
+	var $quiet = false;
+	var $remove_unexisting = false;
+	var $bak = false;
+	
 	function __construct( $args )
 	{
-		if ($args['quiet'])
+		if (isset($args['quiet']))
 			$this->quiet = true;
-		if ($args['delunexisting'])
+		if (isset($args['delunexisting']))
 			$this->remove_unexisting = true;
-		if ($args['bak'])
+		if (isset($args['bak']))
 			$this->bak = true;
 	}
 	
@@ -47,6 +50,7 @@ class OldImageRenamer
 		$res = $dbr->select('oldimage', '*', '1', __METHOD__, array('FOR UPDATE', 'ORDER BY' => 'oi_name, oi_timestamp'));
 		$file = NULL;
 		$lastfilename = NULL;
+		$getPhys = method_exists('File', 'getPhys') ? 'getPhys' : 'getName';
 		while ($oi = $dbr->fetchRow($res))
 		{
 			$row = array();
@@ -63,7 +67,7 @@ class OldImageRenamer
 					$file = wfLocalFile($oi['oi_name']);
 					$path = $file->repo->getZonePath('public') . '/archive/' . $file->getHashPath();
 				}
-				$nfn = $ts.'!'.$file->getPhys();
+				$nfn = 'T'.$ts.'!'.$file->$getPhys();
 				if ($fn != $nfn)
 				{
 					if ($this->remove_unexisting && !file_exists($path . $fn))
@@ -101,7 +105,7 @@ class OldImageRenamer
 					}
 					else
 					{
-						print "Error moving $path$fn to $path$nfn: can't rename()\n";
+						print "Error moving file :-(\n";
 						break;
 					}
 				}
@@ -110,7 +114,7 @@ class OldImageRenamer
 		$dbr->freeResult($res);
 		/* Transliterate existing upload file names */
 		global $wgTransliterateUploadFilenames;
-		if ($wgTransliterateUploadFilenames)
+		if ($wgTransliterateUploadFilenames && $getPhys == 'getPhys')
 		{
 			$res = $dbr->select('image', 'img_name', '1', __METHOD__, array('FOR UPDATE'));
 			while ($img = $dbr->fetchRow($res))
@@ -138,7 +142,7 @@ This script does 2 things:
 
 1) By default, old files in MediaWiki are stored containing timestamp of **next**
 revision in file names. This script renames them to contain **their own** timestamp
-in file names.
+in file names (plus a 'T' letter in the beginning to avoid collisions with old scheme).
 
 2) With MediaWiki4Intranet patch, if \$wgTransliterateUploadFilenames is true, all upload file
 names are transliterated during upload. So MediaWiki expects that filenames of
@@ -154,14 +158,10 @@ END;
 
 print "Going to check upload filenames for ".wfWikiID()." (archive timestamps".($wgTransliterateUploadFilenames?" and transliteration":"").")\n";
 
-if( !isset( $options['quick'] ) ) {
+if (!isset($options['quick']))
+{
 	print "Abort with control-c in the next five seconds... ";
-
-	for ($i = 6; $i >= 1;) {
-		print_c($i, --$i);
-		sleep(1);
-	}
-	echo "\n";
+	wfCountDown(5);
 }
 
 $renamer = new OldImageRenamer( $options );
