@@ -1848,7 +1848,7 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 
 	if( !$haveDiff3 ) {
 		wfDebug( "diff3 not found\n" );
-		return false;
+		return NULL;
 	}
 
 	# Make temporary files
@@ -1856,6 +1856,10 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	$oldtextFile = fopen( $oldtextName = tempnam( $td, 'merge-old-' ), 'w' );
 	$mytextFile = fopen( $mytextName = tempnam( $td, 'merge-mine-' ), 'w' );
 	$yourtextFile = fopen( $yourtextName = tempnam( $td, 'merge-your-' ), 'w' );
+
+	if ($old{-1} != "\n") $old .= "\n";
+	if ($mine{-1} != "\n") $mine .= "\n";
+	if ($yours{-1} != "\n") $yours .= "\n";
 
 	fwrite( $oldtextFile, $old );
 	fclose( $oldtextFile );
@@ -1879,8 +1883,10 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	pclose( $handle );
 
 	# Merge differences
-	$cmd = $wgDiff3 . ' -a -e --merge ' .
-		wfEscapeShellArg( $mytextName, $oldtextName, $yourtextName );
+	$cmd = $wgDiff3 . ' -a -A --merge ' . wfEscapeShellArg(
+		'-L', wfMsg( 'merge-mine' ), '-L', wfMsg( 'merge-old' ),
+		'-L', wfMsg( 'merge-their' ), $mytextName, $oldtextName, $yourtextName
+	);
 	$handle = popen( $cmd, 'r' );
 	$result = '';
 	do {
