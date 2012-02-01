@@ -16,6 +16,8 @@ application/srgs+xml grxml
 application/vnd.mif mif
 application/vnd.ms-excel xls xlt xla
 application/vnd.ms-powerpoint ppt pot pps ppa
+application/vnd.ms-office vsd
+application/vnd.visio vsd
 application/vnd.wap.wbxml wbxml
 application/vnd.wap.wmlc wmlc
 application/vnd.wap.wmlscriptc wmlsc
@@ -83,7 +85,7 @@ image/ief ief
 image/jp2 j2k jp2 jpg2
 image/jpeg jpeg jpg jpe
 image/png png apng
-image/svg+xml svg
+image/svg+xml svg svgz
 image/tiff tiff tif
 image/vnd.djvu djvu djv
 image/vnd.wap.wbmp wbmp
