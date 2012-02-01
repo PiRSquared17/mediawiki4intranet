@@ -1848,7 +1848,7 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 
 	if( !$haveDiff3 ) {
 		wfDebug( "diff3 not found\n" );
-		return false;
+		return NULL;
 	}
 
 	# Make temporary files
@@ -1856,6 +1856,10 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	$oldtextFile = fopen( $oldtextName = tempnam( $td, 'merge-old-' ), 'w' );
 	$mytextFile = fopen( $mytextName = tempnam( $td, 'merge-mine-' ), 'w' );
 	$yourtextFile = fopen( $yourtextName = tempnam( $td, 'merge-your-' ), 'w' );
+
+	if ($old{-1} != "\n") $old .= "\n";
+	if ($mine{-1} != "\n") $mine .= "\n";
+	if ($yours{-1} != "\n") $yours .= "\n";
 
 	fwrite( $oldtextFile, $old );
 	fclose( $oldtextFile );
@@ -1879,8 +1883,10 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	pclose( $handle );
 
 	# Merge differences
-	$cmd = $wgDiff3 . ' -a -e --merge ' .
-		wfEscapeShellArg( $mytextName, $oldtextName, $yourtextName );
+	$cmd = $wgDiff3 . ' -a -A --merge ' . wfEscapeShellArg(
+		'-L', wfMsg( 'merge-mine' ), '-L', wfMsg( 'merge-old' ),
+		'-L', wfMsg( 'merge-their' ), $mytextName, $oldtextName, $yourtextName
+	);
 	$handle = popen( $cmd, 'r' );
 	$result = '';
 	do {
@@ -3665,4 +3671,79 @@ function wfUnpack( $format, $data, $length=false ) {
 		throw new MWException( "unpack could not unpack binary data" );
 	}
 	return $result;
+}
+
+// FIXME (4intra.net patched) Move into language ?
+function wfTransliterateRussian($s)
+{
+	$s = strtr($s, array(
+		'а' => 'a',
+		'б' => 'b',
+		'в' => 'v',
+		'г' => 'g',
+		'д' => 'd',
+		'е' => 'e',
+		'ё' => 'e',
+		'ж' => 'zh',
+		'з' => 'z',
+		'и' => 'i',
+		'й' => 'j',
+		'к' => 'k',
+		'л' => 'l',
+		'м' => 'm',
+		'н' => 'n',
+		'о' => 'o',
+		'п' => 'p',
+		'р' => 'r',
+		'с' => 's',
+		'т' => 't',
+		'у' => 'u',
+		'ф' => 'f',
+		'х' => 'h',
+		'ц' => 'ts',
+		'ч' => 'ch',
+		'ш' => 'sh',
+		'щ' => 'sch',
+		'ь' => '',
+		'ъ' => '',
+		'ы' => 'i',
+		'э' => 'e',
+		'ю' => 'yu',
+		'я' => 'ya',
+		'А' => 'A',
+		'Б' => 'B',
+		'В' => 'V',
+		'Г' => 'G',
+		'Д' => 'D',
+		'Е' => 'E',
+		'Ё' => 'E',
+		'Ж' => 'ZH',
+		'З' => 'Z',
+		'И' => 'I',
+		'Й' => 'J',
+		'К' => 'K',
+		'Л' => 'L',
+		'М' => 'M',
+		'Н' => 'N',
+		'О' => 'O',
+		'П' => 'P',
+		'Р' => 'R',
+		'С' => 'S',
+		'Т' => 'T',
+		'У' => 'U',
+		'Ф' => 'F',
+		'Х' => 'H',
+		'Ц' => 'TS',
+		'Ч' => 'CH',
+		'Ш' => 'SH',
+		'Щ' => 'SCH',
+		'Ь' => '',
+		'Ъ' => '',
+		'Ы' => 'I',
+		'Э' => 'E',
+		'Ю' => 'YU',
+		'Я' => 'YA',
+	));
+	$s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
+	return $s;
 }
