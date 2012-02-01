@@ -1,0 +1,77 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium
+END
+selenium_settings.ini.sample
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/selenium_settings.ini.sample
+END
+SeleniumTestSuite.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestSuite.php
+END
+SeleniumTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestCase.php
+END
+SeleniumTestConstants.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestConstants.php
+END
+selenium_settings_grid.ini.sample
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/selenium_settings_grid.ini.sample
+END
+Selenium.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/Selenium.php
+END
+SeleniumServerManager.php
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumServerManager.php
+END
+SeleniumTestConsoleLogger.php
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestConsoleLogger.php
+END
+SeleniumTestHTMLLogger.php
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestHTMLLogger.php
+END
+SeleniumConfig.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumConfig.php
+END
+SeleniumTestListener.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumTestListener.php
+END
+SeleniumLoader.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/SeleniumLoader.php
+END
