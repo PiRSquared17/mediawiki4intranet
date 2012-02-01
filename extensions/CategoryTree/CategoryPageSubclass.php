@@ -104,7 +104,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         return array_keys($sch);
     }
 
-    function columnList($items, $start_char)
+    static function columnList($items, $start_char)
     {
         global $wgCategoryGroupCharacters;
         /* If all $start_char's are more than 1-character strings,
@@ -215,7 +215,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
     }
 
     /* Short list without subtitles, if not called from $this->getPagesSection() */
-    function shortList($articles, $articles_start_char)
+    static function shortList($articles, $articles_start_char)
     {
         global $wgMinUncatPagesAlphaList;
         $cutoff = $wgMinUncatPagesAlphaList;
