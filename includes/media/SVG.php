@@ -6,13 +6,14 @@
  * @ingroup Media
  */
 
-class SvgThumbnailImage extends ThumbnailImage
-{
-	function SvgThumbnailImage( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false ) {
+class SvgThumbnailImage extends ThumbnailImage {
+
+	function __construct( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false ) {
 		$this->svgurl = $svgurl;
 		$this->later = $later;
-		$this->ThumbnailImage( $file, $url, $width, $height, $path, $page );
+		parent::__construct( $file, $url, $width, $height, $path, $page );
 	}
+
 	static function scaleParam( $name, $value, $sw, $sh ) {
 		if ( $name == 'viewBox' ) {
 			$value = preg_split( '/\s+/', $value );
@@ -26,6 +27,7 @@ class SvgThumbnailImage extends ThumbnailImage
 		}
 		return "$name=\"$value\"";
 	}
+
 	function toHtml( $options = array() ) {
 		if ( count( func_get_args() ) == 2 ) {
 			throw new MWException( __METHOD__ .' called in the old style' );
@@ -84,7 +86,7 @@ class SvgThumbnailImage extends ThumbnailImage
 			if ( $href{0} == '/' ) {
 				$href = $wgServer . $href;
 			}
-			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName';
+			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName'; // 4intra.net
 			$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
 				$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
 			$linkfn = $this->file->getThumbPath() . $hash;
@@ -97,10 +99,35 @@ class SvgThumbnailImage extends ThumbnailImage
 			}
 			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) ) {
 				// Load original SVG or SVGZ and extract opening element
-				$svg = file_get_contents( 'compress.zlib://'.$this->file->getPath() );
-				preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
-				$closepos = strrpos( $svg, '</svg' );
-				if ( $m && $closepos !== false ) {
+				$readfn = $this->file->getPath();
+				if ( function_exists( 'gzopen' ) ) {
+					$fp = gzopen( $readfn, 'rb' );
+				} else {
+					$fp = fopen( $readfn, 'rb' );
+				}
+				$skip = false;
+				if ( $fp ) {
+					$svg = stream_get_contents( $fp );
+					fclose( $fp );
+					if ( substr( $svg, 0, 3 ) == "\x1f\x8b\x08" ) {
+						wfDebug( __CLASS__.": Zlib is not available, can't scale SVGZ image\n" );
+						$skip = true;
+					}
+				}
+				else {
+					wfDebug( __CLASS__.": Cannot read file $readfn\n" );
+					$skip = true;
+				}
+				if ( !$skip ) {
+					// Find opening and closing tags
+					preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
+					$closepos = strrpos( $svg, '</svg' );
+					if ( !$m || $closepos === false ) {
+						wfDebug( __CLASS__.": Invalid SVG (opening or closing tag not found)\n" );
+						$skip = true;
+					}
+				}
+				if ( !$skip ) {
 					$open = $m[0][0];
 					$openpos = $m[0][1];
 					$openlen = strlen( $m[0][0] );
@@ -130,8 +157,8 @@ class SvgThumbnailImage extends ThumbnailImage
 						substr( $svg, $openpos+$openlen, $closepos-$openpos-$openlen ) . $close .
 						ltrim( substr( $svg, $closepos ), ">\t\r\n" );
 					file_put_contents( $linkfn, $svg );
-				}
-				else {
+				} else {
+					// Skip SVG scaling
 					$linkurl = $this->file->getUrl();
 				}
 			}
@@ -190,6 +217,18 @@ class SvgHandler extends ImageHandler {
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Verifies that gzipped SVG files have '.svgz' extension
+	 */
+	function verifyUpload( $tempname, $destName, $fileProps ) {
+		$props = $this->unpackMetadata( $fileProps[ 'metadata' ] );
+		if ( !empty( $props[ 'compressed' ] ) &&
+			strtolower( substr( $destName, -5 ) ) !== '.svgz' ) {
+			return Status::newFatal( 'svgz-extension-error' );
+		}
+		return Status::newGood();
 	}
 
 	/**
