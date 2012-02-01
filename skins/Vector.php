@@ -296,8 +296,8 @@ class VectorTemplate extends BaseTemplate {
 			'accesskey' => $this->skin->accesskey( 'search' )
 		) ); ?>
 
-			<input type='submit' name="go" class="searchButton" id="searchGoButton2"	value="<?php $this->msg('searcharticle') ?>"<?php echo Xml::expandAttributes( Linker::tooltipAndAccesskeyAttribs( ( 'search-go' ) ); ?> /><?php if ($wgUseTwoButtonsSearchForm) { ?>&nbsp;
-			<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton2" value="<?php $this->msg('searchbutton') ?>"<?php echo Xml::expandAttributes( Linker::tooltipAndAccesskeyAttribs( ( 'search-fulltext' ) ); ?> /><?php } else { ?>
+			<input type='submit' name="go" class="searchButton" id="searchGoButton2"	value="<?php $this->msg('searcharticle') ?>"<?php echo Xml::expandAttributes( Linker::tooltipAndAccesskeyAttribs( 'search-go' ) ); ?> /><?php if ($wgUseTwoButtonsSearchForm) { ?>&nbsp;
+			<input type='submit' name="fulltext" class="searchButton" id="mw-searchButton2" value="<?php $this->msg('searchbutton') ?>"<?php echo Xml::expandAttributes( Linker::tooltipAndAccesskeyAttribs( 'search-fulltext' ) ); ?> /><?php } else { ?>
 
 			<div><a href="<?php $this->text('searchaction') ?>" rel="search"><?php $this->msg('powersearch-legend') ?></a></div><?php } ?>
 
