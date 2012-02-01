@@ -3368,6 +3368,7 @@ A temporary folder is missing.',
 'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
 'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
 'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
+'import-file-revisions'      => ' Uploaded $1 file {{PLURAL:$1|revision|revisions}}.',
 'import-token-mismatch'      => 'Loss of session data. Please try again.',
 'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
 
