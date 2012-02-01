@@ -70,7 +70,7 @@ class DraftHooks {
 	public static function loadForm( $editpage ) {
 		global $wgUser, $wgRequest, $wgOut, $wgTitle, $wgLang;
 		// Check permissions
-		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() ) {
+		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() && $wgTitle ) {
 			// Get draft
 			$draft = Draft::newFromID( $wgRequest->getIntOrNull( 'draft' ) );
 			// Load form values
@@ -95,9 +95,11 @@ class DraftHooks {
 					);
 				}
 				// Load draft with info
-				$draft->setTitle( Title::newFromText(
-					$wgRequest->getText( 'wpDraftTitle' ) )
-				);
+				$title = Title::newFromText( $wgRequest->getText( 'wpDraftTitle' ) );
+				if ( !$title ) {
+					$title = $wgTitle;
+				}
+				$draft->setTitle( $title );
 				$draft->setSection( $wgRequest->getInt( 'wpSection' ) );
 				$draft->setStartTime( $wgRequest->getText( 'wpStarttime' ) );
 				$draft->setEditTime( $wgRequest->getText( 'wpEdittime' ) );
@@ -188,15 +190,12 @@ class DraftHooks {
 				'tabindex' => 8,
 				'value' => wfMsg( 'drafts-save-save' ),
 			);
-			$accesskey = $wgUser->getSkin()->accesskey( 'drafts-save' );
-			if ( $accesskey !== false ) {
-				$buttonAttribs['accesskey'] = $accesskey;
+			$attribs = $wgUser->getSkin()->tooltipAndAccesskey( 'drafts-save' );
+			if ( $attribs['accesskey'] ) {
+				$buttonAttribs['accesskey'] = $attribs['accesskey'];
 			}
-			$tooltip = $wgUser->getSkin()->titleAttrib(
-				'drafts-save', 'withaccess'
-			);
-			if ( $tooltip !== false ) {
-				$buttonAttribs['title'] = $tooltip;
+			if ( $attribs['tooltip'] !== false ) {
+				$buttonAttribs['title'] = $attribs['title'];
 			}
 			$ajaxButton = Xml::escapeJsString(
 				Xml::element( 'input',
