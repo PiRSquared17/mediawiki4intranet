@@ -190,11 +190,11 @@ class DraftHooks {
 				'tabindex' => 8,
 				'value' => wfMsg( 'drafts-save-save' ),
 			);
-			$attribs = $wgUser->getSkin()->tooltipAndAccesskey( 'drafts-save' );
-			if ( $attribs['accesskey'] ) {
+			$attribs = $wgUser->getSkin()->tooltipAndAccesskeyAttribs( 'drafts-save' );
+			if ( !empty( $attribs['accesskey'] ) ) {
 				$buttonAttribs['accesskey'] = $attribs['accesskey'];
 			}
-			if ( $attribs['tooltip'] !== false ) {
+			if ( !empty( $attribs['tooltip'] ) ) {
 				$buttonAttribs['title'] = $attribs['title'];
 			}
 			$ajaxButton = Xml::escapeJsString(
