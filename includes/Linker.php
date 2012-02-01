@@ -245,13 +245,24 @@ class Linker {
 			$target->mFragment = '';
 		}
 
-		# If it's a broken link, add the appropriate query pieces, unless
-		# there's already an action specified, or unless 'edit' makes no sense
-		# (i.e., for a nonexistent special page).
-		if ( in_array( 'broken', $options ) && empty( $query['action'] )
-			&& $target->getNamespace() != NS_SPECIAL ) {
-			$query['action'] = 'edit';
-			$query['redlink'] = '1';
+		// TODO remove hardcoded NS_BLOG, move Wikilog talk pages to a separate extension
+		if ( !defined('NS_BLOG') || MWNamespace::getSubject( $target->getNamespace() ) != NS_BLOG ) {
+			# If it's a broken link, add the appropriate query pieces, unless
+			# there's already an action specified, or unless 'edit' makes no sense
+			# (i.e., for a nonexistent special page).
+			if( in_array( 'broken', $options ) and empty( $query['action'] )
+			    and $target->getNamespace() != NS_SPECIAL ) {
+				$query['action'] = 'edit';
+				$query['redlink'] = '1';
+			}
+			if ( $target->isTalkPage() && !empty( $query['action'] ) &&
+			    $query['action'] == 'edit' ) {
+				if ( !array_key_exists( 'section', $query ) ) {
+					$query['section'] = 'new';
+				} elseif ( !$query['section'] ) {
+					unset( $query['section'] );
+				}
+			}
 		}
 		$ret = $target->getLinkUrl( $query );
 		wfProfileOut( __METHOD__ );
