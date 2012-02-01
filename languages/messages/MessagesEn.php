@@ -128,6 +128,7 @@ $datePreferences = array(
 	'mdy',
 	'dmy',
 	'ymd',
+	'ymd hms',
 	'ISO 8601',
 );
 
@@ -174,6 +175,10 @@ $dateFormats = array(
 	'ISO 8601 time' => 'xnH:xni:xns',
 	'ISO 8601 date' => 'xnY-xnm-xnd',
 	'ISO 8601 both' => 'xnY-xnm-xnd"T"xnH:xni:xns',
+
+	'ymd hms time' => 'xnH:xni:xns',
+	'ymd hms date' => 'xnY-xnm-xnd',
+	'ymd hms both' => 'xnY-xnm-xnd" "xnH:xni:xns',
 );
 
 /**
@@ -945,6 +950,24 @@ This might also indicate a bug in the software used by {{SITENAME}}.',
 'nospecialpagetext' => '<strong>You have requested an invalid special page.</strong>
 
 A list of valid special pages can be found at [[Special:SpecialPages|{{int:specialpages}}]].',
+
+# Title errors
+'title-invalid-empty'            => 'Empty page title',
+'title-invalid-utf8'             => 'Bad title',
+'title-invalid-double-interwiki' => 'Double interwiki link in page title',
+'title-invalid-characters'       => 'Bad title',
+'title-invalid-relative'         => 'Bad title',
+'title-invalid-magic-tilde'      => 'Bad title',
+'title-invalid-too-long'         => 'Page title is too long',
+'title-invalid-leading-colon'    => 'Bad title',
+'title-invalid-emptytext'            => 'The requested page title is empty or contains only the name of a namespace.',
+'title-invalid-utf8text'             => 'Page title can not contain UTF-8 sequence "$1".',
+'title-invalid-double-interwikitext' => 'The requested page title contains forbidden double interwiki link.',
+'title-invalid-characterstext'       => 'The requested page title contains forbidden characters: "$1" at position $2.',
+'title-invalid-relativetext'         => 'Relative page titles (./, ../) are forbidden, because they will often be unreachable when handled by user\'s browser.',
+'title-invalid-magic-tildetext'      => 'The requested page title contains forbidden magic tilde sequence (~~~).',
+'title-invalid-too-longtext'         => 'The requested page title is too long. It must be no longer than 255 bytes in UTF-8 encoding. Page title short enough would be "$2".',
+'title-invalid-leading-colontext'    => 'The requested page title contains forbidden colons at the beginning.',
 
 # General errors
 'error'                => 'Error',
@@ -2211,7 +2234,7 @@ $1',
 'upload-warning-msg'          => 'There was a problem with your upload from [$2]. You may return to the [[Special:Upload/stash/$1|upload form]] to correct this problem.',
 
 'upload-proto-error'        => 'Incorrect protocol',
-'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
+'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code>, <code>https://</code> or <code>ftp://</code>.',
 'upload-file-error'         => 'Internal error',
 'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
 Please contact an [[Special:ListUsers/sysop|administrator]].',
@@ -3268,18 +3291,31 @@ This can be imported into another wiki using MediaWiki via the [[Special:Import|
 
 To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
 
-In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".',
+In the latter case you can also use a link, for example [[{{#Special:Export}}/{{MediaWiki:Mainpage}}]] for the page "[[{{MediaWiki:Mainpage}}]]".
+
+Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' filter full page list from the textbox, \'\'not only added pages\'\'.',
 'exportcuronly'     => 'Include only the current revision, not the full history',
 'exportnohistory'   => "----
 '''Note:''' Exporting the full history of pages through this form has been disabled due to performance reasons.",
 'export-submit'     => 'Export',
-'export-addcattext' => 'Add pages from category:',
+'export-addpages'   => "'''Add pages:'''",
 'export-addcat'     => 'Add',
-'export-addnstext'  => 'Add pages from namespace:',
-'export-addns'      => 'Add',
+'export-catname'    => 'From category:',
+'export-notcategory' => 'Not from category:',
+'export-modifydate' => 'Changed after:',
+'export-modifydate-tooltip' => 'Filters the page list (not just the added pages) by modification date. Date format: YYYY-MM-DD or YYYY-MM-DD HH:MM:SS.',
+'export-namespace'  => 'Namespace:',
+'export-invalid-catname' => '<font color=red>\'\'\'Unknown category ignored: \'$1\'\'\'\'.</font>',
+'export-invalid-namespace' => '<font color=red>\'\'\'Unknown namespace ignored: \'$1\'\'\'\'.</font>',
+'export-invalid-modifydate' => '<font color=red>\'\'\'Incorrect timestamp ignored (use format <u>YYYY-MM-DD HH:MM:SS</u>): \'$1\'\'\'\'.</font>',
+'export-include-images' => 'Export images',
+'export-selfcontained' => 'Include image contents into the export file',
 'export-download'   => 'Save as file',
+'export-images'     => 'Include images',
 'export-templates'  => 'Include templates',
-'export-pagelinks'  => 'Include linked pages to a depth of:',
+'export-pagelinks'  => 'Include linked articles',
+'export-subpages'   => 'Include subpages',
+'export-closure'    => 'Include articles from subcategories',
 
 # Namespace 8 related
 'allmessages'                   => 'System messages',
@@ -3326,11 +3362,11 @@ All transwiki import actions are logged at the [[Special:Log/import|import log]]
 'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
 Save it to your computer and upload it here.',
 'importstart'                => 'Importing pages...',
-'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
 'importnopages'              => 'No pages to import.',
 'imported-log-entries'       => 'Imported $1 {{PLURAL:$1|log entry|log entries}}.',
 'importfailed'               => 'Import failed: <nowiki>$1</nowiki>',
 'importunknownsource'        => 'Unknown import source type',
+'importunknownformat'        => 'Unknown import file format',
 'importcantopen'             => 'Could not open import file',
 'importbadinterwiki'         => 'Bad interwiki link',
 'importnotext'               => 'Empty or no text',
@@ -3346,11 +3382,17 @@ The file was only partially uploaded.',
 A temporary folder is missing.',
 'import-parse-failure'       => 'XML import parse failure',
 'import-noarticle'           => 'No page to import!',
-'import-nonewrevisions'      => 'All revisions were previously imported.',
 'xml-error-string'           => '$1 at line $2, col $3 (byte $4): $5',
 'import-upload'              => 'Upload XML data',
-'import-token-mismatch'      => 'Loss of session data.
-Please try again.',
+'import-norevisions'         => 'No revisions to import.',
+'import-nonewrevisions-localnewer' => 'All revisions were previously imported. Page changed locally.',
+'import-nonewrevisions'      => 'All revisions were previously imported. No local changes.',
+'import-revision-count'      => '$1 {{PLURAL:$1|revision|revisions}}',
+'import-revision-count-newpage' => '$1 {{PLURAL:$1|revision|revisions}} (new page)',
+'import-conflict'            => '$1 {{PLURAL:$1|revision|revisions}} (conflict: $2)',
+'import-conflict-difflink'   => '$1 (imported) и $2 (local)',
+'import-file-revisions'      => ' Uploaded $1 file {{PLURAL:$1|revision|revisions}}.',
+'import-token-mismatch'      => 'Loss of session data. Please try again.',
 'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
 
 # Import log
