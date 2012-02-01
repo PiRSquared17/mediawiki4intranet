@@ -74,6 +74,7 @@ class VectorTemplate extends BaseTemplate {
 	 */
 	public function execute() {
 		global $wgLang, $wgVectorUseIconWatch;
+		global $wgCatlinksTop;
 
 		$this->skin = $this->data['skin'];
 
@@ -173,6 +174,11 @@ class VectorTemplate extends BaseTemplate {
 					<a href="#p-search"><?php $this->msg( 'jumptosearch' ) ?></a>
 				</div>
 				<!-- /jumpto -->
+				<?php endif; ?>
+				<?php if ( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ): ?>
+				<!-- catlinks-top -->
+				<div id="catlinks-top"><?php $this->html( 'catlinks' ); ?></div>
+				<!-- /catlinks-top -->
 				<?php endif; ?>
 				<!-- bodycontent -->
 				<?php $this->html( 'bodycontent' ) ?>
