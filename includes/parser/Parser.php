@@ -2942,8 +2942,9 @@ class Parser {
 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
 
-		if (!$piece['headLevel'])
+		if ( empty( $piece['headLevel'] ) ) {
 			$piece['headLevel'] = 0;
+		}
 
 		# Title object, where $text came from
 		$title = false;
