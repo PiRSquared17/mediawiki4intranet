@@ -2854,6 +2854,7 @@ $1',
 'import-revision-count-newpage' => '$1 {{PLURAL:$1|версия|версии|версий}} (новая страница).',
 'import-conflict'            => '$1 {{PLURAL:$1|версия|версии|версий}} (конфликт: $2).',
 'import-conflict-difflink'   => '$1 (импорт) и $2 (локальная)',
+'import-file-revisions'      => ' Загружено $1 {{PLURAL:$1|версия|версии|версий}} файла.',
 'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
 'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
 

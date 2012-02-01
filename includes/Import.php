@@ -1030,7 +1030,7 @@ class WikiRevision {
 		$changed = $article->updateIfNewerOn( $dbw, $revision );
 
 		# Restore edit/create recent changes entry
-		global $wgUseRCPatrol, $wgUseNPPatrol;
+		global $wgUseRCPatrol, $wgUseNPPatrol, $wgUser;
 		# Mark as patrolled if importing user can do so
 		$patrolled = ( $wgUseRCPatrol || $wgUseNPPatrol ) && $this->title->userCan( 'autopatrol' );
 		$prevRev = $dbw->selectRow( 'revision', '*',
@@ -1118,7 +1118,6 @@ class WikiRevision {
 
 	function importUpload() {
 		# Construct a file
-		$archiveName = $this->getArchiveName();
 		$file = wfLocalFile( $this->getTitle() );
 		$archiveName = false;
 
