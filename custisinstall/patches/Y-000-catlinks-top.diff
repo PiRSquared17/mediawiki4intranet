@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328119401 -14400
+# Date 1328182157 -14400
 Bug 88274 - Category links on top
 
-diff -r 6b6371ec1416 -r 141c4a8ea115 skins/MonoBook.php
+diff -r 3ecacc7fdc93 -r 5f58ab2d0f86 skins/MonoBook.php
 --- skins/MonoBook.php
 +++ skins/MonoBook.php
 @@ -5,6 +5,12 @@
@@ -38,7 +38,7 @@ diff -r 6b6371ec1416 -r 141c4a8ea115 skins/MonoBook.php
  		<!-- end content -->
  		<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
  		<div class="visualClear"></div>
-diff -r 6b6371ec1416 -r 141c4a8ea115 skins/Vector.php
+diff -r 3ecacc7fdc93 -r 5f58ab2d0f86 skins/Vector.php
 --- skins/Vector.php
 +++ skins/Vector.php
 @@ -74,6 +74,7 @@
@@ -61,10 +61,10 @@ diff -r 6b6371ec1416 -r 141c4a8ea115 skins/Vector.php
  				<!-- bodycontent -->
  				<?php $this->html( 'bodycontent' ) ?>
  				<!-- /bodycontent -->
-diff -r 6b6371ec1416 -r 141c4a8ea115 skins/monobook/main.css
+diff -r 3ecacc7fdc93 -r 5f58ab2d0f86 skins/monobook/main.css
 --- skins/monobook/main.css
 +++ skins/monobook/main.css
-@@ -1249,3 +1249,9 @@
+@@ -1249,3 +1249,13 @@
  .tipsy {
  	font-size: 127%;
  }
@@ -73,11 +73,15 @@ diff -r 6b6371ec1416 -r 141c4a8ea115 skins/monobook/main.css
 +#catlinks-top div {
 +	float: left;
 +	margin: 0;
++	padding: 0;
 +}
-diff -r 6b6371ec1416 -r 141c4a8ea115 skins/vector/screen.css
++#catlinks-top .catlinks div {
++	padding-left: 0.7em;
++}
+diff -r 3ecacc7fdc93 -r 5f58ab2d0f86 skins/vector/screen.css
 --- skins/vector/screen.css
 +++ skins/vector/screen.css
-@@ -1217,3 +1217,9 @@
+@@ -1217,3 +1217,13 @@
  .tipsy {
  	font-size: 0.8em;
  }
@@ -86,4 +90,8 @@ diff -r 6b6371ec1416 -r 141c4a8ea115 skins/vector/screen.css
 +#catlinks-top div {
 +	float: left;
 +	margin: 0;
++	padding: 0;
++}
++#catlinks-top .catlinks div {
++	padding-left: 0.7em;
 +}
