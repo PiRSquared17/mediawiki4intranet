@@ -4,7 +4,7 @@
 /* Help text */
 
 $HELP = 'MediaWiki4Intranet installation script
-(c) 2010-2011, Vitaliy Filippov, Stas Fomin
+(c) 2010-2012, Vitaliy Filippov, Stas Fomin
 
 Instructions:
 - create a directory for MediaWiki
@@ -20,8 +20,7 @@ To look at the commands which would be run, but do not run them:
 
 /* URL config */
 
-$SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_16_2';
-$SVN_WIKIMEDIA_17 = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_17_0';
+$SVN_WIKIMEDIA = 'http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1';
 $SVN_WIKIMEDIA_TRUNK = 'http://svn.wikimedia.org/svnroot/mediawiki/trunk';
 $SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 
@@ -33,8 +32,7 @@ $FILES_WIKIMEDIA = explode(' ',
     'api.php index.php COPYING thumb.php trackback.php'.
     ' opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
-    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch');
-$EXT_WIKIMEDIA_17 = explode(' ', "Interwiki");
+    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
     'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit');
 $EXT_OUR = array_map('trim', explode("\n",
@@ -121,7 +119,6 @@ if ($UPGRADE)
     cmd("echo Upgrading into $DIR");
     switch_dirs("$SVN_WIKIMEDIA/phase3", $DIR, $DIRS_WIKIMEDIA);
     switch_dirs("$SVN_WIKIMEDIA/extensions", "$DIR/extensions", $EXT_WIKIMEDIA);
-    switch_dirs("$SVN_WIKIMEDIA_17/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_17);
     switch_dirs("$SVN_WIKIMEDIA_TRUNK/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_TRUNK);
 }
 else
@@ -129,7 +126,6 @@ else
     cmd("echo Installing into $DIR");
     get_dirs("$SVN_WIKIMEDIA/phase3", $DIR, $DIRS_WIKIMEDIA);
     get_dirs("$SVN_WIKIMEDIA/extensions", "$DIR/extensions", $EXT_WIKIMEDIA);
-    get_dirs("$SVN_WIKIMEDIA_17/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_17);
     get_dirs("$SVN_WIKIMEDIA_TRUNK/extensions", "$DIR/extensions", $EXT_WIKIMEDIA_TRUNK);
 }
 
