@@ -1,31 +1,31 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297453105 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949164 -14400
 Bug 41449 - Optional setting to always use resample instead of resize
 Bug 67935 - Initialize вот именно что to transparent, а не default solid black
 
-diff -r b11befdd7427 -r 373c9665b938 includes/media/Bitmap.php
+diff -r 6b6371ec1416 -r 55cdc897c32c includes/media/Bitmap.php
 --- includes/media/Bitmap.php
 +++ includes/media/Bitmap.php
-@@ -180,6 +180,7 @@
- 			#
- 			# First find out what kind of file this is, and select the correct
- 			# input routine for this.
-+			global $wgGDAlwaysResample;
+@@ -491,6 +491,7 @@
+ 		#
+ 		# First find out what kind of file this is, and select the correct
+ 		# input routine for this.
++		global $wgGDAlwaysResample;
  
- 			$typemap = array(
- 				'image/gif'          => array( 'imagecreatefromgif',  'palette',   'imagegif'  ),
-@@ -215,11 +216,11 @@
+ 		$typemap = array(
+ 			'image/gif'          => array( 'imagecreatefromgif',  'palette',   'imagegif'  ),
+@@ -529,11 +530,11 @@
  
- 			// Initialise the destination image to transparent instead of
- 			// the default solid black, to support PNG and GIF transparency nicely
--			$background = imagecolorallocate( $dst_image, 0, 0, 0 );
-+			$background = imagecolorallocatealpha( $dst_image, 0, 0, 0, 0x7f );
- 			imagecolortransparent( $dst_image, $background );
- 			imagealphablending( $dst_image, false );
+ 		// Initialise the destination image to transparent instead of
+ 		// the default solid black, to support PNG and GIF transparency nicely
+-		$background = imagecolorallocate( $dst_image, 0, 0, 0 );
++		$background = imagecolorallocatealpha( $dst_image, 0, 0, 0, 0x7f );
+ 		imagecolortransparent( $dst_image, $background );
+ 		imagealphablending( $dst_image, false );
  
--			if( $colorStyle == 'palette' ) {
-+			if( $colorStyle == 'palette' && !$wgGDAlwaysResample ) {
- 				// Don't resample for paletted GIF images.
- 				// It may just uglify them, and completely breaks transparency.
- 				imagecopyresized( $dst_image, $src_image,
+-		if ( $colorStyle == 'palette' ) {
++		if ( $colorStyle == 'palette' && !$wgGDAlwaysResample ) {
+ 			// Don't resample for paletted GIF images.
+ 			// It may just uglify them, and completely breaks transparency.
+ 			imagecopyresized( $dst_image, $src_image,

@@ -1,9 +1,9 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297035745 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949621 -14400
 Bug 59835 - Remove unwanted clickable [+] bullets near non-expandable categories
 
-diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.css
+diff -r 6b6371ec1416 -r 53881f18cb64 extensions/CategoryTree/CategoryTree.css
 --- extensions/CategoryTree/CategoryTree.css
 +++ extensions/CategoryTree/CategoryTree.css
 @@ -16,8 +16,7 @@
@@ -16,7 +16,7 @@ diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.css
  	cursor: pointer;
  	cursor: hand; /* hack for MSIE 5.0 and 5.5 */
  }
-diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.i18n.php
+diff -r 6b6371ec1416 -r 53881f18cb64 extensions/CategoryTree/CategoryTree.i18n.php
 --- extensions/CategoryTree/CategoryTree.i18n.php
 +++ extensions/CategoryTree/CategoryTree.i18n.php
 @@ -34,7 +34,7 @@
@@ -28,48 +28,26 @@ diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.i18n.p
  	'categorytree-page-bullet'      => '&nbsp;', # do not translate or duplicate this message to other languages
  
  	'categorytree-member-counts'    => 'contains {{PLURAL:$1|1 subcategory|$1 subcategories}}, {{PLURAL:$2|1 page|$2 pages}}, and {{PLURAL:$3|1 file|$3 files}}', # $1=subcategories, $2=subpages, $3=files, $4=total, $5=shown-in-tree
-diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTree.js
+diff -r 6b6371ec1416 -r 53881f18cb64 extensions/CategoryTree/CategoryTree.js
 --- extensions/CategoryTree/CategoryTree.js
 +++ extensions/CategoryTree/CategoryTree.js
 @@ -50,7 +50,7 @@
  
-     function categoryTreeLoadNode(cat, options, lnk, div) {
-       div.style.display= 'block';
--      lnk.className= 'CategoryTreeLoaded';
-+      lnk.className= 'CategoryTreeLoaded CategoryTreeClickable';
-       lnk.innerHTML= categoryTreeCollapseBulletMsg;
-       lnk.title= categoryTreeCollapseMsg;
-       lnk.onclick= function() { categoryTreeCollapseNode(cat, options, lnk) }
-diff -r b11befdd7427 -r 29dabdeeedad extensions/CategoryTree/CategoryTreeFunctions.php
+ function categoryTreeLoadNode(cat, options, lnk, div) {
+ 	div.style.display= 'block';
+-	lnk.className= 'CategoryTreeLoaded';
++	lnk.className= 'CategoryTreeLoaded CategoryTreeClickable';
+ 	lnk.innerHTML= categoryTreeCollapseBulletMsg;
+ 	lnk.title= categoryTreeCollapseMsg;
+ 	lnk.onclick= function() { categoryTreeCollapseNode(cat, options, lnk) };
+diff -r 6b6371ec1416 -r 53881f18cb64 extensions/CategoryTree/CategoryTreeFunctions.php
 --- extensions/CategoryTree/CategoryTreeFunctions.php
 +++ extensions/CategoryTree/CategoryTreeFunctions.php
-@@ -664,25 +664,25 @@
- 			$linkattr[ 'class' ] = "CategoryTreeToggle";
- 			$linkattr['style'] = 'display: none;'; // Unhidden by JS
- 
--			/*if ( $count === 0 ) {
-+			if ( !$count ) {
- 				$tag = 'span';
- 				$txt = wfMsgNoTrans( 'categorytree-empty-bullet' );
- 			}
--			else*/ 
--			if ( $children == 0 || $loadchildren ) {
-+			else if ( $children == 0 || $loadchildren ) {
- 				$tag = 'span';
- 				if ( $count === 0 ) $txt = wfMsgNoTrans( 'categorytree-empty-bullet' );
- 				else $txt = wfMsgNoTrans( 'categorytree-expand-bullet' );
- 				$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeExpandNode('".Xml::escapeJsString($key)."',".$this->getOptionsAsJsStructure().",this);";
- 				# Don't load this message for ajax requests, so that we don't have to initialise $wgLang
- 				$linkattr[ 'title' ] = $this->mIsAjaxRequest ? '##LOAD##' : wfMsgNoTrans('categorytree-expand');
-+				$linkattr[ 'class' ] .= ' CategoryTreeClickable';
- 			}
- 			else {
- 				$tag = 'span';
- 				$txt = wfMsgNoTrans( 'categorytree-collapse-bullet' );
- 				$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeCollapseNode('".Xml::escapeJsString($key)."',".$this->getOptionsAsJsStructure().",this);";
- 				$linkattr[ 'title' ] = wfMsgNoTrans('categorytree-collapse');
--				$linkattr[ 'class' ] .= ' CategoryTreeLoaded';
-+				$linkattr[ 'class' ] .= ' CategoryTreeClickable CategoryTreeLoaded';
- 			}
- 
- 			if ( $tag == 'a' ) $linkattr[ 'href' ] = $wikiLink;
+@@ -675,6 +675,7 @@
+ 					$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeExpandNode('" . Xml::escapeJsString( $key ) . "'," . $this->getOptionsAsJsStructure() . ",this);";
+ 					# Don't load this message for ajax requests, so that we don't have to initialise $wgLang
+ 					$linkattr[ 'title' ] = $this->mIsAjaxRequest ? '##LOAD##' : wfMsgNoTrans( 'categorytree-expand' );
++					$linkattr[ 'class' ] .= ' CategoryTreeClickable';
+ 				} else {
+ 					$tag = 'span';
+ 					$txt = wfMsgNoTrans( 'categorytree-collapse-bullet' );

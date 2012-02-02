@@ -1,15 +1,15 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1321011367 -10800
+# Date 1328118283 -14400
 Bug 62054 -
   __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
   enable/disable "tag-like" page grouping based on their other categories,
   __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryPageSubclass.php
+diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
-@@ -61,4 +61,184 @@
+@@ -49,4 +49,184 @@
  		}
  		parent::finaliseCategoryState();
  	}
@@ -68,7 +68,7 @@ diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryPageSubclas
 +        return array_keys($sch);
 +    }
 +
-+    function columnList($items, $start_char)
++    static function columnList($items, $start_char)
 +    {
 +        global $wgCategoryGroupCharacters;
 +        /* If all $start_char's are more than 1-character strings,
@@ -179,7 +179,7 @@ diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryPageSubclas
 +    }
 +
 +    /* Short list without subtitles, if not called from $this->getPagesSection() */
-+    function shortList($articles, $articles_start_char)
++    static function shortList($articles, $articles_start_char)
 +    {
 +        global $wgMinUncatPagesAlphaList;
 +        $cutoff = $wgMinUncatPagesAlphaList;
@@ -194,10 +194,10 @@ diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryTree.php
+diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
-@@ -377,3 +377,36 @@
+@@ -372,3 +372,36 @@
  
  	return false;
  }
@@ -234,7 +234,7 @@ diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r 025d3c6531d8 -r b702964d9c48 extensions/CategoryTree/SubcatCat.i18n.php
+diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,9 @@

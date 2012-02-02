@@ -1,19 +1,23 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297036212 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949524 -14400
 Bug 56653
 Debug wfMsgExt to remove UNIQ____QINU
 
-diff -r b11befdd7427 -r a05a7243fe3c includes/parser/Parser.php
+diff -r 6b6371ec1416 -r 81d848dbc3e1 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -195,7 +195,8 @@
- 		$this->mLastSection = '';
- 		$this->mDTopen = false;
- 		$this->mIncludeCount = array();
--		$this->mStripState = new StripState;
-+		if ( !$this->mStripState )
-+			$this->mStripState = new StripState;
- 		$this->mArgStack = false;
- 		$this->mInPre = false;
- 		$this->mLinkHolders = new LinkHolderArray( $this );
+@@ -270,9 +270,10 @@
+ 		 */
+ 		# $this->mUniqPrefix = "\x07UNIQ" . Parser::getRandomString();
+ 		# Changed to \x7f to allow XML double-parsing -- TS
+-		$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
+-		$this->mStripState = new StripState( $this->mUniqPrefix );
+-
++		if ( !$this->mStripState ) {
++			$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
++			$this->mStripState = new StripState( $this->mUniqPrefix );
++		}
+ 
+ 		# Clear these on every parse, bug 4549
+ 		$this->mTplExpandCache = $this->mTplRedirCache = $this->mTplDomCache = array();

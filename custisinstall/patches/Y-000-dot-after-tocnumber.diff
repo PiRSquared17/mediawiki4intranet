@@ -1,13 +1,13 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1300969814 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949207 -14400
 Bug 52772 - Optional dots (.) after TOC item numbers
 
-diff -r 9cc4b1960d33 -r cd5b10634b39 includes/DefaultSettings.php
+diff -r 6b6371ec1416 -r 0dd576c2f1a3 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
-@@ -1141,6 +1141,11 @@
- $wgMaxPPExpandDepth = 40;
+@@ -2854,6 +2854,11 @@
+ );
  
  /**
 + * If true, add '.' TOC numbers have "x.x.x." format instead of just "x.x.x"
@@ -18,19 +18,19 @@ diff -r 9cc4b1960d33 -r cd5b10634b39 includes/DefaultSettings.php
   * If true, removes (substitutes) templates in "~~~~" signatures.
   */
  $wgCleanSignatures = true;
-diff -r 9cc4b1960d33 -r cd5b10634b39 includes/parser/Parser.php
+diff -r 6b6371ec1416 -r 0dd576c2f1a3 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -3499,7 +3499,7 @@
+@@ -3757,7 +3757,7 @@
  	 * @private
  	 */
  	function formatHeadings( $text, $origText, $isMain=true ) {
--		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds;
-+		global $wgMaxTocLevel, $wgContLang, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
+-		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds;
++		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
  
- 		$doNumberHeadings = $this->mOptions->getNumberHeadings();
- 		$showEditLink = $this->mOptions->getEditSection();
-@@ -3648,6 +3648,8 @@
+ 		# Inhibit editsection links if requested in the page
+ 		if ( isset( $this->mDoubleUnderscores['noeditsection'] ) ) {
+@@ -3898,6 +3898,8 @@
  					$dot = 1;
  				}
  			}

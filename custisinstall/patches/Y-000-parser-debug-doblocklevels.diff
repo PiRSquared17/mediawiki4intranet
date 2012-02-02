@@ -1,11 +1,11 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1323434135 -10800
+# Date 1327950432 -14400
 Bug 67060 - Do not treat </?blockquote> and </?center> as paragraphs
 Bug 68935 - Update for MediaWiki 1.16
 MediaWikiBug 6200 (https://bugzilla.wikimedia.org/show_bug.cgi?id=6200) - Completely rewrite doBlockLevels to correctly handle nested tags
 
-diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
+diff -r 6b6371ec1416 -r 5bf877308089 extensions/Cite/citeParserTests.txt
 --- extensions/Cite/citeParserTests.txt
 +++ extensions/Cite/citeParserTests.txt
 @@ -22,8 +22,7 @@
@@ -73,12 +73,12 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  !! result
  <p><sup id="cite_ref-0" class="reference"><a href="#cite_note-0">[1]</a></sup>
 -</p>
--<table class="gallery" cellspacing="0" cellpadding="0">
-+</p><table class="gallery" cellspacing="0" cellpadding="0">
- 	<tr>
- 		<td><div class="gallerybox" style="width: 155px;">
- 			<div class="thumb" style="padding: 66px 0; width: 150px;"><div style="margin-left: auto; margin-right: auto; width: 120px;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="120" height="14" /></a></div></div>
-@@ -153,8 +146,7 @@
+-<ul class="gallery">
++</p><ul class="gallery">
+ 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
+ 			<div class="thumb" style="width: 150px;"><div style="margin:68px auto;"><a href="/wiki/File:Foobar.jpg" class="image"><img alt="Foobar.jpg" src="http://example.com/images/3/3a/Foobar.jpg" width="120" height="14" /></a></div></div>
+ 			<div class="gallerytext">
+@@ -151,8 +144,7 @@
  !! result
  <p><sup id="cite_ref-blank_0-0" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
  </p><p><sup id="cite_ref-blank_0-1" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
@@ -88,7 +88,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  
  !! end
  
-@@ -169,8 +161,7 @@
+@@ -167,8 +159,7 @@
  !! result
  <p><sup id="cite_ref-blank_0-0" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
  </p><p><sup id="cite_ref-blank_0-1" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
@@ -98,7 +98,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  
  !! end
  
-@@ -185,8 +176,7 @@
+@@ -183,8 +174,7 @@
  !! result
  <p><sup id="cite_ref-blank_0-0" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
  </p><p><sup id="cite_ref-blank_0-1" class="reference"><a href="#cite_note-blank-0">[1]</a></sup>
@@ -108,7 +108,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  
  !! end
  
-@@ -202,8 +192,7 @@
+@@ -200,8 +190,7 @@
  <p><sup id="cite_ref-test123test_0-0" class="reference"><a href="#cite_note-test123test-0">[1]</a></sup>
  <sup id="cite_ref-123test_1-0" class="reference"><a href="#cite_note-123test-1">[2]</a></sup>
  <sup id="cite_ref-test123_2-0" class="reference"><a href="#cite_note-test123-2">[3]</a></sup>
@@ -118,7 +118,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  <li id="cite_note-123test-1"><a href="#cite_ref-123test_1-0">↑</a> Two</li>
  <li id="cite_note-test123-2"><a href="#cite_ref-test123_2-0">↑</a> Three</li></ol>
  
-@@ -236,8 +225,7 @@
+@@ -234,8 +223,7 @@
  </p><p><strong class="error">Cite error: Invalid <code>&lt;references&gt;</code> tag;
  parameter "group" is allowed only.
  Use <code>&lt;references /&gt;</code>, or <code>&lt;references group="..." /&gt;</code></strong>
@@ -128,7 +128,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  <li id="cite_note-bar"><a href="#cite_ref-bar_0">↑</a> <strong class="error">Cite error: Invalid <code>&lt;ref&gt;</code> tag;
  no text was provided for refs named <code>bar</code></strong></li>
  <li id="cite_note-blankwithnoreference"><a href="#cite_ref-blankwithnoreference_0">↑</a> <strong class="error">Cite error: Invalid <code>&lt;ref&gt;</code> tag;
-@@ -257,8 +245,7 @@
+@@ -255,8 +243,7 @@
  !! result
  <p>Wikipedia rocks!<sup id="cite_ref-0" class="reference"><a href="#cite_note-0">[1]</a></sup>
  Wikipedia rocks!<sup id="cite_ref-1" class="reference"><a href="#cite_note-1">[note 1]</a></sup>
@@ -138,7 +138,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  <ol class="references"><li id="cite_note-1"><a href="#cite_ref-1">↑</a> Proceeds of Rockology, vol. XXI</li></ol>
  
  !! end
-@@ -274,8 +261,7 @@
+@@ -272,8 +259,7 @@
  <references group="注" />
  !! result
  <p>AAA<sup id="cite_ref-0" class="reference"><a href="#cite_note-0">[参 1]</a></sup>BBB<sup id="cite_ref-1" class="reference"><a href="#cite_note-1">[注 1]</a></sup>CCC<sup id="cite_ref-2" class="reference"><a href="#cite_note-2">[参 2]</a></sup>
@@ -148,7 +148,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  </dt></dl>
  <ol class="references"><li id="cite_note-0"><a href="#cite_ref-0">↑</a> ref a</li>
  <li id="cite_note-2"><a href="#cite_ref-2">↑</a> ref c</li></ol>
-@@ -295,8 +281,7 @@
+@@ -293,8 +279,7 @@
  </references>
  !! result
  <p><sup id="cite_ref-foo_0-0" class="reference"><a href="#cite_note-foo-0">[1]</a></sup>
@@ -158,7 +158,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  
  !! end
  
-@@ -310,8 +295,7 @@
+@@ -308,8 +293,7 @@
  }}
  !! result
  <p><sup id="cite_ref-foo_0-0" class="reference"><a href="#cite_note-foo-0">[1]</a></sup>
@@ -168,7 +168,7 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  
  !! end
  
-@@ -328,8 +312,7 @@
+@@ -326,8 +310,7 @@
  </references>
  !! result
  <p><sup id="cite_ref-foo_0-0" class="reference"><a href="#cite_note-foo-0">[2 1]</a></sup>
@@ -178,11 +178,20 @@ diff -r 025d3c6531d8 -r 08636134487b extensions/Cite/citeParserTests.txt
  no text was provided for refs named <code>foo</code></strong></li></ol>
  <p><strong class="error">Cite error: <code>&lt;ref&gt;</code> tag with name "unused" defined in <code>&lt;references&gt;</code> is not used in prior text.</strong><br />
  <strong class="error">Cite error: <code>&lt;ref&gt;</code> tag in <code>&lt;references&gt;</code> has conflicting group attribute "1".</strong><br />
-diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
+@@ -349,7 +332,6 @@
+ <references group="klingon"/>
+ !! result
+ <p>Wikipedia rocks!<sup id="cite_ref-0" class="reference"><a href="#cite_note-0">[wa']</a></sup>
+-</p>
+-<ol class="references"><li id="cite_note-0"><a href="#cite_ref-0">↑</a> Proceeds of Rockology, vol. XXI</li></ol>
++</p><ol class="references"><li id="cite_note-0"><a href="#cite_ref-0">↑</a> Proceeds of Rockology, vol. XXI</li></ol>
+ 
+ !! end
+diff -r 6b6371ec1416 -r 5bf877308089 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -1888,7 +1888,7 @@
- 	 * @return bool
+@@ -1963,7 +1963,7 @@
+ 	 * @return Boolean
  	 */
  	function areSubpagesAllowed() {
 -		# Some namespaces don't allow subpages
@@ -190,8 +199,8 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
  		return MWNamespace::hasSubpages( $this->mTitle->getNamespace() );
  	}
  
-@@ -1910,7 +1910,7 @@
- 	/* private */ function closeParagraph() {
+@@ -1988,7 +1988,7 @@
+ 	function closeParagraph() {
  		$result = '';
  		if ( $this->mLastSection != '' ) {
 -			$result = '</' . $this->mLastSection  . ">\n";
@@ -199,17 +208,7 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
  		}
  		$this->mInPre = false;
  		$this->mLastSection = '';
-@@ -1989,35 +1989,85 @@
- 	function doBlockLevels( $text, $linestart ) {
- 		wfProfileIn( __METHOD__ );
- 
--		# Parsing through the text line by line.  The main thing
--		# happening here is handling of block-level elements p, pre,
--		# and making lists from lines starting with * # : etc.
--		#
-+		// Parsing through the text line by line.  The main thing
-+		// happening here is handling of block-level elements p, pre,
-+		// and making lists from lines starting with * # : etc.
+@@ -2111,16 +2111,69 @@
  		$textLines = StringUtils::explode( "\n", $text );
  
  		$lastPrefix = $output = '';
@@ -217,14 +216,6 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +		$this->mDTopen = false;
  		$prefixLength = 0;
 -		$paragraphStack = false;
--
--		foreach ( $textLines as $oLine ) {
--			# Fix up $linestart
--			if ( !$linestart ) {
--				$output .= $oLine;
--				$linestart = true;
--				continue;
--			}
 +
 +		// 0     = always start paragraph for a piece of text or inline tag
 +		// 1     = some text of current paragraph already printed inline,
@@ -282,20 +273,24 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +			'table' => 1,
 +			'pre' => 1,
 +		);
-+
-+		foreach ( $textLines as $oLine )
-+		{
-+			if ( !$linestart )
+ 
+ 		foreach ( $textLines as $oLine ) {
+-			# Fix up $linestart
+ 			if ( !$linestart ) {
+-				$output .= $oLine;
+-				$linestart = true;
+-				continue;
 +				$dontStartParagraph = 1;
- 			// * = ul
- 			// # = ol
- 			// ; = dt
- 			// : = dd
+ 			}
+ 			# * = ul
+ 			# # = ol
+@@ -2128,11 +2181,9 @@
+ 			# : = dd
  
  			$lastPrefixLength = strlen( $lastPrefix );
--			$preCloseMatch = preg_match('/<\\/pre/i', $oLine );
--			$preOpenMatch = preg_match('/<pre/i', $oLine );
--			// If not in a <pre> element, scan for and figure out what prefixes are there.
+-			$preCloseMatch = preg_match( '/<\\/pre/i', $oLine );
+-			$preOpenMatch = preg_match( '/<pre/i', $oLine );
+-			# If not in a <pre> element, scan for and figure out what prefixes are there.
 -			if ( !$this->mInPre ) {
 -				# Multiple prefixes may abut each other for nested lists.
 +			// If at line start and not in a <pre> element, scan for and figure out what prefixes are there.
@@ -304,24 +299,18 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
  				$prefixLength = strspn( $oLine, '*#:;' );
  				$prefix = substr( $oLine, 0, $prefixLength );
  
-@@ -2027,19 +2077,19 @@
- 				//  elements.
+@@ -2142,7 +2193,6 @@
+ 				#  elements.
  				$prefix2 = str_replace( ';', ':', $prefix );
  				$t = substr( $oLine, $prefixLength );
 -				$this->mInPre = (bool)$preOpenMatch;
  			} else {
--				# Don't interpret any other prefixes in preformatted text
-+				// Don't interpret any other prefixes in preformatted text
+ 				# Don't interpret any other prefixes in preformatted text
  				$prefixLength = 0;
- 				$prefix = $prefix2 = '';
- 				$t = $oLine;
- 			}
- 
--			# List generation
-+			// List generation
- 			if( $prefixLength && $lastPrefix === $prefix2 ) {
--				# Same as the last item, so no need to deal with nesting or opening stuff
-+				// Same as the last item, so no need to deal with nesting or opening stuff
+@@ -2153,8 +2203,9 @@
+ 			# List generation
+ 			if ( $prefixLength && $lastPrefix === $prefix2 ) {
+ 				# Same as the last item, so no need to deal with nesting or opening stuff
 +				$output .= $this->closeParagraph();
 +				$dontStartParagraph = 2;
  				$output .= $this->nextItem( substr( $prefix, -1 ) );
@@ -329,7 +318,7 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
  
  				if ( substr( $prefix, -1 ) === ';') {
  					# The one nasty exception: definition lists work like this:
-@@ -2052,12 +2102,17 @@
+@@ -2167,12 +2218,17 @@
  						$output .= $term . $this->nextItem( ':' );
  					}
  				}
@@ -337,19 +326,18 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +				// Reset linestart to false to ignore heading space
 +				$linestart = false;
 +				$emptyLines = 0;
- 			} elseif( $prefixLength || $lastPrefixLength ) {
+ 			} elseif ( $prefixLength || $lastPrefixLength ) {
 +				$output .= $this->closeParagraph();
 +				$dontStartParagraph = $prefixLength ? 2 : 0;
- 				// We need to open or close prefixes, or both.
+ 				# We need to open or close prefixes, or both.
  
--				# Either open or close a level...
-+				// Either open or close a level...
+ 				# Either open or close a level...
  				$commonPrefixLength = $this->getCommon( $prefix, $lastPrefix );
 -				$paragraphStack = false;
  
- 				// Close all the prefixes which aren't shared.
- 				while( $commonPrefixLength < $lastPrefixLength ) {
-@@ -2085,75 +2140,149 @@
+ 				# Close all the prefixes which aren't shared.
+ 				while ( $commonPrefixLength < $lastPrefixLength ) {
+@@ -2200,71 +2256,148 @@
  					++$commonPrefixLength;
  				}
  				$lastPrefix = $prefix2;
@@ -359,25 +347,25 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +				$emptyLines = 0;
  			}
  
--			// If we have no prefixes, go to paragraph mode.
--			if( 0 == $prefixLength ) {
+-			# If we have no prefixes, go to paragraph mode.
+-			if ( 0 == $prefixLength ) {
 -				wfProfileIn( __METHOD__."-paragraph" );
 -				# No prefix (not in list)--go to paragraph mode
--				// XXX: use a stack for nestable elements like span, table and div
+-				# XXX: use a stack for nestable elements like span, table and div
 -				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
 -				$closematch = preg_match(
 -					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
 -					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
 -				if ( $openmatch or $closematch ) {
 -					$paragraphStack = false;
--					# TODO bug 5718: paragraph closed
+-					# TODO bug 5718: paragraph closed
 -					$output .= $this->closeParagraph();
 -					if ( $preOpenMatch and !$preCloseMatch ) {
 -						$this->mInPre = true;
 +			// Go to paragraph mode.
 +			wfProfileIn( __METHOD__."-paragraph" );
 +			if ( $linestart && $inNoPre <= 0 && ' ' == substr( $t, 0, 1 ) &&
-+				( $this->mLastSection === 'pre' || trim($t) != '' ) ) {
++				( $this->mLastSection === 'pre' || trim( $t ) != '' ) ) {
 +				// <pre>formatted text
 +				$emptyLines = 0;
 +				if ( $this->mLastSection !== 'pre' ) {
@@ -402,7 +390,8 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +				while ( strlen( $t ) ) {
 +					// match html tag or preformatted block hidden by link holder
 +					// <html> does not influence on paragraphs in any way, so we don't match it
-+					if ( preg_match('/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.'-pre.*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) ) {
++					if ( preg_match( '/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.
++						'-pre.*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) ) {
 +						$textBefore = substr( $t, 0, $m[0][1] );
 +						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
 +						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) ) {
@@ -413,43 +402,61 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +						$textBefore = $t;
 +						$t = '';
  					}
--					if ( $closematch ) {
--						$inBlockElem = false;
+-					$inBlockElem = !$closematch;
+-				} elseif ( !$inBlockElem && !$this->mInPre ) {
+-					if ( ' ' == substr( $t, 0, 1 ) and ( $this->mLastSection === 'pre' || trim( $t ) != '' ) ) {
+-						# pre
+-						if ( $this->mLastSection !== 'pre' ) {
+-							$paragraphStack = false;
+-							$output .= $this->closeParagraph().'<pre>';
+-							$this->mLastSection = 'pre';
+-						}
+-						$t = substr( $t, 1 );
 -					} else {
--						$inBlockElem = true;
+-						# paragraph
+-						if ( trim( $t ) === '' ) {
+-							if ( $paragraphStack ) {
+-								$output .= $paragraphStack.'<br />';
+-								$paragraphStack = false;
+-								$this->mLastSection = 'p';
+-							} else {
+-								if ( $this->mLastSection !== 'p' ) {
++					$match = isset( $m[0] ) ? $m[0][0] : false;
++					$close = isset( $m[1] ) ? $m[1][0] : false;
++					$tag   = isset( $m[2] ) ? $m[2][0] : false;
++					$empty = isset( $m[3] ) ? $m[3][0] : false;
++					$uniq  = isset( $m[4] ) ? $m[4][0] : false;
 +					if ( $textBefore !== '' ) {
 +						// Here is the place where the text gets inside <p>aragraphs
 +						if ( trim( $textBefore ) !== '' ) {
 +							if ( !$this->mInPre && !$dontStartParagraph ) {
 +								if ( $this->mLastSection == 'pre' ) {
-+									$output .= $this->closeParagraph();
+ 									$output .= $this->closeParagraph();
+-									$this->mLastSection = '';
+-									$paragraphStack = '<p>';
+-								} else {
+-									$paragraphStack = '</p><p>';
 +								}
 +								if ( !$this->mLastSection && !$this->mInPre ) {
 +									$lastParagraphPos = strlen( $output );
 +									$output .= '<p>';
 +									$this->mLastSection = 'p';
-+								}
-+							} elseif ( $dontStartParagraph == 2 ) {
+ 								}
+ 							}
+-						} else {
+-							if ( $paragraphStack ) {
+-								$output .= $paragraphStack;
+-								$paragraphStack = false;
+-								$this->mLastSection = 'p';
+-							} elseif ( $this->mLastSection !== 'p' ) {
+-								$output .= $this->closeParagraph().'<p>';
+-								$this->mLastSection = 'p';
++							elseif ( $dontStartParagraph == 2 ) {
 +								$dontStartParagraph = 1;
 +							}
 +						}
 +						$output .= $textBefore;
- 					}
--				} else if ( !$inBlockElem && !$this->mInPre ) {
--					if ( ' ' == substr( $t, 0, 1 ) and ( $this->mLastSection === 'pre' or trim($t) != '' ) ) {
--						// pre
--						if ($this->mLastSection !== 'pre') {
--							$paragraphStack = false;
--							$output .= $this->closeParagraph().'<pre>';
--							$this->mLastSection = 'pre';
-+					if ( !$m ) {
-+						continue;
 +					}
-+					$match = $m[0][0];
-+					$close = $m[1][0];
-+					$tag   = $m[2][0];
-+					$empty = $m[3][0];
-+					$uniq  = empty( $m[4] ) ? '' : $m[4][0];
 +					if ( $this->mInPre && $close && $tag == 'pre' ) {
 +						// this is </pre> closing tag
 +						$this->mInPre = false;
@@ -457,7 +464,7 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +					} elseif ( $uniq ) {
 +						// UNIQ <pre> closes paragraph
 +						$output .= $this->closeParagraph();
-+					} elseif ( isset( $closesParagraph[ $tag ] ) ) {
++					} elseif ( !empty( $closesParagraph[ $tag ] ) ) {
 +						// block element closes current paragraph
 +						if ( $tag != 'div' ) {
 +							// <div> does not close the paragraph,
@@ -484,25 +491,10 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +								$this->mLastSection = '';
 +								$inNoPre = 0;
 +							}
- 						}
--						$t = substr( $t, 1 );
--					} else {
--						// paragraph
--						if ( trim($t) == '' ) {
--							if ( $paragraphStack ) {
--								$output .= $paragraphStack.'<br />';
--								$paragraphStack = false;
--								$this->mLastSection = 'p';
--							} else {
--								if ($this->mLastSection !== 'p' ) {
--									$output .= $this->closeParagraph();
--									$this->mLastSection = '';
--									$paragraphStack = '<p>';
--								} else {
--									$paragraphStack = '</p><p>';
++						}
 +						// if not an enclosed XML element
 +						if ( !$empty ) {
-+							if ( isset( $noPre[ $tag ] ) ) {
++							if ( !empty( $noPre[ $tag ] ) ) {
 +								$inNoPre += $close ? -1 : 1;
 +							}
 +							if ( !$close ) {
@@ -512,16 +504,7 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +									// into <div>A</div>, and <div>\nA</div> is parsed
 +									// into <div><p>A</p></div>
 +									$dontStartParagraph = 2;
- 								}
--							}
--						} else {
--							if ( $paragraphStack ) {
--								$output .= $paragraphStack;
--								$paragraphStack = false;
--								$this->mLastSection = 'p';
--							} else if ($this->mLastSection !== 'p') {
--								$output .= $this->closeParagraph().'<p>';
--								$this->mLastSection = 'p';
++								}
 +								if ( $tag == 'pre' && !$empty ) {
 +									$this->mInPre = true;
 +								}
@@ -545,11 +528,11 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
 +					$dontStartParagraph = 0;
 +				}
  			}
--			// somewhere above we forget to get out of pre block (bug 785)
--			if($preCloseMatch && $this->mInPre) {
+-			# somewhere above we forget to get out of pre block (bug 785)
+-			if ( $preCloseMatch && $this->mInPre ) {
 -				$this->mInPre = false;
 -			}
--			if ($paragraphStack === false) {
+-			if ( $paragraphStack === false ) {
 -				$output .= $t."\n";
 -			}
 +			wfProfileOut( __METHOD__."-paragraph" );
@@ -557,10 +540,417 @@ diff -r 025d3c6531d8 -r 08636134487b includes/parser/Parser.php
  		}
  		while ( $prefixLength ) {
  			$output .= $this->closeList( $prefix2[$prefixLength-1] );
-diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
---- maintenance/parserTests.txt
-+++ maintenance/parserTests.txt
-@@ -192,7 +192,6 @@
+diff -r 6b6371ec1416 -r 5bf877308089 skins/chick/main.css
+--- skins/chick/main.css
++++ skins/chick/main.css
+@@ -31,8 +31,13 @@
+ 	margin: 0.4em 0em 0.5em 0em;
+ 	line-height: 1.5em;
+ }
++div.paragraph {
++	margin: 0.4em 0em 0.5em 0em;
++	line-height: 1.5em;
++}
+ 
+ p img { margin: 0; }
++div.paragraph img { margin: 0; }
+ 
+ hr {
+ 	height: 1px;
+@@ -190,6 +195,7 @@
+ 	padding: 0 0.9em 0 0.9em;
+ }
+ #siteNotice p { margin: 0; padding: 0; }
++#siteNotice div.paragraph { margin: 0; padding: 0; }
+ .error {
+ 	color: red;
+ 	font-size: larger;
+@@ -259,12 +265,14 @@
+ 	border-width: 0.5em 0 0.8em 1.4em;
+ }
+ div.floatright p { font-style: italic; }
++div.floatright div.paragraph { font-style: italic; }
+ /* @noflip */div.floatleft, table.floatleft {
+ 	margin: 0.3em 0.5em 0.5em 0;
+ 	border: 0.5em solid white;
+ 	border-width: 0.5em 1.4em 0.8em 0;
+ }
+ div.floatleft p { font-style: italic; }
++div.floatleft div.paragraph { font-style: italic; }
+ /* thumbnails */
+ div.thumb {
+ 	margin-bottom: 0.5em;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/cologneblue/screen.css
+--- skins/cologneblue/screen.css
++++ skins/cologneblue/screen.css
+@@ -44,6 +44,11 @@
+ 	font-size: 10pt;
+ 	color: black;
+ }
++#article, #article td, #article th, #article div.paragraph {
++	font-family: Verdana, Arial, sans-serif;
++	font-size: 10pt;
++	color: black;
++}
+ 
+ #article p {
+ 	padding-top: 0;
+@@ -51,6 +56,12 @@
+ 	margin-top: 1ex;
+ 	margin-bottom: 0;
+ }
++#article div.paragraph {
++	padding-top: 0;
++	padding-bottom: 0;
++	margin-top: 1ex;
++	margin-bottom: 0;
++}
+ 
+ p, pre, td, th, li, dd, dt {
+ 	line-height: 12pt;
+@@ -191,6 +202,14 @@
+ 	margin-top: 0;
+ 	padding-bottom: 1ex;
+ }
++#article div.paragraph.subtitle {
++	color: #666666;
++	font-size: 11pt;
++	font-weight: bold;
++	padding-top: 0;
++	margin-top: 0;
++	padding-bottom: 1ex;
++}
+ 
+ a {
+ 	color: #223366;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/commonPrint.css
+--- skins/common/commonPrint.css
++++ skins/common/commonPrint.css
+@@ -35,6 +35,9 @@
+ div.floatright p {
+ 	font-style: italic;
+ }
++div.floatright div.paragraph {
++	font-style: italic;
++}
+ div.floatleft {
+ 	float: left;
+ 	clear: left;
+@@ -44,6 +47,9 @@
+ div.floatleft p {
+ 	font-style: italic;
+ }
++div.floatleft div.paragraph {
++	font-style: italic;
++}
+ div.center {
+ 	text-align: center;
+ }
+@@ -163,6 +169,9 @@
+ .tocindent p {
+ 	margin: 0 0 0 0 ! important;
+ }
++.tocindent div.paragraph {
++	margin: 0 0 0 0 ! important;
++}
+ 
+ pre {
+ 	border: 1pt dashed black;
+@@ -345,6 +354,10 @@
+ 	widows: 3;
+ 	orphans: 3;
+ }
++div.paragraph {
++	widows: 3;
++	orphans: 3;
++}
+ 
+ /**
+  * Categories
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/config-cc.css
+--- skins/common/config-cc.css
++++ skins/common/config-cc.css
+@@ -49,6 +49,9 @@
+ #menu p { 
+ 	font-size:11px;
+ }
++#menu div.paragraph { 
++	font-size:11px;
++}
+ 
+ .dent {
+ 	margin-left:64px;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/oldshared.css
+--- skins/common/oldshared.css
++++ skins/common/oldshared.css
+@@ -41,6 +41,9 @@
+ div.floatright p {
+ 	font-style: italic;
+ }
++div.floatright div.paragraph {
++	font-style: italic;
++}
+ 
+ /* @noflip */
+ div.floatleft {
+@@ -53,6 +56,9 @@
+ div.floatleft p {
+ 	font-style: italic;
+ }
++div.floatleft div.paragraph {
++	font-style: italic;
++}
+ 
+ 
+ /* Print-specific things to hide */
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/shared.css
+--- skins/common/shared.css
++++ skins/common/shared.css
+@@ -214,6 +214,12 @@
+ 	font-size: 90%;
+ 	text-align: right;
+ }
++p.mw-ipb-conveniencelinks, div.paragraph.mw-protect-editreasons,
++p.mw-filedelete-editreasons, p.mw-delete-editreasons,
++p.mw-revdel-editreasons {
++	font-size: 90%;
++	text-align: right;
++}
+ 
+ /*
+  * OpenSearch ajax suggestions
+@@ -452,6 +458,10 @@
+ 	text-indent: 3em;
+ 	margin: 0.8em 0;
+ }
++.previewnote div.paragraph {
++	text-indent: 3em;
++	margin: 0.8em 0;
++}
+ 
+ .visualClear {
+ 	clear: both;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/wikiprintable.css
+--- skins/common/wikiprintable.css
++++ skins/common/wikiprintable.css
+@@ -43,4 +43,5 @@
+ h1.pagetitle { padding-bottom: 0; margin-bottom: 0; }
+ i.link, u.link { color: #000066; }
+ p.subtitle { padding-top: 0; margin-top: 0; }
++div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
+ */
+diff -r 6b6371ec1416 -r 5bf877308089 skins/common/wikistandard.css
+--- skins/common/wikistandard.css
++++ skins/common/wikistandard.css
+@@ -153,11 +153,18 @@
+ p.subpages {
+ 	font-size: small;
+ }
++div.paragraph.subpages {
++	font-size: small;
++}
+ 
+ p.subtitle {
+ 	padding-top: 0;
+ 	margin-top: 0;
+ }
++div.paragraph.subtitle {
++	padding-top: 0;
++	margin-top: 0;
++}
+ 
+ .catlinks {
+ 	font-size: small;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/modern/main.css
+--- skins/modern/main.css
++++ skins/modern/main.css
+@@ -286,6 +286,9 @@
+ p {
+ 	margin: 1em 0 1em 0;
+ }
++div.paragraph {
++	margin: 1em 0 1em 0;
++}
+ 
+ hr {
+ 	height: 1px;
+@@ -486,6 +489,7 @@
+ */
+ }
+ div.floatright p { font-style: italic; }
++div.floatright div.paragraph { font-style: italic; }
+ /* @noflip */div.floatleft, table.floatleft {
+ 	margin: 0 .5em .5em 0;
+ 	border: 0;
+@@ -496,6 +500,7 @@
+ */
+ }
+ div.floatleft p { font-style: italic; }
++div.floatleft div.paragraph { font-style: italic; }
+ /* thumbnails */
+ div.thumb {
+ 	margin-bottom: .5em;
+@@ -658,6 +663,10 @@
+ 	margin: 0;
+ 	padding: 0;
+ }
++.previewnote div.paragraph {
++	margin: 0;
++	padding: 0;
++}
+ 
+ .editExternally {
+ 	border: 1px solid gray;
+@@ -843,6 +852,10 @@
+ 	padding: 0 0 0 0;
+ 	margin: 0 0 0 0;
+ }
++.mw-topbox div.paragraph {
++	padding: 0 0 0 0;
++	margin: 0 0 0 0;
++}
+ 
+ .mw-topbox {
+ 	color: black;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/monobook/main.css
+--- skins/monobook/main.css
++++ skins/monobook/main.css
+@@ -95,9 +95,16 @@
+ 	margin: .4em 0 .5em 0;
+ 	line-height: 1.5em;
+ }
++div.paragraph {
++	margin: .4em 0 .5em 0;
++	line-height: 1.5em;
++}
+ p img {
+ 	margin: 0;
+ }
++div.paragraph img {
++	margin: 0;
++}
+ 
+ hr {
+ 	height: 1px;
+@@ -276,6 +283,10 @@
+ 	margin: 0;
+ 	padding: 0;
+ }
++#siteNotice div.paragraph {
++	margin: 0;
++	padding: 0;
++}
+ 
+ .catlinks {
+ 	border: 1px solid #aaa;
+@@ -377,6 +388,7 @@
+ */
+ }
+ div.floatright p { font-style: italic; }
++div.floatright div.paragraph { font-style: italic; }
+ /* @noflip */div.floatleft, table.floatleft {
+ 	margin: 0 .5em .5em 0;
+ 	border: 0;
+@@ -387,6 +399,7 @@
+ */
+ }
+ div.floatleft p { font-style: italic; }
++div.floatleft div.paragraph { font-style: italic; }
+ /* thumbnails */
+ div.thumb {
+ 	margin-bottom: .5em;
+@@ -1180,6 +1193,9 @@
+ #powersearch p {
+ 	margin-top:0px;
+ }
++#powersearch div.paragraph {
++	margin-top:0px;
++}
+ 
+ div.multipageimagenavbox {
+ 	border: solid 1px silver;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/nostalgia/screen.css
+--- skins/nostalgia/screen.css
++++ skins/nostalgia/screen.css
+@@ -46,6 +46,10 @@
+ 	padding-top: 0;
+ 	margin-top: 0;
+ }
++div.paragraph.subtitle {
++	padding-top: 0;
++	margin-top: 0;
++}
+ div.sitenotice {
+ 	clear: both;
+ }
+diff -r 6b6371ec1416 -r 5bf877308089 skins/simple/main.css
+--- skins/simple/main.css
++++ skins/simple/main.css
+@@ -84,7 +84,12 @@
+     margin: 0.4em 0em 0.5em 0em;
+     line-height: 1.5em;
+ }
++div.paragraph {
++    margin: 0.4em 0em 0.5em 0em;
++    line-height: 1.5em;
++}
+ p img { margin: 0; }
++div.paragraph img { margin: 0; }
+ 
+ h1, h2, h3, h4, h5, h6 {
+     margin: 0;
+@@ -260,11 +265,13 @@
+     border-width: 0.5em 0 0.8em 1.4em;
+ }
+ div.floatright p { font-style: italic; }
++div.floatright div.paragraph { font-style: italic; }
+ /* @noflip */div.floatleft, table.floatleft {
+     margin: 0.3em 0.5em 0.5em 0;
+     border-width: 0.5em 1.4em 0.8em 0;
+ }
+ div.floatleft p { font-style: italic; }
++div.floatleft div.paragraph { font-style: italic; }
+ /* thumbnails */
+ div.thumb {
+     margin-bottom: 0.5em;
+diff -r 6b6371ec1416 -r 5bf877308089 skins/vector/screen.css
+--- skins/vector/screen.css
++++ skins/vector/screen.css
+@@ -769,9 +769,16 @@
+ 	margin: .4em 0 .5em 0;
+ 	line-height: 1.5em;
+ }
++div.paragraph {
++	margin: .4em 0 .5em 0;
++	line-height: 1.5em;
++}
+ p img {
+ 	margin: 0;
+ }
++div.paragraph img {
++	margin: 0;
++}
+ q {
+ 	font-family: Times, "Times New Roman", serif;
+ 	font-style: italic;
+@@ -903,11 +910,13 @@
+ 	border: 0;
+ }
+ div.floatright p { font-style: italic; }
++div.floatright div.paragraph { font-style: italic; }
+ /* @noflip */div.floatleft, table.floatleft {
+ 	margin: 0 .5em .5em 0;
+ 	border: 0;
+ }
+ div.floatleft p { font-style: italic; }
++div.floatleft div.paragraph { font-style: italic; }
+ /* Thumbnails */
+ div.thumb {
+ 	margin-bottom: .5em;
+diff -r 6b6371ec1416 -r 5bf877308089 tests/parser/parserTests.txt
+--- tests/parser/parserTests.txt
++++ tests/parser/parserTests.txt
+@@ -198,7 +198,6 @@
  !! result
  <pre>asdf
  </pre>
@@ -568,7 +958,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! test
-@@ -237,10 +236,8 @@
+@@ -243,10 +242,8 @@
  c
  !! result
  <p>a
@@ -581,7 +971,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  </p>
  !! end
  
-@@ -365,8 +362,7 @@
+@@ -371,8 +368,7 @@
  !! result
  <center>
  <pre>Blah
@@ -591,7 +981,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -1743,8 +1739,8 @@
+@@ -1989,8 +1985,8 @@
  !! result 
  <hr />
  <hr />
@@ -602,7 +992,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  ###
-@@ -2407,8 +2403,8 @@
+@@ -2692,8 +2688,8 @@
  {{paramtest|
    param =[[Image:noimage.png|thumb|[[no link|link]] [[no link|caption]]]]}}
  !! result
@@ -613,7 +1003,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! article
-@@ -2545,8 +2541,7 @@
+@@ -2830,8 +2826,7 @@
  foo {{table}}
  !! result
  <p>foo 
@@ -621,9 +1011,9 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
 -<table>
 +</p><table>
  <tr>
- <td> 1 </td><td> 2
- </td></tr>
-@@ -2563,8 +2558,7 @@
+ <td> 1 </td>
+ <td> 2
+@@ -2850,8 +2845,7 @@
  {{table}}
  !! result
  <p>foo
@@ -631,9 +1021,9 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
 -<table>
 +</p><table>
  <tr>
- <td> 1 </td><td> 2
- </td></tr>
-@@ -3606,11 +3600,9 @@
+ <td> 1 </td>
+ <td> 2
+@@ -4032,11 +4026,9 @@
  !! result
  <h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: Headline 1">edit</a>]</span> <span class="mw-headline" id="Headline_1"> Headline 1 </span></h2>
  <p>Some text
@@ -647,7 +1037,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  <p>Blah blah
  </p>
  !! end
-@@ -3655,8 +3647,7 @@
+@@ -4081,8 +4073,7 @@
  <h6><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=4" title="Edit section: Skipping a level">edit</a>]</span> <span class="mw-headline" id="Skipping_a_level_2"> Skipping a level </span></h6>
  <h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=5" title="Edit section: Headline 2">edit</a>]</span> <span class="mw-headline" id="Headline_2"> Headline 2 </span></h2>
  <p>Some text
@@ -657,7 +1047,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -4062,8 +4053,8 @@
+@@ -4583,8 +4574,8 @@
  !! input
  [[Media:Foobar.jpg|Safe Link<div style=display:none>" onmouseover="alert(document.cookie)" onfoo="</div>]]
  !! result
@@ -668,7 +1058,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! test
-@@ -4585,8 +4576,8 @@
+@@ -5122,8 +5113,8 @@
  string(5) "<tag>"
  array(0) {
  }
@@ -679,7 +1069,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! test
-@@ -4636,8 +4627,8 @@
+@@ -5173,8 +5164,8 @@
    ["foo"]=>
    string(3) "bar"
  }
@@ -690,7 +1080,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  # </tag> should be output literally since there is no matching tag that begins it
-@@ -4687,8 +4678,7 @@
+@@ -5224,8 +5215,7 @@
  <!-- <statictag>hello, world</statictag> -->
  <statictag action=flush/>
  !! result
@@ -700,7 +1090,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  # Nested template calls; this case was broken by Parser.php rev 1.506,
-@@ -4724,7 +4714,7 @@
+@@ -5261,7 +5251,7 @@
  !! input
  <s></s><table></table>
  !! result
@@ -709,7 +1099,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -5070,7 +5060,7 @@
+@@ -5607,7 +5597,7 @@
  http://__TOC__
  !! result
  <h2><span class="editsection">[<a href="/index.php?title=Parser_test&amp;action=edit&amp;section=1" title="Edit section: onmouseover=">edit</a>]</span> <span class="mw-headline" id="onmouseover.3D"> onmouseover= </span></h2>
@@ -718,17 +1108,17 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  <ul>
  <li class="toclevel-1 tocsection-1"><a href="#onmouseover.3D"><span class="tocnumber">1</span> <span class="toctext">onmouseover=</span></a></li>
  </ul>
-@@ -5134,8 +5124,7 @@
+@@ -5675,8 +5665,7 @@
  {|
  !!result
- <p><a href="http://===r:::https://b" class="external free" rel="nofollow">http://===r:::https://b</a>
+ <p><a rel="nofollow" class="external free" href="http://===r:::https://b">http://===r:::https://b</a>
 -</p>
 -<table>
 +</p><table>
  <tr><td></td></tr>
  </table>
  
-@@ -5157,12 +5146,11 @@
+@@ -5698,12 +5687,11 @@
  |
  !! result
  <table>
@@ -744,16 +1134,16 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  <td></u>
  </td>
  </tr>
-@@ -5217,7 +5205,7 @@
+@@ -5758,7 +5746,7 @@
  !! input
  http://example.com<pre>junk</pre>
  !! result
--<a href="http://example.com" class="external free" rel="nofollow">http://example.com</a><pre>junk</pre>
-+<p><a href="http://example.com" class="external free" rel="nofollow">http://example.com</a></p><pre>junk</pre>
+-<a rel="nofollow" class="external free" href="http://example.com">http://example.com</a><pre>junk</pre>
++<p><a rel="nofollow" class="external free" href="http://example.com">http://example.com</a></p><pre>junk</pre>
  
  !!end
  
-@@ -5348,8 +5336,6 @@
+@@ -5889,8 +5877,6 @@
  !! input
  {{Special:Prefixindex/Xyzzyx}}
  !! result
@@ -762,7 +1152,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  <table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
  
  !! end
-@@ -5361,11 +5347,7 @@
+@@ -5902,11 +5888,7 @@
  {{Special:Prefixindex/Xyzzyx}}
  {{Special:Prefixindex/Xyzzyx}}
  !! result
@@ -774,7 +1164,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  <table border="0" id="mw-prefixindex-list-table"><tr><td><a href="/wiki/Xyzzyx" title="Xyzzyx">Xyzzyx</a></td></tr></table>
  
  !! end
-@@ -6280,13 +6262,9 @@
+@@ -6837,13 +6819,9 @@
  </li><li> Talk:Parser_test
  </li><li> Parser test
  </li><li> Parser_test
@@ -790,37 +1180,35 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  </li></ul>
  
  !! end
-@@ -6317,8 +6295,7 @@
- 			<div style="height: 152px;">Image2.gif</div>
+@@ -6873,8 +6851,7 @@
+ 			<div style="height: 150px;">Image2.gif</div>
  			<div class="gallerytext">
  <p>||||
 -</p>
 -			</div>
 +			</p></div>
- 		</div></td>
- 		<td><div class="gallerybox" style="width: 155px;">
- 			<div style="height: 152px;">Image3</div>
-@@ -6329,8 +6306,7 @@
- 			<div style="height: 152px;">Image4</div>
+ 		</div></li>
+ 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
+ 			<div style="height: 150px;">Image3</div>
+@@ -6885,15 +6862,13 @@
+ 			<div style="height: 150px;">Image4</div>
  			<div class="gallerytext">
  <p>300px| centre
 -</p>
 -			</div>
 +			</p></div>
- 		</div></td>
- 	</tr>
- 	<tr>
-@@ -6338,8 +6314,7 @@
- 			<div style="height: 152px;">Image5.svg</div>
+ 		</div></li>
+ 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
+ 			<div style="height: 150px;">Image5.svg</div>
  			<div class="gallerytext">
- <p><a href="http://///////" class="external free" rel="nofollow">http://///////</a>
+ <p><a rel="nofollow" class="external free" href="http://///////">http://///////</a>
 -</p>
 -			</div>
 +			</p></div>
- 		</div></td>
- 		<td><div class="gallerybox" style="width: 155px;">
- 			<div style="height: 152px;">* image6</div>
-@@ -6366,8 +6341,7 @@
+ 		</div></li>
+ 		<li class="gallerybox" style="width: 155px"><div style="width: 155px">
+ 			<div style="height: 150px;">* image6</div>
+@@ -7092,8 +7067,7 @@
  __NEWSECTIONLINK__
  __FORCETOC__
  !! result
@@ -830,7 +1218,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! test
-@@ -6536,8 +6510,8 @@
+@@ -7269,8 +7243,8 @@
  !! input
  <html><script>alert(1);</script></html>
  !! result
@@ -841,7 +1229,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! end
  
  !! test
-@@ -6796,11 +6770,9 @@
+@@ -7592,11 +7566,9 @@
  !! result
  <center>
  <p>foo
@@ -855,7 +1243,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  </pre>
  !! end
  
-@@ -7112,8 +7084,7 @@
+@@ -7908,8 +7880,7 @@
  y
  !! result
  <p>x
@@ -863,9 +1251,9 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
 -<table>
 +</p><table>
  <tr>
- <td> 1 </td><td> 2
- </td></tr>
-@@ -7186,8 +7157,7 @@
+ <td> 1 </td>
+ <td> 2
+@@ -7984,8 +7955,7 @@
  ==heading==
  !! result
  <p>[[link
@@ -875,7 +1263,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7198,8 +7168,7 @@
+@@ -7996,8 +7966,7 @@
  =heading=
  !! result
  <p>{{foo|
@@ -885,7 +1273,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7210,8 +7179,7 @@
+@@ -8008,8 +7977,7 @@
  ==heading==
  !! result
  <p>{{foo|
@@ -895,7 +1283,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7233,7 +7201,7 @@
+@@ -8031,7 +7999,7 @@
  Line two</div>
  !! result
  <div>Line one
@@ -904,7 +1292,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7247,8 +7215,7 @@
+@@ -8045,8 +8013,7 @@
  !! result
  <div>
  <p>Line one
@@ -914,7 +1302,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7262,8 +7229,7 @@
+@@ -8060,8 +8027,7 @@
  !! result
  <div>Line one
  <p>Line two
@@ -924,7 +1312,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7279,30 +7245,25 @@
+@@ -8077,8 +8043,7 @@
  <div>
  <p>Line one
  </p><p>Line two
@@ -934,6 +1322,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
+@@ -8099,22 +8064,18 @@
  # Bug 6200: <blockquote> should behave like <div> with respect to line breaks
  !! test
  Bug 6200: paragraphs inside blockquotes (no extra line breaks)
@@ -957,7 +1346,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! input
  <blockquote>
  Line one
-@@ -7311,15 +7272,12 @@
+@@ -8123,15 +8084,12 @@
  !! result
  <blockquote>
  <p>Line one
@@ -974,7 +1363,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! input
  <blockquote>Line one
  
-@@ -7328,15 +7286,12 @@
+@@ -8140,15 +8098,12 @@
  !! result
  <blockquote>Line one
  <p>Line two
@@ -991,7 +1380,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  !! input
  <blockquote>
  Line one
-@@ -7347,8 +7302,7 @@
+@@ -8159,8 +8114,7 @@
  <blockquote>
  <p>Line one
  </p><p>Line two
@@ -1001,7 +1390,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7360,7 +7314,7 @@
+@@ -8172,7 +8126,7 @@
  Line two</div></blockquote>
  !! result
  <blockquote><div>Line one
@@ -1010,7 +1399,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7374,8 +7328,7 @@
+@@ -8186,8 +8140,7 @@
  !! result
  <blockquote><div>
  <p>Line one
@@ -1020,7 +1409,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7389,8 +7342,7 @@
+@@ -8201,8 +8154,7 @@
  !! result
  <blockquote><div>Line one
  <p>Line two
@@ -1030,7 +1419,7 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-@@ -7406,8 +7358,7 @@
+@@ -8218,8 +8170,7 @@
  <blockquote><div>
  <p>Line one
  </p><p>Line two
@@ -1040,622 +1429,3 @@ diff -r 025d3c6531d8 -r 08636134487b maintenance/parserTests.txt
  
  !! end
  
-diff -r 025d3c6531d8 -r 08636134487b skins/chick/main.css
---- skins/chick/main.css
-+++ skins/chick/main.css
-@@ -32,8 +32,15 @@
- 	line-height: 1.5em;
- }
- 
-+div.paragraph {
-+	margin: 0.4em 0em 0.5em 0em;
-+	line-height: 1.5em;
-+}
-+
- p img { margin: 0; }
- 
-+div.paragraph img { margin: 0; }
-+
- hr {
- 	height: 1px;
- 	color: #aaaaaa;
-@@ -195,6 +202,8 @@
- 	padding: 0 0.9em 0 0.9em;
- }
- #siteNotice p { margin: 0; padding: 0; }
-+
-+#siteNotice div.paragraph { margin: 0; padding: 0; }
- .error {
- 	color: red;
- 	font-size: larger;
-@@ -267,6 +276,8 @@
- 	border-width: 0.5em 0 0.8em 1.4em;
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
- 	float: left;
- 	clear: left;
-@@ -276,6 +287,8 @@
- 	border-width: 0.5em 1.4em 0.8em 0;
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* thumbnails */
- div.thumb {
- 	margin-bottom: 0.5em;
-diff -r 025d3c6531d8 -r 08636134487b skins/common/cologneblue.css
---- skins/common/cologneblue.css
-+++ skins/common/cologneblue.css
-@@ -17,11 +17,23 @@
-  font-family: Verdana, Arial, sans-serif;
-  font-size: 10pt; color: black;
- }
-+
-+#article, #article td, #article th, #article div.paragraph {
-+ font-family: Verdana, Arial, sans-serif;
-+ font-size: 10pt; color: black;
-+}
- #article p {
-  padding-top: 0; padding-bottom: 0;
-  margin-top: 1ex; margin-bottom: 0;
- }
-+
-+#article div.paragraph {
-+ padding-top: 0; padding-bottom: 0;
-+ margin-top: 1ex; margin-bottom: 0;
-+}
- p, pre, td, th, li, dd, dt { line-height: 12pt; }
-+
-+div.paragraph, pre, td, th, li, dd, dt { line-height: 12pt; }
- textarea { overflow: auto; }
- 
- #footer { padding: 4px; }
-@@ -90,6 +102,11 @@
-  padding-top: 0; margin-top: 0; padding-bottom: 1ex;
- }
- 
-+#article div.paragraph.subtitle {
-+ color: #666666; font-size: 11pt; font-weight: bold;
-+ padding-top: 0; margin-top: 0; padding-bottom: 1ex;
-+}
-+
- a { color: #223366; }
- a.external { color: #336644; }
- a:visited { color: #8D0749; }
-diff -r 025d3c6531d8 -r 08636134487b skins/common/commonPrint.css
---- skins/common/commonPrint.css
-+++ skins/common/commonPrint.css
-@@ -32,7 +32,9 @@
-     border: 0.5em solid White;
-     border-width: 0.5em 0 0.8em 1.4em;
- }
--div.floatright p { font-style: italic;} 
-+div.floatright p { font-style: italic;}
-+
-+div.floatright div.paragraph { font-style: italic;} 
- div.floatleft { 
-     float: left; 
-     margin: 0.3em 0.5em 0.5em 0;
-@@ -40,7 +42,9 @@
-     border: 0.5em solid White;
-     border-width: 0.5em 1.4em 0.8em 0;
- }
--div.floatleft p { font-style: italic; } 
-+div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; } 
- /* thumbnails */
- div.thumb {
-     margin-bottom: 0.5em;
-@@ -139,10 +143,19 @@
-     line-height: 1.2em;
- }
- 
-+div.paragraph, .documentDescription {
-+    margin: 1em 0 ! important;
-+    line-height: 1.2em;
-+}
-+
- .tocindent p {
- 	margin: 0 0 0 0 ! important;
- }
- 
-+.tocindent div.paragraph {
-+	margin: 0 0 0 0 ! important;
-+}
-+
- pre {
-     border: 1pt dashed black;
-     white-space: pre;
-diff -r 025d3c6531d8 -r 08636134487b skins/common/common_rtl.css
---- skins/common/common_rtl.css
-+++ skins/common/common_rtl.css
-@@ -35,6 +35,12 @@
- p.mw-revdel-editreasons {
- 	float: left;
- }
-+
-+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
-+p.mw-filedelete-editreasons, p.mw-delete-editreasons,
-+p.mw-revdel-editreasons {
-+	float: left;
-+}
- table.filehistory th {
- 	text-align: right;
- }
-diff -r 025d3c6531d8 -r 08636134487b skins/common/nostalgia.css
---- skins/common/nostalgia.css
-+++ skins/common/nostalgia.css
-@@ -14,4 +14,6 @@
- textarea { overflow: auto; }
- p.subtitle { padding-top: 0; margin-top: 0; }
- 
-+div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
- 
-+
-diff -r 025d3c6531d8 -r 08636134487b skins/common/oldshared.css
---- skins/common/oldshared.css
-+++ skins/common/oldshared.css
-@@ -30,9 +30,13 @@
- /* images */
- div.floatright { float: right; clear: right; margin: 0 0 1em 1em; }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft { float: left; clear: left; margin: 0.3em 0.5em 0.5em 0; }
- div.floatleft p { font-style: italic; }
- 
-+div.floatleft div.paragraph { font-style: italic; }
-+
- 
- /* Print-specific things to hide */
- .printfooter {
-diff -r 025d3c6531d8 -r 08636134487b skins/common/shared.css
---- skins/common/shared.css
-+++ skins/common/shared.css
-@@ -132,6 +132,13 @@
- 	float: right;
- }
- 
-+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
-+p.mw-filedelete-editreasons, p.mw-delete-editreasons,
-+p.mw-revdel-editreasons {
-+	font-size: 90%;
-+	float: right;
-+}
-+
- /* Search results */
- .searchresults {
- }
-@@ -142,6 +149,12 @@
- 	margin-bottom: 1.2em;
- }
- 
-+.searchresults div.paragraph {
-+	margin-left: 0.4em;
-+	margin-top: 1em;
-+	margin-bottom: 1.2em;
-+}
-+
- div.searchresult {
- 	font-size: 95%;
- 	width:38em;
-@@ -508,6 +521,12 @@
- 	font-size: smaller;
- 	margin-bottom: 1em;
- }
-+
-+td.mw-allpages-nav, div.paragraph.mw-allpages-nav {
-+	text-align: right;
-+	font-size: smaller;
-+	margin-bottom: 1em;
-+}
- table.mw-allpages-table-form tr  {
- 	vertical-align: top;
- }
-diff -r 025d3c6531d8 -r 08636134487b skins/common/wikiprintable.css
---- skins/common/wikiprintable.css
-+++ skins/common/wikiprintable.css
-@@ -43,4 +43,6 @@
- h1.pagetitle { padding-bottom: 0; margin-bottom: 0; }
- i.link, u.link { color: #000066; }
- p.subtitle { padding-top: 0; margin-top: 0; }
-+
-+div.paragraph.subtitle { padding-top: 0; margin-top: 0; }
- */
-diff -r 025d3c6531d8 -r 08636134487b skins/common/wikistandard.css
---- skins/common/wikistandard.css
-+++ skins/common/wikistandard.css
-@@ -41,7 +41,11 @@
- h6 .editsection { font-size: 105.3%; }
- hr.sep { color:gray;height:1px;background-color:gray;}
- p.subpages { font-size:small;}
-+
-+div.paragraph.subpages { font-size:small;}
- p.subtitle { padding-top: 0; margin-top: 0;}
-+
-+div.paragraph.subtitle { padding-top: 0; margin-top: 0;}
- .catlinks { font-size:small; margin-top:0; text-align:right;}
- td { empty-cells:show; }
- td.bottom { border-top: 1px solid gray; }
-diff -r 025d3c6531d8 -r 08636134487b skins/modern/main.css
---- skins/modern/main.css
-+++ skins/modern/main.css
-@@ -281,6 +281,10 @@
- 	margin: 1em 0 1em 0;
- }
- 
-+div.paragraph {
-+	margin: 1em 0 1em 0;
-+}
-+
- hr {
- 	height: 1px;
- 	color: #aaa;
-@@ -470,6 +474,8 @@
- */
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
- 	float: left;
- 	clear: left;
-@@ -483,6 +489,8 @@
- */
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* thumbnails */
- div.thumb {
- 	margin-bottom: .5em;
-@@ -659,6 +667,11 @@
- 	padding: 0;
- }
- 
-+.previewnote div.paragraph {
-+	margin: 0;
-+	padding: 0;
-+}
-+
- .editExternally {
- 	border: 1px solid gray;
- 	background-color: #ffffff;
-@@ -719,6 +732,11 @@
- 	font-weight:bold;
- }
- 
-+div.paragraph.revision_saved {
-+	color: green;
-+	font-weight:bold;
-+}
-+
- /* noarticletext */
- div.noarticletext {
- 	border: 1px solid #ccc;
-@@ -889,6 +907,11 @@
- 	margin: 0 0 0 0;
- }
- 
-+.mw-topbox div.paragraph {
-+	padding: 0 0 0 0;
-+	margin: 0 0 0 0;
-+}
-+
- .mw-topbox {
-         color: black;
-         font-weight: bold;
-diff -r 025d3c6531d8 -r 08636134487b skins/modern/rtl.css
---- skins/modern/rtl.css
-+++ skins/modern/rtl.css
-@@ -87,6 +87,11 @@
- 	float: left;
- }
- 
-+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
-+p.mw-filedelete-editreasons, p.mw-delete-editreasons {
-+	float: left;
-+}
-+
- .toggle {
- 	margin-left: 0em;
- 	margin-right: 2em;
-@@ -156,6 +161,10 @@
- 	text-align: left;
- }
- 
-+td.mw-allpages-nav, div.paragraph.mw-allpages-nav, td.mw-allpages-alphaindexline {
-+	text-align: left;
-+}
-+
- /* Special:Prefixindex styling */
- td#mw-prefixindex-nav-form  {
- 	text-align: left;
-diff -r 025d3c6531d8 -r 08636134487b skins/monobook/main.css
---- skins/monobook/main.css
-+++ skins/monobook/main.css
-@@ -100,10 +100,19 @@
- 	margin: .4em 0 .5em 0;
- 	line-height: 1.5em;
- }
-+
-+div.paragraph {
-+	margin: .4em 0 .5em 0;
-+	line-height: 1.5em;
-+}
- p img {
- 	margin: 0;
- }
- 
-+div.paragraph img {
-+	margin: 0;
-+}
-+
- hr {
- 	height: 1px;
- 	color: #aaa;
-@@ -285,6 +294,11 @@
- 	padding: 0;
- }
- 
-+#siteNotice div.paragraph {
-+	margin: 0;
-+	padding: 0;
-+}
-+
- .catlinks {
- 	border: 1px solid #aaa;
- 	background-color: #f9f9f9;
-@@ -388,6 +402,8 @@
- */
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
- 	float: left;
- 	clear: left;
-@@ -401,6 +417,8 @@
- */
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* thumbnails */
- div.thumb {
- 	margin-bottom: .5em;
-@@ -1145,6 +1163,11 @@
- 	margin: 0.8em 0;
- }
- 
-+.previewnote div.paragraph {
-+	text-indent: 3em;
-+	margin: 0.8em 0;
-+}
-+
- .editExternally {
- 	border: 1px solid gray;
- 	background-color: #ffffff;
-@@ -1201,6 +1224,11 @@
- 	font-weight:bold;
- }
- 
-+div.paragraph.revision_saved {
-+	color: green;
-+	font-weight:bold;
-+}
-+
- /* noarticletext */
- div.noarticletext {
- 	border: 1px solid #ccc;
-@@ -1243,6 +1271,10 @@
- 	margin-top:0px;
- }
- 
-+#powersearch div.paragraph {
-+	margin-top:0px;
-+}
-+
- div.multipageimagenavbox {
-    border: solid 1px silver;
-    padding: 4px;
-diff -r 025d3c6531d8 -r 08636134487b skins/monobook/rtl.css
---- skins/monobook/rtl.css
-+++ skins/monobook/rtl.css
-@@ -219,6 +219,11 @@
- 	float: left;
- }
- 
-+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
-+p.mw-filedelete-editreasons, p.mw-delete-editreasons {
-+	float: left;
-+}
-+
- .toggle {
- 	margin-left: 0em;
- 	margin-right: 2em;
-@@ -232,6 +237,10 @@
- 	text-align: left;
- }
- 
-+td.mw-allpages-nav, div.paragraph.mw-allpages-nav, td.mw-allpages-alphaindexline {
-+	text-align: left;
-+}
-+
- /* Special:Prefixindex styling */
- td#mw-prefixindex-nav-form  {
- 	text-align: left;
-diff -r 025d3c6531d8 -r 08636134487b skins/simple/main.css
---- skins/simple/main.css
-+++ skins/simple/main.css
-@@ -84,8 +84,15 @@
-     margin: 0.4em 0em 0.5em 0em;
-     line-height: 1.5em;
- }
-+
-+div.paragraph {
-+    margin: 0.4em 0em 0.5em 0em;
-+    line-height: 1.5em;
-+}
- p img { margin: 0; }
- 
-+div.paragraph img { margin: 0; }
-+
- h1, h2, h3, h4, h5, h6 {
-     margin: 0;
-     padding-top: 0.5em;
-@@ -268,6 +275,8 @@
-     border-width: 0.5em 0 0.8em 1.4em;
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
-     float: left;
-     clear: left;
-@@ -276,6 +285,8 @@
-     border-width: 0.5em 1.4em 0.8em 0;
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* thumbnails */
- div.thumb {
-     margin-bottom: 0.5em;
-diff -r 025d3c6531d8 -r 08636134487b skins/simple/rtl.css
---- skins/simple/rtl.css
-+++ skins/simple/rtl.css
-@@ -156,6 +156,11 @@
- 	float: left;
- }
- 
-+div.paragraph.mw-ipb-conveniencelinks, p.mw-protect-editreasons,
-+p.mw-filedelete-editreasons, p.mw-delete-editreasons {
-+	float: left;
-+}
-+
- .toggle {
- 	margin-left: 0em;
- 	margin-right: 2em;
-@@ -183,3 +188,11 @@
- 	text-align: left;
- }
- 
-+td.mw-allpages-nav, div.paragraph.mw-allpages-nav, td.mw-allpages-alphaindexline {
-+	text-align: left;
-+
-+/* Special:Prefixindex styling */
-+td#mw-prefixindex-nav-form  {
-+	text-align: left;
-+}
-+
-diff -r 025d3c6531d8 -r 08636134487b skins/vector/main-ltr.css
---- skins/vector/main-ltr.css
-+++ skins/vector/main-ltr.css
-@@ -697,9 +697,18 @@
- 	margin: .4em 0 .5em 0;
- 	line-height: 1.5em;
- }
-+
-+div.paragraph {
-+	margin: .4em 0 .5em 0;
-+	line-height: 1.5em;
-+}
- 	p img {
- 		margin: 0;
- 	}
-+
-+	div.paragraph img {
-+		margin: 0;
-+	}
- abbr,
- acronym,
- .explain {
-@@ -842,6 +851,8 @@
- 	border: 0;
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
- 	float: left;
- 	clear: left;
-@@ -850,6 +861,8 @@
- 	border: 0;
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* Thumbnails */
- div.thumb {
- 	margin-bottom: .5em;
-@@ -931,6 +944,12 @@
- 		padding: 0;
- 		margin-bottom: 0.9em;
- 	}
-+
-+	#siteNotice div.paragraph {
-+		margin: 0;
-+		padding: 0;
-+		margin-bottom: 0.9em;
-+	}
- /* Categories */
- .catlinks {
- 	border: 1px solid #aaa;
-diff -r 025d3c6531d8 -r 08636134487b skins/vector/main-rtl.css
---- skins/vector/main-rtl.css
-+++ skins/vector/main-rtl.css
-@@ -697,9 +697,18 @@
- 	margin: .4em 0 .5em 0;
- 	line-height: 1.5em;
- }
-+
-+div.paragraph {
-+	margin: .4em 0 .5em 0;
-+	line-height: 1.5em;
-+}
- 	p img {
- 		margin: 0;
- 	}
-+
-+	div.paragraph img {
-+		margin: 0;
-+	}
- abbr,
- acronym,
- .explain {
-@@ -842,6 +851,8 @@
- 	border: 0;
- }
- div.floatright p { font-style: italic; }
-+
-+div.floatright div.paragraph { font-style: italic; }
- div.floatleft, table.floatleft {
- 	float: right;
- 	clear: right;
-@@ -850,6 +861,8 @@
- 	border: 0;
- }
- div.floatleft p { font-style: italic; }
-+
-+div.floatleft div.paragraph { font-style: italic; }
- /* Thumbnails */
- div.thumb {
- 	margin-bottom: .5em;
-@@ -931,6 +944,12 @@
- 		padding: 0;
- 		margin-bottom: 0.9em;
- 	}
-+
-+	#siteNotice div.paragraph {
-+		margin: 0;
-+		padding: 0;
-+		margin-bottom: 0.9em;
-+	}
- /* Categories */
- .catlinks {
- 	border: 1px solid #aaa;

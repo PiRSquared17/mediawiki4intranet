@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1317322263 -10800
+# Date 1327949101 -14400
 Bug 70192 - named section transclusion
 
-diff -r 45da8fc662c9 -r 333fbaa4d8f8 includes/parser/Parser.php
+diff -r 6b6371ec1416 -r 0a082e01a22c includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -3095,6 +3095,10 @@
+@@ -3260,6 +3260,10 @@
  		$cacheTitle = $title;
  		$titleText = $title->getPrefixedDBkey();
  
@@ -17,7 +17,7 @@ diff -r 45da8fc662c9 -r 333fbaa4d8f8 includes/parser/Parser.php
  		if ( isset( $this->mTplRedirCache[$titleText] ) ) {
  			list( $ns, $dbk ) = $this->mTplRedirCache[$titleText];
  			$title = Title::makeTitle( $ns, $dbk );
-@@ -3113,6 +3117,9 @@
+@@ -3278,6 +3282,9 @@
  		}
  
  		$dom = $this->preprocessToDom( $text, self::PTD_FOR_INCLUSION );
@@ -26,8 +26,8 @@ diff -r 45da8fc662c9 -r 333fbaa4d8f8 includes/parser/Parser.php
 +			$dom = $this->tryExtractNamedSection( $dom, $frag );
  		$this->mTplDomCache[ $titleText ] = $dom;
  
- 		if (! $title->equals($cacheTitle)) {
-@@ -3124,6 +3131,76 @@
+ 		if ( !$title->equals( $cacheTitle ) ) {
+@@ -3289,6 +3296,76 @@
  	}
  
  	/**
@@ -102,5 +102,5 @@ diff -r 45da8fc662c9 -r 333fbaa4d8f8 includes/parser/Parser.php
 +
 +	/**
  	 * Fetch the unparsed text of a template and register a reference to it.
- 	 */
- 	function fetchTemplateAndTitle( $title ) {
+ 	 * @param Title $title
+ 	 * @return Array ( string or false, Title )

@@ -34,7 +34,7 @@ $FILES_WIKIMEDIA = explode(' ',
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit');
+    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit Drafts');
 $EXT_OUR = array_map('trim', explode("\n",
     "AllNsSuggest
     AllowGetParamsInWikilinks
@@ -48,7 +48,6 @@ $EXT_OUR = array_map('trim', explode("\n",
     CustomToolbox
     Dia
     DocExport
-    Drafts
     EnotifDiff
     FavRate
     FlvHandler

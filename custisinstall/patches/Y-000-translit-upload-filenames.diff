@@ -1,103 +1,127 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297451064 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328118374 -14400
 Bug 48216 - Transliterate uploaded file names from Cyrillic to Latin
 
-diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/File.php
+diff -r 6b6371ec1416 -r 50908ecbb383 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -198,6 +198,12 @@
+ $wgUploadDirectory	= false;
+ 
+ /**
++ * Set this to true to enable russian transliteration of uploaded file names.
++ * May be useful for Windows installations.
++ */
++$wgTransliterateUploadFilenames = false;
++
++/**
+  * The URL path of the wiki logo. The logo size should be 135x135 pixels.
+  * Defaults to "{$wgStylePath}/common/images/wiki.png".
+  */
+diff -r 6b6371ec1416 -r 50908ecbb383 includes/GlobalFunctions.php
+--- includes/GlobalFunctions.php
++++ includes/GlobalFunctions.php
+@@ -3666,3 +3666,78 @@
+ 	}
+ 	return $result;
+ }
++
++// FIXME (4intra.net patched) Move into language ?
++function wfTransliterateRussian($s)
++{
++	$s = strtr($s, array(
++		'а' => 'a',
++		'б' => 'b',
++		'в' => 'v',
++		'г' => 'g',
++		'д' => 'd',
++		'е' => 'e',
++		'ё' => 'e',
++		'ж' => 'zh',
++		'з' => 'z',
++		'и' => 'i',
++		'й' => 'j',
++		'к' => 'k',
++		'л' => 'l',
++		'м' => 'm',
++		'н' => 'n',
++		'о' => 'o',
++		'п' => 'p',
++		'р' => 'r',
++		'с' => 's',
++		'т' => 't',
++		'у' => 'u',
++		'ф' => 'f',
++		'х' => 'h',
++		'ц' => 'ts',
++		'ч' => 'ch',
++		'ш' => 'sh',
++		'щ' => 'sch',
++		'ь' => '',
++		'ъ' => '',
++		'ы' => 'i',
++		'э' => 'e',
++		'ю' => 'yu',
++		'я' => 'ya',
++		'А' => 'A',
++		'Б' => 'B',
++		'В' => 'V',
++		'Г' => 'G',
++		'Д' => 'D',
++		'Е' => 'E',
++		'Ё' => 'E',
++		'Ж' => 'ZH',
++		'З' => 'Z',
++		'И' => 'I',
++		'Й' => 'J',
++		'К' => 'K',
++		'Л' => 'L',
++		'М' => 'M',
++		'Н' => 'N',
++		'О' => 'O',
++		'П' => 'P',
++		'Р' => 'R',
++		'С' => 'S',
++		'Т' => 'T',
++		'У' => 'U',
++		'Ф' => 'F',
++		'Х' => 'H',
++		'Ц' => 'TS',
++		'Ч' => 'CH',
++		'Ш' => 'SH',
++		'Щ' => 'SCH',
++		'Ь' => '',
++		'Ъ' => '',
++		'Ы' => 'I',
++		'Э' => 'E',
++		'Ю' => 'YU',
++		'Я' => 'YA',
++	));
++	$s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
++	return $s;
++}
+diff -r 6b6371ec1416 -r 50908ecbb383 includes/filerepo/File.php
 --- includes/filerepo/File.php
 +++ includes/filerepo/File.php
-@@ -19,6 +19,81 @@
+@@ -25,6 +25,7 @@
   *
   * @ingroup FileRepo
   */
 +
-+function wfTransliterate($s)
-+{
-+    $s = strtr($s, array(
-+        'а' => 'a',
-+        'б' => 'b',
-+        'в' => 'v',
-+        'г' => 'g',
-+        'д' => 'd',
-+        'е' => 'e',
-+        'ё' => 'e',
-+        'ж' => 'zh',
-+        'з' => 'z',
-+        'и' => 'i',
-+        'й' => 'j',
-+        'к' => 'k',
-+        'л' => 'l',
-+        'м' => 'm',
-+        'н' => 'n',
-+        'о' => 'o',
-+        'п' => 'p',
-+        'р' => 'r',
-+        'с' => 's',
-+        'т' => 't',
-+        'у' => 'u',
-+        'ф' => 'f',
-+        'х' => 'h',
-+        'ц' => 'ts',
-+        'ч' => 'ch',
-+        'ш' => 'sh',
-+        'щ' => 'sch',
-+        'ь' => '',
-+        'ъ' => '',
-+        'ы' => 'i',
-+        'э' => 'e',
-+        'ю' => 'yu',
-+        'я' => 'ya',
-+        'А' => 'A',
-+        'Б' => 'B',
-+        'В' => 'V',
-+        'Г' => 'G',
-+        'Д' => 'D',
-+        'Е' => 'E',
-+        'Ё' => 'E',
-+        'Ж' => 'ZH',
-+        'З' => 'Z',
-+        'И' => 'I',
-+        'Й' => 'J',
-+        'К' => 'K',
-+        'Л' => 'L',
-+        'М' => 'M',
-+        'Н' => 'N',
-+        'О' => 'O',
-+        'П' => 'P',
-+        'Р' => 'R',
-+        'С' => 'S',
-+        'Т' => 'T',
-+        'У' => 'U',
-+        'Ф' => 'F',
-+        'Х' => 'H',
-+        'Ц' => 'TS',
-+        'Ч' => 'CH',
-+        'Ш' => 'SH',
-+        'Щ' => 'SCH',
-+        'Ь' => '',
-+        'Ъ' => '',
-+        'Ы' => 'I',
-+        'Э' => 'E',
-+        'Ю' => 'YU',
-+        'Я' => 'YA',
-+    ));
-+    $s = preg_replace('/[^a-z_\d\.\-]+/is', '_', $s);
-+    return $s;
-+}
-+
  abstract class File {
  	const DELETED_FILE = 1;
  	const DELETED_COMMENT = 2;
-@@ -465,7 +540,7 @@
- 		}
- 		$extension = $this->getExtension();
- 		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType() );
--		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getName();
-+		$thumbName = $this->handler->makeParamString( $params ) . '-' . $this->getPhys();
- 		if ( $thumbExt != $extension ) {
- 			$thumbName .= ".$thumbExt";
- 		}
-@@ -733,17 +808,33 @@
+@@ -601,7 +602,7 @@
+ 	 * @return string
+ 	 */
+ 	function thumbName( $params ) {
+-		return $this->generateThumbName( $this->getName(), $params );
++		return $this->generateThumbName( $this->getPhys(), $params );
+ 	}
+ 
+ 	/**
+@@ -872,12 +873,28 @@
  	}
  
  	/**
@@ -106,18 +130,20 @@ diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/File.php
 +	function getPhys() {
 +		global $wgTransliterateUploadFilenames;
 +		$name = $this->getName();
-+		if ($wgTransliterateUploadFilenames)
-+		{
-+			if (preg_match('/^(.*)\.(.*?)$/is', $name, $m))
-+				$name = wfTransliterate($m[1]).'.'.$m[2];
-+			else
-+				$name = wfTransliterate($name);
++		if ( $wgTransliterateUploadFilenames ) {
++			if ( preg_match( '/^(.*)\.(.*?)$/is', $name, $m ) ) {
++				$name = wfTransliterateRussian( $m[1] ) . '.' . $m[2];
++			} else {
++				$name = wfTransliterateRussian( $name );
++			}
 +		}
 +		return $name;
 +	}
 +
 +	/**
  	 * Get the path of the file relative to the public zone root
+ 	 *
+ 	 * @return string
  	 */
  	function getRel() {
 -		return $this->getHashPath() . $this->getName();
@@ -125,27 +151,28 @@ diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/File.php
  	}
  
  	/**
- 	 * Get urlencoded relative path of the file
+@@ -886,7 +903,7 @@
+ 	 * @return string
  	 */
  	function getUrlRel() {
 -		return $this->getHashPath() . rawurlencode( $this->getName() );
 +		return $this->getHashPath() . rawurlencode( $this->getPhys() );
  	}
  
- 	/** Get the relative path for an archive file */
-diff -r b11befdd7427 -r 38ead8d644cd includes/filerepo/LocalFile.php
+ 	/**
+diff -r 6b6371ec1416 -r 50908ecbb383 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
-@@ -963,7 +963,7 @@
- 	function publish( $srcPath, $flags = 0 ) {
+@@ -1137,7 +1137,7 @@
+ 	function publishTo( $srcPath, $dstRel, $flags = 0 ) {
  		$this->lock();
- 		$dstRel = $this->getRel();
--		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getName();
-+		$archiveName = gmdate( 'YmdHis' ) . '!'. $this->getPhys();
+ 
+-		$archiveName = wfTimestamp( TS_MW ) . '!'. $this->getName();
++		$archiveName = wfTimestamp( TS_MW ) . '!'. $this->getPhys();
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-@@ -1792,8 +1792,9 @@
+@@ -2077,8 +2077,9 @@
  		$this->file = $file;
  		$this->target = $target;
  		$this->oldHash = $this->file->repo->getHashPath( $this->file->getName() );

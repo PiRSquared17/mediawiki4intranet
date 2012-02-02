@@ -1,13 +1,13 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297176064 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949498 -14400
 Bug 73311 - Rearrange edit form contents, remove copyright warnings
 Bug 75186 - Move subpages by default
 
-diff -r b11befdd7427 -r 396d0d0bdf1b includes/EditPage.php
+diff -r 6b6371ec1416 -r ec169d37add8 includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
-@@ -1304,6 +1304,12 @@
+@@ -1513,6 +1513,12 @@
  		$this->showTosSummary();
  		$this->showEditTools();
  
@@ -20,21 +20,21 @@ diff -r b11befdd7427 -r 396d0d0bdf1b includes/EditPage.php
  		$wgOut->addHTML( <<<HTML
  {$this->editFormTextAfterTools}
  <div class='templatesUsed'>
-@@ -1315,11 +1321,6 @@
+@@ -1524,11 +1530,6 @@
  HTML
  );
  
 -		if ( $this->isConflict )
 -			$this->showConflict();
--		
+-
 -		$wgOut->addHTML( $this->editFormTextBottom );
 -		$wgOut->addHTML( "</form>\n" );
  		if ( !$wgUser->getOption( 'previewontop' ) ) {
  			$this->displayPreviewArea( $previewOutput, false );
  		}
-@@ -1721,7 +1722,9 @@
+@@ -1943,7 +1944,9 @@
  	}
- 	
+ 
  	protected function getCopywarn() {
 -		global $wgRightsText;
 +		global $wgRightsText, $wgNoCopyrightWarnings;
@@ -43,13 +43,13 @@ diff -r b11befdd7427 -r 396d0d0bdf1b includes/EditPage.php
  		if ( $wgRightsText ) {
  			$copywarnMsg = array( 'copyrightwarning',
  				'[[' . wfMsgForContent( 'copyrightpage' ) . ']]',
-diff -r b11befdd7427 -r 396d0d0bdf1b includes/specials/SpecialMovepage.php
+diff -r 6b6371ec1416 -r ec169d37add8 includes/specials/SpecialMovepage.php
 --- includes/specials/SpecialMovepage.php
 +++ includes/specials/SpecialMovepage.php
-@@ -77,7 +77,7 @@
- 			$this->fixRedirects = $wgRequest->getBool( 'wpFixRedirects', true );
- 			$this->leaveRedirect = $wgRequest->getBool( 'wpLeaveRedirect', true );
- 		}
+@@ -86,7 +86,7 @@
+ 		$this->moveTalk = $wgRequest->getBool( 'wpMovetalk', $def );
+ 		$this->fixRedirects = $wgRequest->getBool( 'wpFixRedirects', $def );
+ 		$this->leaveRedirect = $wgRequest->getBool( 'wpLeaveRedirect', $def );
 -		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', false );
 +		$this->moveSubpages = $wgRequest->getBool( 'wpMovesubpages', true );
  		$this->deleteAndMove = $wgRequest->getBool( 'wpDeleteAndMove' ) && $wgRequest->getBool( 'wpConfirm' );
