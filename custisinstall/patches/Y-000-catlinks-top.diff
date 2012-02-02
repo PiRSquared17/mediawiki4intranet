@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1325002992 -10800
+# Date 1328119401 -14400
 Bug 88274 - Category links on top
 
-diff -r 025d3c6531d8 -r 904c39bdc5cb skins/MonoBook.php
+diff -r 6b6371ec1416 -r 141c4a8ea115 skins/MonoBook.php
 --- skins/MonoBook.php
 +++ skins/MonoBook.php
 @@ -5,6 +5,12 @@
@@ -19,16 +19,15 @@ diff -r 025d3c6531d8 -r 904c39bdc5cb skins/MonoBook.php
   * @todo document
   * @file
   * @ingroup Skins
-@@ -60,7 +66,7 @@
+@@ -64,6 +70,7 @@
  	 * @access private
  	 */
  	function execute() {
--		global $wgRequest;
-+		global $wgRequest, $wgCatlinksTop;
++		global $wgCatlinksTop;
+ 		$this->skin = $this->data['skin'];
  
- 		$this->skin = $skin = $this->data['skin'];
- 		$action = $wgRequest->getText( 'action' );
-@@ -86,8 +92,9 @@
+ 		// Suppress warnings to prevent notices about missing indexes in $this->data
+@@ -87,8 +94,9 @@
  		<div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div>
  <?php } ?>
  		<!-- start content -->
@@ -39,19 +38,18 @@ diff -r 025d3c6531d8 -r 904c39bdc5cb skins/MonoBook.php
  		<!-- end content -->
  		<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
  		<div class="visualClear"></div>
-diff -r 025d3c6531d8 -r 904c39bdc5cb skins/Vector.php
+diff -r 6b6371ec1416 -r 141c4a8ea115 skins/Vector.php
 --- skins/Vector.php
 +++ skins/Vector.php
-@@ -353,7 +353,7 @@
- 	 * Outputs the entire contents of the XHTML page
+@@ -74,6 +74,7 @@
  	 */
  	public function execute() {
--		global $wgRequest, $wgOut, $wgContLang;
-+		global $wgRequest, $wgOut, $wgContLang, $wgCatlinksTop;
+ 		global $wgLang, $wgVectorUseIconWatch;
++		global $wgCatlinksTop;
  
  		$this->skin = $this->data['skin'];
- 		$action = $wgRequest->getText( 'action' );
-@@ -488,10 +488,15 @@
+ 
+@@ -174,6 +175,11 @@
  				</div>
  				<!-- /jumpto -->
  				<?php endif; ?>
@@ -60,20 +58,15 @@ diff -r 025d3c6531d8 -r 904c39bdc5cb skins/Vector.php
 +				<div id="catlinks-top"><?php $this->html( 'catlinks' ); ?></div>
 +				<!-- /catlinks-top -->
 +				<?php endif; ?>
- 				<!-- bodytext -->
- 				<?php $this->html( 'bodytext' ) ?>
- 				<!-- /bodytext -->
--				<?php if ( $this->data['catlinks'] ): ?>
-+				<?php if ( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ): ?>
- 				<!-- catlinks -->
- 				<?php $this->html( 'catlinks' ); ?>
- 				<!-- /catlinks -->
-diff -r 025d3c6531d8 -r 904c39bdc5cb skins/monobook/main.css
+ 				<!-- bodycontent -->
+ 				<?php $this->html( 'bodycontent' ) ?>
+ 				<!-- /bodycontent -->
+diff -r 6b6371ec1416 -r 141c4a8ea115 skins/monobook/main.css
 --- skins/monobook/main.css
 +++ skins/monobook/main.css
-@@ -1306,3 +1306,9 @@
- .no-text-transform {
- 	text-transform: none;
+@@ -1249,3 +1249,9 @@
+ .tipsy {
+ 	font-size: 127%;
  }
 +
 +/* Categories above the content */
@@ -81,27 +74,16 @@ diff -r 025d3c6531d8 -r 904c39bdc5cb skins/monobook/main.css
 +	float: left;
 +	margin: 0;
 +}
-diff -r 025d3c6531d8 -r 904c39bdc5cb skins/vector/main-ltr.css
---- skins/vector/main-ltr.css
-+++ skins/vector/main-ltr.css
-@@ -1126,3 +1126,8 @@
- 	background-position:right bottom;
- 	background-repeat:no-repeat;
+diff -r 6b6371ec1416 -r 141c4a8ea115 skins/vector/screen.css
+--- skins/vector/screen.css
++++ skins/vector/screen.css
+@@ -1217,3 +1217,9 @@
+ .tipsy {
+ 	font-size: 0.8em;
  }
++
 +/* Categories above the content */
 +#catlinks-top div {
 +	float: left;
-+	margin: 0;
-+}
-diff -r 025d3c6531d8 -r 904c39bdc5cb skins/vector/main-rtl.css
---- skins/vector/main-rtl.css
-+++ skins/vector/main-rtl.css
-@@ -1126,3 +1126,8 @@
- 	background-position:left bottom;
- 	background-repeat:no-repeat;
- }
-+/* Categories above the content */
-+#catlinks-top div {
-+	float: right;
 +	margin: 0;
 +}

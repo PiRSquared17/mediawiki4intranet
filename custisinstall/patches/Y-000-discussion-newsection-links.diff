@@ -1,25 +1,24 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1318856800 -10800
+# Date 1327950503 -14400
 Add new section by default when editing a discussion page.
 
-diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/Linker.php
+diff -r 6b6371ec1416 -r f17cc3504a37 includes/Linker.php
 --- includes/Linker.php
 +++ includes/Linker.php
-@@ -232,13 +232,25 @@
+@@ -245,13 +245,24 @@
  			$target->mFragment = '';
  		}
  
 -		# If it's a broken link, add the appropriate query pieces, unless
 -		# there's already an action specified, or unless 'edit' makes no sense
 -		# (i.e., for a nonexistent special page).
--		if( in_array( 'broken', $options ) and empty( $query['action'] )
--		and $target->getNamespace() != NS_SPECIAL ) {
+-		if ( in_array( 'broken', $options ) && empty( $query['action'] )
+-			&& $target->getNamespace() != NS_SPECIAL ) {
 -			$query['action'] = 'edit';
 -			$query['redlink'] = '1';
 +		// TODO remove hardcoded NS_BLOG, move Wikilog talk pages to a separate extension
-+		if ( !defined('NS_BLOG') || MWNamespace::getSubject( $target->getNamespace() ) != NS_BLOG )
-+		{
++		if ( !defined('NS_BLOG') || MWNamespace::getSubject( $target->getNamespace() ) != NS_BLOG ) {
 +			# If it's a broken link, add the appropriate query pieces, unless
 +			# there's already an action specified, or unless 'edit' makes no sense
 +			# (i.e., for a nonexistent special page).
@@ -39,10 +38,10 @@ diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/Linker.php
  		}
  		$ret = $target->getLinkUrl( $query );
  		wfProfileOut( __METHOD__ );
-diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/SkinTemplate.php
+diff -r 6b6371ec1416 -r f17cc3504a37 includes/SkinTemplate.php
 --- includes/SkinTemplate.php
 +++ includes/SkinTemplate.php
-@@ -655,6 +655,8 @@
+@@ -739,6 +739,8 @@
  		if( $checkEdit && !$title->isKnown() ) {
  			$classes[] = 'new';
  			$query = 'action=edit&redlink=1';
@@ -50,11 +49,11 @@ diff -r 45da8fc662c9 -r 6c8b1ae6e55a includes/SkinTemplate.php
 +				$query .= '&section=new';
  		}
  
- 		$text = wfMsg( $message );
-diff -r 45da8fc662c9 -r 6c8b1ae6e55a maintenance/parserTests.txt
---- maintenance/parserTests.txt
-+++ maintenance/parserTests.txt
-@@ -1404,7 +1404,7 @@
+ 		// wfMessageFallback will nicely accept $message as an array of fallbacks
+diff -r 6b6371ec1416 -r f17cc3504a37 tests/parser/parserTests.txt
+--- tests/parser/parserTests.txt
++++ tests/parser/parserTests.txt
+@@ -1552,7 +1552,7 @@
  !! input
  [[Talk:Parser testing]], [[Meta:Disclaimers]]
  !! result

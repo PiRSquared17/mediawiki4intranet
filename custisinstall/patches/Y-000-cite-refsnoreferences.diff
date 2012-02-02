@@ -1,35 +1,40 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1301327463 -14400
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949556 -14400
 Bug 77150 - Check refsNoReferences only when clearState == true
 
-diff -r 9cc4b1960d33 -r b01d663c050e extensions/Cite/Cite_body.php
+diff -r 6b6371ec1416 -r ac5283c41c2d extensions/Cite/Cite_body.php
 --- extensions/Cite/Cite_body.php
 +++ extensions/Cite/Cite_body.php
-@@ -878,8 +878,8 @@
- 	 * Called at the end of page processing to append an error if refs were 
- 	 * used without a references tag.
+@@ -1051,12 +1051,12 @@
+ 	 *
+ 	 * @return bool
  	 */
--	function checkRefsNoReferences(&$parser, &$text){
--		if ( $parser->getOptions()->getIsSectionPreview() ) return true;
-+	function checkRefsNoReferences(&$parser, &$text, $clearState){
-+		if ( $parser->getOptions()->getIsSectionPreview() || !$clearState ) return true;
+-	function checkRefsNoReferences( &$parser, &$text ) {
++	function checkRefsNoReferences( &$parser, &$text, $clearState ) {
+ 		if ( $parser->extCite !== $this ) {
+-			return $parser->extCite->checkRefsNoReferences( $parser, $text );
++			return $parser->extCite->checkRefsNoReferences( $parser, $text, $clearState );
+ 		}
+ 		
+-		if ( $parser->getOptions()->getIsSectionPreview() ) {
++		if ( $parser->getOptions()->getIsSectionPreview() || !$clearState ) {
+ 			return true;
+ 		}
  
- 		foreach ( $this->mRefs as $group => $refs ) {
- 			if ( count( $refs ) == 0 ) continue;
-diff -r 9cc4b1960d33 -r b01d663c050e includes/parser/Parser.php
+diff -r 6b6371ec1416 -r ac5283c41c2d includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -394,7 +394,7 @@
+@@ -397,7 +397,7 @@
  
  		$text = $this->mStripState->unstripNoWiki( $text );
  
 -		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text ) );
 +		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text, $clearState ) );
  
- //!JF Move to its own function
- 
-@@ -452,7 +452,7 @@
+ 		$text = $this->replaceTransparentTags( $text );
+ 		$text = $this->mStripState->unstripGeneral( $text );
+@@ -438,7 +438,7 @@
  			$this->limitationWarn( 'expensive-parserfunction', $this->mExpensiveFunctionCount, $wgExpensiveParserFunctionLimit );
  		}
  

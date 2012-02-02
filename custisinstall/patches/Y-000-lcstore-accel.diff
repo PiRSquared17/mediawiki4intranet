@@ -1,46 +1,39 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1320668400 -10800
+# Date 1328118333 -14400
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 025d3c6531d8 -r 8d1f6616b0f7 includes/AutoLoader.php
+diff -r 6b6371ec1416 -r d2af694de5d9 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
-@@ -135,6 +135,7 @@
+@@ -128,6 +128,7 @@
+ 	'IndexPager' => 'includes/Pager.php',
+ 	'Interwiki' => 'includes/interwiki/Interwiki.php',
  	'IP' => 'includes/IP.php',
- 	'Job' => 'includes/JobQueue.php',
- 	'JSMin' => 'includes/JSMin.php',
 +	'LCStore_Accel' => 'includes/LocalisationCache.php',
- 	'LCStore_DB' => 'includes/LocalisationCache.php',
  	'LCStore_CDB' => 'includes/LocalisationCache.php',
+ 	'LCStore_DB' => 'includes/LocalisationCache.php',
  	'LCStore_Null' => 'includes/LocalisationCache.php',
-diff -r 025d3c6531d8 -r 8d1f6616b0f7 includes/LocalisationCache.php
+diff -r 6b6371ec1416 -r d2af694de5d9 includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
-@@ -2,6 +2,8 @@
- 
- define( 'MW_LC_VERSION', 1 );
- 
-+require_once 'ObjectCache.php';
-+
- /**
-  * Class for caching the contents of localisation files, Messages*.php
-  * and *.i18n.php.
-@@ -155,8 +157,12 @@
+@@ -154,8 +154,14 @@
  				case 'db':
  					$storeClass = 'LCStore_DB';
  					break;
 +				case 'accel':
  				case 'detect':
 -					$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
-+					if ( !( wfGetCache( CACHE_ACCEL ) instanceof FakeMemCachedClient ) )
++					try {
++						wfGetCache( CACHE_ACCEL );
 +						$storeClass = 'LCStore_Accel';
-+					else
++					} catch( MWException $e ) {
 +						$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
++					}
  					break;
  				default:
- 					throw new MWException( 
-@@ -319,7 +325,10 @@
+ 					throw new MWException(
+@@ -316,7 +322,10 @@
  		}
  
  		$deps = $this->store->get( $code, 'deps' );
@@ -52,7 +45,7 @@ diff -r 025d3c6531d8 -r 8d1f6616b0f7 includes/LocalisationCache.php
  			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
  			return true;
  		}
-@@ -744,6 +753,54 @@
+@@ -747,6 +756,54 @@
  }
  
  /**
@@ -104,6 +97,6 @@ diff -r 025d3c6531d8 -r 8d1f6616b0f7 includes/LocalisationCache.php
 +}
 +
 +/**
-  * LCStore implementation which uses the standard DB functions to store data. 
+  * LCStore implementation which uses the standard DB functions to store data.
   * This will work on any MediaWiki installation.
   */

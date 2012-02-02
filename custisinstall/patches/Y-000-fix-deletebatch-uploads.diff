@@ -1,15 +1,15 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1308146188 -14400
+# Date 1327949335 -14400
 Bug 79994 - Fix DeleteBatch bug: it does not delete uploads
 
-diff -r 45da8fc662c9 -r 1732c61b0857 extensions/DeleteBatch/DeleteBatch.body.php
+diff -r 6b6371ec1416 -r 6f4bc4849c50 extensions/DeleteBatch/DeleteBatch.body.php
 --- extensions/DeleteBatch/DeleteBatch.body.php
 +++ extensions/DeleteBatch/DeleteBatch.body.php
-@@ -290,14 +290,15 @@
- 			/*this is absolutely required - creating a new ImagePage object does not automatically
- 			provide it with image  */
- 			$art->img = new Image( $art->mTitle );
+@@ -310,14 +310,15 @@
+ 		/* this stuff goes like articleFromTitle in Wiki.php */
+ 		if ( $page->getNamespace() == NS_FILE ) {
+ 			$art = new ImagePage( $page );
 +			$art->delete();
  		} else {
  			$art = new Article( $page );

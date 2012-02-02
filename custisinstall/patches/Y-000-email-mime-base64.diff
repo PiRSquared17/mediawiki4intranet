@@ -1,70 +1,62 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1301664275 -14400
+# Date 1327949018 -14400
 Bug 78064 - Use MIME-Base64 encoding for mail headers instead of MIME-QuotedPrintable
 
-diff -r 9cc4b1960d33 -r e3195f721865 includes/GlobalFunctions.php
---- includes/GlobalFunctions.php
-+++ includes/GlobalFunctions.php
-@@ -1273,6 +1273,27 @@
- 	return $out;
- }
- 
-+// Uses iconv php extension, calls wfQuotedPrintable if it's unavailable
-+function wfMimeBase64( $string, $charset = '' )
-+{
-+	if( empty( $charset ) )
-+	{
-+		global $wgInputEncoding;
-+		$charset = $wgInputEncoding;
-+	}
-+	if ( !function_exists( 'iconv_mime_encode' ) )
-+	{
-+		// Do not split and recode the string when iconv is unavailable
-+		return '=?'.$charset.'?B?'.base64_encode( $string ).'?=';
-+	}
-+	return substr( iconv_mime_encode( '', $string, array(
-+		'input-charset' => $charset,
-+		'output-charset' => 'utf-8',
-+		'line-length' => 76,
-+		'line-break-chars' => "\n",
-+		'scheme' => 'B'
-+	) ), 2 );
-+}
- 
- /**
-  * @todo document
-diff -r 9cc4b1960d33 -r e3195f721865 includes/UserMailer.php
+diff -r 6b6371ec1416 -r fcf433d92b28 includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
-@@ -55,7 +55,7 @@
- 		if( $this->name != '' && !wfIsWindows() ) {
- 			global $wgEnotifUseRealName;
- 			$name = ( $wgEnotifUseRealName && $this->realName ) ? $this->realName : $this->name;
--			$quoted = wfQuotedPrintable( $name );
-+			$quoted = wfMimeBase64( $name );
- 			if( strpos( $quoted, '.' ) !== false || strpos( $quoted, ',' ) !== false ) {
- 				$quoted = '"' . $quoted . '"';
- 			}
-@@ -141,7 +141,7 @@
+@@ -59,7 +59,7 @@
+ 			if ( $this->name != '' && !wfIsWindows() ) {
+ 				global $wgEnotifUseRealName;
+ 				$name = ( $wgEnotifUseRealName && $this->realName ) ? $this->realName : $this->name;
+-				$quoted = UserMailer::quotedPrintable( $name );
++				$quoted = UserMailer::mimeBase64( $name );
+ 				if ( strpos( $quoted, '.' ) !== false || strpos( $quoted, ',' ) !== false ) {
+ 					$quoted = '"' . $quoted . '"';
+ 				}
+@@ -165,7 +165,7 @@
  			if ( $replyto ) {
  				$headers['Reply-To'] = $replyto->toString();
  			}
--			$headers['Subject'] = wfQuotedPrintable( $subject );
-+			$headers['Subject'] = wfMimeBase64( $subject );
+-			$headers['Subject'] = self::quotedPrintable( $subject );
++			$headers['Subject'] = self::mimeBase64( $subject );
  			$headers['Date'] = date( 'r' );
  			$headers['MIME-Version'] = '1.0';
- 			$headers['Content-type'] = (is_null($contentType) ?
-@@ -198,10 +198,10 @@
- 			if (function_exists('mail')) {
- 				if (is_array($to)) {
- 					foreach ($to as $recip) {
--						$sent = mail( $recip->toString(), wfQuotedPrintable( $subject ), $body, $headers );
-+						$sent = mail( $recip->toString(), wfMimeBase64( $subject ), $body, $headers );
- 					}
- 				} else {
--					$sent = mail( $to->toString(), wfQuotedPrintable( $subject ), $body, $headers );
-+					$sent = mail( $to->toString(), wfMimeBase64( $subject ), $body, $headers );
- 				}
- 			} else {
- 				$wgErrorString = 'PHP is not configured to send mail';
+ 			$headers['Content-type'] = ( is_null( $contentType ) ?
+@@ -230,7 +230,7 @@
+ 				$to = array( $to );
+ 			}
+ 			foreach ( $to as $recip ) {
+-				$sent = mail( $recip->toString(), self::quotedPrintable( $subject ), $body, $headers, $wgAdditionalMailParams );
++				$sent = mail( $recip->toString(), self::mimeBase64( $subject ), $body, $headers, $wgAdditionalMailParams );
+ 			}
+ 
+ 			restore_error_handler();
+@@ -270,6 +270,26 @@
+ 	}
+ 
+ 	/**
++	 * Converts a string into MIME-Base64 header encoding.
++	 */
++	public static function mimeBase64( $string, $charset = '' ) {
++		if( empty( $charset ) ) {
++			$charset = 'UTF-8';
++		}
++		if ( !function_exists( 'iconv_mime_encode' ) ) {
++			// Do not split and recode the string when iconv is unavailable
++			return '=?'.$charset.'?B?'.base64_encode( $string ).'?=';
++		}
++		return substr( iconv_mime_encode( '', $string, array(
++			'input-charset' => $charset,
++			'output-charset' => 'utf-8',
++			'line-length' => 76,
++			'line-break-chars' => "\n",
++			'scheme' => 'B'
++		) ), 2 );
++	}
++
++	/**
+ 	 * Converts a string into quoted-printable format
+ 	 * @since 1.17
+ 	 */

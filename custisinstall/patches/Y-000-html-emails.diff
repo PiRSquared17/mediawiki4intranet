@@ -1,44 +1,61 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297262226 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949183 -14400
 HTML email support, needed for Bug 25475 (diffs in enotify emails)
 
-diff -r b11befdd7427 -r 0f2a4d0811de includes/UserMailer.php
+diff -r 6b6371ec1416 -r 88f6b6c0bcd8 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -1019,6 +1019,11 @@
+ $wgEnableUserEmail = true;
+ 
+ /**
++ * Default content-type for e-mail. Set to text/html for HTML e-mail.
++ */
++$wgEmailContentType = 'text/plain';
++
++/**
+  * Set to true to put the sending user's email in a Reply-To header
+  * instead of From. ($wgEmergencyContact will be used as From.)
+  *
+diff -r 6b6371ec1416 -r 88f6b6c0bcd8 includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
-@@ -106,8 +106,10 @@
- 	 * @return mixed True on success, a WikiError object on failure.
+@@ -115,15 +115,19 @@
+ 	 * @param $subject String: email's subject.
+ 	 * @param $body String: email's text.
+ 	 * @param $replyto MailAddress: optional reply-to email (default: null).
+-	 * @param $contentType String: optional custom Content-Type (default: text/plain; charset=UTF-8)
++	 * @param $contentType String: optional custom Content-Type (default: $wgEmailContentType; charset=UTF-8)
+ 	 * @return Status object
  	 */
- 	static function send( $to, $from, $subject, $body, $replyto=null, $contentType=null ) {
--		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal;
-+		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal, $wgEmailContentType;
- 		global $wgEnotifMaxRecips;
-+		if (!$wgEmailContentType)
-+			$wgEmailContentType = 'text/plain';
+-	public static function send( $to, $from, $subject, $body, $replyto = null, $contentType = 'text/plain; charset=UTF-8') {
++	public static function send( $to, $from, $subject, $body, $replyto = null, $contentType = null) {
+ 		global $wgSMTP, $wgEnotifMaxRecips, $wgAdditionalMailParams;
++		global $wgEmailContentType;
  
- 		if ( is_array( $to ) ) {
- 			wfDebug( __METHOD__.': sending mail to ' . implode( ',', $to ) . "\n" );
-@@ -145,7 +147,7 @@
+ 		if ( !is_array( $to ) ) {
+ 			$to = array( $to );
+ 		}
++		if ( is_null( $contentType ) ) {
++			$contentType = $wgEmailContentType.'; charset=UTF-8';
++		}
+ 
+ 		wfDebug( __METHOD__ . ': sending mail to ' . implode( ', ', $to ) . "\n" );
+ 
+@@ -168,8 +172,7 @@
+ 			$headers['Subject'] = self::quotedPrintable( $subject );
  			$headers['Date'] = date( 'r' );
  			$headers['MIME-Version'] = '1.0';
- 			$headers['Content-type'] = (is_null($contentType) ?
--					'text/plain; charset='.$wgOutputEncoding : $contentType);
-+					$wgEmailContentType.'; charset='.$wgOutputEncoding : $contentType);
+-			$headers['Content-type'] = ( is_null( $contentType ) ?
+-				'text/plain; charset=UTF-8' : $contentType );
++			$headers['Content-type'] = $contentType;
  			$headers['Content-transfer-encoding'] = '8bit';
- 			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>'; // FIXME
- 			$headers['X-Mailer'] = 'MediaWiki mailer';
-@@ -177,7 +179,7 @@
- 				$endl = "\n";
- 			}
- 			$ctype = (is_null($contentType) ? 
--					'text/plain; charset='.$wgOutputEncoding : $contentType);
-+					$wgEmailContentType . '; charset='.$wgOutputEncoding : $contentType);
- 			$headers =
- 				"MIME-Version: 1.0$endl" .
- 				"Content-type: $ctype$endl" .
-@@ -291,14 +293,17 @@
+ 			// @todo FIXME
+ 			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>';
+@@ -347,14 +350,17 @@
  		$watchers = array();
- 		if ($wgEnotifWatchlist || $wgShowUpdatedMarker) {
+ 		if ( $wgEnotifWatchlist || $wgShowUpdatedMarker ) {
  			$dbw = wfGetDB( DB_MASTER );
 -			$res = $dbw->select( array( 'watchlist' ),
 +			$userCondition = array(
@@ -59,28 +76,31 @@ diff -r b11befdd7427 -r 0f2a4d0811de includes/UserMailer.php
 -				), __METHOD__
 +				$userCondition, __METHOD__
  			);
- 			while ($row = $dbw->fetchObject( $res ) ) {
+ 			foreach ( $res as $row ) {
  				$watchers[] = intval( $row->wl_user );
-@@ -469,11 +474,13 @@
- 		$pagetitle = $this->title->getPrefixedText();
- 		$keys['$PAGETITLE']          = $pagetitle;
- 		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
-+		$keys['$PAGETITLE_URL_NOENC']= urldecode($this->title->getFullUrl());
+@@ -507,6 +513,7 @@
  
- 		$keys['$PAGEMINOREDIT']      = $medit;
- 		$keys['$PAGESUMMARY']        = $summary;
- 		$keys['$UNWATCHURL']         = $this->title->getFullUrl( 'action=unwatch' );
+ 		$keys['$PAGETITLE'] = $this->title->getPrefixedText();
+ 		$keys['$PAGETITLE_URL'] = $this->title->getCanonicalUrl();
++		$keys['$PAGETITLE_URL_NOENC'] = urldecode( $this->title->getCanonicalUrl() );
+ 		$keys['$PAGEMINOREDIT'] = $this->minorEdit ? wfMsgForContent( 'minoredit' ) : '';
+ 		$keys['$PAGESUMMARY'] = $this->summary == '' ? ' - ' : $this->summary;
+ 		$keys['$UNWATCHURL'] = $this->title->getCanonicalUrl( 'action=unwatch' );
+@@ -529,6 +536,8 @@
+ 		$subject = strtr( $subject, $keys );
+ 		$this->subject = MessageCache::singleton()->transform( $subject, false, null, $this->title );
  
 +		wfRunHooks('EnotifComposeCommonMailtext', array(&$this, &$keys));
- 		$subject = strtr( $subject, $keys );
- 
- 		# Reveal the page editor's address as REPLY-TO address only if
-@@ -583,6 +590,8 @@
- 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
- 			$body);
- 
-+		wfRunHooks('EnotifPersonalizeMailtext', array(&$this, &$watchingUser, &$body));
 +
- 		return UserMailer::send($to, $this->from, $this->subject, $body, $this->replyto);
+ 		$body = wfMsgExt( 'enotif_body', 'content' );
+ 		$body = strtr( $body, $keys );
+ 		$body = MessageCache::singleton()->transform( $body, false, null, $this->title );
+@@ -616,6 +625,8 @@
+ 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
+ 			$body );
+ 
++		wfRunHooks( 'EnotifPersonalizeMailtext', array( &$this, &$watchingUser, &$body ) );
++
+ 		return UserMailer::send( $to, $this->from, $this->subject, $body, $this->replyto );
  	}
  

@@ -1,31 +1,32 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1321012389 -10800
+# Date 1328105765 -14400
 Bug 53818 - Allow optional shifting of included template/article heading levels
 Bug 75714 - Remove \n\n before special page inclusion
 
-diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Parser.php
+diff -r 6b6371ec1416 -r ce6c7b69cae7 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -2780,6 +2780,7 @@
+@@ -2924,6 +2924,7 @@
  	 *  $piece['title']: the title, i.e. the part before the |
  	 *  $piece['parts']: the parameter array
  	 *  $piece['lineStart']: whether the brace was at the start of a line
 +	 *  $piece['headLevel']: the shift value for all heading levels
- 	 * @param PPFrame The current frame, contains template arguments
- 	 * @return string the text of the template
+ 	 * @param $frame PPFrame The current frame, contains template arguments
+ 	 * @return String: the text of the template
  	 * @private
-@@ -2797,6 +2798,9 @@
+@@ -2941,6 +2942,10 @@
  		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
  		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
  
-+		if (!$piece['headLevel'])
++		if ( empty( $piece['headLevel'] ) ) {
 +			$piece['headLevel'] = 0;
++		}
 +
  		# Title object, where $text came from
- 		$title = null;
+ 		$title = false;
  
-@@ -3034,22 +3038,22 @@
+@@ -3187,22 +3192,22 @@
  			$newFrame = $frame->newChild( $args, $title );
  
  			if ( $nowiki ) {
@@ -52,19 +53,19 @@ diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Parser.php
  			$isLocalObj = false;
  		}
  
-@@ -3057,7 +3061,7 @@
+@@ -3210,7 +3215,7 @@
  		# Add a blank line preceding, to prevent it from mucking up
  		# immediately preceding headings
  		if ( $isHTML ) {
 -			$text = "\n\n" . $this->insertStripItem( $text );
 +			$text = "\n" . $this->insertStripItem( $text );
- 		}
- 		# Escape nowiki-style return values
- 		elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
-diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Preprocessor_DOM.php
+ 		} elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
+ 			# Escape nowiki-style return values
+ 			$text = wfEscapeWikiText( $text );
+diff -r 6b6371ec1416 -r ce6c7b69cae7 includes/parser/Preprocessor_DOM.php
 --- includes/parser/Preprocessor_DOM.php
 +++ includes/parser/Preprocessor_DOM.php
-@@ -263,6 +263,12 @@
+@@ -320,6 +320,12 @@
  					continue;
  				}
  
@@ -77,24 +78,24 @@ diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Preprocessor_DOM.php
  				// Determine element name
  				if ( !preg_match( $elementsRegex, $text, $matches, 0, $i + 1 ) ) {
  					// Element name missing or not listed
-@@ -819,7 +825,6 @@
+@@ -891,7 +897,6 @@
  	 */
  	var $depth;
  
 -
  	/**
  	 * Construct a new preprocessor frame.
- 	 * @param Preprocessor $preprocessor The parent preprocessor
-@@ -871,7 +876,7 @@
- 		return new PPTemplateFrame_DOM( $this->preprocessor, $this, $numberedArgs, $namedArgs, $title );
- 	}
- 
+ 	 * @param $preprocessor Preprocessor The parent preprocessor
+@@ -951,7 +956,7 @@
+ 	 * @param $flags int
+ 	 * @return string
+ 	 */
 -	function expand( $root, $flags = 0 ) {
 +	function expand( $root, $flags = 0, $headshift = 0 ) {
  		static $expansionDepth = 0;
  		if ( is_string( $root ) ) {
  			return $root;
-@@ -898,6 +903,8 @@
+@@ -978,6 +983,8 @@
  		$outStack = array( '', '' );
  		$iteratorStack = array( false, $root );
  		$indexStack = array( 0, 0 );
@@ -103,7 +104,7 @@ diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Preprocessor_DOM.php
  
  		while ( count( $iteratorStack ) > 1 ) {
  			$level = count( $outStack ) - 1;
-@@ -943,8 +950,40 @@
+@@ -1025,8 +1032,40 @@
  			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
  				$newIterator = $contextNode;
  			} elseif ( $contextNode instanceof DOMNode ) {
@@ -144,7 +145,7 @@ diff -r 025d3c6531d8 -r 3e33523273a7 includes/parser/Preprocessor_DOM.php
  				} elseif ( $contextNode->nodeName == 'template' ) {
  					# Double-brace expansion
  					$xpath = new DOMXPath( $contextNode->ownerDocument );
-@@ -956,6 +995,7 @@
+@@ -1038,6 +1077,7 @@
  					} else {
  						$lineStart = $contextNode->getAttribute( 'lineStart' );
  						$params = array(

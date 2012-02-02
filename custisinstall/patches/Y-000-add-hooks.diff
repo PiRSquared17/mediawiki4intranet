@@ -1,28 +1,28 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1313686052 -10800
+# Date 1327949546 -14400
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 Bug 82496, change url limit from 255 to 4095 for scary transclusions
 
-diff -r 45da8fc662c9 -r 676a80801620 includes/ChangesList.php
+diff -r 6b6371ec1416 -r a3fcd383dec9 includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
-@@ -751,6 +751,7 @@
- 			if( $rc_type == RC_LOG ){
- 				$secureName = SpecialPage::getTitleFor( 'Log', $rc_log_type )->getPrefixedDBkey();
+@@ -783,6 +783,7 @@
+ 			if( $type == RC_LOG ){
+ 				$secureName = SpecialPage::getTitleFor( 'Log', $logType )->getPrefixedDBkey();
  			}
 +			wfRunHooks( 'EnhancedChangesListGroupBy', array( &$rc, &$title, &$secureName ) );
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 45da8fc662c9 -r 676a80801620 includes/Title.php
+diff -r 6b6371ec1416 -r a3fcd383dec9 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
-@@ -1277,12 +1277,20 @@
- 			return $errors;
- 		}
- 
+@@ -1411,12 +1411,20 @@
+ 	 * @return Array list of errors
+ 	 */
+ 	private function checkSpecialsAndNSPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
 +		/**
 +		 * Do not deny all actions except 'createaccount' and 'execute'
 +		 * on special pages, let them decide themselves.
@@ -32,47 +32,35 @@ diff -r 45da8fc662c9 -r 676a80801620 includes/Title.php
  		# Only 'createaccount' and 'execute' can be performed on
  		# special pages, which don't actually exist in the DB.
  		$specialOKActions = array( 'createaccount', 'execute' );
- 		if( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions) ) {
- 			$errors[] = array('ns-specialprotected');
+ 		if ( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions ) ) {
+ 			$errors[] = array( 'ns-specialprotected' );
  		}
 +		 * </commented out>
 +		 */
  
  		# Check $wgNamespaceProtection for restricted namespaces
- 		if( $this->isNamespaceProtected() ) {
-diff -r 45da8fc662c9 -r 676a80801620 includes/Wiki.php
---- includes/Wiki.php
-+++ includes/Wiki.php
-@@ -152,6 +152,8 @@
- 			// Do this above the read whitelist check for security...
- 			$title = SpecialPage::getTitleFor( 'Search' );
- 		}
-+		if ( !wfRunHooks( 'MediaWikiPreliminaryChecks', array( &$title, &$output, $request ) ) )
-+			return false;
- 		# If the user is not logged in, the Namespace:title of the article must be in
- 		# the Read array in order for the user to see it. (We have to check here to
- 		# catch special pages etc. We check again in Article::view())
-diff -r 45da8fc662c9 -r 676a80801620 includes/parser/Parser.php
+ 		if ( $this->isNamespaceProtected( $user ) ) {
+diff -r 6b6371ec1416 -r a3fcd383dec9 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -3217,7 +3217,7 @@
+@@ -3453,7 +3453,7 @@
  
  		$url = $title->getFullUrl( "action=$action" );
  
--		if (strlen($url) > 255)
-+		if (strlen($url) > 4095)
- 			return wfMsg('scarytranscludetoolong');
- 		return $this->fetchScaryTemplateMaybeFromCache($url);
- 	}
-diff -r 45da8fc662c9 -r 676a80801620 includes/specials/SpecialMovepage.php
+-		if ( strlen( $url ) > 255 ) {
++		if ( strlen( $url ) > 4095 ) {
+ 			return wfMsgForContent( 'scarytranscludetoolong' );
+ 		}
+ 		return $this->fetchScaryTemplateMaybeFromCache( $url );
+diff -r 6b6371ec1416 -r a3fcd383dec9 includes/specials/SpecialMovepage.php
 --- includes/specials/SpecialMovepage.php
 +++ includes/specials/SpecialMovepage.php
-@@ -212,7 +212,7 @@
+@@ -231,7 +231,7 @@
  					Xml::label( wfMsg( 'newtitle' ), 'wpNewTitle' ) .
  				"</td>
  				<td class='mw-input'>" .
 -					Xml::input( 'wpNewTitle', 40, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
 +					Xml::input( 'wpNewTitle', 80, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
- 					Xml::hidden( 'wpOldTitle', $this->oldTitle->getPrefixedText() ) .
+ 					Html::hidden( 'wpOldTitle', $this->oldTitle->getPrefixedText() ) .
  				"</td>
  			</tr>

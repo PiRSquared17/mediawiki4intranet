@@ -1,38 +1,42 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1305543178 -14400
+# Date 1327949218 -14400
 Bug 80143 - Extension patch for changing merge conflict display style
 
-diff -r 45da8fc662c9 -r b4f98861c052 includes/DefaultSettings.php
+diff -r 6b6371ec1416 -r 1cd1a4762366 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
-@@ -4357,3 +4357,5 @@
-  */
- $wgOldChangeTagsIndex = false;
+@@ -5556,6 +5556,9 @@
+ $wgDBtestuser = ''; //db user that has permission to create and drop the test databases only
+ $wgDBtestpassword = '';
  
 +/** Defines that MergeConflicts extension patch was applied to this MW installation */
 +define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );
-diff -r 45da8fc662c9 -r b4f98861c052 includes/EditPage.php
++
+ /**
+  * For really cool vim folding this needs to be at the end:
+  * vim: foldmarker=@{,@} foldmethod=marker
+diff -r 6b6371ec1416 -r 1cd1a4762366 includes/EditPage.php
 --- includes/EditPage.php
 +++ includes/EditPage.php
-@@ -948,12 +948,15 @@
- 			$text = $this->textbox1; // do not try to merge here!
- 		} else if ( $this->isConflict ) {
- 			# Attempt merge
--			if ( $this->mergeChangesInto( $text ) ) {
-+			if ( $result = $this->mergeChangesInto( $text ) ) {
- 				// Successful merge! Maybe we should tell the user the good news?
- 				$this->isConflict = false;
- 				wfDebug( __METHOD__ . ": Suppressing edit conflict, successful merge.\n" );
- 			} else {
- 				$this->section = '';
-+				// was merging available?
-+				$this->mMergeAvailable = $result !== NULL;
-+				$this->textbox2 = $this->textbox1;
- 				$this->textbox1 = $text;
- 				wfDebug( __METHOD__ . ": Keeping edit conflict, failed merge.\n" );
- 			}
-@@ -1286,7 +1289,7 @@
+@@ -1096,12 +1096,15 @@
+ 				$text = $this->textbox1; // do not try to merge here!
+ 			} elseif ( $this->isConflict ) {
+ 				# Attempt merge
+-				if ( $this->mergeChangesInto( $text ) ) {
++				if ( $result = $this->mergeChangesInto( $text ) ) {
+ 					// Successful merge! Maybe we should tell the user the good news?
+ 					$this->isConflict = false;
+ 					wfDebug( __METHOD__ . ": Suppressing edit conflict, successful merge.\n" );
+ 				} else {
+ 					$this->section = '';
++					// was merging available?
++					$this->mMergeAvailable = $result !== NULL;
++					$this->textbox2 = $this->textbox1;
+ 					$this->textbox1 = $text;
+ 					wfDebug( __METHOD__ . ": Keeping edit conflict, failed merge.\n" );
+ 				}
+@@ -1495,7 +1498,7 @@
  			// and fallback to the raw wpTextbox1 since editconflicts can't be
  			// resolved between page source edits and custom ui edits using the
  			// custom edit ui.
@@ -41,22 +45,23 @@ diff -r 45da8fc662c9 -r b4f98861c052 includes/EditPage.php
  		} else {
  			$this->showContentForm();
  		}
-@@ -1330,7 +1333,7 @@
+@@ -1539,7 +1542,8 @@
  	protected function showHeader() {
- 		global $wgOut, $wgUser, $wgTitle, $wgMaxArticleSize, $wgLang;
+ 		global $wgOut, $wgUser, $wgMaxArticleSize, $wgLang;
  		if ( $this->isConflict ) {
--			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", 'explainconflict' );
-+			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1</div>", $this->mMergeAvailable ? 'explainconflictmerged' : 'explainconflict' );
+-			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1\n</div>", 'explainconflict' );
++			$wgOut->wrapWikiMsg( "<div class='mw-explainconflict'>\n$1\n</div>",
++				$this->mMergeAvailable ? 'explainconflictmerged' : 'explainconflict' );
  			$this->edittime = $this->mArticle->getTimestamp();
  		} else {
  			if ( $this->section != '' && !$this->isSectionEditSupported() ) {
-@@ -1621,11 +1624,11 @@
+@@ -1841,11 +1845,11 @@
  		$this->showTextbox( isset($textoverride) ? $textoverride : $this->textbox1, 'wpTextbox1', $attribs );
  	}
  
 -	protected function showTextbox2() {
 +	public function showTextbox2() {
- 		$this->showTextbox( $this->textbox2, 'wpTextbox2', array( 'tabindex' => 6 ) );
+ 		$this->showTextbox( $this->textbox2, 'wpTextbox2', array( 'tabindex' => 6, 'readonly' ) );
  	}
  
 -	protected function showTextbox( $content, $name, $customAttribs = array() ) {
@@ -64,7 +69,7 @@ diff -r 45da8fc662c9 -r b4f98861c052 includes/EditPage.php
  		global $wgOut, $wgUser;
  
  		$wikitext = $this->safeUnicodeOutput( $content );
-@@ -1767,16 +1770,15 @@
+@@ -1992,16 +1996,15 @@
  	 */
  	protected function showConflict() {
  		global $wgOut;
@@ -84,19 +89,19 @@ diff -r 45da8fc662c9 -r b4f98861c052 includes/EditPage.php
  			$this->showTextbox2();
  		}
  	}
-diff -r 45da8fc662c9 -r b4f98861c052 includes/GlobalFunctions.php
+diff -r 6b6371ec1416 -r 1cd1a4762366 includes/GlobalFunctions.php
 --- includes/GlobalFunctions.php
 +++ includes/GlobalFunctions.php
-@@ -1487,7 +1487,7 @@
- 	# case of broken installations.
- 	if( !$wgDiff3 || !file_exists( $wgDiff3 ) ) {
+@@ -1848,7 +1848,7 @@
+ 
+ 	if( !$haveDiff3 ) {
  		wfDebug( "diff3 not found\n" );
 -		return false;
 +		return NULL;
  	}
  
  	# Make temporary files
-@@ -1496,6 +1496,10 @@
+@@ -1857,6 +1857,10 @@
  	$mytextFile = fopen( $mytextName = tempnam( $td, 'merge-mine-' ), 'w' );
  	$yourtextFile = fopen( $yourtextName = tempnam( $td, 'merge-your-' ), 'w' );
  
@@ -104,18 +109,18 @@ diff -r 45da8fc662c9 -r b4f98861c052 includes/GlobalFunctions.php
 +	if ($mine{-1} != "\n") $mine .= "\n";
 +	if ($yours{-1} != "\n") $yours .= "\n";
 +
- 	fwrite( $oldtextFile, $old ); fclose( $oldtextFile );
- 	fwrite( $mytextFile, $mine ); fclose( $mytextFile );
- 	fwrite( $yourtextFile, $yours ); fclose( $yourtextFile );
-@@ -1515,8 +1519,10 @@
+ 	fwrite( $oldtextFile, $old );
+ 	fclose( $oldtextFile );
+ 	fwrite( $mytextFile, $mine );
+@@ -1879,8 +1883,10 @@
  	pclose( $handle );
  
  	# Merge differences
 -	$cmd = $wgDiff3 . ' -a -e --merge ' .
--	  wfEscapeShellArg( $mytextName, $oldtextName, $yourtextName );
+-		wfEscapeShellArg( $mytextName, $oldtextName, $yourtextName );
 +	$cmd = $wgDiff3 . ' -a -A --merge ' . wfEscapeShellArg(
-+	  '-L', wfMsg( 'merge-mine' ), '-L', wfMsg( 'merge-old' ),
-+	  '-L', wfMsg( 'merge-their' ), $mytextName, $oldtextName, $yourtextName
++		'-L', wfMsg( 'merge-mine' ), '-L', wfMsg( 'merge-old' ),
++		'-L', wfMsg( 'merge-their' ), $mytextName, $oldtextName, $yourtextName
 +	);
  	$handle = popen( $cmd, 'r' );
  	$result = '';

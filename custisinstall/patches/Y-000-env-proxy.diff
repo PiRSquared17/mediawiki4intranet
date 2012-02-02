@@ -1,15 +1,15 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1309879177 -14400
+# Date 1327949082 -14400
 Bug 60996 - Support environment proxy settings for HTTP downloads, allow HTTPS downloads
 HTTPS is added to upload-proto-error-text message only in English and Russian languages.
 Bug 82496 - Support environment no_proxy settings for scary transclusions
 
-diff -r 45da8fc662c9 -r 4f291f91dd88 includes/HttpFunctions.php
+diff -r 6b6371ec1416 -r 018b5f491e9c includes/HttpFunctions.php
 --- includes/HttpFunctions.php
 +++ includes/HttpFunctions.php
-@@ -113,6 +113,64 @@
- 			$matches
+@@ -135,6 +135,64 @@
+ 			$uri
  		);
  	}
 +
@@ -73,7 +73,7 @@ diff -r 45da8fc662c9 -r 4f291f91dd88 includes/HttpFunctions.php
  }
  
  /**
-@@ -225,8 +283,8 @@
+@@ -281,8 +339,8 @@
  			$this->proxy = 'http://localhost:80/';
  		} elseif ( $wgHTTPProxy ) {
  			$this->proxy = $wgHTTPProxy ;
@@ -84,97 +84,11 @@ diff -r 45da8fc662c9 -r 4f291f91dd88 includes/HttpFunctions.php
  		}
  	}
  
-diff -r 45da8fc662c9 -r 4f291f91dd88 includes/upload/UploadFromUrl.php
---- includes/upload/UploadFromUrl.php
-+++ includes/upload/UploadFromUrl.php
-@@ -68,7 +68,7 @@
- 
- 	public static function isValidUrl( $url ) {
- 		// Only allow HTTP or FTP for now
--		return (bool)preg_match( '!^(http://|ftp://)!', $url );
-+		return (bool)preg_match( '!^(https?://|ftp://)!', $url );
- 	}
- 
- 	/**
-@@ -78,60 +78,47 @@
- 		if( !self::isValidUrl( $this->mUrl ) ) {
- 			return Status::newFatal( 'upload-proto-error' );
- 		}
--		$res = $this->curlCopy();
--		if( $res !== true ) {
--			return Status::newFatal( $res );
--		}
--		return Status::newGood();
-+		return $this->httpCopy();
- 	}
- 
- 	/**
- 	 * Safe copy from URL
- 	 * Returns true if there was an error, false otherwise
- 	 */
--	private function curlCopy() {
-+	private function httpCopy() {
- 		global $wgOut;
- 
- 		# Open temporary file
--		$this->mCurlDestHandle = @fopen( $this->mTempPath, "wb" );
--		if( $this->mCurlDestHandle === false ) {
-+		$this->mDestHandle = @fopen( $this->mTempPath, "wb" );
-+		if( $this->mDestHandle === false ) {
- 			# Could not open temporary file to write in
- 			return 'upload-file-error';
- 		}
- 
--		$ch = curl_init();
--		curl_setopt( $ch, CURLOPT_HTTP_VERSION, 1.0); # Probably not needed, but apparently can work around some bug
--		curl_setopt( $ch, CURLOPT_TIMEOUT, 10); # 10 seconds timeout
--		curl_setopt( $ch, CURLOPT_LOW_SPEED_LIMIT, 512); # 0.5KB per second minimum transfer speed
--		curl_setopt( $ch, CURLOPT_URL, $this->mUrl);
--		curl_setopt( $ch, CURLOPT_WRITEFUNCTION, array( $this, 'uploadCurlCallback' ) );
--		curl_exec( $ch );
--		$error =  curl_errno( $ch );
--		curl_close( $ch );
-+		$request = HttpRequest::factory( $this->mUrl, array( 'timeout' => 10 ) );
-+		$request->setCallback( array( $this, 'uploadCallback' ) );
-+		$status = $request->execute();
- 
--		fclose( $this->mCurlDestHandle );
--		unset( $this->mCurlDestHandle );
-+		fclose( $this->mDestHandle );
-+		unset( $this->mDestHandle );
- 
--		if( $error )
--			return "upload-curl-error$errornum";
--
--		return true;
-+		return $status;
- 	}
- 
- 	/**
--	 * Callback function for CURL-based web transfer
-+	 * Callback function for web transfer
- 	 * Write data to file unless we've passed the length limit;
- 	 * if so, abort immediately.
- 	 * @access private
- 	 */
--	function uploadCurlCallback( $ch, $data ) {
-+	function uploadCallback( $ch, $data ) {
- 		global $wgMaxUploadSize;
- 		$length = strlen( $data );
- 		$this->mFileSize += $length;
- 		if( $this->mFileSize > $wgMaxUploadSize ) {
- 			return 0;
- 		}
--		fwrite( $this->mCurlDestHandle, $data );
-+		fwrite( $this->mDestHandle, $data );
- 		return $length;
- 	}
- }
-diff -r 45da8fc662c9 -r 4f291f91dd88 languages/messages/MessagesEn.php
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -2126,7 +2126,7 @@
-  #</pre> <!-- leave this line exactly as it is -->', # only translate this message to other languages if you have to change it
+@@ -2211,7 +2211,7 @@
+ 'upload-warning-msg'          => 'There was a problem with your upload from [$2]. You may return to the [[Special:Upload/stash/$1|upload form]] to correct this problem.',
  
  'upload-proto-error'        => 'Incorrect protocol',
 -'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
@@ -182,11 +96,11 @@ diff -r 45da8fc662c9 -r 4f291f91dd88 languages/messages/MessagesEn.php
  'upload-file-error'         => 'Internal error',
  'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
  Please contact an [[Special:ListUsers/sysop|administrator]].',
-diff -r 45da8fc662c9 -r 4f291f91dd88 languages/messages/MessagesRu.php
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -1666,7 +1666,7 @@
-  #</pre> <!-- оставьте эту строчку как есть -->',
+@@ -1765,7 +1765,7 @@
+ 'upload-warning-msg'          => 'При загрузке с [$2] произошла ошибка. Для исправления ошибки вернитесь на [[Special:Upload/stash/$1|upload form]].',
  
  'upload-proto-error'        => 'Неправильный протокол',
 -'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code> или <code>ftp://</code>.',
@@ -194,11 +108,11 @@ diff -r 45da8fc662c9 -r 4f291f91dd88 languages/messages/MessagesRu.php
  'upload-file-error'         => 'Внутренняя ошибка',
  'upload-file-error-text'    => 'Внутренняя ошибка при попытке создать временный файл на сервере.
  Пожалуйста, обратитесь к [[Special:ListUsers/sysop|администратору]].',
-diff -r 45da8fc662c9 -r 4f291f91dd88 languages/messages/MessagesRue.php
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesRue.php
 --- languages/messages/MessagesRue.php
 +++ languages/messages/MessagesRue.php
-@@ -1375,7 +1375,7 @@
- 'filename-bad-prefix'         => "Назва файлу, котрый начітавате ся зачінать на '''„$1“''', што не є назва звычайно приряджована діґіталным фотоапаратом. Звольте іншу назву, котра ваш файл попише лїпше.",
+@@ -1473,7 +1473,7 @@
+ 'upload-warning-msg'          => 'Почас вашого начітаваня файлу [$2] ся став проблем. Кідь го хочете вырїшыти, можете ся вернути до  [[Special:Upload/stash/$1|формуларя начітаваня]].',
  
  'upload-proto-error'        => 'Неплатный протокол',
 -'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code> або <code>ftp://</code>.',

@@ -1,46 +1,13 @@
 # HG changeset patch
-# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
-# Date 1297451953 -10800
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949112 -14400
 Make file extensions lower-case in upload form autofill JS
 Bug 68017 - Configurable maximum filename length in image galleries
 
-diff -r b11befdd7427 -r d47247d6a81f includes/DefaultSettings.php
---- includes/DefaultSettings.php
-+++ includes/DefaultSettings.php
-@@ -467,6 +467,8 @@
-  * normal uploads is currently to edit php.ini.
-  */
- $wgMaxUploadSize = 1024*1024*100; # 100MB
-+/** Maximum length for filenames shown in image gallery. */
-+$wgMaxFilenameLength = 20;
- 
- /**
-  * Point the upload navigation link to an external URL
-diff -r b11befdd7427 -r d47247d6a81f includes/ImageGallery.php
---- includes/ImageGallery.php
-+++ includes/ImageGallery.php
-@@ -218,7 +218,7 @@
- 	 *
- 	 */
- 	function toHTML() {
--		global $wgLang;
-+		global $wgLang, $wgMaxFilenameLength;
- 
- 		$sk = $this->getSkin();
- 
-@@ -308,7 +308,7 @@
- 			$textlink = $this->mShowFilename ?
- 				$sk->link(
- 					$nt,
--					htmlspecialchars( $wgLang->truncate( $nt->getText(), 20 ) ),
-+					htmlspecialchars( $wgLang->truncate( $nt->getText(), $wgMaxFilenameLength ) ),
- 					array(),
- 					array(),
- 					array( 'known', 'noclasses' )
-diff -r b11befdd7427 -r d47247d6a81f skins/common/upload.js
+diff -r 6b6371ec1416 -r f46aa146b760 skins/common/upload.js
 --- skins/common/upload.js
 +++ skins/common/upload.js
-@@ -270,6 +270,10 @@
+@@ -226,6 +226,10 @@
  			return false;
  		}
  	}
@@ -49,5 +16,5 @@ diff -r b11befdd7427 -r d47247d6a81f skins/common/upload.js
 +	if (dot >= 0)
 +		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
  
- 	// Capitalise first letter and replace spaces by underscores
- 	// FIXME: $wgCapitalizedNamespaces
+ 	// Replace spaces by underscores
+ 	fname = fname.replace( / /g, '_' );
