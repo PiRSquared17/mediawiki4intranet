@@ -1231,4 +1231,8 @@ div.vectorTabs ul {
 #catlinks-top div {
 	float: left;
 	margin: 0;
+	padding: 0;
+}
+#catlinks-top .catlinks div {
+	padding-left: 0.7em;
 }
