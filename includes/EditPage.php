@@ -1099,14 +1099,14 @@ class EditPage {
 				$text = $this->textbox1; // do not try to merge here!
 			} elseif ( $this->isConflict ) {
 				# Attempt merge
-				if ( $result = $this->mergeChangesInto( $text ) ) {
+				if ( $res = $this->mergeChangesInto( $text ) ) {
 					// Successful merge! Maybe we should tell the user the good news?
 					$this->isConflict = false;
 					wfDebug( __METHOD__ . ": Suppressing edit conflict, successful merge.\n" );
 				} else {
 					$this->section = '';
 					// was merging available?
-					$this->mMergeAvailable = $result !== NULL;
+					$this->mMergeAvailable = $res !== NULL;
 					$this->textbox2 = $this->textbox1;
 					$this->textbox1 = $text;
 					wfDebug( __METHOD__ . ": Keeping edit conflict, failed merge.\n" );
