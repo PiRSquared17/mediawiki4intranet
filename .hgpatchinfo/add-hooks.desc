@@ -1,3 +1,4 @@
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 Bug 82496, change url limit from 255 to 4095 for scary transclusions
+Bug 93182, Add NormalizeMessageKey to wfMessage()
