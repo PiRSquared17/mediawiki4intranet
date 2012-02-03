@@ -270,9 +270,10 @@ class Parser {
 		 */
 		# $this->mUniqPrefix = "\x07UNIQ" . Parser::getRandomString();
 		# Changed to \x7f to allow XML double-parsing -- TS
-		$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
-		$this->mStripState = new StripState( $this->mUniqPrefix );
-
+		if ( !$this->mStripState ) {
+			$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
+			$this->mStripState = new StripState( $this->mUniqPrefix );
+		}
 
 		# Clear these on every parse, bug 4549
 		$this->mTplExpandCache = $this->mTplRedirCache = $this->mTplDomCache = array();
@@ -397,7 +398,7 @@ class Parser {
 
 		$text = $this->mStripState->unstripNoWiki( $text );
 
-		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text ) );
+		wfRunHooks( 'ParserBeforeTidy', array( &$this, &$text, $clearState ) );
 
 		$text = $this->replaceTransparentTags( $text );
 		$text = $this->mStripState->unstripGeneral( $text );
@@ -438,7 +439,7 @@ class Parser {
 			$this->limitationWarn( 'expensive-parserfunction', $this->mExpensiveFunctionCount, $wgExpensiveParserFunctionLimit );
 		}
 
-		wfRunHooks( 'ParserAfterTidy', array( &$this, &$text ) );
+		wfRunHooks( 'ParserAfterTidy', array( &$this, &$text, $clearState ) );
 
 		# Information on include size limits, for the benefit of users who try to skirt them
 		if ( $this->mOptions->getEnableLimitReport() ) {
@@ -1963,7 +1964,7 @@ class Parser {
 	 * @return Boolean
 	 */
 	function areSubpagesAllowed() {
-		# Some namespaces don't allow subpages
+		// Some namespaces don't allow subpages
 		return MWNamespace::hasSubpages( $this->mTitle->getNamespace() );
 	}
 
@@ -1988,7 +1989,7 @@ class Parser {
 	function closeParagraph() {
 		$result = '';
 		if ( $this->mLastSection != '' ) {
-			$result = '</' . $this->mLastSection  . ">\n";
+			$result = '</' . $this->mLastSection  . ">";
 		}
 		$this->mInPre = false;
 		$this->mLastSection = '';
@@ -2111,16 +2112,69 @@ class Parser {
 		$textLines = StringUtils::explode( "\n", $text );
 
 		$lastPrefix = $output = '';
-		$this->mDTopen = $inBlockElem = false;
+		$this->mDTopen = false;
 		$prefixLength = 0;
-		$paragraphStack = false;
+
+		// 0     = always start paragraph for a piece of text or inline tag
+		// 1     = some text of current paragraph already printed inline,
+		//         so persist 1 across newline and print text from there inline also
+		// 2     = print text inline if there is some, but reset to 0 at newline if not
+		$dontStartParagraph = 0;
+
+		// the output position of last paragraph start
+		$lastParagraphPos = NULL;
+
+		// 'p'   = inside a paragraph
+		// 'div' = inside a <div class="paragraph">
+		// 'pre' = inside preformatted lines (with space at beginning)
+		$this->mLastSection = '';
+
+		// true  = inside a <pre> tag
+		$this->mInPre = false;
+
+		// > 0   = inside a $noPre tag
+		$inNoPre = 0;
+
+		// <div class="paragraph"> can itself contain paragraphs, so this is a stack of them
+		$nestedSections = array();
+
+		// empty lines counter
+		$emptyLines = 0;
+
+		// Block elements force to close current paragraph
+		$closesParagraph = array(
+			'div' => 1,
+			'center' => 1,
+			'table' => 1,
+			'caption' => 1,
+			'tr' => 1,
+			'td' => 1,
+			'th' => 1,
+			'h1' => 1,
+			'h2' => 1,
+			'h3' => 1,
+			'h4' => 1,
+			'h5' => 1,
+			'h6' => 1,
+			'hr' => 1,
+			'ul' => 1,
+			'ol' => 1,
+			'li' => 1,
+			'pre' => 1,
+			'p' => 1,
+			'blockquote' => 1,
+			'script' => 1,
+		);
+
+		// These elements disallow preformatting by adding space at the beginning of line
+		$noPre = array(
+			'table' => 1,
+			'pre' => 1,
+		);
 
 		foreach ( $textLines as $oLine ) {
-			# Fix up $linestart
 			if ( !$linestart ) {
-				$output .= $oLine;
-				$linestart = true;
-				continue;
+				$dontStartParagraph = 1;
 			}
 			# * = ul
 			# # = ol
@@ -2128,11 +2182,9 @@ class Parser {
 			# : = dd
 
 			$lastPrefixLength = strlen( $lastPrefix );
-			$preCloseMatch = preg_match( '/<\\/pre/i', $oLine );
-			$preOpenMatch = preg_match( '/<pre/i', $oLine );
-			# If not in a <pre> element, scan for and figure out what prefixes are there.
-			if ( !$this->mInPre ) {
-				# Multiple prefixes may abut each other for nested lists.
+			// If at line start and not in a <pre> element, scan for and figure out what prefixes are there.
+			if ( $linestart && !$this->mInPre ) {
+				// Multiple prefixes may abut each other for nested lists.
 				$prefixLength = strspn( $oLine, '*#:;' );
 				$prefix = substr( $oLine, 0, $prefixLength );
 
@@ -2142,7 +2194,6 @@ class Parser {
 				#  elements.
 				$prefix2 = str_replace( ';', ':', $prefix );
 				$t = substr( $oLine, $prefixLength );
-				$this->mInPre = (bool)$preOpenMatch;
 			} else {
 				# Don't interpret any other prefixes in preformatted text
 				$prefixLength = 0;
@@ -2153,8 +2204,9 @@ class Parser {
 			# List generation
 			if ( $prefixLength && $lastPrefix === $prefix2 ) {
 				# Same as the last item, so no need to deal with nesting or opening stuff
+				$output .= $this->closeParagraph();
+				$dontStartParagraph = 2;
 				$output .= $this->nextItem( substr( $prefix, -1 ) );
-				$paragraphStack = false;
 
 				if ( substr( $prefix, -1 ) === ';') {
 					# The one nasty exception: definition lists work like this:
@@ -2167,12 +2219,17 @@ class Parser {
 						$output .= $term . $this->nextItem( ':' );
 					}
 				}
+
+				// Reset linestart to false to ignore heading space
+				$linestart = false;
+				$emptyLines = 0;
 			} elseif ( $prefixLength || $lastPrefixLength ) {
+				$output .= $this->closeParagraph();
+				$dontStartParagraph = $prefixLength ? 2 : 0;
 				# We need to open or close prefixes, or both.
 
 				# Either open or close a level...
 				$commonPrefixLength = $this->getCommon( $prefix, $lastPrefix );
-				$paragraphStack = false;
 
 				# Close all the prefixes which aren't shared.
 				while ( $commonPrefixLength < $lastPrefixLength ) {
@@ -2200,71 +2257,148 @@ class Parser {
 					++$commonPrefixLength;
 				}
 				$lastPrefix = $prefix2;
+
+				// Reset linestart to false to ignore heading space
+				$linestart = !$prefixLength;
+				$emptyLines = 0;
 			}
 
-			# If we have no prefixes, go to paragraph mode.
-			if ( 0 == $prefixLength ) {
-				wfProfileIn( __METHOD__."-paragraph" );
-				# No prefix (not in list)--go to paragraph mode
-				# XXX: use a stack for nestable elements like span, table and div
-				$openmatch = preg_match('/(?:<table|<blockquote|<h1|<h2|<h3|<h4|<h5|<h6|<pre|<tr|<p|<ul|<ol|<li|<\\/tr|<\\/td|<\\/th)/iS', $t );
-				$closematch = preg_match(
-					'/(?:<\\/table|<\\/blockquote|<\\/h1|<\\/h2|<\\/h3|<\\/h4|<\\/h5|<\\/h6|'.
-					'<td|<th|<\\/?div|<hr|<\\/pre|<\\/p|'.$this->mUniqPrefix.'-pre|<\\/li|<\\/ul|<\\/ol|<\\/?center)/iS', $t );
-				if ( $openmatch or $closematch ) {
-					$paragraphStack = false;
-					# TODO bug 5718: paragraph closed
-					$output .= $this->closeParagraph();
-					if ( $preOpenMatch and !$preCloseMatch ) {
-						$this->mInPre = true;
-					}
-					$inBlockElem = !$closematch;
-				} elseif ( !$inBlockElem && !$this->mInPre ) {
-					if ( ' ' == substr( $t, 0, 1 ) and ( $this->mLastSection === 'pre' || trim( $t ) != '' ) ) {
-						# pre
-						if ( $this->mLastSection !== 'pre' ) {
-							$paragraphStack = false;
-							$output .= $this->closeParagraph().'<pre>';
-							$this->mLastSection = 'pre';
+			// Go to paragraph mode.
+			wfProfileIn( __METHOD__."-paragraph" );
+			if ( $linestart && $inNoPre <= 0 && ' ' == substr( $t, 0, 1 ) &&
+				( $this->mLastSection === 'pre' || trim( $t ) != '' ) ) {
+				// <pre>formatted text
+				$emptyLines = 0;
+				if ( $this->mLastSection !== 'pre' ) {
+					$output .= $this->closeParagraph().'<pre>';
+					$this->mLastSection = 'pre';
+				}
+				$output .= substr( $t, 1 ) . "\n";
+			} elseif ( !$this->mInPre && trim( $t ) === '' ) {
+				// close paragraph
+				$output .= $this->closeParagraph();
+				$dontStartParagraph = 0;
+				$emptyLines++;
+				if ( $emptyLines > 1 ) {
+					// start a new paragraph
+					$lastParagraphPos = strlen( $output );
+					$this->mLastSection = 'p';
+					$output .= '<p><br />';
+					$emptyLines = 0;
+				}
+			} else {
+				$emptyLines = 0;
+				while ( strlen( $t ) ) {
+					// match html tag or preformatted block hidden by link holder
+					// <html> does not influence on paragraphs in any way, so we don't match it
+					if ( preg_match( '/<(\/?)([a-z][a-z0-9]*).*?(\/?)>|('.$this->mUniqPrefix.
+						'-pre.*?'.self::MARKER_SUFFIX.')/iS', $t, $m, PREG_OFFSET_CAPTURE ) ) {
+						$textBefore = substr( $t, 0, $m[0][1] );
+						$t = substr( $t, $m[0][1] + strlen( $m[0][0] ) );
+						if ( $m[2][0] && empty( $closesParagraph[ $m[2][0] ] ) ) {
+							$textBefore .= $m[0][0];
+							$m[0][0] = '';
 						}
-						$t = substr( $t, 1 );
 					} else {
-						# paragraph
-						if ( trim( $t ) === '' ) {
-							if ( $paragraphStack ) {
-								$output .= $paragraphStack.'<br />';
-								$paragraphStack = false;
-								$this->mLastSection = 'p';
-							} else {
-								if ( $this->mLastSection !== 'p' ) {
+						$textBefore = $t;
+						$t = '';
+					}
+					$match = isset( $m[0] ) ? $m[0][0] : false;
+					$close = isset( $m[1] ) ? $m[1][0] : false;
+					$tag   = isset( $m[2] ) ? $m[2][0] : false;
+					$empty = isset( $m[3] ) ? $m[3][0] : false;
+					$uniq  = isset( $m[4] ) ? $m[4][0] : false;
+					if ( $textBefore !== '' ) {
+						// Here is the place where the text gets inside <p>aragraphs
+						if ( trim( $textBefore ) !== '' ) {
+							if ( !$this->mInPre && !$dontStartParagraph ) {
+								if ( $this->mLastSection == 'pre' ) {
 									$output .= $this->closeParagraph();
-									$this->mLastSection = '';
-									$paragraphStack = '<p>';
-								} else {
-									$paragraphStack = '</p><p>';
+								}
+								if ( !$this->mLastSection && !$this->mInPre ) {
+									$lastParagraphPos = strlen( $output );
+									$output .= '<p>';
+									$this->mLastSection = 'p';
 								}
 							}
-						} else {
-							if ( $paragraphStack ) {
-								$output .= $paragraphStack;
-								$paragraphStack = false;
-								$this->mLastSection = 'p';
-							} elseif ( $this->mLastSection !== 'p' ) {
-								$output .= $this->closeParagraph().'<p>';
-								$this->mLastSection = 'p';
+							elseif ( $dontStartParagraph == 2 ) {
+								$dontStartParagraph = 1;
+							}
+						}
+						$output .= $textBefore;
+					}
+					if ( $this->mInPre && $close && $tag == 'pre' ) {
+						// this is </pre> closing tag
+						$this->mInPre = false;
+						$inNoPre--;
+					} elseif ( $uniq ) {
+						// UNIQ <pre> closes paragraph
+						$output .= $this->closeParagraph();
+					} elseif ( !empty( $closesParagraph[ $tag ] ) ) {
+						// block element closes current paragraph
+						if ( $tag != 'div' ) {
+							// <div> does not close the paragraph,
+							// but turns it into a <div class="paragraph">
+							$output .= $this->closeParagraph();
+						} elseif ( !$empty ) {
+							// <div> is the only case of nested "paragraphs"
+							if ( $close ) {
+								// </div> - close current nesting level
+								$output .= $this->closeParagraph();
+								list( $this->mLastSection, $inNoPre ) = array_pop( $nestedSections );
+							} else {
+								// <div> - start a nested level
+								if ( $this->mLastSection == 'p' && $tag == 'div' ) {
+									// <div> can not be used inside <p>
+									// so turn last <p> into a <div class="paragraph">
+									$output =
+										substr( $output, 0, $lastParagraphPos ) .
+										'<div class="paragraph">' .
+										substr( $output, $lastParagraphPos+3 );
+									$this->mLastSection = 'div';
+								}
+								$nestedSections[] = array( $this->mLastSection, $inNoPre );
+								$this->mLastSection = '';
+								$inNoPre = 0;
+							}
+						}
+						// if not an enclosed XML element
+						if ( !$empty ) {
+							if ( !empty( $noPre[ $tag ] ) ) {
+								$inNoPre += $close ? -1 : 1;
+							}
+							if ( !$close ) {
+								if ( !$this->mLastSection ) {
+									// do not start paragraph right after opening block
+									// element tag on the same line. I.e. <div>A</div> is parsed
+									// into <div>A</div>, and <div>\nA</div> is parsed
+									// into <div><p>A</p></div>
+									$dontStartParagraph = 2;
+								}
+								if ( $tag == 'pre' && !$empty ) {
+									$this->mInPre = true;
+								}
+							} elseif ( $dontStartParagraph ) {
+								// Current block element is closed
+								$dontStartParagraph = 2;
 							}
 						}
 					}
+					if ( $match !== '' ) {
+						$output .= $match;
+					}
 				}
-				wfProfileOut( __METHOD__."-paragraph" );
+				$output .= "\n";
+				// If line ended after opening block element tag with no text after it
+				// => allow to start a paragraph from next line
+				// If there was some text (dontStartParagraph == 1)
+				// => do not start a paragraph from next line
+				if ( $dontStartParagraph == 2 ) {
+					$dontStartParagraph = 0;
+				}
 			}
-			# somewhere above we forget to get out of pre block (bug 785)
-			if ( $preCloseMatch && $this->mInPre ) {
-				$this->mInPre = false;
-			}
-			if ( $paragraphStack === false ) {
-				$output .= $t."\n";
-			}
+			wfProfileOut( __METHOD__."-paragraph" );
+			$linestart = true;
 		}
 		while ( $prefixLength ) {
 			$output .= $this->closeList( $prefix2[$prefixLength-1] );
@@ -2924,6 +3058,7 @@ class Parser {
 	 *  $piece['title']: the title, i.e. the part before the |
 	 *  $piece['parts']: the parameter array
 	 *  $piece['lineStart']: whether the brace was at the start of a line
+	 *  $piece['headLevel']: the shift value for all heading levels
 	 * @param $frame PPFrame The current frame, contains template arguments
 	 * @return String: the text of the template
 	 * @private
@@ -2940,6 +3075,10 @@ class Parser {
 		$forceRawInterwiki = false; # Force interwiki transclusion to be done in raw mode not rendered
 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
+
+		if ( empty( $piece['headLevel'] ) ) {
+			$piece['headLevel'] = 0;
+		}
 
 		# Title object, where $text came from
 		$title = false;
@@ -3101,6 +3240,17 @@ class Parser {
 				$ns = $this->mTitle->getNamespace();
 			}
 			$title = Title::newFromText( $part1, $ns );
+			if ( method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() ) {
+				global $haclgInclusionDeniedMessage;
+				$title = NULL;
+				if ( $haclgInclusionDeniedMessage ) {
+					$found = true;
+					$text = wfMsg( $haclgInclusionDeniedMessage );
+				} elseif ( $haclgInclusionDeniedMessage === '' ) {
+					$found = true;
+					$text = '';
+				}
+			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
 				# Check for language variants if the template is not found
@@ -3187,22 +3337,22 @@ class Parser {
 			$newFrame = $frame->newChild( $args, $title );
 
 			if ( $nowiki ) {
-				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
+				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
 				# Expansion is eligible for the empty-frame cache
 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
 					$text = $this->mTplExpandCache[$titleText];
 				} else {
-					$text = $newFrame->expand( $text );
+					$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 					$this->mTplExpandCache[$titleText] = $text;
 				}
 			} else {
 				# Uncached expansion
-				$text = $newFrame->expand( $text );
+				$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
 			}
 		}
 		if ( $isLocalObj && $nowiki ) {
-			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG );
+			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
 			$isLocalObj = false;
 		}
 
@@ -3210,7 +3360,7 @@ class Parser {
 		# Add a blank line preceding, to prevent it from mucking up
 		# immediately preceding headings
 		if ( $isHTML ) {
-			$text = "\n\n" . $this->insertStripItem( $text );
+			$text = "\n" . $this->insertStripItem( $text );
 		} elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
 			# Escape nowiki-style return values
 			$text = wfEscapeWikiText( $text );
@@ -3260,6 +3410,10 @@ class Parser {
 		$cacheTitle = $title;
 		$titleText = $title->getPrefixedDBkey();
 
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag = $title->getFragment() )
+			$titleText .= '#' . $frag;
+
 		if ( isset( $this->mTplRedirCache[$titleText] ) ) {
 			list( $ns, $dbk ) = $this->mTplRedirCache[$titleText];
 			$title = Title::makeTitle( $ns, $dbk );
@@ -3278,6 +3432,9 @@ class Parser {
 		}
 
 		$dom = $this->preprocessToDom( $text, self::PTD_FOR_INCLUSION );
+		// CustIS Bug 70192 - named section transclusion
+		if ( $frag )
+			$dom = $this->tryExtractNamedSection( $dom, $frag );
 		$this->mTplDomCache[ $titleText ] = $dom;
 
 		if ( !$title->equals( $cacheTitle ) ) {
@@ -3286,6 +3443,76 @@ class Parser {
 		}
 
 		return array( $dom, $title );
+	}
+
+	/**
+	 * CustIS Bug 70192 - try to extract a named section from DOM Document
+	 */
+	function tryExtractNamedSection( $dom, $frag )
+	{
+		$stack = array( array( $dom->node, 0 ) );
+		$foundlevel = false;
+		$newchild = NULL;
+		$newroot = NULL;
+		$content_started = false;
+		while( $stack )
+		{
+			$ptr = &$stack[ count( $stack ) - 1 ];
+			if ( $ptr[1] >= $ptr[0]->childNodes->length )
+			{
+				array_pop( $stack );
+				if ( $foundlevel )
+					$newchild = $newchild->parentNode;
+				continue;
+			}
+			$node = $ptr[0]->childNodes->item( $ptr[1] );
+			$ptr[1]++;
+			if ( !$foundlevel )
+			{
+				if ( $node->nodeName == 'h' )
+				{
+					$h = $node->nodeValue;
+					$l = $node->getAttribute( 'level' );
+					$h = trim( substr( $h, $l, -$l ) );
+					if ( $h == $frag )
+					{
+						$foundlevel = $l;
+						foreach ( $stack as $inside )
+						{
+							$el = $inside[0]->cloneNode();
+							if ( $newchild )
+								$newchild->addChild( $el );
+							else
+								$newroot = $el;
+							$newchild = $el;
+						}
+					}
+				}
+				elseif ( $node->childNodes && $node->childNodes->length )
+					$stack[] = array( $node, 0 );
+			}
+			else
+			{
+				if ( $node->nodeName == 'h' && $node->getAttribute( 'level' ) <= $foundlevel )
+					break;
+				if ( !$content_started && $node->nodeType == XML_TEXT_NODE )
+				{
+					// left-trim included section
+					$v = ltrim( $node->nodeValue );
+					if ( !$v )
+						continue;
+					else
+						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
+				}
+				else
+					$newchild->appendChild( $node->cloneNode( true ) );
+				$content_started = true;
+			}
+		}
+		unset( $ptr );
+		if ( $newroot )
+			$dom = new PPNode_DOM( $newroot );
+		return $dom;
 	}
 
 	/**
@@ -3757,7 +3984,7 @@ class Parser {
 	 * @private
 	 */
 	function formatHeadings( $text, $origText, $isMain=true ) {
-		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds;
+		global $wgMaxTocLevel, $wgHtml5, $wgExperimentalHtmlIds, $wgDotAfterTocnumber;
 
 		# Inhibit editsection links if requested in the page
 		if ( isset( $this->mDoubleUnderscores['noeditsection'] ) ) {
@@ -3898,6 +4125,8 @@ class Parser {
 					$dot = 1;
 				}
 			}
+			if ( $wgDotAfterTocnumber )
+				$numbering .= '.';
 
 			# The safe header is a version of the header text safe to use for links
 			# Avoid insertion of weird stuff like <math> by expanding the relevant sections
@@ -3974,6 +4203,11 @@ class Parser {
 
 			# Don't number the heading if it is the only one (looks silly)
 			if ( count( $matches[3] ) > 1 && $this->mOptions->getNumberHeadings() ) {
+				# CustIS Bug 54239 - Number [[#Section|Section]] links
+				if ( empty( $headNumberReplacer ) ) {
+					$headNumberReplacer = new ReplacementArray();
+				}
+				$headNumberReplacer->setPair('>'.$headlineHint.'</a>', '>'.$numbering.' '.$headlineHint.'</a>');
 				# the two are different if the line contains a link
 				$headline = $numbering . ' ' . $headline;
 			}
@@ -4068,6 +4302,10 @@ class Parser {
 		if ( $isMain ) {
 			$this->mOutput->setSections( $tocraw );
 		}
+
+		# Bug 54239 - Number [[#Section|Section]] links
+		if ( !empty( $headNumberReplacer ) )
+			$text = $headNumberReplacer->replace($text);
 
 		# split up and insert constructed headlines
 
