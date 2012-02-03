@@ -34,7 +34,8 @@ $wgHooks['UserLoadFromSession'][] = 'efHttpAuthUserLoadFromSession';
 function efHttpAuthUserLoadFromSession($user_obj, &$result)
 {
     global $wgSitename, $wgScriptPath, $wgCookiePrefix, $efBasicAuthUnauthHtml, $wgUser;
-    $httpauth = !empty($_GET['httpauth']) || !empty($_POST['httpauth']) || !empty($_COOKIE[$wgCookiePrefix.'httpauth']);
+    $httpauth = !empty($_GET['httpauth']) ||
+        !empty($_POST['httpauth']);
     if ($httpauth &&
         ($n = $_SERVER['PHP_AUTH_USER']) &&
         ($p = $_SERVER['PHP_AUTH_PW']))
@@ -53,9 +54,6 @@ function efHttpAuthUserLoadFromSession($user_obj, &$result)
     {
         header('HTTP/1.1 401 Unauthorized');
         header('WWW-Authenticate: Basic realm="'.$wgSitename.'"');
-        // TODO check if this is needed for something, but probably not.
-        //if (!$_COOKIE[$wgCookiePrefix.'httpauth'])
-        //   setcookie($wgCookiePrefix.'httpauth', 1, -1, $wgScriptPath);
         if ($efBasicAuthUnauthHtml !== NULL)
             print $efBasicAuthUnauthHtml;
         else

@@ -1,6 +1,7 @@
 <?php
 
 # An extension to support removing "confidential" data from page texts on export
+# License: GPLv2 or later
 # (c) Vitaliy Filippov, 2011
 
 $wgHooks['ExportFilterText'][] = 'ExportRemoveConfidential::remove';

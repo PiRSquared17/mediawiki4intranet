@@ -52,7 +52,7 @@ function efCustomToolboxSkinTemplateToolboxEnd($tpl)
     if (wfEmptyMsg('toolbox-content', $text))
         return true;
     $options = $wgParser->mOptions;
-    $clearstate = false;
+    $clearstate = !$wgParser->mStripState;
     if (!$options)
     {
         $options = ParserOptions::newFromUser($wgUser);
