@@ -1857,9 +1857,9 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	$mytextFile = fopen( $mytextName = tempnam( $td, 'merge-mine-' ), 'w' );
 	$yourtextFile = fopen( $yourtextName = tempnam( $td, 'merge-your-' ), 'w' );
 
-	if ($old{-1} != "\n") $old .= "\n";
-	if ($mine{-1} != "\n") $mine .= "\n";
-	if ($yours{-1} != "\n") $yours .= "\n";
+	if ($old{strlen($old)-1} != "\n") $old .= "\n";
+	if ($mine{strlen($mine)-1} != "\n") $mine .= "\n";
+	if ($yours{strlen($yours)-1} != "\n") $yours .= "\n";
 
 	fwrite( $oldtextFile, $old );
 	fclose( $oldtextFile );
@@ -1867,20 +1867,6 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 	fclose( $mytextFile );
 	fwrite( $yourtextFile, $yours );
 	fclose( $yourtextFile );
-
-	# Check for a conflict
-	$cmd = $wgDiff3 . ' -a --overlap-only ' .
-		wfEscapeShellArg( $mytextName ) . ' ' .
-		wfEscapeShellArg( $oldtextName ) . ' ' .
-		wfEscapeShellArg( $yourtextName );
-	$handle = popen( $cmd, 'r' );
-
-	if( fgets( $handle, 1024 ) ) {
-		$conflict = true;
-	} else {
-		$conflict = false;
-	}
-	pclose( $handle );
 
 	# Merge differences
 	$cmd = $wgDiff3 . ' -a -A --merge ' . wfEscapeShellArg(
@@ -1896,7 +1882,7 @@ function wfMerge( $old, $mine, $yours, &$result ) {
 		}
 		$result .= $data;
 	} while ( true );
-	pclose( $handle );
+	$conflict = pclose( $handle ) != 0;
 	unlink( $mytextName );
 	unlink( $oldtextName );
 	unlink( $yourtextName );
