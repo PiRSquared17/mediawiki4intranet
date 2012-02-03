@@ -82,7 +82,10 @@ function _enotifdiff_compose_common_mailtext(&$mailer, &$keys)
 {
     global $wgOut;
     $oldWgOut = $wgOut;
-    $wgOut = new OutputPage;
+    if (class_exists('RequestContext'))
+        $wgOut = new OutputPage(RequestContext::getMain());
+    else
+        $wgOut = new OutputPage();
     $de = new DifferenceEngine(Title::newFromText($keys['$PAGETITLE']), $keys['$OLDID'], 'next');
     $de->showDiffPage(true);
     $keys['$DIFF'] = $wgOut->getHTML();
@@ -115,6 +118,10 @@ function _enotifdiff_personalize_mailtext(&$mailer, &$user, &$body)
 
 function _enotifdiff_user_condition(&$mailer, &$condition)
 {
-    $condition = str_ireplace('wl_notificationtimestamp IS NULL', '(wl_notificationtimestamp IS NULL OR user_options LIKE \'%enotifsendmultiple=1%\' OR user_options LIKE \'%enotifsenddiffs=1%\')', $condition);
+    $condition = str_ireplace(
+        'wl_notificationtimestamp IS NULL',
+        '(wl_notificationtimestamp IS NULL OR EXISTS (SELECT * FROM user_properties'.
+        ' WHERE up_user=user_id AND up_property IN (\'enotifsendmultiple\', \'enotifsenddiffs\') AND up_value=1))',
+        $condition);
     return true;
 }

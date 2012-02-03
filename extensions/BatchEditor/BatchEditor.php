@@ -27,7 +27,7 @@ function wfInitBatchEditor()
 
 function wfSpecialBatchEditor($par = null)
 {
-    global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgLang, $IP, $wgScriptPath;
+    global $wgOut, $wgRequest, $wgTitle, $wgUser, $wgLang, $IP, $wgScriptPath, $wgVersion;
 
     $wgOut->setPageTitle(wfMsg('batcheditor-title'));
 
@@ -216,7 +216,10 @@ function wfSpecialBatchEditor($par = null)
             {
                 $oldrev = wfMsgHTML('revisionasof', $wgLang->timeanddate($article->getTimestamp(), true));
                 $newrev = wfMsg('yourtext');
-                $wgOut->addStyle('common/diff.css');
+                if (version_compare($wgVersion, '1.18') >= 0)
+                    $wgOut->addModules('mediawiki.action.history.diff');
+                else
+                    $wgOut->addStyle('common/diff.css');
                 $wgOut->addWikiText("== [[$s_title]] ==");
                 $canedit = $article->getTitle()->userCan('edit');
                 if (!$canedit)

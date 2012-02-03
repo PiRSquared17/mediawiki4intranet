@@ -18,6 +18,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#### ENGLISH ####
+
 # (!) This extension requires a patch into core MediaWiki code (!)
 # Apply it with GNU patch utility, with the following command:
 # patch -p0 -d <your_mediawiki_directory> < MergeConflicts.diff
@@ -35,6 +37,8 @@
 # upper one, which (as MediaWiki authors probably think) could lead to that they'll
 # always overwrite conflicting changes with their own simply clicking on "Save" and
 # not reading any warnings.
+
+#### РУССКИЙ ####
 
 # (!) Расширение для работы требует патча в код MediaWiki (!)
 # Применяйте его утилитой GNU patch и командой:
@@ -72,9 +76,9 @@ elseif ( !$_SERVER['SERVER_NAME'] )
 {
     /* Refuse to work if MW_PATCH_MERGE_CONFLICTS is not defined,
        which means our patch is not applied to this installation */
-    die('ATTENTION! MergeConflicts extension patch is not applied to this MediaWiki installation.
+    die( 'ATTENTION! MergeConflicts extension patch is not applied to this MediaWiki installation.
 Please apply it before using this extension with the following command:
-patch -d "'.$IP.'" -p0 < "'.dirname(__FILE__).'/MergeConflicts.diff"'."\n");
+patch -d "'.$IP.'" -p0 < "'.dirname(__FILE__).'/MergeConflicts.diff"'."\n" );
 }
 
 function wfSetupMergeConflicts()
@@ -87,9 +91,10 @@ function wfParseDiff3( $merged )
     $lines = explode( "\n", $merged );
     $conflicts = array();
     $precontext = array();
-    $to = NULL;
+    $postcontext = $mine = $old = $their = NULL;
     $lineno = array( 0, 0, 0 );
     $m_mine = '<<<<<<< '.wfMsg( 'merge-mine' );
+    $m_empty_mine = '<<<<<<< '.wfMsg( 'merge-old' );
     $m_old = '||||||| '.wfMsg( 'merge-old' );
     $m_their = '>>>>>>> '.wfMsg( 'merge-their' );
     foreach ( $lines as $line )
@@ -113,6 +118,28 @@ function wfParseDiff3( $merged )
             $mine = array();
             $to = &$mine;
         }
+        elseif ( trim( $line ) == $m_empty_mine )
+        {
+            if ( $postcontext !== NULL )
+            {
+                $conflicts[] = array(
+                    'line'  => $conflictline,
+                    'pre'   => $precontext,
+                    'mine'  => $mine,
+                    'old'   => $old,
+                    'their' => $their,
+                    'post'  => $postcontext,
+                );
+                $postcontext = $mine = $old = $their = NULL;
+                $precontext = array();
+            }
+            // diff3 emits "<<< old ... === ... >>> (their)" when '<<< my' is empty
+            // instead of "<<< mine ||| old === ... >>> (their)".
+            $conflictline = $lineno;
+            $mine = array();
+            $old = array();
+            $to = &$old;
+        }
         elseif ( trim( $line ) == $m_old )
         {
             $old = array();
@@ -133,7 +160,7 @@ function wfParseDiff3( $merged )
         }
         else
         {
-            if ( $to !== NULL )
+            if ( isset( $to ) )
                 $to[] = $line;
             else
             {
@@ -210,9 +237,9 @@ function wfFormatDiff3Conflicts( $conflicts )
         // Conflicting lines
         for ( $i = 0; $i < $lines; $i++ )
         {
-            $mine = htmlspecialchars( $conflict['mine'][$i] );
-            $old = htmlspecialchars( $conflict['old'][$i] );
-            $their = htmlspecialchars( $conflict['their'][$i] );
+            $mine = htmlspecialchars( isset( $conflict['mine'][$i] ) ? $conflict['mine'][$i] : '' );
+            $old = htmlspecialchars( isset( $conflict['old'][$i] ) ? $conflict['old'][$i] : '' );
+            $their = htmlspecialchars( isset( $conflict['their'][$i] ) ? $conflict['their'][$i] : '' );
             if ( $mine == '' && $old == '' && $their == '' )
                 $mine = '&nbsp;';
             $tr[] = array( '',

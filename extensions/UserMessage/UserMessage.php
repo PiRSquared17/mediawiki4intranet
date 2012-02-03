@@ -30,6 +30,8 @@
    It is useful, for example, for (CustIS Bug 61726) personalization of
    MediaWiki:Edittools. Personalized messages will have names like
    MediaWiki:Edittools@UserName.
+
+   Non-compatible with stock 1.18 - requires adding NormalizeMessageKey hook to Message class.
 */
 
 /* INSTALLATION */
@@ -56,38 +58,38 @@ $wgExtensionCredits['other'][] = array(
 $wgHooks['NormalizeMessageKey'][] = 'efUserMessageNormalizeMessageKey';
 $wgHooks['userCan'][] = 'efUserMessageAllowEditPersonalMessages';
 $wgExtensionMessagesFiles['UserMessage'] = dirname(__FILE__) . '/UserMessage.i18n.php';
-if (!isset($wgUserMessageAllowCustomization))
-    $wgUserMessageAllowCustomization = array('edittools' => true);
+
+// Default settings:
+$wgUserMessageDelimiter = '@';
+$wgUserMessageAllowCustomization = array('edittools' => true);
 
 function efUserMessageIsPersonalMessage($title)
 {
     global $wgContLang, $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
     /* Match keys like MediaWiki:Something_Customisable@UserName */
-    if (!$wgUserMessageDelimiter)
-        $wgUserMessageDelimiter = '@';
     return $title->getNamespace() == NS_MEDIAWIKI &&
         ($newkey = $wgContLang->lcfirst($title->getText())) &&
         ($p = mb_strrpos($newkey, $wgUserMessageDelimiter)) !== false &&
         $wgUserMessageAllowCustomization[mb_substr($newkey, 0, $p)] &&
-        User::newFromName(mb_substr($newkey, $p+mb_strlen($delim)));
+        User::newFromName(mb_substr($newkey, $p+mb_strlen($wgUserMessageDelimiter)));
 }
 
 function efUserMessageNormalizeMessageKey(&$key, &$useDB, &$langCode, &$transform)
 {
     global $wgUserMessageAllowCustomization, $wgUserMessageDelimiter;
-    global $wgUser, $wgMessageCache, $wgTitle;
-    if (!$wgUserMessageDelimiter)
-        $wgUserMessageDelimiter = '@';
-    if (array_key_exists($key, $wgUserMessageAllowCustomization) && $wgUser && $wgUser->getID() &&
-        is_object($wgMessageCache))
+    global $wgUser, $wgTitle;
+    if (is_array($key))
+        return true;
+    if (isset($wgUserMessageAllowCustomization[$key]) &&
+        $wgUser && $wgUser->getID())
     {
         /* This is a customisable message */
         $newkey = $key.$wgUserMessageDelimiter.$wgUser->getName();
-        if (!wfEmptyMsg($newkey, $wgMessageCache->get($newkey, true, $langCode)))
+        if (!wfEmptyMsg($newkey, MessageCache::singleton()->get($newkey, true, $langCode)))
             $key = $newkey;
     }
     elseif (($p = mb_strrpos($key, $wgUserMessageDelimiter)) !== false &&
-        $wgUserMessageAllowCustomization[mb_substr($key, 0, $p)] &&
+        isset($wgUserMessageAllowCustomization[mb_substr($key, 0, $p)]) &&
         User::newFromName(mb_substr($key, $p+mb_strlen($wgUserMessageDelimiter))))
     {
         /* Personal message is requested, but no such exists for a user,

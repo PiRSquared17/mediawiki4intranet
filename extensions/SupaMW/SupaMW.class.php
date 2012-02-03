@@ -101,7 +101,7 @@ class SUPAField extends HTMLTextField {
         return Html::rawElement( 'td', array( 'class' => 'mw-label' ), $label );
     }
     function getInputHTML( $value ) {
-        global $wgScriptPath;
+        global $wgScriptPath, $wgOut;
         $applet =
 '<a href="javascript:void(0)" onclick="supaPasteAgain()">'.wfMsg( 'supa-paste-again' ).'</a><br />
 <applet id="SupaApplet" archive="'.$wgScriptPath.'/extensions/SupaMW/Supa.jar"
@@ -118,9 +118,8 @@ class SUPAField extends HTMLTextField {
         $applet = str_replace( "\n", "\\n", addslashes( $applet ) );
         $javaDisabled = wfMsg( 'supa-java-disabled' );
         $emptyContent = wfMsg( 'supa-empty-content' );
-        return '<input type="hidden" name="wpSupaContent" id="wpSupaContent" value="" />
-<div id="mw-supa-placeholder">'.wfMsgExt( 'supa-needs-java', 'parseinline' ).<<<EOF
-</div><script language="JavaScript" type="text/javascript"><!--
+        $wgOut->addScript( <<<EOF
+<script language="JavaScript" type="text/javascript"><!--
 if ( navigator.javaEnabled() ) {
     window.supaPostApplet = function() {
         document.getElementById( 'mw-supa-placeholder' ).innerHTML = '$applet';
@@ -168,6 +167,9 @@ if ( navigator.javaEnabled() ) {
     };
 }
 //--></script>
-EOF;
+EOF
+);
+        return '<input type="hidden" name="wpSupaContent" id="wpSupaContent" value="" />
+<div id="mw-supa-placeholder"><div id="wpUploadFileSUPA"></div>'.wfMsgExt( 'supa-needs-java', 'parseinline' ).'</div>';
     }
 }
