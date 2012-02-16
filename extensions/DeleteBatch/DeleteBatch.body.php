@@ -285,6 +285,15 @@ class DeleteBatchForm {
 		$page = Title::newFromText( $line );
 			if ( is_null( $page ) ) { /* invalid title? */
 				$wgOut->addWikiMsg( 'deletebatch-omitting-invalid', $line );
+		if ( !$multi ) {
+			if ( !is_null( $user ) ) {
+					$wgUser = $user;
+				}
+			}
+			return false;
+		}
+		if ( !$page->exists() ) { /* no such page? */
+			$wgOut->addWikiMsg( 'deletebatch-omitting-nonexistant', $line );
 			if ( !$multi ) {
 				if ( !is_null( $user ) ) {
 					$wgUser = $user;
@@ -292,10 +301,12 @@ class DeleteBatchForm {
 			}
 			return false;
 		}
-		if ( !$page->exists() ) { /* no such page? */
-				$wgOut->addWikiMsg( 'deletebatch-omitting-nonexistant', $line );
-			if ( !$multi ) {
-				if ( !is_null( $user ) ) {
+
+		$allowed = wfRunHooks( 'userCan', array( &$page, &$wgUser, "delete", &$result ) );
+		if( !$allowed ) {
+			$wgOut->addWikiText( wfMsg('deletebatch-permission-denied', $line) );
+			if (!$multi) {
+				if (!is_null($user)) {
 					$wgUser = $user;
 				}
 			}
@@ -310,14 +321,15 @@ class DeleteBatchForm {
 		/* this stuff goes like articleFromTitle in Wiki.php */
 		if ( $page->getNamespace() == NS_FILE ) {
 			$art = new ImagePage( $page );
+			$art->delete();
 		} else {
 			$art = new Article( $page );
+			$art->doDelete( $reason );
 		}
 
 		/* what is the generic reason for page deletion?
 		   something about the content, I guess...
 		*/
-		$art->doDelete( $reason );
 		$db->commit();
 		return true;
 	}
