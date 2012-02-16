@@ -1275,3 +1275,8 @@ div.mw-lag-warn-high {
 #catlinks-top .catlinks div {
 	padding-left: 0.7em;
 }
+ul#filetoc {
+	font-size: 100%;
+	line-height: 1.35em;
+	padding: 0.3em 0;
+}
