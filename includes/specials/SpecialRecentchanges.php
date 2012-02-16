@@ -98,8 +98,10 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 	public function feedSetup() {
 		global $wgFeedLimit;
 		$opts = $this->getDefaultOptions();
-		# Feed is cached on limit,hideminor,namespace; other params would randomly not work
-		$opts->fetchValuesFromRequest( $this->getRequest(), array( 'limit', 'hideminor', 'namespace' ) );
+		$opts->fetchValuesFromRequest( $this->getRequest(), array(
+			'days', 'limit', 'from', 'hideminor', 'hidebots', 'hideanons', 'hideliu',
+			'hidepatrolled', 'hidemyself', 'namespace', 'invert', 'categories',
+			'categories_any', 'tagfilter' ) );
 		$opts->validateIntBounds( 'limit', 0, $wgFeedLimit );
 		return $opts;
 	}
@@ -355,6 +357,8 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 	 * @return database result or false (for Recentchangeslinked only)
 	 */
 	public function doMainQuery( $conds, $opts ) {
+		global $wgAllowCategorizedRecentChanges;
+
 		$tables = array( 'recentchanges' );
 		$join_conds = array();
 		$query_options = array(
@@ -369,15 +373,35 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 		$associated = $opts['associated'];
 
 		$fields = array( $dbr->tableName( 'recentchanges' ) . '.*' ); // all rc columns
+
+		$categories = trim( $opts['categories'], " \t\n\r\0\x0B|" );
+		// JOIN on categories
+		if( $wgAllowCategorizedRecentChanges && $categories &&
+		    ( $categories = preg_split( '/[\s\|]*\|[\s\|]*/', $categories ) ) ) {
+			foreach( $categories as &$cat ) {
+				$cat = str_replace( ' ', '_', $cat );
+			}
+			$tables[] = 'page';
+			$join_conds['page'] = array( 'INNER JOIN', array( 'page_title=rc_title', 'page_namespace=rc_namespace' ) );
+			if( $opts['categories_any'] ) {
+				$conds[] = "EXISTS (".$dbr->selectSQLText( 'categorylinks', '*', array( 'cl_from=page_id', 'cl_to' => $categories ) ).")";
+			} else {
+				foreach( $categories as $i => $cat ) {
+					$tables[] = "`categorylinks` cl$i";
+					$join_conds["`categorylinks` cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
+				}
+			}
+		}
+
 		// JOIN on watchlist for users
 		if ( $uid ) {
 			$tables[] = 'watchlist';
 			$fields[] = 'wl_user';
 			$fields[] = 'wl_notificationtimestamp';
 			$join_conds['watchlist'] = array('LEFT JOIN',
-				"wl_user={$uid} AND wl_title=rc_title AND wl_namespace=rc_namespace");
+				array('wl_user' => $uid, 'wl_title=rc_title', 'wl_namespace=rc_namespace'));
 		}
-		if ( $this->getUser()->isAllowed( 'rollback' ) ) {
+		if ( $this->getUser()->isAllowed( 'rollback' ) && empty( $join_conds['page'] ) ) {
 			$tables[] = 'page';
 			$fields[] = 'page_latest';
 			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
@@ -468,7 +492,7 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 		// And now for the content
 		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery() );
 
-		if( $wgAllowCategorizedRecentChanges ) {
+		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
 			$this->filterByCategories( $rows, $opts );
 		}
 
@@ -482,10 +506,15 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 
 		$s = $list->beginRecentChangesList();
 		foreach( $rows as $obj ) {
+// <IntraACL>
+			$rc = RecentChange::newFromRow( $obj );
+			if ( !$rc->getTitle()->userCanReadEx() ) {
+				continue;
+			}
+// </IntraACL>
 			if( $limit == 0 ) {
 				break;
 			}
-			$rc = RecentChange::newFromRow( $obj );
 			$rc->counter = $counter++;
 			# Check if the page has been updated since the last visit
 			if( $wgShowUpdatedMarker && !empty( $obj->wl_notificationtimestamp ) ) {
@@ -709,6 +738,7 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 			$a2r[$id][] = $k;
 			$rowsarr[$k] = $r;
 		}
+		$rows = $rowsarr;
 
 		# Shortcut?
 		if( !count( $articles ) || !count( $cats ) ) {
@@ -721,14 +751,14 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 		$match = $c->run();
 
 		# Filter
-		$newrows = array();
+		$rowsarr = array();
 		foreach( $match as $id ) {
 			foreach( $a2r[$id] as $rev ) {
 				$k = $rev;
-				$newrows[$k] = $rowsarr[$k];
+				$rowsarr[$k] = $rows[$k];
 			}
 		}
-		$rows = $newrows;
+		$rows = $rowsarr;
 	}
 
 	/**
