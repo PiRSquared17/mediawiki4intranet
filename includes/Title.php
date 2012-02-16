@@ -83,6 +83,7 @@ class Title {
 	var $mRedirect = null;            // /< Is the article at this title a redirect?
 	var $mNotificationTimestamp = array(); // /< Associative array of user ID -> timestamp/false
 	var $mBacklinkCache = null;       // /< Cache of links to this title
+	var $mBadtitleError = null;       // /< Error which caused the invalid title
 	// @}
 
 
@@ -103,7 +104,9 @@ class Title {
 		$t = new Title();
 		$t->mDbkeyform = $key;
 		if ( $t->secureAndSplit() ) {
-			return $t;
+// <IntraACL>
+			return $t->checkAccessControl();
+// </IntraACL>
 		} else {
 			return null;
 		}
@@ -156,7 +159,10 @@ class Title {
 				$cachedcount++;
 				Title::$titleCache[$text] =& $t;
 			}
-			return $t;
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+			return $t->checkAccessControl();
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch			return $t;
 		} else {
 			$ret = null;
 			return $ret;
@@ -176,9 +182,10 @@ class Title {
 	 * the given title's length does not exceed the maximum.
 	 *
 	 * @param $url String the title, as might be taken from a URL
+	 * @param $return_bad boolean True to ignore errors and return invalid title
 	 * @return Title the new object, or NULL on an error
 	 */
-	public static function newFromURL( $url ) {
+	public static function newFromURL( $url, $return_bad = false ) {
 		global $wgLegalTitleChars;
 		$t = new Title();
 
@@ -191,6 +198,10 @@ class Title {
 
 		$t->mDbkeyform = str_replace( ' ', '_', $url );
 		if ( $t->secureAndSplit() ) {
+// <IntraACL>
+			return $t->checkAccessControl();
+// </IntraACL>
+		} elseif ( $return_bad ) {
 			return $t;
 		} else {
 			return null;
@@ -303,7 +314,11 @@ class Title {
 		$t->mArticleID = ( $ns >= 0 ) ? -1 : 0;
 		$t->mUrlform = wfUrlencode( $t->mDbkeyform );
 		$t->mTextform = str_replace( '_', ' ', $title );
+/*op-patch|TS|2009-06-19|HaloACL|SafeTitle|start*/
+		$t = $t->checkAccessControl();
 		return $t;
+/*op-patch|TS|2009-06-19|end*/  
+// Preplaced by patch		return $t;
 	}
 
 	/**
@@ -321,7 +336,9 @@ class Title {
 		$t = new Title();
 		$t->mDbkeyform = Title::makeName( $ns, $title, $fragment, $interwiki );
 		if ( $t->secureAndSplit() ) {
-			return $t;
+// <IntraACL>
+			return $t->checkAccessControl();
+// </IntraACL>
 		} else {
 			return null;
 		}
@@ -1411,12 +1428,20 @@ class Title {
 	 * @return Array list of errors
 	 */
 	private function checkSpecialsAndNSPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
+		/**
+		 * Do not deny all actions except 'createaccount' and 'execute'
+		 * on special pages, let them decide themselves.
+		 * -- vitalif@mail.ru 2011-04-03
+		 * <commented out>:
+		 *
 		# Only 'createaccount' and 'execute' can be performed on
 		# special pages, which don't actually exist in the DB.
 		$specialOKActions = array( 'createaccount', 'execute' );
 		if ( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions ) ) {
 			$errors[] = array( 'ns-specialprotected' );
 		}
+		 * </commented out>
+		 */
 
 		# Check $wgNamespaceProtection for restricted namespaces
 		if ( $this->isNamespaceProtected( $user ) ) {
@@ -2640,6 +2665,8 @@ class Title {
 	 */
 	private function secureAndSplit() {
 		global $wgContLang, $wgLocalInterwiki;
+		global $wgMaxTitleBytes;
+		$this->mBadtitleError = NULL;
 
 		# Initialisation
 		$this->mInterwiki = $this->mFragment = '';
@@ -2660,11 +2687,13 @@ class Title {
 		$dbkey = trim( $dbkey, '_' );
 
 		if ( $dbkey == '' ) {
+			$this->mBadtitleError = array( 'title-invalid-empty' );
 			return false;
 		}
 
 		if ( false !== strpos( $dbkey, UTF8_REPLACEMENT ) ) {
 			# Contained illegal UTF-8 sequences or forbidden Unicode chars.
+			$this->mBadtitleError = array( 'title-invalid-utf8', array( UTF8_REPLACEMENT ) );
 			return false;
 		}
 
@@ -2703,6 +2732,7 @@ class Title {
 					if ( !$firstPass ) {
 						# Can't make a local interwiki link to an interwiki link.
 						# That's just crazy!
+						$this->mBadtitleError = array( 'title-invalid-double-interwiki' );
 						return false;
 					}
 
@@ -2716,6 +2746,7 @@ class Title {
 					{
 						if ( $dbkey == '' ) {
 							# Can't have an empty self-link
+							$this->mBadtitleError = array( 'title-invalid-empty' );
 							return false;
 						}
 						$this->mInterwiki = '';
@@ -2752,7 +2783,11 @@ class Title {
 
 		# Reject illegal characters.
 		$rxTc = self::getTitleInvalidRegex();
-		if ( preg_match( $rxTc, $dbkey ) ) {
+		if( preg_match( $rxTc, $dbkey, $m, PREG_OFFSET_CAPTURE ) ) {
+			$marked = substr( $dbkey, 0, $m[0][1] ) . '--->' . $m[0][0] . '<---' . substr( $dbkey, $m[0][1] + strlen( $m[0][0] ) );
+			$this->mBadtitleError = array( 'title-invalid-characters',
+				array( $m[0][0], mb_strlen( substr( $dbkey, 0, $m[0][1] ) ), mb_strlen( $m[0][0] ), $marked )
+			);
 			return false;
 		}
 
@@ -2768,21 +2803,32 @@ class Title {
 			   substr( $dbkey, -2 ) == '/.' ||
 			   substr( $dbkey, -3 ) == '/..' ) )
 		{
+			$this->mBadtitleError = array( 'title-invalid-relative' );
 			return false;
 		}
 
 		# Magic tilde sequences? Nu-uh!
-		if ( strpos( $dbkey, '~~~' ) !== false ) {
+		if( ( $p = strpos( $dbkey, '~~~' ) ) !== false ) {
+			$this->mBadtitleError = array( 'title-invalid-magic-tilde', array( $p ) );
 			return false;
 		}
 
-		# Limit the size of titles to 255 bytes. This is typically the size of the
-		# underlying database field. We make an exception for special pages, which
-		# don't need to be stored in the database, and may edge over 255 bytes due
-		# to subpage syntax for long titles, e.g. [[Special:Block/Long name]]
-		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > 255 ) ||
-		  strlen( $dbkey ) > 512 )
-		{
+		/**
+		 * Limit the size of titles to $wgMaxTitleBytes bytes.
+		 * It is set to 255 by default - this is typically the size of the underlying database field.
+		 * We make an exception for special pages, which don't need to be stored
+		 * in the database, and may edge over this limit due to subpage syntax
+		 * for long titles, e.g. [[Special:Block/Long name]]
+		 *
+		 * Really, even in MySQL you can use VARBINARY(767) for page.page_title.
+		 * 767 is the maximum size for an index key in InnoDB.
+		 * So the limit is made configurable in MediaWiki4Intranet.
+		 */
+		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = $wgMaxTitleBytes ) ) ||
+		  strlen( $dbkey ) > ( $max = $wgMaxTitleBytes*2 ) ) {
+			$chop = substr( $dbkey, 0, $max+1 );
+			$chop = mb_substr( $chop, 0, mb_strlen( $chop ) - 1 );
+			$this->mBadtitleError = array( 'title-invalid-too-long', array( $max, $chop ) );
 			return false;
 		}
 
@@ -2797,6 +2843,7 @@ class Title {
 		# Can't make a link to a namespace alone... "empty" local links can only be
 		# self-links with a fragment identifier.
 		if ( $dbkey == '' && $this->mInterwiki == '' && $this->mNamespace != NS_MAIN ) {
+			$this->mBadtitleError = array( 'title-invalid-empty' );
 			return false;
 		}
 
@@ -2812,6 +2859,7 @@ class Title {
 
 		// Any remaining initial :s are illegal.
 		if ( $dbkey !== '' && ':' == $dbkey { 0 } ) {
+			$this->mBadtitleError = array( 'title-invalid-leading-colon' );
 			return false;
 		}
 
@@ -4261,6 +4309,7 @@ class Title {
 
 		return $types;
 	}
+
 	/**
 	 * Get a filtered list of all restriction types supported by this wiki.
 	 * @param bool $exists True to get all restriction types that apply to
@@ -4341,4 +4390,104 @@ class Title {
 		wfRunHooks( 'PageContentLanguage', array( $this, &$pageLang, $wgLang ) );
 		return wfGetLangObj( $pageLang );
 	}
+
+// <IntraACL>
+	
+	/**
+	 * This function is called from the patches for HaloACL for secure listings
+	 * (e.g. Special:AllPages). It checks, whether the current user is allowed
+	 * to read the article for this title object. For normal pages this is
+	 * evaluate in the method <userCanRead>.
+	 * However, the special pages that generate listings, often create title
+	 * objects before the can check their accessibility. The fallback mechanism
+	 * of HaloACL creates the title "Permission denied" for the article that
+	 * must not be accessed. The listings would then show a link to "Permission
+	 * denied". So this function returns "false" for the title "Permission denied"
+	 * as well.
+	 *
+	 * @return
+	 * 		true, if this title can be read
+	 * 		false, if the title is protected or "Permission denied".
+	 */
+	public function userCanReadEx( $otherUser = NULL ) {
+		if ( !defined( 'HACL_HALOACL_VERSION' ) ) {
+			// IntraACL is disabled
+			return true;
+		}
+		global $haclgContLang;
+		if ( $this->mTextform === $haclgContLang->getPermissionDeniedPage() ) {
+			// Special handling of "Permission denied" page
+			return false;
+		}
+		if ( $otherUser ) {
+			$canRead = false;
+			$status = HACLEvaluator::userCan( $this, $otherUser, 'read', $canRead );
+			return $canRead;
+		}
+		return $this->userCanRead();
+	}
+
+	/**
+	 * This function checks, if this title is accessible for the action of the
+	 * current request. If the action is unknown it is assumed to be "read".
+	 * If the title is not accessible, the new title "Permission denied" is
+	 * returned. This is a fallback to protect titles if all other security
+	 * patches fail.
+	 *
+	 * While a page is rendered, the same title is often checked several times.
+	 * To speed things up, the results of an accessibility check are internally
+	 * cached.
+	 *
+	 * This function can be disabled in HACL_Initialize.php or LocalSettings.php
+	 * by setting the variable $haclgEnableTitleCheck = false.
+	 *
+	 * @return
+	 * 		$this, if access is granted on this title or
+	 * 		the title for "Permission denied" if not.
+	 */
+	private function checkAccessControl() {
+		if ( !defined( 'HACL_HALOACL_VERSION' ) ) {
+			// IntraACL is disabled or not fully initialized
+			return $this;
+		}
+		global $haclgEnableTitleCheck;
+		if ( isset( $haclgEnableTitleCheck ) && $haclgEnableTitleCheck === false ) {
+			return $this;
+		}
+		static $permissionCache = array();
+		
+		$action = 'read';
+		$index = $this->getFullText().'-'.$action;
+		$allowed = @$permissionCache[$index];
+		if ( !isset( $allowed ) ) {
+			switch ( $action ) {
+				case 'create':
+				case 'move':
+				case 'delete':
+					$allowed = $this->userCan($action);
+					break;
+				case 'edit':
+					// If the article does not exist and edit right was requested,
+					// check for create right.
+					$allowed = $this->userCan($this->exists() ? 'edit' : 'create');
+					break;
+				default:
+					// If the user has no read access to a non-existing page,
+					// but has the right to create it - allow him to "read" it
+					$allowed = $this->userCanRead() || !$this->exists() && $this->userCan('create');
+			}
+			$permissionCache[$index] = $allowed;
+		}
+		if ( $allowed === false ) {
+			global $haclgContLang;
+			$etc = $haclgEnableTitleCheck;
+			$haclgEnableTitleCheck = false;
+			$t = Title::newFromURL($haclgContLang->getPermissionDeniedPage());
+			$haclgEnableTitleCheck = $etc;
+			return $t;
+		}
+		return $this;
+	}
+// </IntraACL>
+
 }
