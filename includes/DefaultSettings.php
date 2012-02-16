@@ -198,6 +198,12 @@ $wgUploadPath       = false;
 $wgUploadDirectory	= false;
 
 /**
+ * Set this to true to enable russian transliteration of uploaded file names.
+ * May be useful for Windows installations.
+ */
+$wgTransliterateUploadFilenames = false;
+
+/**
  * The URL path of the wiki logo. The logo size should be 135x135 pixels.
  * Defaults to "{$wgStylePath}/common/images/wiki.png".
  */
@@ -871,6 +877,11 @@ $wgXMLMimeTypes = array(
 		'html'                              			=> 'text/html', // application/xhtml+xml?
 );
 
+$wgXMLMayBeCompressed = array(
+	'image/svg+xml' => true,
+	'application/x-dia-diagram' => true,
+);
+
 /**
  * Limit images on image description pages to a user-selectable limit. In order
  * to reduce disk usage, limits can only be selected from a list.
@@ -1017,6 +1028,11 @@ $wgEnableEmail = true;
  * This can potentially be abused, as it's hard to track.
  */
 $wgEnableUserEmail = true;
+
+/**
+ * Default content-type for e-mail. Set to text/html for HTML e-mail.
+ */
+$wgEmailContentType = 'text/plain';
 
 /**
  * Set to true to put the sending user's email in a Reply-To header
@@ -1346,6 +1362,12 @@ $wgOldChangeTagsIndex = false;
  * @name   Text storage
  * @{
  */
+
+/**
+ * Paths to zip/unzip utilities.
+ */
+$wgZip = '/usr/bin/zip';
+$wgUnzip = '/usr/bin/unzip';
 
 /**
  * We can also compress text stored in the 'text' table. If this is set on, new
@@ -1766,6 +1788,11 @@ $wgUseXVO = false;
  * HTTP redirects.
  */
 $wgVaryOnXFP = false;
+
+# Maximum number of bytes in titles. 255 by default, but even in MySQL,
+# you can change page.page_title to VARBINARY(767) and raise this value to 767.
+# (767 is the maximum size for an index key in InnoDB)
+$wgMaxTitleBytes	= 255;
 
 /**
  * Internal server name as known to Squid, if different. Example:
@@ -3654,6 +3681,28 @@ $wgDeleteRevisionsLimit = 0;
 /** Number of accounts each IP address may create, 0 to disable.
  * Requires memcached */
 $wgAccountCreationThrottle = 0;
+
+/**
+ * Import/export formats
+ */
+$wgExportFormats = array(
+	array(
+		'extension' => 'xml',
+		'mimetype' => 'application/xml',
+		'reader' => 'WikiImporter',
+		'writer' => 'XmlDumpWriter',
+	),
+);
+
+/**
+ * Archive classes for import
+ */
+$wgDumpArchiveByExt = array(
+	'xml' => array( 'OldMultipartDumpArchive', 'StubDumpArchive' ),
+	'multipart' => array( 'OldMultipartDumpArchive' ),
+	'zip' => array( 'ZipDumpArchive' ),
+	'' => array( 'ZipDumpArchive', 'StubDumpArchive' ),
+);
 
 /**
  * Edits matching these regular expressions in body text
@@ -5560,6 +5609,9 @@ $wgSeleniumTestConfigs = array();
 $wgSeleniumConfigFile = null;
 $wgDBtestuser = ''; //db user that has permission to create and drop the test databases only
 $wgDBtestpassword = '';
+
+/** Defines that MergeConflicts extension patch was applied to this MW installation */
+define ( 'MW_PATCH_MERGE_CONFLICTS', 1 );
 
 /**
  * For really cool vim folding this needs to be at the end:
