@@ -32,7 +32,7 @@ $FILES_WIKIMEDIA = explode(' ',
     'api.php index.php COPYING thumb.php trackback.php'.
     ' opensearch_desc.php img_auth.php redirect.php');
 $EXT_WIKIMEDIA = explode(' ',
-    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki');
+    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki OpenID');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
     'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit Drafts');
 $EXT_OUR = array_map('trim', explode("\n",
@@ -62,7 +62,6 @@ $EXT_OUR = array_map('trim', explode("\n",
     MMHandler
     Mp3Handler
     NewPagesEx
-    OpenID
     PdfHandler
     PlantUML
     Polls
