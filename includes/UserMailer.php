@@ -115,14 +115,18 @@ class UserMailer {
 	 * @param $subject String: email's subject.
 	 * @param $body String: email's text.
 	 * @param $replyto MailAddress: optional reply-to email (default: null).
-	 * @param $contentType String: optional custom Content-Type (default: text/plain; charset=UTF-8)
+	 * @param $contentType String: optional custom Content-Type (default: $wgEmailContentType; charset=UTF-8)
 	 * @return Status object
 	 */
-	public static function send( $to, $from, $subject, $body, $replyto = null, $contentType = 'text/plain; charset=UTF-8') {
+	public static function send( $to, $from, $subject, $body, $replyto = null, $contentType = null) {
 		global $wgSMTP, $wgEnotifMaxRecips, $wgAdditionalMailParams;
+		global $wgEmailContentType;
 
 		if ( !is_array( $to ) ) {
 			$to = array( $to );
+		}
+		if ( is_null( $contentType ) ) {
+			$contentType = $wgEmailContentType.'; charset=UTF-8';
 		}
 
 		wfDebug( __METHOD__ . ': sending mail to ' . implode( ', ', $to ) . "\n" );
@@ -168,8 +172,7 @@ class UserMailer {
 			$headers['Subject'] = self::quotedPrintable( $subject );
 			$headers['Date'] = date( 'r' );
 			$headers['MIME-Version'] = '1.0';
-			$headers['Content-type'] = ( is_null( $contentType ) ?
-				'text/plain; charset=UTF-8' : $contentType );
+			$headers['Content-type'] = $contentType;
 			$headers['Content-transfer-encoding'] = '8bit';
 			// @todo FIXME
 			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>';
@@ -347,14 +350,17 @@ class EmailNotification {
 		$watchers = array();
 		if ( $wgEnotifWatchlist || $wgShowUpdatedMarker ) {
 			$dbw = wfGetDB( DB_MASTER );
-			$res = $dbw->select( array( 'watchlist' ),
+			$userCondition = array(
+				'user_id=wl_user',
+				'wl_title' => $title->getDBkey(),
+				'wl_namespace' => $title->getNamespace(),
+				'wl_user != ' . intval( $editor->getID() ),
+				'wl_notificationtimestamp IS NULL',
+			);
+			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
+			$res = $dbw->select( array( 'watchlist', 'user' ),
 				array( 'wl_user' ),
-				array(
-					'wl_title' => $title->getDBkey(),
-					'wl_namespace' => $title->getNamespace(),
-					'wl_user != ' . intval( $editor->getID() ),
-					'wl_notificationtimestamp IS NULL',
-				), __METHOD__
+				$userCondition, __METHOD__
 			);
 			foreach ( $res as $row ) {
 				$watchers[] = intval( $row->wl_user );
@@ -507,6 +513,7 @@ class EmailNotification {
 
 		$keys['$PAGETITLE'] = $this->title->getPrefixedText();
 		$keys['$PAGETITLE_URL'] = $this->title->getCanonicalUrl();
+		$keys['$PAGETITLE_URL_NOENC'] = urldecode( $this->title->getCanonicalUrl() );
 		$keys['$PAGEMINOREDIT'] = $this->minorEdit ? wfMsgForContent( 'minoredit' ) : '';
 		$keys['$PAGESUMMARY'] = $this->summary == '' ? ' - ' : $this->summary;
 		$keys['$UNWATCHURL'] = $this->title->getCanonicalUrl( 'action=unwatch' );
@@ -528,6 +535,8 @@ class EmailNotification {
 		$subject = wfMsgExt( 'enotif_subject', 'content' );
 		$subject = strtr( $subject, $keys );
 		$this->subject = MessageCache::singleton()->transform( $subject, false, null, $this->title );
+
+		wfRunHooks('EnotifComposeCommonMailtext', array(&$this, &$keys));
 
 		$body = wfMsgExt( 'enotif_body', 'content' );
 		$body = strtr( $body, $keys );
@@ -615,6 +624,8 @@ class EmailNotification {
 				$wgContLang->date( $this->timestamp, true, false, $timecorrection ),
 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
 			$body );
+
+		wfRunHooks( 'EnotifPersonalizeMailtext', array( &$this, &$watchingUser, &$body ) );
 
 		return UserMailer::send( $to, $this->from, $this->subject, $body, $this->replyto );
 	}
