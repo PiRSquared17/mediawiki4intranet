@@ -4963,7 +4963,8 @@ $messages['ru'] = array(
 	'openidconvertsuccesstext' => 'Вы успешно преобразовали ваш OpenID в $1.',
 	'openidconvertyourstext' => 'Это уже ваш OpenID.',
 	'openidconvertothertext' => 'Это чужой OpenID.',
-	'openidalreadyloggedin' => "'''Вы уже вошли, $1!'''
+	'openidalreadyloggedin' => 'Вы уже вошли!',
+	'openidalreadyloggedintext' => "'''Вы уже вошли, $1!'''
 
 Если вы желаете использовать в будущем вход через OpenID, вы можете [[Special:OpenIDConvert|преобразовать вашу учётную запись для использования в OpenID]].",
 	'openidnousername' => 'Не указано имя участника.',
