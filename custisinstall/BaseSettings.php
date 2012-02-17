@@ -222,10 +222,12 @@ if (wfIsWindows())
     $wgSVGConverterPath = realpath($IP."/../../app/inkscape/");
     $wgDIAConverterPath = realpath($IP."/../../app/dia/bin/");
     //$wgImageMagickConvertCommand = realpath($IP."/../../app/imagemagick")."/convert.exe";
-    # Bug 48216
+    // Bug 48216 - Transliterate cyrillic file names of uploaded files
     $wgTransliterateUploadFilenames = true;
     $wgSphinxQL_host = '127.0.0.1';
     $wgSphinxQL_port = '9306';
+    $wgZip = realpath("$IP/../../app/zip/zip.exe");
+    $wgUnzip = realpath("$IP/../../app/zip/unzip.exe");
 }
 
 $wgCookieExpiration = 3650 * 86400;
