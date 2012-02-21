@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1329850531 -14400
+# Date 1329851161 -14400
 Bug 18103 - Allow to view categorized Recent Changes, SQL category filtering
 
-diff -r 2b1195378d97 -r d6800476260e includes/specials/SpecialRecentchanges.php
+diff -r 2b1195378d97 -r 4a090b21c820 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -98,8 +98,10 @@
@@ -66,15 +66,29 @@ diff -r 2b1195378d97 -r d6800476260e includes/specials/SpecialRecentchanges.php
  			$tables[] = 'page';
  			$fields[] = 'page_latest';
  			$join_conds['page'] = array('LEFT JOIN', 'rc_cur_id=page_id');
-@@ -468,7 +492,7 @@
+@@ -466,9 +490,9 @@
+ 		}
+ 
  		// And now for the content
- 		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery() );
+-		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery() );
++		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery( $opts ) );
  
 -		if( $wgAllowCategorizedRecentChanges ) {
 +		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
  			$this->filterByCategories( $rows, $opts );
  		}
  
+@@ -521,8 +545,8 @@
+ 	 * Get the query string to append to feed link URLs.
+ 	 * This is overridden by RCL to add the target parameter
+ 	 */
+-	public function getFeedQuery() {
+-		return false;
++	public function getFeedQuery( $opts ) {
++		return http_build_query( $opts->getChangedValues() );
+ 	}
+ 
+ 	/**
 @@ -709,6 +733,7 @@
  			$a2r[$id][] = $k;
  			$rowsarr[$k] = $r;
