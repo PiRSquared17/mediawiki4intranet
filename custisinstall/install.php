@@ -27,10 +27,10 @@ $SVN_OUR = 'svn://svn.office.custis.ru/mediawiki';
 /* File set config */
 
 $DIRS_WIKIMEDIA = explode(' ',
-    'config includes languages maintenance skins');
+    'includes languages maintenance mw-config resources serialized skins tests');
 $FILES_WIKIMEDIA = explode(' ',
     'api.php index.php COPYING thumb.php trackback.php'.
-    ' opensearch_desc.php img_auth.php redirect.php');
+    ' opensearch_desc.php img_auth.php redirect.php load.php profileinfo.php');
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki OpenID');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
