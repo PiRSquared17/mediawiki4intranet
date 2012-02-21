@@ -87,7 +87,7 @@ $EXT_OUR = array_map('trim', explode("\n",
     Workflow
     mediawikiquizzer"
 ));
-$SKINS_OUR = explode(' ', 'custis custisru dumphtml ichick');
+$SKINS_OUR = explode(' ', 'custis custisru dumphtml ichick cleanmonobook');
 
 /* The install script */
 
