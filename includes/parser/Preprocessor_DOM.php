@@ -320,6 +320,12 @@ class Preprocessor_DOM implements Preprocessor {
 					continue;
 				}
 
+				if ( strtolower( substr( $text, $i, strlen( '<enableheadshift>' ) ) ) == '<enableheadshift>' ) {
+					$accum .= '<enableHeadShift><ignore>&lt;enableheadshift&gt;</ignore></enableHeadShift>';
+					$i += strlen( '<enableheadshift>' );
+					continue;
+				}
+
 				// Determine element name
 				if ( !preg_match( $elementsRegex, $text, $matches, 0, $i + 1 ) ) {
 					// Element name missing or not listed
@@ -891,7 +897,6 @@ class PPFrame_DOM implements PPFrame {
 	 */
 	var $depth;
 
-
 	/**
 	 * Construct a new preprocessor frame.
 	 * @param $preprocessor Preprocessor The parent preprocessor
@@ -951,7 +956,7 @@ class PPFrame_DOM implements PPFrame {
 	 * @param $flags int
 	 * @return string
 	 */
-	function expand( $root, $flags = 0 ) {
+	function expand( $root, $flags = 0, $headshift = 0 ) {
 		static $expansionDepth = 0;
 		if ( is_string( $root ) ) {
 			return $root;
@@ -978,6 +983,8 @@ class PPFrame_DOM implements PPFrame {
 		$outStack = array( '', '' );
 		$iteratorStack = array( false, $root );
 		$indexStack = array( 0, 0 );
+		$headlevel = $headshift;
+		$headshift_enabled = false;
 
 		while ( count( $iteratorStack ) > 1 ) {
 			$level = count( $outStack ) - 1;
@@ -1025,8 +1032,40 @@ class PPFrame_DOM implements PPFrame {
 			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
 				$newIterator = $contextNode;
 			} elseif ( $contextNode instanceof DOMNode ) {
+				if ( $contextNode->nodeName == 'h' ) {
+					# Remember heading levels
+					$mn = $contextNode->attributes->getNamedItem( 'level' );
+					if ( $mn ) {
+						if ( $headshift > 0 && $headshift_enabled ) {
+							$mn->value = 0+$headshift+$mn->value;
+							$headshiftlocal = $headshift;
+							if ( $mn->value > 6 ) {
+								$headshiftlocal = $headshift-$mn->value+6;
+								$mn->value = 6;
+							}
+							if ( $contextNode->childNodes->length <= 1 ) {
+								$contextNode->nodeValue =
+									str_repeat( '=', $headshiftlocal ) .
+									trim( $contextNode->nodeValue ) .
+									str_repeat( '=', $headshiftlocal );
+							} else {
+								$contextNode->childNodes->item( 0 )->nodeValue =
+									str_repeat( '=', $headshiftlocal ) .
+									trim( $contextNode->childNodes->item( 0 )->nodeValue );
+								$contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue =
+									trim( $contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue ) .
+									str_repeat( '=', $headshiftlocal );
+							}
+						}
+						$headlevel = 0+$mn->value;
+					}
+				}
 				if ( $contextNode->nodeType == XML_TEXT_NODE ) {
 					$out .= $contextNode->nodeValue;
+				} elseif ( $contextNode->nodeName == 'enableHeadShift' ) {
+					$headshift_enabled = true;
+					# Generic recursive expansion
+					$newIterator = $contextNode->childNodes;
 				} elseif ( $contextNode->nodeName == 'template' ) {
 					# Double-brace expansion
 					$xpath = new DOMXPath( $contextNode->ownerDocument );
@@ -1038,6 +1077,7 @@ class PPFrame_DOM implements PPFrame {
 					} else {
 						$lineStart = $contextNode->getAttribute( 'lineStart' );
 						$params = array(
+							'headLevel' => $headlevel,
 							'title' => new PPNode_DOM( $title ),
 							'parts' => new PPNode_DOM( $parts ),
 							'lineStart' => $lineStart );
@@ -1115,20 +1155,21 @@ class PPFrame_DOM implements PPFrame {
 
 					# Insert a heading marker only for <h> children of <root>
 					# This is to stop extractSections from going over multiple tree levels
-					if ( $contextNode->parentNode->nodeName == 'root'
-					  && $this->parser->ot['html'] )
-					{
-						# Insert heading index marker
-						$headingIndex = $contextNode->getAttribute( 'i' );
-						$titleText = $this->title->getPrefixedDBkey();
-						$this->parser->mHeadings[] = array( $titleText, $headingIndex );
-						$serial = count( $this->parser->mHeadings ) - 1;
-						$marker = "{$this->parser->mUniqPrefix}-h-$serial-" . Parser::MARKER_SUFFIX;
-						$count = $contextNode->getAttribute( 'level' );
-						$s = substr( $s, 0, $count ) . $marker . substr( $s, $count );
-						$this->parser->mStripState->addGeneral( $marker, '' );
+					if ( $s != str_repeat( '=', $contextNode->getAttribute( 'level' ) * 2 ) ) {
+						if ( $contextNode->parentNode->nodeName == 'root'
+						  && $this->parser->ot['html'] ) {
+							# Insert heading index marker
+							$headingIndex = $contextNode->getAttribute( 'i' );
+							$titleText = $this->title->getPrefixedDBkey();
+							$this->parser->mHeadings[] = array( $titleText, $headingIndex );
+							$serial = count( $this->parser->mHeadings ) - 1;
+							$marker = "{$this->parser->mUniqPrefix}-h-$serial-" . Parser::MARKER_SUFFIX;
+							$count = $contextNode->getAttribute( 'level' );
+							$s = substr( $s, 0, $count ) . $marker . substr( $s, $count );
+							$this->parser->mStripState->addGeneral( $marker, '' );
+						}
+						$out .= $s;
 					}
-					$out .= $s;
 				} else {
 					# Generic recursive expansion
 					$newIterator = $contextNode->childNodes;
