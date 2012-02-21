@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118429 -14400
+# Date 1329850531 -14400
 Bug 18103 - Allow to view categorized Recent Changes, SQL category filtering
 
-diff -r 6b6371ec1416 -r f9a4b971136a includes/specials/SpecialRecentchanges.php
+diff -r 2b1195378d97 -r d6800476260e includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -98,8 +98,10 @@
@@ -46,8 +46,8 @@ diff -r 6b6371ec1416 -r f9a4b971136a includes/specials/SpecialRecentchanges.php
 +				$conds[] = "EXISTS (".$dbr->selectSQLText( 'categorylinks', '*', array( 'cl_from=page_id', 'cl_to' => $categories ) ).")";
 +			} else {
 +				foreach( $categories as $i => $cat ) {
-+					$tables[] = "`categorylinks` cl$i";
-+					$join_conds["`categorylinks` cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
++					$tables["cl$i"] = 'categorylinks';
++					$join_conds["cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
 +				}
 +			}
 +		}
