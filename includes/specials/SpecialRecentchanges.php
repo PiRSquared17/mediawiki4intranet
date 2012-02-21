@@ -490,7 +490,7 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 		}
 
 		// And now for the content
-		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery() );
+		$this->getOutput()->setFeedAppendQuery( $this->getFeedQuery( $opts ) );
 
 		if( !empty( $wgAllowCategorizedRecentChanges ) ) {
 			$this->filterByCategories( $rows, $opts );
@@ -550,8 +550,8 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 	 * Get the query string to append to feed link URLs.
 	 * This is overridden by RCL to add the target parameter
 	 */
-	public function getFeedQuery() {
-		return false;
+	public function getFeedQuery( $opts ) {
+		return http_build_query( $opts->getChangedValues() );
 	}
 
 	/**
