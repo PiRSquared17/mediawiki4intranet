@@ -387,8 +387,8 @@ class SpecialRecentChanges extends IncludableSpecialPage {
 				$conds[] = "EXISTS (".$dbr->selectSQLText( 'categorylinks', '*', array( 'cl_from=page_id', 'cl_to' => $categories ) ).")";
 			} else {
 				foreach( $categories as $i => $cat ) {
-					$tables[] = "`categorylinks` cl$i";
-					$join_conds["`categorylinks` cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
+					$tables["cl$i"] = 'categorylinks';
+					$join_conds["cl$i"] = array( "INNER JOIN", array( "cl$i.cl_from=page_id", "cl$i.cl_to" => $cat ) );
 				}
 			}
 		}
