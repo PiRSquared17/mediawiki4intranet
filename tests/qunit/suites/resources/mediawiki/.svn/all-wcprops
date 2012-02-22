@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/mediawiki
+END
+mediawiki.util.js
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/mediawiki/mediawiki.util.js
+END
+mediawiki.jscompat.test.js
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/mediawiki/mediawiki.jscompat.test.js
+END
+mediawiki.user.js
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/mediawiki/mediawiki.user.js
+END
+mediawiki.js
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/qunit/suites/resources/mediawiki/mediawiki.js
+END
