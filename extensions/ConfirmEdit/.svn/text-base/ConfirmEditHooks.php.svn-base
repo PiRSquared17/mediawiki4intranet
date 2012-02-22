@@ -1,22 +1,24 @@
 <?php
 
 class ConfirmEditHooks {
+
 	/**
 	 * Get the global Captcha instance
 	 *
-	 * @return Captcha|SimpleCaptcha
+	 * @return Captcha
 	 */
 	static function getInstance() {
 		global $wgCaptcha, $wgCaptchaClass;
-
 		static $done = false;
-
 		if ( !$done ) {
 			$done = true;
 			$wgCaptcha = new $wgCaptchaClass;
 		}
-
 		return $wgCaptcha;
+	}
+
+	static function confirmEdit( $editPage, $newtext, $section ) {
+		return self::getInstance()->confirmEdit( $editPage, $newtext, $section );
 	}
 
 	static function confirmEditMerged( $editPage, $newtext ) {
@@ -54,34 +56,23 @@ class ConfirmEditHooks {
 	static function confirmEmailUser( $from, $to, $subject, $text, &$error ) {
 		return self::getInstance()->confirmEmailUser( $from, $to, $subject, $text, $error );
 	}
-
-	public static function APIGetAllowedParams( &$module, &$params ) {
-		return self::getInstance()->APIGetAllowedParams( $module, $params );
-	}
-
-	public static function APIGetParamDescription( &$module, &$desc ) {
-		return self::getInstance()->APIGetParamDescription( $module, $desc );
-	}
 }
 
 class CaptchaSpecialPage extends UnlistedSpecialPage {
-	public function __construct() {
+	public function __construct(){
 		parent::__construct( 'Captcha' );
 	}
-
 	function execute( $par ) {
 		$this->setHeaders();
-
 		$instance = ConfirmEditHooks::getInstance();
-
 		switch( $par ) {
-			case "image":
-				if ( method_exists( $instance, 'showImage' ) ) {
-					return $instance->showImage();
-				}
-			case "help":
-			default:
-				return $instance->showHelp();
+		case "image":
+			if ( method_exists( $instance, 'showImage' ) )
+				return $instance->showImage();
+		case "help":
+		default:
+			return $instance->showHelp();
 		}
 	}
 }
+
