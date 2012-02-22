@@ -1,0 +1,413 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328110169 -14400
+Bug 80684 - SVG double-render
+Bug 63356 - SVGZ and generic XML-GZIP mime-types support
+
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -871,6 +871,11 @@
+ 		'html'                              			=> 'text/html', // application/xhtml+xml?
+ );
+ 
++$wgXMLMayBeCompressed = array(
++	'image/svg+xml' => true,
++	'application/x-dia-diagram' => true,
++);
++
+ /**
+  * Limit images on image description pages to a user-selectable limit. In order
+  * to reduce disk usage, limits can only be selected from a list.
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/MimeMagic.php
+--- includes/MimeMagic.php
++++ includes/MimeMagic.php
+@@ -469,7 +469,7 @@
+ 			'webp',
+ 
+ 			// XML formats we sure hope we recognize reliably
+-			'svg',
++			'svg', 'svgz',
+ 		);
+ 		return in_array( strtolower( $extension ), $types );
+ 	}
+@@ -661,11 +661,16 @@
+ 		 */
+ 		$xml = new XmlTypeCheck( $file );
+ 		if ( $xml->wellFormed ) {
+-			global $wgXMLMimeTypes;
+-			if ( isset( $wgXMLMimeTypes[$xml->getRootElement()] ) ) {
+-				return $wgXMLMimeTypes[$xml->getRootElement()];
+-			} else {
+-				return 'application/xml';
++			global $wgXMLMimeTypes, $wgXMLMayBeCompressed;
++			$t = $wgXMLMimeTypes[$xml->getRootElement()];
++			if ( !$xml->compressed ) {
++				if ( $t ) {
++					return $t;
++				} else {
++					return 'application/xml';
++				}
++			} elseif ( $wgXMLMayBeCompressed[$t] ) {
++				return $t;
+ 			}
+ 		}
+ 
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/XmlTypeCheck.php
+--- includes/XmlTypeCheck.php
++++ includes/XmlTypeCheck.php
+@@ -20,6 +20,12 @@
+ 	public $rootElement = '';
+ 
+ 	/**
++	 * Name of file compression type (can be only 'gzip' by now),
++	 * or FALSE if the file is uncompressed.
++	 */
++	public $compressed = false;
++
++	/**
+ 	 * @param $file string filename
+ 	 * @param $filterCallback callable (optional)
+ 	 *        Function to call to do additional custom validity checks from the
+@@ -53,6 +59,18 @@
+ 		xml_set_element_handler( $parser, array( $this, 'rootElementOpen' ), false );
+ 
+ 		$file = fopen( $fname, "rb" );
++		$gz = fread( $file, 2 );
++		if ( $gz == "\x1F\x8B" ) {
++			if ( function_exists( 'gzopen' ) ) {
++				fclose( $file );
++				$this->compressed = 'gzip';
++				$file = gzopen( $fname, "rb" );
++			} else {
++				return;
++			}
++		} else {
++			fseek( $file, 0, SEEK_SET );
++		}
+ 		do {
+ 			$chunk = fread( $file, 32768 );
+ 			$ret = xml_parse( $parser, $chunk, feof( $file ) );
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/Generic.php
+--- includes/media/Generic.php
++++ includes/media/Generic.php
+@@ -460,7 +460,7 @@
+ 	 * @param $fileName The local path to the file.
+ 	 * @return Status object
+ 	 */
+-	function verifyUpload( $fileName ) {
++	function verifyUpload( $fileName, $destName, $fileProps ) {
+ 		return Status::newGood();
+ 	}
+ 
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
+--- includes/media/SVG.php
++++ includes/media/SVG.php
+@@ -6,6 +6,177 @@
+  * @ingroup Media
+  */
+ 
++class SvgThumbnailImage extends ThumbnailImage {
++
++	function __construct( $file, $url, $svgurl, $width, $height, $path = false, $page = false, $later = false ) {
++		$this->svgurl = $svgurl;
++		$this->later = $later;
++		parent::__construct( $file, $url, $width, $height, $path, $page );
++	}
++
++	static function scaleParam( $name, $value, $sw, $sh ) {
++		if ( $name == 'viewBox' ) {
++			$value = preg_split( '/\s+/', $value );
++			$value[0] *= $sw; $value[1] *= $sh;
++			$value[2] *= $sw; $value[3] *= $sh;
++			$value = implode( ' ', $value );
++		} elseif ( $name == 'width' ) {
++			$value *= $sw;
++		} else {
++			$value *= $sh;
++		}
++		return "$name=\"$value\"";
++	}
++
++	function toHtml( $options = array() ) {
++		if ( count( func_get_args() ) == 2 ) {
++			throw new MWException( __METHOD__ .' called in the old style' );
++		}
++
++		$alt = empty( $options['alt'] ) ? '' : $options['alt'];
++		$query = empty( $options['desc-query'] )  ? '' : $options['desc-query'];
++
++		if ( !empty( $options['custom-url-link'] ) ) {
++			$linkAttribs = array( 'href' => $options['custom-url-link'] );
++			if ( !empty( $options['title'] ) ) {
++				$linkAttribs['title'] = $options['title'];
++			}
++		} elseif ( !empty( $options['custom-title-link'] ) ) {
++			$title = $options['custom-title-link'];
++			$linkAttribs = array(
++				'href' => $title->getLinkUrl(),
++				'title' => empty( $options['title'] ) ? $title->getFullText() : $options['title']
++			);
++		} elseif ( !empty( $options['desc-link'] ) ) {
++			$linkAttribs = $this->getDescLinkAttribs( empty( $options['title'] ) ? null : $options['title'], $query );
++		} elseif ( !empty( $options['file-link'] ) ) {
++			$linkAttribs = array( 'href' => $this->file->getURL() );
++		} else {
++			$linkAttribs = array( 'href' => '' );
++		}
++
++		$attribs = array(
++			'alt' => $alt,
++			'src' => $this->url,
++			'width' => $this->width,
++			'height' => $this->height,
++		);
++		if ( !empty( $options['valign'] ) ) {
++			$attribs['style'] = "vertical-align: {$options['valign']}";
++		}
++		if ( !empty( $options['img-class'] ) ) {
++			$attribs['class'] = $options['img-class'];
++		}
++
++		$linkurl = $this->file->getUrl();
++
++		if ( !empty( $linkAttribs['href'] ) ||
++			$this->width != $this->file->getWidth() ||
++			$this->height != $this->file->getHeight() ) {
++			if ( empty( $linkAttribs['href'] ) ) {
++				$linkAttribs['href'] = '';
++			}
++			if ( empty( $linkAttribs['title'] ) ) {
++				$linkAttribs['title'] = '';
++			}
++			// :-( The only cross-browser way to link from SVG
++			// is to add an <a xlink:href> into SVG image itself
++			global $wgServer;
++			$href = $linkAttribs['href'];
++			if ( $href{0} == '/' ) {
++				$href = $wgServer . $href;
++			}
++			$method = method_exists( $this->file, 'getPhys' ) ? 'getPhys' : 'getName'; // 4intra.net
++			$hash = '/' . $this->file->$method() . '-linked-' . crc32( $href . "\0" .
++				$linkAttribs['title'] . "\0" . $this->width . "\0" . $this->height ) . '.svg';
++			$linkfn = $this->file->getThumbPath() . $hash;
++			$linkurl = $this->file->getThumbUrl() . $hash;
++
++			// Cache changed SVGs only when TRANSFORM_LATER is on
++			$mtime = false;
++			if ( $this->later ) {
++				$mtime = @filemtime( $linkfn );
++			}
++			if ( !$mtime || $mtime < filemtime( $this->file->getPath() ) ) {
++				// Load original SVG or SVGZ and extract opening element
++				$readfn = $this->file->getPath();
++				if ( function_exists( 'gzopen' ) ) {
++					$fp = gzopen( $readfn, 'rb' );
++				} else {
++					$fp = fopen( $readfn, 'rb' );
++				}
++				$skip = false;
++				if ( $fp ) {
++					$svg = stream_get_contents( $fp );
++					fclose( $fp );
++					if ( substr( $svg, 0, 3 ) == "\x1f\x8b\x08" ) {
++						wfDebug( __CLASS__.": Zlib is not available, can't scale SVGZ image\n" );
++						$skip = true;
++					}
++				}
++				else {
++					wfDebug( __CLASS__.": Cannot read file $readfn\n" );
++					$skip = true;
++				}
++				if ( !$skip ) {
++					// Find opening and closing tags
++					preg_match( '#<svg[^<>]*>#is', $svg, $m, PREG_OFFSET_CAPTURE );
++					$closepos = strrpos( $svg, '</svg' );
++					if ( !$m || $closepos === false ) {
++						wfDebug( __CLASS__.": Invalid SVG (opening or closing tag not found)\n" );
++						$skip = true;
++					}
++				}
++				if ( !$skip ) {
++					$open = $m[0][0];
++					$openpos = $m[0][1];
++					$openlen = strlen( $m[0][0] );
++					$sw = $this->width / $this->file->getWidth();
++					$sh = $this->height / $this->file->getHeight();
++					$close = '';
++					// Scale width, height and viewBox
++					$open = preg_replace_callback( '/(viewBox|width|height)=[\'\"]([^\'\"]+)[\'\"]/',
++						create_function( '$m', "return SvgThumbnailImage::scaleParam( \$m[1], \$m[2], $sw, $sh );" ), $open );
++					// Add xlink namespace, if not yet
++					if ( !strpos( $open, 'xmlns:xlink' ) ) {
++						$open = substr( $open, 0, -1 ) . ' xmlns:xlink="http://www.w3.org/1999/xlink">';
++					}
++					if ( $sw < 0.99 || $sw > 1.01 || $sh < 0.99 || $sh > 1.01 ) {
++						// Wrap contents into a scaled layer
++						$open .= "<g transform='scale($sw $sh)'>";
++						$close = "</g>$close";
++					}
++					// Wrap contents into a hyperlink
++					if ( $href ) {
++						$open .= '<a xlink:href="'.htmlspecialchars( $href ).
++							'" target="_parent" xlink:title="'.htmlspecialchars( $linkAttribs['title'] ).'">';
++						$close = "</a>$close";
++					}
++					// Write modified SVG
++					$svg = substr( $svg, 0, $openpos ) . $open .
++						substr( $svg, $openpos+$openlen, $closepos-$openpos-$openlen ) . $close .
++						ltrim( substr( $svg, $closepos ), ">\t\r\n" );
++					file_put_contents( $linkfn, $svg );
++				} else {
++					// Skip SVG scaling
++					$linkurl = $this->file->getUrl();
++				}
++			}
++		}
++
++		// Output PNG <img> wrapped into SVG <object>
++		$html = $this->linkWrap( $linkAttribs, Xml::element( 'img', $attribs ) );
++		$html = Xml::tags( 'object', array(
++			'type' => 'image/svg+xml',
++			'data' => $linkurl,
++			'style' => 'overflow: hidden; vertical-align: middle',
++			'width' => $this->width,
++			'height' => $this->height,
++		), $html );
++		return $html;
++	}
++}
++
+ /**
+  * Handler for SVG images.
+  *
+@@ -49,6 +220,18 @@
+ 	}
+ 
+ 	/**
++	 * Verifies that gzipped SVG files have '.svgz' extension
++	 */
++	function verifyUpload( $tempname, $destName, $fileProps ) {
++		$props = $this->unpackMetadata( $fileProps[ 'metadata' ] );
++		if ( !empty( $props[ 'compressed' ] ) &&
++			strtolower( substr( $destName, -5 ) ) !== '.svgz' ) {
++			return Status::newFatal( 'svgz-extension-error' );
++		}
++		return Status::newGood();
++	}
++
++	/**
+ 	 * @param $image File
+ 	 * @param  $params
+ 	 * @return bool
+@@ -96,7 +279,7 @@
+ 		$srcPath = $image->getPath();
+ 
+ 		if ( $flags & self::TRANSFORM_LATER ) {
+-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
++			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath, false, true );
+ 		}
+ 
+ 		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
+@@ -106,7 +289,7 @@
+ 
+ 		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
+ 		if( $status === true ) {
+-			return new ThumbnailImage( $image, $dstUrl, $clientWidth, $clientHeight, $dstPath );
++			return new SvgThumbnailImage( $image, $dstUrl, $image->getFullUrl(), $clientWidth, $clientHeight, $dstPath );
+ 		} else {
+ 			return $status; // MediaTransformError
+ 		}
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVGMetadataExtractor.php
+--- includes/media/SVGMetadataExtractor.php
++++ includes/media/SVGMetadataExtractor.php
+@@ -57,19 +57,28 @@
+ 			throw new MWException( "Error getting filesize of SVG." );
+ 		}
+ 
+-		if ( $size > $wgSVGMetadataCutoff ) {
+-			$this->debug( "SVG is $size bytes, which is bigger than $wgSVGMetadataCutoff. Truncating." );
+-			$contents = file_get_contents( $source, false, null, -1, $wgSVGMetadataCutoff );
+-			if ($contents === false) {
+-				throw new MWException( 'Error reading SVG file.' );
++		$fp = fopen( $source, 'rb' );
++		if ( !$fp ) {
++			throw new MWException( 'Error reading SVG file.' );
++		}
++		if ( function_exists( 'gzopen' ) && fread( $fp, 3 ) == "\x1f\x8b\x08" ) {
++			fclose( $fp );
++			$fp = gzopen( $source, 'rb' );
++			if ( !$fp ) {
++				throw new MWException( 'Error reading gzip-compressed SVG file.' );
+ 			}
+-			$this->reader->XML( $contents, null, LIBXML_NOERROR | LIBXML_NOWARNING );
++			$this->metadata['compressed'] = true;
+ 		} else {
+-			$this->reader->open( $source, null, LIBXML_NOERROR | LIBXML_NOWARNING );
++			fseek( $fp, 0, 0 );
++			$this->metadata['compressed'] = false;
+ 		}
++		$contents = stream_get_contents( $fp, $wgSVGMetadataCutoff );
++		fclose( $fp );
++		$this->reader->XML( $contents, null, LIBXML_NOERROR | LIBXML_NOWARNING );
+ 
+ 		$this->metadata['width'] = self::DEFAULT_WIDTH;
+ 		$this->metadata['height'] = self::DEFAULT_HEIGHT;
++		$this->metadata['viewBox'] = '';
+ 
+ 		// Because we cut off the end of the svg making an invalid one. Complicated
+ 		// try catch thing to make sure warnings get restored. Seems like there should
+@@ -254,6 +263,7 @@
+ 		if( $this->reader->getAttribute('viewBox') ) {
+ 			// min-x min-y width height
+ 			$viewBox = preg_split( '/\s+/', trim( $this->reader->getAttribute('viewBox') ) );
++			$this->metadata['viewBox'] = $viewBox;
+ 			if( count( $viewBox ) == 4 ) {
+ 				$viewWidth = $this->scaleSVGUnit( $viewBox[2] );
+ 				$viewHeight = $this->scaleSVGUnit( $viewBox[3] );
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/mime.types
+--- includes/mime.types
++++ includes/mime.types
+@@ -83,7 +83,7 @@
+ image/jp2 j2k jp2 jpg2
+ image/jpeg jpeg jpg jpe
+ image/png png apng
+-image/svg+xml svg
++image/svg+xml svg svgz
+ image/tiff tiff tif
+ image/vnd.djvu djvu djv
+ image/vnd.wap.wbmp wbmp
+diff -r 6b6371ec1416 -r 0e3da4f64269 includes/upload/UploadBase.php
+--- includes/upload/UploadBase.php
++++ includes/upload/UploadBase.php
+@@ -405,7 +405,7 @@
+ 
+ 		$handler = MediaHandler::getHandler( $mime );
+ 		if ( $handler ) {
+-			$handlerStatus = $handler->verifyUpload( $this->mTempPath );
++			$handlerStatus = $handler->verifyUpload( $this->mTempPath, $this->mDestName, $this->mFileProps );
+ 			if ( !$handlerStatus->isOK() ) {
+ 				$errors = $handlerStatus->getErrorsArray();
+ 				return reset( $errors );
+diff -r 6b6371ec1416 -r 0e3da4f64269 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -3636,6 +3636,7 @@
+ 'file-info-png-looped'   => 'looped',
+ 'file-info-png-repeat'   => 'played $1 {{PLURAL:$1|time|times}}',
+ 'file-info-png-frames'   => '$1 {{PLURAL:$1|frame|frames}}',
++'svgz-extension-error'   => 'Compressed SVG files must have "svgz" extension to be correctly rendered by browsers.',
+ 
+ # Special:NewFiles
+ 'newimages'             => 'Gallery of new files',
+diff -r 6b6371ec1416 -r 0e3da4f64269 languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -3025,6 +3025,7 @@
+ 'file-info-png-looped'   => 'закольцованный',
+ 'file-info-png-repeat'   => 'проигрывается $1 {{PLURAL:$1|раз|раза|раз}}',
+ 'file-info-png-frames'   => '$1 {{PLURAL:$1|кадр|кадра|кадров}}',
++'svgz-extension-error'   => 'Чтобы сжатые SVG-файлы корректно отображались браузерами, они должны иметь расширение "svgz".',
+ 
+ # Special:NewFiles
+ 'newimages'             => 'Галерея новых файлов',

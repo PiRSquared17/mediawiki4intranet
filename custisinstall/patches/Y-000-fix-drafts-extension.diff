@@ -1,0 +1,87 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328121737 -14400
+Bug 93182 - Move our Drafts fixes to patch (save each ... seconds, not ... seconds from last user action)
+
+diff -r 3ecacc7fdc93 -r c062a1521f16 extensions/Drafts/Drafts.hooks.php
+--- extensions/Drafts/Drafts.hooks.php
++++ extensions/Drafts/Drafts.hooks.php
+@@ -70,7 +70,7 @@
+ 	public static function loadForm( $editpage ) {
+ 		global $wgUser, $wgRequest, $wgOut, $wgTitle, $wgLang;
+ 		// Check permissions
+-		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() ) {
++		if ( $wgUser->isAllowed( 'edit' ) && $wgUser->isLoggedIn() && $wgTitle ) {
+ 			// Get draft
+ 			$draft = Draft::newFromID( $wgRequest->getIntOrNull( 'draft' ) );
+ 			// Load form values
+@@ -95,9 +95,11 @@
+ 					);
+ 				}
+ 				// Load draft with info
+-				$draft->setTitle( Title::newFromText(
+-					$wgRequest->getText( 'wpDraftTitle' ) )
+-				);
++				$title = Title::newFromText( $wgRequest->getText( 'wpDraftTitle' ) );
++				if ( !$title ) {
++					$title = $wgTitle;
++				}
++				$draft->setTitle( $title );
+ 				$draft->setSection( $wgRequest->getInt( 'wpSection' ) );
+ 				$draft->setStartTime( $wgRequest->getText( 'wpStarttime' ) );
+ 				$draft->setEditTime( $wgRequest->getText( 'wpEdittime' ) );
+@@ -188,15 +190,12 @@
+ 				'tabindex' => 8,
+ 				'value' => wfMsg( 'drafts-save-save' ),
+ 			);
+-			$accesskey = $wgUser->getSkin()->accesskey( 'drafts-save' );
+-			if ( $accesskey !== false ) {
+-				$buttonAttribs['accesskey'] = $accesskey;
++			$attribs = $wgUser->getSkin()->tooltipAndAccesskeyAttribs( 'drafts-save' );
++			if ( !empty( $attribs['accesskey'] ) ) {
++				$buttonAttribs['accesskey'] = $attribs['accesskey'];
+ 			}
+-			$tooltip = $wgUser->getSkin()->titleAttrib(
+-				'drafts-save', 'withaccess'
+-			);
+-			if ( $tooltip !== false ) {
+-				$buttonAttribs['title'] = $tooltip;
++			if ( !empty( $attribs['tooltip'] ) ) {
++				$buttonAttribs['title'] = $attribs['title'];
+ 			}
+ 			$ajaxButton = Xml::escapeJsString(
+ 				Xml::element( 'input',
+diff -r 3ecacc7fdc93 -r c062a1521f16 extensions/Drafts/Drafts.js
+--- extensions/Drafts/Drafts.js
++++ extensions/Drafts/Drafts.js
+@@ -102,25 +102,21 @@
+ 		);
+ 		// Ensure timer is cleared in case we saved manually before it expired
+ 		clearTimeout( timer );
++		timer = null;
+ 	};
+ 
+ 	/**
+ 	 * Updates the user interface to represent being out of sync with the server
++	 * MediaWiki4IntraNet Bug 50580. Changed behaviour - the draft is saved exactly
++	 * each ... seconds, not just ... seconds after last user action in the editbox.
+ 	 */
+ 	this.change = function() {
+ 		// Sets state to changed
+ 		self.setState( 'changed' );
+ 		// Checks if timer is pending
+-		if ( timer ) {
+-			// Clears pending timer
+-			clearTimeout( timer );
+-		}
+-		// Checks if auto-save wait time was set, and that it's greater than 0
+-		if ( configuration.autoSaveWait && configuration.autoSaveWait > 0 ) {
++		if ( !timer && configuration.autoSaveWait && configuration.autoSaveWait > 0 ) {
+ 			// Sets timer to save automatically after a period of time
+-			timer = setTimeout(
+-				'wgDraft.save()', configuration.autoSaveWait * 1000
+-			);
++			timer = setTimeout("wgDraft.save()", configuration.autoSaveWait * 1000);
+ 		}
+ 	};
+ 

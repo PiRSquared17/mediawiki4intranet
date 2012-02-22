@@ -1,0 +1,82 @@
+/*
+ $Id: SVNIntegration.css 70 2008-08-12 11:51:42Z Stefan $
+*/
+
+/* wrapper around every SVN output */
+div.SVNIntegrationOutput {
+	padding: 0.2em;
+	margin: 0.5em;
+}
+
+/* FileInfo */
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo {}
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table {
+	border: 1px solid #aaa;
+	padding: 0.2em;
+	width: 100%;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table tr.even {
+	background: #eee;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table th a {
+	color: #fff;
+}
+
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table td.description {
+	font-weight: bold;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table td.value {}
+
+/* FileHistory */
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory {
+	border: 1px solid #aaa;
+	padding: 0.5em;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryEntries {}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryEntries div.SVNIntegrationHistoryEntry {}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryEntries div.SVNIntegrationHistoryEntry div.SVNIntegrationHistoryEntryRevision {
+	font-weight: bold;
+	border-bottom: 1px solid #036;
+	padding-top: 1em;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryEntries div.SVNIntegrationHistoryEntry div.SVNIntegrationHistoryEntryMessage {
+	padding: 0.5em;
+}
+
+/* PrintFile */
+div.SVNIntegrationOutput div.SVNIntegrationPrintFile {
+	border: 1px solid #aaa;
+	padding: 0.5em;
+}
+div.SVNIntegrationOutput div.SVNIntegrationPrintFile div.SVNIntegrationPrintFileHeader {}
+div.SVNIntegrationOutput div.SVNIntegrationPrintFile pre {}
+
+
+/* Todo */
+div.SVNIntegrationOutput div.SVNIntegrationTodo {
+	border: 1px solid #aaa;
+	padding: 0.5em;
+}
+
+
+/* headers */
+div.SVNIntegrationOutput div.SVNIntegrationFileInfo table th,
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryHeader,
+div.SVNIntegrationOutput div.SVNIntegrationPrintFile div.SVNIntegrationPrintFileHeader,
+div.SVNIntegrationOutput div.SVNIntegrationTodo div.SVNIntegrationTodoHeader {
+	background: #036;
+	color: #fff;
+	font-weight: bold;
+	padding: 0.5em;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryHeader p {
+	margin: 0;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryHeader a,
+div.SVNIntegrationOutput div.SVNIntegrationPrintFile div.SVNIntegrationPrintFileHeader a,
+div.SVNIntegrationOutput div.SVNIntegrationTodo div.SVNIntegrationTodoHeader a {
+	color: #fff;
+}
+div.SVNIntegrationOutput div.SVNIntegrationFileHistory div.SVNIntegrationHistoryHeader a:hover {
+	color: #036;
+}
