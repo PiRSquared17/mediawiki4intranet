@@ -32,9 +32,9 @@ $FILES_WIKIMEDIA = explode(' ',
     'api.php index.php COPYING thumb.php trackback.php'.
     ' opensearch_desc.php img_auth.php redirect.php load.php profileinfo.php');
 $EXT_WIKIMEDIA = explode(' ',
-    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki OpenID');
+    'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki OpenID ConfirmEdit');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud ConfirmEdit Drafts');
+    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud Drafts');
 $EXT_OUR = array_map('trim', explode("\n",
     "AllNsSuggest
     AllowGetParamsInWikilinks
