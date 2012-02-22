@@ -12,10 +12,8 @@
  */
 
 if ( !defined( 'MEDIAWIKI' ) ) {
-	exit;
+	echo( "This file is an extension to the MediaWiki software and cannot be used standalone.\n" );
+	die( 1 );
 }
-
-require_once dirname( __FILE__ ) . '/ConfirmEdit.php';
-$wgCaptchaClass = 'MathCaptcha';
 
 $wgAutoloadClasses['MathCaptcha'] = dirname( __FILE__ ) . '/MathCaptcha.class.php';
