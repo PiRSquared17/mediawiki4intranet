@@ -69,7 +69,7 @@ class FancyCaptcha extends SimpleCaptcha {
 				'id'    => 'wpCaptchaId',
 				'value' => $index ) ) .
 			"<p>" .
-			Html::element( 'input', array(
+			Xml::element( 'input', array(
 				'name' => 'wpCaptchaWord',
 				'id'   => 'wpCaptchaWord',
 				'autocorrect' => 'off',
