@@ -34,6 +34,7 @@ $messages = array();
 $messages['en'] = array(
 	'openid-desc' => 'Let users log in to the wiki with an [http://openid.net/ OpenID]. If this is enabled on the wiki, they can also use their user account URL of this wiki as OpenID to log in to other OpenID-aware web sites',
 	'openidlogin' => 'Log in / create account with OpenID',
+	'nologin' => "{{SERVER}}{{SCRIPTPATH}}/extensions/OpenID/skin/icons/openid-inputicon.png [[Special:OpenIDLogin|Log in with OpenID]].\n\nDon't have an account? $1.",
 	'openidserver' => 'OpenID server',
 	'openidxrds' => 'Yadis file',
 	'openidconvert' => 'OpenID converter',
@@ -4915,6 +4916,7 @@ $messages['roa-tara'] = array(
 $messages['ru'] = array(
 	'openid-desc' => 'Вход в вики с помощью [http://openid.net/ OpenID], а также вход на другие сайты поддерживающие OpenID с помощью учётной записи в вики',
 	'openidlogin' => 'Вход с помощью OpenID',
+	'nologin' => "{{SERVER}}{{SCRIPTPATH}}/extensions/OpenID/skin/icons/openid-inputicon.png [[Special:OpenIDLogin|Вход с помощью OpenID]].\n\nНет учётной записи? '''$1'''.",
 	'openidserver' => 'Сервер OpenID',
 	'openidxrds' => 'Файл Yadis',
 	'openidconvert' => 'Преобразователь OpenID',
@@ -4961,7 +4963,8 @@ $messages['ru'] = array(
 	'openidconvertsuccesstext' => 'Вы успешно преобразовали ваш OpenID в $1.',
 	'openidconvertyourstext' => 'Это уже ваш OpenID.',
 	'openidconvertothertext' => 'Это чужой OpenID.',
-	'openidalreadyloggedin' => "'''Вы уже вошли, $1!'''
+	'openidalreadyloggedin' => 'Вы уже вошли!',
+	'openidalreadyloggedintext' => "'''Вы уже вошли, $1!'''
 
 Если вы желаете использовать в будущем вход через OpenID, вы можете [[Special:OpenIDConvert|преобразовать вашу учётную запись для использования в OpenID]].",
 	'openidnousername' => 'Не указано имя участника.',
