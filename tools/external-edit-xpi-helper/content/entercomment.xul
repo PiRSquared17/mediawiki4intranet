@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet href="chrome://global/skin/global.css" type="text/css"?>
+
+<!DOCTYPE dialog SYSTEM "chrome://wikihelper/locale/wikihelper.dtd">
+
+<dialog
+    title="&wikihelper.ecommenttitle;"
+    id="wikiHelperEnterCommentDialog"
+    onload="window.focus()"
+    ondialogaccept="return window.arguments[0].save(document.getElementById('ecomment').value);"
+    ondialogcancel="window.arguments[0].indialog = false; return true;"
+    buttons="accept,cancel"
+    buttonlabelcancel="&wikihelper.cancel;"
+    buttonlabelaccept="&wikihelper.ok;"
+    xmlns:em="http://www.mozilla.org/2004/em-rdf#"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+
+<groupbox>
+  <vbox>
+    <text value="&wikihelper.entercomment;" style="font-weight: bold;" />
+    <textbox id="ecomment" value="&wikihelper.defaultcomment;" style="width: 20em" />
+    <separator class="thin" />
+  </vbox>
+</groupbox>
+
+</dialog>

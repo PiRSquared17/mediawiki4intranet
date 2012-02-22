@@ -826,7 +826,9 @@ class LoginForm extends SpecialPage {
 			$this->displaySuccessfulLogin( 'loginsuccess', $injected_html );
 		} else {
 			$titleObj = Title::newFromText( $this->mReturnTo );
-			if ( !$titleObj instanceof Title ) {
+/*patch|2011-04-05|IntraACL|start*/
+			if ( !$titleObj instanceof Title || method_exists( $titleObj, 'userCanReadEx' ) && !$titleObj->userCanReadEx() ) {
+/*patch|2011-04-05|IntraACL|end*/
 				$titleObj = Title::newMainPage();
 			}
 			$redirectUrl = $titleObj->getFullURL( $this->mReturnToQuery );
@@ -976,8 +978,8 @@ class LoginForm extends SpecialPage {
 			$linkq .= '&uselang=' . $this->mLanguage;
 		}
 
-		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalURL( $linkq ) ) . '">';
-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
+		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
+		$link .= wfMsgExt( $linkmsg . 'link', array( 'parseinline' ) ); # Calling either 'gotaccountlink' or 'nologinlink'
 		$link .= '</a>';
 
 		# Don't show a "create account" link if the user can't

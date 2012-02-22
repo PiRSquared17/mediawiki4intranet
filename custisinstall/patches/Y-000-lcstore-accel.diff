@@ -1,0 +1,102 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328118333 -14400
+Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
+
+diff -r 6b6371ec1416 -r d2af694de5d9 includes/AutoLoader.php
+--- includes/AutoLoader.php
++++ includes/AutoLoader.php
+@@ -128,6 +128,7 @@
+ 	'IndexPager' => 'includes/Pager.php',
+ 	'Interwiki' => 'includes/interwiki/Interwiki.php',
+ 	'IP' => 'includes/IP.php',
++	'LCStore_Accel' => 'includes/LocalisationCache.php',
+ 	'LCStore_CDB' => 'includes/LocalisationCache.php',
+ 	'LCStore_DB' => 'includes/LocalisationCache.php',
+ 	'LCStore_Null' => 'includes/LocalisationCache.php',
+diff -r 6b6371ec1416 -r d2af694de5d9 includes/LocalisationCache.php
+--- includes/LocalisationCache.php
++++ includes/LocalisationCache.php
+@@ -154,8 +154,14 @@
+ 				case 'db':
+ 					$storeClass = 'LCStore_DB';
+ 					break;
++				case 'accel':
+ 				case 'detect':
+-					$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
++					try {
++						wfGetCache( CACHE_ACCEL );
++						$storeClass = 'LCStore_Accel';
++					} catch( MWException $e ) {
++						$storeClass = $wgCacheDirectory ? 'LCStore_CDB' : 'LCStore_DB';
++					}
+ 					break;
+ 				default:
+ 					throw new MWException(
+@@ -316,7 +322,10 @@
+ 		}
+ 
+ 		$deps = $this->store->get( $code, 'deps' );
+-		if ( $deps === null ) {
++		$keys = $this->store->get( $code, 'list', 'messages' );
++		$preload = $this->store->get( $code, 'preload' );
++		// Different keys may expire separately, at least in LCStore_Accel
++		if ( $deps === null || $keys === null || $preload === null ) {
+ 			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
+ 			return true;
+ 		}
+@@ -747,6 +756,54 @@
+ }
+ 
+ /**
++ * LCStore implementation which uses PHP accelerator to store data.
++ * This will work if one of XCache, eAccelerator, or APC cacher is configured.
++ * (See ObjectCache.php)
++ */
++class LCStore_Accel implements LCStore {
++	var $currentLang;
++	var $keys;
++
++	public function __construct() {
++		$this->cache = wfGetCache( CACHE_ACCEL );
++	}
++
++	public function get( $code, $key ) {
++		$k = wfMemcKey( 'l10n', $code, 'k', $key );
++		return $this->cache->get( $k );
++	}
++
++	public function startWrite( $code ) {
++		$k = wfMemcKey( 'l10n', $code, 'l' );
++		$keys = $this->cache->get( $k );
++		if ( $keys ) {
++			foreach ( $keys as $k ) {
++				$this->cache->delete( $k );
++			}
++		}
++		$this->currentLang = $code;
++		$this->keys = array();
++	}
++
++	public function finishWrite() {
++		if ( $this->currentLang ) {
++			$k = wfMemcKey( 'l10n', $this->currentLang, 'l' );
++			$this->cache->set( $k, array_keys( $this->keys ) );
++		}
++		$this->currentLang = NULL;
++		$this->keys = array();
++	}
++
++	public function set( $key, $value ) {
++		if ( $this->currentLang ) {
++			$k = wfMemcKey( 'l10n', $this->currentLang, 'k', $key );
++			$this->keys[$k] = true;
++			$this->cache->set( $k, $value );
++		}
++	}
++}
++
++/**
+  * LCStore implementation which uses the standard DB functions to store data.
+  * This will work on any MediaWiki installation.
+  */
