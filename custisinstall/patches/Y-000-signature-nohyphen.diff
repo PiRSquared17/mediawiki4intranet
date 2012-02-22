@@ -1,0 +1,29 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949611 -14400
+Bug 44402 - Remove '--' in signatures
+Bug 62536 - Change <math></math> to <m></m>
+
+diff -r 6b6371ec1416 -r 4431dd0bb649 includes/EditPage.php
+--- includes/EditPage.php
++++ includes/EditPage.php
+@@ -2462,8 +2462,8 @@
+ 			$wgUseTeX ?	array(
+ 				'image'  => $wgLang->getImageFile( 'button-math' ),
+ 				'id'     => 'mw-editbutton-math',
+-				'open'   => "<math>",
+-				'close'  => "</math>",
++				'open'   => "<m>",
++				'close'  => "</m>",
+ 				'sample' => wfMsg( 'math_sample' ),
+ 				'tip'    => wfMsg( 'math_tip' ),
+ 				'key'    => 'C'
+@@ -2480,7 +2480,7 @@
+ 			array(
+ 				'image'  => $wgLang->getImageFile( 'button-sig' ),
+ 				'id'     => 'mw-editbutton-signature',
+-				'open'   => '--~~~~',
++				'open'   => '~~~~',
+ 				'close'  => '',
+ 				'sample' => '',
+ 				'tip'    => wfMsg( 'sig_tip' ),

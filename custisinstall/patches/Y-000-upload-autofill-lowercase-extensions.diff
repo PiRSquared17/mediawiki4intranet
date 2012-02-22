@@ -1,0 +1,20 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949112 -14400
+Make file extensions lower-case in upload form autofill JS
+Bug 68017 - Configurable maximum filename length in image galleries
+
+diff -r 6b6371ec1416 -r f46aa146b760 skins/common/upload.js
+--- skins/common/upload.js
++++ skins/common/upload.js
+@@ -226,6 +226,10 @@
+ 			return false;
+ 		}
+ 	}
++	// Find and make extension lower-case
++	var dot = fname.lastIndexOf('.');
++	if (dot >= 0)
++		fname = fname.substring(0,dot).concat(fname.substring(dot, fname.length).toLowerCase());
+ 
+ 	// Replace spaces by underscores
+ 	fname = fname.replace( / /g, '_' );

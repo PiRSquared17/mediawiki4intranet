@@ -1,0 +1,78 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328268640 -14400
+Bug 63447, add hook for MediaWiki::preliminaryChecks()
+Bug 71769, add hook for overriding grouping values for enhanced recent changes view
+Bug 82496, change url limit from 255 to 4095 for scary transclusions
+Bug 93182, Add NormalizeMessageKey to wfMessage()
+
+diff -r 3ecacc7fdc93 -r f8c993add39d includes/ChangesList.php
+--- includes/ChangesList.php
++++ includes/ChangesList.php
+@@ -783,6 +783,7 @@
+ 			if( $type == RC_LOG ){
+ 				$secureName = SpecialPage::getTitleFor( 'Log', $logType )->getPrefixedDBkey();
+ 			}
++			wfRunHooks( 'EnhancedChangesListGroupBy', array( &$rc, &$title, &$secureName ) );
+ 			if( !isset( $this->rc_cache[$secureName] ) ) {
+ 				$this->rc_cache[$secureName] = array();
+ 			}
+diff -r 3ecacc7fdc93 -r f8c993add39d includes/Message.php
+--- includes/Message.php
++++ includes/Message.php
+@@ -108,6 +108,7 @@
+ 	 */
+ 	public function __construct( $key, $params = array() ) {
+ 		global $wgLang;
++		wfRunHooks( 'NormalizeMessageKey', array( &$key, &$useDB, &$langCode, &$transform ) );
+ 		$this->key = $key;
+ 		$this->parameters = array_values( $params );
+ 		$this->language = $wgLang;
+diff -r 3ecacc7fdc93 -r f8c993add39d includes/Title.php
+--- includes/Title.php
++++ includes/Title.php
+@@ -1411,12 +1411,20 @@
+ 	 * @return Array list of errors
+ 	 */
+ 	private function checkSpecialsAndNSPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
++		/**
++		 * Do not deny all actions except 'createaccount' and 'execute'
++		 * on special pages, let them decide themselves.
++		 * -- vitalif@mail.ru 2011-04-03
++		 * <commented out>:
++		 *
+ 		# Only 'createaccount' and 'execute' can be performed on
+ 		# special pages, which don't actually exist in the DB.
+ 		$specialOKActions = array( 'createaccount', 'execute' );
+ 		if ( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions ) ) {
+ 			$errors[] = array( 'ns-specialprotected' );
+ 		}
++		 * </commented out>
++		 */
+ 
+ 		# Check $wgNamespaceProtection for restricted namespaces
+ 		if ( $this->isNamespaceProtected( $user ) ) {
+diff -r 3ecacc7fdc93 -r f8c993add39d includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -3453,7 +3453,7 @@
+ 
+ 		$url = $title->getFullUrl( "action=$action" );
+ 
+-		if ( strlen( $url ) > 255 ) {
++		if ( strlen( $url ) > 4095 ) {
+ 			return wfMsgForContent( 'scarytranscludetoolong' );
+ 		}
+ 		return $this->fetchScaryTemplateMaybeFromCache( $url );
+diff -r 3ecacc7fdc93 -r f8c993add39d includes/specials/SpecialMovepage.php
+--- includes/specials/SpecialMovepage.php
++++ includes/specials/SpecialMovepage.php
+@@ -231,7 +231,7 @@
+ 					Xml::label( wfMsg( 'newtitle' ), 'wpNewTitle' ) .
+ 				"</td>
+ 				<td class='mw-input'>" .
+-					Xml::input( 'wpNewTitle', 40, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
++					Xml::input( 'wpNewTitle', 80, $wgContLang->recodeForEdit( $newTitle->getPrefixedText() ), array( 'type' => 'text', 'id' => 'wpNewTitle' ) ) .
+ 					Html::hidden( 'wpOldTitle', $this->oldTitle->getPrefixedText() ) .
+ 				"</td>
+ 			</tr>

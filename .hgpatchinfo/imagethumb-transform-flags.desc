@@ -1,0 +1,2 @@
+Bug 54081 - Add flags imagegallery=>true, imagehistory=>true to transform() params.
+This allows extensions (FlvHandler) to decide whether to insert one code or another.
