@@ -3101,6 +3101,17 @@ class Parser {
 				$ns = $this->mTitle->getNamespace();
 			}
 			$title = Title::newFromText( $part1, $ns );
+			if ( method_exists( $title, 'userCanReadEx' ) && !$title->userCanReadEx() ) {
+				global $haclgInclusionDeniedMessage;
+				$title = NULL;
+				if ( $haclgInclusionDeniedMessage ) {
+					$found = true;
+					$text = wfMsg( $haclgInclusionDeniedMessage );
+				} elseif ( $haclgInclusionDeniedMessage === '' ) {
+					$found = true;
+					$text = '';
+				}
+			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
 				# Check for language variants if the template is not found
