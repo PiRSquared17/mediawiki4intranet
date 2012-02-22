@@ -310,14 +310,15 @@ class DeleteBatchForm {
 		/* this stuff goes like articleFromTitle in Wiki.php */
 		if ( $page->getNamespace() == NS_FILE ) {
 			$art = new ImagePage( $page );
+			$art->delete();
 		} else {
 			$art = new Article( $page );
+			$art->doDelete( $reason );
 		}
 
 		/* what is the generic reason for page deletion?
 		   something about the content, I guess...
 		*/
-		$art->doDelete( $reason );
 		$db->commit();
 		return true;
 	}
