@@ -1,0 +1,64 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327950503 -14400
+Add new section by default when editing a discussion page.
+
+diff -r 6b6371ec1416 -r f17cc3504a37 includes/Linker.php
+--- includes/Linker.php
++++ includes/Linker.php
+@@ -245,13 +245,24 @@
+ 			$target->mFragment = '';
+ 		}
+ 
+-		# If it's a broken link, add the appropriate query pieces, unless
+-		# there's already an action specified, or unless 'edit' makes no sense
+-		# (i.e., for a nonexistent special page).
+-		if ( in_array( 'broken', $options ) && empty( $query['action'] )
+-			&& $target->getNamespace() != NS_SPECIAL ) {
+-			$query['action'] = 'edit';
+-			$query['redlink'] = '1';
++		// TODO remove hardcoded NS_BLOG, move Wikilog talk pages to a separate extension
++		if ( !defined('NS_BLOG') || MWNamespace::getSubject( $target->getNamespace() ) != NS_BLOG ) {
++			# If it's a broken link, add the appropriate query pieces, unless
++			# there's already an action specified, or unless 'edit' makes no sense
++			# (i.e., for a nonexistent special page).
++			if( in_array( 'broken', $options ) and empty( $query['action'] )
++			    and $target->getNamespace() != NS_SPECIAL ) {
++				$query['action'] = 'edit';
++				$query['redlink'] = '1';
++			}
++			if ( $target->isTalkPage() && !empty( $query['action'] ) &&
++			    $query['action'] == 'edit' ) {
++				if ( !array_key_exists( 'section', $query ) ) {
++					$query['section'] = 'new';
++				} elseif ( !$query['section'] ) {
++					unset( $query['section'] );
++				}
++			}
+ 		}
+ 		$ret = $target->getLinkUrl( $query );
+ 		wfProfileOut( __METHOD__ );
+diff -r 6b6371ec1416 -r f17cc3504a37 includes/SkinTemplate.php
+--- includes/SkinTemplate.php
++++ includes/SkinTemplate.php
+@@ -739,6 +739,8 @@
+ 		if( $checkEdit && !$title->isKnown() ) {
+ 			$classes[] = 'new';
+ 			$query = 'action=edit&redlink=1';
++			if ( $title->isTalkPage() )
++				$query .= '&section=new';
+ 		}
+ 
+ 		// wfMessageFallback will nicely accept $message as an array of fallbacks
+diff -r 6b6371ec1416 -r f17cc3504a37 tests/parser/parserTests.txt
+--- tests/parser/parserTests.txt
++++ tests/parser/parserTests.txt
+@@ -1552,7 +1552,7 @@
+ !! input
+ [[Talk:Parser testing]], [[Meta:Disclaimers]]
+ !! result
+-<p><a href="/index.php?title=Talk:Parser_testing&amp;action=edit&amp;redlink=1" class="new" title="Talk:Parser testing (page does not exist)">Talk:Parser testing</a>, <a href="/index.php?title=Meta:Disclaimers&amp;action=edit&amp;redlink=1" class="new" title="Meta:Disclaimers (page does not exist)">Meta:Disclaimers</a>
++<p><a href="/index.php?title=Talk:Parser_testing&amp;action=edit&amp;redlink=1&amp;section=new" class="new" title="Talk:Parser testing (page does not exist)">Talk:Parser testing</a>, <a href="/index.php?title=Meta:Disclaimers&amp;action=edit&amp;redlink=1" class="new" title="Meta:Disclaimers (page does not exist)">Meta:Disclaimers</a>
+ </p>
+ !! end
+ 

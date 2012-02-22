@@ -1,0 +1,120 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1329402603 -14400
+Originally, this patch included several simple fixes required for
+MediaWiki 1.14-1.16 to run under more restrictive PHP 5.3.x.
+
+Now it includes some very simple independent changes to different extensions:
+1) Interwiki - always add prefixes lowercased
+2) WikiCategoryTagCloud - debug fnShowWatchingUsers()
+3) SyntaxHighlight_GeSHi - require_once() geshi.php instead of just require()
+4) WhoIsWatching (1.18) - debug to work with 1.18 o_O
+
+diff -r 2b1195378d97 -r e358283a1c1f extensions/Interwiki/Interwiki_body.php
+--- extensions/Interwiki/Interwiki_body.php
++++ extensions/Interwiki/Interwiki_body.php
+@@ -177,7 +177,7 @@
+ 	}
+ 
+ 	function doSubmit() {
+-		global $wgRequest, $wgOut;
++		global $wgRequest, $wgOut, $wgContLang;
+ 		$prefix = $wgRequest->getVal( 'wpInterwikiPrefix' );
+ 		$do = $wgRequest->getVal( 'wpInterwikiAction' );
+ 		// show an error if the prefix is invalid (only when adding one)
+@@ -202,8 +202,9 @@
+ 				$log->addEntry( 'iw_delete', $selfTitle, $reason, array( $prefix ) );
+ 			}
+ 			break;
++		case 'add':
++			$prefix = $wgContLang->lc( $prefix );
+ 		case 'edit':
+-		case 'add':
+ 			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
+ 			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
+ 			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
+diff -r 2b1195378d97 -r e358283a1c1f extensions/PagedTiffHandler/PagedTiffHandler.image.php
+--- extensions/PagedTiffHandler/PagedTiffHandler.image.php
++++ extensions/PagedTiffHandler/PagedTiffHandler.image.php
+@@ -335,6 +335,7 @@
+ 		}
+ 
+ 		$infos = null;
++		$state->prevPage = -1;
+ 		preg_match_all( '/\[BEGIN\](.+?)\[END\]/si', $dump, $infos, PREG_SET_ORDER );
+ 		foreach ( $infos as $info ) {
+ 			$state->resetPage();
+diff -r 2b1195378d97 -r e358283a1c1f extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
+--- extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
++++ extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
+@@ -354,7 +354,7 @@
+ 	private static function initialise() {
+ 		if( !self::$initialised ) {
+ 			if( !class_exists( 'GeSHi' ) ) {
+-				require( 'geshi/geshi.php' );
++				require_once( 'geshi/geshi.php' );
+ 			}
+ 			self::$initialised = true;
+ 		}
+diff -r 2b1195378d97 -r e358283a1c1f extensions/WhoIsWatching/WhoIsWatching_body.php
+--- extensions/WhoIsWatching/WhoIsWatching_body.php
++++ extensions/WhoIsWatching/WhoIsWatching_body.php
+@@ -84,33 +84,33 @@
+ 			}
+ 			ksort($users);
+ 			foreach ($users as $name => $id)
+-			$wgOut->addHTML("<option value=\"".$id."\">".$name."</option>");
++				$wgOut->addHTML("<option value=\"".$id."\">".$name."</option>");
+ 			$wgOut->addHTML('</select></td><td>');
+ 			$wgOut->addHTML("<input type=\"submit\" value=\"".wfMsg('specialwhoiswatchingaddbtn')."\" />");
+ 			$wgOut->addHTML("</td></tr></table></div></form>");
+ 		}
+ 	}
+ }
+- 
+-function fnShowWatchingCount(&$template, &$tpl)
++
++function fnShowWatchingCount( &$template, &$tpl )
+ {
+     global $wgLang, $wgPageShowWatchingUsers, $whoiswatching_showifzero, $wgOut;
+ 
+-    if ($wgPageShowWatchingUsers && $whoiswatching_showifzero) {
++    if ( $wgPageShowWatchingUsers && $whoiswatching_showifzero ) {
+         $dbr = wfGetDB( DB_SLAVE );
+         $watchlist = $dbr->tableName( 'watchlist' );
+-        $sql = "SELECT COUNT(*) AS n FROM $watchlist
+-                WHERE wl_title='" . $dbr->strencode($template->mTitle->getDBkey()) .
+-                "' AND  wl_namespace=" . $template->mTitle->getNamespace() ;
+-        $res = $dbr->query( $sql, 'SkinTemplate::outputPage');
++        $t = $template->getTitle();
++        $res = $dbr->select( 'watchlist', 'COUNT(*) n', array(
++            'wl_namespace' => $t->getNamespace(),
++            'wl_title' => $t->getDBkey(),
++        ), 'SkinTemplate::outputPage' );
+         $x = $dbr->fetchObject( $res );
+         $numberofwatchingusers = $x->n;
+-        $tpl->set('numberofwatchingusers',
+-                  wfMsgExt('number_of_watching_users_pageview', array('parseinline'),
+-                  $wgLang->formatNum($numberofwatchingusers))
+-        );
++        $tpl->set( 'numberofwatchingusers', wfMsgExt(
++            'number_of_watching_users_pageview', array( 'parseinline' ),
++            $wgLang->formatNum( $numberofwatchingusers )
++        ) );
+     }
+ 
+     return true;
+ }
+-
+diff -r 2b1195378d97 -r e358283a1c1f extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+--- extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
++++ extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+@@ -45,7 +45,7 @@
+ }
+ 
+ function invalidateCache() {
+-	$titles[0] = explode( "\n", wfMsg( 'tagcloudpages' ) );
++	$titles = explode( "\n", wfMsg( 'tagcloudpages' ) );
+ 
+ 	for ( $i = 0; $i < count( $titles ); $i++ ) {
+ 		$t = Title::newFromText( $titles[$i] );

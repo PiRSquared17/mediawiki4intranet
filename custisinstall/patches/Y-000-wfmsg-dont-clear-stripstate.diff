@@ -1,0 +1,23 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949524 -14400
+Bug 56653
+Debug wfMsgExt to remove UNIQ____QINU
+
+diff -r 6b6371ec1416 -r 81d848dbc3e1 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -270,9 +270,10 @@
+ 		 */
+ 		# $this->mUniqPrefix = "\x07UNIQ" . Parser::getRandomString();
+ 		# Changed to \x7f to allow XML double-parsing -- TS
+-		$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
+-		$this->mStripState = new StripState( $this->mUniqPrefix );
+-
++		if ( !$this->mStripState ) {
++			$this->mUniqPrefix = "\x7fUNIQ" . self::getRandomString();
++			$this->mStripState = new StripState( $this->mUniqPrefix );
++		}
+ 
+ 		# Clear these on every parse, bug 4549
+ 		$this->mTplExpandCache = $this->mTplRedirCache = $this->mTplDomCache = array();
