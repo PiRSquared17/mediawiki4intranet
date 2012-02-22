@@ -2214,7 +2214,9 @@ $templates
 		} else {
 			$titleObj = Title::newFromText( $returnto );
 		}
-		if ( !is_object( $titleObj ) ) {
+/*patch|2011-04-05|IntraACL|start*/
+		if ( !$titleObj instanceof Title || method_exists( $titleObj, 'userCanReadEx' ) && !$titleObj->userCanReadEx() ) {
+/*patch|2011-04-05|IntraACL|end*/
 			$titleObj = Title::newMainPage();
 		}
 
