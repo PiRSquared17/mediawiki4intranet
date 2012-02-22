@@ -1,0 +1,107 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1329403466 -14400
+Bug 88274 - Category links on top
+
+diff -r 2b1195378d97 -r 33cb44d99fff skins/MonoBook.php
+--- skins/MonoBook.php
++++ skins/MonoBook.php
+@@ -5,6 +5,12 @@
+  * Translated from gwicke's previous TAL template version to remove
+  * dependency on PHPTAL.
+  *
++ * Configuration:
++ *   $wgCatlinksTop =
++ *     false:  (default) Show category links below article content
++ *     true:   Show category links below and above article content
++ *     'only': Show category links above article content only
++ *
+  * @todo document
+  * @file
+  * @ingroup Skins
+@@ -64,6 +70,7 @@
+ 	 * @access private
+ 	 */
+ 	function execute() {
++		global $wgCatlinksTop;
+ 		$this->skin = $this->data['skin'];
+ 
+ 		// Suppress warnings to prevent notices about missing indexes in $this->data
+@@ -87,8 +94,9 @@
+ 		<div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div>
+ <?php } ?>
+ 		<!-- start content -->
++		<?php if( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php } ?>
+ <?php $this->html('bodytext') ?>
+-		<?php if($this->data['catlinks']) { $this->html('catlinks'); } ?>
++		<?php if( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ) { $this->html('catlinks'); } ?>
+ 		<!-- end content -->
+ 		<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
+ 		<div class="visualClear"></div>
+diff -r 2b1195378d97 -r 33cb44d99fff skins/Vector.php
+--- skins/Vector.php
++++ skins/Vector.php
+@@ -74,6 +74,7 @@
+ 	 */
+ 	public function execute() {
+ 		global $wgLang, $wgVectorUseIconWatch;
++		global $wgCatlinksTop;
+ 
+ 		$this->skin = $this->data['skin'];
+ 
+@@ -174,6 +175,11 @@
+ 				</div>
+ 				<!-- /jumpto -->
+ 				<?php endif; ?>
++				<?php if ( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ): ?>
++				<!-- catlinks-top -->
++				<div id="catlinks-top"><?php $this->html( 'catlinks' ); ?></div>
++				<!-- /catlinks-top -->
++				<?php endif; ?>
+ 				<!-- bodycontent -->
+ 				<?php $this->html( 'bodycontent' ) ?>
+ 				<!-- /bodycontent -->
+diff -r 2b1195378d97 -r 33cb44d99fff skins/monobook/main.css
+--- skins/monobook/main.css
++++ skins/monobook/main.css
+@@ -1249,3 +1249,18 @@
+ .tipsy {
+ 	font-size: 127%;
+ }
++
++/* Categories above the content */
++#catlinks-top div {
++	float: left;
++	margin: 0;
++	padding: 0;
++}
++#catlinks-top .catlinks div {
++	padding-left: 0.7em;
++}
++ul#filetoc {
++	font-size: 100%;
++	line-height: 1.35em;
++	padding: 0.3em 0;
++}
+diff -r 2b1195378d97 -r 33cb44d99fff skins/vector/screen.css
+--- skins/vector/screen.css
++++ skins/vector/screen.css
+@@ -1217,3 +1217,18 @@
+ .tipsy {
+ 	font-size: 0.8em;
+ }
++
++/* Categories above the content */
++#catlinks-top div {
++	float: left;
++	margin: 0;
++	padding: 0;
++}
++#catlinks-top .catlinks div {
++	padding-left: 0.7em;
++}
++ul#filetoc {
++	font-size: 100%;
++	line-height: 1.35em;
++	padding: 0.3em 0;
++}

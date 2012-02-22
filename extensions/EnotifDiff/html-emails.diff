@@ -1,0 +1,86 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitali@st-filippov.office.custis.ru>
+# Date 1297262226 -10800
+HTML email support, needed for Bug 25475 (diffs in enotify emails)
+
+diff -r b11befdd7427 -r 0f2a4d0811de includes/UserMailer.php
+--- includes/UserMailer.php
++++ includes/UserMailer.php
+@@ -106,8 +106,10 @@
+ 	 * @return mixed True on success, a WikiError object on failure.
+ 	 */
+ 	static function send( $to, $from, $subject, $body, $replyto=null, $contentType=null ) {
+-		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal;
++		global $wgSMTP, $wgOutputEncoding, $wgErrorString, $wgEnotifImpersonal, $wgEmailContentType;
+ 		global $wgEnotifMaxRecips;
++		if (!$wgEmailContentType)
++			$wgEmailContentType = 'text/plain';
+ 
+ 		if ( is_array( $to ) ) {
+ 			wfDebug( __METHOD__.': sending mail to ' . implode( ',', $to ) . "\n" );
+@@ -145,7 +147,7 @@
+ 			$headers['Date'] = date( 'r' );
+ 			$headers['MIME-Version'] = '1.0';
+ 			$headers['Content-type'] = (is_null($contentType) ?
+-					'text/plain; charset='.$wgOutputEncoding : $contentType);
++					$wgEmailContentType.'; charset='.$wgOutputEncoding : $contentType);
+ 			$headers['Content-transfer-encoding'] = '8bit';
+ 			$headers['Message-ID'] = "<$msgid@" . $wgSMTP['IDHost'] . '>'; // FIXME
+ 			$headers['X-Mailer'] = 'MediaWiki mailer';
+@@ -177,7 +179,7 @@
+ 				$endl = "\n";
+ 			}
+ 			$ctype = (is_null($contentType) ? 
+-					'text/plain; charset='.$wgOutputEncoding : $contentType);
++					$wgEmailContentType . '; charset='.$wgOutputEncoding : $contentType);
+ 			$headers =
+ 				"MIME-Version: 1.0$endl" .
+ 				"Content-type: $ctype$endl" .
+@@ -291,14 +293,17 @@
+ 		$watchers = array();
+ 		if ($wgEnotifWatchlist || $wgShowUpdatedMarker) {
+ 			$dbw = wfGetDB( DB_MASTER );
+-			$res = $dbw->select( array( 'watchlist' ),
++			$userCondition = array(
++				'user_id=wl_user',
++				'wl_title' => $title->getDBkey(),
++				'wl_namespace' => $title->getNamespace(),
++				'wl_user != ' . intval( $editor->getID() ),
++				'wl_notificationtimestamp IS NULL',
++			);
++			wfRunHooks('EnotifUserCondition', array(&$this, &$userCondition));
++			$res = $dbw->select( array( 'watchlist', 'user' ),
+ 				array( 'wl_user' ),
+-				array(
+-					'wl_title' => $title->getDBkey(),
+-					'wl_namespace' => $title->getNamespace(),
+-					'wl_user != ' . intval( $editor->getID() ),
+-					'wl_notificationtimestamp IS NULL',
+-				), __METHOD__
++				$userCondition, __METHOD__
+ 			);
+ 			while ($row = $dbw->fetchObject( $res ) ) {
+ 				$watchers[] = intval( $row->wl_user );
+@@ -469,11 +474,13 @@
+ 		$pagetitle = $this->title->getPrefixedText();
+ 		$keys['$PAGETITLE']          = $pagetitle;
+ 		$keys['$PAGETITLE_URL']      = $this->title->getFullUrl();
++		$keys['$PAGETITLE_URL_NOENC']= urldecode($this->title->getFullUrl());
+ 
+ 		$keys['$PAGEMINOREDIT']      = $medit;
+ 		$keys['$PAGESUMMARY']        = $summary;
+ 		$keys['$UNWATCHURL']         = $this->title->getFullUrl( 'action=unwatch' );
+ 
++		wfRunHooks('EnotifComposeCommonMailtext', array(&$this, &$keys));
+ 		$subject = strtr( $subject, $keys );
+ 
+ 		# Reveal the page editor's address as REPLY-TO address only if
+@@ -583,6 +590,8 @@
+ 				$wgContLang->time( $this->timestamp, true, false, $timecorrection ) ),
+ 			$body);
+ 
++		wfRunHooks('EnotifPersonalizeMailtext', array(&$this, &$watchingUser, &$body));
++
+ 		return UserMailer::send($to, $this->from, $this->subject, $body, $this->replyto);
+ 	}
+ 

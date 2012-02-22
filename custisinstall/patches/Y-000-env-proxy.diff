@@ -1,0 +1,122 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1327949082 -14400
+Bug 60996 - Support environment proxy settings for HTTP downloads, allow HTTPS downloads
+HTTPS is added to upload-proto-error-text message only in English and Russian languages.
+Bug 82496 - Support environment no_proxy settings for scary transclusions
+
+diff -r 6b6371ec1416 -r 018b5f491e9c includes/HttpFunctions.php
+--- includes/HttpFunctions.php
++++ includes/HttpFunctions.php
+@@ -135,6 +135,64 @@
+ 			$uri
+ 		);
+ 	}
++
++	/**
++	 * Determine HTTP proxy from environment settings respecting
++	 * 'http_proxy' and 'no_proxy' environment variables
++	 */
++	public static function envProxy( $url )
++	{
++		if ( $proxy = getenv( "http_proxy" ) )
++		{
++			$useproxy = true;
++			if ( $url && ( $noproxy = preg_split( "#\s*,\s*#is", getenv( "no_proxy" ) ) ) )
++			{
++				foreach ( $noproxy as $n )
++				{
++					if ( preg_match('#(\d+)\.(\d+)\.(\d+)\.(\d+)/(\d+)#s', $n, $m) &&
++						preg_match('#^[a-z0-9_]+://(?:[^/]*:[^/]*@)?([^/@]+)(?:/|$|\?)#is', $url, $ip) )
++					{
++						$mask = array(
++							max( 0x100 - ( 1 << max(  8-$m[5], 0 ) ), 0 ),
++							max( 0x100 - ( 1 << max( 16-$m[5], 0 ) ), 0 ),
++							max( 0x100 - ( 1 << max( 24-$m[5], 0 ) ), 0 ),
++							max( 0x100 - ( 1 << max( 32-$m[5], 0 ) ), 0 ),
++						);
++						$ip = @gethostbyname( $ip[1] );
++						if ( preg_match( '#(\d+)\.(\d+)\.(\d+)\.(\d+)#s', $ip, $ipm ) &&
++							( intval( $ipm[1] ) & $mask[0] ) == intval( $m[1] ) &&
++							( intval( $ipm[2] ) & $mask[1] ) == intval( $m[2] ) &&
++							( intval( $ipm[3] ) & $mask[2] ) == intval( $m[3] ) &&
++							( intval( $ipm[4] ) & $mask[3] ) == intval( $m[4] ) )
++						{
++							$useproxy = false;
++							break;
++						}
++					}
++					else
++					{
++						$n = preg_replace( '/#.*$/is', '', $n );
++						$n = preg_quote( $n );
++						$n = str_replace( '\\*', '.*', $n );
++						if ( preg_match( '#'.$n.'#is', $url ) )
++						{
++							$useproxy = false;
++							break;
++						}
++					}
++				}
++			}
++			if ( $useproxy )
++			{
++				$proxy = preg_replace( '#^http://#is', '', $proxy );
++				$proxy = preg_replace( '#/*$#is', '', $proxy );
++			}
++			else
++				$proxy = '';
++			return $proxy;
++		}
++		return NULL;
++	}
+ }
+ 
+ /**
+@@ -281,8 +339,8 @@
+ 			$this->proxy = 'http://localhost:80/';
+ 		} elseif ( $wgHTTPProxy ) {
+ 			$this->proxy = $wgHTTPProxy ;
+-		} elseif ( getenv( "http_proxy" ) ) {
+-			$this->proxy = getenv( "http_proxy" );
++		} elseif ( ( $env_proxy = Http::envProxy( $this->url ) ) !== NULL ) {
++			$this->proxy = $env_proxy;
+ 		}
+ 	}
+ 
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -2211,7 +2211,7 @@
+ 'upload-warning-msg'          => 'There was a problem with your upload from [$2]. You may return to the [[Special:Upload/stash/$1|upload form]] to correct this problem.',
+ 
+ 'upload-proto-error'        => 'Incorrect protocol',
+-'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code> or <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Remote upload requires URLs beginning with <code>http://</code>, <code>https://</code> or <code>ftp://</code>.',
+ 'upload-file-error'         => 'Internal error',
+ 'upload-file-error-text'    => 'An internal error occurred when attempting to create a temporary file on the server.
+ Please contact an [[Special:ListUsers/sysop|administrator]].',
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -1765,7 +1765,7 @@
+ 'upload-warning-msg'          => 'При загрузке с [$2] произошла ошибка. Для исправления ошибки вернитесь на [[Special:Upload/stash/$1|upload form]].',
+ 
+ 'upload-proto-error'        => 'Неправильный протокол',
+-'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code> или <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Для удалённой загрузки требуется адрес, начинающийся с <code>http://</code>, <code>https://</code> или <code>ftp://</code>.',
+ 'upload-file-error'         => 'Внутренняя ошибка',
+ 'upload-file-error-text'    => 'Внутренняя ошибка при попытке создать временный файл на сервере.
+ Пожалуйста, обратитесь к [[Special:ListUsers/sysop|администратору]].',
+diff -r 6b6371ec1416 -r 018b5f491e9c languages/messages/MessagesRue.php
+--- languages/messages/MessagesRue.php
++++ languages/messages/MessagesRue.php
+@@ -1473,7 +1473,7 @@
+ 'upload-warning-msg'          => 'Почас вашого начітаваня файлу [$2] ся став проблем. Кідь го хочете вырїшыти, можете ся вернути до  [[Special:Upload/stash/$1|формуларя начітаваня]].',
+ 
+ 'upload-proto-error'        => 'Неплатный протокол',
+-'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code> або <code>ftp://</code>.',
++'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code>, <code>https://</code> або <code>ftp://</code>.',
+ 'upload-file-error'         => 'Інтерна хыба',
+ 'upload-file-error-text'    => 'Почас спробы створїня дочасного файлу настала внутрїшня хыба на сервері.
+ Просиме контактуйте  [[Special:ListUsers/sysop|адміністратора]].',

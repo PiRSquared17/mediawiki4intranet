@@ -1,0 +1,189 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   $Id$
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+#column-one {
+	font-size: 1.1em;
+	line-height: 1.0em;
+	color: #444444;
+}
+
+#toc { /* table of contents */
+	background: #f8f8f8; /* very light orange */
+	border: 1px solid #1860AC; /* light orange */
+}
+	
+#toctitle {
+	background: #1860AC; /* light orange */
+	color: #d5d5d5; /* very dark orange */
+}
+	
+#footer {
+	border-top: 1px solid #666666;
+	color: #999999;
+}
+	
+
+/* Links -------------------------------------------------------------*/
+a {color: #2153B0;} /* blue */
+a:hover {color: #173A7B;} /* dark blue */
+
+p a:visited {color: #FD9A26;}
+
+div.paragraph a:visited {color: #FD9A26;} /* orange */
+#content a.new {color: green;} /* green */
+
+#column-one a:hover {color: #173A7B;} /* dark blue */
+#column-one .selected a {
+	color: #FD9A26; /* orange */
+	font-weight: bolder;
+}
+
+#toc a {color: #808080;} /* blue */
+#toc a:hover {color: #173A7B;} /* dark blue */
+#toc p a:visited {color: #2153B0;}
+
+#toc div.paragraph a:visited {color: #2153B0;} /* blue */
+
+#footer a {color: #999999;}
+#footer a:hover {color: #173A7B;} /* dark blue */
+
+
+
+
+
+/* Structure & Frame -------------------------------------------------*/
+body {
+	background: #FFF url(cis-logo-cube.png) repeat; /* blue and white background */
+}
+
+#titleBar {
+	height: 100px;
+	text-align: left;
+	width: 100%;
+	}
+
+#globalWrapper {
+	margin: 10px auto;
+	text-align: left;
+	width: 99%;
+}
+
+#column-content {
+	margin-left: 10px;
+	margin-right: 240px;
+	background: #FFFFFF;
+	padding: 10px;
+	border: 1px dashed #FFC000;
+}
+
+#column-one {
+  position:absolute;
+	top: 7px; 
+	right: 7px;
+	width: 185px;
+	background: #FBFCFD;
+	padding: 5px;
+	font-size: 70%;
+	border: 1px dashed #FFC000;
+}
+
+#footer {
+	clear: both;
+	height: 5em;
+	margin: 3em 0 3em 200px;
+}
+
+
+.editsection {
+float: right;
+font-size: 50%;
+}
+
+.portlet h5 { /* blocks within #column-one */
+	border-top: 1px solid #eeeeee;
+	margin: 0;
+	padding: 0;
+}
+
+
+/* Lists -------------------------------------------------------------*/
+
+.portlet ul {
+	margin-bottom: 2em;
+}
+
+.portlet li {
+	margin: 0.5em 0;
+  list-style-type:none;
+}
+
+/* Special stylized non-IE bullets
+   Does not work in Internet Explorer, which merely default to normal bullets. */
+html>body .portlet ul {
+	list-style: none;
+	margin-left: 0px;
+	padding: 0 0 0 30px;
+	padding-left: 10px;
+	text-indent: -10px;
+	} 
+
+html>body .portlet li {
+	margin-left: 10px;
+	}
+
+html>body .portlet ul li:before {
+	content: "\00BB \0020";
+}
+
+
+/* Form Elements -----------------------------------------------------*/
+.portlet #searchform {
+	margin-left: 10px;
+	margin-bottom: 1em;
+}
+
+.portlet #searchform input {
+	margin: 0.15em 0;
+}
+
+
+/* Various Tags & Classes --------------------------------------------*/
+#siteSub, .urlexpansion, .printfooter {
+	display: none;
+}
+
+.visualClear {
+	clear: both;
+}
+
+
+@import url("page-history.css");
+@import url("diff.css");
+@import url("forms.css");
+@import url("notifications.css");
+
+
+
+
+/* Footer ------------------------------------------------------------*/
+#footer ul {
+	list-style: none;
+	margin: 0;
+	}
+
+#footer ul li {
+	margin: 0.1em;
+	margin-right: 1em;
+	}
+
+#f-lastmod {}
+#f-viewcount {display: none;}
+#f-copyright {}
+#f-about {float: left;}
+#f-disclaimer {float: left;}
+#f-developedby {float: left;}
