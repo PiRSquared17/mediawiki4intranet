@@ -372,3 +372,36 @@ function efCategoryTreeSkinJoinCategoryLinks( $skin, &$links, &$result ) {
 
 	return false;
 }
+
+$wgExtensionMessagesFiles['SubcategorizedCategoryPage'] = dirname(__FILE__)."/SubcatCat.i18n.php";
+$wgHooks['MagicWordwgVariableIDs'][] = 'efSubcatCatMagicWordwgVariableIDs';
+$wgHooks['OutputPageParserOutput'][] = 'efSubcatCatOutputPageParserOutput';
+$wgHooks['ParserBeforeInternalParse'][] = 'efSubcatCatParserBeforeInternalParse';
+
+function efSubcatCatMagicWordwgVariableIDs(&$wgVariableIDs)
+{
+    wfLoadExtensionMessages('SubcategorizedCategoryPage');
+    $wgVariableIDs[] = 'nocategorysubcatlist';
+    $wgVariableIDs[] = 'nocategorycolumns';
+    return true;
+}
+
+function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
+{
+    if (isset($parserOutput->useSubcategorizedList))
+        $out->useSubcategorizedList = $parserOutput->useSubcategorizedList;
+    if (isset($parserOutput->noCategoryColumns))
+        $out->noCategoryColumns = $parserOutput->noCategoryColumns;
+    return true;
+}
+
+function efSubcatCatParserBeforeInternalParse($parser, $text, $stripState)
+{
+    if (MagicWord::get('nocategorysubcatlist')->matchAndRemove($text))
+        $parser->mOutput->useSubcategorizedList = FALSE;
+    if (MagicWord::get('categorysubcatlist')->matchAndRemove($text))
+        $parser->mOutput->useSubcategorizedList = TRUE;
+    if (MagicWord::get('nocategorycolumns')->matchAndRemove($text))
+        $parser->mOutput->noCategoryColumns = TRUE;
+    return true;
+}
