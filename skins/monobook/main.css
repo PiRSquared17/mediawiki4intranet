@@ -1265,3 +1265,18 @@ div.mw-lag-warn-high {
 .tipsy {
 	font-size: 127%;
 }
+
+/* Categories above the content */
+#catlinks-top div {
+	float: left;
+	margin: 0;
+	padding: 0;
+}
+#catlinks-top .catlinks div {
+	padding-left: 0.7em;
+}
+ul#filetoc {
+	font-size: 100%;
+	line-height: 1.35em;
+	padding: 0.3em 0;
+}
