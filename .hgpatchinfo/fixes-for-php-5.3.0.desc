@@ -1,0 +1,11 @@
+Originally, this patch included several simple fixes required for
+MediaWiki 1.14-1.16 to run under more restrictive PHP 5.3.x.
+
+Now it includes some very simple independent changes to different extensions:
+1) Interwiki - always add prefixes lowercased
+2) WikiCategoryTagCloud - debug fnShowWatchingUsers()
+3) SyntaxHighlight_GeSHi - require_once() geshi.php instead of just require()
+4) WhoIsWatching (1.18) - debug to work with 1.18 o_O
+5) Serious 1.18 backwards-compatibility bug: incorrect scripts in <head> of
+   legacy skins which build <head> by themselves
+

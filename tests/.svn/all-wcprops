@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 62
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests
+END
+RunSeleniumTests.php
+K 25
+svn:wc:ra_dav:version-url
+V 83
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/RunSeleniumTests.php
+END
+parserTests.php
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/parserTests.php
+END
+TestsAutoLoader.php
+K 25
+svn:wc:ra_dav:version-url
+V 82
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/TestsAutoLoader.php
+END
+testHelpers.inc
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/testHelpers.inc
+END
+.htaccess
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/.htaccess
+END
