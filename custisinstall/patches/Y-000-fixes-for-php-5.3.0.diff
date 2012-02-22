@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1329402603 -14400
+# Date 1329944203 -14400
 Originally, this patch included several simple fixes required for
 MediaWiki 1.14-1.16 to run under more restrictive PHP 5.3.x.
 
@@ -9,8 +9,11 @@ Now it includes some very simple independent changes to different extensions:
 2) WikiCategoryTagCloud - debug fnShowWatchingUsers()
 3) SyntaxHighlight_GeSHi - require_once() geshi.php instead of just require()
 4) WhoIsWatching (1.18) - debug to work with 1.18 o_O
+5) Serious 1.18 backwards-compatibility bug: incorrect scripts in <head> of
+   legacy skins which build <head> by themselves
 
-diff -r 2b1195378d97 -r e358283a1c1f extensions/Interwiki/Interwiki_body.php
+
+diff -r e1f225b28f49 -r f4f510503186 extensions/Interwiki/Interwiki_body.php
 --- extensions/Interwiki/Interwiki_body.php
 +++ extensions/Interwiki/Interwiki_body.php
 @@ -177,7 +177,7 @@
@@ -33,7 +36,7 @@ diff -r 2b1195378d97 -r e358283a1c1f extensions/Interwiki/Interwiki_body.php
  			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
  			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
  			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
-diff -r 2b1195378d97 -r e358283a1c1f extensions/PagedTiffHandler/PagedTiffHandler.image.php
+diff -r e1f225b28f49 -r f4f510503186 extensions/PagedTiffHandler/PagedTiffHandler.image.php
 --- extensions/PagedTiffHandler/PagedTiffHandler.image.php
 +++ extensions/PagedTiffHandler/PagedTiffHandler.image.php
 @@ -335,6 +335,7 @@
@@ -44,7 +47,7 @@ diff -r 2b1195378d97 -r e358283a1c1f extensions/PagedTiffHandler/PagedTiffHandle
  		preg_match_all( '/\[BEGIN\](.+?)\[END\]/si', $dump, $infos, PREG_SET_ORDER );
  		foreach ( $infos as $info ) {
  			$state->resetPage();
-diff -r 2b1195378d97 -r e358283a1c1f extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
+diff -r e1f225b28f49 -r f4f510503186 extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 --- extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 +++ extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 @@ -354,7 +354,7 @@
@@ -56,7 +59,7 @@ diff -r 2b1195378d97 -r e358283a1c1f extensions/SyntaxHighlight_GeSHi/SyntaxHigh
  			}
  			self::$initialised = true;
  		}
-diff -r 2b1195378d97 -r e358283a1c1f extensions/WhoIsWatching/WhoIsWatching_body.php
+diff -r e1f225b28f49 -r f4f510503186 extensions/WhoIsWatching/WhoIsWatching_body.php
 --- extensions/WhoIsWatching/WhoIsWatching_body.php
 +++ extensions/WhoIsWatching/WhoIsWatching_body.php
 @@ -84,33 +84,33 @@
@@ -106,7 +109,7 @@ diff -r 2b1195378d97 -r e358283a1c1f extensions/WhoIsWatching/WhoIsWatching_body
      return true;
  }
 -
-diff -r 2b1195378d97 -r e358283a1c1f extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+diff -r e1f225b28f49 -r f4f510503186 extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 --- extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 +++ extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 @@ -45,7 +45,7 @@
@@ -118,3 +121,15 @@ diff -r 2b1195378d97 -r e358283a1c1f extensions/WikiCategoryTagCloud/WikiCategor
  
  	for ( $i = 0; $i < count( $titles ); $i++ ) {
  		$t = Title::newFromText( $titles[$i] );
+diff -r e1f225b28f49 -r f4f510503186 includes/SkinTemplate.php
+--- includes/SkinTemplate.php
++++ includes/SkinTemplate.php
+@@ -509,7 +509,7 @@
+ 		if ( $this->useHeadElement ) {
+ 			$tpl->set( 'headelement', $out->headElement( $this ) );
+ 		} else {
+-			$tpl->set( 'headscripts', $out->getScript() );
++			$tpl->set( 'headscripts', $out->getHeadScripts( $this ) . $out->getHeadItems() );
+ 		}
+ 
+ 		$tpl->set( 'debughtml', $this->generateDebugHTML() );
