@@ -8,4 +8,6 @@ Now it includes some very simple independent changes to different extensions:
 4) WhoIsWatching (1.18) - debug to work with 1.18 o_O
 5) Serious 1.18 backwards-compatibility bug: incorrect scripts in <head> of
    legacy skins which build <head> by themselves
-
+   https://bugzilla.wikimedia.org/show_bug.cgi?id=34600
+6) Another serious bug: setEditSection(false) is not passed to parser output
+   https://bugzilla.wikimedia.org/show_bug.cgi?id=34687
