@@ -1,0 +1,9 @@
+<!ENTITY wikihelper.error          "Неверный файл описания получен от MediaWiki: строки URL=... или Script=... не найдены">
+<!ENTITY wikihelper.enterpath      "Введите путь к редактору:">
+<!ENTITY wikihelper.editornotfound "Редактор XXX не найден!">
+<!ENTITY wikihelper.notexecutable  "Файл XXX не исполняемый!">
+<!ENTITY wikihelper.ecommenttitle  "Введите комментарий">
+<!ENTITY wikihelper.entercomment   "Введите комментарий к данному изменению:">
+<!ENTITY wikihelper.defaultcomment "Изменён файл">
+<!ENTITY wikihelper.ok             "Загрузить файл">
+<!ENTITY wikihelper.cancel         "Отмена">
