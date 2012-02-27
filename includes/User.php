@@ -3336,7 +3336,9 @@ class User {
 	 */
 	protected function getTokenUrl( $page, $token ) {
 		// Hack to bypass localization of 'Special:'
+		$hacl = haclfDisableTitlePatch();
 		$title = Title::makeTitle( NS_MAIN, "Special:$page/$token" );
+		haclfRestoreTitlePatch($hacl);
 		return $title->getCanonicalUrl();
 	}
 
