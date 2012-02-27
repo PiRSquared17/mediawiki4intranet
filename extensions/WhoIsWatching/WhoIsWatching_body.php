@@ -106,10 +106,11 @@ function fnShowWatchingCount( &$template, &$tpl )
         ), 'SkinTemplate::outputPage' );
         $x = $dbr->fetchObject( $res );
         $numberofwatchingusers = $x->n;
-        $tpl->set( 'numberofwatchingusers', wfMsgExt(
+        $msg = wfMsgExt(
             'number_of_watching_users_pageview', array( 'parseinline' ),
             $wgLang->formatNum( $numberofwatchingusers )
-        ) );
+        );
+        $tpl->set( 'numberofwatchingusers', $msg );
     }
 
     return true;
