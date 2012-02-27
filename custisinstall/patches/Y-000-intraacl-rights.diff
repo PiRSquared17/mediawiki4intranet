@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118415 -14400
+# Date 1330340900 -14400
 Bug 63447 - (HaloACL extension part) patch for MediaWiki right support
 
-diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/CategoryTree/CategoryTreeFunctions.php
+diff -r e1f225b28f49 -r 6224104991c1 extensions/CategoryTree/CategoryTreeFunctions.php
 --- extensions/CategoryTree/CategoryTreeFunctions.php
 +++ extensions/CategoryTree/CategoryTreeFunctions.php
 @@ -301,7 +301,7 @@
@@ -47,7 +47,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/CategoryTree/CategoryTreeFunctio
  
  			# $trans = $title->getLocalizedText();
  			$trans = ''; # place holder for when translated titles are available
-diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/DeleteBatch/DeleteBatch.body.php
+diff -r e1f225b28f49 -r 6224104991c1 extensions/DeleteBatch/DeleteBatch.body.php
 --- extensions/DeleteBatch/DeleteBatch.body.php
 +++ extensions/DeleteBatch/DeleteBatch.body.php
 @@ -285,6 +285,15 @@
@@ -83,7 +83,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/DeleteBatch/DeleteBatch.body.php
  					$wgUser = $user;
  				}
  			}
-diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/DeleteBatch/DeleteBatch.i18n.php
+diff -r e1f225b28f49 -r 6224104991c1 extensions/DeleteBatch/DeleteBatch.i18n.php
 --- extensions/DeleteBatch/DeleteBatch.i18n.php
 +++ extensions/DeleteBatch/DeleteBatch.i18n.php
 @@ -30,6 +30,7 @@
@@ -94,7 +94,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e extensions/DeleteBatch/DeleteBatch.i18n.php
  	'deletebatch-file-bad-format' => 'The file should be plain text',
  	'deletebatch-file-missing' => 'Unable to read given file',
  	'deletebatch-select-script' => 'Delete page script',
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/CategoryPage.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/CategoryPage.php
 --- includes/CategoryPage.php
 +++ includes/CategoryPage.php
 @@ -236,6 +236,11 @@
@@ -122,7 +122,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/CategoryPage.php
  		global $wgContLang;
  
  		$link = Linker::link( $title );
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/ChangesFeed.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/ChangesFeed.php
 --- includes/ChangesFeed.php
 +++ includes/ChangesFeed.php
 @@ -49,15 +49,16 @@
@@ -157,7 +157,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/ChangesFeed.php
  			$talkpage = MWNamespace::canTalk( $obj->rc_namespace ) ? $title->getTalkPage()->getFullUrl() : '';
  			// Skip items with deleted content (avoids partially complete/inconsistent output)
  			if( $obj->rc_deleted ) continue;
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/FeedUtils.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/FeedUtils.php
 --- includes/FeedUtils.php
 +++ includes/FeedUtils.php
 @@ -97,11 +97,8 @@
@@ -174,7 +174,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/FeedUtils.php
  
  		if( $title->getNamespace() >= 0 && !$accErrors && $newid ) {
  			if( $oldid ) {
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/LogEventsList.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/LogEventsList.php
 --- includes/LogEventsList.php
 +++ includes/LogEventsList.php
 @@ -316,6 +316,11 @@
@@ -189,7 +189,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/LogEventsList.php
  		// Log time
  		$time = $this->logTimestamp( $row );
  		// User links
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/OutputPage.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/OutputPage.php
 --- includes/OutputPage.php
 +++ includes/OutputPage.php
 @@ -2214,7 +2214,9 @@
@@ -203,7 +203,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/OutputPage.php
  			$titleObj = Title::newMainPage();
  		}
  
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/QueryPage.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/QueryPage.php
 --- includes/QueryPage.php
 +++ includes/QueryPage.php
 @@ -560,6 +560,12 @@
@@ -219,7 +219,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/QueryPage.php
  				$line = $this->formatResult( $skin, $row );
  				if ( $line ) {
  					$attr = ( isset( $row->usepatrol ) && $row->usepatrol && $row->patrolled == 0 )
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/Title.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -103,7 +103,9 @@
@@ -392,7 +392,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/Title.php
 +// </IntraACL>
 +
  }
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/User.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/User.php
 --- includes/User.php
 +++ includes/User.php
 @@ -540,6 +540,11 @@
@@ -472,7 +472,17 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/User.php
  		return $name;
  	}
  
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/UserMailer.php
+@@ -3311,7 +3336,9 @@
+ 	 */
+ 	protected function getTokenUrl( $page, $token ) {
+ 		// Hack to bypass localization of 'Special:'
++		$hacl = haclfDisableTitlePatch();
+ 		$title = Title::makeTitle( NS_MAIN, "Special:$page/$token" );
++		haclfRestoreTitlePatch($hacl);
+ 		return $title->getCanonicalUrl();
+ 	}
+ 
+diff -r e1f225b28f49 -r 6224104991c1 includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
 @@ -470,7 +470,12 @@
@@ -489,7 +499,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/UserMailer.php
  		}
  
  		$this->sendMails();
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/parser/Parser.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3101,6 +3101,17 @@
@@ -510,7 +520,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/parser/Parser.php
  			if ( $title ) {
  				$titleText = $title->getPrefixedText();
  				# Check for language variants if the template is not found
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialAllpages.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialAllpages.php
 --- includes/specials/SpecialAllpages.php
 +++ includes/specials/SpecialAllpages.php
 @@ -336,6 +336,11 @@
@@ -525,7 +535,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialAllpages.php
  					if( $t ) {
  						$link = ( $s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->link( $t ) .
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialListredirects.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialListredirects.php
 --- includes/specials/SpecialListredirects.php
 +++ includes/specials/SpecialListredirects.php
 @@ -108,6 +108,11 @@
@@ -540,7 +550,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialListredirects.php
  			global $wgLang;
  			# Make a link to the destination page
  			$arr = $wgLang->getArrow() . $wgLang->getDirMark();
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialNewpages.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialNewpages.php
 --- includes/specials/SpecialNewpages.php
 +++ includes/specials/SpecialNewpages.php
 @@ -305,6 +305,11 @@
@@ -555,7 +565,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialNewpages.php
  		$time = Html::element( 'span', array( 'class' => 'mw-newpages-time' ),
  			$wgLang->timeAndDate( $result->rc_timestamp, true )
  		);
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialPrefixindex.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialPrefixindex.php
 --- includes/specials/SpecialPrefixindex.php
 +++ includes/specials/SpecialPrefixindex.php
 @@ -167,6 +167,11 @@
@@ -570,7 +580,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialPrefixindex.php
  					if( $t ) {
  						$link = ($s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->linkKnown(
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialRandompage.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialRandompage.php
 --- includes/specials/SpecialRandompage.php
 +++ includes/specials/SpecialRandompage.php
 @@ -68,6 +68,10 @@
@@ -584,7 +594,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialRandompage.php
  		}
  
  		$redirectParam = $this->isRedirect() ? array( 'redirect' => 'no' ) : array();
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialRecentchanges.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -482,10 +482,15 @@
@@ -604,7 +614,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialRecentchanges.php
  			$rc->counter = $counter++;
  			# Check if the page has been updated since the last visit
  			if( $wgShowUpdatedMarker && !empty( $obj->wl_notificationtimestamp ) ) {
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialSearch.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialSearch.php
 --- includes/specials/SpecialSearch.php
 +++ includes/specials/SpecialSearch.php
 @@ -480,7 +480,14 @@
@@ -623,7 +633,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialSearch.php
  		}
  		$out .= "</ul>\n";
  
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialUserlogin.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialUserlogin.php
 --- includes/specials/SpecialUserlogin.php
 +++ includes/specials/SpecialUserlogin.php
 @@ -826,7 +826,9 @@
@@ -637,7 +647,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialUserlogin.php
  				$titleObj = Title::newMainPage();
  			}
  			$redirectUrl = $titleObj->getFullURL( $this->mReturnToQuery );
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialWatchlist.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialWatchlist.php
 --- includes/specials/SpecialWatchlist.php
 +++ includes/specials/SpecialWatchlist.php
 @@ -388,6 +388,11 @@
@@ -652,7 +662,7 @@ diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialWatchlist.php
  			$rc->counter = $counter++;
  
  			if ( $wgShowUpdatedMarker ) {
-diff -r 6b6371ec1416 -r 56d1ccd40a5e includes/specials/SpecialWhatlinkshere.php
+diff -r e1f225b28f49 -r 6224104991c1 includes/specials/SpecialWhatlinkshere.php
 --- includes/specials/SpecialWhatlinkshere.php
 +++ includes/specials/SpecialWhatlinkshere.php
 @@ -246,6 +246,11 @@
