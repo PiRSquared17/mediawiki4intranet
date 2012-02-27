@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1330085989 -14400
+# Date 1330350919 -14400
 Originally, this patch included several simple fixes required for
 MediaWiki 1.14-1.16 to run under more restrictive PHP 5.3.x.
 
@@ -15,7 +15,7 @@ Now it includes some very simple independent changes to different extensions:
 6) Another serious bug: setEditSection(false) is not passed to parser output
    https://bugzilla.wikimedia.org/show_bug.cgi?id=34687
 
-diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/Interwiki/Interwiki_body.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 extensions/Interwiki/Interwiki_body.php
 --- extensions/Interwiki/Interwiki_body.php
 +++ extensions/Interwiki/Interwiki_body.php
 @@ -177,7 +177,7 @@
@@ -38,7 +38,7 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/Interwiki/Interwiki_body.php
  			$theurl = $wgRequest->getVal( 'wpInterwikiURL' );
  			$local = $wgRequest->getCheck( 'wpInterwikiLocal' ) ? 1 : 0;
  			$trans = $wgRequest->getCheck( 'wpInterwikiTrans' ) ? 1 : 0;
-diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/PagedTiffHandler/PagedTiffHandler.image.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 extensions/PagedTiffHandler/PagedTiffHandler.image.php
 --- extensions/PagedTiffHandler/PagedTiffHandler.image.php
 +++ extensions/PagedTiffHandler/PagedTiffHandler.image.php
 @@ -335,6 +335,7 @@
@@ -49,7 +49,7 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/PagedTiffHandler/PagedTiffHandle
  		preg_match_all( '/\[BEGIN\](.+?)\[END\]/si', $dump, $infos, PREG_SET_ORDER );
  		foreach ( $infos as $info ) {
  			$state->resetPage();
-diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 --- extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 +++ extensions/SyntaxHighlight_GeSHi/SyntaxHighlight_GeSHi.class.php
 @@ -354,7 +354,7 @@
@@ -61,10 +61,10 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/SyntaxHighlight_GeSHi/SyntaxHigh
  			}
  			self::$initialised = true;
  		}
-diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/WhoIsWatching/WhoIsWatching_body.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 extensions/WhoIsWatching/WhoIsWatching_body.php
 --- extensions/WhoIsWatching/WhoIsWatching_body.php
 +++ extensions/WhoIsWatching/WhoIsWatching_body.php
-@@ -84,33 +84,33 @@
+@@ -84,33 +84,34 @@
  			}
  			ksort($users);
  			foreach ($users as $name => $id)
@@ -101,17 +101,17 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/WhoIsWatching/WhoIsWatching_body
 -        $tpl->set('numberofwatchingusers',
 -                  wfMsgExt('number_of_watching_users_pageview', array('parseinline'),
 -                  $wgLang->formatNum($numberofwatchingusers))
--        );
-+        $tpl->set( 'numberofwatchingusers', wfMsgExt(
++        $msg = wfMsgExt(
 +            'number_of_watching_users_pageview', array( 'parseinline' ),
 +            $wgLang->formatNum( $numberofwatchingusers )
-+        ) );
+         );
++        $tpl->set( 'numberofwatchingusers', $msg );
      }
  
      return true;
  }
 -
-diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 --- extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 +++ extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php
 @@ -45,7 +45,7 @@
@@ -123,7 +123,7 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 extensions/WikiCategoryTagCloud/WikiCategor
  
  	for ( $i = 0; $i < count( $titles ); $i++ ) {
  		$t = Title::newFromText( $titles[$i] );
-diff -r e1f225b28f49 -r 43c0552fa1e8 includes/SkinTemplate.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 includes/SkinTemplate.php
 --- includes/SkinTemplate.php
 +++ includes/SkinTemplate.php
 @@ -509,7 +509,7 @@
@@ -135,7 +135,7 @@ diff -r e1f225b28f49 -r 43c0552fa1e8 includes/SkinTemplate.php
  		}
  
  		$tpl->set( 'debughtml', $this->generateDebugHTML() );
-diff -r e1f225b28f49 -r 43c0552fa1e8 includes/parser/Parser.php
+diff -r e1f225b28f49 -r 824e2a7a7e91 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3765,9 +3765,7 @@
