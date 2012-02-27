@@ -228,6 +228,7 @@ if (wfIsWindows())
     $wgSphinxQL_port = '9306';
     $wgZip = realpath("$IP/../../app/zip/zip.exe");
     $wgUnzip = realpath("$IP/../../app/zip/unzip.exe");
+    $wgParserCacheType = $wgMessageCacheType = $wgMainCacheType = CACHE_DB;
 }
 
 $wgCookieExpiration = 3650 * 86400;
