@@ -509,7 +509,7 @@ class SkinTemplate extends Skin {
 		if ( $this->useHeadElement ) {
 			$tpl->set( 'headelement', $out->headElement( $this ) );
 		} else {
-			$tpl->set( 'headscripts', $out->getScript() );
+			$tpl->set( 'headscripts', $out->getHeadScripts( $this ) . $out->getHeadItems() );
 		}
 
 		$tpl->set( 'debughtml', $this->generateDebugHTML() );
@@ -739,6 +739,8 @@ class SkinTemplate extends Skin {
 		if( $checkEdit && !$title->isKnown() ) {
 			$classes[] = 'new';
 			$query = 'action=edit&redlink=1';
+			if ( $title->isTalkPage() )
+				$query .= '&section=new';
 		}
 
 		// wfMessageFallback will nicely accept $message as an array of fallbacks
