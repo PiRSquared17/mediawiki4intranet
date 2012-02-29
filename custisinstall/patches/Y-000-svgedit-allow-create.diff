@@ -1,12 +1,26 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1330525269 -14400
+# Date 1330538627 -14400
 Bug 72481 - Allow to create files with SVGEdit
 
-diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.hooks.php
+diff -r b6139b507754 -r ba147b4c832c extensions/SVGEdit/SVGEdit.hooks.php
 --- extensions/SVGEdit/SVGEdit.hooks.php
 +++ extensions/SVGEdit/SVGEdit.hooks.php
-@@ -66,4 +66,19 @@
+@@ -29,11 +29,12 @@
+ 				$modules[] = 'ext.svgedit.inline';
+ 			}
+ 		}
++		/* // Commented until WikiEditor will be installed on MediaWiki4Intranet
+ 		if ($wgRequest->getVal('action') == 'edit') {
+ 			if( $wgUser->isAllowed( 'upload' ) ) {
+ 				$modules[] = 'ext.svgedit.toolbar';
+ 			}
+-		}
++		}*/
+ 		if ($modules) {
+ 			$out->addModules($modules);
+ 		}
+@@ -66,4 +67,19 @@
  			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
  	}
  
@@ -26,7 +40,7 @@ diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.hooks.php
 +	}
 +
  }
-diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.i18n.php
+diff -r b6139b507754 -r ba147b4c832c extensions/SVGEdit/SVGEdit.i18n.php
 --- extensions/SVGEdit/SVGEdit.i18n.php
 +++ extensions/SVGEdit/SVGEdit.i18n.php
 @@ -20,7 +20,9 @@
@@ -49,7 +63,7 @@ diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.i18n.php
  );
  
  /** Slovenian (Slovenščina)
-diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.php
+diff -r b6139b507754 -r ba147b4c832c extensions/SVGEdit/SVGEdit.php
 --- extensions/SVGEdit/SVGEdit.php
 +++ extensions/SVGEdit/SVGEdit.php
 @@ -22,6 +22,7 @@
@@ -68,7 +82,7 @@ diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.php
  			'svgedit-edit-tab',
  			'svgedit-edit-tab-tooltip'
  		),
-diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/modules/ext.svgedit.editButton.js
+diff -r b6139b507754 -r ba147b4c832c extensions/SVGEdit/modules/ext.svgedit.editButton.js
 --- extensions/SVGEdit/modules/ext.svgedit.editButton.js
 +++ extensions/SVGEdit/modules/ext.svgedit.editButton.js
 @@ -22,7 +22,7 @@
@@ -94,7 +108,7 @@ diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/modules/ext.svgedit.edit
  
  		if (window.location.hash.indexOf('!action=svgedit') != -1) {
  			window.location.hash = '';
-diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/modules/ext.svgedit.editor.js
+diff -r b6139b507754 -r ba147b4c832c extensions/SVGEdit/modules/ext.svgedit.editor.js
 --- extensions/SVGEdit/modules/ext.svgedit.editor.js
 +++ extensions/SVGEdit/modules/ext.svgedit.editor.js
 @@ -31,7 +31,7 @@
