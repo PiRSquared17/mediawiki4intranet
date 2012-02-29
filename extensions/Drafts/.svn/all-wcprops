@@ -1,0 +1,71 @@
+K 25
+svn:wc:ra_dav:version-url
+V 58
+/svnroot/mediawiki/!svn/ver/107500/trunk/extensions/Drafts
+END
+Drafts.alias.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/107294/trunk/extensions/Drafts/Drafts.alias.php
+END
+Drafts.sql
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svnroot/mediawiki/!svn/ver/88070/trunk/extensions/Drafts/Drafts.sql
+END
+Drafts.classes.php
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/mediawiki/!svn/ver/106553/trunk/extensions/Drafts/Drafts.classes.php
+END
+Drafts.pg.sql
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/mediawiki/!svn/ver/59144/trunk/extensions/Drafts/Drafts.pg.sql
+END
+Drafts.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/mediawiki/!svn/ver/107261/trunk/extensions/Drafts/Drafts.i18n.php
+END
+Drafts.pages.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/106553/trunk/extensions/Drafts/Drafts.pages.php
+END
+Drafts.php
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/mediawiki/!svn/ver/107299/trunk/extensions/Drafts/Drafts.php
+END
+Drafts.css
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svnroot/mediawiki/!svn/ver/49587/trunk/extensions/Drafts/Drafts.css
+END
+Drafts.hooks.php
+K 25
+svn:wc:ra_dav:version-url
+V 75
+/svnroot/mediawiki/!svn/ver/106553/trunk/extensions/Drafts/Drafts.hooks.php
+END
+patch-draft_token.sql
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/55638/trunk/extensions/Drafts/patch-draft_token.sql
+END
+Drafts.js
+K 25
+svn:wc:ra_dav:version-url
+V 68
+/svnroot/mediawiki/!svn/ver/107500/trunk/extensions/Drafts/Drafts.js
+END
