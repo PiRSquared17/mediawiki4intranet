@@ -347,10 +347,11 @@ function replicate($src, $dest)
     repl_log(sprintf("Imported in %.2f seconds", $tp-$tx));
     // Extract the import report
     $report = '';
-    preg_match('/<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/is', $text, $m);
-    if ($m)
+    if (preg_match('/<!--\s*start\s*content\s*-->.*?<ul>/is', $text, $m, PREG_OFFSET_CAPTURE))
     {
-        $report = $m[1];
+        $report = substr($text, $m[0][1]+strlen($m[0][0]));
+        if (($p = stripos($report, '</ul')) !== false)
+            $report = substr($report, 0, $p);
         $report = str_replace('&nbsp;', ' ', $report);
         $report = preg_replace('/\s+/', ' ', $report);
         $report = preg_replace('/<li[^<>]*>/', "\n", $report);
