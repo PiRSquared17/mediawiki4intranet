@@ -29,11 +29,12 @@ class SVGEditHooks {
 				$modules[] = 'ext.svgedit.inline';
 			}
 		}
+		/* // Commented until WikiEditor will be installed on MediaWiki4Intranet
 		if ($wgRequest->getVal('action') == 'edit') {
 			if( $wgUser->isAllowed( 'upload' ) ) {
 				$modules[] = 'ext.svgedit.toolbar';
 			}
-		}
+		}*/
 		if ($modules) {
 			$out->addModules($modules);
 		}
