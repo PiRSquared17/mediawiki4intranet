@@ -1411,12 +1411,20 @@ class Title {
 	 * @return Array list of errors
 	 */
 	private function checkSpecialsAndNSPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
+		/**
+		 * Do not deny all actions except 'createaccount' and 'execute'
+		 * on special pages, let them decide themselves.
+		 * -- vitalif@mail.ru 2011-04-03
+		 * <commented out>:
+		 *
 		# Only 'createaccount' and 'execute' can be performed on
 		# special pages, which don't actually exist in the DB.
 		$specialOKActions = array( 'createaccount', 'execute' );
 		if ( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions ) ) {
 			$errors[] = array( 'ns-specialprotected' );
 		}
+		 * </commented out>
+		 */
 
 		# Check $wgNamespaceProtection for restricted namespaces
 		if ( $this->isNamespaceProtected( $user ) ) {
