@@ -8,6 +8,8 @@ $messages['en'] = array(
     'enotif-empty-summary'   => 'empty summary.',
     'enotif_lastvisited'     => 'See $1 for all changes since your last visit.',
     'enotif_lastdiff'        => 'See $1 to view this change.',
+
+    // Page change notification email body
     'enotif_body'            =>
 '<body>
 <p>Dear <b>$WATCHINGUSERNAME</b>,</p>
@@ -31,6 +33,7 @@ Feedback and further assistance: <a href="{{fullurl:{{MediaWiki:Helppage}}}}">{{
 </i></p>
 </body>$DIFF',
 
+    // Email address confirmation body (for new accounts and re-submit from Special:ConfirmEmail)
     'confirmemail_body'      =>
 '<body>
 <p>Someone, probably you, from IP address $1,
@@ -48,6 +51,44 @@ to cancel the e-mail address confirmation:</p>
 
 <p>This confirmation code will expire at $4.</p>
 </body>',
+
+    // Email address confirmation body (for the case when address was changed in preferences)
+    'confirmemail_body_changed' =>
+'<body>
+<p>Someone, probably you, from IP address $1,
+has changed the e-mail address of the account "$2" to this address on {{SITENAME}}.</p>
+
+<p>To confirm that this account really does belong to you and reactivate
+e-mail features on {{SITENAME}}, open this link in your browser:</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>If the account does *not* belong to you, follow this link
+to cancel the e-mail address confirmation:</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>This confirmation code will expire at $4.</p>
+</body>',
+
+    // Email address confirmation body (for the case when address was added in preferences)
+    'confirmemail_body_set'     =>
+'<body>
+<p>Someone, probably you, from IP address $1,
+has set the e-mail address of the account "$2" to this address on {{SITENAME}}.</p>
+
+<p>To confirm that this account really does belong to you and reactivate
+e-mail features on {{SITENAME}}, open this link in your browser:</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>If the account does *not* belong to you, follow this link
+to cancel the e-mail address confirmation:</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>This confirmation code will expire at $4.</p>
+</body>',
 );
 
 $messages['ru'] = array(
@@ -57,6 +98,7 @@ $messages['ru'] = array(
     'enotif_lastvisited'     => '<a href="$1">Перейдите по ссылке</a> для просмотра всех изменений, произошедших с вашего последнего посещения.',
     'enotif_lastdiff'        => '<a href="$1">Перейдите по ссылке</a> для ознакомления с изменением.',
 
+    // Тело email-оповещения об изменении страницы
     'enotif_body'            =>
 '<body>
 <p><b>$WATCHINGUSERNAME,</b></p>
@@ -81,6 +123,7 @@ $REALDIFF
 </i></p>
 </body>$DIFF',
 
+    // Тело письма подтверждения адреса (на случай регистрации и перезапроса со страницы Special:ConfirmEmail)
     'confirmemail_body'      =>
 '<body>
 <p>Кто-то (возможно вы) с IP-адресом $1 зарегистрировал
@@ -95,6 +138,44 @@ $REALDIFF
 
 <p>Если вы <b>*не* регистрировали</b> подобной учётной записи, то перейдите
 по следующей ссылке, чтобы отменить подтверждение адреса:</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>Код подтверждения действителен до $4.</p>
+</body>',
+
+    // Тело письма подтверждения адреса (на случай его изменения со страницы настроек)
+    'confirmemail_body_changed' =>
+'<body>
+<p>Кто-то (возможно вы) с IP-адресом $1
+указал данный адрес электронной почты в качестве нового для учётной записи «<b>$2</b>» в проекте {{SITENAME}}.</p>
+
+<p>Чтобы подтвердить, что эта учётная запись действительно принадлежит вам,
+и включить возможность отправки писем с сайта {{SITENAME}}, откройте приведённую ниже ссылку в браузере.</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>Если данная учётная запись *не* относится к вам, то перейдите по следующей ссылке,
+чтобы отменить подтверждение адреса</p>
+
+<p><a href="$5">$5</a></p>
+
+<p>Код подтверждения действителен до $4.</p>
+</body>',
+
+    // Тело письма подтверждения адреса (на случай его добавления со страницы настроек)
+    'confirmemail_body_set'     =>
+'<body>
+<p>Кто-то (возможно вы) с IP-адресом $1
+указал данный адрес электронной почты для учётной записи «$2» в проекте {{SITENAME}}.</p>
+
+<p>Чтобы подтвердить, что эта учётная запись действительно принадлежит вам,
+и включить возможность отправки писем с сайта {{SITENAME}}, откройте приведённую ниже ссылку в браузере.</p>
+
+<p><a href="$3">$3</a></p>
+
+<p>Если данная учётная запись *не* относится к вам, то перейдите по следующей ссылке,
+чтобы отменить подтверждение адреса</p>
 
 <p><a href="$5">$5</a></p>
 
