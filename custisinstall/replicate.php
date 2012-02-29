@@ -326,6 +326,11 @@ function replicate($src, $dest)
     if ($status != 200)
         throw new ReplicateException("Could not retrieve Special:Import page");
     preg_match('/<input([^<>]*name="editToken"[^<>]*)>/is', $text, $m);
+    if (!$m)
+    {
+        $text = preg_replace('/^.*<!-- start content -->(.*)<!-- end content -->.*$/is', '\1', $text);
+        throw new ReplicateException("No editToken on Special:Import. Content was:\n".trim($text));
+    }
     preg_match('/value=\"([^\"]*)\"/is', $m[1], $m);
     $token = $m[1];
     // Run import
@@ -341,13 +346,17 @@ function replicate($src, $dest)
     $tp = microtime(true);
     repl_log(sprintf("Imported in %.2f seconds", $tp-$tx));
     // Extract the import report
+    $report = '';
     preg_match('/<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/is', $text, $m);
-    $report = $m[1];
-    $report = str_replace('&nbsp;', ' ', $report);
-    $report = preg_replace('/\s+/', ' ', $report);
-    $report = preg_replace('/<li[^<>]*>/', "\n", $report);
-    $report = preg_replace('/<\/?[a-z0-9_:\-]+(\/?\s+[^<>]*)?>/', '', $report);
-    $report = trim(html_entity_decode($report));
+    if ($m)
+    {
+        $report = $m[1];
+        $report = str_replace('&nbsp;', ' ', $report);
+        $report = preg_replace('/\s+/', ' ', $report);
+        $report = preg_replace('/<li[^<>]*>/', "\n", $report);
+        $report = preg_replace('/<\/?[a-z0-9_:\-]+(\/?\s+[^<>]*)?>/', '', $report);
+        $report = trim(html_entity_decode($report));
+    }
     if ($report === '')
         throw new ReplicateException("Could not replicate, no import report found in response content:\n$text");
     repl_log("Report:\n$report");
