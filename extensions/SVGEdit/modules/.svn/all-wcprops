@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 66
+/svnroot/mediawiki/!svn/ver/90241/trunk/extensions/SVGEdit/modules
+END
+ext.svgedit.editButton.js
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/81228/trunk/extensions/SVGEdit/modules/ext.svgedit.editButton.js
+END
+ext.svgedit.toolbar.js
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/83134/trunk/extensions/SVGEdit/modules/ext.svgedit.toolbar.js
+END
+ext.svgedit.formmultipart.js
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/81275/trunk/extensions/SVGEdit/modules/ext.svgedit.formmultipart.js
+END
+ext.svgedit.editor.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/90241/trunk/extensions/SVGEdit/modules/ext.svgedit.editor.js
+END
+ext.svgedit.embedapi.js
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/81275/trunk/extensions/SVGEdit/modules/ext.svgedit.embedapi.js
+END
+ext.svgedit.io.js
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/88770/trunk/extensions/SVGEdit/modules/ext.svgedit.io.js
+END
+ext.svgedit.editButton.css
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/81228/trunk/extensions/SVGEdit/modules/ext.svgedit.editButton.css
+END
+ext.svgedit.inline.js
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/81308/trunk/extensions/SVGEdit/modules/ext.svgedit.inline.js
+END
