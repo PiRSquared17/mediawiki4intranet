@@ -1,0 +1,35 @@
+K 25
+svn:wc:ra_dav:version-url
+V 59
+/svnroot/mediawiki/!svn/ver/107287/trunk/extensions/SVGEdit
+END
+.gitignore
+K 25
+svn:wc:ra_dav:version-url
+V 69
+/svnroot/mediawiki/!svn/ver/81228/trunk/extensions/SVGEdit/.gitignore
+END
+SVGEdit.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/mediawiki/!svn/ver/107287/trunk/extensions/SVGEdit/SVGEdit.i18n.php
+END
+SVGEdit.php
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/mediawiki/!svn/ver/106136/trunk/extensions/SVGEdit/SVGEdit.php
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svnroot/mediawiki/!svn/ver/83134/trunk/extensions/SVGEdit/README
+END
+SVGEdit.hooks.php
+K 25
+svn:wc:ra_dav:version-url
+V 76
+/svnroot/mediawiki/!svn/ver/83134/trunk/extensions/SVGEdit/SVGEdit.hooks.php
+END
