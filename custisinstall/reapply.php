@@ -27,6 +27,7 @@ $PATCHED_EXTENSIONS = array_map('trim', explode("\n",
     PagedTiffHandler
     SyntaxHighlight_GeSHi
     WhoIsWatching
+    SVGEdit
     WikiCategoryTagCloud"));
 $CREATED_FILES = array('extensions/CategoryTree/SubcatCat.i18n.php', 'includes/DumpArchive.php');
 
