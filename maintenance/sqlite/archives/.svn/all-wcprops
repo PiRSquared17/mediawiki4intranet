@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives
+END
+patch-tc-timestamp.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-tc-timestamp.sql
+END
+initial-indexes.sql
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/initial-indexes.sql
+END
+patch-iw_api_and_wikiid.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-iw_api_and_wikiid.sql
+END
+searchindex-fts3.sql
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/searchindex-fts3.sql
+END
+patch-kill-iwl_pft.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-kill-iwl_pft.sql
+END
+patch-rename-iwl_prefix.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-rename-iwl_prefix.sql
+END
+patch-log_search-rename-index.sql
+K 25
+svn:wc:ra_dav:version-url
+V 118
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-log_search-rename-index.sql
+END
+patch-kill-iwl_prefix.sql
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-kill-iwl_prefix.sql
+END
+patch-archive_kill_ar_page_revid.sql
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-archive_kill_ar_page_revid.sql
+END
+patch-categorylinks-better-collation.sql
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/sqlite/archives/patch-categorylinks-better-collation.sql
+END
