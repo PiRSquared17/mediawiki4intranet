@@ -1051,12 +1051,12 @@ class Cite {
 	 *
 	 * @return bool
 	 */
-	function checkRefsNoReferences( &$parser, &$text ) {
+	function checkRefsNoReferences( &$parser, &$text, $clearState ) {
 		if ( $parser->extCite !== $this ) {
-			return $parser->extCite->checkRefsNoReferences( $parser, $text );
+			return $parser->extCite->checkRefsNoReferences( $parser, $text, $clearState );
 		}
 		
-		if ( $parser->getOptions()->getIsSectionPreview() ) {
+		if ( $parser->getOptions()->getIsSectionPreview() || !$clearState ) {
 			return true;
 		}
 
