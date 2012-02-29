@@ -1167,6 +1167,9 @@ class WikiRevision {
 		}
 
 		$user = User::newFromName( $this->user_text );
+		if( !$user ) {
+			$user = new FakeUser( $this->user_text );
+		}
 		
 		# Do the actual upload
 		if ( $archiveName ) {
