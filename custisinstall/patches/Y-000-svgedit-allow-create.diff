@@ -1,0 +1,117 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1330525269 -14400
+Bug 72481 - Allow to create files with SVGEdit
+
+diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.hooks.php
+--- extensions/SVGEdit/SVGEdit.hooks.php
++++ extensions/SVGEdit/SVGEdit.hooks.php
+@@ -66,4 +66,19 @@
+ 			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
+ 	}
+ 
++	/**
++	 * UploadForm:initial hook, suggests creating non-existing SVG files with SVGEdit
++	 */
++	public static function uploadFormInitial( $upload ) {
++		if ( strtolower( substr( $upload->mDesiredDestName, -4 ) ) == '.svg' ) {
++			$title = Title::newFromText( $upload->mDesiredDestName, NS_FILE );
++			if ( $title ) {
++				$upload->uploadFormTextTop .= wfMsgNoTrans(
++					'svgedit-suggest-create', $title->getFullUrl().'#!action=svgedit'
++				);
++			}
++		}
++		return true;
++	}
++
+ }
+diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.i18n.php
+--- extensions/SVGEdit/SVGEdit.i18n.php
++++ extensions/SVGEdit/SVGEdit.i18n.php
+@@ -20,7 +20,9 @@
+ 	'svgedit-desc' => 'In-browser editing of SVG drawings with [http://code.google.com/p/svg-edit/ SVG-Edit]',
+ 	'svgedit-edit-tab' => 'Edit drawing',
+ 	'svgedit-edit-tab-tooltip' => 'You can edit this SVG drawing in your browser',
+-	'svgedit-toolbar-insert' => 'SVG drawing'
++	'svgedit-toolbar-insert' => 'SVG drawing',
++	'svgedit-editbutton-create' => 'Create image with SVGEdit',
++	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Also, you can <a href="$1">create/edit this SVG file with SVGEdit</a>.</div>',
+ );
+ 
+ /** Message documentation (Message documentation)
+@@ -514,6 +516,8 @@
+ 	'svgedit-edit-tab' => 'Править рисунок',
+ 	'svgedit-edit-tab-tooltip' => 'Вы можете редактировать этот SVG-рисунок в вашем браузере',
+ 	'svgedit-toolbar-insert' => 'Рисование SVG',
++	'svgedit-editbutton-create' => 'Создать рисунок в SVGEdit',
++	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Также вы можете <a href="$1">создать/изменить этот SVG-файл с помощью SVGEdit</a>.</div>',
+ );
+ 
+ /** Slovenian (Slovenščina)
+diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/SVGEdit.php
+--- extensions/SVGEdit/SVGEdit.php
++++ extensions/SVGEdit/SVGEdit.php
+@@ -22,6 +22,7 @@
+ 
+ $wgHooks['BeforePageDisplay'][] = 'SVGEditHooks::beforePageDisplay';
+ $wgHooks['MakeGlobalVariablesScript'][] = 'SVGEditHooks::makeGlobalVariablesScript';
++$wgHooks['UploadForm:initial'][] = 'SVGEditHooks::uploadFormInitial';
+ 
+ $wgAutoloadClasses['SVGEditHooks'] = dirname( __FILE__ ) . '/SVGEdit.hooks.php';
+ 
+@@ -59,6 +60,7 @@
+ 		),
+ 		'messages' => array(
+ 			'svgedit-editbutton-edit',
++			'svgedit-editbutton-create',
+ 			'svgedit-edit-tab',
+ 			'svgedit-edit-tab-tooltip'
+ 		),
+diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/modules/ext.svgedit.editButton.js
+--- extensions/SVGEdit/modules/ext.svgedit.editButton.js
++++ extensions/SVGEdit/modules/ext.svgedit.editButton.js
+@@ -22,7 +22,7 @@
+ 		var trigger = function() {
+ 			mw.svgedit.open({
+ 				filename: wgTitle,
+-				replace: '#file',
++				replace: (wgArticleId ? '#file' : '#mw-imagepage-nofile'),
+ 				onclose: function(filename) {
+ 					if (filename) {
+ 						// Saved! Refresh parent window...
+@@ -48,11 +48,11 @@
+ 		});
+ 
+ 		var button = $('<button></button>')
+-			.text(mw.msg('svgedit-editbutton-edit'))
++			.text(mw.msg(wgArticleId ? 'svgedit-editbutton-edit' : 'svgedit-editbutton-create'))
+ 			.click(function() {
+ 				trigger();
+ 			});
+-		$('.fullMedia').append(button);
++		$(wgArticleId ? '.fullMedia' : '#mw-imagepage-nofile').append(button);
+ 
+ 		if (window.location.hash.indexOf('!action=svgedit') != -1) {
+ 			window.location.hash = '';
+diff -r b6139b507754 -r 97e5949b56af extensions/SVGEdit/modules/ext.svgedit.editor.js
+--- extensions/SVGEdit/modules/ext.svgedit.editor.js
++++ extensions/SVGEdit/modules/ext.svgedit.editor.js
+@@ -31,7 +31,7 @@
+ 		if ("filename" in options) {
+ 			// Get some basic info on the image before we go barrelling in...
+ 			mwSVG.fetchInfo(options.filename, function(imageinfo) {
+-				mw.svgedit.openEditor(options, imageinfo);
++				mw.svgedit.openEditor(options, imageinfo || {});
+ 			});
+ 		} else {
+ 			mw.svgedit.openEditor(options, {});
+@@ -60,7 +60,7 @@
+ 			url += '?dimensions=' + origWidth + ',' + origHeight;
+ 		}
+ 
+-		var preferredHeight = origHeight + 180; // leave space for toolbars and UI inside the iframe
++		var preferredHeight = origHeight ? origHeight + 180 : 500; // leave space for toolbars and UI inside the iframe
+ 		var windowHeight = $(window).height() - 40; // leave space for our toolbar outside the iframe
+ 		var minHeight = Math.min(windowHeight, preferredHeight);
+ 		var initHeight = Math.max(minHeight, minHeight);
