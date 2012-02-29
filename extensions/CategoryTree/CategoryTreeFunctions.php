@@ -675,6 +675,7 @@ class CategoryTree {
 					$linkattr[ 'onclick' ] = "if (this.href) this.href='javascript:void(0)'; categoryTreeExpandNode('" . Xml::escapeJsString( $key ) . "'," . $this->getOptionsAsJsStructure() . ",this);";
 					# Don't load this message for ajax requests, so that we don't have to initialise $wgLang
 					$linkattr[ 'title' ] = $this->mIsAjaxRequest ? '##LOAD##' : wfMsgNoTrans( 'categorytree-expand' );
+					$linkattr[ 'class' ] .= ' CategoryTreeClickable';
 				} else {
 					$tag = 'span';
 					$txt = wfMsgNoTrans( 'categorytree-collapse-bullet' );
