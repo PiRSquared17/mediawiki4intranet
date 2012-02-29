@@ -807,7 +807,14 @@ p {
 	margin: .4em 0 .5em 0;
 	line-height: 1.5em;
 }
+div.paragraph {
+	margin: .4em 0 .5em 0;
+	line-height: 1.5em;
+}
 p img {
+	margin: 0;
+}
+div.paragraph img {
 	margin: 0;
 }
 q {
@@ -941,11 +948,13 @@ select {
 	border: 0;
 }
 div.floatright p { font-style: italic; }
+div.floatright div.paragraph { font-style: italic; }
 /* @noflip */div.floatleft, table.floatleft {
 	margin: 0 .5em .5em 0;
 	border: 0;
 }
 div.floatleft p { font-style: italic; }
+div.floatleft div.paragraph { font-style: italic; }
 /* Thumbnails */
 div.thumb {
 	margin-bottom: .5em;
@@ -1254,4 +1263,19 @@ div.vectorTabs ul {
 /* Tooltips are outside of the normal body code, so this helps make the size of the text sensible */
 .tipsy {
 	font-size: 0.8em;
+}
+
+/* Categories above the content */
+#catlinks-top div {
+	float: left;
+	margin: 0;
+	padding: 0;
+}
+#catlinks-top .catlinks div {
+	padding-left: 0.7em;
+}
+ul#filetoc {
+	font-size: 100%;
+	line-height: 1.35em;
+	padding: 0.3em 0;
 }
