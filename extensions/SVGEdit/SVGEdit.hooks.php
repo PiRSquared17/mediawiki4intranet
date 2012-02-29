@@ -66,4 +66,19 @@ class SVGEditHooks {
 			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
 	}
 
+	/**
+	 * UploadForm:initial hook, suggests creating non-existing SVG files with SVGEdit
+	 */
+	public static function uploadFormInitial( $upload ) {
+		if ( strtolower( substr( $upload->mDesiredDestName, -4 ) ) == '.svg' ) {
+			$title = Title::newFromText( $upload->mDesiredDestName, NS_FILE );
+			if ( $title ) {
+				$upload->uploadFormTextTop .= wfMsgNoTrans(
+					'svgedit-suggest-create', $title->getFullUrl().'#!action=svgedit'
+				);
+			}
+		}
+		return true;
+	}
+
 }
