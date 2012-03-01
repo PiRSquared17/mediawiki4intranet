@@ -677,23 +677,25 @@ special external link styling */
  */
 
 #p-navigation, #p-tb, #p-personal, #p-cactions {
-    display: block;
-    width: auto;
-    height: auto;
-    margin: 0;
-    padding: 0;
+	display: block;
+	width: auto;
+	height: auto;
+	margin: 0;
+	padding: 0;
 }
 #p-navigation div, #p-tb div {
-    border-top-style: none;
+	border-top-style: none;
 }
 #p-tb li, #p-tb ul, #p-navigation li, #p-navigation ul, #p-personal ul, #p-personal li, #p-cactions ul, #p-cactions li {
-    white-space: nowrap;
-    display: inline;
-    position: relative;
-    margin: 0;
-    padding: 0;
+	white-space: nowrap;
+	display: inline;
+	position: relative;
+	margin: 0;
+	padding: 0;
 }
-#p-wikilogcalendar { display: none }
+#p-wikilogcalendar, #p-favratebar {
+	display: none;
+}
 
 #p-navigation h5, #p-logo, #p-tb h5, #p-personal h5, #p-cactions h5, #p-search, #footer {
 	display: none;
@@ -1015,7 +1017,7 @@ table.gallery td {
 }
 /* Keep this temporarily so that cached pages will display right */
 table.gallery td.galleryheader {
-    text-align: center;
+	text-align: center;
 	font-weight: bold;
 }
 table.gallery caption {
