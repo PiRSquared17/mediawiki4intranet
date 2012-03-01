@@ -134,6 +134,7 @@ require_once($IP.'/extensions/Mp3Handler/Mp3Handler.php');
 require_once($IP.'/extensions/Dia/Dia.php');
 
 $wgAllowCategorizedRecentChanges = true;
+$wgFeedLimit = 500;
 
 require_once($IP.'/extensions/MergeConflicts/MergeConflicts.php');
 require_once($IP.'/extensions/AllNsSuggest/AllNsSuggest.php');
