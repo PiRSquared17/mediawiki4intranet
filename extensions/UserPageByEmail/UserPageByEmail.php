@@ -27,6 +27,7 @@ $dir = dirname(__FILE__) . '/';
 $wgAutoloadClasses['SpecialUserPageByEmail'] = $dir . 'UserPageByEmail.class.php';
 $wgExtensionMessagesFiles['UserPageByEmail'] = $dir . 'UserPageByEmail.i18n.php';
 $wgSpecialPages['UserPageByEmail'] = 'SpecialUserPageByEmail';
+$wgSpecialPageGroups['UserPageByEmail'] = 'users';
 
 // Extension credits that will show up on Special:Version
 $wgExtensionCredits['other'][] = array(
