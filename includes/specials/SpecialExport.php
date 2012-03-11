@@ -1,6 +1,6 @@
 <?php
 # Copyright (C) 2003-2008 Brion Vibber <brion@pobox.com>
-#           (C) 2010-2011 Vitaliy Filippov <vitalif@mail.ru>
+#           (C) 2010+     Vitaliy Filippov <vitalif@mail.ru>
 # http://www.mediawiki.org/
 # http://wiki.4intra.net/MW_Import_Export
 #
@@ -45,7 +45,7 @@ class SpecialExport extends SpecialPage {
 		$this->curonly = true;
 		$this->doExport = false;
 		$this->templates = $wgRequest->getCheck( 'templates' );
-		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
+		$this->images = $wgRequest->getCheck( 'images' );
 		$this->pageLinkDepth = $this->validateLinkDepth(
 			$wgRequest->getIntOrNull( 'pagelink-depth' )
 		);
@@ -285,6 +285,7 @@ class SpecialExport extends SpecialPage {
 		$p = !empty( $state[ 'pagelinks' ] );
 		$i = !empty( $state[ 'images' ] );
 		$s = !empty( $state[ 'subpages' ] );
+		$r = !empty( $state[ 'redirects' ] );
 		$step = 0;
 		do {
 			// Loop as there may be more than one closure type
@@ -293,13 +294,16 @@ class SpecialExport extends SpecialPage {
 			if( $p ) $added += self::getPagelinks( $pageSet );
 			if( $i ) $added += self::getImages( $pageSet );
 			if( $s ) $added += self::getSubpages( $pageSet );
+			if( $r ) $added += self::getRedirects( $pageSet );
 			$step++;
 		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
 
 		// Filter user-readable pages (also MW Bug 8824)
-		foreach ( $pageSet as $key => $title )
-			if ( !$title->userCanRead() )
+		foreach ( $pageSet as $key => $title ) {
+			if ( !$title->userCanRead() ) {
 				unset( $pageSet[ $key ] );
+			}
+		}
 
 		// Filter pages by $modifydate
 		if ( $modifydate !== NULL && $pageSet ) {
@@ -373,7 +377,7 @@ class SpecialExport extends SpecialPage {
 			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
 		}
 		// Checkboxes:
-		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k ) {
+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages', 'redirects' ) as $k ) {
 			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
 				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
 				array( 'style' => 'vertical-align: middle' )
@@ -501,12 +505,40 @@ class SpecialExport extends SpecialPage {
 			$ids[ $title->getArticleId() ] = true;
 			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
 		}
-		$nsx = $where;
 		foreach ( $where as $ns => &$w ) {
-			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
+			$w = '( page_namespace='.$ns.' AND ( '.implode( ' OR ', $w ).' ) )';
 		}
-		$where = '('.implode( ' OR ', $where ).')';
+		$where = '( '.implode( ' OR ', $where ).' )';
 		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
+		$added = 0;
+		foreach( $result as $row ) {
+			if( empty( $ids[ $row->page_id ] ) ) {
+				$add = Title::newFromRow( $row );
+				$pageSet[ $add->getPrefixedText() ] = $add;
+				$added++;
+			}
+		}
+		return $added;
+	}
+
+	/**
+	 * Expand a list of pages to include redirects linking to them.
+	 * @param &$pageSet array, associative array indexed by title prefixed text for output
+	 * @return int count of added pages
+	 */
+	public static function getRedirects( &$pageSet ) {
+		$dbr = wfGetDB( DB_SLAVE );
+		$where = array();
+		$ids = array();
+		foreach ( $pageSet as $title ) {
+			$ids[ $title->getArticleId() ] = true;
+			$where[ $title->getNamespace() ][] = $title->getDBkey();
+		}
+		foreach ( $where as $ns => &$w ) {
+			$w = '( rd_namespace='.$ns.' AND rd_title IN ( ' . $dbr->makeList( $w ) . ' ) )';
+		}
+		$where = '( '.implode( ' OR ', $where ).' )';
+		$result = $dbr->select( array( 'page', 'redirect' ), 'page.*', array( 'page_id=rd_from', $where ), __METHOD__ );
 		$added = 0;
 		foreach( $result as $row ) {
 			if( empty( $ids[ $row->page_id ] ) ) {
