@@ -271,15 +271,16 @@ function page_list($src, $cat, $notcat = '', $modifydate = '', $ignore_since_ima
             'modifydate' => $modifydate,
         );
         if (!$ignore_since_images)
-            $params['templates'] = $params['images'] = 1;
+            $params['templates'] = $params['images'] = $params['redirects'] = 1;
         $text = page_list_load($src, $params);
         if ($text && $ignore_since_images)
         {
-            // Add templates and images in a separate request, without passing modifydate
+            // Add templates, images and redirects in a separate request, without passing modifydate
             $text = page_list_load($src, array(
                 'notcategory' => $notcat,
                 'templates' => 1,
                 'images' => 1,
+                'redirects' => 1,
                 'pages' => $text,
             ));
         }
