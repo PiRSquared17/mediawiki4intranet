@@ -3293,6 +3293,7 @@ Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' fil
 'export-pagelinks'  => 'Include linked articles',
 'export-subpages'   => 'Include subpages',
 'export-closure'    => 'Include articles from subcategories',
+'export-redirects'  => 'Include redirects',
 
 # Namespace 8 related
 'allmessages'                   => 'System messages',
