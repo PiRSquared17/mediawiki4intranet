@@ -155,28 +155,37 @@ abstract class WikilogQuery
 		);
 	}
 
-	/* Does $dbr->select with additional conditions taken from this query object */
-	public function select($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
-	{
+	/**
+	 * Does $dbr->select with additional conditions taken from this query object
+	 */
+	public function select( $dbr, $tables, $fields, $conds = array(),
+		$function = __METHOD__, $options = array(), $join_conds = array()) {
 		return $dbr->query( $this->selectSQLText( $dbr, $tables, $fields, $conds, $function, $options, $join_conds ), $function );
 	}
 
-	/* Does $dbr->selectSQLText with additional conditions taken from this query object */
-	public function selectSQLText($dbr, $tables, $fields, $conds = array(), $function = __FUNCTION__, $options = array(), $join_conds = array())
-	{
+	/**
+	 * Generates query text with additional conditions taken from this query object
+	 */
+	public function selectSQLText( $dbr, $tables, $fields, $conds = array(),
+		$function = __METHOD__, $options = array(), $join_conds = array() ) {
 		$info = $this->getQueryInfo( $dbr );
-		if ( $tables )
+		if ( $tables ) {
 			$tables = array_merge( $info['tables'], $tables );
-		else
+		} else {
 			$tables = $info['tables'];
-		if ( $info['conds'] )
-			$conds = array_merge( $info['conds'], $conds );
-		if ( $info['options'] )
-			$options = array_merge( $info['options'], $options );
-		if ( $info['join_conds'] )
-			$join_conds = array_merge( $info['join_conds'], $join_conds );
-		if ( !$fields )
+		}
+		if ( $info['conds'] ) {
+			$conds = $conds ? array_merge( $info['conds'], $conds ) : $info['conds'];
+		}
+		if ( $info['options'] ) {
+			$options = $options ? array_merge( $info['options'], $options ) : $info['options'];
+		}
+		if ( $info['join_conds'] ) {
+			$join_conds = $join_conds ? array_merge( $info['join_conds'], $join_conds ) : $info['join_conds'];
+		}
+		if ( !$fields ) {
 			$fields = $info['fields'];
+		}
 		return $dbr->selectSQLText($tables, $fields, $conds, $function, $options, $join_conds);
 	}
 }
@@ -521,7 +530,7 @@ class WikilogItemQuery
 class WikilogCommentQuery
 	extends WikilogQuery
 {
-	# Valid filter values for moderation status.
+	// Valid filter values for moderation status.
 	const MS_ALL        = 'all';		///< Return all comments.
 	const MS_ACCEPTED   = 'accepted';	///< Return only accepted comments.
 	const MS_PENDING    = 'pending';	///< Return only pending comments.
@@ -533,54 +542,33 @@ class WikilogCommentQuery
 		self::MS_NOTDELETED, self::MS_NOTPENDING
 	);
 
-	# Local variables.
+	// Local variables.
 	private $mModStatus = self::MS_ALL;	///< Filter by moderation status.
 	private $mNamespace = false;		///< Filter by namespace.
-	private $mWikilog = null;			///< Filter by wikilog.
-	private $mItem = null;				///< Filter by wikilog item (article).
+	private $mSubject = false;			///< Filter by subject article.
 	private $mThread = false;			///< Filter by thread.
 	private $mAuthor = false;			///< Filter by author.
 	private $mDate = false;				///< Filter by date.
+	private $mIncludeSubpages = false;	///< Include comments to all subpages of subject page.
+	private $mSort = 'thread';			///< Sort order (only 'thread' is supported by now).
+	private $mLimit = 0;				///< Limit.
+	private $mFirstCommentId = false;	///< Forward navigation: ID of the first comment on page.
+	private $mNextCommentId = false;	///< Backward navigation: ID of the first comment on NEXT page.
 
-	# Options
-	/** Query options. */
-	protected $mDefaultOptions = array(
-		'include-item' => false,		// Include WikilogItem data in query.
-	);
+	// The real page boundaries are saved here after calling getQueryInfo().
+	// You can pass them back to WikilogCommentQuery using setXXXCommentId().
+	private $mRealFirstCommentId = false;
+	private $mRealNextCommentId = false;
 
 	/**
 	 * Constructor.
-	 * @param $from Title, WikilogInfo or WikilogItem to set up the query.
+	 * @param $from Title subject.
 	 */
-	public function __construct( $from = null ) {
+	public function __construct( $subject = null ) {
 		parent::__construct();
 
-		if ( $from ) {
-			$this->setWikilogOrItem( $from );
-		}
-	}
-
-	/**
-	 * Handy method to set either the wikilog or the item to query for.
-	 * @param $from Title, WikilogInfo or WikilogItem object.
-	 */
-	public function setWikilogOrItem( $from ) {
-		if ( $from instanceof Title ) {
-			$from = Wikilog::getWikilogInfo( $from );
-		}
-		if ( $from instanceof WikilogInfo ) {
-			if ( $from->isItem() ) {
-				$from = WikilogItem::newFromInfo( $from );
-			} else {
-				$this->setWikilog( $from->getTitle() );
-				return;
-			}
-		}
-		if ( $from instanceof WikilogItem ) {
-			$this->setItem( $from );
-			return;
-		} else {
-			throw new MWException( "Not a valid wikilog object." );
+		if ( $subject ) {
+			$this->setSubject( $subject );
 		}
 	}
 
@@ -609,28 +597,13 @@ class WikilogCommentQuery
 	}
 
 	/**
-	 * Set the wikilog to query for. Only comments for articles published in
-	 * the given wikilog are returned. The item filter has precedence over this
-	 * filter.
-	 * @param $wikilogTitle Wikilog title object to query for (Title).
+	 * Set the page to query for. Only comments for the given article
+	 * are returned. You may set includeSubpageComments() and then
+	 * all comments for all subpages of this page will be also returned.
+	 * @param Title $item page to query for
 	 */
-	public function setWikilog( $wikilog ) {
-		$this->mWikilog = $wikilog;
-	}
-
-	/**
-	 * Set the wikilog item to query for. Only comments for the given article
-	 * is returned.
-	 * @param $item Wikilog item to query for (WikilogItem or Title).
-	 *   Preferably, a WikilogItem object should be passed, but a Title
-	 *   object is also accepted and automatically converted (no error
-	 *   checking).
-	 */
-	public function setItem( $item ) {
-		if ( $item instanceof Title ) {
-			$item = WikilogItem::newFromID( $item->getArticleId() );
-		}
-		$this->mItem = $item;
+	public function setSubject( Title $page ) {
+		$this->mSubject = $page;
 	}
 
 	/**
@@ -644,6 +617,16 @@ class WikilogCommentQuery
 			$thread = implode( '/', $thread );
 		}
 		$this->mThread = $thread;
+	}
+
+	/**
+	 * Set sort order and limit.
+	 * Note that the query sorted on thread ALWAYS includes full threads
+	 * (threads are not broken)
+	 */
+	public function setLimit( $sort, $limit ) {
+		$this->mSort = $sort;
+		$this->mLimit = $limit;
 	}
 
 	/**
@@ -683,16 +666,33 @@ class WikilogCommentQuery
 		}
 	}
 
+	public function setIncludeSubpageComments( $inc ) {
+		$this->mIncludeSubpages = $inc;
+	}
+
+	public function setFirstCommentId( $id ) {
+		$this->mFirstCommentId = $id;
+	}
+
+	public function setNextCommentId( $id ) {
+		$this->mNextCommentId = $id;
+	}
+
 	/**
 	 * Accessor functions.
 	 */
 	public function getModStatus() { return $this->mModStatus; }
 	public function getNamespace() { return $this->mNamespace; }
-	public function getWikilog() { return $this->mWikilog; }
-	public function getItem() { return $this->mItem; }
+	public function getSubject() { return $this->mSubject; }
 	public function getThread() { return $this->mThread; }
 	public function getAuthor() { return $this->mAuthor; }
 	public function getDate() { return $this->mDate; }
+	public function getLimit() { return $this->mLimit; }
+	public function getIncludeSubpageComments() { return $this->mIncludeSubpages; }
+	public function getFirstCommentId() { return $this->mFirstCommentId; }
+	public function getNextCommentId() { return $this->mNextCommentId; }
+	public function getRealFirstCommentId() { return $this->mRealFirstCommentId; }
+	public function getRealNextCommentId() { return $this->mRealNextCommentId; }
 
 	/**
 	 * Organizes all the query information and constructs the table and
@@ -706,10 +706,8 @@ class WikilogCommentQuery
 	public function getQueryInfo( $db, $opts = array() ) {
 		$this->setOptions( $opts );
 
-		$join_wlp = false;
-
 		# Basic defaults.
-		$wlc_tables = WikilogComment::selectTables( $db );
+		$wlc_tables = WikilogComment::selectTables();
 		$q_tables = $wlc_tables['tables'];
 		$q_fields = WikilogComment::selectFields();
 		$q_conds = array();
@@ -732,15 +730,18 @@ class WikilogCommentQuery
 			$q_conds[] = "wlc_status <> " . $db->addQuotes( 'PENDING' );
 		}
 
-		# Filter by article or wikilog.
-		if ( $this->mItem !== null ) {
-			$q_conds['wlc_post'] = $this->mItem->getID();
-			if ( $this->mThread ) {
-				$q_conds[] = "wlc_thread " . $db->buildLike( $this->mThread . '/', $db->anyString() );
+		# Filter by subject page.
+		if ( $this->mSubject ) {
+			if ( $this->mIncludeSubpages ) {
+				$q_conds['p.page_namespace'] = $this->mSubject->getNamespace();
+				$q_conds[] = '(p.page_title = ' . $db->addQuotes( $this->mSubject->getDBkey() ) . ' OR p.page_title ' .
+					$db->buildLike( $this->mSubject->getDBkey() . '/', $db->anyString() ) . ')';
+			} else {
+				$q_conds['wlc_post'] = $this->mSubject->getArticleId();
+				if ( $this->mThread ) {
+					$q_conds[] = 'wlc_thread ' . $db->buildLike( $this->mThread . '/', $db->anyString() );
+				}
 			}
-		} elseif ( $this->mWikilog !== null ) {
-			$join_wlp = true;
-			$q_conds['wlp_parent'] = $this->mWikilog->getArticleId();
 		} elseif ( $this->mNamespace !== false ) {
 			$q_conds['c.page_namespace'] = $this->mNamespace;
 		}
@@ -756,16 +757,37 @@ class WikilogCommentQuery
 			$q_conds[] = 'wlc_timestamp < ' . $db->addQuotes( $this->mDate->end );
 		}
 
-		# Additional data.
-		if ( $this->getOption( 'include-item' ) ) {
-			$wlp_tables = WikilogItem::selectTables( $db );
-			$q_tables = array_merge( $q_tables, $wlp_tables['tables'] );
-			$q_joins['wikilog_posts'] = array( 'JOIN', 'wlp_page = wlc_post' );
-			$q_joins += $wlp_tables['join_conds'];
-			$q_fields = array_merge( $q_fields, WikilogItem::selectFields() );
-		} elseif ( $join_wlp ) {
-			$q_tables[] = 'wikilog_posts';
-			$q_joins['wikilog_posts'] = array( 'JOIN', 'wlp_page = wlc_post' );
+		# Sort order and limits
+		if ( $this->mSort == 'thread' ) {
+			$dbr = wfGetDB( DB_SLAVE );
+			$first = $last = $back = false;
+			if ( $this->mNextCommentId ) {
+				// Backward navigation: next comment ID is set from the outside.
+				// Determine first comment ID from it.
+				if ( $this->mNextCommentId != 'MAX' ) {
+					$back = $last = $this->getPostThread( $dbr, $this->mNextCommentId );
+				} else {
+					// FIXME "Go to the last page" is kludgy anyway with our "not-break-the-thread" idea.
+					// I.e. "last page" will not be the same as if you navigate forward.
+					// This can be fixed only by partitioning the full query set into pages at the beginning.
+					$back = true;
+				}
+			} else {
+				// Forward navigation: first comment ID may be set from the outside.
+				// Determine real limit from it.
+				$first = $this->getPostThread( $dbr, $this->mFirstCommentId );
+			}
+			list( $first, $last ) = $this->getLimitPostThread( $dbr, $q_tables, $q_conds, $q_options, $q_joins,
+				$this->mIncludeSubpages ? false : $this->mThread, $first, $last, $back, $this->mLimit );
+			$q_options['ORDER BY'] = 'wlc_post, wlc_thread, wlc_id';
+			$q_conds[] = $this->getPostThreadCond( $dbr, $first, $last );
+			// Save real page boundaries so pager can retrieve them later
+			if ( $first ) {
+				$this->mRealFirstCommentId = $first->id;
+			}
+			if ( $last ) {
+				$this->mRealNextCommentId = $last->id;
+			}
 		}
 
 		return array(
@@ -778,6 +800,94 @@ class WikilogCommentQuery
 	}
 
 	/**
+	 * Determine $first or $last post/thread boundary from another condition
+	 * ($last or $first respectively), query options and a limit.
+	 * This is the function responsive for NOT CUTTING discussion threads in the middle.
+	 *  @return array( $newFirst, $newLast )
+	 */
+	function getLimitPostThread( $dbr, $tables, $conds, $options, $joins, $parentThread, $first, $last, $backwards, $limit ) {
+		if ( $limit <= 0 ) {
+			return false;
+		}
+		$tmpConds = $conds;
+		$tmpConds[] = $this->getPostThreadCond( $dbr, $first, $last );
+		$tmpOpts = $options;
+		$tmpOpts['LIMIT'] = 1;
+		$tmpOpts['OFFSET'] = $limit-1;
+		$dir = $backwards ? 'DESC' : 'ASC';
+		$tmpOpts['ORDER BY'] = "wlc_post $dir, wlc_thread $dir, wlc_id $dir";
+		$other = false;
+		// Select $limit'th comment, get post and thread from it
+		$res = $dbr->select( $tables, 'wlc_post, wlc_thread', $tmpConds, __METHOD__, $tmpOpts, $joins );
+		$row = $res->fetchObject();
+		if ( $row ) {
+			$p = $parentThread ? 1+strlen( $parentThread ) : 0;
+			$other = (object)array(
+				'post' => $row->wlc_post,
+				'thread' => substr( $row->wlc_thread, 0, $p+6 ),
+			);
+			if ( !$backwards ) {
+				// Next thread number (for LessThan)
+				$other->thread = substr( $other->thread, 0, -6 ) .
+					sprintf( "%06d", 1 + substr( $other->thread, -6 ) );
+			}
+			$tmpConds = $conds;
+			$tmpConds[] = $this->getPostThreadCond( $dbr, $backwards ? $first : $other, $backwards ? $other : $last );
+			$tmpOpts['OFFSET'] = 0;
+			// Get "other" comment id
+			$res = $dbr->select( $tables, 'wlc_id', $tmpConds, __METHOD__, $tmpOpts, $joins );
+			$row = $res->fetchObject();
+			$other->id = $row ? $row->wlc_id : false;
+		}
+		return $backwards ? array( $other, $last ) : array( $first, $other );
+	}
+
+	/**
+	 * Get post and thread for comment #$id
+	 */
+	function getPostThread( $dbr, $id ) {
+		if ( !$id ) {
+			return false;
+		}
+		$res = $dbr->select( 'wikilog_comments', 'wlc_post, wlc_thread',
+			array( 'wlc_id' => $this->mFirstCommentId ), __METHOD__ );
+		$row = $dbr->fetchObject( $res );
+		if ( $row ) {
+			return (object)array(
+				'id' => $id,
+				'post' => intval( $row->wlc_post ),
+				'thread' => $row->wlc_thread,
+			);
+		}
+		return false;
+	}
+
+	/**
+	 * Returns the condition to select comments between (first post, first thread) and (last post, last thread)
+	 *  @param object $first (post => post ID, thread => thread)
+	 *  @param object $last (post => post ID, thread => thread)
+	 *  @return string
+	 */
+	function getPostThreadCond( $dbr, $first, $last ) {
+		if ( !$first && !$last ) {
+			return '1=1';
+		}
+		if ( $first && $last && $first->post == $last->post ) {
+			return "wlc_post = {$first->post} AND (wlc_thread >= {$first->thread} AND wlc_thread < {$last->thread})";
+		}
+		$cond = array();
+		if ( $first ) {
+			$cond[] = "wlc_post >= {$first->post} AND (wlc_post > {$first->post}".
+				" OR wlc_thread >= ".$dbr->addQuotes( $first->thread ).")";
+		}
+		if ( $last ) {
+			$cond[] = "wlc_post <= {$last->post} AND (wlc_post < {$last->post}".
+				" OR wlc_thread < ".$dbr->addQuotes( $last->thread ).")";
+		}
+		return implode( ' AND ', $cond );
+	}
+
+	/**
 	 * Returns the query information as an array suitable to be used to
 	 * construct a URL to Special:WikilogComments with the proper query
 	 * parameters. Used in navigation links.
@@ -785,11 +895,8 @@ class WikilogCommentQuery
 	public function getDefaultQuery() {
 		$query = array();
 
-		if ( $this->mItem ) {
-			$query['item'] = $this->mItem->mTitle->getPrefixedDBKey();
-		} elseif ( $this->mWikilog ) {
-			$query['wikilog'] = $this->mWikilog->getPrefixedDBKey();
-		} elseif ( $this->mNamespace !== false ) {
+		//..............
+		if ( $this->mNamespace !== false ) {
 			$query['wikilog'] = Title::makeTitle( $this->mNamespace, "*" )->getPrefixedDBKey();
 		}
 

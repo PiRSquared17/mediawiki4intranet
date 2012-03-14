@@ -34,7 +34,7 @@ $FILES_WIKIMEDIA = explode(' ',
 $EXT_WIKIMEDIA = explode(' ',
     'ParserFunctions CharInsert SyntaxHighlight_GeSHi Cite WhoIsWatching CategoryTree DeleteBatch Interwiki OpenID ConfirmEdit');
 $EXT_WIKIMEDIA_TRUNK = explode(' ',
-    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud Drafts');
+    'googleAnalytics Renameuser UserMerge PagedTiffHandler MediaFunctions WikiCategoryTagCloud Drafts SVGEdit');
 $EXT_OUR = array_map('trim', explode("\n",
     "AllNsSuggest
     AllowGetParamsInWikilinks
@@ -76,7 +76,6 @@ $EXT_OUR = array_map('trim', explode("\n",
     SphinxSearch
     SphinxSearchEngine
     SupaMW
-    SVGEdit
     SVNIntegration
     SWFUpload
     TemplatedPageList
@@ -135,6 +134,7 @@ foreach ($SKINS_OUR as $s)
 
 cmd("svn export $SVN_OUR/extensions/FullLocalImage.php $DIR/extensions/FullLocalImage.php");
 cmd("svn co --force http://geshi.svn.sourceforge.net/svnroot/geshi/trunk/geshi-1.0.X/src/ $DIR/extensions/geshi/");
+cmd("svn co --force http://svg-edit.googlecode.com/svn/trunk/editor $DIR/extensions/SVGEdit/svg-edit");
 cmd("svn revert -R $DIR/extensions/geshi");
 
 cmd(($WINDOWS ? "del" : "rm")." $DIR/extensions/CategoryTree/SubcatCat.i18n.php");

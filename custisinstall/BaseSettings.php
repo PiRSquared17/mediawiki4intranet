@@ -134,6 +134,7 @@ require_once($IP.'/extensions/Mp3Handler/Mp3Handler.php');
 require_once($IP.'/extensions/Dia/Dia.php');
 
 $wgAllowCategorizedRecentChanges = true;
+$wgFeedLimit = 500;
 
 require_once($IP.'/extensions/MergeConflicts/MergeConflicts.php');
 require_once($IP.'/extensions/AllNsSuggest/AllNsSuggest.php');
@@ -228,6 +229,7 @@ if (wfIsWindows())
     $wgSphinxQL_port = '9306';
     $wgZip = realpath("$IP/../../app/zip/zip.exe");
     $wgUnzip = realpath("$IP/../../app/zip/unzip.exe");
+    $wgParserCacheType = $wgMessageCacheType = $wgMainCacheType = CACHE_DB;
 }
 
 $wgCookieExpiration = 3650 * 86400;
