@@ -69,6 +69,7 @@ $wgMemCachedServers = array();
 $wgRawHtml = true;
 $wgAllowUserJs = true;
 $wgUseAjax = true;
+$wgUseTidy = true;
 
 $wgFileExtensions = array(
     'png', 'gif', 'jpg', 'jpeg', 'svg',
