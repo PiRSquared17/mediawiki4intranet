@@ -271,15 +271,16 @@ function page_list($src, $cat, $notcat = '', $modifydate = '', $ignore_since_ima
             'modifydate' => $modifydate,
         );
         if (!$ignore_since_images)
-            $params['templates'] = $params['images'] = 1;
+            $params['templates'] = $params['images'] = $params['redirects'] = 1;
         $text = page_list_load($src, $params);
         if ($text && $ignore_since_images)
         {
-            // Add templates and images in a separate request, without passing modifydate
+            // Add templates, images and redirects in a separate request, without passing modifydate
             $text = page_list_load($src, array(
                 'notcategory' => $notcat,
                 'templates' => 1,
                 'images' => 1,
+                'redirects' => 1,
                 'pages' => $text,
             ));
         }
@@ -326,6 +327,11 @@ function replicate($src, $dest)
     if ($status != 200)
         throw new ReplicateException("Could not retrieve Special:Import page");
     preg_match('/<input([^<>]*name="editToken"[^<>]*)>/is', $text, $m);
+    if (!$m)
+    {
+        $text = preg_replace('/^.*<!-- start content -->(.*)<!-- end content -->.*$/is', '\1', $text);
+        throw new ReplicateException("No editToken on Special:Import. Content was:\n".trim($text));
+    }
     preg_match('/value=\"([^\"]*)\"/is', $m[1], $m);
     $token = $m[1];
     // Run import
@@ -341,13 +347,18 @@ function replicate($src, $dest)
     $tp = microtime(true);
     repl_log(sprintf("Imported in %.2f seconds", $tp-$tx));
     // Extract the import report
-    preg_match('/<!--\s*start\s*content\s*-->.*?<ul>(.*?)<\/ul>/is', $text, $m);
-    $report = $m[1];
-    $report = str_replace('&nbsp;', ' ', $report);
-    $report = preg_replace('/\s+/', ' ', $report);
-    $report = preg_replace('/<li[^<>]*>/', "\n", $report);
-    $report = preg_replace('/<\/?[a-z0-9_:\-]+(\/?\s+[^<>]*)?>/', '', $report);
-    $report = trim(html_entity_decode($report));
+    $report = '';
+    if (preg_match('/<!--\s*start\s*content\s*-->.*?<ul>/is', $text, $m, PREG_OFFSET_CAPTURE))
+    {
+        $report = substr($text, $m[0][1]+strlen($m[0][0]));
+        if (($p = stripos($report, '</ul')) !== false)
+            $report = substr($report, 0, $p);
+        $report = str_replace('&nbsp;', ' ', $report);
+        $report = preg_replace('/\s+/', ' ', $report);
+        $report = preg_replace('/<li[^<>]*>/', "\n", $report);
+        $report = preg_replace('/<\/?[a-z0-9_:\-]+(\/?\s+[^<>]*)?>/', '', $report);
+        $report = trim(html_entity_decode($report));
+    }
     if ($report === '')
         throw new ReplicateException("Could not replicate, no import report found in response content:\n$text");
     repl_log("Report:\n$report");

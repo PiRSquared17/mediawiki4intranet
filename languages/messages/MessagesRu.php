@@ -2783,6 +2783,7 @@ $1',
 'export-pagelinks'  => 'Включить статьи, связанные ссылками',
 'export-subpages'   => 'Включить подстатьи',
 'export-closure'    => 'Включить статьи из подкатегорий',
+'export-redirects'  => 'Включить перенаправления',
 
 # Namespace 8 related
 'allmessages'                   => 'Системные сообщения',
