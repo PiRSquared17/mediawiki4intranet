@@ -1,0 +1,28 @@
+#!/bin/sh
+# Clone MediaWiki4Intranet SVN repository using HGSubversion with correct arguments.
+# Mercurial extensions hgsubversion and pbranch are required.
+
+cd `dirname $0`
+SVN=svn://svn.office.custis.ru/mediawiki
+EXTPATH_FILE=./mw4i-extpath
+EXTPATH=`grep ^ext_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+CHGPATH=`grep ^chg_repo $EXTPATH_FILE 2>/dev/null | awk '{print $2}' | head -n1`
+
+if [ -z "$EXTPATH" -o -z "$CHGPATH" ]; then
+    cat <<EOF
+Before running this script, you must create file '$EXTPATH_FILE' with following contents:
+ext_repo <full path to desired hg mw4i repository>
+chg_repo <full path to hg repository with patch branches>
+googlecode_repo <full path to cloned Google Code mediawiki4intranet repository>
+EOF
+else
+    hg clone --authors hgsubversion-authormap \
+        --filemap hgsubversion-filemap \
+        --branch mw4i-ext $SVN $EXTPATH && \
+    cd $EXTPATH && \
+    hg pull -f -r all $CHGPATH && \
+    hg pgraph >/dev/null && \
+    echo 'mw4install: all, mw4i-ext' >> .hg/pgraph && \
+    (hg pmerge mw4install; hg branch mw4install; hg ci -m 'Create deployment branch') && \
+    hg pmerge mw4install
+fi

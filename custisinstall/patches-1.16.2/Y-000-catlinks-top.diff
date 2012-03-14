@@ -1,0 +1,107 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1325002992 -10800
+Bug 88274 - Category links on top
+
+diff -r 025d3c6531d8 -r 904c39bdc5cb skins/MonoBook.php
+--- skins/MonoBook.php
++++ skins/MonoBook.php
+@@ -5,6 +5,12 @@
+  * Translated from gwicke's previous TAL template version to remove
+  * dependency on PHPTAL.
+  *
++ * Configuration:
++ *   $wgCatlinksTop =
++ *     false:  (default) Show category links below article content
++ *     true:   Show category links below and above article content
++ *     'only': Show category links above article content only
++ *
+  * @todo document
+  * @file
+  * @ingroup Skins
+@@ -60,7 +66,7 @@
+ 	 * @access private
+ 	 */
+ 	function execute() {
+-		global $wgRequest;
++		global $wgRequest, $wgCatlinksTop;
+ 
+ 		$this->skin = $skin = $this->data['skin'];
+ 		$action = $wgRequest->getText( 'action' );
+@@ -86,8 +92,9 @@
+ 		<div id="jump-to-nav"><?php $this->msg('jumpto') ?> <a href="#column-one"><?php $this->msg('jumptonavigation') ?></a>, <a href="#searchInput"><?php $this->msg('jumptosearch') ?></a></div>
+ <?php } ?>
+ 		<!-- start content -->
++		<?php if( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ) { ?><div id="catlinks-top"><?php $this->html('catlinks'); ?></div><?php } ?>
+ <?php $this->html('bodytext') ?>
+-		<?php if($this->data['catlinks']) { $this->html('catlinks'); } ?>
++		<?php if( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ) { $this->html('catlinks'); } ?>
+ 		<!-- end content -->
+ 		<?php if($this->data['dataAfterContent']) { $this->html ('dataAfterContent'); } ?>
+ 		<div class="visualClear"></div>
+diff -r 025d3c6531d8 -r 904c39bdc5cb skins/Vector.php
+--- skins/Vector.php
++++ skins/Vector.php
+@@ -353,7 +353,7 @@
+ 	 * Outputs the entire contents of the XHTML page
+ 	 */
+ 	public function execute() {
+-		global $wgRequest, $wgOut, $wgContLang;
++		global $wgRequest, $wgOut, $wgContLang, $wgCatlinksTop;
+ 
+ 		$this->skin = $this->data['skin'];
+ 		$action = $wgRequest->getText( 'action' );
+@@ -488,10 +488,15 @@
+ 				</div>
+ 				<!-- /jumpto -->
+ 				<?php endif; ?>
++				<?php if ( $this->data['catlinks'] && !empty( $wgCatlinksTop ) ): ?>
++				<!-- catlinks-top -->
++				<div id="catlinks-top"><?php $this->html( 'catlinks' ); ?></div>
++				<!-- /catlinks-top -->
++				<?php endif; ?>
+ 				<!-- bodytext -->
+ 				<?php $this->html( 'bodytext' ) ?>
+ 				<!-- /bodytext -->
+-				<?php if ( $this->data['catlinks'] ): ?>
++				<?php if ( $this->data['catlinks'] && ( !isset( $wgCatlinksTop ) || $wgCatlinksTop !== 'only' ) ): ?>
+ 				<!-- catlinks -->
+ 				<?php $this->html( 'catlinks' ); ?>
+ 				<!-- /catlinks -->
+diff -r 025d3c6531d8 -r 904c39bdc5cb skins/monobook/main.css
+--- skins/monobook/main.css
++++ skins/monobook/main.css
+@@ -1306,3 +1306,9 @@
+ .no-text-transform {
+ 	text-transform: none;
+ }
++
++/* Categories above the content */
++#catlinks-top div {
++	float: left;
++	margin: 0;
++}
+diff -r 025d3c6531d8 -r 904c39bdc5cb skins/vector/main-ltr.css
+--- skins/vector/main-ltr.css
++++ skins/vector/main-ltr.css
+@@ -1126,3 +1126,8 @@
+ 	background-position:right bottom;
+ 	background-repeat:no-repeat;
+ }
++/* Categories above the content */
++#catlinks-top div {
++	float: left;
++	margin: 0;
++}
+diff -r 025d3c6531d8 -r 904c39bdc5cb skins/vector/main-rtl.css
+--- skins/vector/main-rtl.css
++++ skins/vector/main-rtl.css
+@@ -1126,3 +1126,8 @@
+ 	background-position:left bottom;
+ 	background-repeat:no-repeat;
+ }
++/* Categories above the content */
++#catlinks-top div {
++	float: right;
++	margin: 0;
++}
