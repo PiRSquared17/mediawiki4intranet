@@ -7,16 +7,20 @@ include custisinstall/favicons/toolswiki.ico
 include custisinstall/favicons/uml2.ico
 include custisinstall/favicons/mmwiki.ico
 include custisinstall/favicons/custiswiki.ico
+include custisinstall/favicons/wiki4intranet.ico
 include custisinstall/logos/toolswiki-logo.png
 include custisinstall/logos/uml2wiki-logo.png
 include custisinstall/logos/mmwiki-logo.png
 include custisinstall/logos/custiswiki-logo.png
+include custisinstall/logos/wiki4intranet-logo.png
+include custisinstall/logos/wiki4intranet-logo.svg
 include custisinstall/install.bat
 include custisinstall/install.php
 include custisinstall/maintenance
 include custisinstall/patches
 include custisinstall/patches-1.13.1
 include custisinstall/patches-1.14.1
+include custisinstall/patches-1.16.2
 include custisinstall/reapply.php
 include custisinstall/replicate.php
 # needed to correctly clone the history of custisinstall:

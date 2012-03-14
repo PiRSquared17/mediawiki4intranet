@@ -52,7 +52,6 @@ $(document).ready(function() {
 			.click(function() {
 				trigger();
 			});
-
 		$(wgArticleId ? '.fullMedia' : '#mw-imagepage-nofile').append(button);
 
 		if (window.location.hash.indexOf('!action=svgedit') != -1) {

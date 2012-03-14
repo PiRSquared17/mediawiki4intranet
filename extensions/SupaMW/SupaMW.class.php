@@ -123,6 +123,13 @@ class SUPAField extends HTMLTextField {
 if ( navigator.javaEnabled() ) {
     window.supaPostApplet = function() {
         document.getElementById( 'mw-supa-placeholder' ).innerHTML = '$applet';
+        var d = document.getElementById( 'wpDestFile' );
+        var s = d.value;
+        var p = s.lastIndexOf( '.' );
+        if ( p > -1 ) {
+            s = s.substr( 0, p );
+        }
+        d.value = s + '.png';
         return true;
     };
     addHandler( document.getElementById( 'wpSourceTypeSupa' ), 'change', supaPostApplet );

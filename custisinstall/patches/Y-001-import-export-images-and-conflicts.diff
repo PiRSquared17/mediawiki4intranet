@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118460 -14400
+# Date 1331462744 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/AutoLoader.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -53,17 +53,7 @@
@@ -66,7 +66,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/AutoLoader.php
  
  	# includes/actions
  	'CreditsAction' => 'includes/actions/CreditsAction.php',
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/DefaultSettings.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -1354,6 +1354,12 @@
@@ -111,7 +111,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/DumpArchive.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -590,7 +590,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/Export.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -30,12 +30,11 @@
@@ -1466,7 +1466,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/Export.php
  
  function xmlsafe( $string ) {
  	wfProfileIn( __FUNCTION__ );
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/Import.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -24,6 +24,19 @@
@@ -1928,7 +1928,17 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/Import.php
  		if( !$file ) {
  			wfDebug( __METHOD__ . ': Bad file for ' . $this->getTitle() . "\n" );
  			return false;
-@@ -1176,10 +1192,10 @@
+@@ -1151,6 +1167,9 @@
+ 		}
+ 
+ 		$user = User::newFromName( $this->user_text );
++		if( !$user ) {
++			$user = new FakeUser( $this->user_text );
++		}
+ 		
+ 		# Do the actual upload
+ 		if ( $archiveName ) {
+@@ -1176,10 +1195,10 @@
  			return false;
  		}
  
@@ -1942,7 +1952,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/Import.php
  			return false;
  		}
  
-@@ -1189,130 +1205,14 @@
+@@ -1189,130 +1208,14 @@
  		if( !$data ) {
  			wfDebug( "IMPORT: couldn't fetch source $src\n" );
  			fclose( $f );
@@ -2075,7 +2085,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/Import.php
 -		}
 -	}
 -}
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/filerepo/LocalFile.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -1137,7 +1137,7 @@
@@ -2087,13 +2097,13 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,36 +1,32 @@
  <?php
 +# Copyright (C) 2003-2008 Brion Vibber <brion@pobox.com>
-+#           (C) 2010-2011 Vitaliy Filippov <vitalif@mail.ru>
++#           (C) 2010+     Vitaliy Filippov <vitalif@mail.ru>
 +# http://www.mediawiki.org/
 +# http://wiki.4intra.net/MW_Import_Export
 +#
@@ -2148,7 +2158,13 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
  	private $images;
  
  	public function __construct() {
-@@ -54,41 +50,14 @@
+@@ -49,46 +45,19 @@
+ 		$this->curonly = true;
+ 		$this->doExport = false;
+ 		$this->templates = $wgRequest->getCheck( 'templates' );
+-		$this->images = $wgRequest->getCheck( 'images' ); // Doesn't do anything yet
++		$this->images = $wgRequest->getCheck( 'images' );
+ 		$this->pageLinkDepth = $this->validateLinkDepth(
  			$wgRequest->getIntOrNull( 'pagelink-depth' )
  		);
  		$nsindex = '';
@@ -2341,7 +2357,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
  		/* Ok, let's get to it... */
  		if( $history == WikiExporter::CURRENT ) {
  			$lb = false;
-@@ -285,102 +198,257 @@
+@@ -285,102 +198,261 @@
  			$lb = wfGetLBFactory()->newMainLB();
  			$db = $lb->getConnection( DB_SLAVE );
  			$buffer = WikiExporter::STREAM;
@@ -2471,6 +2487,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +		$p = !empty( $state[ 'pagelinks' ] );
 +		$i = !empty( $state[ 'images' ] );
 +		$s = !empty( $state[ 'subpages' ] );
++		$r = !empty( $state[ 'redirects' ] );
 +		$step = 0;
 +		do {
 +			// Loop as there may be more than one closure type
@@ -2479,6 +2496,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +			if( $p ) $added += self::getPagelinks( $pageSet );
 +			if( $i ) $added += self::getImages( $pageSet );
 +			if( $s ) $added += self::getSubpages( $pageSet );
++			if( $r ) $added += self::getRedirects( $pageSet );
 +			$step++;
 +		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
  
@@ -2488,16 +2506,19 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 -				$ns = $wgContLang->getNsText( $row->page_namespace );
 -				$n = $ns . ':' . $n;
 +		// Filter user-readable pages (also MW Bug 8824)
-+		foreach ( $pageSet as $key => $title )
-+			if ( !$title->userCanRead() )
++		foreach ( $pageSet as $key => $title ) {
++			if ( !$title->userCanRead() ) {
 +				unset( $pageSet[ $key ] );
-+
+ 			}
++		}
+ 
+-			$pages[] = $n;
 +		// Filter pages by $modifydate
 +		if ( $modifydate !== NULL && $pageSet ) {
 +			$ids = array();
 +			foreach ( $pageSet as $key => $title ) {
 +				$ids[ $title->getArticleId() ] = $title;
- 			}
++			}
 +			$dbr = wfGetDB( DB_SLAVE );
 +			$res = $dbr->select( array( 'page', 'revision' ), 'page_id',
 +				array(
@@ -2511,17 +2532,16 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +			foreach ( $ids as $title ) {
 +				unset( $pageSet[ $title->getPrefixedText() ] );
 +			}
-+		}
- 
--			$pages[] = $n;
+ 		}
+-		return $pages;
++
 +		// Filter pages from requested NOT-category
 +		if ( $notcategory !== NULL ) {
 +			$notlist = self::getPagesFromCategory( $notcategory );
 +			foreach ( $notlist as $title ) {
 +				unset( $pageSet[ $title->getPrefixedText() ] );
 +			}
- 		}
--		return $pages;
++		}
 +
 +		// Save resulting page list
 +		$pages = array_keys( $pageSet );
@@ -2568,7 +2588,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
 +		}
 +		// Checkboxes:
-+		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages' ) as $k ) {
++		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages', 'redirects' ) as $k ) {
 +			$form .= '<div class="ap_'.$k.'">' . Xml::checkLabel(
 +				wfMsg( "export-$k" ), $k, "ap-$k", !empty( $state[ $k ] ),
 +				array( 'style' => 'vertical-align: middle' )
@@ -2663,7 +2683,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
  	}
  
  	/**
-@@ -389,104 +457,94 @@
+@@ -389,104 +461,122 @@
  	 * @param $pageSet array, associative array indexed by titles for output
  	 * @return array associative array index by titles
  	 */
@@ -2789,11 +2809,10 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +			$ids[ $title->getArticleId() ] = true;
 +			$where[ $title->getNamespace() ][] = 'page_title LIKE '.$dbr->addQuotes( $title->getDBkey().'/%' );
 +		}
-+		$nsx = $where;
 +		foreach ( $where as $ns => &$w ) {
-+			$w = '(page_namespace='.$ns.' AND ('.implode(' OR ', $w).'))';
++			$w = '( page_namespace='.$ns.' AND ( '.implode( ' OR ', $w ).' ) )';
 +		}
-+		$where = '('.implode( ' OR ', $where ).')';
++		$where = '( '.implode( ' OR ', $where ).' )';
 +		$result = $dbr->select( 'page', '*', array( $where ), __METHOD__ );
 +		$added = 0;
 +		foreach( $result as $row ) {
@@ -2808,6 +2827,35 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +		return $added;
  	}
  
++	/**
++	 * Expand a list of pages to include redirects linking to them.
++	 * @param &$pageSet array, associative array indexed by title prefixed text for output
++	 * @return int count of added pages
++	 */
++	public static function getRedirects( &$pageSet ) {
++		$dbr = wfGetDB( DB_SLAVE );
++		$where = array();
++		$ids = array();
++		foreach ( $pageSet as $title ) {
++			$ids[ $title->getArticleId() ] = true;
++			$where[ $title->getNamespace() ][] = $title->getDBkey();
++		}
++		foreach ( $where as $ns => &$w ) {
++			$w = '( rd_namespace='.$ns.' AND rd_title IN ( ' . $dbr->makeList( $w ) . ' ) )';
++		}
++		$where = '( '.implode( ' OR ', $where ).' )';
++		$result = $dbr->select( array( 'page', 'redirect' ), 'page.*', array( 'page_id=rd_from', $where ), __METHOD__ );
++		$added = 0;
++		foreach( $result as $row ) {
++			if( empty( $ids[ $row->page_id ] ) ) {
++				$add = Title::newFromRow( $row );
++				$pageSet[ $add->getPrefixedText() ] = $add;
++				$added++;
++			}
++		}
++		return $added;
++	}
++
 +	/**
 +	 * Expand a list of pages to include items used in those pages.
 +	 * @private
@@ -2838,7 +2886,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialExport.php
 +		return $added;
 +	}
  }
-diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialImport.php
+diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -24,6 +24,90 @@
@@ -3076,10 +3124,10 @@ diff -r 50908ecbb383 -r 6d7dfe15426f includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesEn.php
+diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -3268,18 +3268,31 @@
+@@ -3268,18 +3268,32 @@
  
  To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
  
@@ -3113,10 +3161,11 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesEn.php
 +'export-pagelinks'  => 'Include linked articles',
 +'export-subpages'   => 'Include subpages',
 +'export-closure'    => 'Include articles from subcategories',
++'export-redirects'  => 'Include redirects',
  
  # Namespace 8 related
  'allmessages'                   => 'System messages',
-@@ -3326,11 +3339,11 @@
+@@ -3326,11 +3340,11 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -3129,7 +3178,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesEn.php
  'importcantopen'             => 'Could not open import file',
  'importbadinterwiki'         => 'Bad interwiki link',
  'importnotext'               => 'Empty or no text',
-@@ -3346,11 +3359,17 @@
+@@ -3346,11 +3360,17 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',
@@ -3150,10 +3199,10 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesRu.php
+diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -2740,18 +2740,31 @@
+@@ -2740,18 +2740,32 @@
  
  Чтобы экспортировать статьи, введите их наименования в поле редактирования, одно название на строку, и выберите хотите ли вы экспортировать всю историю изменений статей или только последние версии статей.
  
@@ -3187,10 +3236,11 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesRu.php
 +'export-pagelinks'  => 'Включить статьи, связанные ссылками',
 +'export-subpages'   => 'Включить подстатьи',
 +'export-closure'    => 'Включить статьи из подкатегорий',
++'export-redirects'  => 'Включить перенаправления',
  
  # Namespace 8 related
  'allmessages'                   => 'Системные сообщения',
-@@ -2797,11 +2810,11 @@
+@@ -2797,11 +2811,11 @@
  'import-comment'             => 'Примечание:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
@@ -3203,7 +3253,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesRu.php
  'importcantopen'             => 'Невозможно открыть импортируемый файл',
  'importbadinterwiki'         => 'Неправильная интервики-ссылка',
  'importnotext'               => 'Текст отсутствует',
-@@ -2814,9 +2827,16 @@
+@@ -2814,9 +2828,16 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -3221,7 +3271,7 @@ diff -r 50908ecbb383 -r 6d7dfe15426f languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 50908ecbb383 -r 6d7dfe15426f skins/common/shared.css
+diff -r 6ada923f95d9 -r 3309119b2086 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -857,3 +857,30 @@
