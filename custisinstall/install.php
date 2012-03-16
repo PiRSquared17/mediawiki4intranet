@@ -75,7 +75,6 @@ $EXT_OUR = array_map('trim', explode("\n",
     SphinxSearch
     SphinxSearchEngine
     SupaMW
-    SVNIntegration
     SWFUpload
     TemplatedPageList
     UserMagic
