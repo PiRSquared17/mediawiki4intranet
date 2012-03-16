@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118333 -14400
+# Date 1331918167 -14400
 Bug 75715, Bug 68935 - Add Localisation Cache support for CACHE_ACCEL
 
-diff -r 6b6371ec1416 -r d2af694de5d9 includes/AutoLoader.php
+diff -r b6139b507754 -r 2b76c88fcf58 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -128,6 +128,7 @@
@@ -14,7 +14,7 @@ diff -r 6b6371ec1416 -r d2af694de5d9 includes/AutoLoader.php
  	'LCStore_CDB' => 'includes/LocalisationCache.php',
  	'LCStore_DB' => 'includes/LocalisationCache.php',
  	'LCStore_Null' => 'includes/LocalisationCache.php',
-diff -r 6b6371ec1416 -r d2af694de5d9 includes/LocalisationCache.php
+diff -r b6139b507754 -r 2b76c88fcf58 includes/LocalisationCache.php
 --- includes/LocalisationCache.php
 +++ includes/LocalisationCache.php
 @@ -154,8 +154,14 @@
@@ -41,7 +41,7 @@ diff -r 6b6371ec1416 -r d2af694de5d9 includes/LocalisationCache.php
 +		$keys = $this->store->get( $code, 'list', 'messages' );
 +		$preload = $this->store->get( $code, 'preload' );
 +		// Different keys may expire separately, at least in LCStore_Accel
-+		if ( $deps === null || $keys === null || $preload === null ) {
++		if ( !$deps || !$keys || !$preload ) {
  			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
  			return true;
  		}
