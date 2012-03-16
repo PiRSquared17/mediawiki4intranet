@@ -111,7 +111,6 @@ require_once($IP.'/extensions/DocExport/DocExport.php');
 require_once($IP.'/extensions/CustisScripts/CustisScripts.php');
 require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
-require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
 require_once($IP.'/extensions/FullLocalImage.php');
