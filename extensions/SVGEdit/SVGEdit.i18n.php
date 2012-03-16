@@ -20,7 +20,9 @@ $messages['en'] = array(
 	'svgedit-desc' => 'In-browser editing of SVG drawings with [http://code.google.com/p/svg-edit/ SVG-Edit]',
 	'svgedit-edit-tab' => 'Edit drawing',
 	'svgedit-edit-tab-tooltip' => 'You can edit this SVG drawing in your browser',
-	'svgedit-toolbar-insert' => 'SVG drawing'
+	'svgedit-toolbar-insert' => 'SVG drawing',
+	'svgedit-editbutton-create' => 'Create image with SVGEdit',
+	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Also, you can <a href="$1">create/edit this SVG file with SVGEdit</a>.</div>',
 );
 
 /** Message documentation (Message documentation)
@@ -514,6 +516,8 @@ $messages['ru'] = array(
 	'svgedit-edit-tab' => 'Править рисунок',
 	'svgedit-edit-tab-tooltip' => 'Вы можете редактировать этот SVG-рисунок в вашем браузере',
 	'svgedit-toolbar-insert' => 'Рисование SVG',
+	'svgedit-editbutton-create' => 'Создать рисунок в SVGEdit',
+	'svgedit-suggest-create' => '<div style="display: inline-block; border: 1px dashed blue; padding: 4px; background: #f8f8ff">Также вы можете <a href="$1">создать/изменить этот SVG-файл с помощью SVGEdit</a>.</div>',
 );
 
 /** Slovenian (Slovenščina)
