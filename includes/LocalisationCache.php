@@ -325,7 +325,7 @@ class LocalisationCache {
 		$keys = $this->store->get( $code, 'list', 'messages' );
 		$preload = $this->store->get( $code, 'preload' );
 		// Different keys may expire separately, at least in LCStore_Accel
-		if ( $deps === null || $keys === null || $preload === null ) {
+		if ( !$deps || !$keys || !$preload ) {
 			wfDebug( __METHOD__."($code): cache missing, need to make one\n" );
 			return true;
 		}
