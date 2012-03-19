@@ -374,7 +374,7 @@ class SpecialExport extends SpecialPage {
 				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
 		}
 		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
-			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal( 'link-depth' ) ) . '<br />';
+			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 4, $wgRequest->getVal( 'link-depth' ) ) . '<br />';
 		}
 		// Checkboxes:
 		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages', 'redirects' ) as $k ) {
