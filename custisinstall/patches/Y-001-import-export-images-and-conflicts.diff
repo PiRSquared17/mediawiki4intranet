@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1331462744 -14400
+# Date 1332159752 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 6ada923f95d9 -r 3309119b2086 includes/AutoLoader.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -53,17 +53,7 @@
@@ -66,7 +66,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/AutoLoader.php
  
  	# includes/actions
  	'CreditsAction' => 'includes/actions/CreditsAction.php',
-diff -r 6ada923f95d9 -r 3309119b2086 includes/DefaultSettings.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -1354,6 +1354,12 @@
@@ -111,7 +111,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 6ada923f95d9 -r 3309119b2086 includes/DumpArchive.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -590,7 +590,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 6ada923f95d9 -r 3309119b2086 includes/Export.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -30,12 +30,11 @@
@@ -1466,7 +1466,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/Export.php
  
  function xmlsafe( $string ) {
  	wfProfileIn( __FUNCTION__ );
-diff -r 6ada923f95d9 -r 3309119b2086 includes/Import.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -24,6 +24,19 @@
@@ -2085,7 +2085,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/Import.php
 -		}
 -	}
 -}
-diff -r 6ada923f95d9 -r 3309119b2086 includes/filerepo/LocalFile.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -1137,7 +1137,7 @@
@@ -2097,7 +2097,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialExport.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,36 +1,32 @@
@@ -2570,7 +2570,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialExport.php
 -		global $wgContLang;
 +	// Display page selection form, enclosed into a <fieldset>
 +	static function addPagesForm( $state ) {
-+		global $wgExportMaxLinkDepth;
++		global $wgExportMaxLinkDepth, $wgRequest;
 +		$form = '<fieldset class="addpages">';
 +		$form .= '<legend>' . wfMsgExt( 'export-addpages', 'parse' ) . '</legend>';
 +		$textboxes = array(
@@ -2585,7 +2585,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialExport.php
 +				Xml::inputLabel( wfMsg( "export-$k" ), $k, "ap-$k", $size, !empty( $state[ $k ] ) ? $state[ $k ] : '' ) . '</div>';
 +		}
 +		if( $wgExportMaxLinkDepth || self::userCanOverrideExportDepth() ) {
-+			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal('link-depth') ) . '<br />';
++			$form .= Xml::inputLabel( wfMsg( 'export-link-depth' ), 'link-depth', 'link-depth', 20, $wgRequest->getVal( 'link-depth' ) ) . '<br />';
 +		}
 +		// Checkboxes:
 +		foreach ( array( 'closure', 'templates', 'images', 'pagelinks', 'subpages', 'redirects' ) as $k ) {
@@ -2886,7 +2886,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialExport.php
 +		return $added;
 +	}
  }
-diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialImport.php
+diff -r 6ada923f95d9 -r 9cf666808921 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -24,6 +24,90 @@
@@ -3124,10 +3124,10 @@ diff -r 6ada923f95d9 -r 3309119b2086 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesEn.php
+diff -r 6ada923f95d9 -r 9cf666808921 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
-@@ -3268,18 +3268,32 @@
+@@ -3268,18 +3268,33 @@
  
  To export pages, enter the titles in the text box below, one title per line, and select whether you want the current revision as well as all old revisions, with the page history lines, or the current revision with the info about the last edit.
  
@@ -3162,10 +3162,11 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesEn.php
 +'export-subpages'   => 'Include subpages',
 +'export-closure'    => 'Include articles from subcategories',
 +'export-redirects'  => 'Include redirects',
++'export-link-depth' => 'Maximum link depth:',
  
  # Namespace 8 related
  'allmessages'                   => 'System messages',
-@@ -3326,11 +3340,11 @@
+@@ -3326,11 +3341,11 @@
  'importtext'                 => 'Please export the file from the source wiki using the [[Special:Export|export utility]].
  Save it to your computer and upload it here.',
  'importstart'                => 'Importing pages...',
@@ -3178,7 +3179,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesEn.php
  'importcantopen'             => 'Could not open import file',
  'importbadinterwiki'         => 'Bad interwiki link',
  'importnotext'               => 'Empty or no text',
-@@ -3346,11 +3360,17 @@
+@@ -3346,11 +3361,17 @@
  A temporary folder is missing.',
  'import-parse-failure'       => 'XML import parse failure',
  'import-noarticle'           => 'No page to import!',
@@ -3199,10 +3200,10 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesRu.php
+diff -r 6ada923f95d9 -r 9cf666808921 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
-@@ -2740,18 +2740,32 @@
+@@ -2740,18 +2740,33 @@
  
  Чтобы экспортировать статьи, введите их наименования в поле редактирования, одно название на строку, и выберите хотите ли вы экспортировать всю историю изменений статей или только последние версии статей.
  
@@ -3237,10 +3238,11 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesRu.php
 +'export-subpages'   => 'Включить подстатьи',
 +'export-closure'    => 'Включить статьи из подкатегорий',
 +'export-redirects'  => 'Включить перенаправления',
++'export-link-depth' => 'Глубина замыкания по ссылкам:',
  
  # Namespace 8 related
  'allmessages'                   => 'Системные сообщения',
-@@ -2797,11 +2811,11 @@
+@@ -2797,11 +2812,11 @@
  'import-comment'             => 'Примечание:',
  'importtext'                 => 'Пожалуйста, экспортируйте страницу из исходной вики, используя [[Special:Export|соответствующий инструмент]]. Сохраните файл на диск, а затем загрузите его сюда.',
  'importstart'                => 'Импортирование страниц…',
@@ -3253,7 +3255,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesRu.php
  'importcantopen'             => 'Невозможно открыть импортируемый файл',
  'importbadinterwiki'         => 'Неправильная интервики-ссылка',
  'importnotext'               => 'Текст отсутствует',
-@@ -2814,9 +2828,16 @@
+@@ -2814,9 +2829,16 @@
  'importuploaderrortemp'      => 'Не удалось загрузить или импортировать файл. Временная папка отсутствует.',
  'import-parse-failure'       => 'Ошибка разбора XML при импорте',
  'import-noarticle'           => 'Нет страницы для импортирования!',
@@ -3271,7 +3273,7 @@ diff -r 6ada923f95d9 -r 3309119b2086 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6ada923f95d9 -r 3309119b2086 skins/common/shared.css
+diff -r 6ada923f95d9 -r 9cf666808921 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -857,3 +857,30 @@
