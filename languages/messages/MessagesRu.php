@@ -2766,6 +2766,7 @@ $1',
 'export-subpages'   => 'Включить подстатьи',
 'export-closure'    => 'Включить статьи из подкатегорий',
 'export-redirects'  => 'Включить перенаправления',
+'export-link-depth' => 'Глубина замыкания по ссылкам:',
 
 # Namespace 8 related
 'allmessages'                   => 'Системные сообщения',
