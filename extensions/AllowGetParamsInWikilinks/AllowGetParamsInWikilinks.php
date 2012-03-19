@@ -36,7 +36,7 @@ function efAllowGetParamsInWikiLinks($skin, $target, &$text, &$customAttribs, &$
     }
     $direccion = parse_url($target->getText());
 
-    if (!array_key_exists('query', $direccion))
+    if (!$direccion || !array_key_exists('query', $direccion))
     {
         /** it is not written in the form target?query */
         return true;
