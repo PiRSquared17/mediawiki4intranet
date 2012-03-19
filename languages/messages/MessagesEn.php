@@ -3317,6 +3317,7 @@ Please note that \'\'\'Changed after:\'\'\' and \'\'\'Not in category:\'\'\' fil
 'export-subpages'   => 'Include subpages',
 'export-closure'    => 'Include articles from subcategories',
 'export-redirects'  => 'Include redirects',
+'export-link-depth' => 'Maximum link depth:',
 
 # Namespace 8 related
 'allmessages'                   => 'System messages',
