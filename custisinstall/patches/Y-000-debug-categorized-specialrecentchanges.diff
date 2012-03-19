@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1329851161 -14400
+# Date 1332167882 -14400
 Bug 18103 - Allow to view categorized Recent Changes, SQL category filtering
 
-diff -r 2b1195378d97 -r 4a090b21c820 includes/specials/SpecialRecentchanges.php
+diff -r b6139b507754 -r 6aca47ca2577 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -98,8 +98,10 @@
@@ -115,3 +115,15 @@ diff -r 2b1195378d97 -r 4a090b21c820 includes/specials/SpecialRecentchanges.php
  	}
  
  	/**
+diff -r b6139b507754 -r 6aca47ca2577 includes/specials/SpecialRecentchangeslinked.php
+--- includes/specials/SpecialRecentchangeslinked.php
++++ includes/specials/SpecialRecentchangeslinked.php
+@@ -240,7 +240,7 @@
+ 		}
+ 	}
+ 
+-	public function getFeedQuery() {
++	public function getFeedQuery( $opts ) {
+ 		$target = $this->getTargetTitle();
+ 		if( $target ) {
+ 			return "target=" . urlencode( $target->getPrefixedDBkey() );
