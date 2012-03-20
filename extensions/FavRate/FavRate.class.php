@@ -187,7 +187,8 @@ class FavRate
         foreach ($res as $row)
         {
             self::$cache[$row->ps_page]['total'] = $row->fav;
-            self::$cache[$row->ps_page]['user'.$userId] = $row->myfav;
+            if ($userId)
+                self::$cache[$row->ps_page]['user'.$userId] = $row->myfav;
         }
     }
 
@@ -198,8 +199,6 @@ class FavRate
     {
         global $wgUser;
         $userId = $wgUser->getId();
-        if (!$userId)
-            return true;
         foreach ($comments as $comment)
             $pageIds[] = $comment->mCommentPage;
         self::preload($userId, $pageIds);
@@ -222,8 +221,11 @@ class FavRate
         }
         if ($userId || $total)
         {
-            $tools['fav'.$my.($total > 0 ? ' hasfav' : '')] = '<a href="javascript:void(0)" '.
-                'onclick="favRateToggleFavWikilog(this, '.$pageId.')">+'.$total.'</a>';
+            $text = '+'.$total;
+            if ($userId)
+                $text = '<a href="javascript:void(0)" '.
+                    'onclick="favRateToggleFavWikilog(this, '.$pageId.')">'.$text.'</a>';
+            $tools['fav'.$my.($total > 0 ? ' hasfav' : '')] = $text;
         }
         return true;
     }
