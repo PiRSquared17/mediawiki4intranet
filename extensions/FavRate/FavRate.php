@@ -103,7 +103,7 @@ $egFavRateMaxHits = 100000;
 $egFavRateMaxFav = 100;
 $egFavRateMaxLinks = 100;
 $egFavRateHitsColor = "#0c0";
-$egFavRateFavColor = "#c00";
+$egFavRateFavColor = "#d0d";
 $egFavRateLinksColor = "#00c";
 
 // AJAX export function
