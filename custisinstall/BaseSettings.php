@@ -262,11 +262,11 @@ $wgOpenSearchTemplate  = true;
 // Don't purge recent changes... (keep them for 50 years)
 $wgRCMaxAge = 50 * 365 * 86400;
 
-$wgGroupPermissions['*']['delete'] = true;
-$wgGroupPermissions['*']['undelete'] = true;
-$wgGroupPermissions['*']['upload_by_url'] = true;
-$wgGroupPermissions['*']['import'] = true;
-$wgGroupPermissions['*']['importupload'] = true;
+$wgGroupPermissions['user']['delete'] = true;
+$wgGroupPermissions['user']['undelete'] = true;
+$wgGroupPermissions['user']['upload_by_url'] = true;
+$wgGroupPermissions['user']['import'] = true;
+$wgGroupPermissions['user']['importupload'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search
