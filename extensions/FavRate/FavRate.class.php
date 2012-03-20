@@ -222,7 +222,7 @@ class FavRate
         }
         if ($userId || $total)
         {
-            $tools['fav'.$my] = '<a href="javascript:void(0)" '.
+            $tools['fav'.$my.($total > 0 ? ' hasfav' : '')] = '<a href="javascript:void(0)" '.
                 'onclick="favRateToggleFavWikilog(this, '.$pageId.')">+'.$total.'</a>';
         }
         return true;

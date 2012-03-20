@@ -38,3 +38,6 @@ img.fav1, img.fav0:hover { background: url(asterisk.png) no-repeat; }
 .wl-comment-tools li.wl-comment-action-fav1:hover a { color: white; }
 .wl-comment-tools li.wl-comment-action-fav0:hover { background: #c0c; }
 .wl-comment-tools li.wl-comment-action-fav0:hover a { color: white; }
+@media screen {
+    .wl-comment-tools li.hasfav { display: inline; }
+}
