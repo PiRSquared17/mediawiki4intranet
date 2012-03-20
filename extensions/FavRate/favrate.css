@@ -33,6 +33,8 @@ img.fav1, img.fav0:hover { background: url(asterisk.png) no-repeat; }
 .skin-vector #favtogglebtn { top: -45px; }
 .favlinks { margin: 0; text-align: center; font-size: 90%; }
 .favlinks a { margin: 0.5em 0; }
-.wl-comment-action-fav1 { background: #faa; color: black; }
-.wl-comment-tools li.wl-comment-action-fav1:hover { background: #faa; color: #a00; }
-.wl-comment-tools li.wl-comment-action-fav0:hover { background: #faa; color: #a00; }
+.wl-comment-action-fav1 a { color: #e0e; }
+.wl-comment-tools li.wl-comment-action-fav1:hover { background: #c0c; }
+.wl-comment-tools li.wl-comment-action-fav1:hover a { color: white; }
+.wl-comment-tools li.wl-comment-action-fav0:hover { background: #c0c; }
+.wl-comment-tools li.wl-comment-action-fav0:hover a { color: white; }
