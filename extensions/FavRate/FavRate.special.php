@@ -2,7 +2,7 @@
 
 /**
  * MediaWiki FavRate extension
- * Copyright © 2010-2012 Vitaliy Filippov
+ * Copyright © 2010+ Vitaliy Filippov
  * License: GPLv3 or later
  * http://wiki.4intra.net/FavRate
  *
@@ -32,6 +32,7 @@ class SpecialFavRate extends IncludableSpecialPage
         parent::__construct('FavRate');
         wfLoadExtensionMessages('FavRate');
     }
+
     function execute($par)
     {
         global $wgRequest, $wgOut, $wgLang, $wgScriptPath, $wgUser;

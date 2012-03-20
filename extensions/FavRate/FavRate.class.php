@@ -2,7 +2,7 @@
 
 /**
  * MediaWiki FavRate extension
- * Copyright © 2010-2012 Vitaliy Filippov
+ * Copyright © 2010+ Vitaliy Filippov
  * License: GPLv3 or later
  * http://wiki.4intra.net/FavRate
  *
@@ -26,11 +26,15 @@ if (!defined('MEDIAWIKI'))
     die();
 
 /**
- * Main class for extension
+ * FavRate extension main class
  */
 class FavRate
 {
-    // Database schema updates
+    static $cache = array();
+
+    /**
+     * Database schema updates
+     */
     static function LoadExtensionSchemaUpdates()
     {
         $dbw = wfGetDB(DB_MASTER);
@@ -38,40 +42,36 @@ class FavRate
             $dbw->sourceFile(dirname(__FILE__) . '/FavRate.sql');
         return true;
     }
-    // Unique page view tracking
-    // Probably not recommended for large sites
+
+    /**
+     * Unique page view tracking for ALL pages
+     * WARNING: probably not recommended for large sites with high load
+     */
     static function ArticleViewHeader(&$article, &$outputDone, &$pcache)
     {
         global $wgUser, $egFavRateLogVisitors;
         // Only track authorized users
         if ($egFavRateLogVisitors && $wgUser && $wgUser->getId())
         {
-            $dbw = wfGetDB(DB_MASTER);
-            $user_id = $wgUser->getId();
-            $page_id = $article->getId();
-            if ($user_id && $page_id)
-            {
-                $dbw->replace(
-                    'fr_page_stats',
-                    array(array('ps_page', 'ps_user', 'ps_type')),
-                    array(
-                        'ps_page'       => $page_id,
-                        'ps_user'       => $user_id,
-                        'ps_timestamp'  => wfTimestamp(TS_MW),
-                        'ps_type'       => 0,
-                    ), __METHOD__
-                );
-            }
+            $pageId = $article->getId();
+            if ($pageId)
+                self::setFavorite($pageId, $wgUser->getId(), 0, true);
         }
         return true;
     }
-    // Add/remove favorites
-    static function setFavorite($pageid, $addremove)
+
+    /**
+     * AJAX callback for adding/removing page $pageid to/from favorites
+     * @param int $pageid Page ID
+     * @param boolean $addremove true to add, false to remove
+     * @return JSON-encoded array(boolean $ok, string $message)
+     */
+    static function ajaxSetFavorite($pageid, $addremove)
     {
         global $wgUser;
-        if (!$wgUser || !$wgUser->getId())
+        if (!$wgUser->getId())
         {
-            // Unauthorized user cannot add anything to favorites
+            // Unauthorized user can't add anything to favorites
             return '[false,"'.addslashes(wfMsgExt(
                 'favrate-unauthorized', 'parseinline', Title::newFromText('Special:Userlogin')
             )).'"]';
@@ -80,90 +80,188 @@ class FavRate
         if (!$title || !$title->exists() ||
             method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
         {
-            // Page is invalid
+            // Page is invalid or unreadable
             return '[false,"'.addslashes(wfMsg('favrate-invalid-page')).'"]';
         }
-        $dbw = wfGetDB(DB_MASTER);
-        if ($addremove)
-            $dbw->replace('fr_page_stats', array(array('ps_page', 'ps_user')), array(
-                'ps_page'       => $pageid,
-                'ps_user'       => $wgUser->getId(),
-                'ps_timestamp'  => wfTimestamp(TS_MW),
-                'ps_type'       => 1,
-            ), __METHOD__);
-        else
-            $dbw->delete('fr_page_stats', array(
-                'ps_page'       => $pageid,
-                'ps_user'       => $wgUser->getId(),
-                'ps_type'       => 1,
-            ));
+        self::setFavorite($pageid, $wgUser->getId(), 1, $addremove);
+        // Invalidate cache for the page (+/- talk page)
+        $title->invalidateCache();
+        if (class_exists('WikilogComment'))
+        {
+            $comment = WikilogComment::newFromPageID($pageid);
+            if ($comment)
+                $comment->invalidateCache();
+        }
         return '[true,"'.addslashes(wfMsgExt(
             $addremove ? 'favrate-added' : 'favrate-removed',
             'parseinline', 'Special:FavRate/favorites/'.$wgUser->getName()
         )).'"]';
     }
-    // Display rating bar
+
+    /**
+     * Set or clear favorites table entry
+     * @param int $pageid Page ID
+     * @param int $userid User ID
+     * @param boolean $fav true to set favorite entry, false to set view tracking
+     * @param boolean $add true to add entry, false to remove
+     */
+    static function setFavorite($pageid, $userid, $fav, $add)
+    {
+        $dbw = wfGetDB(DB_MASTER);
+        $fav = $fav ? 1 : 0;
+        if ($add)
+        {
+            $dbw->replace(
+                'fr_page_stats',
+                array(array('ps_page', 'ps_user', 'ps_type')),
+                array(
+                    'ps_page'       => $pageid,
+                    'ps_user'       => $userid,
+                    'ps_timestamp'  => wfTimestamp(TS_MW),
+                    'ps_type'       => $fav,
+                ), __METHOD__
+            );
+        }
+        else
+        {
+            $dbw->delete('fr_page_stats', array(
+                'ps_page'       => $pageid,
+                'ps_user'       => $userid,
+                'ps_type'       => $fav,
+            ));
+        }
+    }
+
+    /**
+     * Get rating counters for $article and user $userid (may be an instance of WikiPage or Title)
+     * Should not be called in a loop!
+     *
+     * @param object $article
+     * @param int $userid
+     * @return false or array(
+     *   counter => page counter,
+     *   fav => favorites count,
+     *   myfav => is user's favorite,
+     *   links => page link count
+     * )
+     */
+    static function getPageCounters($article, $userId = 0)
+    {
+        $counters = array();
+        $dbr = wfGetDB(DB_SLAVE);
+        if ($article instanceof Title)
+            $article = new WikiPage($article);
+        $pageId = $article->getId();
+        if (!$pageId)
+            return false;
+        $counters['counter'] = $article->getCount();
+        $res = $dbr->select(
+            'fr_page_stats',
+            array("COUNT(*) fav", 'SUM(ps_user='.intval($userId).') myfav'),
+            array('ps_type' => 1, 'ps_page' => $pageId), __METHOD__
+        );
+        $row = $dbr->fetchRow($res);
+        $dbr->freeResult($res);
+        $counters['fav'] = $row['fav'];
+        $counters['myfav'] = $row['myfav'] ? 1 : 0;
+        $counters['links'] = $dbr->selectField('pagelinks', 'COUNT(*)', array(
+            'pl_namespace' => $article->getTitle()->getNamespace(),
+            'pl_title' => $article->getTitle()->getDBkey()
+        ), __METHOD__);
+        return $counters;
+    }
+
+    /**
+     * Preloads favorites for $userId and $pageIds
+     */
+    static function preload($userId, $pageIds)
+    {
+        $dbr = wfGetDB(DB_SLAVE);
+        $res = $dbr->select(
+            'fr_page_stats',
+            array('ps_page', "COUNT(1) fav", 'SUM(ps_user='.intval($userId).') myfav'),
+            array('ps_type' => 1, 'ps_page' => $pageIds),
+            __METHOD__,
+            array('GROUP BY' => 'ps_page')
+        );
+        foreach ($res as $row)
+        {
+            self::$cache[$row->ps_page]['total'] = $row->fav;
+            self::$cache[$row->ps_page]['user'.$userId] = $row->myfav;
+        }
+    }
+
+    /**
+     * Preloads ratings for all Wikilog comments in $comments
+     */
+    static function WikilogPreloadComments($pager, &$comments)
+    {
+        global $wgUser;
+        $userId = $wgUser->getId();
+        if (!$userId)
+            return true;
+        foreach ($comments as $comment)
+            $pageIds[] = $comment->mCommentPage;
+        self::preload($userId, $pageIds);
+        return true;
+    }
+
+    /**
+     * Displays rating count and button for Wikilog comments
+     */
+    static function WikilogCommentToolLinks($formatter, $comment, &$tools)
+    {
+        global $wgUser;
+        $userId = $wgUser->getId();
+        $pageId = $comment->mCommentPage;
+        $total = $my = 0;
+        if (isset(self::$cache[$pageId]))
+        {
+            $total = intval(self::$cache[$pageId]["total"]);
+            $my = $userId && self::$cache[$pageId]["user$userId"] ? 1 : 0;
+        }
+        if ($userId || $total)
+        {
+            $tools['fav'.$my] = '<a href="javascript:void(0)" '.
+                'onclick="favRateToggleFavWikilog(this, '.$pageId.')">+'.$total.'</a>';
+        }
+        return true;
+    }
+
+    /**
+     * Loads extension resource module everywhere :-(
+     * Because we can't modify modules during sidebar construction
+     */
+    static function BeforePageDisplay($out, $skin)
+    {
+        $out->addModules('ext.favrate');
+        return true;
+    }
+
+    /**
+     * Adds rating bars and add/remove to/from favorites button to page sidebar
+     */
     static function SkinBuildSidebar($skin, &$bar)
     {
         global $wgTitle, $wgArticle, $wgUser, $wgRequest, $wgScriptPath, $wgOut;
         global $egFavRateMaxHits, $egFavRateMaxFav, $egFavRateMaxLinks, $egFavRatePublicLogs;
         global $egFavRateHitsColor, $egFavRateFavColor, $egFavRateLinksColor;
-        if (($page_id = $wgTitle->getArticleID()) && array_key_exists('favratebar', $bar))
+        if (!isset($bar['favratebar']))
+            return true;
+        $pageCounters = self::getPageCounters($wgArticle ? $wgArticle : $wgTitle, $wgUser ? $wgUser->getId() : 0);
+        if ($pageCounters)
         {
-            $dbr = wfGetDB(DB_SLAVE);
             wfLoadExtensionMessages('FavRate');
-            $wgOut->addHeadItem(
-                'favrate.css',
-                '<link rel="stylesheet" type="text/css" href="'.
-                $wgScriptPath.'/extensions/FavRate/favrate.css" />'
-            );
-            $msg = array();
-            foreach (array('addfav', 'remfav') as $s)
-                $msg[] = "'$s': '".addslashes(wfMsg("favrate-$s"))."'";
-            $wgOut->addHeadItem(
-                'favrate.js',
-                '<script language="JavaScript">var favRateMsg = {'.implode(',', $msg).'}</script>'.
-                '<script language="JavaScript" src="'.$wgScriptPath.'/extensions/FavRate/favrate.js"></script>'
-            );
-            // 1) $counter = page counter
-            if ($wgArticle)
-                $counter = $wgArticle->getCount();
-            else
-            {
-                $a = new Article($wgTitle);
-                $counter = $a->getCount();
-            }
-            $userid = 0;
-            if ($wgUser && $wgUser->getId())
-                $userid = $wgUser->getId();
-            $result = $dbr->select(
-                'fr_page_stats',
-                array("COUNT(*) fav", "SUM(ps_user=$userid) myfav"),
-                array('ps_type' => 1, 'ps_page' => $page_id), __METHOD__
-            );
-            $row = $dbr->fetchRow($result);
-            $dbr->freeResult($result);
-            // 2) $fav = favorites
-            $fav = $row['fav'];
-            // 3) $myfav = is favorite for current user
-            $myfav = $row['myfav'] ? 1 : 0;
-            // 4) $links = backlinks
-            $links = $dbr->selectField(
-                'pagelinks', 'COUNT(*)',
-                array('pl_namespace' => $wgTitle->getNamespace(), 'pl_title' => $wgTitle->getDBkey()),
-                __METHOD__
-            );
             $blank = "$wgScriptPath/extensions/FavRate/blank.gif";
             $html = '<div style="margin-top: 6px">';
             // Toggle button and status message placeholder
-            $html .=
-                "<div class='favtoggle'><div id='favstatus'></div>".
-                "<img id='favtogglebtn' class='fav$myfav' onclick='favRateToggleFav()'".
-                " title='".wfMsg('favrate-addfav')."' alt=' ' src='$blank' /></div>";
+            $html .= '<div class="favtoggle">'.
+                '<img class="favtogglebtn fav'.$pageCounters['myfav'].'" onclick="favRateToggleFav(this)"'.
+                ' title="'.wfMsg('favrate-addfav').'" alt=" " src="'.$blank.'" /></div>';
             // Rating bars
-            $html .= self::bar($counter, $egFavRateMaxHits, $egFavRateHitsColor, wfMsg('favrate-hits'));
-            $html .= self::bar($fav, $egFavRateMaxFav, $egFavRateFavColor, wfMsg('favrate-fav'));
-            $html .= self::bar($links, $egFavRateMaxLinks, $egFavRateLinksColor, wfMsg('favrate-links'));
+            $html .= self::bar($pageCounters['counter'], $egFavRateMaxHits, $egFavRateHitsColor, wfMsg('favrate-hits'));
+            $html .= self::bar($pageCounters['fav'], $egFavRateMaxFav, $egFavRateFavColor, wfMsg('favrate-fav'));
+            $html .= self::bar($pageCounters['links'], $egFavRateMaxLinks, $egFavRateLinksColor, wfMsg('favrate-links'));
             $html .= '<div class="favlinks">';
             if ($egFavRatePublicLogs)
             {
@@ -183,7 +281,10 @@ class FavRate
             unset($bar['favratebar']);
         return true;
     }
-    // Get HTML for a rating bar
+
+    /**
+     * Builds HTML code for a rating bar
+     */
     static function bar($n, $max, $color, $text)
     {
         global $wgScriptPath;
