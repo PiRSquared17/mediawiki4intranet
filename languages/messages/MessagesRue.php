@@ -1473,7 +1473,7 @@ $1',
 'upload-warning-msg'          => 'Почас вашого начітаваня файлу [$2] ся став проблем. Кідь го хочете вырїшыти, можете ся вернути до  [[Special:Upload/stash/$1|формуларя начітаваня]].',
 
 'upload-proto-error'        => 'Неплатный протокол',
-'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code> або <code>ftp://</code>.',
+'upload-proto-error-text'   => 'Награня вздаленого файлу пожадує зазначіня URLs з початком <code>http://</code>, <code>https://</code> або <code>ftp://</code>.',
 'upload-file-error'         => 'Інтерна хыба',
 'upload-file-error-text'    => 'Почас спробы створїня дочасного файлу настала внутрїшня хыба на сервері.
 Просиме контактуйте  [[Special:ListUsers/sysop|адміністратора]].',

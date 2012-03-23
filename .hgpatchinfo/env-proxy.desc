@@ -1,0 +1,3 @@
+Bug 60996 - Support environment proxy settings for HTTP downloads, allow HTTPS downloads
+HTTPS is added to upload-proto-error-text message only in English and Russian languages.
+Bug 82496 - Support environment no_proxy settings for scary transclusions
