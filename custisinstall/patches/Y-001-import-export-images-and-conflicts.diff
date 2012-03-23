@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1332167463 -14400
+# Date 1332515086 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/AutoLoader.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -53,17 +53,7 @@
@@ -66,7 +66,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/AutoLoader.php
  
  	# includes/actions
  	'CreditsAction' => 'includes/actions/CreditsAction.php',
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/DefaultSettings.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -1354,6 +1354,12 @@
@@ -111,7 +111,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/DumpArchive.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -590,7 +590,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/Export.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -30,12 +30,11 @@
@@ -1466,7 +1466,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/Export.php
  
  function xmlsafe( $string ) {
  	wfProfileIn( __FUNCTION__ );
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/Import.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -24,6 +24,19 @@
@@ -1580,7 +1580,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/Import.php
 +						if ( !$title[0]->userCan( 'edit' ) ) {
 +							global $wgUser;
 +							wfDebug( __METHOD__ . ": edit permission denied for [[" .
-+								$this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
++								$title[0]->getPrefixedText() . "]], user " . $wgUser->getName() );
 +							$skip = true;
 +						}
  					}
@@ -2085,7 +2085,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/Import.php
 -		}
 -	}
 -}
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/filerepo/LocalFile.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -1137,7 +1137,7 @@
@@ -2097,7 +2097,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/specials/SpecialExport.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,36 +1,32 @@
@@ -2886,7 +2886,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/specials/SpecialExport.php
 +		return $added;
 +	}
  }
-diff -r 6ada923f95d9 -r 01265a0d8381 includes/specials/SpecialImport.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -24,6 +24,90 @@
@@ -3124,7 +3124,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6ada923f95d9 -r 01265a0d8381 languages/messages/MessagesEn.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3268,18 +3268,33 @@
@@ -3200,7 +3200,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 6ada923f95d9 -r 01265a0d8381 languages/messages/MessagesRu.php
+diff -r 6ada923f95d9 -r a8b2e21af8fc languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2740,18 +2740,33 @@
@@ -3273,7 +3273,7 @@ diff -r 6ada923f95d9 -r 01265a0d8381 languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6ada923f95d9 -r 01265a0d8381 skins/common/shared.css
+diff -r 6ada923f95d9 -r a8b2e21af8fc skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -857,3 +857,30 @@
