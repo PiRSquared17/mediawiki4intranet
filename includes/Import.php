@@ -547,7 +547,7 @@ class WikiImporter {
 						if ( !$title[0]->userCan( 'edit' ) ) {
 							global $wgUser;
 							wfDebug( __METHOD__ . ": edit permission denied for [[" .
-								$this->title->getPrefixedText() . "]], user " . $wgUser->getName() );
+								$title[0]->getPrefixedText() . "]], user " . $wgUser->getName() );
 							$skip = true;
 						}
 					}
