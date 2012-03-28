@@ -38,7 +38,7 @@ class SpecialFavRate extends IncludableSpecialPage
      */
     function execute($par)
     {
-        global $wgUser, $egFavRatePublicLogs;
+        global $wgUser, $egFavRatePublicLogs, $wgRequest;
         $title = NULL;
         if (!strpos($par, '/'))
             $par .= '/';
@@ -48,10 +48,16 @@ class SpecialFavRate extends IncludableSpecialPage
         if ($action == 'log' && ($egFavRatePublicLogs || $is_adm))
             self::viewPageLog($pagename);
         elseif ($action == 'favorites')
+        {
+            if (!$pagename && ($username = $wgRequest->getVal('username')))
+            {
+                $wgOut->redirect(Title::makeTitle(NS_SPECIAL, "FavRate/$username")->getLocalUrl());
+                return;
+            }
             self::viewUserFavorites($pagename);
+        }
         else
             self::viewTopPages();
-        return true;
     }
 
     /**
@@ -109,12 +115,13 @@ class SpecialFavRate extends IncludableSpecialPage
             $person = $wgUser;
         else
             $person = User::newFromName($username, false);
-        $link = Title::makeTitle(NS_SPECIAL, 'FavRate/favorites/')->getLocalUrl();
+        $link = Title::makeTitle(NS_SPECIAL, 'FavRate/favorites')->getLocalUrl();
         $wgOut->addHTML(
-            wfMsg('favrate-select-user').
-            ' <input type="text" id="favUser" value="'.htmlspecialchars($username).'" />'.
-            ' <a href="javascript:void(0)" onclick="document.location=\''.$link.
-            '\'+encodeURIComponent(document.getElementById(\'favUser\').value)">'.wfMsg('favrate-user-go').'</a>'
+            Xml::tags('form', array('action' => $link, 'method' => 'POST'),
+                wfMsg('favrate-select-user').
+                ' '.Xml::element('input', array('type' => 'text', 'id' => 'favUser', 'value' => $person->getName()), '', true) .
+                ' '.Xml::element('input', array('type' => 'submit', 'value' => wfMsg('favrate-user-go')))
+            )
         );
         if (!$person || !$person->getId())
         {
