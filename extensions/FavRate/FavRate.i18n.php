@@ -38,6 +38,8 @@ Total visitors: $2. Total likes: $3.',
     'favrate-invalid-title'     => 'Unknown or special page selected',
     'favrate-invalid-title-text' => 'The page "$1" either does not exist in this project or is a special page.',
 
+    'favrate-select-user'       => 'Select other user:',
+    'favrate-user-go'           => 'Go',
     'favrate-favlist-title'     => 'Likes',
     'favrate-favlist-subtitle'  => '== Likes of user [[User:$1|$1]] ==',
     'favrate-list-fav'          => '* $2 &mdash; [[:$1]] {{#if:$3|(comment: $3)}}',
@@ -82,6 +84,8 @@ $messages['ru'] = array(
     'favrate-invalid-title'     => 'Страница не существует',
     'favrate-invalid-title-text' => 'Страница "$1" не существует или является служебной.',
 
+    'favrate-select-user'       => 'Выбрать другого пользователя:',
+    'favrate-user-go'           => 'Показать',
     'favrate-favlist-title'     => 'Отмеченные страницы',
     'favrate-favlist-subtitle'  => '== Отмеченные пользователем [[User:$1|$1]] страницы ==',
     'favrate-list-fav'          => '* $2 &mdash; [[:$1]] {{#if:$3|(комментарий: $3)}}',

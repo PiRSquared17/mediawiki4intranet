@@ -109,9 +109,17 @@ class SpecialFavRate extends IncludableSpecialPage
             $person = $wgUser;
         else
             $person = User::newFromName($username, false);
+        $link = Title::makeTitle(NS_SPECIAL, 'FavRate/favorites/')->getLocalUrl();
+        $wgOut->addHTML(
+            wfMsg('favrate-select-user').
+            ' <input type="text" id="favUser" value="'.htmlspecialchars($username).'" />'.
+            ' <a href="javascript:void(0)" onclick="document.location=\''.$link.
+            '\'+encodeURIComponent(document.getElementById(\'favUser\').value)">'.wfMsg('favrate-user-go').'</a>'
+        );
         if (!$person || !$person->getId())
         {
-            $wgOut->showErrorPage('favrate-invalid-user', 'favrate-invalid-user-text', array($username));
+            $wgOut->setPageTitle(wfMsg('favrate-invalid-user'));
+            $wgOut->addWikiText(wfMsgNoTrans('favrate-invalid-user-text', $username));
             return;
         }
         // TODO move query away from here
@@ -178,6 +186,7 @@ class SpecialFavRate extends IncludableSpecialPage
         $ids = array();
         foreach ($res as $row)
         {
+            $row->links = 0;
             $rows[$row->page_id] = $row;
             $ids[] = $row->page_id;
         }
