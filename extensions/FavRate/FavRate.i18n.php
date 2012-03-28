@@ -49,38 +49,38 @@ Total visitors: $2. Total favorites: $3.',
  * @author Vitaliy Filippov
  */
 $messages['ru'] = array(
-    'favrate'                   => 'Рейтинг страниц на основе избранного',
-    'favrate-desc'              => 'Рейтинг страниц на основе избранного &mdash; ещё одна система рейтингов для MediaWiki.',
+    'favrate'                   => 'Рейтинг отмеченных страниц',
+    'favrate-desc'              => 'Рейтинг отмеченных страниц &mdash; ещё одна система рейтингов для MediaWiki.',
     'favratebar'                => 'Рейтинг страницы',
 
     'favrate-hits'              => 'Просмотры',
-    'favrate-fav'               => 'Избранное',
+    'favrate-fav'               => 'Отмеченное',
     'favrate-links'             => 'Ссылки сюда',
     'favrate-viewlogs'          => 'журналы',
-    'favrate-favorites'         => 'избранное',
-    'favrate-addfav'            => 'Добавить в избранное',
-    'favrate-remfav'            => 'Удалить из избранного',
-    'favrate-added'             => 'Страница добавлена в [[$1|Избранное]].',
-    'favrate-removed'           => 'Страница удалена из [[$1|Избранного]].',
-    'favrate-unauthorized'      => '[[$1|Авторизуйтесь]], чтобы добавлять страницы в избранное.',
+    'favrate-favorites'         => 'отмеченное',
+    'favrate-addfav'            => 'Отметить',
+    'favrate-remfav'            => 'Удалить из Отмеченного',
+    'favrate-added'             => 'Страница добавлена к [[$1|Отмеченным]].',
+    'favrate-removed'           => 'Страница удалена из [[$1|Отмеченных]].',
+    'favrate-unauthorized'      => '[[$1|Авторизуйтесь]], чтобы отмечать страницы.',
     'favrate-nonfavorable'      => 'Выбрана несуществующая или некорректная страница.',
 
     'favrate-page-log-title'    => 'Журнал просмотров страницы',
-    'favrate-page-log'          => '== [[:$1]] — Журнал уникальных просмотров и добавления в избранное ==
+    'favrate-page-log'          => '== [[:$1]] — Журнал уникальных просмотров и отметок ==
 
-Всего посетителей: $2. Всего добавили в избранное: $3.',
+Всего посетителей: $2. Всего отметили: $3.',
     'favrate-log-view'          => '* $2: [[:$1]] <span style="color: gray">&mdash; последний просмотр.</span>',
-    'favrate-log-fav'           => '* $2: [[:$1]] &mdash; добавил в [[:$3|Избранное]].',
+    'favrate-log-fav'           => '* $2: [[:$1]] &mdash; [[:$3|отметил]].',
     'favrate-invalid-title'     => 'Страница не существует',
     'favrate-invalid-title-text' => 'Страница "$1" не существует или является служебной.',
 
-    'favrate-favlist-title'     => 'Избранные страницы',
-    'favrate-favlist-subtitle'  => '== Избранные пользователем [[User:$1|$1]] страницы ==',
+    'favrate-favlist-title'     => 'Отмеченные страницы',
+    'favrate-favlist-subtitle'  => '== Отмеченные пользователем [[User:$1|$1]] страницы ==',
     'favrate-list-fav'          => '* $2 &mdash; [[:$1]]',
     'favrate-invalid-user'      => 'Неизвестный пользователь',
     'favrate-invalid-user-text' => 'Пользователь «$1» не зарегистрирован в данном вики-проекте.',
 
     'favrate-rating-title'      => 'Рейтинг страниц',
     'favrate-rating-empty'      => 'Нет статистики для отображения.',
-    'favrate-rating-item'       => '* [[:$1]] — $2 просмотр{{PLURAL:$2||а|ов}}, $3 ссыл{{PLURAL:$3|ка|ки|ок}}, в избранном у $4 пользовател{{PLURAL:$4|я|ей}}.',
+    'favrate-rating-item'       => '* [[:$1]] — $2 просмотр{{PLURAL:$2||а|ов}}, $3 ссыл{{PLURAL:$3|ка|ки|ок}}, отмечено $4 пользовател{{PLURAL:$4|ем|ями}}.',
 );
