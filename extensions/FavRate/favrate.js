@@ -67,7 +67,8 @@
         var input = document.getElementById('favrate-comment-'+pageId);
         sajax_do_call('efFavRateSet', [ pageId, 1, input.value ], function(request) {
             favStatus.className = 'favstatus';
-            favBtn.title = mw.msg('favrate-remfav-cmt', input.value);
+            if (input.value != '')
+                favBtn.title = mw.msg('favrate-remfav-cmt', input.value);
         });
     };
 
