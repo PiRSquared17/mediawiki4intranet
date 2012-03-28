@@ -168,7 +168,7 @@ class FavRate
         $counters['counter'] = $article->getCount();
         $res = $dbr->select(
             'fr_page_stats',
-            array('COUNT(*) fav', 'ps_user='.intval($userId).' myfav'),
+            array('COUNT(*) fav', 'SUM(ps_user='.intval($userId).') myfav'),
             array('ps_type' => 1, 'ps_page' => $pageId),
             __METHOD__
         );
