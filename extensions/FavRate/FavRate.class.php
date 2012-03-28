@@ -85,7 +85,7 @@ class FavRate
             // Page is invalid or unreadable
             return '[false,"'.addslashes(wfMsg('favrate-invalid-page')).'"]';
         }
-        self::setFavorite($pageid, $wgUser->getId(), 1, $addremove, $comment);
+        self::setFavorite($pageid, $wgUser->getId(), 1, $addremove, $comment ? $comment : NULL);
         // Invalidate cache for the page (+/- talk page)
         $title->invalidateCache();
         if (class_exists('WikilogComment'))
