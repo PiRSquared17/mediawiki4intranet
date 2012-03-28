@@ -33,11 +33,12 @@ class SpecialFavRate extends IncludableSpecialPage
         wfLoadExtensionMessages('FavRate');
     }
 
+    /**
+     * Special:FavRate main function
+     */
     function execute($par)
     {
-        global $wgRequest, $wgOut, $wgLang, $wgScriptPath, $wgUser;
-        global $egFavRatePublicLogs;
-        $dbr = wfGetDB(DB_SLAVE);
+        global $wgUser, $egFavRatePublicLogs;
         $title = NULL;
         if (!strpos($par, '/'))
             $par .= '/';
@@ -45,114 +46,150 @@ class SpecialFavRate extends IncludableSpecialPage
         $is_adm = in_array('sysop', $wgUser->getGroups()) ||
             in_array('bureaucrat', $wgUser->getGroups());
         if ($action == 'log' && ($egFavRatePublicLogs || $is_adm))
-        {
-            // View log for a page
-            $title = Title::newFromText($pagename);
-            if (!$title || !$title->getArticleId() ||
-                method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
-            {
-                // Page is unreadable, special or does not exist at all
-                $wgOut->showErrorPage('favrate-invalid-title', 'favrate-invalid-title-text', array($pagename));
-                return;
-            }
-            // TODO Resrict listing to 200 items on a page
-            $res = $dbr->select(
-                array('user', 'fr_page_stats'), '*',
-                array('ps_page' => $title->getArticleId(), 'user_id=ps_user'),
-                __METHOD__,
-                array('ORDER BY' => 'ps_timestamp DESC', 'LIMIT' => 200)
-            );
-            $selected = $dbr->numRows($res);
-            $key = array('view', 'fav');
-            $text = '';
-            $n = array(0, 0);
-            foreach ($res as $row)
-            {
-                $n[$row->ps_type]++;
-                $fav = $row->ps_type ? Title::newFromText('Special:FavRate/favorites/'.$row->user_name) : '';
-                $text .= wfMsg(
-                    'favrate-log-'.$key[$row->ps_type],
-                    $wgLang->getNsText(NS_USER).':'.$row->user_name,
-                    $wgLang->timeanddate($row->ps_timestamp, true),
-                    $fav
-                ) . "\n";
-            }
-            $wgOut->addWikiText(wfMsg('favrate-page-log', $title->getPrefixedText(), $n[0], $n[1]));
-            $wgOut->addWikiText($text);
-            $wgOut->setPageTitle(wfMsg('favrate-page-log-title'));
-        }
+            self::viewPageLog($pagename);
         elseif ($action == 'favorites')
-        {
-            // View favorites of a user
-            if (!$pagename)
-                $person = $wgUser;
-            else
-                $person = User::newFromName($pagename, false);
-            if (!$person || !$person->getId())
-            {
-                $wgOut->showErrorPage('favrate-invalid-user', 'favrate-invalid-user-text', array($pagename));
-                return;
-            }
-            // TODO Resrict listing to 200 items on a page
-            $res = $dbr->select(
-                array('page', 'fr_page_stats'), '*',
-                array('ps_user' => $person->getId(), 'page_id=ps_page', 'ps_type' => 1),
-                __METHOD__,
-                array('ORDER BY' => 'ps_timestamp DESC')
-            );
-            $text = '';
-            foreach ($res as $row)
-            {
-                $text .= wfMsg(
-                    'favrate-list-fav',
-                    Title::newFromRow($row)->getPrefixedText(),
-                    $wgLang->timeanddate($row->ps_timestamp, true)
-                ) . "\n";
-            }
-            $wgOut->addWikiText(wfMsg('favrate-favlist-subtitle', $person->getName()));
-            $wgOut->addWikiText($text);
-            $wgOut->setPageTitle(wfMsg('favrate-favlist-title', $person->getName()));
-        }
+            self::viewUserFavorites($pagename);
         else
-        {
-            // View 100 top rated pages
-            $wgOut->setPageTitle(wfMsg('favrate-rating-title'));
-            $where = array();
-            // TODO Advanced page selection mechanisms
-            $res = $dbr->select(
-                array('page', 'fr_page_stats'), 'page.*, COUNT(1) fav',
-                array('page_id=ps_page', 'ps_type=1'),
-                __METHOD__,
-                array('GROUP BY' => 'ps_page', 'ORDER BY' => 'fav DESC', 'LIMIT' => 100)
-            );
-            if (!$dbr->numRows($res))
-                $wgOut->addWikiText(wfMsg('favrate-rating-empty'));
-            $ids = array();
-            foreach ($res as $row)
-            {
-                $rows[$row->page_id] = $row;
-                $ids[] = $row->page_id;
-            }
-            // Retrieve link count
-            $res = $dbr->select(
-                array('page', 'pagelinks'), 'page_id, COUNT(1) links',
-                array('pl_namespace=page_namespace', 'page_title=pl_title', 'page_id' => $ids),
-                __METHOD__,
-                array('GROUP BY' => 'page_id')
-            );
-            foreach ($res as $row)
-                $rows[$row->page_id]->links = $row->links;
-            foreach ($rows as $row)
-            {
-                $title = Title::newFromRow($row);
-                if (!$title)
-                    continue;
-                $wgOut->addHTML(wfMsgExt(
-                    'favrate-rating-item', 'parseinline', $title->getPrefixedText(),
-                    $row->page_counter, $row->links, $row->fav
-                ));
-            }
-        }
+            self::viewTopPages();
         return true;
+    }
+
+    /**
+     * Show logs for a page
+     * @TODO Restrict listing to 200 items on a page
+     * @param string $pagename Page title
+     */
+    function viewPageLog($pagename)
+    {
+        global $wgOut, $wgLang;
+        $title = Title::newFromText($pagename);
+        if (!$title || !$title->getArticleId() ||
+            method_exists($title, 'userCanReadEx') && !$title->userCanReadEx())
+        {
+            // Page is unreadable, special or does not exist at all
+            $wgOut->showErrorPage('favrate-invalid-title', 'favrate-invalid-title-text', array($pagename));
+            return;
+        }
+        // TODO move query away from here
+        $dbr = wfGetDB(DB_SLAVE);
+        $res = $dbr->select(
+            array('user', 'fr_page_stats'), '*',
+            array('ps_page' => $title->getArticleId(), 'user_id=ps_user'),
+            __METHOD__,
+            array('ORDER BY' => 'ps_timestamp DESC', 'LIMIT' => 200)
+        );
+        $text = '';
+        $total = array(0, 0); // total views, total likes
+        $ns_user = $wgLang->getNsText(NS_USER);
+        foreach ($res as $row)
+        {
+            $total[$row->ps_type]++;
+            $favLink = $row->ps_type ? Title::newFromText('Special:FavRate/favorites/'.$row->user_name) : '';
+            $key = $row->ps_type ? ($row->ps_comment ? 'favrate-log-comment' : 'favrate-log-fav') : 'favrate-log-view';
+            $text .= wfMsg($key,
+                $ns_user.':'.$row->user_name,
+                $wgLang->timeanddate($row->ps_timestamp, true),
+                $favLink, $row->ps_comment
+            ) . "\n";
+        }
+        $wgOut->addWikiText(wfMsg('favrate-page-log', $title->getPrefixedText(), $total[0], $total[1]));
+        $wgOut->addWikiText($text);
+        $wgOut->setPageTitle(wfMsg('favrate-page-log-title'));
+    }
+
+    /**
+     * Show favorites of given user, or of the current user by default
+     * @TODO Restrict listing to 200 items on a page
+     * @param string $username desired user name
+     */
+    function viewUserFavorites($username)
+    {
+        global $wgUser, $wgOut, $wgLang;
+        if (!$username)
+            $person = $wgUser;
+        else
+            $person = User::newFromName($username, false);
+        if (!$person || !$person->getId())
+        {
+            $wgOut->showErrorPage('favrate-invalid-user', 'favrate-invalid-user-text', array($username));
+            return;
+        }
+        // TODO move query away from here
+        $dbr = wfGetDB(DB_SLAVE);
+        $res = $dbr->select(
+            array('page', 'fr_page_stats'), '*',
+            array('ps_user' => $person->getId(), 'page_id=ps_page', 'ps_type' => 1),
+            __METHOD__,
+            array('ORDER BY' => 'ps_timestamp DESC')
+        );
+        $text = '';
+        foreach ($res as $row)
+        {
+            $text .= wfMsgNoTrans(
+                'favrate-list-fav',
+                Title::newFromRow($row)->getPrefixedText(),
+                $wgLang->timeanddate($row->ps_timestamp, true),
+                $row->ps_comment
+            ) . "\n";
+        }
+        $wgOut->addWikiText(wfMsg('favrate-favlist-subtitle', $person->getName()));
+        $wgOut->addWikiText($text);
+        $wgOut->setPageTitle(wfMsg('favrate-favlist-title', $person->getName()));
+    }
+
+    /**
+     * Show 100 top rated pages
+     */
+    function viewTopPages()
+    {
+        global $wgOut;
+        $wgOut->setPageTitle(wfMsg('favrate-rating-title'));
+        $rows = $this->getTopPages();
+        if (!$rows)
+            $wgOut->addWikiText(wfMsg('favrate-rating-empty'));
+        foreach ($rows as $row)
+        {
+            $title = Title::newFromRow($row);
+            if (!$title)
+                continue;
+            $wgOut->addHTML(wfMsgExt(
+                'favrate-rating-item', 'parseinline', $title->getPrefixedText(),
+                $row->page_counter, $row->links, $row->fav
+            ));
+        }
+    }
+
+    /**
+     * Select 100 top rated pages with favorite and link counts
+     * @TODO Advanced page selection mechanisms
+     */
+    function getTopPages()
+    {
+        $where = array();
+        $dbr = wfGetDB(DB_SLAVE);
+        $res = $dbr->select(
+            array('page', 'fr_page_stats'), 'page.*, COUNT(1) fav',
+            array('page_id=ps_page', 'ps_type=1'),
+            __METHOD__,
+            array('GROUP BY' => 'ps_page', 'ORDER BY' => 'fav DESC', 'LIMIT' => 100)
+        );
+        if (!$dbr->numRows($res))
+            return false;
+        $ids = array();
+        foreach ($res as $row)
+        {
+            $rows[$row->page_id] = $row;
+            $ids[] = $row->page_id;
+        }
+        // Retrieve link count
+        $res = $dbr->select(
+            array('page', 'pagelinks'), 'page_id, COUNT(1) links',
+            array('pl_namespace=page_namespace', 'page_title=pl_title', 'page_id' => $ids),
+            __METHOD__,
+            array('GROUP BY' => 'page_id')
+        );
+        foreach ($res as $row)
+            $rows[$row->page_id]->links = $row->links;
+        return $rows;
     }
 }

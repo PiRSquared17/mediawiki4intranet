@@ -37,9 +37,10 @@ class FavRate
      */
     static function LoadExtensionSchemaUpdates()
     {
-        $dbw = wfGetDB(DB_MASTER);
-        if (!$dbw->tableExists('fr_page_stats'))
-            $dbw->sourceFile(dirname(__FILE__) . '/FavRate.sql');
+        global $wgExtNewTables, $wgExtNewFields;
+        $dir = dirname(__FILE__);
+        $wgExtNewTables[] = array('fr_page_stats', "$dir/FavRate.sql");
+        $wgExtNewFields[] = array('fr_page_stats', 'ps_comment', "$dir/ps_comment.sql");
         return true;
     }
 
@@ -64,9 +65,10 @@ class FavRate
      * AJAX callback for adding/removing page $pageid to/from favorites
      * @param int $pageid Page ID
      * @param boolean $addremove true to add, false to remove
+     * @param string $comment optional comment to add for this favorite
      * @return JSON-encoded array(boolean $ok, string $message)
      */
-    static function ajaxSetFavorite($pageid, $addremove)
+    static function ajaxSetFavorite($pageid, $addremove, $comment = NULL)
     {
         global $wgUser;
         if (!$wgUser->getId())
@@ -83,7 +85,7 @@ class FavRate
             // Page is invalid or unreadable
             return '[false,"'.addslashes(wfMsg('favrate-invalid-page')).'"]';
         }
-        self::setFavorite($pageid, $wgUser->getId(), 1, $addremove);
+        self::setFavorite($pageid, $wgUser->getId(), 1, $addremove, $comment);
         // Invalidate cache for the page (+/- talk page)
         $title->invalidateCache();
         if (class_exists('WikilogComment'))
@@ -92,20 +94,27 @@ class FavRate
             if ($comment)
                 $comment->invalidateCache();
         }
-        return '[true,"'.addslashes(wfMsgExt(
-            $addremove ? 'favrate-added' : 'favrate-removed',
-            'parseinline', 'Special:FavRate/favorites/'.$wgUser->getName()
-        )).'"]';
+        $msg = $addremove ? 'favrate-added' : 'favrate-removed';
+        $html = wfMsgExt($msg, 'parseinline', 'Special:FavRate/favorites/'.$wgUser->getName());
+        if ($addremove)
+        {
+            $html .= '<br /><input type="text" id="favrate-comment-'.$pageid.'" value="'.
+                wfMsg('favrate-comment').'" class="favcomment favempty" onfocus="favRateStartComment('.$pageid.')" />'.
+                '&nbsp;<a href="javascript:void(0)" onclick="favRateComment('.$pageid.')">'.wfMsg('favrate-post-comment').'</a>';
+        }
+        return '[true,"'.addslashes($html).'"]';
     }
 
     /**
-     * Set or clear favorites table entry
+     * Set or clear favorites table entry, optionally with a short comment.
+     * Comments are stored in the same DB table, maybe it's not optimal for large sites.
      * @param int $pageid Page ID
      * @param int $userid User ID
      * @param boolean $fav true to set favorite entry, false to set view tracking
      * @param boolean $add true to add entry, false to remove
+     * @param string $comment Optional comment to the favorite (useful only for $fav==true)
      */
-    static function setFavorite($pageid, $userid, $fav, $add)
+    static function setFavorite($pageid, $userid, $fav, $add, $comment = NULL)
     {
         $dbw = wfGetDB(DB_MASTER);
         $fav = $fav ? 1 : 0;
@@ -119,22 +128,23 @@ class FavRate
                     'ps_user'       => $userid,
                     'ps_timestamp'  => wfTimestamp(TS_MW),
                     'ps_type'       => $fav,
+                    'ps_comment'    => $comment,
                 ), __METHOD__
             );
         }
         else
         {
             $dbw->delete('fr_page_stats', array(
-                'ps_page'       => $pageid,
-                'ps_user'       => $userid,
-                'ps_type'       => $fav,
+                'ps_page' => $pageid,
+                'ps_user' => $userid,
+                'ps_type' => $fav,
             ));
         }
     }
 
     /**
      * Get rating counters for $article and user $userid (may be an instance of WikiPage or Title)
-     * Should not be called in a loop!
+     * Not suitable for mass fetch. Should not be called in a loop!
      *
      * @param object $article
      * @param int $userid
@@ -142,6 +152,7 @@ class FavRate
      *   counter => page counter,
      *   fav => favorites count,
      *   myfav => is user's favorite,
+     *   comment => user's comment,
      *   links => page link count
      * )
      */
@@ -157,13 +168,22 @@ class FavRate
         $counters['counter'] = $article->getCount();
         $res = $dbr->select(
             'fr_page_stats',
-            array("COUNT(*) fav", 'SUM(ps_user='.intval($userId).') myfav'),
-            array('ps_type' => 1, 'ps_page' => $pageId), __METHOD__
+            array('COUNT(*) fav', 'ps_user='.intval($userId).' myfav'),
+            array('ps_type' => 1, 'ps_page' => $pageId),
+            __METHOD__
         );
         $row = $dbr->fetchRow($res);
-        $dbr->freeResult($res);
+        $comment = NULL;
+        if ($row['myfav'])
+        {
+            $comment = $dbr->selectField(
+                'fr_page_stats', 'ps_comment',
+                array('ps_user' => $userId, 'ps_type' => 1, 'ps_page' => $pageId), __METHOD__
+            );
+        }
         $counters['fav'] = $row['fav'];
         $counters['myfav'] = $row['myfav'] ? 1 : 0;
+        $counters['comment'] = $comment;
         $counters['links'] = $dbr->selectField('pagelinks', 'COUNT(*)', array(
             'pl_namespace' => $article->getTitle()->getNamespace(),
             'pl_title' => $article->getTitle()->getDBkey()
@@ -257,9 +277,13 @@ class FavRate
             $blank = "$wgScriptPath/extensions/FavRate/blank.gif";
             $html = '<div style="margin-top: 6px">';
             // Toggle button and status message placeholder
+            if ($pageCounters['comment'])
+                $linkAlt = wfMsg('favrate-remfav-cmt', $pageCounters['comment']);
+            else
+                $linkAlt = wfMsg($pageCounters['myfav'] ? 'favrate-remfav' : 'favrate-addfav');
             $html .= '<div class="favtoggle">'.
                 '<img class="favtogglebtn fav'.$pageCounters['myfav'].'" onclick="favRateToggleFav(this)"'.
-                ' title="'.wfMsg('favrate-addfav').'" alt=" " src="'.$blank.'" /></div>';
+                ' title="'.$linkAlt.'" alt=" " src="'.$blank.'" /></div>';
             // Rating bars
             $html .= self::bar($pageCounters['counter'], $egFavRateMaxHits, $egFavRateHitsColor, wfMsg('favrate-hits'));
             $html .= self::bar($pageCounters['fav'], $egFavRateMaxFav, $egFavRateFavColor, wfMsg('favrate-fav'));
@@ -272,7 +296,7 @@ class FavRate
                     Title::newFromText("Special:FavRate/log/$wgTitle")->getLocalUrl()
                 ).'">'.wfMsg('favrate-viewlogs').'</a> ';
             }
-            // Links to "My Favorites"
+            // Link to "My Likes"
             $html .= '<a rel="nofollow" href="'.htmlspecialchars(
                 Title::newFromText("Special:FavRate/favorites")->getLocalUrl()
             ).'">'.wfMsg('favrate-favorites').'</a>';
