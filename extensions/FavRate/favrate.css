@@ -26,6 +26,8 @@
     -o-transition: opacity 150ms ease-out 0s;
     -webkit-transition: opacity 150ms ease-out 0s;
 }
+.favcomment { font-size: 100%; }
+.favcomment.favempty { color: #aaa; font-style: italic; }
 .favtogglebtn { cursor: pointer; position: absolute; top: -26px; right: 0; width: 16px; height: 16px; }
 .favbar { height: 7px; border: 1px outset gray; margin: 2px 0 0 0; width: 100%; background-color: gray; }
 img.fav1:hover, img.fav0 { background: url(asteriskgray.png) no-repeat; }

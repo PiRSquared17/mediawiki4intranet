@@ -93,7 +93,7 @@ $wgResourceModules['ext.favrate'] = array(
     'remoteExtPath' => 'FavRate',
     'scripts' => array('favrate.js'),
     'styles' => array('favrate.css'),
-    'messages' => array('favrate-addfav', 'favrate-remfav'),
+    'messages' => array('favrate-addfav', 'favrate-remfav', 'favrate-remfav-cmt'),
 );
 
 // Default configuration values
@@ -107,7 +107,7 @@ $egFavRateFavColor = "#d0d";
 $egFavRateLinksColor = "#00c";
 
 // AJAX export function
-function efFavRateSet($pageid, $addremove)
+function efFavRateSet()
 {
-    return FavRate::ajaxSetFavorite($pageid, $addremove);
+    return call_user_func_array('FavRate::ajaxSetFavorite', func_get_args());
 }

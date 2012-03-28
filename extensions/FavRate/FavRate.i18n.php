@@ -9,40 +9,44 @@ $messages = array();
  * @author Vitaliy Filippov
  */
 $messages['en'] = array(
-    'favrate'                   => 'Favorites-based page rating',
-    'favrate-desc'              => 'Favorites-based page rating &ndash; yet another page rating system for MediaWiki.',
+    'favrate'                   => 'Likes-based page rating',
+    'favrate-desc'              => 'Likes-based page rating &ndash; yet another page rating system for MediaWiki.',
     'favratebar'                => 'Page rating',
 
     'favrate-hits'              => 'Views',
-    'favrate-fav'               => 'Favorites',
+    'favrate-fav'               => 'Likes',
     'favrate-links'             => 'Links',
     'favrate-viewlogs'          => 'view logs',
-    'favrate-favorites'         => 'favorites',
-    'favrate-addfav'            => 'Add to favorites',
-    'favrate-remfav'            => 'Remove from favorites',
+    'favrate-favorites'         => 'my likes',
+    'favrate-addfav'            => 'Like',
+    'favrate-remfav'            => 'Unlike',
+    'favrate-remfav-cmt'        => 'Unlike (current comment: $1)',
+    'favrate-comment'           => 'comment here',
+    'favrate-post-comment'      => 'Post',
     'favrate-added'             => 'Page added to [[$1|Favorites]].',
     'favrate-removed'           => 'Page removed from [[$1|Favorites]].',
     'favrate-unauthorized'      => '[[$1|Log in]] to add page to favorites.',
     'favrate-nonfavorable'      => 'Invalid page for favorites.',
 
     'favrate-page-log-title'    => 'Page view log',
-    'favrate-page-log'          => '== [[:$1]] — Unique visitors and favorites log ==
+    'favrate-page-log'          => '== [[:$1]] — Unique visit and like log ==
 
-Total visitors: $2. Total favorites: $3.',
+Total visitors: $2. Total likes: $3.',
     'favrate-log-view'          => '* $2: [[:$1]] <span style="color: gray">&mdash; last access time.</span>',
-    'favrate-log-fav'           => '* $2: [[:$1]] &mdash; added into [[:$3|Favorites]].',
+    'favrate-log-fav'           => '* $2: [[:$1]] &mdash; [[:$3|likes this page]].',
+    'favrate-log-comment'       => '* $2: [[:$1]] &mdash; [[:$3|likes this page]] (comment: $4).',
     'favrate-invalid-title'     => 'Unknown or special page selected',
     'favrate-invalid-title-text' => 'The page "$1" either does not exist in this project or is a special page.',
 
-    'favrate-favlist-title'     => 'Favorites',
-    'favrate-favlist-subtitle'  => '== Favorites of user [[User:$1|$1]] ==',
-    'favrate-list-fav'          => '* $2 &mdash; [[:$1]]',
+    'favrate-favlist-title'     => 'Likes',
+    'favrate-favlist-subtitle'  => '== Likes of user [[User:$1|$1]] ==',
+    'favrate-list-fav'          => '* $2 &mdash; [[:$1]] {{#if:$3|(comment: $3)}}',
     'favrate-invalid-user'      => 'Unknown user',
     'favrate-invalid-user-text' => 'The user "$1" does not exist in this project.',
 
     'favrate-rating-title'      => 'Page rating',
     'favrate-rating-empty'      => 'No statistics to display.',
-    'favrate-rating-item'       => '* [[:$1]] — $2 view{{PLURAL:$2|s}}, $3 link{{PLURAL:$3||s}}, $4 user{{PLURAL:$3||s}} marked as favorite.',
+    'favrate-rating-item'       => '* [[:$1]] — $2 view{{PLURAL:$2|s}}, $3 link{{PLURAL:$3||s}}, $4 like{{PLURAL:$3||s}}.',
 );
 
 /** Russian
@@ -59,7 +63,10 @@ $messages['ru'] = array(
     'favrate-viewlogs'          => 'журналы',
     'favrate-favorites'         => 'отмеченное',
     'favrate-addfav'            => 'Отметить',
-    'favrate-remfav'            => 'Удалить из Отмеченного',
+    'favrate-remfav'            => 'Снять отметку',
+    'favrate-remfav-cmt'        => 'Снять отметку (текущий комментарий: $1)',
+    'favrate-comment'           => 'комментарий',
+    'favrate-post-comment'      => 'ОК',
     'favrate-added'             => 'Страница добавлена к [[$1|Отмеченным]].',
     'favrate-removed'           => 'Страница удалена из [[$1|Отмеченных]].',
     'favrate-unauthorized'      => '[[$1|Авторизуйтесь]], чтобы отмечать страницы.',
@@ -71,12 +78,13 @@ $messages['ru'] = array(
 Всего посетителей: $2. Всего отметили: $3.',
     'favrate-log-view'          => '* $2: [[:$1]] <span style="color: gray">&mdash; последний просмотр.</span>',
     'favrate-log-fav'           => '* $2: [[:$1]] &mdash; [[:$3|отметил]].',
+    'favrate-log-comment'       => '* $2: [[:$1]] &mdash; [[:$3|отметил]] (комментарий: $4).',
     'favrate-invalid-title'     => 'Страница не существует',
     'favrate-invalid-title-text' => 'Страница "$1" не существует или является служебной.',
 
     'favrate-favlist-title'     => 'Отмеченные страницы',
     'favrate-favlist-subtitle'  => '== Отмеченные пользователем [[User:$1|$1]] страницы ==',
-    'favrate-list-fav'          => '* $2 &mdash; [[:$1]]',
+    'favrate-list-fav'          => '* $2 &mdash; [[:$1]] {{#if:$3|(комментарий: $3)}}',
     'favrate-invalid-user'      => 'Неизвестный пользователь',
     'favrate-invalid-user-text' => 'Пользователь «$1» не зарегистрирован в данном вики-проекте.',
 

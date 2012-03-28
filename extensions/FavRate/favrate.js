@@ -9,6 +9,9 @@
 {
     var favRateTimer = null;
     var favStatus = null;
+    var favBtn = null; // last used button
+
+    // AJAX response handler
     var favRateToggleCallback = function(request, btn, pageId, callback, add)
     {
         if (request.status != 200)
@@ -40,11 +43,35 @@
             btn.className = btn.className.replace(add ? 'fav0' : 'fav1', add ? 'fav1' : 'fav0');
             btn.title = mw.msg(add ? 'favrate-remfav' : 'favrate-addfav');
         }
+        favBtn = btn;
         if (callback)
             callback(add);
         clearTimeout(favRateTimer);
-        favRateTimer = setTimeout(function() { favStatus.className = ''; }, 1500);
+        favRateTimer = setTimeout(function() { favStatus.className = 'favstatus'; }, 1500);
     };
+
+    // Start editing the comment, also prevents status window from hiding
+    window.favRateStartComment = function(pageId)
+    {
+        clearTimeout(favRateTimer);
+        if (favStatus)
+            favStatus.className = 'favstatus favvisible';
+        var input = document.getElementById('favrate-comment-'+pageId);
+        input.className = 'favcomment';
+        input.value = '';
+    };
+
+    // Add a comment to favorite
+    window.favRateComment = function(pageId)
+    {
+        var input = document.getElementById('favrate-comment-'+pageId);
+        sajax_do_call('efFavRateSet', [ pageId, 1, input.value ], function(request) {
+            favStatus.className = 'favstatus';
+            favBtn.title = mw.msg('favrate-remfav-cmt', input.value);
+        });
+    };
+
+    // Toggle favorite for page pageId
     window.favRateToggleFavFor = function(btn, pageId, callback)
     {
         var u = mw.config ? mw.config.get('wgUserName') : wgUserName;
@@ -55,11 +82,15 @@
                 function(request) { favRateToggleCallback(request, btn, pageId, callback, add); });
         }
     };
+
+    // Toggle favorite for current page
     window.favRateToggleFav = function(btn)
     {
         var id = mw.config ? mw.config.get('wgArticleId') : wgArticleId;
         favRateToggleFavFor(btn, id);
     };
+
+    // Toggle favorite for a Wikilog comment
     window.favRateToggleFavWikilog = function(link, pageId)
     {
         favRateToggleFavFor(link.parentNode, pageId, function(add) {
