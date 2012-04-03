@@ -296,7 +296,7 @@ class SpecialExport extends SpecialPage {
 			if( $s ) $added += self::getSubpages( $pageSet );
 			if( $r ) $added += self::getRedirects( $pageSet );
 			$step++;
-		} while( $t+$p+$i+$s > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
+		} while( $t+$p+$i+$s+$r > 1 && $added > 0 && ( !$linkDepth || $step < $linkDepth ) );
 
 		// Filter user-readable pages (also MW Bug 8824)
 		foreach ( $pageSet as $key => $title ) {
