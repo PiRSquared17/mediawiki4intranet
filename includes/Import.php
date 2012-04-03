@@ -934,7 +934,7 @@ class WikiRevision {
 	}
 	function getSha1() {
 		if ( $this->sha1base36 ) {
-			return wfBaseConvert( $this->sha1base36, 36, 16 );
+			return wfBaseConvert( $this->sha1base36, 36, 16, 40 );
 		}
 		return false;
 	}
@@ -1122,9 +1122,9 @@ class WikiRevision {
 		$archiveName = false;
 
 		if ( $file->exists() && $file->getTimestamp() > $this->getTimestamp() ) {
-			$archiveName = 'T' . $this->getTimestamp() . '!' . $file->getName();
-			$file = OldLocalFile::newFromArchiveName( $this->getTitle(), 
-				RepoGroup::singleton()->getLocalRepo(), $archiveName );			
+			$archiveName = 'T' . $this->getTimestamp() . '!' . $file->getPhys();
+			$file = OldLocalFile::newFromArchiveName( $this->getTitle(),
+				RepoGroup::singleton()->getLocalRepo(), $archiveName );
 			wfDebug( __METHOD__ . ": Importing archived file as $archiveName\n" );
 		} else {
 			wfDebug( __METHOD__ . ': Importing new file as ' . $file->getName() . "\n" );
