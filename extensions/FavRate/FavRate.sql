@@ -12,10 +12,8 @@ CREATE TABLE /*$wgDBprefix*/fr_page_stats (
     ps_type TINYINT(1) NOT NULL,
     -- Entry timestamp
     ps_timestamp BINARY(14) NOT NULL,
+    -- Comment
+    ps_comment VARCHAR(255) DEFAULT NULL,
     -- Primary key
     PRIMARY KEY (ps_page, ps_user, ps_type)
 ) /*$wgDBTableOptions*/;
-
--- Create foreign keys (InnoDB only)
-ALTER TABLE /*$wgDBprefix*/fr_page_stats ADD FOREIGN KEY (ps_user) REFERENCES /*$wgDBprefix*/user (user_id) ON DELETE CASCADE ON UPDATE CASCADE;
-ALTER TABLE /*$wgDBprefix*/fr_page_stats ADD FOREIGN KEY (ps_page) REFERENCES /*$wgDBprefix*/page (page_id) ON DELETE CASCADE ON UPDATE CASCADE;

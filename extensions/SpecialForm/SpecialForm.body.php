@@ -26,8 +26,6 @@ if( !defined( 'MEDIAWIKI' ) ) {
 	exit( 1 );
 }
 
-require_once('XmlFunctions.php');
-
 class SpecialForm extends SpecialPage {
 
 	/**

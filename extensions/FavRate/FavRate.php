@@ -2,7 +2,7 @@
 
 /**
  * MediaWiki FavRate extension
- * Copyright © 2010-2012 Vitaliy Filippov
+ * Copyright © 2010+ Vitaliy Filippov
  * License: GPLv3 or later
  * http://wiki.4intra.net/FavRate
  *
@@ -70,15 +70,31 @@ $wgExtensionCredits['specialpage'][] = array(
     'description'    => 'Yet another page rating system for MediaWiki.',
     'descriptionmsg' => 'favrate-desc',
 );
-$wgHooks['LoadExtensionSchemaUpdates'][] = 'FavRate::LoadExtensionSchemaUpdates';
-$wgHooks['ArticleViewHeader'][] = 'FavRate::ArticleViewHeader';
-$wgHooks['SkinBuildSidebar'][] = 'FavRate::SkinBuildSidebar';
 $wgExtensionMessagesFiles['FavRate'] = dirname(__FILE__) . '/FavRate.i18n.php';
 $wgAutoloadClasses['FavRate'] = dirname(__FILE__) . '/FavRate.class.php';
 $wgAutoloadClasses['SpecialFavRate'] = dirname(__FILE__) . '/FavRate.special.php';
 $wgSpecialPages['FavRate'] = 'SpecialFavRate';
 $wgSpecialPageGroups['FavRate'] = 'highuse';
 $wgAjaxExportList[] = 'efFavRateSet';
+
+// Core hooks
+$wgHooks['LoadExtensionSchemaUpdates'][] = 'FavRate::LoadExtensionSchemaUpdates';
+$wgHooks['ArticleViewHeader'][] = 'FavRate::ArticleViewHeader';
+$wgHooks['SkinBuildSidebar'][] = 'FavRate::SkinBuildSidebar';
+$wgHooks['BeforePageDisplay'][] = 'FavRate::BeforePageDisplay';
+
+// Hooks for Wikilog
+$wgHooks['WikilogPreloadComments'][] = 'FavRate::WikilogPreloadComments';
+$wgHooks['WikilogCommentToolLinks'][] = 'FavRate::WikilogCommentToolLinks';
+
+// ResourceLoader module
+$wgResourceModules['ext.favrate'] = array(
+    'localBasePath' => dirname(__FILE__),
+    'remoteExtPath' => 'FavRate',
+    'scripts' => array('favrate.js'),
+    'styles' => array('favrate.css'),
+    'messages' => array('favrate-addfav', 'favrate-remfav', 'favrate-remfav-cmt'),
+);
 
 // Default configuration values
 $egFavRateLogVisitors = false;
@@ -87,10 +103,11 @@ $egFavRateMaxHits = 100000;
 $egFavRateMaxFav = 100;
 $egFavRateMaxLinks = 100;
 $egFavRateHitsColor = "#0c0";
-$egFavRateFavColor = "#c00";
+$egFavRateFavColor = "#d0d";
 $egFavRateLinksColor = "#00c";
 
-function efFavRateSet($pageid, $addremove)
+// AJAX export function
+function efFavRateSet()
 {
-    return FavRate::setFavorite($pageid, $addremove);
+    return call_user_func_array('FavRate::ajaxSetFavorite', func_get_args());
 }
