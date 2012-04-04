@@ -1,0 +1,30 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   $Id$
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+
+.dynamiccontent{
+display:none;
+}
+
+.editsection {
+  display: none;
+}
+
+#siteSub, .urlexpansion, .printfooter {
+	display: none;
+	}
+
+#f-viewcount {display: none;}
+
+.hiddenStructure {
+    display: none;
+}
+
+#column-content {
+	margin: 3px;
+}

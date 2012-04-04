@@ -1,0 +1,155 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328105765 -14400
+Bug 53818 - Allow optional shifting of included template/article heading levels
+Bug 75714 - Remove \n\n before special page inclusion
+
+diff -r 6b6371ec1416 -r ce6c7b69cae7 includes/parser/Parser.php
+--- includes/parser/Parser.php
++++ includes/parser/Parser.php
+@@ -2924,6 +2924,7 @@
+ 	 *  $piece['title']: the title, i.e. the part before the |
+ 	 *  $piece['parts']: the parameter array
+ 	 *  $piece['lineStart']: whether the brace was at the start of a line
++	 *  $piece['headLevel']: the shift value for all heading levels
+ 	 * @param $frame PPFrame The current frame, contains template arguments
+ 	 * @return String: the text of the template
+ 	 * @private
+@@ -2941,6 +2942,10 @@
+ 		$isChildObj = false;        # $text is a DOM node needing expansion in a child frame
+ 		$isLocalObj = false;        # $text is a DOM node needing expansion in the current frame
+ 
++		if ( empty( $piece['headLevel'] ) ) {
++			$piece['headLevel'] = 0;
++		}
++
+ 		# Title object, where $text came from
+ 		$title = false;
+ 
+@@ -3187,22 +3192,22 @@
+ 			$newFrame = $frame->newChild( $args, $title );
+ 
+ 			if ( $nowiki ) {
+-				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG );
++				$text = $newFrame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
+ 			} elseif ( $titleText !== false && $newFrame->isEmpty() ) {
+ 				# Expansion is eligible for the empty-frame cache
+ 				if ( isset( $this->mTplExpandCache[$titleText] ) ) {
+ 					$text = $this->mTplExpandCache[$titleText];
+ 				} else {
+-					$text = $newFrame->expand( $text );
++					$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
+ 					$this->mTplExpandCache[$titleText] = $text;
+ 				}
+ 			} else {
+ 				# Uncached expansion
+-				$text = $newFrame->expand( $text );
++				$text = $newFrame->expand( $text, 0, $piece['headLevel'] );
+ 			}
+ 		}
+ 		if ( $isLocalObj && $nowiki ) {
+-			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG );
++			$text = $frame->expand( $text, PPFrame::RECOVER_ORIG, $piece['headLevel'] );
+ 			$isLocalObj = false;
+ 		}
+ 
+@@ -3210,7 +3215,7 @@
+ 		# Add a blank line preceding, to prevent it from mucking up
+ 		# immediately preceding headings
+ 		if ( $isHTML ) {
+-			$text = "\n\n" . $this->insertStripItem( $text );
++			$text = "\n" . $this->insertStripItem( $text );
+ 		} elseif ( $nowiki && ( $this->ot['html'] || $this->ot['pre'] ) ) {
+ 			# Escape nowiki-style return values
+ 			$text = wfEscapeWikiText( $text );
+diff -r 6b6371ec1416 -r ce6c7b69cae7 includes/parser/Preprocessor_DOM.php
+--- includes/parser/Preprocessor_DOM.php
++++ includes/parser/Preprocessor_DOM.php
+@@ -320,6 +320,12 @@
+ 					continue;
+ 				}
+ 
++				if ( strtolower( substr( $text, $i, strlen( '<enableheadshift>' ) ) ) == '<enableheadshift>' ) {
++					$accum .= '<enableHeadShift><ignore>&lt;enableheadshift&gt;</ignore></enableHeadShift>';
++					$i += strlen( '<enableheadshift>' );
++					continue;
++				}
++
+ 				// Determine element name
+ 				if ( !preg_match( $elementsRegex, $text, $matches, 0, $i + 1 ) ) {
+ 					// Element name missing or not listed
+@@ -891,7 +897,6 @@
+ 	 */
+ 	var $depth;
+ 
+-
+ 	/**
+ 	 * Construct a new preprocessor frame.
+ 	 * @param $preprocessor Preprocessor The parent preprocessor
+@@ -951,7 +956,7 @@
+ 	 * @param $flags int
+ 	 * @return string
+ 	 */
+-	function expand( $root, $flags = 0 ) {
++	function expand( $root, $flags = 0, $headshift = 0 ) {
+ 		static $expansionDepth = 0;
+ 		if ( is_string( $root ) ) {
+ 			return $root;
+@@ -978,6 +983,8 @@
+ 		$outStack = array( '', '' );
+ 		$iteratorStack = array( false, $root );
+ 		$indexStack = array( 0, 0 );
++		$headlevel = $headshift;
++		$headshift_enabled = false;
+ 
+ 		while ( count( $iteratorStack ) > 1 ) {
+ 			$level = count( $outStack ) - 1;
+@@ -1025,8 +1032,40 @@
+ 			} elseif ( is_array( $contextNode ) || $contextNode instanceof DOMNodeList ) {
+ 				$newIterator = $contextNode;
+ 			} elseif ( $contextNode instanceof DOMNode ) {
++				if ( $contextNode->nodeName == 'h' ) {
++					# Remember heading levels
++					$mn = $contextNode->attributes->getNamedItem( 'level' );
++					if ( $mn ) {
++						if ( $headshift > 0 && $headshift_enabled ) {
++							$mn->value = 0+$headshift+$mn->value;
++							$headshiftlocal = $headshift;
++							if ( $mn->value > 6 ) {
++								$headshiftlocal = $headshift-$mn->value+6;
++								$mn->value = 6;
++							}
++							if ( $contextNode->childNodes->length <= 1 ) {
++								$contextNode->nodeValue =
++									str_repeat( '=', $headshiftlocal ) .
++									trim( $contextNode->nodeValue ) .
++									str_repeat( '=', $headshiftlocal );
++							} else {
++								$contextNode->childNodes->item( 0 )->nodeValue =
++									str_repeat( '=', $headshiftlocal ) .
++									trim( $contextNode->childNodes->item( 0 )->nodeValue );
++								$contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue =
++									trim( $contextNode->childNodes->item( $contextNode->childNodes->length-1 )->nodeValue ) .
++									str_repeat( '=', $headshiftlocal );
++							}
++						}
++						$headlevel = 0+$mn->value;
++					}
++				}
+ 				if ( $contextNode->nodeType == XML_TEXT_NODE ) {
+ 					$out .= $contextNode->nodeValue;
++				} elseif ( $contextNode->nodeName == 'enableHeadShift' ) {
++					$headshift_enabled = true;
++					# Generic recursive expansion
++					$newIterator = $contextNode->childNodes;
+ 				} elseif ( $contextNode->nodeName == 'template' ) {
+ 					# Double-brace expansion
+ 					$xpath = new DOMXPath( $contextNode->ownerDocument );
+@@ -1038,6 +1077,7 @@
+ 					} else {
+ 						$lineStart = $contextNode->getAttribute( 'lineStart' );
+ 						$params = array(
++							'headLevel' => $headlevel,
+ 							'title' => new PPNode_DOM( $title ),
+ 							'parts' => new PPNode_DOM( $parts ),
+ 							'lineStart' => $lineStart );
