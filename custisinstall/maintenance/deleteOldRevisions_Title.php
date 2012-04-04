@@ -62,7 +62,10 @@ foreach ($orig_argv as $page)
                 $new_argv[] = $id;
             }
             else
+            {
                 print "    $page does not exist\n";
+                exit;
+            }
         }
     }
     else

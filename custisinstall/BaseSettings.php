@@ -111,7 +111,6 @@ require_once($IP.'/extensions/DocExport/DocExport.php');
 require_once($IP.'/extensions/CustisScripts/CustisScripts.php');
 require_once($IP.'/extensions/BatchEditor/BatchEditor.php');
 require_once($IP.'/extensions/MarkupBabel/MarkupBabel.php');
-require_once($IP.'/extensions/AnyWikiDraw/AnyWikiDraw.php');
 require_once($IP.'/extensions/CategoryTemplate/CategoryTemplate.php');
 require_once($IP.'/extensions/DeleteBatch/DeleteBatch.php');
 require_once($IP.'/extensions/FullLocalImage.php');
@@ -263,11 +262,11 @@ $wgOpenSearchTemplate  = true;
 // Don't purge recent changes... (keep them for 50 years)
 $wgRCMaxAge = 50 * 365 * 86400;
 
-$wgGroupPermissions['*']['delete'] = true;
-$wgGroupPermissions['*']['undelete'] = true;
-$wgGroupPermissions['*']['upload_by_url'] = true;
-$wgGroupPermissions['*']['import'] = true;
-$wgGroupPermissions['*']['importupload'] = true;
+$wgGroupPermissions['user']['delete'] = true;
+$wgGroupPermissions['user']['undelete'] = true;
+$wgGroupPermissions['user']['upload_by_url'] = true;
+$wgGroupPermissions['user']['import'] = true;
+$wgGroupPermissions['user']['importupload'] = true;
 $wgGroupPermissions['sysop']['deletebatch'] = true;
 
 // Default settings for Sphinx search

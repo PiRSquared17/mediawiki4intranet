@@ -23,7 +23,7 @@ function wfFLImage() {
 }
 
 class wgFLImageFuncts {
-	function getImage( $name ) {
+	static function getImage( $name ) {
 		$title = Title::makeTitleSafe( NS_FILE, $name );
 		if ( is_object( $title ) ) {
 			$img = wfFindFile( $title );
@@ -35,16 +35,15 @@ class wgFLImageFuncts {
 			return null;
 		}
 	}
-	function Localimage ( &$parser, $name = '', $arg = null ) {
+	static function Localimage ( &$parser, $name = '', $arg = null ) {
 		$img = self::getImage( $name );
-		if( $img != NULL )
-		{
+		if( $img != NULL ) {
 			$parser->mOutput->addImage($img->title->getDBkey());
 			return $img->getURL();
 		}
 		return '';
 	}
-	function Fullimage( &$parser, $name = '', $arg = null ) {
+	static function Fullimage( &$parser, $name = '', $arg = null ) {
 		global $wgServer;
 		$img = self::getImage( $name );
 		if( !$img ) return '';
