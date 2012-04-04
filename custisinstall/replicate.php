@@ -298,7 +298,8 @@ function replicate($src, $dest)
     // Login into source wiki
     login_into($src, 'source wiki');
     // Read page list for replication
-    $text = page_list($src, $src['category'], $src['notcategory'], $since_time, $ignore_since_images);
+    $text = page_list($src, $src['category'], isset($src['notcategory']) ? $src['notcategory'] : false,
+        $since_time, $ignore_since_images);
     if (!$text)
         throw new ReplicateException("No pages need replication in source wiki");
     $ts = microtime(true);

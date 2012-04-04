@@ -56,12 +56,13 @@ EOT;
     if ($wgMonobookOverrideLeftColumnWidth)
     {
         $html .= "<style type=\"text/css\" media=\"screen\">
-#column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-#content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-.portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
-#p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em; }
-#p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em; }
-#p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em; }
+#column-content { margin: 0 0 .6em -".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+#content { margin: 2.8em 0 0 ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+.portlet { width: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
+#p-personal { width: 100% !important; }
+#p-logo { width: ".$wgMonobookOverrideLeftColumnWidth."em !important; }
+#p-logo a, #p-logo a:hover { width: ".($wgMonobookOverrideLeftColumnWidth+0.2)."em !important; }
+#p-cactions { left: ".($wgMonobookOverrideLeftColumnWidth-0.4)."em !important; }
 </style>\n";
     }
     $out->addScript($html);
@@ -156,7 +157,7 @@ function efcustis_get_subcategories($dbr, $dbkey)
     return $cat;
 }
 
-function get_category_page_list ($categoryname)
+function get_category_page_list($categoryname)
 {
     $cattitle = Title::newFromText($categoryname, NS_CATEGORY);
     $dbr = wfGetDB(DB_SLAVE);
@@ -191,9 +192,15 @@ function efMigrateUserOptions($updater = null)
 {
     global $wgUpdates;
     if ($updater)
+    {
         $updater->addExtensionUpdate(array('efDoMigrateUserOptions'));
+        $updater->addExtensionUpdate(array('efDoGroupLength'));
+    }
     else
+    {
         $wgUpdates['mysql'][] = 'efDoMigrateUserOptions';
+        $wgUpdates['mysql'][] = 'efDoGroupLength';
+    }
     return true;
 }
 
@@ -209,6 +216,7 @@ function efDoMigrateUserOptions()
         array( 'user_properties' => array( 'LEFT JOIN', array( 'up_user=user_id' ) ) )
     );
     $nusers = 0;
+    $migrate = array();
     foreach ( $res as $o ) {
         if ( trim( $o->user_options ) ) {
             $nusers++;
@@ -225,4 +233,19 @@ function efDoMigrateUserOptions()
 
     $dbw->insert( 'user_properties', $migrate, __METHOD__ );
     print "migrated for $nusers users\n";
+}
+
+function efDoGroupLength()
+{
+    $dbw = wfGetDB(DB_MASTER);
+    $dbw->query(
+        'ALTER TABLE '.$dbw->tableName('user_groups').
+        ' CHANGE ug_group ug_group VARBINARY(32) NOT NULL',
+        __FUNCTION__
+    );
+    $dbw->query(
+        'ALTER TABLE '.$dbw->tableName('user_former_groups').
+        ' CHANGE ufg_group ufg_group VARBINARY(32) NOT NULL',
+        __FUNCTION__
+    );
 }

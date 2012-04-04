@@ -38,7 +38,6 @@ $EXT_WIKIMEDIA_TRUNK = explode(' ',
 $EXT_OUR = array_map('trim', explode("\n",
     "AllNsSuggest
     AllowGetParamsInWikilinks
-    AnyWikiDraw
     BatchEditor
     BugzillaBuglist
     Calendar
@@ -76,7 +75,6 @@ $EXT_OUR = array_map('trim', explode("\n",
     SphinxSearch
     SphinxSearchEngine
     SupaMW
-    SVNIntegration
     SWFUpload
     TemplatedPageList
     UserMagic

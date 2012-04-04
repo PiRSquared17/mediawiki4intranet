@@ -82,7 +82,7 @@ class SupaMW {
 }
 
 class SUPAField extends HTMLTextField {
-    function getLabelHtml() {
+    function getLabelHtml( $attr = array() ) {
         $id = "wpSourceType{$this->mParams['upload-type']}";
         $label = Html::rawElement( 'label', array( 'for' => $id ), $this->mLabel );
 
