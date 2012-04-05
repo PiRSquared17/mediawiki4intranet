@@ -183,8 +183,7 @@ MediawikiQuizzer::setupNamespace(104);
 
 # Wikilog
 require_once($IP.'/extensions/Wikilog/Wikilog.php');
-define('NS_BLOG', 100);
-Wikilog::setupNamespace(NS_BLOG, 'Блог', 'Обсуждение_блога');
+Wikilog::setupBlogNamespace(100);
 $wgWikilogPagerDateFormat = 'ymd hms';
 $wgNamespacesToBeSearchedDefault[NS_BLOG] = 1;
 $wgWikilogMaxCommentSize = 0x7FFFFFFF;
