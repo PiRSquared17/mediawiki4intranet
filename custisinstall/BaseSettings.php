@@ -103,6 +103,7 @@ $wgSubcategorizedAlwaysExclude = array('CustisWikiToLib',
 
 $wgGroupPermissions['*']['interwiki'] = false;
 $wgGroupPermissions['sysop']['interwiki'] = true;
+$wgGroupPermissions['sysop']['override-export-depth'] = true;
 
 require_once($IP.'/extensions/Interwiki/Interwiki.php');
 require_once($IP.'/extensions/WikiCategoryTagCloud/WikiCategoryTagCloud.php');
