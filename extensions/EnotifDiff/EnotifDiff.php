@@ -25,10 +25,10 @@ $wgHooks['EnotifPersonalizeMailtext'][] = '_enotifdiff_personalize_mailtext';
 $wgHooks['EnotifUserCondition'][] = '_enotifdiff_user_condition';
 $wgExtensionMessagesFiles['EnotifDiff'] = dirname(__FILE__) . '/EnotifDiff.i18n.php';
 $wgExtensionCredits['other'][] = array (
-    'name'        => 'Differences in Enotify mail',
-    'description' => 'Your MediaWiki will get an ability to send page diffs in enotify mail messages',
+    'name'        => 'Page differences in Enotify mail',
+    'description' => 'An ability to send page diffs in enotify mail messages',
     'author'      => 'Vitaliy Filippov',
-    'url'         => 'http://lib.custis.ru/EnotifDiff',
+    'url'         => 'http://wiki.4intra.net/EnotifDiff',
     'version'     => '1.0.2 (2011-02-04), for MediaWiki 1.16',
 );
 
