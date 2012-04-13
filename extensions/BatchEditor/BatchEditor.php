@@ -196,7 +196,7 @@ function wfSpecialBatchEditor($par = null)
             }
             elseif (!$a_create)
             {
-                $wgOut->addWikiText("== [[$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
+                $wgOut->addWikiText("== [[:$s_title]] ==\n".wfMsg('batcheditor-not-found', $s_title));
                 continue;
             }
             $newtext = $oldtext;
@@ -220,7 +220,7 @@ function wfSpecialBatchEditor($par = null)
                     $wgOut->addModules('mediawiki.action.history.diff');
                 else
                     $wgOut->addStyle('common/diff.css');
-                $wgOut->addWikiText("== [[$s_title]] ==");
+                $wgOut->addWikiText("== [[:$s_title]] ==");
                 $canedit = $article->getTitle()->userCan('edit');
                 if (!$canedit)
                     $wgOut->addWikiText('<div style="color:red">\'\'\''.wfMsg('batcheditor-edit-denied').'\'\'\'</div>');
