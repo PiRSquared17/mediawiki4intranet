@@ -264,7 +264,7 @@ class SpecialOpenIDLogin extends SpecialOpenID {
 				$fullname = $sreg['fullname'];
 			}
 
-			if ( array_key_exists( 'http://axschema.org/namePerson/first', $ax ) || array_key_exists( 'http://axschema.org/namePerson/last', $ax ) ) {
+			if ( $ax && ( array_key_exists( 'http://axschema.org/namePerson/first', $ax ) || array_key_exists( 'http://axschema.org/namePerson/last', $ax ) ) ) {
 				$fullname = $ax['http://axschema.org/namePerson/first'][0] . " " . $ax['http://axschema.org/namePerson/last'][0];
 			}
 
