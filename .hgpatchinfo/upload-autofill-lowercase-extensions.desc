@@ -1,2 +1,3 @@
 Make file extensions lower-case in upload form autofill JS
 Bug 68017 - Configurable maximum filename length in image galleries
+Bug 97259 - Limit thumbnail file names to 255 characters
