@@ -1,10 +1,25 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1327949112 -14400
+# Date 1334659500 -14400
 Make file extensions lower-case in upload form autofill JS
 Bug 68017 - Configurable maximum filename length in image galleries
+Bug 97259 - Limit thumbnail file names to 255 characters
 
-diff -r 6b6371ec1416 -r f46aa146b760 skins/common/upload.js
+diff -r b6139b507754 -r 148358678505 includes/filerepo/File.php
+--- includes/filerepo/File.php
++++ includes/filerepo/File.php
+@@ -619,6 +619,10 @@
+ 		$extension = $this->getExtension();
+ 		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType(), $params );
+ 		$thumbName = $this->handler->makeParamString( $params ) . '-' . $name;
++		if ( strlen( $thumbName ) + strlen( $thumbExt ) > 254 ) {
++			// Hardcode max filename length to 255 characters - this is the limit for most filesystems
++			$thumbName = substr( $thumbName, 0, 254 - strlen( $thumbExt ) );
++		}
+ 		if ( $thumbExt != $extension ) {
+ 			$thumbName .= ".$thumbExt";
+ 		}
+diff -r b6139b507754 -r 148358678505 skins/common/upload.js
 --- skins/common/upload.js
 +++ skins/common/upload.js
 @@ -226,6 +226,10 @@
