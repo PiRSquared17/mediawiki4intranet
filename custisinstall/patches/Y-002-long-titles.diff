@@ -1,0 +1,60 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1328119423 -14400
+Depends on: Y-000-detailed-badtitle.diff
+
+Bug 90260 - Allow to raise page title length limit
+
+diff -r 0a11b67be7be -r b1b654b57138 includes/DefaultSettings.php
+--- includes/DefaultSettings.php
++++ includes/DefaultSettings.php
+@@ -1767,6 +1767,11 @@
+  */
+ $wgVaryOnXFP = false;
+ 
++# Maximum number of bytes in titles. 255 by default, but even in MySQL,
++# you can change page.page_title to VARBINARY(767) and raise this value to 767.
++# (767 is the maximum size for an index key in InnoDB)
++$wgMaxTitleBytes	= 255;
++
+ /**
+  * Internal server name as known to Squid, if different. Example:
+  * <code>
+diff -r 0a11b67be7be -r b1b654b57138 includes/Title.php
+--- includes/Title.php
++++ includes/Title.php
+@@ -2657,6 +2657,7 @@
+ 	 */
+ 	private function secureAndSplit() {
+ 		global $wgContLang, $wgLocalInterwiki;
++		global $wgMaxTitleBytes;
+ 		$this->mBadtitleError = NULL;
+ 
+ 		# Initialisation
+@@ -2804,13 +2805,19 @@
+ 			return false;
+ 		}
+ 
+-		# Limit the size of titles to 255 bytes. This is typically the size of the
+-		# underlying database field. We make an exception for special pages, which
+-		# don't need to be stored in the database, and may edge over 255 bytes due
+-		# to subpage syntax for long titles, e.g. [[Special:Block/Long name]]
+-		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = 255 ) ) ||
+-		  strlen( $dbkey ) > ( $max = 512 ) )
+-		{
++		/**
++		 * Limit the size of titles to $wgMaxTitleBytes bytes.
++		 * It is set to 255 by default - this is typically the size of the underlying database field.
++		 * We make an exception for special pages, which don't need to be stored
++		 * in the database, and may edge over this limit due to subpage syntax
++		 * for long titles, e.g. [[Special:Block/Long name]]
++		 *
++		 * Really, even in MySQL you can use VARBINARY(767) for page.page_title.
++		 * 767 is the maximum size for an index key in InnoDB.
++		 * So the limit is made configurable in MediaWiki4Intranet.
++		 */
++		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = $wgMaxTitleBytes ) ) ||
++		  strlen( $dbkey ) > ( $max = $wgMaxTitleBytes*2 ) ) {
+ 			$chop = substr( $dbkey, 0, $max+1 );
+ 			$chop = mb_substr( $chop, 0, mb_strlen( $chop ) - 1 );
+ 			$this->mBadtitleError = array( 'title-invalid-too-long', array( $max, $chop ) );

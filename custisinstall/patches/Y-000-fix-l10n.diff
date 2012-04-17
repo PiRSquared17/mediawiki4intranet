@@ -1,0 +1,60 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1333622487 -14400
+Bug 73938 - YMD HMS date format
+Bug 92689 - Allow localisable namespaces (stock MW doesn't allow them)
+
+diff -r b6139b507754 -r ca8ff6e5cfa8 includes/specials/SpecialUserlogin.php
+--- includes/specials/SpecialUserlogin.php
++++ includes/specials/SpecialUserlogin.php
+@@ -976,8 +976,8 @@
+ 			$linkq .= '&uselang=' . $this->mLanguage;
+ 		}
+ 
+-		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalURL( $linkq ) ) . '">';
+-		$link .= wfMsgHtml( $linkmsg . 'link' ); # Calling either 'gotaccountlink' or 'nologinlink'
++		$link = '<a href="' . htmlspecialchars ( $titleObj->getLocalUrl( $linkq ) ) . '">';
++		$link .= wfMsgExt( $linkmsg . 'link', array( 'parseinline' ) ); # Calling either 'gotaccountlink' or 'nologinlink'
+ 		$link .= '</a>';
+ 
+ 		# Don't show a "create account" link if the user can't
+diff -r b6139b507754 -r ca8ff6e5cfa8 languages/Language.php
+--- languages/Language.php
++++ languages/Language.php
+@@ -289,12 +289,12 @@
+ 	 */
+ 	function getNamespaces() {
+ 		if ( is_null( $this->namespaceNames ) ) {
+-			global $wgMetaNamespace, $wgMetaNamespaceTalk, $wgExtraNamespaces;
++			global $wgMetaNamespace, $wgMetaNamespaceTalk;
+ 
+ 			$this->namespaceNames = self::$dataCache->getItem( $this->mCode, 'namespaceNames' );
+ 			$validNamespaces = MWNamespace::getCanonicalNamespaces();
+ 
+-			$this->namespaceNames = $wgExtraNamespaces + $this->namespaceNames + $validNamespaces;
++			$this->namespaceNames = $this->namespaceNames + $validNamespaces;
+ 
+ 			$this->namespaceNames[NS_PROJECT] = $wgMetaNamespace;
+ 			if ( $wgMetaNamespaceTalk ) {
+diff -r b6139b507754 -r ca8ff6e5cfa8 languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -128,6 +128,7 @@
+ 	'mdy',
+ 	'dmy',
+ 	'ymd',
++	'ymd hms',
+ 	'ISO 8601',
+ );
+ 
+@@ -174,6 +175,10 @@
+ 	'ISO 8601 time' => 'xnH:xni:xns',
+ 	'ISO 8601 date' => 'xnY-xnm-xnd',
+ 	'ISO 8601 both' => 'xnY-xnm-xnd"T"xnH:xni:xns',
++
++	'ymd hms time' => 'xnH:xni:xns',
++	'ymd hms date' => 'xnY-xnm-xnd',
++	'ymd hms both' => 'xnY-xnm-xnd" "xnH:xni:xns',
+ );
+ 
+ /**

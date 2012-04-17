@@ -1,0 +1,31 @@
+/*
+-----------------------------------------------------
+MediaWiki 'custis' style sheet for CSS2-capable browsers
+FileName:   $Id$
+Author:		stas-fomin@yandex.ru
+-----------------------------------------------------
+*/
+
+/* BEGIN user notifications */
+.usermessage {
+    background-color: #ffce7b; /* yellow */
+    border: 1px solid #ffa500; /* orange */
+    color: Black;
+    font-weight: bold;
+    margin: 2em 0em 1em 0em;
+    padding: 0.5em 1em;
+    vertical-align: middle;
+}
+
+#siteNotice {
+    font-size: 95%;
+    padding: 0 0.9em 0 0.9em;
+    text-align: center;
+	}
+
+#siteNotice p {margin: 0; padding: 0;}
+
+#siteNotice div.paragraph {margin: 0; padding: 0;}
+
+.error {color: red; font-size: larger;}
+/* END user notifications */

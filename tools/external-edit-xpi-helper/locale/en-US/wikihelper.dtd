@@ -1,0 +1,9 @@
+<!ENTITY wikihelper.error          "Invalid helper file from MediaWiki: line URL=... or line Script=... not found">
+<!ENTITY wikihelper.enterpath      "Enter path to an editor:">
+<!ENTITY wikihelper.editornotfound "Editor XXX not found!">
+<!ENTITY wikihelper.notexecutable  "File XXX is not executable!">
+<!ENTITY wikihelper.ecommenttitle  "Enter revision comment">
+<!ENTITY wikihelper.entercomment   "Please enter a comment for this change:">
+<!ENTITY wikihelper.defaultcomment "Changed a file">
+<!ENTITY wikihelper.ok             "OK">
+<!ENTITY wikihelper.cancel         "Cancel">
