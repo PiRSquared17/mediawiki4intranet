@@ -1,0 +1,1 @@
+Bug 67208 - Always send redirect instead of POST when URL is <= 2048 bytes; Bug 85659 - OpenID prompt on login

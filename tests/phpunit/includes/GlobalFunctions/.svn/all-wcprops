@@ -1,0 +1,29 @@
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/GlobalFunctions
+END
+wfUrlencodeTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/GlobalFunctions/wfUrlencodeTest.php
+END
+wfExpandUrl.php
+K 25
+svn:wc:ra_dav:version-url
+V 111
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/GlobalFunctions/wfExpandUrl.php
+END
+GlobalTest.php
+K 25
+svn:wc:ra_dav:version-url
+V 110
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/GlobalFunctions/GlobalTest.php
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 102
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/phpunit/includes/GlobalFunctions/README
+END
