@@ -1,25 +1,79 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1334659500 -14400
+# Date 1334756353 -14400
 Make file extensions lower-case in upload form autofill JS
 Bug 68017 - Configurable maximum filename length in image galleries
 Bug 97259 - Limit thumbnail file names to 255 characters
 
-diff -r b6139b507754 -r 148358678505 includes/filerepo/File.php
---- includes/filerepo/File.php
-+++ includes/filerepo/File.php
-@@ -619,6 +619,10 @@
- 		$extension = $this->getExtension();
- 		list( $thumbExt, $thumbMime ) = $this->handler->getThumbType( $extension, $this->getMimeType(), $params );
- 		$thumbName = $this->handler->makeParamString( $params ) . '-' . $name;
-+		if ( strlen( $thumbName ) + strlen( $thumbExt ) > 254 ) {
-+			// Hardcode max filename length to 255 characters - this is the limit for most filesystems
-+			$thumbName = substr( $thumbName, 0, 254 - strlen( $thumbExt ) );
-+		}
- 		if ( $thumbExt != $extension ) {
- 			$thumbName .= ".$thumbExt";
+diff -r b6139b507754 -r d9cf6e748edb includes/specials/SpecialUpload.php
+--- includes/specials/SpecialUpload.php
++++ includes/specials/SpecialUpload.php
+@@ -574,6 +574,9 @@
+ 				$this->showRecoverableUploadError( wfMsgExt( 'illegalfilename',
+ 					'parseinline', $details['filtered'] ) );
+ 				break;
++			case UploadBase::FILENAME_TOO_LONG:
++				$this->showRecoverableUploadError( wfMsgHtml( 'filename-toolong' ) );
++				break;
+ 			case UploadBase::FILETYPE_MISSING:
+ 				$this->showRecoverableUploadError( wfMsgExt( 'filetype-missing',
+ 					'parseinline' ) );
+diff -r b6139b507754 -r d9cf6e748edb includes/upload/UploadBase.php
+--- includes/upload/UploadBase.php
++++ includes/upload/UploadBase.php
+@@ -37,6 +37,7 @@
+ 	const HOOK_ABORTED = 11;
+ 	const FILE_TOO_LARGE = 12;
+ 	const WINDOWS_NONASCII_FILENAME = 13;
++	const FILENAME_TOO_LONG = 14;
+ 
+ 	public function getVerificationErrorCode( $error ) {
+ 		$code_to_status = array(self::EMPTY_FILE => 'empty-file',
+@@ -49,6 +50,7 @@
+ 								self::VERIFICATION_ERROR => 'verification-error',
+ 								self::HOOK_ABORTED =>  'hookaborted',
+ 								self::WINDOWS_NONASCII_FILENAME => 'windows-nonascii-filename',
++								self::FILENAME_TOO_LONG => 'filename-toolong',
+ 		);
+ 		if( isset( $code_to_status[$error] ) ) {
+ 			return $code_to_status[$error];
+@@ -617,6 +619,13 @@
+ 			$this->mFilteredName = $this->mDesiredDestName;
  		}
-diff -r b6139b507754 -r 148358678505 skins/common/upload.js
+ 
++		# oi_archive_name is max 255 bytes, which include a timestamp and an
++		# exclamation mark, so restrict file name to 240 bytes.
++		if ( strlen( $this->mFilteredName ) > 240 ) {
++			$this->mTitleError = self::FILENAME_TOO_LONG;
++			return $this->mTitle = null;
++		}
++
+ 		/**
+ 		 * Chop off any directories in the given filename. Then
+ 		 * filter out illegal characters, and try to make a legible name
+diff -r b6139b507754 -r d9cf6e748edb languages/messages/MessagesEn.php
+--- languages/messages/MessagesEn.php
++++ languages/messages/MessagesEn.php
+@@ -2106,6 +2106,7 @@
+ 'minlength1'                  => 'Filenames must be at least one letter.',
+ 'illegalfilename'             => 'The filename "$1" contains characters that are not allowed in page titles.
+ Please rename the file and try uploading it again.',
++'filename-toolong'            => 'Filenames may not be longer than 240 bytes.',
+ 'badfilename'                 => 'Filename has been changed to "$1".',
+ 'filetype-mime-mismatch'      => 'File extension ".$1" does not match the detected MIME type of the file ($2).',
+ 'filetype-badmime'            => 'Files of the MIME type "$1" are not allowed to be uploaded.',
+diff -r b6139b507754 -r d9cf6e748edb languages/messages/MessagesRu.php
+--- languages/messages/MessagesRu.php
++++ languages/messages/MessagesRu.php
+@@ -1671,6 +1671,7 @@
+ 'ignorewarnings'              => 'Игнорировать предупреждения',
+ 'minlength1'                  => 'Название файла должно содержать хотя бы одну букву.',
+ 'illegalfilename'             => 'Имя файла «$1» содержит символы, которые не разрешается использовать в заголовках. Пожалуйста, переименуйте файл и попытайтесь загрузить его снова.',
++'filename-toolong'            => 'Имена файлов не должны превышать 240 байт в длину.',
+ 'badfilename'                 => 'Название файла было изменено на $1.',
+ 'filetype-mime-mismatch'      => 'Расширение файла «.$1» не соответствует его MIME-типу ($2).',
+ 'filetype-badmime'            => 'Файлы, имеющие MIME-тип «$1», не могут быть загружены.',
+diff -r b6139b507754 -r d9cf6e748edb skins/common/upload.js
 --- skins/common/upload.js
 +++ skins/common/upload.js
 @@ -226,6 +226,10 @@
