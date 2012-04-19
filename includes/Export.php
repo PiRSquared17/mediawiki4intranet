@@ -681,11 +681,11 @@ class XmlDumpWriter {
 	}
 
 	/**
-	 * Return prefixed text form of title, but using the content language's
-	 * canonical namespace. This skips any special-casing such as gendered
+	 * Return prefixed text form of title, but using english namespace names.
+	 * This skips any special-casing such as gendered
 	 * user namespaces -- which while useful, are not yet listed in the
 	 * XML <siteinfo> data so are unsafe in export.
-	 * 
+	 *
 	 * @param Title $title
 	 * @return string
 	 */
@@ -694,8 +694,8 @@ class XmlDumpWriter {
 			return $title->getPrefixedText();
 		}
 
-		global $wgContLang;
-		$prefix = str_replace( '_', ' ', $wgContLang->getNsText( $title->getNamespace() ) );
+		global $wgCanonicalNamespaceNames;
+		$prefix = str_replace( '_', ' ', $wgCanonicalNamespaceNames[ $title->getNamespace() ] );
 
 		if ($prefix !== '') {
 			$prefix .= ':';
