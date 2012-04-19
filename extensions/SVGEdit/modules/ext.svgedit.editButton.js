@@ -22,7 +22,7 @@ $(document).ready(function() {
 		var trigger = function() {
 			mw.svgedit.open({
 				filename: wgTitle,
-				replace: '#file',
+				replace: (wgArticleId ? '#file' : '#mw-imagepage-nofile'),
 				onclose: function(filename) {
 					if (filename) {
 						// Saved! Refresh parent window...
@@ -48,11 +48,11 @@ $(document).ready(function() {
 		});
 
 		var button = $('<button></button>')
-			.text(mw.msg('svgedit-editbutton-edit'))
+			.text(mw.msg(wgArticleId ? 'svgedit-editbutton-edit' : 'svgedit-editbutton-create'))
 			.click(function() {
 				trigger();
 			});
-		$('.fullMedia').append(button);
+		$(wgArticleId ? '.fullMedia' : '#mw-imagepage-nofile').append(button);
 
 		if (window.location.hash.indexOf('!action=svgedit') != -1) {
 			window.location.hash = '';
