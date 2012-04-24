@@ -28,13 +28,6 @@ $wgAllowExternalImagesFrom = array(
     'http://plantime.office.custis.ru/'
 );
 
-$wgSMTP = array(
-    "host"   => 'localhost',
-    "IDHost" => 'custis.ru',
-    "port"   => "25",
-    "auth"   => false,
-);
-
 // Bug 57350 - PDF and Djvu (UNIX only)
 require_once($IP.'/extensions/PdfHandler/PdfHandler.php');
 
