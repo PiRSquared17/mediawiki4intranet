@@ -1,10 +1,27 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1327949524 -14400
+# Date 1335967617 -14400
 Bug 56653
 Debug wfMsgExt to remove UNIQ____QINU
 
-diff -r 6b6371ec1416 -r 81d848dbc3e1 includes/parser/Parser.php
+diff -r b6139b507754 -r 3a20114dfb20 includes/cache/MessageCache.php
+--- includes/cache/MessageCache.php
++++ includes/cache/MessageCache.php
+@@ -806,7 +806,12 @@
+ 				# Uncloneable
+ 				$this->mParser = new $class( $wgParserConf );
+ 			} else {
+-				$this->mParser = clone $wgParser;
++				# Deep clone is more safe - for example, Cite extension
++				# stores its state in an object property, which is not cloned
++				# and therefore is reset on clearState().
++				# And so, all citations are lost when something that calls
++				# wfMsg() ( not wfMsgExt() ) is included.
++				$this->mParser = unserialize( serialize( $wgParser ) );
+ 			}
+ 		}
+ 		return $this->mParser;
+diff -r b6139b507754 -r 3a20114dfb20 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -270,9 +270,10 @@
