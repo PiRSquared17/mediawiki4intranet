@@ -1,1 +1,2 @@
 Bug 77150 - Check refsNoReferences only when clearState == true
+Bug 98667 - Append <references /> automatically instead of croaking
