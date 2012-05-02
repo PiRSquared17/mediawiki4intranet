@@ -1,21 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1331126657 -14400
+# Date 1335966516 -14400
 Bug 95417, MediaWikiBug 35032 - fix UploadFromStash by backporting it from trunk r105822
 
-diff -r b6139b507754 -r 5006d855c68e includes/upload/.svn/entries
---- includes/upload/.svn/entries
-+++ includes/upload/.svn/entries
-@@ -1,7 +1,7 @@
- 10
- 
- dir
--110002
-+113226
- http://svn.wikimedia.org/svnroot/mediawiki/tags/REL1_18_1/phase3/includes/upload
- http://svn.wikimedia.org/svnroot/mediawiki
- 
-diff -r b6139b507754 -r 5006d855c68e includes/upload/UploadFromStash.php
+diff -r b6139b507754 -r 193e31007e98 includes/upload/UploadFromStash.php
 --- includes/upload/UploadFromStash.php
 +++ includes/upload/UploadFromStash.php
 @@ -9,13 +9,18 @@
@@ -175,7 +163,7 @@ diff -r b6139b507754 -r 5006d855c68e includes/upload/UploadFromStash.php
 -}
 \ No newline at end of file
 +}
-diff -r b6139b507754 -r 5006d855c68e includes/upload/UploadStash.php
+diff -r b6139b507754 -r 193e31007e98 includes/upload/UploadStash.php
 --- includes/upload/UploadStash.php
 +++ includes/upload/UploadStash.php
 @@ -10,6 +10,9 @@
