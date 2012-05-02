@@ -1,0 +1,6 @@
+K 13
+svn:externals
+V 92
+geshi https://geshi.svn.sourceforge.net/svnroot/geshi/tags/RELEASE_1_0_8_10/geshi-1.0.X/src
+
+END
