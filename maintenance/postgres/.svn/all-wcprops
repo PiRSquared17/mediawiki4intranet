@@ -1,0 +1,23 @@
+K 25
+svn:wc:ra_dav:version-url
+V 77
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres
+END
+compare_schemas.pl
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/compare_schemas.pl
+END
+tables.sql
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/tables.sql
+END
+mediawiki_mysql2postgres.pl
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/mediawiki_mysql2postgres.pl
+END
