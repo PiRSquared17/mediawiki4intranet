@@ -31,7 +31,7 @@ mw.svgedit = {
 		if ("filename" in options) {
 			// Get some basic info on the image before we go barrelling in...
 			mwSVG.fetchInfo(options.filename, function(imageinfo) {
-				mw.svgedit.openEditor(options, imageinfo);
+				mw.svgedit.openEditor(options, imageinfo || {});
 			});
 		} else {
 			mw.svgedit.openEditor(options, {});
@@ -60,7 +60,7 @@ mw.svgedit = {
 			url += '?dimensions=' + origWidth + ',' + origHeight;
 		}
 
-		var preferredHeight = origHeight + 180; // leave space for toolbars and UI inside the iframe
+		var preferredHeight = origHeight ? origHeight + 180 : 500; // leave space for toolbars and UI inside the iframe
 		var windowHeight = $(window).height() - 40; // leave space for our toolbar outside the iframe
 		var minHeight = Math.min(windowHeight, preferredHeight);
 		var initHeight = Math.max(minHeight, minHeight);
