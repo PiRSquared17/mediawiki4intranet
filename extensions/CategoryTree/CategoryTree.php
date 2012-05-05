@@ -395,7 +395,7 @@ function efSubcatCatOutputPageParserOutput(&$out, $parserOutput)
     return true;
 }
 
-function efSubcatCatParserBeforeInternalParse($parser, $text, $stripState)
+function efSubcatCatParserBeforeInternalParse($parser, &$text, $stripState)
 {
     if (MagicWord::get('nocategorysubcatlist')->matchAndRemove($text))
         $parser->mOutput->useSubcategorizedList = FALSE;
