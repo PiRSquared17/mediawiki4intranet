@@ -335,6 +335,7 @@ class PagedTiffImage {
 		}
 
 		$infos = null;
+		$state->prevPage = -1;
 		preg_match_all( '/\[BEGIN\](.+?)\[END\]/si', $dump, $infos, PREG_SET_ORDER );
 		foreach ( $infos as $info ) {
 			$state->resetPage();
