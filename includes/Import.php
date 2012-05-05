@@ -1162,7 +1162,7 @@ class WikiRevision {
 				# Broken file; delete it if it is a temporary file
 				unlink( $source );
 			}
-			wfDebug( __METHOD__ . ": Corrupt file $source.\n" );
+			wfDebug( __METHOD__ . ": Corrupt file $source ( $sha1 != ".sha1_file($source)." ).\n" );
 			return false;
 		}
 
