@@ -82,7 +82,7 @@ function MagicNumberedHeadingsLanguageGetMagic(&$magicWords, $langCode)
     return true;
 }
 
-function MagicNumberedHeadingsParserBeforeInternalParse($parser, $text, $stripState)
+function MagicNumberedHeadingsParserBeforeInternalParse($parser, &$text, $stripState)
 {
     if (MagicWord::get(MAG_NUMBEREDHEADINGS)->matchAndRemove($text))
         $parser->mOptions->mNumberHeadings = TRUE;
