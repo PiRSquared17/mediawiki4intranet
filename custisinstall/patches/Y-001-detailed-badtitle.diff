@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118462 -14400
+# Date 1336229347 -14400
 Bug 64385 - Detailed "invalid title" diagnostics for MediaWiki
 
-diff -r 56d1ccd40a5e -r 0a11b67be7be includes/Title.php
+diff -r eac88b619d9a -r 8f135a5a837c includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -83,6 +83,7 @@
@@ -132,7 +132,7 @@ diff -r 56d1ccd40a5e -r 0a11b67be7be includes/Title.php
  			return false;
  		}
  
-diff -r 56d1ccd40a5e -r 0a11b67be7be includes/Wiki.php
+diff -r eac88b619d9a -r 8f135a5a837c includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
 @@ -77,7 +77,11 @@
@@ -158,11 +158,11 @@ diff -r 56d1ccd40a5e -r 0a11b67be7be includes/Wiki.php
 +			if ( !$error ) {
 +				$error = array( 'badtitle' );
 +			}
-+			throw new ErrorPageError( $error[0], new Message( $error[0].'text', $error[1] ) );
++			throw new ErrorPageError( $error[0], new Message( $error[0].'text', isset( $error[1] ) ? $error[1] : array() ) );
  		// If the user is not logged in, the Namespace:title of the article must be in
  		// the Read array in order for the user to see it. (We have to check here to
  		// catch special pages etc. We check again in Article::view())
-diff -r 56d1ccd40a5e -r 0a11b67be7be languages/messages/MessagesEn.php
+diff -r eac88b619d9a -r 8f135a5a837c languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -946,6 +946,24 @@
@@ -190,7 +190,7 @@ diff -r 56d1ccd40a5e -r 0a11b67be7be languages/messages/MessagesEn.php
  # General errors
  'error'                => 'Error',
  'databaseerror'        => 'Database error',
-diff -r 56d1ccd40a5e -r 0a11b67be7be languages/messages/MessagesRu.php
+diff -r eac88b619d9a -r 8f135a5a837c languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -604,6 +604,24 @@

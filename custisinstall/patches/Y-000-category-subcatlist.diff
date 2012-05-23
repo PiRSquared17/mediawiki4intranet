@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328118283 -14400
+# Date 1336228722 -14400
 Bug 62054 -
   __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
   enable/disable "tag-like" page grouping based on their other categories,
   __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryPageSubclass.php
+diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
 @@ -49,4 +49,184 @@
@@ -194,7 +194,7 @@ diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryTree.php
+diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
 @@ -372,3 +372,36 @@
@@ -224,7 +224,7 @@ diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryTree.php
 +    return true;
 +}
 +
-+function efSubcatCatParserBeforeInternalParse($parser, $text, $stripState)
++function efSubcatCatParserBeforeInternalParse($parser, &$text, $stripState)
 +{
 +    if (MagicWord::get('nocategorysubcatlist')->matchAndRemove($text))
 +        $parser->mOutput->useSubcategorizedList = FALSE;
@@ -234,7 +234,7 @@ diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r 6b6371ec1416 -r da32ce6073b0 extensions/CategoryTree/SubcatCat.i18n.php
+diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,9 @@

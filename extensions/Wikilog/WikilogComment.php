@@ -322,8 +322,9 @@ class WikilogComment
 		foreach ( $to_ids as $id => $can_unsubcribe ) {
 			// Do not send user his own comments
 			if ( $id != $this->mUserID ) {
-				$email = new MailAddress( User::newFromId( $id )->getEmail() );
+				$email = User::newFromId( $id )->getEmail();
 				if ( $email ) {
+					$email = new MailAddress( $email );
 					if ( $can_unsubcribe ) {
 						$to_with[] = $email;
 					} else {
@@ -957,14 +958,12 @@ class WikilogCommentFormatter
 					'known'
 				);
 			}
-			if ( $this->mAllowModeration ) {
-				$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
-					wfMsg( 'wikilog-page-lc' ),
-					array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
-					array( 'section' => false ),
-					'known'
-				);
-			}
+			$tools['page'] = $this->mSkin->link( $comment->mCommentTitle,
+				wfMsg( 'wikilog-page-lc' ),
+				array( 'title' => wfMsg( 'wikilog-comment-page' ) ),
+				array( 'section' => false ),
+				'known'
+			);
 			// TODO: batch checking of page restrictions
 			if ( $comment->mCommentTitle->quickUserCan( 'edit' ) ) {
 				$tools['edit'] = $this->mSkin->link( $comment->mCommentTitle,

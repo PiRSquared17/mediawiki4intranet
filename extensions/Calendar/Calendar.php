@@ -32,19 +32,19 @@ $wgExtensionCredits['parserhook'][] = array(
 
 $path = dirname(__FILE__);
 
-$wgExtensionFunctions[] = "wfCalendarExtension";
 $wgExtensionMessagesFiles['wfCalendarExtension'] = "$path/Calendar.i18n.php";
 $wgAutoloadClasses['WikiCalendar'] = "$path/Calendar.class.php";
 $wgAutoloadClasses['CalendarCommon'] = "$path/Calendar.common.php";
 $wgAutoloadClasses['CalendarArticle'] = "$path/Calendar.class.php";
 $wgAutoloadClasses['CalendarArticles'] = "$path/Calendar.class.php";
+$wgHooks['ParserFirstCallInit'][] = 'wfRegisterCalendar';
 $wgHooks['UnknownAction'][] = 'wfCalendarUnknownAction';
 $wgAjaxExportList[] = 'wfCalendarLoadDay';
 
-function wfCalendarExtension()
+function wfRegisterCalendar($parser)
 {
-    global $wgParser;
-    $wgParser->setHook('calendar', 'wfCalendarDisplay');
+    $parser->setHook('calendar', 'wfCalendarDisplay');
+    return true;
 }
 
 function wfCalendarLoadDay($title, $date, $parstr)
@@ -85,7 +85,7 @@ function wfCalendarUnknownAction($action, $article)
         $params = $wgRequest->getValues();
         $t = $article->getTitle();
         $params['path'] = str_replace("\\", "/", dirname(__FILE__));
-        $params['title'] = Title::newFromText($t->prefix($t->getBaseText()));
+        $params['title'] = Title::makeTitleSafe($t->getNamespace(), $t->getBaseText());
         $params['name'] = $t->getSubpageText();
         $calendar->config($params);
         $calendar->renderFeed();

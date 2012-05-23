@@ -1,9 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1327949556 -14400
+# Date 1335962981 -14400
 Bug 77150 - Check refsNoReferences only when clearState == true
+Bug 98667 - Append <references /> automatically instead of croaking
 
-diff -r 6b6371ec1416 -r ac5283c41c2d extensions/Cite/Cite_body.php
+diff -r b6139b507754 -r 64b43f864056 extensions/Cite/Cite_body.php
 --- extensions/Cite/Cite_body.php
 +++ extensions/Cite/Cite_body.php
 @@ -1051,12 +1051,12 @@
@@ -22,7 +23,20 @@ diff -r 6b6371ec1416 -r ac5283c41c2d extensions/Cite/Cite_body.php
  			return true;
  		}
  
-diff -r 6b6371ec1416 -r ac5283c41c2d includes/parser/Parser.php
+@@ -1064,10 +1064,10 @@
+ 			if ( count( $refs ) == 0 ) {
+ 				continue;
+ 			}
+-			$text .= "\n<br />";
+ 			if ( $group == CITE_DEFAULT_GROUP ) {
+-				$text .= $this->error( 'cite_error_refs_without_references' );
++				$text .= "<hr />\n" . $this->references( NULL, array(), $parser );
+ 			} else {
++				$text .= "\n<br />";
+ 				$text .= $this->error( 'cite_error_group_refs_without_references', htmlspecialchars( $group ) );
+ 			}
+ 		}
+diff -r b6139b507754 -r 64b43f864056 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -397,7 +397,7 @@
