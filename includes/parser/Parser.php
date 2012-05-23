@@ -3253,6 +3253,10 @@ class Parser {
 			}
 			if ( $title ) {
 				$titleText = $title->getPrefixedText();
+				// CustIS Bug 70192 - named section transclusion
+				if ( $frag = $title->getFragment() ) {
+					$titleText .= '#' . $frag;
+				}
 				# Check for language variants if the template is not found
 				if ( $wgContLang->hasVariants() && $title->getArticleID() == 0 ) {
 					$wgContLang->findVariantLink( $part1, $title, true );
@@ -3408,11 +3412,12 @@ class Parser {
 	 */
 	function getTemplateDom( $title ) {
 		$cacheTitle = $title;
-		$titleText = $title->getPrefixedDBkey();
 
+		$titleText = $title->getPrefixedDBkey();
 		// CustIS Bug 70192 - named section transclusion
-		if ( $frag = $title->getFragment() )
+		if ( $frag = $title->getFragment() ) {
 			$titleText .= '#' . $frag;
+		}
 
 		if ( isset( $this->mTplRedirCache[$titleText] ) ) {
 			list( $ns, $dbk ) = $this->mTplRedirCache[$titleText];
@@ -3433,8 +3438,9 @@ class Parser {
 
 		$dom = $this->preprocessToDom( $text, self::PTD_FOR_INCLUSION );
 		// CustIS Bug 70192 - named section transclusion
-		if ( $frag )
+		if ( $frag ) {
 			$dom = $this->tryExtractNamedSection( $dom, $frag );
+		}
 		$this->mTplDomCache[ $titleText ] = $dom;
 
 		if ( !$title->equals( $cacheTitle ) ) {
@@ -3448,70 +3454,65 @@ class Parser {
 	/**
 	 * CustIS Bug 70192 - try to extract a named section from DOM Document
 	 */
-	function tryExtractNamedSection( $dom, $frag )
-	{
+	function tryExtractNamedSection( $dom, $frag ) {
 		$stack = array( array( $dom->node, 0 ) );
 		$foundlevel = false;
 		$newchild = NULL;
 		$newroot = NULL;
 		$content_started = false;
-		while( $stack )
-		{
+		while( $stack ) {
 			$ptr = &$stack[ count( $stack ) - 1 ];
-			if ( $ptr[1] >= $ptr[0]->childNodes->length )
-			{
+			if ( $ptr[1] >= $ptr[0]->childNodes->length ) {
 				array_pop( $stack );
-				if ( $foundlevel )
+				if ( $foundlevel ) {
 					$newchild = $newchild->parentNode;
+				}
 				continue;
 			}
 			$node = $ptr[0]->childNodes->item( $ptr[1] );
 			$ptr[1]++;
-			if ( !$foundlevel )
-			{
-				if ( $node->nodeName == 'h' )
-				{
+			if ( !$foundlevel ) {
+				if ( $node->nodeName == 'h' ) {
 					$h = $node->nodeValue;
 					$l = $node->getAttribute( 'level' );
 					$h = trim( substr( $h, $l, -$l ) );
-					if ( $h == $frag )
-					{
+					if ( $h == $frag ) {
 						$foundlevel = $l;
-						foreach ( $stack as $inside )
-						{
+						foreach ( $stack as $inside ) {
 							$el = $inside[0]->cloneNode();
-							if ( $newchild )
+							if ( $newchild ) {
 								$newchild->addChild( $el );
-							else
+							} else {
 								$newroot = $el;
+							}
 							$newchild = $el;
 						}
 					}
-				}
-				elseif ( $node->childNodes && $node->childNodes->length )
+				} elseif ( $node->childNodes && $node->childNodes->length ) {
 					$stack[] = array( $node, 0 );
-			}
-			else
-			{
-				if ( $node->nodeName == 'h' && $node->getAttribute( 'level' ) <= $foundlevel )
+				}
+			} else {
+				if ( $node->nodeName == 'h' && $node->getAttribute( 'level' ) <= $foundlevel ) {
 					break;
-				if ( !$content_started && $node->nodeType == XML_TEXT_NODE )
-				{
+				}
+				if ( !$content_started && $node->nodeType == XML_TEXT_NODE ) {
 					// left-trim included section
 					$v = ltrim( $node->nodeValue );
-					if ( !$v )
+					if ( !$v ) {
 						continue;
-					else
+					} else {
 						$newchild->appendChild( $newchild->ownerDocument->createTextNode( $v ) );
-				}
-				else
+					}
+				} else {
 					$newchild->appendChild( $node->cloneNode( true ) );
+				}
 				$content_started = true;
 			}
 		}
 		unset( $ptr );
-		if ( $newroot )
+		if ( $newroot ) {
 			$dom = new PPNode_DOM( $newroot );
+		}
 		return $dom;
 	}
 
