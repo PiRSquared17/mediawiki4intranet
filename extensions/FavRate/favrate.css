@@ -1,0 +1,45 @@
+/**
+ * MediaWiki FavRate extension
+ * Copyright © 2010-2012 Vitaliy Filippov
+ * License: LGPLv3 or later
+ * http://wiki.4intra.net/FavRate
+ */
+
+#p-favratebar { overflow: visible; }
+.skin-vector #p-favratebar { margin-right: 15px; }
+.favtoggle { width: 100%; position: relative; }
+.favstatus {
+    z-index: -1;
+    position: absolute;
+    padding: 0.5em;
+    background: white;
+    border: 1px solid gray;
+    visibility: hidden;
+    opacity: 0;
+}
+.favstatus.favvisible {
+    z-index: 10;
+    visibility: visible;
+    opacity: 1;
+    transition: opacity 150ms ease-out 0s;
+    -moz-transition: opacity 150ms ease-out 0s;
+    -o-transition: opacity 150ms ease-out 0s;
+    -webkit-transition: opacity 150ms ease-out 0s;
+}
+.favcomment { font-size: 100%; }
+.favcomment.favempty { color: #aaa; font-style: italic; }
+.favtogglebtn { cursor: pointer; position: absolute; top: -26px; right: 0; width: 16px; height: 16px; }
+.favbar { height: 7px; border: 1px outset gray; margin: 2px 0 0 0; width: 100%; background-color: gray; }
+img.fav1:hover, img.fav0 { background: url(asteriskgray.png) no-repeat; }
+img.fav1, img.fav0:hover { background: url(asterisk.png) no-repeat; }
+.skin-vector #favtogglebtn { top: -45px; }
+.favlinks { margin: 0; text-align: center; font-size: 90%; }
+.favlinks a { margin: 0.5em 0; }
+.wl-comment-action-fav1 a { color: #e0e; }
+.wl-comment-tools li.wl-comment-action-fav1:hover { background: #c0c; }
+.wl-comment-tools li.wl-comment-action-fav1:hover a { color: white; }
+.wl-comment-tools li.wl-comment-action-fav0:hover { background: #c0c; }
+.wl-comment-tools li.wl-comment-action-fav0:hover a { color: white; }
+@media screen {
+    .wl-comment-tools li.hasfav { display: inline; }
+}
