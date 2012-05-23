@@ -167,7 +167,7 @@ class MediaWiki {
 			if ( !$error ) {
 				$error = array( 'badtitle' );
 			}
-			throw new ErrorPageError( $error[0], new Message( $error[0].'text', $error[1] ) );
+			throw new ErrorPageError( $error[0], new Message( $error[0].'text', isset( $error[1] ) ? $error[1] : array() ) );
 		// If the user is not logged in, the Namespace:title of the article must be in
 		// the Read array in order for the user to see it. (We have to check here to
 		// catch special pages etc. We check again in Article::view())
