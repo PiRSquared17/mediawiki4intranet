@@ -1,0 +1,84 @@
+# HG changeset patch
+# User Vitaliy Filippov <vitalif@yourcmc.ru>
+# Date 1337941101 -14400
+Bug 98050 - Preserve key TTL in XXBagOStuff::incr()
+
+diff -r b6139b507754 -r 9a12ee36bce1 includes/objectcache/APCBagOStuff.php
+--- includes/objectcache/APCBagOStuff.php
++++ includes/objectcache/APCBagOStuff.php
+@@ -28,6 +28,10 @@
+ 		return true;
+ 	}
+ 
++	public function incr( $key, $value = 1 ) {
++		return apc_inc( $key, $value );
++	}
++
+ 	public function keys() {
+ 		$info = apc_cache_info( 'user' );
+ 		$list = $info['cache_list'];
+diff -r b6139b507754 -r 9a12ee36bce1 includes/objectcache/BagOStuff.php
+--- includes/objectcache/BagOStuff.php
++++ includes/objectcache/BagOStuff.php
+@@ -118,6 +118,7 @@
+ 	}
+ 
+ 	/**
++	 * Increase stored value of $key by $value while preserving its TTL (!)
+ 	 * @param $key String: Key to increase
+ 	 * @param $value Integer: Value to add to $key (Default 1)
+ 	 * @return null if lock is not possible else $key value increased by $value
+diff -r b6139b507754 -r 9a12ee36bce1 includes/objectcache/DBABagOStuff.php
+--- includes/objectcache/DBABagOStuff.php
++++ includes/objectcache/DBABagOStuff.php
+@@ -177,6 +177,33 @@
+ 		return $ret;
+ 	}
+ 
++	function incr( $key, $step = 1 ) {
++		wfProfileIn( __METHOD__ );
++
++		$handle = $this->getWriter();
++
++		if ( !$handle ) {
++			wfProfileOut( __METHOD__ );
++			return false;
++		}
++
++		list( $value, $expiry ) = $this->decode( dba_fetch( $key, $handle ) );
++		if ( $expiry < time() ) {
++			$value = 0;
++			$expiry = 0;
++		}
++		$value += $step;
++		$blob = $this->encode( $value, $expiry );
++
++		$ret = dba_replace( $key, $blob, $handle );
++
++		dba_close( $handle );
++
++		wfProfileOut( __METHOD__ );
++
++		return $value;
++	}
++
+ 	function keys() {
+ 		$reader = $this->getReader();
+ 		$k1 = dba_firstkey( $reader );
+diff -r b6139b507754 -r 9a12ee36bce1 includes/objectcache/XCacheBagOStuff.php
+--- includes/objectcache/XCacheBagOStuff.php
++++ includes/objectcache/XCacheBagOStuff.php
+@@ -47,5 +47,13 @@
+ 		xcache_unset( $key );
+ 		return true;
+ 	}
++
++	/**
++	 * Increase stored value of $key by $value while preserving its TTL (!)
++	 */
++	public function incr( $key, $value = 1 ) {
++		return xcache_inc( $key, $value );
++	}
++
+ }
+ 
