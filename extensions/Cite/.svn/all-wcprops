@@ -1,0 +1,65 @@
+K 25
+svn:wc:ra_dav:version-url
+V 65
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite
+END
+Cite_body.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/Cite_body.php
+END
+Cite.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/Cite.i18n.php
+END
+citeParserTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/citeParserTests.txt
+END
+Cite.php
+K 25
+svn:wc:ra_dav:version-url
+V 74
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/Cite.php
+END
+citeCatTreeParserTests.txt
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/citeCatTreeParserTests.txt
+END
+SpecialCite.php
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/SpecialCite.php
+END
+cite_text-ja
+K 25
+svn:wc:ra_dav:version-url
+V 78
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/cite_text-ja
+END
+SpecialCite_body.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/SpecialCite_body.php
+END
+SpecialCite.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/SpecialCite.i18n.php
+END
+SpecialCite.alias.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/Cite/SpecialCite.alias.php
+END
