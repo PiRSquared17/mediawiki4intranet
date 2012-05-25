@@ -47,5 +47,13 @@ class XCacheBagOStuff extends BagOStuff {
 		xcache_unset( $key );
 		return true;
 	}
+
+	/**
+	 * Increase stored value of $key by $value while preserving its TTL (!)
+	 */
+	public function incr( $key, $value = 1 ) {
+		return xcache_inc( $key, $value );
+	}
+
 }
 
