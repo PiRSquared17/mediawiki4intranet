@@ -28,6 +28,10 @@ class APCBagOStuff extends BagOStuff {
 		return true;
 	}
 
+	public function incr( $key, $value = 1 ) {
+		return apc_inc( $key, $value );
+	}
+
 	public function keys() {
 		$info = apc_cache_info( 'user' );
 		$list = $info['cache_list'];
