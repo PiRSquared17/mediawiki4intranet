@@ -383,7 +383,7 @@ abstract class UploadBase {
 		# restrictions. But skip the ZIP check for office documents which
 		# can contain both OOXML and binary data at once which will cause
 		# errors.
-		if ( !$wgAllowJavaUploads && !preg_match( '#^application\.(msword|vnd\.)#s', $mime ) ) {
+		if ( !$wgAllowJavaUploads && !preg_match( '#^application/(msword|vnd\.)#s', $mime ) ) {
 			$this->mJavaDetected = false;
 			$zipStatus = ZipDirectoryReader::read( $this->mTempPath,
 				array( $this, 'zipEntryCallback' ) );
