@@ -9,7 +9,7 @@ class APCBagOStuff extends BagOStuff {
 	public function get( $key ) {
 		$val = apc_fetch( $key );
 
-		if ( is_string( $val ) ) {
+		if ( !is_numeric( $val ) && is_string( $val ) ) {
 			$val = unserialize( $val );
 		}
 
@@ -17,7 +17,11 @@ class APCBagOStuff extends BagOStuff {
 	}
 
 	public function set( $key, $value, $exptime = 0 ) {
-		apc_store( $key, serialize( $value ), $exptime );
+		if ( !is_numeric( $value ) ) {
+			$value = serialize( $value );
+		}
+
+		apc_store( $key, $value, $exptime );
 
 		return true;
 	}
@@ -29,7 +33,7 @@ class APCBagOStuff extends BagOStuff {
 	}
 
 	public function incr( $key, $value = 1 ) {
-		return apc_inc( $key, $value );
+		return apc_inc( $key, $value, $success );
 	}
 
 	public function keys() {

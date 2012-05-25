@@ -16,7 +16,7 @@ class XCacheBagOStuff extends BagOStuff {
 	public function get( $key ) {
 		$val = xcache_get( $key );
 
-		if ( is_string( $val ) ) {
+		if ( !is_numeric( $val ) && is_string( $val ) ) {
 			$val = unserialize( $val );
 		}
 
@@ -32,7 +32,11 @@ class XCacheBagOStuff extends BagOStuff {
 	 * @return bool
 	 */
 	public function set( $key, $value, $expire = 0 ) {
-		xcache_set( $key, serialize( $value ), $expire );
+		if ( !is_numeric( $value ) ) {
+			$value = serialize( $value );
+		}
+
+		xcache_set( $key, $value, $expire );
 		return true;
 	}
 
