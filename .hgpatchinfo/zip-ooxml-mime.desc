@@ -1,0 +1,3 @@
+Bug 79501 - Determine OOXML types correctly, allow external mime magic for invalid zip files
+Bug 43343 - Add application/vnd.ms-office and application/vnd.visio MIME types for Visio
+Bug 100212 - Skip Java applet check for office document types
