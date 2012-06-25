@@ -35,6 +35,9 @@ class FakeUser {
 	function getName() {
 		return $this->name;
 	}
+	function isAllowed( $action = '' ) {
+		return false;
+	}
 }
 
 /**
