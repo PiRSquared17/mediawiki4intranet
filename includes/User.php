@@ -256,7 +256,9 @@ class User {
 				$this->loadDefaults();
 				break;
 			case 'name':
+				$hacl = haclfDisableTitlePatch();
 				$this->mId = self::idFromName( $this->mName );
+				haclfRestoreTitlePatch( $hacl );
 				if ( !$this->mId ) {
 					# Nonexistent user placeholder object
 					$this->loadDefaults( $this->mName );

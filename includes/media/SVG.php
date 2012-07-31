@@ -15,17 +15,19 @@ class SvgThumbnailImage extends ThumbnailImage {
 	}
 
 	static function scaleParam( $name, $value, $sw, $sh ) {
-		if ( $name == 'viewBox' ) {
-			$value = preg_split( '/\s+/', $value );
-			$value[0] *= $sw; $value[1] *= $sh;
-			$value[2] *= $sw; $value[3] *= $sh;
-			$value = implode( ' ', $value );
-		} elseif ( $name == 'width' ) {
-			$value *= $sw;
-		} else {
-			$value *= $sh;
+		// $name could be width, height or viewBox
+		$i = ( $name == 'height' ? 1 : 0 );
+		$mul = array( $sw, $sh );
+		preg_match_all( '/\d+(?:\.\d+)?/', $value, $nums, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE );
+		$r = '';
+		$p = 0;
+		foreach( $nums[0] as $num ) {
+			$r .= substr( $value, $p, $num[1]-$p );
+			$r .= $num[0] * $mul[($i++) & 1];
+			$p = $num[1] + strlen( $num[0] );
 		}
-		return "$name=\"$value\"";
+		$r .= substr( $value, $p );
+		return $name.'="'.$r.'"';
 	}
 
 	function toHtml( $options = array() ) {
