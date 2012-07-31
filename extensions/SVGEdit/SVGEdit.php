@@ -22,6 +22,7 @@ $wgExtensionMessagesFiles['SVGEdit'] =  dirname(__FILE__) . '/SVGEdit.i18n.php';
 
 $wgHooks['BeforePageDisplay'][] = 'SVGEditHooks::beforePageDisplay';
 $wgHooks['MakeGlobalVariablesScript'][] = 'SVGEditHooks::makeGlobalVariablesScript';
+$wgHooks['UploadForm:initial'][] = 'SVGEditHooks::uploadFormInitial';
 
 $wgAutoloadClasses['SVGEditHooks'] = dirname( __FILE__ ) . '/SVGEdit.hooks.php';
 
@@ -59,6 +60,7 @@ $wgResourceModules += array(
 		),
 		'messages' => array(
 			'svgedit-editbutton-edit',
+			'svgedit-editbutton-create',
 			'svgedit-edit-tab',
 			'svgedit-edit-tab-tooltip'
 		),
