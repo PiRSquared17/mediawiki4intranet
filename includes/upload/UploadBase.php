@@ -37,6 +37,7 @@ abstract class UploadBase {
 	const HOOK_ABORTED = 11;
 	const FILE_TOO_LARGE = 12;
 	const WINDOWS_NONASCII_FILENAME = 13;
+	const FILENAME_TOO_LONG = 14;
 
 	public function getVerificationErrorCode( $error ) {
 		$code_to_status = array(self::EMPTY_FILE => 'empty-file',
@@ -49,6 +50,7 @@ abstract class UploadBase {
 								self::VERIFICATION_ERROR => 'verification-error',
 								self::HOOK_ABORTED =>  'hookaborted',
 								self::WINDOWS_NONASCII_FILENAME => 'windows-nonascii-filename',
+								self::FILENAME_TOO_LONG => 'filename-toolong',
 		);
 		if( isset( $code_to_status[$error] ) ) {
 			return $code_to_status[$error];
@@ -380,8 +382,10 @@ abstract class UploadBase {
 		}
 
 		# Check for Java applets, which if uploaded can bypass cross-site
-		# restrictions.
-		if ( !$wgAllowJavaUploads ) {
+		# restrictions. But skip the ZIP check for office documents which
+		# can contain both OOXML and binary data at once which will cause
+		# errors.
+		if ( !$wgAllowJavaUploads && !preg_match( '#^application/(msword|vnd\.)#s', $mime ) ) {
 			$this->mJavaDetected = false;
 			$zipStatus = ZipDirectoryReader::read( $this->mTempPath,
 				array( $this, 'zipEntryCallback' ) );
@@ -405,7 +409,7 @@ abstract class UploadBase {
 
 		$handler = MediaHandler::getHandler( $mime );
 		if ( $handler ) {
-			$handlerStatus = $handler->verifyUpload( $this->mTempPath );
+			$handlerStatus = $handler->verifyUpload( $this->mTempPath, $this->mDestName, $this->mFileProps );
 			if ( !$handlerStatus->isOK() ) {
 				$errors = $handlerStatus->getErrorsArray();
 				return reset( $errors );
@@ -615,6 +619,13 @@ abstract class UploadBase {
 			$this->mFilteredName = $title->getDBkey();
 		} else {
 			$this->mFilteredName = $this->mDesiredDestName;
+		}
+
+		# oi_archive_name is max 255 bytes, which include a timestamp and an
+		# exclamation mark, so restrict file name to 240 bytes.
+		if ( strlen( $this->mFilteredName ) > 240 ) {
+			$this->mTitleError = self::FILENAME_TOO_LONG;
+			return $this->mTitle = null;
 		}
 
 		/**
@@ -877,7 +888,7 @@ abstract class UploadBase {
 	 * @return Boolean: true if the file contains something looking like embedded scripts
 	 */
 	public static function detectScript( $file, $mime, $extension ) {
-		global $wgAllowTitlesInSVG;
+		global $wgAllowTitlesInSVG, $wgForbiddenTagsInUploads;
 
 		# ugly hack: for text files, always look at the entire file.
 		# For binary field, just check the first K.
@@ -934,16 +945,18 @@ abstract class UploadBase {
 		 * Also returns true if Safari would mistake the given file for HTML
 		 * when served with a generic content-type.
 		 */
-		$tags = array(
-			'<a href',
-			'<body',
-			'<head',
-			'<html',   #also in safari
-			'<img',
-			'<pre',
-			'<script', #also in safari
-			'<table'
-		);
+		$tags = $wgForbiddenTagsInUploads;
+		if ( !$tags )
+			$tags = array(
+				'<a href',
+				'<body',
+				'<head',
+				'<html',   #also in safari
+				'<img',
+				'<pre',
+				'<script', #also in safari
+				'<table'
+			);
 
 		if( !$wgAllowTitlesInSVG && $extension !== 'svg' && $mime !== 'image/svg' ) {
 			$tags[] = '<title';

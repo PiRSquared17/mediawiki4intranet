@@ -83,6 +83,7 @@ class Title {
 	var $mRedirect = null;            // /< Is the article at this title a redirect?
 	var $mNotificationTimestamp = array(); // /< Associative array of user ID -> timestamp/false
 	var $mBacklinkCache = null;       // /< Cache of links to this title
+	var $mBadtitleError = null;       // /< Error which caused the invalid title
 	// @}
 
 
@@ -181,9 +182,10 @@ class Title {
 	 * the given title's length does not exceed the maximum.
 	 *
 	 * @param $url String the title, as might be taken from a URL
+	 * @param $return_bad boolean True to ignore errors and return invalid title
 	 * @return Title the new object, or NULL on an error
 	 */
-	public static function newFromURL( $url ) {
+	public static function newFromURL( $url, $return_bad = false ) {
 		global $wgLegalTitleChars;
 		$t = new Title();
 
@@ -199,6 +201,8 @@ class Title {
 // <IntraACL>
 			return $t->checkAccessControl();
 // </IntraACL>
+		} elseif ( $return_bad ) {
+			return $t;
 		} else {
 			return null;
 		}
@@ -1424,12 +1428,20 @@ class Title {
 	 * @return Array list of errors
 	 */
 	private function checkSpecialsAndNSPermissions( $action, $user, $errors, $doExpensiveQueries, $short ) {
+		/**
+		 * Do not deny all actions except 'createaccount' and 'execute'
+		 * on special pages, let them decide themselves.
+		 * -- vitalif@mail.ru 2011-04-03
+		 * <commented out>:
+		 *
 		# Only 'createaccount' and 'execute' can be performed on
 		# special pages, which don't actually exist in the DB.
 		$specialOKActions = array( 'createaccount', 'execute' );
 		if ( NS_SPECIAL == $this->mNamespace && !in_array( $action, $specialOKActions ) ) {
 			$errors[] = array( 'ns-specialprotected' );
 		}
+		 * </commented out>
+		 */
 
 		# Check $wgNamespaceProtection for restricted namespaces
 		if ( $this->isNamespaceProtected( $user ) ) {
@@ -2653,6 +2665,8 @@ class Title {
 	 */
 	private function secureAndSplit() {
 		global $wgContLang, $wgLocalInterwiki;
+		global $wgMaxTitleBytes;
+		$this->mBadtitleError = NULL;
 
 		# Initialisation
 		$this->mInterwiki = $this->mFragment = '';
@@ -2673,11 +2687,13 @@ class Title {
 		$dbkey = trim( $dbkey, '_' );
 
 		if ( $dbkey == '' ) {
+			$this->mBadtitleError = array( 'title-invalid-empty' );
 			return false;
 		}
 
 		if ( false !== strpos( $dbkey, UTF8_REPLACEMENT ) ) {
 			# Contained illegal UTF-8 sequences or forbidden Unicode chars.
+			$this->mBadtitleError = array( 'title-invalid-utf8', array( UTF8_REPLACEMENT ) );
 			return false;
 		}
 
@@ -2716,6 +2732,7 @@ class Title {
 					if ( !$firstPass ) {
 						# Can't make a local interwiki link to an interwiki link.
 						# That's just crazy!
+						$this->mBadtitleError = array( 'title-invalid-double-interwiki' );
 						return false;
 					}
 
@@ -2729,6 +2746,7 @@ class Title {
 					{
 						if ( $dbkey == '' ) {
 							# Can't have an empty self-link
+							$this->mBadtitleError = array( 'title-invalid-empty' );
 							return false;
 						}
 						$this->mInterwiki = '';
@@ -2765,7 +2783,11 @@ class Title {
 
 		# Reject illegal characters.
 		$rxTc = self::getTitleInvalidRegex();
-		if ( preg_match( $rxTc, $dbkey ) ) {
+		if( preg_match( $rxTc, $dbkey, $m, PREG_OFFSET_CAPTURE ) ) {
+			$marked = substr( $dbkey, 0, $m[0][1] ) . '--->' . $m[0][0] . '<---' . substr( $dbkey, $m[0][1] + strlen( $m[0][0] ) );
+			$this->mBadtitleError = array( 'title-invalid-characters',
+				array( $m[0][0], mb_strlen( substr( $dbkey, 0, $m[0][1] ) ), mb_strlen( $m[0][0] ), $marked )
+			);
 			return false;
 		}
 
@@ -2781,21 +2803,32 @@ class Title {
 			   substr( $dbkey, -2 ) == '/.' ||
 			   substr( $dbkey, -3 ) == '/..' ) )
 		{
+			$this->mBadtitleError = array( 'title-invalid-relative' );
 			return false;
 		}
 
 		# Magic tilde sequences? Nu-uh!
-		if ( strpos( $dbkey, '~~~' ) !== false ) {
+		if( ( $p = strpos( $dbkey, '~~~' ) ) !== false ) {
+			$this->mBadtitleError = array( 'title-invalid-magic-tilde', array( $p ) );
 			return false;
 		}
 
-		# Limit the size of titles to 255 bytes. This is typically the size of the
-		# underlying database field. We make an exception for special pages, which
-		# don't need to be stored in the database, and may edge over 255 bytes due
-		# to subpage syntax for long titles, e.g. [[Special:Block/Long name]]
-		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > 255 ) ||
-		  strlen( $dbkey ) > 512 )
-		{
+		/**
+		 * Limit the size of titles to $wgMaxTitleBytes bytes.
+		 * It is set to 255 by default - this is typically the size of the underlying database field.
+		 * We make an exception for special pages, which don't need to be stored
+		 * in the database, and may edge over this limit due to subpage syntax
+		 * for long titles, e.g. [[Special:Block/Long name]]
+		 *
+		 * Really, even in MySQL you can use VARBINARY(767) for page.page_title.
+		 * 767 is the maximum size for an index key in InnoDB.
+		 * So the limit is made configurable in MediaWiki4Intranet.
+		 */
+		if ( ( $this->mNamespace != NS_SPECIAL && strlen( $dbkey ) > ( $max = $wgMaxTitleBytes ) ) ||
+		  strlen( $dbkey ) > ( $max = $wgMaxTitleBytes*2 ) ) {
+			$chop = substr( $dbkey, 0, $max+1 );
+			$chop = mb_substr( $chop, 0, mb_strlen( $chop ) - 1 );
+			$this->mBadtitleError = array( 'title-invalid-too-long', array( $max, $chop ) );
 			return false;
 		}
 
@@ -2810,6 +2843,7 @@ class Title {
 		# Can't make a link to a namespace alone... "empty" local links can only be
 		# self-links with a fragment identifier.
 		if ( $dbkey == '' && $this->mInterwiki == '' && $this->mNamespace != NS_MAIN ) {
+			$this->mBadtitleError = array( 'title-invalid-empty' );
 			return false;
 		}
 
@@ -2825,6 +2859,7 @@ class Title {
 
 		// Any remaining initial :s are illegal.
 		if ( $dbkey !== '' && ':' == $dbkey { 0 } ) {
+			$this->mBadtitleError = array( 'title-invalid-leading-colon' );
 			return false;
 		}
 
