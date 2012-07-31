@@ -161,7 +161,10 @@ class SpecialFavRate extends IncludableSpecialPage
         $wgOut->setPageTitle(wfMsg('favrate-rating-title'));
         $rows = $this->getTopPages();
         if (!$rows)
+        {
             $wgOut->addWikiText(wfMsg('favrate-rating-empty'));
+            return;
+        }
         foreach ($rows as $row)
         {
             $title = Title::newFromRow($row);

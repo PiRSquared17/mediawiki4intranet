@@ -531,9 +531,9 @@ class WikilogItemFeed
 			'type' => $wgMimeType
 		);
 		if ( $wgWikilogEnableComments ) {
-			$cmtLink['thr:count'] = $row->wlp_num_comments;
-			if ( !is_null( $row->wlp_talk_updated ) ) {
-				$cmtLink['thr:updated'] = wfTimestamp( TS_ISO_8601, $row->wlp_talk_updated );
+			$cmtLink['thr:count'] = $row->wti_num_comments;
+			if ( isset( $row->wti_talk_updated ) ) {
+				$cmtLink['thr:updated'] = wfTimestamp( TS_ISO_8601, $row->wti_talk_updated );
 			}
 		}
 		$entry->addLinkRel( 'replies', $cmtLink );

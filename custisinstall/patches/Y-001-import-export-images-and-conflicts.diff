@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1336229385 -14400
+# Date 1340622325 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/AutoLoader.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -53,17 +53,7 @@
@@ -66,7 +66,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/AutoLoader.php
  
  	# includes/actions
  	'CreditsAction' => 'includes/actions/CreditsAction.php',
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/DefaultSettings.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -1354,6 +1354,12 @@
@@ -111,7 +111,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/DumpArchive.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -590,7 +590,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Export.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -30,12 +30,11 @@
@@ -1492,10 +1492,10 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Export.php
  
  function xmlsafe( $string ) {
  	wfProfileIn( __FUNCTION__ );
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
-@@ -24,6 +24,19 @@
+@@ -24,6 +24,22 @@
   * @ingroup SpecialPage
   */
  
@@ -1510,12 +1510,15 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
 +	function getName() {
 +		return $this->name;
 +	}
++	function isAllowed( $action = '' ) {
++		return false;
++	}
 +}
 +
  /**
   * XML file reader for the page data importer
   *
-@@ -35,28 +48,21 @@
+@@ -35,28 +51,21 @@
  	private $mLogItemCallback, $mUploadCallback, $mRevisionCallback, $mPageCallback;
  	private $mSiteInfoCallback, $mTargetNamespace, $mPageOutCallback;
  	private $mDebug;
@@ -1550,7 +1553,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  	}
  
  	private function throwXmlError( $err ) {
-@@ -468,10 +474,44 @@
+@@ -468,10 +477,44 @@
  		return $this->logItemCallback( $revision );
  	}
  
@@ -1596,7 +1599,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  
  		// Fields that can just be stuffed in the pageInfo object
  		$normalFields = array( 'title', 'id', 'redirect', 'restrictions' );
-@@ -501,6 +541,15 @@
+@@ -501,6 +544,15 @@
  					if ( !$title ) {
  						$badTitle = true;
  						$skip = true;
@@ -1612,7 +1615,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  					}
  
  					$this->pageCallback( $title );
-@@ -509,7 +558,12 @@
+@@ -509,7 +561,12 @@
  			} elseif ( $tag == 'revision' ) {
  				$this->handleRevision( $pageInfo );
  			} elseif ( $tag == 'upload' ) {
@@ -1626,7 +1629,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  			} elseif ( $tag != '#text' ) {
  				$this->warn( "Unhandled page XML tag $tag" );
  				$skip = true;
-@@ -552,9 +606,17 @@
+@@ -552,9 +609,17 @@
  		}
  
  		$pageInfo['revisionCount']++;
@@ -1646,7 +1649,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  	}
  
  	private function processRevision( $pageInfo, $revisionInfo ) {
-@@ -596,7 +658,7 @@
+@@ -596,7 +661,7 @@
  		$uploadInfo = array();
  
  		$normalFields = array( 'timestamp', 'comment', 'filename', 'text',
@@ -1655,7 +1658,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  
  		$skip = false;
  
-@@ -657,16 +719,15 @@
+@@ -657,16 +722,15 @@
  		$revision->setTimestamp( $uploadInfo['timestamp'] );
  		$revision->setText( $text );
  		$revision->setFilename( $uploadInfo['filename'] );
@@ -1678,7 +1681,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  		}
  		$revision->setSize( intval( $uploadInfo['size'] ) );
  		$revision->setComment( $uploadInfo['comment'] );
-@@ -725,93 +786,6 @@
+@@ -725,93 +789,6 @@
  	}
  }
  
@@ -1772,7 +1775,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  class XMLReader2 extends XMLReader {
  	function nodeContents() {
  		if( $this->isEmptyElement ) {
-@@ -852,7 +826,7 @@
+@@ -852,7 +829,7 @@
  	var $fileSrc = '';
  	var $sha1base36 = false;
  	var $isTemp = false;
@@ -1781,7 +1784,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  
  	function setTitle( $title ) {
  		if( is_object( $title ) ) {
-@@ -907,9 +881,6 @@
+@@ -907,9 +884,6 @@
  	function setFilename( $filename ) {
  		$this->filename = $filename;
  	}
@@ -1791,7 +1794,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  
  	function setSize( $size ) {
  		$this->size = intval( $size );
-@@ -963,10 +934,13 @@
+@@ -963,10 +937,13 @@
  	}
  	function getSha1() {
  		if ( $this->sha1base36 ) {
@@ -1806,7 +1809,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  	function getFileSrc() {
  		return $this->fileSrc;
  	}
-@@ -977,9 +951,6 @@
+@@ -977,9 +954,6 @@
  	function getFilename() {
  		return $this->filename;
  	}
@@ -1816,7 +1819,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  
  	function getSize() {
  		return $this->size;
-@@ -1009,7 +980,7 @@
+@@ -1009,7 +983,7 @@
  		} else {
  			$userId = 0;
  			$userText = $this->getUser();
@@ -1825,7 +1828,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  		}
  
  		// avoid memory leak...?
-@@ -1018,6 +989,7 @@
+@@ -1018,6 +992,7 @@
  
  		$article = new Article( $this->title );
  		$pageId = $article->getId();
@@ -1833,7 +1836,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  		if( $pageId == 0 ) {
  			# must create the page...
  			$pageId = $article->insertOn( $dbw );
-@@ -1026,18 +998,19 @@
+@@ -1026,18 +1001,19 @@
  		} else {
  			$created = false;
  
@@ -1856,7 +1859,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  			}
  			$oldcountable = $article->isCountable();
  		}
-@@ -1053,15 +1026,51 @@
+@@ -1053,15 +1029,51 @@
  			'timestamp'  => $this->timestamp,
  			'minor_edit' => $this->minor,
  			) );
@@ -1911,7 +1914,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  	}
  
  	function importLogItem() {
-@@ -1098,7 +1107,7 @@
+@@ -1098,7 +1110,7 @@
  			'log_action' => $this->action,
  			'log_timestamp' => $dbw->timestamp( $this->timestamp ),
  			'log_user' => User::idFromName( $this->user_text ),
@@ -1920,7 +1923,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  			'log_namespace' => $this->getTitle()->getNamespace(),
  			'log_title' => $this->getTitle()->getDBkey(),
  			'log_comment' => $this->getComment(),
-@@ -1109,21 +1118,28 @@
+@@ -1109,21 +1121,28 @@
  
  	function importUpload() {
  		# Construct a file
@@ -1961,7 +1964,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  		if( !$file ) {
  			wfDebug( __METHOD__ . ': Bad file for ' . $this->getTitle() . "\n" );
  			return false;
-@@ -1146,11 +1162,14 @@
+@@ -1146,11 +1165,14 @@
  				# Broken file; delete it if it is a temporary file
  				unlink( $source );
  			}
@@ -1977,7 +1980,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  		
  		# Do the actual upload
  		if ( $archiveName ) {
-@@ -1176,10 +1195,10 @@
+@@ -1176,10 +1198,10 @@
  			return false;
  		}
  
@@ -1991,7 +1994,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
  			return false;
  		}
  
-@@ -1189,130 +1208,14 @@
+@@ -1189,130 +1211,14 @@
  		if( !$data ) {
  			wfDebug( "IMPORT: couldn't fetch source $src\n" );
  			fclose( $f );
@@ -2124,7 +2127,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/Import.php
 -		}
 -	}
 -}
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/filerepo/LocalFile.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -1137,7 +1137,7 @@
@@ -2136,7 +2139,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/specials/SpecialExport.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,36 +1,32 @@
@@ -2925,7 +2928,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/specials/SpecialExport.php
 +		return $added;
 +	}
  }
-diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/specials/SpecialImport.php
+diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -24,6 +24,90 @@
@@ -3163,7 +3166,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6ada923f95d9 -r 0d9b2d6904bd languages/messages/MessagesEn.php
+diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3268,18 +3268,33 @@
@@ -3239,7 +3242,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 6ada923f95d9 -r 0d9b2d6904bd languages/messages/MessagesRu.php
+diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2740,18 +2740,33 @@
@@ -3312,7 +3315,7 @@ diff -r 6ada923f95d9 -r 0d9b2d6904bd languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6ada923f95d9 -r 0d9b2d6904bd skins/common/shared.css
+diff -r 6ada923f95d9 -r 68597169ef1c skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -857,3 +857,30 @@
