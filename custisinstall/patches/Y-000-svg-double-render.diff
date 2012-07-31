@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328110169 -14400
+# Date 1343757404 -14400
 Bug 80684 - SVG double-render
 Bug 63356 - SVGZ and generic XML-GZIP mime-types support
 
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/DefaultSettings.php
+diff -r b6139b507754 -r e152e3c8332c includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -871,6 +871,11 @@
@@ -19,7 +19,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/DefaultSettings.php
  /**
   * Limit images on image description pages to a user-selectable limit. In order
   * to reduce disk usage, limits can only be selected from a list.
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/MimeMagic.php
+diff -r b6139b507754 -r e152e3c8332c includes/MimeMagic.php
 --- includes/MimeMagic.php
 +++ includes/MimeMagic.php
 @@ -469,7 +469,7 @@
@@ -53,7 +53,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/MimeMagic.php
  			}
  		}
  
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/XmlTypeCheck.php
+diff -r b6139b507754 -r e152e3c8332c includes/XmlTypeCheck.php
 --- includes/XmlTypeCheck.php
 +++ includes/XmlTypeCheck.php
 @@ -20,6 +20,12 @@
@@ -88,7 +88,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/XmlTypeCheck.php
  		do {
  			$chunk = fread( $file, 32768 );
  			$ret = xml_parse( $parser, $chunk, feof( $file ) );
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/Generic.php
+diff -r b6139b507754 -r e152e3c8332c includes/media/Generic.php
 --- includes/media/Generic.php
 +++ includes/media/Generic.php
 @@ -460,7 +460,7 @@
@@ -100,10 +100,10 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/Generic.php
  		return Status::newGood();
  	}
  
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
+diff -r b6139b507754 -r e152e3c8332c includes/media/SVG.php
 --- includes/media/SVG.php
 +++ includes/media/SVG.php
-@@ -6,6 +6,177 @@
+@@ -6,6 +6,179 @@
   * @ingroup Media
   */
  
@@ -116,17 +116,19 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
 +	}
 +
 +	static function scaleParam( $name, $value, $sw, $sh ) {
-+		if ( $name == 'viewBox' ) {
-+			$value = preg_split( '/\s+/', $value );
-+			$value[0] *= $sw; $value[1] *= $sh;
-+			$value[2] *= $sw; $value[3] *= $sh;
-+			$value = implode( ' ', $value );
-+		} elseif ( $name == 'width' ) {
-+			$value *= $sw;
-+		} else {
-+			$value *= $sh;
++		// $name could be width, height or viewBox
++		$i = ( $name == 'height' ? 1 : 0 );
++		$mul = array( $sw, $sh );
++		preg_match_all( '/\d+(?:\.\d+)?/', $value, $nums, PREG_PATTERN_ORDER|PREG_OFFSET_CAPTURE );
++		$r = '';
++		$p = 0;
++		foreach( $nums[0] as $num ) {
++			$r .= substr( $value, $p, $num[1]-$p );
++			$r .= $num[0] * $mul[($i++) & 1];
++			$p = $num[1] + strlen( $num[0] );
 +		}
-+		return "$name=\"$value\"";
++		$r .= substr( $value, $p );
++		return $name.'="'.$r.'"';
 +	}
 +
 +	function toHtml( $options = array() ) {
@@ -281,7 +283,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
  /**
   * Handler for SVG images.
   *
-@@ -49,6 +220,18 @@
+@@ -49,6 +222,18 @@
  	}
  
  	/**
@@ -300,7 +302,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
  	 * @param $image File
  	 * @param  $params
  	 * @return bool
-@@ -96,7 +279,7 @@
+@@ -96,7 +281,7 @@
  		$srcPath = $image->getPath();
  
  		if ( $flags & self::TRANSFORM_LATER ) {
@@ -309,7 +311,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
  		}
  
  		if ( !wfMkdirParents( dirname( $dstPath ) ) ) {
-@@ -106,7 +289,7 @@
+@@ -106,7 +291,7 @@
  
  		$status = $this->rasterize( $srcPath, $dstPath, $physicalWidth, $physicalHeight );
  		if( $status === true ) {
@@ -318,7 +320,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVG.php
  		} else {
  			return $status; // MediaTransformError
  		}
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVGMetadataExtractor.php
+diff -r b6139b507754 -r e152e3c8332c includes/media/SVGMetadataExtractor.php
 --- includes/media/SVGMetadataExtractor.php
 +++ includes/media/SVGMetadataExtractor.php
 @@ -57,19 +57,28 @@
@@ -365,7 +367,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/media/SVGMetadataExtractor.php
  			if( count( $viewBox ) == 4 ) {
  				$viewWidth = $this->scaleSVGUnit( $viewBox[2] );
  				$viewHeight = $this->scaleSVGUnit( $viewBox[3] );
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/mime.types
+diff -r b6139b507754 -r e152e3c8332c includes/mime.types
 --- includes/mime.types
 +++ includes/mime.types
 @@ -83,7 +83,7 @@
@@ -377,7 +379,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/mime.types
  image/tiff tiff tif
  image/vnd.djvu djvu djv
  image/vnd.wap.wbmp wbmp
-diff -r 6b6371ec1416 -r 0e3da4f64269 includes/upload/UploadBase.php
+diff -r b6139b507754 -r e152e3c8332c includes/upload/UploadBase.php
 --- includes/upload/UploadBase.php
 +++ includes/upload/UploadBase.php
 @@ -405,7 +405,7 @@
@@ -389,7 +391,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 includes/upload/UploadBase.php
  			if ( !$handlerStatus->isOK() ) {
  				$errors = $handlerStatus->getErrorsArray();
  				return reset( $errors );
-diff -r 6b6371ec1416 -r 0e3da4f64269 languages/messages/MessagesEn.php
+diff -r b6139b507754 -r e152e3c8332c languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3636,6 +3636,7 @@
@@ -400,7 +402,7 @@ diff -r 6b6371ec1416 -r 0e3da4f64269 languages/messages/MessagesEn.php
  
  # Special:NewFiles
  'newimages'             => 'Gallery of new files',
-diff -r 6b6371ec1416 -r 0e3da4f64269 languages/messages/MessagesRu.php
+diff -r b6139b507754 -r e152e3c8332c languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -3025,6 +3025,7 @@
