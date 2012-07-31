@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 71
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache
+END
+HTMLCacheUpdate.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/HTMLCacheUpdate.php
+END
+MemcachedSessions.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/MemcachedSessions.php
+END
+LinkBatch.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/LinkBatch.php
+END
+LinkCache.php
+K 25
+svn:wc:ra_dav:version-url
+V 85
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/LinkCache.php
+END
+CacheDependency.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/CacheDependency.php
+END
+HTMLFileCache.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/HTMLFileCache.php
+END
+MessageCache.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/MessageCache.php
+END
+SquidUpdate.php
+K 25
+svn:wc:ra_dav:version-url
+V 87
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/includes/cache/SquidUpdate.php
+END
