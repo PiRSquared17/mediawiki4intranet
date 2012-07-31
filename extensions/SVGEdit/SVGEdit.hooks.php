@@ -29,11 +29,12 @@ class SVGEditHooks {
 				$modules[] = 'ext.svgedit.inline';
 			}
 		}
+		/* // Commented until WikiEditor will be installed on MediaWiki4Intranet
 		if ($wgRequest->getVal('action') == 'edit') {
 			if( $wgUser->isAllowed( 'upload' ) ) {
 				$modules[] = 'ext.svgedit.toolbar';
 			}
-		}
+		}*/
 		if ($modules) {
 			$out->addModules($modules);
 		}
@@ -64,6 +65,21 @@ class SVGEditHooks {
 	private static function trigger( $title ) {
 		return $title && $title->getNamespace() == NS_FILE &&
 			$title->userCan( 'edit' ) && $title->userCan( 'upload' );
+	}
+
+	/**
+	 * UploadForm:initial hook, suggests creating non-existing SVG files with SVGEdit
+	 */
+	public static function uploadFormInitial( $upload ) {
+		if ( strtolower( substr( $upload->mDesiredDestName, -4 ) ) == '.svg' ) {
+			$title = Title::newFromText( $upload->mDesiredDestName, NS_FILE );
+			if ( $title ) {
+				$upload->uploadFormTextTop .= wfMsgNoTrans(
+					'svgedit-suggest-create', $title->getFullUrl().'#!action=svgedit'
+				);
+			}
+		}
+		return true;
 	}
 
 }
