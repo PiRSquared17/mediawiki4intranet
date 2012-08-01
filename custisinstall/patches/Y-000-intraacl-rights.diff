@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1343747322 -14400
+# Date 1343802143 -14400
 Bug 63447 - (HaloACL extension part) patch for MediaWiki right support
 
-diff -r b6139b507754 -r 5d390976926c extensions/CategoryTree/CategoryTreeFunctions.php
+diff -r b6139b507754 -r dc45bce2c779 extensions/CategoryTree/CategoryTreeFunctions.php
 --- extensions/CategoryTree/CategoryTreeFunctions.php
 +++ extensions/CategoryTree/CategoryTreeFunctions.php
 @@ -301,7 +301,7 @@
@@ -47,7 +47,7 @@ diff -r b6139b507754 -r 5d390976926c extensions/CategoryTree/CategoryTreeFunctio
  
  			# $trans = $title->getLocalizedText();
  			$trans = ''; # place holder for when translated titles are available
-diff -r b6139b507754 -r 5d390976926c extensions/DeleteBatch/DeleteBatch.body.php
+diff -r b6139b507754 -r dc45bce2c779 extensions/DeleteBatch/DeleteBatch.body.php
 --- extensions/DeleteBatch/DeleteBatch.body.php
 +++ extensions/DeleteBatch/DeleteBatch.body.php
 @@ -285,6 +285,15 @@
@@ -83,7 +83,7 @@ diff -r b6139b507754 -r 5d390976926c extensions/DeleteBatch/DeleteBatch.body.php
  					$wgUser = $user;
  				}
  			}
-diff -r b6139b507754 -r 5d390976926c extensions/DeleteBatch/DeleteBatch.i18n.php
+diff -r b6139b507754 -r dc45bce2c779 extensions/DeleteBatch/DeleteBatch.i18n.php
 --- extensions/DeleteBatch/DeleteBatch.i18n.php
 +++ extensions/DeleteBatch/DeleteBatch.i18n.php
 @@ -30,6 +30,7 @@
@@ -94,7 +94,7 @@ diff -r b6139b507754 -r 5d390976926c extensions/DeleteBatch/DeleteBatch.i18n.php
  	'deletebatch-file-bad-format' => 'The file should be plain text',
  	'deletebatch-file-missing' => 'Unable to read given file',
  	'deletebatch-select-script' => 'Delete page script',
-diff -r b6139b507754 -r 5d390976926c includes/CategoryPage.php
+diff -r b6139b507754 -r dc45bce2c779 includes/CategoryPage.php
 --- includes/CategoryPage.php
 +++ includes/CategoryPage.php
 @@ -236,6 +236,11 @@
@@ -122,7 +122,7 @@ diff -r b6139b507754 -r 5d390976926c includes/CategoryPage.php
  		global $wgContLang;
  
  		$link = Linker::link( $title );
-diff -r b6139b507754 -r 5d390976926c includes/ChangesFeed.php
+diff -r b6139b507754 -r dc45bce2c779 includes/ChangesFeed.php
 --- includes/ChangesFeed.php
 +++ includes/ChangesFeed.php
 @@ -49,15 +49,16 @@
@@ -157,7 +157,7 @@ diff -r b6139b507754 -r 5d390976926c includes/ChangesFeed.php
  			$talkpage = MWNamespace::canTalk( $obj->rc_namespace ) ? $title->getTalkPage()->getFullUrl() : '';
  			// Skip items with deleted content (avoids partially complete/inconsistent output)
  			if( $obj->rc_deleted ) continue;
-diff -r b6139b507754 -r 5d390976926c includes/FeedUtils.php
+diff -r b6139b507754 -r dc45bce2c779 includes/FeedUtils.php
 --- includes/FeedUtils.php
 +++ includes/FeedUtils.php
 @@ -97,11 +97,8 @@
@@ -174,7 +174,7 @@ diff -r b6139b507754 -r 5d390976926c includes/FeedUtils.php
  
  		if( $title->getNamespace() >= 0 && !$accErrors && $newid ) {
  			if( $oldid ) {
-diff -r b6139b507754 -r 5d390976926c includes/LogEventsList.php
+diff -r b6139b507754 -r dc45bce2c779 includes/LogEventsList.php
 --- includes/LogEventsList.php
 +++ includes/LogEventsList.php
 @@ -316,6 +316,11 @@
@@ -189,7 +189,7 @@ diff -r b6139b507754 -r 5d390976926c includes/LogEventsList.php
  		// Log time
  		$time = $this->logTimestamp( $row );
  		// User links
-diff -r b6139b507754 -r 5d390976926c includes/OutputPage.php
+diff -r b6139b507754 -r dc45bce2c779 includes/OutputPage.php
 --- includes/OutputPage.php
 +++ includes/OutputPage.php
 @@ -2214,7 +2214,9 @@
@@ -203,7 +203,7 @@ diff -r b6139b507754 -r 5d390976926c includes/OutputPage.php
  			$titleObj = Title::newMainPage();
  		}
  
-diff -r b6139b507754 -r 5d390976926c includes/QueryPage.php
+diff -r b6139b507754 -r dc45bce2c779 includes/QueryPage.php
 --- includes/QueryPage.php
 +++ includes/QueryPage.php
 @@ -560,6 +560,12 @@
@@ -219,7 +219,7 @@ diff -r b6139b507754 -r 5d390976926c includes/QueryPage.php
  				$line = $this->formatResult( $skin, $row );
  				if ( $line ) {
  					$attr = ( isset( $row->usepatrol ) && $row->usepatrol && $row->patrolled == 0 )
-diff -r b6139b507754 -r 5d390976926c includes/Title.php
+diff -r b6139b507754 -r dc45bce2c779 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -103,7 +103,9 @@
@@ -392,20 +392,24 @@ diff -r b6139b507754 -r 5d390976926c includes/Title.php
 +// </IntraACL>
 +
  }
-diff -r b6139b507754 -r 5d390976926c includes/User.php
+diff -r b6139b507754 -r dc45bce2c779 includes/User.php
 --- includes/User.php
 +++ includes/User.php
-@@ -256,7 +256,9 @@
+@@ -256,7 +256,13 @@
  				$this->loadDefaults();
  				break;
  			case 'name':
-+				$hacl = haclfDisableTitlePatch();
++				if ( defined( 'HACL_HALOACL_VERSION' ) ) {
++					$hacl = haclfDisableTitlePatch();
++				}
  				$this->mId = self::idFromName( $this->mName );
-+				haclfRestoreTitlePatch( $hacl );
++				if ( defined( 'HACL_HALOACL_VERSION' ) ) {
++					haclfRestoreTitlePatch( $hacl );
++				}
  				if ( !$this->mId ) {
  					# Nonexistent user placeholder object
  					$this->loadDefaults( $this->mName );
-@@ -540,6 +542,12 @@
+@@ -540,6 +546,12 @@
  	public static function isValidUserName( $name ) {
  		global $wgContLang, $wgMaxNameChars;
  
@@ -418,7 +422,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  		if ( $name == ''
  		|| User::isIP( $name )
  		|| strpos( $name, '/' ) !== false
-@@ -547,6 +555,9 @@
+@@ -547,6 +559,9 @@
  		|| $name != $wgContLang->ucfirst( $name ) ) {
  			wfDebugLog( 'username', __METHOD__ .
  				": '$name' invalid due to empty, IP, slash, length, or lowercase" );
@@ -428,7 +432,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  			return false;
  		}
  
-@@ -558,6 +569,9 @@
+@@ -558,6 +573,9 @@
  			|| strcmp( $name, $parsed->getPrefixedText() ) ) {
  			wfDebugLog( 'username', __METHOD__ .
  				": '$name' invalid due to ambiguous prefixes" );
@@ -438,7 +442,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  			return false;
  		}
  
-@@ -574,9 +588,15 @@
+@@ -574,9 +592,15 @@
  		if( preg_match( $unicodeBlacklist, $name ) ) {
  			wfDebugLog( 'username', __METHOD__ .
  				": '$name' invalid due to blacklisted characters" );
@@ -454,7 +458,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  		return true;
  	}
  
-@@ -747,6 +767,14 @@
+@@ -747,6 +771,14 @@
  	 * @return bool|string
  	 */
  	public static function getCanonicalName( $name, $validate = 'valid' ) {
@@ -469,7 +473,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  		# Force usernames to capital
  		global $wgContLang;
  		$name = $wgContLang->ucfirst( $name );
-@@ -762,6 +790,9 @@
+@@ -762,6 +794,9 @@
  			Title::newFromText( $name ) : Title::makeTitle( NS_USER, $name );
  		# Check for invalid titles
  		if( is_null( $t ) ) {
@@ -479,7 +483,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  			return false;
  		}
  
-@@ -790,6 +821,9 @@
+@@ -790,6 +825,9 @@
  			default:
  				throw new MWException( 'Invalid parameter value for $validate in ' . __METHOD__ );
  		}
@@ -489,7 +493,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  		return $name;
  	}
  
-@@ -3311,7 +3345,13 @@
+@@ -3311,7 +3349,13 @@
  	 */
  	protected function getTokenUrl( $page, $token ) {
  		// Hack to bypass localization of 'Special:'
@@ -503,7 +507,7 @@ diff -r b6139b507754 -r 5d390976926c includes/User.php
  		return $title->getCanonicalUrl();
  	}
  
-diff -r b6139b507754 -r 5d390976926c includes/UserMailer.php
+diff -r b6139b507754 -r dc45bce2c779 includes/UserMailer.php
 --- includes/UserMailer.php
 +++ includes/UserMailer.php
 @@ -470,7 +470,12 @@
@@ -520,7 +524,7 @@ diff -r b6139b507754 -r 5d390976926c includes/UserMailer.php
  		}
  
  		$this->sendMails();
-diff -r b6139b507754 -r 5d390976926c includes/parser/Parser.php
+diff -r b6139b507754 -r dc45bce2c779 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3101,6 +3101,17 @@
@@ -541,7 +545,7 @@ diff -r b6139b507754 -r 5d390976926c includes/parser/Parser.php
  			if ( $title ) {
  				$titleText = $title->getPrefixedText();
  				# Check for language variants if the template is not found
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialAllpages.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialAllpages.php
 --- includes/specials/SpecialAllpages.php
 +++ includes/specials/SpecialAllpages.php
 @@ -336,6 +336,11 @@
@@ -556,7 +560,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialAllpages.php
  					if( $t ) {
  						$link = ( $s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->link( $t ) .
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialListredirects.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialListredirects.php
 --- includes/specials/SpecialListredirects.php
 +++ includes/specials/SpecialListredirects.php
 @@ -108,6 +108,11 @@
@@ -571,7 +575,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialListredirects.php
  			global $wgLang;
  			# Make a link to the destination page
  			$arr = $wgLang->getArrow() . $wgLang->getDirMark();
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialNewpages.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialNewpages.php
 --- includes/specials/SpecialNewpages.php
 +++ includes/specials/SpecialNewpages.php
 @@ -305,6 +305,11 @@
@@ -586,7 +590,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialNewpages.php
  		$time = Html::element( 'span', array( 'class' => 'mw-newpages-time' ),
  			$wgLang->timeAndDate( $result->rc_timestamp, true )
  		);
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialPrefixindex.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialPrefixindex.php
 --- includes/specials/SpecialPrefixindex.php
 +++ includes/specials/SpecialPrefixindex.php
 @@ -167,6 +167,11 @@
@@ -601,7 +605,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialPrefixindex.php
  					if( $t ) {
  						$link = ($s->page_is_redirect ? '<div class="allpagesredirect">' : '' ) .
  							$sk->linkKnown(
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialRandompage.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialRandompage.php
 --- includes/specials/SpecialRandompage.php
 +++ includes/specials/SpecialRandompage.php
 @@ -68,6 +68,10 @@
@@ -615,7 +619,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialRandompage.php
  		}
  
  		$redirectParam = $this->isRedirect() ? array( 'redirect' => 'no' ) : array();
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialRecentchanges.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialRecentchanges.php
 --- includes/specials/SpecialRecentchanges.php
 +++ includes/specials/SpecialRecentchanges.php
 @@ -482,10 +482,15 @@
@@ -635,7 +639,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialRecentchanges.php
  			$rc->counter = $counter++;
  			# Check if the page has been updated since the last visit
  			if( $wgShowUpdatedMarker && !empty( $obj->wl_notificationtimestamp ) ) {
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialSearch.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialSearch.php
 --- includes/specials/SpecialSearch.php
 +++ includes/specials/SpecialSearch.php
 @@ -480,7 +480,14 @@
@@ -654,7 +658,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialSearch.php
  		}
  		$out .= "</ul>\n";
  
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialUserlogin.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialUserlogin.php
 --- includes/specials/SpecialUserlogin.php
 +++ includes/specials/SpecialUserlogin.php
 @@ -826,7 +826,9 @@
@@ -668,7 +672,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialUserlogin.php
  				$titleObj = Title::newMainPage();
  			}
  			$redirectUrl = $titleObj->getFullURL( $this->mReturnToQuery );
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialWatchlist.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialWatchlist.php
 --- includes/specials/SpecialWatchlist.php
 +++ includes/specials/SpecialWatchlist.php
 @@ -388,6 +388,11 @@
@@ -683,7 +687,7 @@ diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialWatchlist.php
  			$rc->counter = $counter++;
  
  			if ( $wgShowUpdatedMarker ) {
-diff -r b6139b507754 -r 5d390976926c includes/specials/SpecialWhatlinkshere.php
+diff -r b6139b507754 -r dc45bce2c779 includes/specials/SpecialWhatlinkshere.php
 --- includes/specials/SpecialWhatlinkshere.php
 +++ includes/specials/SpecialWhatlinkshere.php
 @@ -246,6 +246,11 @@
