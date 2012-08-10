@@ -3954,7 +3954,7 @@ class Title {
 		}
 
 		list( $name, $lang ) = MessageCache::singleton()->figureMessage( $wgContLang->lcfirst( $this->getText() ) );
-		$message = wfMessage( $name )->inLanguage( $lang )->useDatabase( false );
+		$message = wfMessage( $name )->inLanguage( $lang );
 
 		if ( $message->exists() ) {
 			return $message->plain();
