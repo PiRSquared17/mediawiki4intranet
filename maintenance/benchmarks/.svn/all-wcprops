@@ -1,0 +1,47 @@
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks
+END
+benchmarkPurge.php
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/benchmarkPurge.php
+END
+bench_if_switch.php
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/bench_if_switch.php
+END
+bench_HTTP_HTTPS.php
+K 25
+svn:wc:ra_dav:version-url
+V 100
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/bench_HTTP_HTTPS.php
+END
+bench_strtr_str_replace.php
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/bench_strtr_str_replace.php
+END
+Benchmarker.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/Benchmarker.php
+END
+bench_wfIsWindows.php
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/bench_wfIsWindows.php
+END
+bench_delete_truncate.php
+K 25
+svn:wc:ra_dav:version-url
+V 105
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/benchmarks/bench_delete_truncate.php
+END

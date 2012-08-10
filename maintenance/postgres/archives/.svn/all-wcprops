@@ -1,0 +1,107 @@
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives
+END
+patch-msg_resource.sql
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-msg_resource.sql
+END
+patch-kill-iwl_prefix.sql
+K 25
+svn:wc:ra_dav:version-url
+V 112
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-kill-iwl_prefix.sql
+END
+patch-testrun.sql
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-testrun.sql
+END
+patch-page.sql
+K 25
+svn:wc:ra_dav:version-url
+V 101
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-page.sql
+END
+patch-rename-iwl_prefix.sql
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-rename-iwl_prefix.sql
+END
+patch-iwlinks.sql
+K 25
+svn:wc:ra_dav:version-url
+V 104
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-iwlinks.sql
+END
+patch-categorylinks-better-collation.sql
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-categorylinks-better-collation.sql
+END
+patch-user_former_groups.sql
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-user_former_groups.sql
+END
+patch-uploadstash.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-uploadstash.sql
+END
+patch-tag_summary.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-tag_summary.sql
+END
+patch-valid_tag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 106
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-valid_tag.sql
+END
+patch-update_sequences.sql
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-update_sequences.sql
+END
+patch-msg_resource_links.sql
+K 25
+svn:wc:ra_dav:version-url
+V 115
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-msg_resource_links.sql
+END
+patch-kill-iwl_pft.sql
+K 25
+svn:wc:ra_dav:version-url
+V 109
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-kill-iwl_pft.sql
+END
+patch-module_deps.sql
+K 25
+svn:wc:ra_dav:version-url
+V 108
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-module_deps.sql
+END
+patch-uploadstash_sequence.sql
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-uploadstash_sequence.sql
+END
+patch-change_tag.sql
+K 25
+svn:wc:ra_dav:version-url
+V 107
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/maintenance/postgres/archives/patch-change_tag.sql
+END
