@@ -1,10 +1,10 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1335962981 -14400
+# Date 1346427779 -14400
 Bug 77150 - Check refsNoReferences only when clearState == true
 Bug 98667 - Append <references /> automatically instead of croaking
 
-diff -r b6139b507754 -r 64b43f864056 extensions/Cite/Cite_body.php
+diff -r b6139b507754 -r 3640d7df6539 extensions/Cite/Cite_body.php
 --- extensions/Cite/Cite_body.php
 +++ extensions/Cite/Cite_body.php
 @@ -1051,12 +1051,12 @@
@@ -36,10 +36,29 @@ diff -r b6139b507754 -r 64b43f864056 extensions/Cite/Cite_body.php
  				$text .= $this->error( 'cite_error_group_refs_without_references', htmlspecialchars( $group ) );
  			}
  		}
-diff -r b6139b507754 -r 64b43f864056 includes/parser/Parser.php
+@@ -1102,7 +1102,8 @@
+ 		
+ 		if ( !Cite::$hooksInstalled ) {
+ 			$wgHooks['ParserClearState'][] = array( $parser->extCite, 'clearState' );
+-			$wgHooks['ParserBeforeTidy'][] = array( $parser->extCite, 'checkRefsNoReferences' );
++			/* mediawiki4intranet: new hook, simple hack for auto-adding <references /> */
++			$wgHooks['ParserAfterInternal'][] = array( $parser->extCite, 'checkRefsNoReferences' );
+ 			$wgHooks['InlineEditorPartialAfterParse'][] = array( $parser->extCite, 'checkAnyCalls' );
+ 			Cite::$hooksInstalled = true;
+ 		}
+diff -r b6139b507754 -r 3640d7df6539 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
-@@ -397,7 +397,7 @@
+@@ -339,6 +339,8 @@
+ 		wfRunHooks( 'ParserAfterStrip', array( &$this, &$text, &$this->mStripState ) );
+ 		$text = $this->internalParse( $text );
+ 
++		wfRunHooks( 'ParserAfterInternal', array( &$this, &$text, &$this->mStripState ) );
++
+ 		$text = $this->mStripState->unstripGeneral( $text );
+ 
+ 		# Clean up special characters, only run once, next-to-last before doBlockLevels
+@@ -397,7 +399,7 @@
  
  		$text = $this->mStripState->unstripNoWiki( $text );
  
@@ -48,7 +67,7 @@ diff -r b6139b507754 -r 64b43f864056 includes/parser/Parser.php
  
  		$text = $this->replaceTransparentTags( $text );
  		$text = $this->mStripState->unstripGeneral( $text );
-@@ -438,7 +438,7 @@
+@@ -438,7 +440,7 @@
  			$this->limitationWarn( 'expensive-parserfunction', $this->mExpensiveFunctionCount, $wgExpensiveParserFunctionLimit );
  		}
  
