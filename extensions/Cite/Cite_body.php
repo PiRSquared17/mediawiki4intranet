@@ -1051,12 +1051,12 @@ class Cite {
 	 *
 	 * @return bool
 	 */
-	function checkRefsNoReferences( &$parser, &$text ) {
+	function checkRefsNoReferences( &$parser, &$text, $clearState ) {
 		if ( $parser->extCite !== $this ) {
-			return $parser->extCite->checkRefsNoReferences( $parser, $text );
+			return $parser->extCite->checkRefsNoReferences( $parser, $text, $clearState );
 		}
 		
-		if ( $parser->getOptions()->getIsSectionPreview() ) {
+		if ( $parser->getOptions()->getIsSectionPreview() || !$clearState ) {
 			return true;
 		}
 
@@ -1064,10 +1064,10 @@ class Cite {
 			if ( count( $refs ) == 0 ) {
 				continue;
 			}
-			$text .= "\n<br />";
 			if ( $group == CITE_DEFAULT_GROUP ) {
-				$text .= $this->error( 'cite_error_refs_without_references' );
+				$text .= "<hr />\n" . $this->references( NULL, array(), $parser );
 			} else {
+				$text .= "\n<br />";
 				$text .= $this->error( 'cite_error_group_refs_without_references', htmlspecialchars( $group ) );
 			}
 		}
@@ -1102,7 +1102,8 @@ class Cite {
 		
 		if ( !Cite::$hooksInstalled ) {
 			$wgHooks['ParserClearState'][] = array( $parser->extCite, 'clearState' );
-			$wgHooks['ParserBeforeTidy'][] = array( $parser->extCite, 'checkRefsNoReferences' );
+			/* mediawiki4intranet: new hook, simple hack for auto-adding <references /> */
+			$wgHooks['ParserAfterInternal'][] = array( $parser->extCite, 'checkRefsNoReferences' );
 			$wgHooks['InlineEditorPartialAfterParse'][] = array( $parser->extCite, 'checkAnyCalls' );
 			Cite::$hooksInstalled = true;
 		}

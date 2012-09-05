@@ -50,7 +50,7 @@ function categoryTreeCollapseNode(cat, options, lnk) {
 
 function categoryTreeLoadNode(cat, options, lnk, div) {
 	div.style.display= 'block';
-	lnk.className= 'CategoryTreeLoaded';
+	lnk.className= 'CategoryTreeLoaded CategoryTreeClickable';
 	lnk.innerHTML= categoryTreeCollapseBulletMsg;
 	lnk.title= categoryTreeCollapseMsg;
 	lnk.onclick= function() { categoryTreeCollapseNode(cat, options, lnk) };
