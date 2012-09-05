@@ -1,0 +1,3 @@
+Depends on: Y-000-detailed-badtitle.diff
+
+Bug 90260 - Allow to raise page title length limit

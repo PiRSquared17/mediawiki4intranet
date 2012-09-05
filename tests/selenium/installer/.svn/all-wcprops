@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 81
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer
+END
+MediaWikiInstallationMessage.php
+K 25
+svn:wc:ra_dav:version-url
+V 114
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiInstallationMessage.php
+END
+MediaWikiErrorsNamepageTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 117
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiErrorsNamepageTestCase.php
+END
+MediaWikiInstallerTestSuite.php
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiInstallerTestSuite.php
+END
+MediaWikiErrorsConnectToDatabasePageTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 130
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiErrorsConnectToDatabasePageTestCase.php
+END
+MediaWikiOnAlreadyInstalledTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiOnAlreadyInstalledTestCase.php
+END
+MediaWikiHelpFieldHintTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiHelpFieldHintTestCase.php
+END
+MediaWikiInstallationCommonFunction.php
+K 25
+svn:wc:ra_dav:version-url
+V 121
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiInstallationCommonFunction.php
+END
+MediaWikiUpgradeExistingDatabaseTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 126
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiUpgradeExistingDatabaseTestCase.php
+END
+MediaWikiButtonsAvailabilityTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiButtonsAvailabilityTestCase.php
+END
+MediaWikiMySQLDataBaseTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiMySQLDataBaseTestCase.php
+END
+MediaWikiInstallationConfig.php
+K 25
+svn:wc:ra_dav:version-url
+V 113
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiInstallationConfig.php
+END
+MediaWikiRightFrameworkLinksTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiRightFrameworkLinksTestCase.php
+END
+MediaWikiMySQLiteDataBaseTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 119
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiMySQLiteDataBaseTestCase.php
+END
+MediaWikiInstallationVariables.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiInstallationVariables.php
+END
+MediaWikiUserInterfaceTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 116
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiUserInterfaceTestCase.php
+END
+MediaWikiDifferntDatabasePrefixTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 125
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiDifferntDatabasePrefixTestCase.php
+END
+README.txt
+K 25
+svn:wc:ra_dav:version-url
+V 92
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/README.txt
+END
+MediaWikiRestartInstallationTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 122
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiRestartInstallationTestCase.php
+END
+MediaWikiDifferentDatabaseAccountTestCase.php
+K 25
+svn:wc:ra_dav:version-url
+V 127
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/phase3/tests/selenium/installer/MediaWikiDifferentDatabaseAccountTestCase.php
+END
