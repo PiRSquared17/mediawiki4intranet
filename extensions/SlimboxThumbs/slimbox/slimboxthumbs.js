@@ -39,11 +39,13 @@ function makeSlimboxThumbs( $, pathRegexp, wgFullScriptPath ) {
 						}
 						h = wgFullScriptPath + '/thumb.php?f=' + escape( n ) + '&w=' + sc;
 					}
-					e.parentNode._lightbox = [
-						h, '<a href="'+e.parentNode.href+'">'+
-						n.replace( /_/g, ' ' )+'</a>'
-					];
-					nodes.push( e.parentNode );
+					if ( h != e.src ) {
+						e.parentNode._lightbox = [
+							h, '<a href="'+e.parentNode.href+'">'+
+							n.replace( /_/g, ' ' )+'</a>'
+						];
+						nodes.push( e.parentNode );
+					}
 				}
 			} );
 			$( nodes ).slimbox({ captionAnimationDuration: 0 }, function( e, i ) {

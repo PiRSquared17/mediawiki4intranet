@@ -53,7 +53,7 @@ function efSBTGetImageSizes( $names ) {
 		if ( $title && $title->userCanRead() ) {
 			$file = wfFindFile( $title );
 			if ( $file ) {
-				$result[ $name ] = array( $file->getWidth(), $file->getHeight(), $file->getUrl() );
+				$result[ $name ] = array( $file->getWidth(), $file->getHeight(), $file->getFullUrl() );
 			}
 		}
 	}
