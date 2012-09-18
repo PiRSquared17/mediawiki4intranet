@@ -162,7 +162,7 @@ class MediaWiki {
 			// Die now before we mess up $wgArticle and the skin stops working
 			throw new ErrorPageError( 'badtitle', 'badtitletext' );
 		// Show detailed errors for incorrect titles which have $mBadtitleError
-		} elseif ( $title->mBadtitleError ) {
+		} elseif ( !empty( $title->mBadtitleError ) ) {
 			$error = $title->mBadtitleError;
 			if ( !$error ) {
 				$error = array( 'badtitle' );
