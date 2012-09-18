@@ -18,6 +18,7 @@ function makeSlimboxThumbs( $, pathRegexp, wgFullScriptPath ) {
 		}
 	} );
 	if ( names.length ) {
+		sajax_request_type = 'POST';
 		sajax_do_call( 'efSBTGetImageSizes', [ names.join( ':' ) ], function( r ) {
 			var nodes = [];
 			var can;
