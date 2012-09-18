@@ -49,11 +49,13 @@ $wgAjaxExportList[] = 'efSBTGetImageSizes';
 function efSBTGetImageSizes( $names ) {
 	$result = array();
 	foreach ( explode( ':', $names ) as $name ) {
-		$title = Title::makeTitle( NS_FILE, $name );
-		if ( $title && $title->userCanRead() ) {
-			$file = wfFindFile( $title );
-			if ( $file ) {
-				$result[ $name ] = array( $file->getWidth(), $file->getHeight(), $file->getUrl() );
+		if ( !isset( $result[$name] ) ) {
+			$title = Title::makeTitle( NS_FILE, $name );
+			if ( $title && $title->userCanRead() ) {
+				$file = wfFindFile( $title );
+				if ( $file && $file->getWidth() ) {
+					$result[ $name ] = array( $file->getWidth(), $file->getHeight(), $file->getFullUrl() );
+				}
 			}
 		}
 	}
