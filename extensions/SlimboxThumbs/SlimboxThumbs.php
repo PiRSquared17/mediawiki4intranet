@@ -52,7 +52,7 @@ function efSBTGetImageSizes( $names ) {
 		$title = Title::makeTitle( NS_FILE, $name );
 		if ( $title && $title->userCanRead() ) {
 			$file = wfFindFile( $title );
-			if ( $file ) {
+			if ( $file && $file->getWidth() ) {
 				$result[ $name ] = array( $file->getWidth(), $file->getHeight(), $file->getFullUrl() );
 			}
 		}
