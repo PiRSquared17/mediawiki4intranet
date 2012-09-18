@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1336228722 -14400
+# Date 1346864402 -14400
 Bug 62054 -
   __CATEGORYSUBCATLIST__ and __NOCATEGORYSUBCATLIST__ magic words to
   enable/disable "tag-like" page grouping based on their other categories,
   __NOCATEGORYCOLUMNS__ magic word to disable 3-column lists in categories
 
-diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclass.php
+diff -r b6139b507754 -r 7545cf4862e3 extensions/CategoryTree/CategoryPageSubclass.php
 --- extensions/CategoryTree/CategoryPageSubclass.php
 +++ extensions/CategoryTree/CategoryPageSubclass.php
 @@ -49,4 +49,184 @@
@@ -57,7 +57,7 @@ diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclas
 +            $supercats = array();
 +            while ($row = $dbr->fetchRow($res))
 +            {
-+                if (!$sch[$row[0]])
++                if (!isset($sch[$row[0]]))
 +                {
 +                    $supercats[] = $row[0];
 +                    $sch[$row[0]] = true;
@@ -153,7 +153,7 @@ diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclas
 +        /* Count unsubcategorized articles */
 +        $count_undone = 0;
 +        for ($i = count($this->articles)-1; $i >= 0; $i--)
-+            if (!$done[$i])
++            if (!isset($done[$i]))
 +                $count_undone++;
 +        $cutoff = $wgMinUncatPagesAlphaList;
 +        if (!$cutoff || $cutoff < 0)
@@ -162,7 +162,7 @@ diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclas
 +           current category subtitle, else show normal alpha-list. */
 +        for ($i = count($this->articles)-1; $i >= 0; $i--)
 +        {
-+            if (!$done[$i])
++            if (!isset($done[$i]))
 +            {
 +                array_unshift($new, $this->articles[$i]);
 +                if ($count_undone > $cutoff)
@@ -194,7 +194,7 @@ diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryPageSubclas
 +        return $r;
 +    }
  }
-diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryTree.php
+diff -r b6139b507754 -r 7545cf4862e3 extensions/CategoryTree/CategoryTree.php
 --- extensions/CategoryTree/CategoryTree.php
 +++ extensions/CategoryTree/CategoryTree.php
 @@ -372,3 +372,36 @@
@@ -234,7 +234,7 @@ diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/CategoryTree.php
 +        $parser->mOutput->noCategoryColumns = TRUE;
 +    return true;
 +}
-diff -r b6139b507754 -r 17f33f9f9d04 extensions/CategoryTree/SubcatCat.i18n.php
+diff -r b6139b507754 -r 7545cf4862e3 extensions/CategoryTree/SubcatCat.i18n.php
 --- /dev/null
 +++ extensions/CategoryTree/SubcatCat.i18n.php
 @@ -0,0 +1,9 @@

@@ -68,12 +68,14 @@ var swfupload_lang = {" . join(", ", $vars) . "};
         $msg_name_prefix = wfMsg('swfupload-filename-prefix');
         $msg_select_file = wfMsg('swfupload-select-file');
         $msg_cancel = wfMsg('swfupload-cancelbtn');
+        $def_prefix = date('Y-m-d-');
+        $def_category = wfmsg('swfupload-def-category', date('Y-m-d'));
         $wgOut->addHTML(wfMsgExt('swfupload-page-text', 'parse'));
         $wgOut->addHTML(<<<EOF
 <table>
     <tr><td colspan="2">$msg_comment</td></tr>
-    <tr><td colspan="2"><textarea style="width:100%" onchange="upload1.addPostParam('wpUploadDescription', this.value)" cols="30" rows="3"></textarea></td></tr>
-    <tr><td>$msg_name_prefix</td><td><input type="text" style="width:100%" onchange="upload1.addPostParam('swfuploadNamePrefix', this.value)" value="" /></td></tr>
+    <tr><td colspan="2"><textarea style="width:100%" onchange="upload1.addPostParam('wpUploadDescription', this.value)" cols="30" rows="3">$def_category</textarea></td></tr>
+    <tr><td>$msg_name_prefix</td><td><input type="text" style="width:100%" onchange="upload1.addPostParam('swfuploadNamePrefix', this.value)" value="$def_prefix" /></td></tr>
     <tr><td colspan="2" align="right">$msg_select_file <span id="spanButtonPlaceholder1"></span> <input id="btnCancel1" type="button" value="$msg_cancel" onclick="upload1.cancelQueue();" disabled="disabled" style="width: 61px; margin: 0 0 0 2px; padding: 0; height: 22px; font-size: 8pt;" /></td></tr>
 </table>
 <div class="fieldset flash" id="fsUploadProgress1"></div>

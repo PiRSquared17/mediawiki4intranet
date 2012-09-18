@@ -1,9 +1,9 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1336229347 -14400
+# Date 1346864421 -14400
 Bug 64385 - Detailed "invalid title" diagnostics for MediaWiki
 
-diff -r eac88b619d9a -r 8f135a5a837c includes/Title.php
+diff -r dc45bce2c779 -r 17a9bff00164 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -83,6 +83,7 @@
@@ -132,7 +132,7 @@ diff -r eac88b619d9a -r 8f135a5a837c includes/Title.php
  			return false;
  		}
  
-diff -r eac88b619d9a -r 8f135a5a837c includes/Wiki.php
+diff -r dc45bce2c779 -r 17a9bff00164 includes/Wiki.php
 --- includes/Wiki.php
 +++ includes/Wiki.php
 @@ -77,7 +77,11 @@
@@ -153,7 +153,7 @@ diff -r eac88b619d9a -r 8f135a5a837c includes/Wiki.php
  			// Die now before we mess up $wgArticle and the skin stops working
  			throw new ErrorPageError( 'badtitle', 'badtitletext' );
 +		// Show detailed errors for incorrect titles which have $mBadtitleError
-+		} elseif ( $title->mBadtitleError ) {
++		} elseif ( !empty( $title->mBadtitleError ) ) {
 +			$error = $title->mBadtitleError;
 +			if ( !$error ) {
 +				$error = array( 'badtitle' );
@@ -162,7 +162,7 @@ diff -r eac88b619d9a -r 8f135a5a837c includes/Wiki.php
  		// If the user is not logged in, the Namespace:title of the article must be in
  		// the Read array in order for the user to see it. (We have to check here to
  		// catch special pages etc. We check again in Article::view())
-diff -r eac88b619d9a -r 8f135a5a837c languages/messages/MessagesEn.php
+diff -r dc45bce2c779 -r 17a9bff00164 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -946,6 +946,24 @@
@@ -190,7 +190,7 @@ diff -r eac88b619d9a -r 8f135a5a837c languages/messages/MessagesEn.php
  # General errors
  'error'                => 'Error',
  'databaseerror'        => 'Database error',
-diff -r eac88b619d9a -r 8f135a5a837c languages/messages/MessagesRu.php
+diff -r dc45bce2c779 -r 17a9bff00164 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -604,6 +604,24 @@
