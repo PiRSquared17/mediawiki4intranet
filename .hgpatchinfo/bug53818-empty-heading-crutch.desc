@@ -1,0 +1,7 @@
+Depends on: Y-000-shift-included-templates-heading-levels.diff
+
+Bug 53818 - A logical patch which removes empty headings from parser
+output instead of taking '==' as their text and all the remaining ='s
+as heading marker.
+
+Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>

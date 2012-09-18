@@ -1,0 +1,119 @@
+K 25
+svn:wc:ra_dav:version-url
+V 72
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit
+END
+ReCaptcha.php
+K 25
+svn:wc:ra_dav:version-url
+V 86
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ReCaptcha.php
+END
+ConfirmEdit.alias.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ConfirmEdit.alias.php
+END
+QuestyCaptcha.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/QuestyCaptcha.i18n.php
+END
+HTMLCaptchaField.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/HTMLCaptchaField.php
+END
+FancyCaptcha.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/FancyCaptcha.i18n.php
+END
+ConfirmEdit.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ConfirmEdit.php
+END
+Captcha.php
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/Captcha.php
+END
+README
+K 25
+svn:wc:ra_dav:version-url
+V 79
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/README
+END
+ConfirmEditHooks.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ConfirmEditHooks.php
+END
+ReCaptcha.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 91
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ReCaptcha.i18n.php
+END
+MathCaptcha.php
+K 25
+svn:wc:ra_dav:version-url
+V 88
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/MathCaptcha.php
+END
+QuestyCaptcha.php
+K 25
+svn:wc:ra_dav:version-url
+V 90
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/QuestyCaptcha.php
+END
+CaptchaStore.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/CaptchaStore.php
+END
+MathCaptcha.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 94
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/MathCaptcha.class.php
+END
+ConfirmEdit.i18n.php
+K 25
+svn:wc:ra_dav:version-url
+V 93
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/ConfirmEdit.i18n.php
+END
+recaptchalib.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/recaptchalib.php
+END
+QuestyCaptcha.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/QuestyCaptcha.class.php
+END
+FancyCaptcha.php
+K 25
+svn:wc:ra_dav:version-url
+V 89
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/FancyCaptcha.php
+END
+FancyCaptcha.class.php
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/svnroot/mediawiki/!svn/ver/108689/tags/REL1_18_1/extensions/ConfirmEdit/FancyCaptcha.class.php
+END
