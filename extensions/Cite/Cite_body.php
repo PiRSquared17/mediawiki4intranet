@@ -1102,7 +1102,8 @@ class Cite {
 		
 		if ( !Cite::$hooksInstalled ) {
 			$wgHooks['ParserClearState'][] = array( $parser->extCite, 'clearState' );
-			$wgHooks['ParserBeforeTidy'][] = array( $parser->extCite, 'checkRefsNoReferences' );
+			/* mediawiki4intranet: new hook, simple hack for auto-adding <references /> */
+			$wgHooks['ParserAfterInternal'][] = array( $parser->extCite, 'checkRefsNoReferences' );
 			$wgHooks['InlineEditorPartialAfterParse'][] = array( $parser->extCite, 'checkAnyCalls' );
 			Cite::$hooksInstalled = true;
 		}

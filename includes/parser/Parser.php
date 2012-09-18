@@ -340,6 +340,8 @@ class Parser {
 		wfRunHooks( 'ParserAfterStrip', array( &$this, &$text, &$this->mStripState ) );
 		$text = $this->internalParse( $text );
 
+		wfRunHooks( 'ParserAfterInternal', array( &$this, &$text, &$this->mStripState ) );
+
 		$text = $this->mStripState->unstripGeneral( $text );
 
 		# Clean up special characters, only run once, next-to-last before doBlockLevels

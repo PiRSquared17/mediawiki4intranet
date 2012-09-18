@@ -695,10 +695,13 @@ class XmlDumpWriter {
 		}
 
 		global $wgCanonicalNamespaceNames;
-		$prefix = str_replace( '_', ' ', $wgCanonicalNamespaceNames[ $title->getNamespace() ] );
-
-		if ($prefix !== '') {
-			$prefix .= ':';
+		if ( !$title->getNamespace() ) {
+			$prefix = '';
+		} else {
+			$prefix = str_replace( '_', ' ', $wgCanonicalNamespaceNames[ $title->getNamespace() ] );
+			if ( $prefix !== '' ) {
+				$prefix .= ':';
+			}
 		}
 
 		return $prefix . $title->getText();

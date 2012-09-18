@@ -93,7 +93,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
             $supercats = array();
             while ($row = $dbr->fetchRow($res))
             {
-                if (!$sch[$row[0]])
+                if (!isset($sch[$row[0]]))
                 {
                     $supercats[] = $row[0];
                     $sch[$row[0]] = true;
@@ -189,7 +189,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
         /* Count unsubcategorized articles */
         $count_undone = 0;
         for ($i = count($this->articles)-1; $i >= 0; $i--)
-            if (!$done[$i])
+            if (!isset($done[$i]))
                 $count_undone++;
         $cutoff = $wgMinUncatPagesAlphaList;
         if (!$cutoff || $cutoff < 0)
@@ -198,7 +198,7 @@ class CategoryTreeCategoryViewer extends CategoryViewer {
            current category subtitle, else show normal alpha-list. */
         for ($i = count($this->articles)-1; $i >= 0; $i--)
         {
-            if (!$done[$i])
+            if (!isset($done[$i]))
             {
                 array_unshift($new, $this->articles[$i]);
                 if ($count_undone > $cutoff)
