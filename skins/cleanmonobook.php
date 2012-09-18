@@ -94,8 +94,8 @@ class CleanmonobookTemplate extends QuickTemplate {
 <?php	}
 		if($this->data['trackbackhtml']) print $this->data['trackbackhtml']; ?>
 	</head>
-<body<?php if($this->data['body_ondblclick']) { ?> ondblclick="<?php $this->text('body_ondblclick') ?>"<?php } ?>
-<?php if($this->data['body_onload']) { ?> onload="<?php $this->text('body_onload') ?>"<?php } ?>
+<body<?php if(!empty($this->data['body_ondblclick'])) { ?> ondblclick="<?php $this->text('body_ondblclick') ?>"<?php } ?>
+<?php if(!empty($this->data['body_onload'])) { ?> onload="<?php $this->text('body_onload') ?>"<?php } ?>
  class="mediawiki <?php $this->text('dir') ?> <?php $this->text('pageclass') ?> <?php $this->text('skinnameclass') ?>">
 	<div id="globalWrapper">
 		<div id="column-content">
