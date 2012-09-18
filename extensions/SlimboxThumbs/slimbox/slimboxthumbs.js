@@ -11,7 +11,7 @@ function makeSlimboxThumbs( $, pathRegexp, wgFullScriptPath ) {
 	var names = [];
 	$( 'img' ).each( function( i, e ) {
 		if ( e.parentNode.nodeName == 'A' && ( m = re.exec( e.parentNode.href ) ) ) {
-			var n = unescape( m[1] );
+			var n = decodeURIComponent( m[1] );
 			names.push( n );
 		}
 	} );
@@ -25,7 +25,7 @@ function makeSlimboxThumbs( $, pathRegexp, wgFullScriptPath ) {
 			r = $.parseJSON( r.responseText );
 			$( 'img' ).each( function( i, e ) {
 				if ( e.parentNode.nodeName == 'A' && ( m = re.exec( e.parentNode.href ) ) ) {
-					var n = unescape( m[1] );
+					var n = decodeURIComponent( m[1] );
 					if ( !r[n] ) {
 						return;
 					}
@@ -37,7 +37,7 @@ function makeSlimboxThumbs( $, pathRegexp, wgFullScriptPath ) {
 						if ( sh < sc ) {
 							sc = sh;
 						}
-						h = wgFullScriptPath + '/thumb.php?f=' + escape( n ) + '&w=' + sc;
+						h = wgFullScriptPath + '/thumb.php?f=' + encodeURIComponent( n ) + '&w=' + sc;
 					}
 					if ( h != e.src ) {
 						e.parentNode._lightbox = [
