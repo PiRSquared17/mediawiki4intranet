@@ -1,6 +1,6 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1340622325 -14400
+# Date 1346864360 -14400
 Depends on: Y-000-translit-upload-filenames.diff
 
 Totally improved MediaWiki Import and Export engine with conflict detection,
@@ -18,7 +18,7 @@ https://bugzilla.wikimedia.org/show_bug.cgi?id=22881
 
 Signed-off-by: Vitaliy Filippov <vitalif@yourcmc.ru>
 
-diff -r 6ada923f95d9 -r 68597169ef1c includes/AutoLoader.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/AutoLoader.php
 --- includes/AutoLoader.php
 +++ includes/AutoLoader.php
 @@ -53,17 +53,7 @@
@@ -66,7 +66,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/AutoLoader.php
  
  	# includes/actions
  	'CreditsAction' => 'includes/actions/CreditsAction.php',
-diff -r 6ada923f95d9 -r 68597169ef1c includes/DefaultSettings.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/DefaultSettings.php
 --- includes/DefaultSettings.php
 +++ includes/DefaultSettings.php
 @@ -1354,6 +1354,12 @@
@@ -111,7 +111,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/DefaultSettings.php
   * Edits matching these regular expressions in body text
   * will be recognised as spam and rejected automatically.
   *
-diff -r 6ada923f95d9 -r 68597169ef1c includes/DumpArchive.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/DumpArchive.php
 --- /dev/null
 +++ includes/DumpArchive.php
 @@ -0,0 +1,475 @@
@@ -590,7 +590,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/DumpArchive.php
 +		return true;
 +	}
 +}
-diff -r 6ada923f95d9 -r 68597169ef1c includes/Export.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/Export.php
 --- includes/Export.php
 +++ includes/Export.php
 @@ -30,12 +30,11 @@
@@ -1018,18 +1018,26 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/Export.php
  	 * @param Title $title
  	 * @return string
  	 */
-@@ -686,8 +694,8 @@
+@@ -686,470 +694,23 @@
  			return $title->getPrefixedText();
  		}
  
 -		global $wgContLang;
 -		$prefix = str_replace( '_', ' ', $wgContLang->getNsText( $title->getNamespace() ) );
+-
+-		if ($prefix !== '') {
+-			$prefix .= ':';
 +		global $wgCanonicalNamespaceNames;
-+		$prefix = str_replace( '_', ' ', $wgCanonicalNamespaceNames[ $title->getNamespace() ] );
++		if ( !$title->getNamespace() ) {
++			$prefix = '';
++		} else {
++			$prefix = str_replace( '_', ' ', $wgCanonicalNamespaceNames[ $title->getNamespace() ] );
++			if ( $prefix !== '' ) {
++				$prefix .= ':';
++			}
+ 		}
  
- 		if ($prefix !== '') {
- 			$prefix .= ':';
-@@ -697,459 +705,9 @@
+ 		return $prefix . $title->getText();
  	}
  }
  
@@ -1492,7 +1500,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/Export.php
  
  function xmlsafe( $string ) {
  	wfProfileIn( __FUNCTION__ );
-diff -r 6ada923f95d9 -r 68597169ef1c includes/Import.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/Import.php
 --- includes/Import.php
 +++ includes/Import.php
 @@ -24,6 +24,22 @@
@@ -2127,7 +2135,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/Import.php
 -		}
 -	}
 -}
-diff -r 6ada923f95d9 -r 68597169ef1c includes/filerepo/LocalFile.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/filerepo/LocalFile.php
 --- includes/filerepo/LocalFile.php
 +++ includes/filerepo/LocalFile.php
 @@ -1137,7 +1137,7 @@
@@ -2139,7 +2147,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/filerepo/LocalFile.php
  		$archiveRel = 'archive/' . $this->getHashPath() . $archiveName;
  		$flags = $flags & File::DELETE_SOURCE ? LocalRepo::DELETE_SOURCE : 0;
  		$status = $this->repo->publish( $srcPath, $dstRel, $archiveRel, $flags );
-diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/specials/SpecialExport.php
 --- includes/specials/SpecialExport.php
 +++ includes/specials/SpecialExport.php
 @@ -1,36 +1,32 @@
@@ -2399,7 +2407,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
  		/* Ok, let's get to it... */
  		if( $history == WikiExporter::CURRENT ) {
  			$lb = false;
-@@ -285,102 +198,261 @@
+@@ -285,102 +198,264 @@
  			$lb = wfGetLBFactory()->newMainLB();
  			$db = $lb->getConnection( DB_SLAVE );
  			$buffer = WikiExporter::STREAM;
@@ -2472,6 +2480,9 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
 +	static function addPagesExec( &$state ) {
 +		// Split up and normalize input
 +		$pageSet = array();
++		if ( !isset( $state['pages'] ) ) {
++			$state['pages'] = '';
++		}
 +		foreach( explode( "\n", $state['pages'] ) as $pageName ) {
 +			$pageName = trim( $pageName );
 +			$title = Title::newFromText( $pageName );
@@ -2725,7 +2736,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
  	}
  
  	/**
-@@ -389,104 +461,122 @@
+@@ -389,104 +464,122 @@
  	 * @param $pageSet array, associative array indexed by titles for output
  	 * @return array associative array index by titles
  	 */
@@ -2928,7 +2939,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialExport.php
 +		return $added;
 +	}
  }
-diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialImport.php
+diff -r 6ada923f95d9 -r 830e3365f862 includes/specials/SpecialImport.php
 --- includes/specials/SpecialImport.php
 +++ includes/specials/SpecialImport.php
 @@ -24,6 +24,90 @@
@@ -3166,7 +3177,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c includes/specials/SpecialImport.php
  		}
  	}
  
-diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesEn.php
+diff -r 6ada923f95d9 -r 830e3365f862 languages/messages/MessagesEn.php
 --- languages/messages/MessagesEn.php
 +++ languages/messages/MessagesEn.php
 @@ -3268,18 +3268,33 @@
@@ -3242,7 +3253,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesEn.php
  'import-invalid-interwiki'   => 'Cannot import from the specified wiki.',
  
  # Import log
-diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesRu.php
+diff -r 6ada923f95d9 -r 830e3365f862 languages/messages/MessagesRu.php
 --- languages/messages/MessagesRu.php
 +++ languages/messages/MessagesRu.php
 @@ -2740,18 +2740,33 @@
@@ -3315,7 +3326,7 @@ diff -r 6ada923f95d9 -r 68597169ef1c languages/messages/MessagesRu.php
  'import-token-mismatch'      => 'Потеряны данные сеанса. Пожалуйста, попробуйте ещё раз.',
  'import-invalid-interwiki'   => 'Невозможно импортировать из указанной вики.',
  
-diff -r 6ada923f95d9 -r 68597169ef1c skins/common/shared.css
+diff -r 6ada923f95d9 -r 830e3365f862 skins/common/shared.css
 --- skins/common/shared.css
 +++ skins/common/shared.css
 @@ -857,3 +857,30 @@

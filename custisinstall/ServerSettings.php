@@ -46,3 +46,6 @@ $wgDiff3 = '/usr/bin/diff3';
 
 // Bug 82496 - enable scary (cross-wiki) transclusions
 $wgEnableScaryTranscluding = true;
+
+// Bug 107222 - TikaMW. TODO: enable also on Windows along with Sphinx
+require_once($IP.'/extensions/TikaMW/TikaMW.php');

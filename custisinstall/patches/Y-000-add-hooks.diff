@@ -1,12 +1,12 @@
 # HG changeset patch
 # User Vitaliy Filippov <vitalif@yourcmc.ru>
-# Date 1328268640 -14400
+# Date 1344604090 -14400
 Bug 63447, add hook for MediaWiki::preliminaryChecks()
 Bug 71769, add hook for overriding grouping values for enhanced recent changes view
 Bug 82496, change url limit from 255 to 4095 for scary transclusions
 Bug 93182, Add NormalizeMessageKey to wfMessage()
 
-diff -r 3ecacc7fdc93 -r f8c993add39d includes/ChangesList.php
+diff -r b6139b507754 -r 79cacab0e3d8 includes/ChangesList.php
 --- includes/ChangesList.php
 +++ includes/ChangesList.php
 @@ -783,6 +783,7 @@
@@ -17,18 +17,18 @@ diff -r 3ecacc7fdc93 -r f8c993add39d includes/ChangesList.php
  			if( !isset( $this->rc_cache[$secureName] ) ) {
  				$this->rc_cache[$secureName] = array();
  			}
-diff -r 3ecacc7fdc93 -r f8c993add39d includes/Message.php
+diff -r b6139b507754 -r 79cacab0e3d8 includes/Message.php
 --- includes/Message.php
 +++ includes/Message.php
 @@ -108,6 +108,7 @@
  	 */
  	public function __construct( $key, $params = array() ) {
  		global $wgLang;
-+		wfRunHooks( 'NormalizeMessageKey', array( &$key, &$useDB, &$langCode, &$transform ) );
++		wfRunHooks( 'NormalizeMessageKey', array( &$key, &$this->useDatabase, &$langCode, &$transform ) );
  		$this->key = $key;
  		$this->parameters = array_values( $params );
  		$this->language = $wgLang;
-diff -r 3ecacc7fdc93 -r f8c993add39d includes/Title.php
+diff -r b6139b507754 -r 79cacab0e3d8 includes/Title.php
 --- includes/Title.php
 +++ includes/Title.php
 @@ -1411,12 +1411,20 @@
@@ -52,7 +52,16 @@ diff -r 3ecacc7fdc93 -r f8c993add39d includes/Title.php
  
  		# Check $wgNamespaceProtection for restricted namespaces
  		if ( $this->isNamespaceProtected( $user ) ) {
-diff -r 3ecacc7fdc93 -r f8c993add39d includes/parser/Parser.php
+@@ -3946,7 +3954,7 @@
+ 		}
+ 
+ 		list( $name, $lang ) = MessageCache::singleton()->figureMessage( $wgContLang->lcfirst( $this->getText() ) );
+-		$message = wfMessage( $name )->inLanguage( $lang )->useDatabase( false );
++		$message = wfMessage( $name )->inLanguage( $lang );
+ 
+ 		if ( $message->exists() ) {
+ 			return $message->plain();
+diff -r b6139b507754 -r 79cacab0e3d8 includes/parser/Parser.php
 --- includes/parser/Parser.php
 +++ includes/parser/Parser.php
 @@ -3453,7 +3453,7 @@
@@ -64,7 +73,7 @@ diff -r 3ecacc7fdc93 -r f8c993add39d includes/parser/Parser.php
  			return wfMsgForContent( 'scarytranscludetoolong' );
  		}
  		return $this->fetchScaryTemplateMaybeFromCache( $url );
-diff -r 3ecacc7fdc93 -r f8c993add39d includes/specials/SpecialMovepage.php
+diff -r b6139b507754 -r 79cacab0e3d8 includes/specials/SpecialMovepage.php
 --- includes/specials/SpecialMovepage.php
 +++ includes/specials/SpecialMovepage.php
 @@ -231,7 +231,7 @@
