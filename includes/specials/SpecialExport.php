@@ -238,6 +238,9 @@ class SpecialExport extends SpecialPage {
 	static function addPagesExec( &$state ) {
 		// Split up and normalize input
 		$pageSet = array();
+		if ( !isset( $state['pages'] ) ) {
+			$state['pages'] = '';
+		}
 		foreach( explode( "\n", $state['pages'] ) as $pageName ) {
 			$pageName = trim( $pageName );
 			$title = Title::newFromText( $pageName );
