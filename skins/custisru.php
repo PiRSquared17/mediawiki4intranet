@@ -453,7 +453,7 @@ class CustisRuTemplate extends QuickTemplate {
     <tr>
      <td width="20" class="menu_partition_sep"><img alt="" height="1" width="5" src="<?=$sp?>/skins/custisru/spacer.gif"></td>
      <td width="100%" class="menu_normal_text">
-      <a class="m_uplink" <?= $val['href'] ? 'href="'.htmlspecialchars($val['href']).'"' : '' ?> <?= $val['id'] ? $this->skin->tooltipAndAccesskey($val['id']) : '' ?>><?= $val['html'] ? $val['html'] : htmlspecialchars($val['text']) ?></a>
+      <a class="m_uplink" <?= $val['href'] ? 'href="'.htmlspecialchars($val['href']).'"' : '' ?> <?= $val['id'] ? $this->skin->tooltipAndAccesskey($val['id']) : '' ?>><?= !empty($val['html']) ? $val['html'] : htmlspecialchars($val['text']) ?></a>
      </td>
     </tr>
     <tr>
